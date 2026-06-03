@@ -178,6 +178,7 @@ public sealed partial class PgParser
         // PARTITION OF parent … / OF type … — no column list; accept the remainder verbatim.
         if (c.AtAnyWord("SELECT", "VALUES")) throw new ParseException("expected AS before the query in CREATE TABLE AS", c.Here);
         var rest = c.AtEnd ? null : CaptureRest(c);
+        ValidateTableTail(rest, persistence, pos);
         return new CreateTableStatement
         { Position = pos, Schema = schema, Name = name, IfNotExists = ifNotExists, Persistence = persistence, IsPartitionOrTyped = true, TrailingText = rest };
     }
@@ -190,8 +191,27 @@ public sealed partial class PgParser
         List<Token> toks;
         try { toks = OperatorLexer.Merge(Tokenizer.Tokenize(tail)); } catch { return; }
         var t = new TokenCursor(toks);
+        bool hasPartitionBy = false, hasInherits = false, hasOf = false, hasTablespace = false;
+
+        void EmptyParensError(string what) { if (t.AtSymbol('(') && t.Peek()?.IsSymbol(')') == true) throw new ParseException($"{what} cannot be empty", here); }
+
         while (!t.AtEnd)
         {
+            if (t.MatchWords("PARTITION", "OF")) { continue; }           // partition child — not a PARTITION BY
+            if (t.MatchWords("PARTITION", "BY"))
+            {
+                hasPartitionBy = true;
+                if (!t.AtAnyWord("RANGE", "LIST", "HASH")) throw new ParseException("PARTITION BY requires RANGE, LIST or HASH", here);
+                t.Advance();
+                EmptyParensError("partition key");
+                continue;
+            }
+            if (t.MatchWords("FOR", "VALUES"))
+            {
+                if (t.MatchWord("IN")) EmptyParensError("partition value list");
+                else if (t.MatchWord("FROM")) { EmptyParensError("FROM bound"); SkipBalanced(t); if (t.MatchWord("TO")) EmptyParensError("TO bound"); }
+                continue;
+            }
             if (t.MatchWords("ON", "COMMIT"))
             {
                 if (persistence != "TEMP") throw new ParseException("ON COMMIT can only be used on a temporary table", here);
@@ -199,18 +219,27 @@ public sealed partial class PgParser
                     throw new ParseException("ON COMMIT must be DROP, DELETE ROWS or PRESERVE ROWS", here);
                 continue;
             }
-            if (t.MatchWord("INHERITS"))
-            {
-                if (t.AtSymbol('(') && t.Peek()?.IsSymbol(')') == true) throw new ParseException("INHERITS requires at least one parent table", here);
-                continue;
-            }
-            if (t.MatchWord("WITH") && t.AtSymbol('(') && t.Peek()?.IsSymbol(')') == true)
-                throw new ParseException("storage parameter list cannot be empty", here);
+            if (t.MatchWord("INHERITS")) { hasInherits = true; EmptyParensError("INHERITS parent list"); continue; }
+            if (t.MatchWord("TABLESPACE")) { hasTablespace = true; continue; }
+            if (t.MatchWord("OF")) { hasOf = true; continue; }
+            if (t.MatchWord("WITH") && t.AtSymbol('(')) { EmptyParensError("storage parameter list"); continue; }
             if (t.MatchWord("fillfactor") && t.MatchOperator("=") && t.Current is { Kind: TokenKind.Number } n
                 && long.TryParse(n.Value, out var ff) && (ff < 10 || ff > 100))
                 throw new ParseException($"fillfactor must be between 10 and 100, got {ff}", here);
             if (!t.AtEnd) t.Advance();
         }
+
+        // cross-clause combinations PostgreSQL forbids
+        if (persistence == "UNLOGGED" && hasPartitionBy) throw new ParseException("partitioned tables cannot be UNLOGGED", here);
+        if (hasInherits && hasPartitionBy) throw new ParseException("cannot create a partitioned table that also INHERITS", here);
+        if (hasOf && hasInherits) throw new ParseException("a typed table (OF) cannot use INHERITS", here);
+    }
+
+    private static void SkipBalanced(TokenCursor t)
+    {
+        if (!t.AtSymbol('(')) return;
+        int depth = 0;
+        do { if (t.AtSymbol('(')) depth++; else if (t.AtSymbol(')')) depth--; t.Advance(); } while (!t.AtEnd && depth > 0);
     }
 
     private CreateTableAsStatement ParseCreateTableAs(TokenCursor c, string? schema, string name, bool ifNotExists, List<string> aliases)

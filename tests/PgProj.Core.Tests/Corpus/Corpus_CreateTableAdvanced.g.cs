@@ -21,9 +21,9 @@ public class Corpus_CreateTableAdvanced
     public void ctaa0007() => CorpusAssert.Parses(@"CREATE TABLE s.ctaa_hash2 (id bigint, a int, b text) PARTITION BY HASH (a, b)", "ok");
     [Fact]
     public void ctaa0008() => CorpusAssert.Parses(@"CREATE TABLE s.ctaa_rangeexpr (id bigint, val numeric) PARTITION BY RANGE ((val * 2))", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ctaa0009() => CorpusAssert.Parses(@"CREATE TABLE s.ctaa_bad_part PARTITION BY", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ctaa0010() => CorpusAssert.Parses(@"CREATE TABLE s.ctaa_bad_part2 (id int) PARTITION BY RANGE ()", "error");
     [Fact]
     public void ctaa0011() => CorpusAssert.Parses(@"CREATE TABLE s.ctaa_part_of1 PARTITION OF s.events FOR VALUES FROM ('2025-01-01') TO ('2026-01-01')", "ok");
@@ -139,7 +139,7 @@ CREATE TABLE s.ctaa_bad_rem_p PARTITION OF s.ctaa_bad_remainder FOR VALUES WITH 
     public void ctaa0063() => CorpusAssert.Parses(@"CREATE UNLOGGED TABLE s.ctaa_unlog1 (id int, val text)", "ok");
     [Fact]
     public void ctaa0064() => CorpusAssert.Parses(@"CREATE UNLOGGED TABLE s.ctaa_unlog2 (id int) WITH (fillfactor = 90)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ctaa0065() => CorpusAssert.Parses(@"CREATE UNLOGGED TABLE s.ctaa_unlog3 (id int, val text) PARTITION BY LIST (val)", "error");
     [Fact]
     public void ctaa0066() => CorpusAssert.Parses(@"CREATE TEMP TABLE ctaa_temp1 (id int, val text)", "ok");
@@ -202,9 +202,9 @@ CREATE TABLE s.ctaa_range_multi_p PARTITION OF s.ctaa_range_multi FOR VALUES FRO
     [Fact]
     public void ctaa0091() => CorpusAssert.Parses(@"CREATE TABLE s.ctaa_range_multi2 (a int, b int) PARTITION BY RANGE (a, b);
 CREATE TABLE s.ctaa_range_multi2_p PARTITION OF s.ctaa_range_multi2 FOR VALUES FROM (MINVALUE, MINVALUE) TO (MAXVALUE, MAXVALUE)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ctaa0092() => CorpusAssert.Parses(@"CREATE TABLE s.ctaa_bad_range_to PARTITION OF s.events FOR VALUES FROM ('2033-01-01') TO ()", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ctaa0093() => CorpusAssert.Parses(@"CREATE TABLE s.ctaa_bad_range_from PARTITION OF s.events FOR VALUES FROM () TO ('2034-01-01')", "error");
     [Fact]
     public void ctaa0094() => CorpusAssert.Parses(@"CREATE TABLE s.ctaa_part_with_idx PARTITION OF s.events FOR VALUES FROM ('2034-01-01') TO ('2035-01-01');
@@ -215,11 +215,11 @@ CREATE INDEX ON s.ctaa_part_with_idx (payload)", "ok");
     public void ctaa0096() => CorpusAssert.Parses(@"CREATE TABLE s.ctaa_like_view (LIKE s.v)", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void ctaa0097() => CorpusAssert.Parses(@"CREATE TABLE s.ctaa_unlog_part (id int, region text) UNLOGGED PARTITION BY LIST (region)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ctaa0098() => CorpusAssert.Parses(@"CREATE UNLOGGED TABLE s.ctaa_unlog_part2 (id int, region text) PARTITION BY LIST (region)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ctaa0099() => CorpusAssert.Parses(@"CREATE TABLE s.ctaa_inh_part () INHERITS (s.parent) PARTITION BY LIST (kind)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ctaa0100() => CorpusAssert.Parses(@"CREATE TABLE s.ctaa_of_inh OF s.addr INHERITS (s.parent)", "error");
     [Fact]
     public void ctaa0101() => CorpusAssert.Parses(@"CREATE TABLE s.ctaa_of_part OF s.addr PARTITION BY LIST (city)", "ok");
@@ -347,7 +347,7 @@ CREATE TABLE s.ctaa_hash_zero_mod_p PARTITION OF s.ctaa_hash_zero_mod FOR VALUES
     [Fact(Skip = "pending: parser not yet complete")]
     public void ctaa0148() => CorpusAssert.Parses(@"CREATE TABLE s.ctaa_hash_neg_rem (id int) PARTITION BY HASH (id);
 CREATE TABLE s.ctaa_hash_neg_rem_p PARTITION OF s.ctaa_hash_neg_rem FOR VALUES WITH (modulus 4, remainder -1)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ctaa0149() => CorpusAssert.Parses(@"CREATE TABLE s.ctaa_list_empty_in (code text) PARTITION BY LIST (code);
 CREATE TABLE s.ctaa_list_empty_in_p PARTITION OF s.ctaa_list_empty_in FOR VALUES IN ()", "error");
     [Fact]
@@ -508,7 +508,7 @@ CREATE TABLE s.ctab_def2_other PARTITION OF s.ctab_def2 DEFAULT", "ok");
     public void ctab0045() => CorpusAssert.Parses(@"CREATE UNLOGGED TABLE s.ctab_unlog1 (id int, name text)", "ok");
     [Fact]
     public void ctab0046() => CorpusAssert.Parses(@"CREATE UNLOGGED TABLE s.ctab_unlog2 (id int PRIMARY KEY, val numeric)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ctab0047() => CorpusAssert.Parses(@"CREATE UNLOGGED TABLE s.ctab_unlog3 (id int) PARTITION BY RANGE (id)", "error");
     [Fact]
     public void ctab0048() => CorpusAssert.Parses(@"CREATE TEMP TABLE ctab_tmp1 (id int, val text)", "ok");
@@ -571,9 +571,9 @@ CREATE TABLE s.ctab_partcol2_us PARTITION OF s.ctab_partcol2 (region WITH OPTION
     public void ctab0071() => CorpusAssert.Parses(@"CREATE TABLE (id int)", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void ctab0072() => CorpusAssert.Parses(@"CREATE TABLE s.ctab_e1 PARTITION BY RANGE (id)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ctab0073() => CorpusAssert.Parses(@"CREATE TABLE s.ctab_e2 (id int) PARTITION BY RANGE ()", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ctab0074() => CorpusAssert.Parses(@"CREATE TABLE s.ctab_e3 (id int) PARTITION BY BOGUS (id)", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void ctab0075() => CorpusAssert.Parses(@"CREATE TABLE s.ctab_e4 (id int, d date NOT NULL, PRIMARY KEY (id, d)) PARTITION BY RANGE (d);
@@ -596,7 +596,7 @@ CREATE TABLE s.ctab_e9_p1 PARTITION OF s.ctab_e9 FOR VALUES WITH (REMAINDER 0)",
     [Fact(Skip = "pending: parser not yet complete")]
     public void ctab0081() => CorpusAssert.Parses(@"CREATE TABLE s.ctab_e10 (id int NOT NULL) PARTITION BY HASH (id);
 CREATE TABLE s.ctab_e10_p1 PARTITION OF s.ctab_e10 FOR VALUES WITH (MODULUS 4)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ctab0082() => CorpusAssert.Parses(@"CREATE UNLOGGED TABLE s.ctab_e11 (id int) PARTITION BY RANGE (id);
 CREATE TABLE s.ctab_e11_p1 PARTITION OF s.ctab_e11 FOR VALUES FROM (0) TO (100)", "error");
     [Fact]
@@ -621,11 +621,11 @@ CREATE TABLE s.ctab_partof_child () INHERITS (s.ctab_partof_inh_p)", "error");
 CREATE TABLE s.ctab_partcol3_p PARTITION OF s.ctab_partcol3 (extra_col text) FOR VALUES FROM ('2024-01-01') TO ('2025-01-01')", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void ctab0091() => CorpusAssert.Parses(@"CREATE TABLE s.ctab_ofbad OF s.mood", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ctab0092() => CorpusAssert.Parses(@"CREATE TABLE s.ctab_of_and_inh OF s.addr () INHERITS (s.parent)", "error");
     [Fact]
     public void ctab0093() => CorpusAssert.Parses(@"CREATE TABLE s.ctab_of_and_part OF s.addr PARTITION BY HASH (street)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ctab0094() => CorpusAssert.Parses(@"CREATE TABLE s.ctab_part_and_inh (id int, d date NOT NULL, PRIMARY KEY (id, d)) PARTITION BY RANGE (d) INHERITS (s.parent)", "error");
     [Fact]
     public void ctab0095() => CorpusAssert.Parses(@"CREATE TABLE s.ctab_rng_multi (a int, b int, c int) PARTITION BY RANGE (a, b);
@@ -1012,7 +1012,7 @@ CREATE TABLE ctac_list_mc2_ab PARTITION OF ctac_list_mc2 FOR VALUES IN ('a', 'b'
     public void ctac0074() => CorpusAssert.Parses(@"CREATE TABLE ctac_range_expr (id int, d date) PARTITION BY RANGE (date_trunc('month', d))", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void ctac0075() => CorpusAssert.Parses(@"CREATE TABLE ctac_hash_expr (id int NOT NULL) PARTITION BY HASH (id % 10)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ctac0076() => CorpusAssert.Parses(@"CREATE UNLOGGED TABLE ctac_partitioned_unlogged (id int NOT NULL) PARTITION BY HASH (id)", "error");
     [Fact]
     public void ctac0077() => CorpusAssert.Parses(@"CREATE TABLE ctac_partitioned_temp (id int NOT NULL) PARTITION BY HASH (id)", "ok");
@@ -1035,11 +1035,11 @@ CREATE TABLE ctac_list_range_bad_p1 PARTITION OF ctac_list_range_bad FOR VALUES 
     [Fact(Skip = "pending: parser not yet complete")]
     public void ctac0084() => CorpusAssert.Parses(@"CREATE TABLE ctac_list_hash_bad (id int NOT NULL) PARTITION BY LIST (id);
 CREATE TABLE ctac_list_hash_bad_p1 PARTITION OF ctac_list_hash_bad FOR VALUES WITH (MODULUS 2, REMAINDER 0)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ctac0085() => CorpusAssert.Parses(@"CREATE TABLE ctac_syntax_part_bad PARTITION BY", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void ctac0086() => CorpusAssert.Parses(@"CREATE TABLE ctac_like_incl_bad (LIKE s.t INCLUDING BADOPTION)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ctac0087() => CorpusAssert.Parses(@"CREATE UNLOGGED TABLE ctac_unlogged_part (id int NOT NULL) PARTITION BY HASH (id);
 CREATE TABLE ctac_unlogged_child PARTITION OF ctac_unlogged_part FOR VALUES WITH (MODULUS 2, REMAINDER 0)", "error");
     [Fact(Skip = "pending: parser not yet complete")]
