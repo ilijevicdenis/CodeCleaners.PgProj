@@ -99,7 +99,7 @@ public class Corpus_ListenNotify
     public void lsna0046() => CorpusAssert.Parses(@"NOTIFY ""event.channel"", 'data'", "ok");
     [Fact]
     public void lsna0047() => CorpusAssert.Parses(@"LISTEN ""event.channel""", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lsna0048() => CorpusAssert.Parses(@"NOTIFY chan, U&'unicode \0041'", "ok");
     [Fact]
     public void lsna0049() => CorpusAssert.Parses(@"SELECT pg_notify('ch', repeat('x', 100))", "ok");

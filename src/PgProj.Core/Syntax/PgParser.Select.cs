@@ -172,10 +172,29 @@ public sealed partial class PgParser
     private SelectItem ParseSelectItem(TokenCursor c)
     {
         var item = new SelectItem { Expr = ParseExpression(c) };
-        if (c.MatchWord("AS")) item.Alias = c.ExpectIdentifier();
+        if (c.MatchWord("AS")) item.Alias = ParseAliasName(c);
+        else if (TryParseUnicodeIdent(c, out var ua)) item.Alias = ua;
         else if (c.Current is { Kind: TokenKind.Word } w && !NotAnAlias.Contains(w.Value)) item.Alias = c.Advance().Value;
         else if (c.Current is { Kind: TokenKind.QuotedIdent }) item.Alias = c.Advance().Value;
         return item;
+    }
+
+    // an alias name, which may be a unicode-escaped identifier U&"…" [UESCAPE 'c']
+    private string ParseAliasName(TokenCursor c)
+        => TryParseUnicodeIdent(c, out var ua) ? ua : c.ExpectIdentifier();
+
+    private static bool TryParseUnicodeIdent(TokenCursor c, out string alias)
+    {
+        alias = "";
+        if (c.Current is { Kind: TokenKind.Word } u && (u.Value is "U" or "u")
+            && c.Peek() is { } amp && amp.IsSymbol('&') && amp.Position == u.Position + 1
+            && c.Peek(2) is { Kind: TokenKind.QuotedIdent } qi && qi.Position == amp.Position + 1)
+        {
+            c.Advance(); c.Advance(); alias = c.Advance().Value;
+            if (c.MatchWord("UESCAPE") && c.Current is { Kind: TokenKind.String }) c.Advance();
+            return true;
+        }
+        return false;
     }
 
     private void ParseGroupBy(TokenCursor c, SelectQuery q)

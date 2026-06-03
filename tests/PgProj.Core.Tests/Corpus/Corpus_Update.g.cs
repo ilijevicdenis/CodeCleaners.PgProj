@@ -344,7 +344,7 @@ name = 'comment_ok'", "ok");
     public void upda0168() => CorpusAssert.Parses(@"UPDATE s.events_2024 SET payload = '{}'::jsonb WHERE id = 1", "ok");
     [Fact]
     public void upda0169() => CorpusAssert.Parses(@"UPDATE s.events SET payload = '{}'::jsonb WHERE occurred = '2024-06-01'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void upda0170() => CorpusAssert.Parses(@"UPDATE s.t SET val = 1 RETURNING WITH (OLD AS o, NEW AS n) *, o.val, n.val", "ok");
     [Fact]
     public void upda0171() => CorpusAssert.Parses(@"UPDATE s.t AS a SET a.name = 'alias_dot'", "error");

@@ -180,7 +180,7 @@ END $$;", "ok");
     public void doca0081() => CorpusAssert.Parses(@"DO LANGUAGE sql $$ SELECT 1 $$;", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void doca0082() => CorpusAssert.Parses(@"DO LANGUAGE nonexistent_lang $$ BEGIN END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void doca0083() => CorpusAssert.Parses(@"DO LANGUAGE 'plpgsql' $$ BEGIN END $$;", "ok");
     [Fact]
     public void doca0084() => CorpusAssert.Parses(@"DO $$ BEGIN END $$", "ok");

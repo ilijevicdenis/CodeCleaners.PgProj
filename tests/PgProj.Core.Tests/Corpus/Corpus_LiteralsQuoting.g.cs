@@ -275,9 +275,9 @@ newline'", "ok");
     public void lita0132() => CorpusAssert.Parses(@"CREATE TABLE s.""My Table"" (id int); DROP TABLE s.""My Table""", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void lita0133() => CorpusAssert.Parses(@"SELECT 1 AS """"", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0134() => CorpusAssert.Parses(@"SELECT 1 AS U&""\0041lpha""", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0135() => CorpusAssert.Parses(@"SELECT 1 AS U&""!0041BC"" UESCAPE '!'", "ok");
     [Fact]
     public void lita0136() => CorpusAssert.Parses(@"SELECT 1 AS unquoted_ident", "ok");

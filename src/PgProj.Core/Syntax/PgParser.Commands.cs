@@ -48,13 +48,16 @@ public sealed partial class PgParser
     {
         c.ExpectWord("DO");
         string? lang = null;
-        if (c.MatchWord("LANGUAGE")) lang = c.ExpectIdentifier();
+        if (c.MatchWord("LANGUAGE")) lang = LangNameOrString(c);
         if (c.Current is not { Kind: TokenKind.DollarString or TokenKind.String })
             throw new ParseException("expected a code block after DO", c.Here);
         c.Advance();
-        if (c.MatchWord("LANGUAGE")) lang = c.ExpectIdentifier();   // LANGUAGE may follow the body
+        if (c.MatchWord("LANGUAGE")) lang = LangNameOrString(c);   // LANGUAGE may follow the body
         return new CommandStatement { Kind = "DO", Detail = lang };
     }
+
+    private static string LangNameOrString(TokenCursor c)
+        => c.Current is { Kind: TokenKind.String } s ? c.Advance().Value : c.ExpectIdentifier();
 
     private CommandStatement ParseCall(TokenCursor c)
     {
@@ -188,6 +191,8 @@ public sealed partial class PgParser
             if (t is { Kind: TokenKind.String } or { Kind: TokenKind.DollarString }) c.Advance();   // 'x' / $$x$$ / $tag$x$tag$
             else if (t is { Kind: TokenKind.Word } w && w.Value.Length == 1 && "EBXebx".IndexOf(w.Value[0]) >= 0
                      && c.Peek() is { Kind: TokenKind.String } ps && ps.Position == w.Position + 1) { c.Advance(); c.Advance(); }  // E'…' etc
+            else if (t is { Kind: TokenKind.Word } u && (u.Value is "U" or "u") && c.Peek()?.IsSymbol('&') == true
+                     && c.Peek(2) is { Kind: TokenKind.String }) { c.Advance(); c.Advance(); c.Advance(); if (c.MatchWord("UESCAPE") && c.Current is { Kind: TokenKind.String }) c.Advance(); }  // U&'…'
             else throw new ParseException("NOTIFY payload must be a string literal", c.Here);
             while (c.Current is { Kind: TokenKind.String }) c.Advance();   // adjacent string concatenation
         }

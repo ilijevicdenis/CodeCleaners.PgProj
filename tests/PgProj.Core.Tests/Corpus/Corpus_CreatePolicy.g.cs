@@ -377,7 +377,7 @@ CREATE POLICY p_for_ins_wc ON s.t AS PERMISSIVE FOR INSERT TO PUBLIC WITH CHECK 
     [Fact]
     public void pola0123() => CorpusAssert.Parses(@"ALTER TABLE s.t ENABLE ROW LEVEL SECURITY;
 CREATE POLICY p_for_upd_full ON s.t AS RESTRICTIVE FOR UPDATE TO CURRENT_ROLE USING (id > 0) WITH CHECK (val IS NOT NULL);", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pola0124() => CorpusAssert.Parses(@"ALTER TABLE s.t ENABLE ROW LEVEL SECURITY;
 CREATE POLICY p_alter_noop ON s.t;
 ALTER POLICY p_alter_noop ON s.t;", "ok");

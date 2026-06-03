@@ -811,7 +811,6 @@ doca0069
 doca0077
 doca0081
 doca0082
-doca0083
 doca0085
 doca0088
 doca0092
@@ -1341,8 +1340,6 @@ lita0080
 lita0085
 lita0116
 lita0133
-lita0134
-lita0135
 lita0161
 lita0165
 lita0166
@@ -1416,7 +1413,6 @@ lnga0082
 lnga0084
 lnga0085
 lsna0044
-lsna0048
 lsna0071
 lsna0095
 lsna0096
@@ -1703,7 +1699,6 @@ pola0116
 pola0117
 pola0118
 pola0119
-pola0124
 pola0152
 pola0153
 pola0154
@@ -3185,7 +3180,6 @@ upda0104
 upda0105
 upda0107
 upda0118
-upda0170
 upda0172
 updb0026
 updb0083

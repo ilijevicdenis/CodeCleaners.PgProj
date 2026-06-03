@@ -42,7 +42,8 @@ public sealed partial class PgParser
         }
         else if (c.MatchWords("OWNER", "TO")) { ParseRoleSpec(c); alter.Actions.Add("OWNER"); }
         else if (c.MatchWords("SET", "SCHEMA")) { c.ExpectIdentifier(); alter.Actions.Add("SET SCHEMA"); }
-        else { if (c.AtEnd) throw new ParseException("expected an ALTER action", c.Here); ConsumeRest(c); }
+        else if (c.AtEnd) { if (kind != "POLICY") throw new ParseException("expected an ALTER action", c.Here); }   // ALTER POLICY p ON t — bare no-op is valid
+        else ConsumeRest(c);
 
         return alter;
     }
