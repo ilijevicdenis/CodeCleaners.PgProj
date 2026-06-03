@@ -139,9 +139,132 @@ public sealed partial class PgParser
         if (!isProc) c.ExpectWord("FUNCTION");
         var (s, n) = ParseQualifiedName(c);
         var node = new CreateFunctionStatement { Schema = s, Name = n, IsProcedure = isProc };
-        if (c.AtSymbol('(')) node.ArgTypes = ExtractArgTypes(CaptureBalancedParens(c));
-        ConsumeRest(c);                          // RETURNS / LANGUAGE / options / AS body — kept as SourceText
+
+        bool hasOut = false;
+        if (c.AtSymbol('('))
+        {
+            var argInner = CaptureBalancedParens(c);
+            node.ArgTypes = ExtractArgTypes(argInner);            // unchanged — model identity depends on this
+            hasOut = ValidateFunctionArgs(argInner);              // overlay validation, no effect on the model
+        }
+
+        // RETURNS … and the option/body tail — captured as before, validated via a sub-cursor.
+        int m = c.Mark();
+        ConsumeRest(c);
+        ValidateFunctionTail(c.Range(m, c.Mark()), hasOut);
         return node;
+    }
+
+    // Validate the captured argument tokens: one mode per arg, VARIADIC must be an array, defaults must be
+    // trailing, no empty/trailing-comma entries. Returns whether any OUT/INOUT parameter is present.
+    private bool ValidateFunctionArgs(List<Token> argInner)
+    {
+        if (argInner.Count == 0) return false;
+        var a = new TokenCursor(argInner);
+        bool hasOut = false, seenDefault = false;
+        do
+        {
+            if (a.AtEnd) throw new ParseException("trailing comma in function argument list", a.Here);
+            string? mode = null;
+            if (a.AtAnyWord("IN", "OUT", "INOUT", "VARIADIC"))
+            {
+                mode = a.Advance().Value.ToUpperInvariant();
+                if (mode == "IN" && a.MatchWord("OUT")) mode = "INOUT";       // "IN OUT" is the two-word spelling of INOUT
+                else if (a.AtAnyWord("IN", "OUT", "INOUT", "VARIADIC")) throw new ParseException("only one parameter mode is allowed per argument", a.Here);
+            }
+            if (mode is "OUT" or "INOUT") hasOut = true;
+
+            int mk = a.Mark();                                   // name is optional: "[name] type"
+            a.ExpectIdentifier();
+            bool nameThenType = !(a.AtEnd || a.AtSymbol(',') || a.AtWord("DEFAULT") || a.AtOperator("="));
+            a.Reset(mk);
+            if (nameThenType) a.ExpectIdentifier();
+            var type = CaptureArgTypeText(a);                    // lenient — handles dotted names, %TYPE, array/precision suffixes
+            if (mode == "VARIADIC" && !IsArrayOrAnyType(type)) throw new ParseException("a VARIADIC parameter must be an array type", a.Here);
+
+            bool thisDefault = false;
+            if (a.MatchWord("DEFAULT") || a.MatchOperator("=")) { thisDefault = true; while (!a.AtEnd && !a.AtSymbol(',')) { if (a.AtSymbol('(')) CaptureBalancedParens(a); else a.Advance(); } }
+            if (mode is null or "IN" or "INOUT" or "VARIADIC")
+            {
+                if (seenDefault && !thisDefault) throw new ParseException("input parameters after one with a default value must also have defaults", a.Here);
+                if (thisDefault) seenDefault = true;
+            }
+        } while (a.MatchSymbol(','));
+        return hasOut;
+    }
+
+    // Capture an argument's type text up to a top-level comma / DEFAULT / '=' — lenient enough for
+    // dotted names, anchored types (col%TYPE), and precision/array suffixes.
+    private static string CaptureArgTypeText(TokenCursor a)
+    {
+        int m = a.Mark(), depth = 0;
+        while (!a.AtEnd)
+        {
+            var t = a.Current!;
+            if (depth == 0 && (t.IsSymbol(',') || t.IsWord("DEFAULT") || t.IsSymbol('='))) break;
+            if (t.IsSymbol('(') || t.IsSymbol('[')) depth++;
+            else if (t.IsSymbol(')') || t.IsSymbol(']')) depth--;
+            a.Advance();
+        }
+        return Token.Render(a.Range(m, a.Mark()));
+    }
+
+    private static bool IsArrayOrAnyType(string type)
+        => type.Contains('[') || type.EndsWith("ARRAY", System.StringComparison.OrdinalIgnoreCase)
+           || type.Trim().Equals("any", System.StringComparison.OrdinalIgnoreCase) || type.Contains("\"any\"");
+
+    private static readonly System.Collections.Generic.HashSet<string> ParallelValues =
+        new(System.StringComparer.OrdinalIgnoreCase) { "SAFE", "UNSAFE", "RESTRICTED" };
+
+    // Validate RETURNS + the option/body tail: at most one of each option category, valid PARALLEL value,
+    // COST > 0, ROWS only for set-returning functions, OUT params incompatible with RETURNS TABLE, and a
+    // body must be present. Unknown trailing tokens fall back to lenient acceptance (no false positives).
+    private void ValidateFunctionTail(List<Token> tail, bool hasOut)
+    {
+        var o = new TokenCursor(tail);
+        bool returnsSet = false, returnsTable = false;
+        if (o.MatchWord("RETURNS"))
+        {
+            if (o.MatchWord("TABLE")) { returnsTable = true; returnsSet = true; if (!o.AtSymbol('(')) throw new ParseException("expected '(' after RETURNS TABLE", o.Here); CaptureBalancedParens(o); }
+            else { if (o.MatchWord("SETOF")) returnsSet = true; ParseCastType(o); }
+        }
+        if (hasOut && returnsTable) throw new ParseException("cannot use OUT parameters together with RETURNS TABLE", o.Here);
+
+        var seen = new System.Collections.Generic.HashSet<string>(System.StringComparer.OrdinalIgnoreCase);
+        void Once(string cat) { if (!seen.Add(cat)) throw new ParseException($"conflicting or redundant {cat} option", o.Here); }
+        bool hasBody = false, hasRows = false, clean = true;
+        while (!o.AtEnd)
+        {
+            if (o.MatchWord("LANGUAGE")) { if (o.Current is { Kind: TokenKind.String }) o.Advance(); else o.ExpectIdentifier(); continue; }
+            if (o.AtAnyWord("IMMUTABLE", "STABLE", "VOLATILE")) { o.Advance(); Once("volatility"); continue; }
+            if (o.MatchWords("NOT", "LEAKPROOF") || o.MatchWord("LEAKPROOF")) { Once("leakproof"); continue; }
+            if (o.MatchWord("STRICT") || o.MatchWords("CALLED", "ON", "NULL", "INPUT") || o.MatchWords("RETURNS", "NULL", "ON", "NULL", "INPUT")) { Once("null-handling"); continue; }
+            if (o.MatchWords("EXTERNAL", "SECURITY") || o.MatchWord("SECURITY")) { if (!o.MatchWord("DEFINER")) o.ExpectWord("INVOKER"); Once("security"); continue; }
+            if (o.MatchWord("PARALLEL")) { var v = o.ExpectIdentifier(); if (!ParallelValues.Contains(v)) throw new ParseException($"invalid PARALLEL value \"{v}\"", o.Here); Once("parallel"); continue; }
+            if (o.MatchWord("COST")) { var v = ParseOptNumber(o); if (v is <= 0) throw new ParseException("COST must be positive", o.Here); Once("cost"); continue; }
+            if (o.MatchWord("ROWS")) { ParseOptNumber(o); hasRows = true; Once("rows"); continue; }
+            if (o.MatchWord("WINDOW")) { Once("window"); continue; }
+            if (o.MatchWord("SUPPORT")) { ParseQualifiedName(o); continue; }
+            if (o.MatchWord("TRANSFORM")) { do { o.ExpectWord("FOR"); o.ExpectWord("TYPE"); ParseCastType(o); } while (o.MatchSymbol(',')); continue; }
+            if (o.MatchWord("SET")) { o.ExpectIdentifier(); if (o.MatchWords("FROM", "CURRENT")) { } else { if (!(o.MatchWord("TO") || o.MatchOperator("="))) throw new ParseException("expected TO or = in SET", o.Here); do { o.Advance(); } while (o.MatchSymbol(',') && !o.AtEnd); } continue; }
+            if (o.MatchWord("AS")) { hasBody = true; ConsumeRest(o); continue; }
+            if (o.MatchWords("BEGIN", "ATOMIC")) { hasBody = true; ConsumeRest(o); continue; }
+            if (o.MatchWord("RETURN")) { hasBody = true; ConsumeRest(o); continue; }
+            clean = false; break;                                // unknown token — stop validating, stay lenient
+        }
+        if (clean)
+        {
+            if (hasRows && !returnsSet) throw new ParseException("ROWS is only valid for set-returning functions", o.Here);
+            if (!hasBody) throw new ParseException("no function body specified", o.Here);
+        }
+    }
+
+    private static double? ParseOptNumber(TokenCursor c)
+    {
+        bool neg = c.MatchOperator("-"); if (!neg) c.MatchOperator("+");
+        if (c.Current is not { Kind: TokenKind.Number } t) return null;
+        c.Advance();
+        return double.TryParse(t.Value, System.Globalization.CultureInfo.InvariantCulture, out var d) ? (neg ? -d : d) : null;
     }
 
     // ---- helpers ------------------------------------------------------------

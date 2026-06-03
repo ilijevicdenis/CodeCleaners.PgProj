@@ -141,33 +141,33 @@ public class Corpus_CreateFunction
     public void fna0067() => CorpusAssert.Parses(@"CREATE FUNCTION s.leakproof_fn(x integer) RETURNS integer LANGUAGE sql IMMUTABLE LEAKPROOF AS $$ SELECT x $$", "ok");
     [Fact]
     public void fna0068() => CorpusAssert.Parses(@"CREATE FUNCTION s.not_leakproof(x integer) RETURNS integer LANGUAGE sql IMMUTABLE NOT LEAKPROOF AS $$ SELECT x $$", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void fna0069() => CorpusAssert.Parses(@"CREATE FUNCTION s.cost_zero(x integer) RETURNS integer LANGUAGE sql COST 0 AS $$ SELECT x $$", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void fna0070() => CorpusAssert.Parses(@"CREATE FUNCTION s.rows_on_scalar(x integer) RETURNS integer LANGUAGE sql ROWS 100 AS $$ SELECT x $$", "error");
     [Fact]
     public void fna0071() => CorpusAssert.Parses(@"CREATE FUNCTION (x integer) RETURNS integer LANGUAGE sql AS $$ SELECT x $$", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void fna0072() => CorpusAssert.Parses(@"CREATE FUNCTION s.no_lang(x integer) RETURNS integer LANGUAGE sql", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void fna0073() => CorpusAssert.Parses(@"CREATE FUNCTION s.bad_volatile(x integer) RETURNS integer LANGUAGE sql IMMUTABLE VOLATILE AS $$ SELECT x $$", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void fna0074() => CorpusAssert.Parses(@"CREATE FUNCTION s.bad_strict(x integer) RETURNS integer LANGUAGE sql STRICT CALLED ON NULL INPUT AS $$ SELECT x $$", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void fna0075() => CorpusAssert.Parses(@"CREATE FUNCTION s.bad_security(x integer) RETURNS integer LANGUAGE sql SECURITY DEFINER SECURITY INVOKER AS $$ SELECT x $$", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void fna0076() => CorpusAssert.Parses(@"CREATE FUNCTION s.bad_parallel(x integer) RETURNS integer LANGUAGE sql PARALLEL SAFE PARALLEL UNSAFE AS $$ SELECT x $$", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void fna0077() => CorpusAssert.Parses(@"CREATE FUNCTION s.bad_mode(INOUT VARIADIC x integer[]) RETURNS integer LANGUAGE sql AS $$ SELECT x[1] $$", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void fna0078() => CorpusAssert.Parses(@"CREATE FUNCTION s.bad_returns_table_out(OUT x integer) RETURNS TABLE(a int) LANGUAGE sql AS $$ SELECT 1, 1 $$", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void fna0079() => CorpusAssert.Parses(@"CREATE FUNCTION s.bad_default_order(x integer DEFAULT 0, y integer) RETURNS integer LANGUAGE sql AS $$ SELECT x + y $$", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void fna0080() => CorpusAssert.Parses(@"CREATE FUNCTION s.bad_parallel_val(x integer) RETURNS integer LANGUAGE sql PARALLEL MAYBE AS $$ SELECT x $$", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void fna0081() => CorpusAssert.Parses(@"CREATE FUNCTION s.fn_variadic_not_array(VARIADIC x integer) RETURNS integer LANGUAGE sql AS $$ SELECT x $$", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void fna0082() => CorpusAssert.Parses(@"CREATE FUNCTION s.fn_extra_comma(x integer,) RETURNS integer LANGUAGE sql AS $$ SELECT x $$", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void fna0083() => CorpusAssert.Parses(@"CREATE FUNCTION s.fn_bad_cost_str(x integer) RETURNS integer LANGUAGE sql COST 'a lot' AS $$ SELECT x $$", "error");
@@ -538,11 +538,11 @@ SELECT x + 1 $$;", "ok");
     public void fnb0093() => CorpusAssert.Parses(@"CREATE FUNCTION s.fn_security_parallel(x integer) RETURNS integer LANGUAGE sql SECURITY DEFINER PARALLEL SAFE IMMUTABLE AS $$ SELECT x $$;", "ok");
     [Fact]
     public void fnb0094() => CorpusAssert.Parses(@"CREATE FUNCTION s.fn_leakproof_strict(x integer) RETURNS integer LANGUAGE sql IMMUTABLE LEAKPROOF STRICT AS $$ SELECT x $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void fnb0095() => CorpusAssert.Parses(@"CREATE FUNCTION s.fn_set_local_off() RETURNS integer LANGUAGE sql SET LOCAL AS $$ SELECT 1 $$;", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void fnb0096() => CorpusAssert.Parses(@"CREATE FUNCTION s.fn_no_returns() LANGUAGE sql AS $$ SELECT 1 $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void fnb0097() => CorpusAssert.Parses(@"CREATE FUNCTION s.fn_bad_parallel(x integer) RETURNS integer LANGUAGE sql PARALLEL SUPERFAST AS $$ SELECT x $$;", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void fnb0098() => CorpusAssert.Parses(@"CREATE FUNCTION s.fn_bad_volatility(x integer) RETURNS integer LANGUAGE sql MUTABLE AS $$ SELECT x $$;", "error");
@@ -562,7 +562,7 @@ SELECT x + 1 $$;", "ok");
     public void fnb0105() => CorpusAssert.Parses(@"CREATE FUNCTION s.fn_bad_rows(n integer) RETURNS SETOF integer LANGUAGE sql ROWS 'many' AS $$ SELECT generate_series(1,n) $$;", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void fnb0106() => CorpusAssert.Parses(@"CREATE FUNCTION s.fn_variadic_not_last(VARIADIC arr integer[], x integer) RETURNS integer LANGUAGE sql AS $$ SELECT x $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void fnb0107() => CorpusAssert.Parses(@"CREATE FUNCTION s.fn_default_then_nodefault(x integer DEFAULT 1, y integer) RETURNS integer LANGUAGE sql AS $$ SELECT x + y $$;", "error");
     [Fact]
     public void fnb0108() => CorpusAssert.Parses(@"CREATE FUNCTION s.fn_dup_mode(IN OUT x integer) RETURNS integer LANGUAGE sql AS $$ SELECT x $$;", "ok");
@@ -572,9 +572,9 @@ SELECT x + 1 $$;", "ok");
     public void fnb0110() => CorpusAssert.Parses(@"CREATE FUNCTION s.fn_bad_lang(x integer) RETURNS integer LANGUAGE nonexistent_lang AS $$ SELECT x $$;", "error");
     [Fact]
     public void fnb0111() => CorpusAssert.Parses(@"CREATE FUNCTION s.fn_leakproof_volatile(x integer) RETURNS integer LANGUAGE sql VOLATILE LEAKPROOF AS $$ SELECT x $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void fnb0112() => CorpusAssert.Parses(@"CREATE FUNCTION s.fn_missing_body(x integer) RETURNS integer LANGUAGE sql;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void fnb0113() => CorpusAssert.Parses(@"CREATE FUNCTION s.fn_comma_extra(x integer,) RETURNS integer LANGUAGE sql AS $$ SELECT x $$;", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void fnb0114() => CorpusAssert.Parses(@"CREATE FUNCTION s.fn_returns_missing_type(x integer) RETURNS LANGUAGE sql AS $$ SELECT x $$;", "error");
@@ -582,15 +582,15 @@ SELECT x + 1 $$;", "ok");
     public void fnb0115() => CorpusAssert.Parses(@"CREATE FUNCTION s.fn_table_no_cols() RETURNS TABLE() LANGUAGE sql AS $$ SELECT 1 $$;", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void fnb0116() => CorpusAssert.Parses(@"CREATE FUNCTION s.fn_setof_table_invalid() RETURNS SETOF TABLE(a int) LANGUAGE sql AS $$ SELECT 1 $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void fnb0117() => CorpusAssert.Parses(@"CREATE FUNCTION s.fn_parallel_none(x integer) RETURNS integer LANGUAGE sql PARALLEL NONE AS $$ SELECT x $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void fnb0118() => CorpusAssert.Parses(@"CREATE FUNCTION s.fn_duplicate_immutable(x integer) RETURNS integer LANGUAGE sql IMMUTABLE IMMUTABLE AS $$ SELECT x $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void fnb0119() => CorpusAssert.Parses(@"CREATE FUNCTION s.fn_stable_immutable(x integer) RETURNS integer LANGUAGE sql STABLE IMMUTABLE AS $$ SELECT x $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void fnb0120() => CorpusAssert.Parses(@"CREATE FUNCTION s.fn_sec_def_invoker(x integer) RETURNS integer LANGUAGE sql SECURITY DEFINER SECURITY INVOKER AS $$ SELECT x $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void fnb0121() => CorpusAssert.Parses(@"CREATE FUNCTION s.fn_strict_called(x integer) RETURNS integer LANGUAGE sql STRICT CALLED ON NULL INPUT AS $$ SELECT x $$;", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void fnb0122() => CorpusAssert.Parses(@"CREATE FUNCTION s.fn_plpgsql_begin_atomic(x integer) RETURNS integer LANGUAGE plpgsql BEGIN ATOMIC RETURN x + 1; END;", "error");
@@ -648,7 +648,7 @@ SELECT x + 1 $$;", "ok");
     public void fnb0148() => CorpusAssert.Parses(@"CREATE FUNCTION s.fn_plpgsql_cursor() RETURNS void LANGUAGE plpgsql AS $$ DECLARE c refcursor; BEGIN OPEN c FOR SELECT * FROM s.t; CLOSE c; END $$;", "ok");
     [Fact]
     public void fnb0149() => CorpusAssert.Parses(@"CREATE FUNCTION s.fn_search_path_multi_set() RETURNS integer LANGUAGE sql SET search_path TO s, public, pg_catalog AS $$ SELECT 1 $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void fnb0150() => CorpusAssert.Parses(@"CREATE FUNCTION s.fn_cost_zero(x integer) RETURNS integer LANGUAGE sql COST 0 AS $$ SELECT x $$;", "error");
     [Fact]
     public void fnb0151() => CorpusAssert.Parses(@"CREATE FUNCTION s.fn_rows_one(n integer) RETURNS SETOF integer LANGUAGE sql ROWS 1 AS $$ SELECT generate_series(1,n) $$;", "ok");
@@ -808,7 +808,7 @@ SELECT x + 1 $$;", "ok");
     public void fnc0058() => CorpusAssert.Parses(@"CREATE FUNCTION fnc_window() RETURNS integer LANGUAGE sql WINDOW AS $$ SELECT 1 $$;", "ok");
     [Fact]
     public void fnc0059() => CorpusAssert.Parses(@"CREATE FUNCTION fnc_all_opts(x integer DEFAULT 0) RETURNS integer LANGUAGE sql IMMUTABLE STRICT PARALLEL SAFE COST 10 SECURITY INVOKER AS $$ SELECT x $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void fnc0060() => CorpusAssert.Parses(@"CREATE FUNCTION fnc_opts_order2(x integer) RETURNS integer LANGUAGE sql COST 50 ROWS 0 VOLATILE CALLED ON NULL INPUT PARALLEL UNSAFE SECURITY DEFINER AS $$ SELECT x $$;", "error");
     [Fact]
     public void fnc0061() => CorpusAssert.Parses(@"CREATE FUNCTION fnc_begin_atomic() RETURNS integer LANGUAGE sql BEGIN ATOMIC SELECT 1; END;", "ok");
@@ -886,9 +886,9 @@ SELECT x + 1 $$;", "ok");
     public void fnc0097() => CorpusAssert.Parses(@"CREATE FUNCTION fnc_returns_table_complex() RETURNS TABLE(id bigint, nm text, val numeric) LANGUAGE sql AS $$ SELECT t.id, t.name, t.val FROM s.t t LIMIT 1 $$;", "ok");
     [Fact]
     public void fnc0098() => CorpusAssert.Parses(@"CREATE FUNCTION fnc_plpgsql_out(IN x integer, OUT doubled integer, OUT tripled integer) LANGUAGE plpgsql AS $$ BEGIN doubled := x * 2; tripled := x * 3; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void fnc0099() => CorpusAssert.Parses(@"CREATE FUNCTION fnc_cost_zero() RETURNS integer LANGUAGE sql COST 0 AS $$ SELECT 1 $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void fnc0100() => CorpusAssert.Parses(@"CREATE FUNCTION fnc_rows_nonsrf() RETURNS integer LANGUAGE sql ROWS 100 AS $$ SELECT 1 $$;", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void fnc0101() => CorpusAssert.Parses(@"CREATE FUNCTION RETURNS integer LANGUAGE sql AS $$ SELECT 1 $$;", "error");
@@ -900,31 +900,31 @@ SELECT x + 1 $$;", "ok");
     public void fnc0104() => CorpusAssert.Parses(@"CREATE FUNCTION fnc_bad_lang() RETURNS integer LANGUAGE nonexistentlang AS $$ SELECT 1 $$;", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void fnc0105() => CorpusAssert.Parses(@"CREATE FUNCTION fnc_bad_volatility(x integer) RETURNS integer LANGUAGE sql TEMPORARY AS $$ SELECT x $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void fnc0106() => CorpusAssert.Parses(@"CREATE FUNCTION fnc_bad_parallel(x integer) RETURNS integer LANGUAGE sql PARALLEL MAYBE AS $$ SELECT x $$;", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void fnc0107() => CorpusAssert.Parses(@"CREATE FUNCTION fnc_bad_returns_setof() RETURNS SET OF integer LANGUAGE sql AS $$ SELECT 1 $$;", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void fnc0108() => CorpusAssert.Parses(@"CREATE FUNCTION fnc_bad_cost_str() RETURNS integer LANGUAGE sql COST 'many' AS $$ SELECT 1 $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void fnc0109() => CorpusAssert.Parses(@"CREATE FUNCTION fnc_duplicate_opt() RETURNS integer LANGUAGE sql IMMUTABLE VOLATILE AS $$ SELECT 1 $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void fnc0110() => CorpusAssert.Parses(@"CREATE FUNCTION fnc_dup_strict() RETURNS integer LANGUAGE sql STRICT CALLED ON NULL INPUT AS $$ SELECT 1 $$;", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void fnc0111() => CorpusAssert.Parses(@"CREATE FUNCTION fnc_variadic_not_last(VARIADIC a integer[], b integer) RETURNS integer LANGUAGE sql AS $$ SELECT b $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void fnc0112() => CorpusAssert.Parses(@"CREATE FUNCTION fnc_default_before_required(a integer DEFAULT 1, b integer) RETURNS integer LANGUAGE sql AS $$ SELECT a + b $$;", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void fnc0113() => CorpusAssert.Parses(@"CREATE FUNCTION fnc_table_no_cols() RETURNS TABLE() LANGUAGE sql AS $$ SELECT 1 $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void fnc0114() => CorpusAssert.Parses(@"CREATE FUNCTION fnc_bad_as() RETURNS integer LANGUAGE sql;", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void fnc0115() => CorpusAssert.Parses(@"CREATE FUNCTION fnc_double_as() RETURNS integer LANGUAGE sql AS $$ SELECT 1 $$ AS $$ SELECT 2 $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void fnc0116() => CorpusAssert.Parses(@"CREATE FUNCTION fnc_dup_parallel() RETURNS integer LANGUAGE sql PARALLEL SAFE PARALLEL UNSAFE AS $$ SELECT 1 $$;", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void fnc0117() => CorpusAssert.Parses(@"CREATE FUNCTION fnc_rows_neg() RETURNS SETOF integer LANGUAGE sql ROWS -1 AS $$ SELECT 1 $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void fnc0118() => CorpusAssert.Parses(@"CREATE FUNCTION fnc_cost_neg() RETURNS integer LANGUAGE sql COST -5 AS $$ SELECT 1 $$;", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void fnc0119() => CorpusAssert.Parses(@"CREATE FUNCTION fnc_missing_paren2(x integer RETURNS integer) LANGUAGE sql AS $$ SELECT x $$;", "error");
@@ -944,7 +944,7 @@ SELECT x + 1 $$;", "ok");
     public void fnc0126() => CorpusAssert.Parses(@"CREATE FUNCTION fnc_atomic_table() RETURNS TABLE(n integer) LANGUAGE sql BEGIN ATOMIC SELECT generate_series(1,5); END;", "ok");
     [Fact]
     public void fnc0127() => CorpusAssert.Parses(@"CREATE FUNCTION fnc_atomic_strict2(x integer) RETURNS integer LANGUAGE sql STRICT BEGIN ATOMIC RETURN x + 1; END;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void fnc0128() => CorpusAssert.Parses(@"CREATE FUNCTION fnc_dup_secdef() RETURNS integer LANGUAGE sql SECURITY DEFINER SECURITY INVOKER AS $$ SELECT 1 $$;", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void fnc0129() => CorpusAssert.Parses(@"CREATE FUNCTION fnc_both_body_styles() RETURNS integer LANGUAGE sql AS $$ SELECT 1 $$ BEGIN ATOMIC SELECT 2; END;", "error");
@@ -978,7 +978,7 @@ SELECT x + 1 $$;", "ok");
     public void fnc0143() => CorpusAssert.Parses(@"CREATE FUNCTION fnc_cost_integer() RETURNS integer LANGUAGE sql COST 1000 AS $$ SELECT 1 $$;", "ok");
     [Fact]
     public void fnc0144() => CorpusAssert.Parses(@"CREATE FUNCTION fnc_plpgsql_secdef_path(x integer) RETURNS integer LANGUAGE plpgsql SECURITY DEFINER SET search_path = '' AS $$ BEGIN RETURN x; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void fnc0145() => CorpusAssert.Parses(@"CREATE FUNCTION fnc_sql_stable_imm() RETURNS integer LANGUAGE sql STABLE IMMUTABLE AS $$ SELECT 1 $$;", "error");
     [Fact]
     public void fnc0146() => CorpusAssert.Parses(@"CREATE FUNCTION fnc_returns_setof_mood() RETURNS SETOF s.mood LANGUAGE sql AS $$ SELECT status FROM s.t $$;", "ok");
@@ -992,9 +992,9 @@ SELECT x + 1 $$;", "ok");
     public void fnc0150() => CorpusAssert.Parses(@"CREATE FUNCTION fnc_sql_body_multi_stmt() RETURNS void LANGUAGE sql BEGIN ATOMIC INSERT INTO s.t(name) VALUES ('a'); INSERT INTO s.t(name) VALUES ('b'); END;", "ok");
     [Fact]
     public void fnc0151() => CorpusAssert.Parses(@"CREATE FUNCTION fnc_named_variadic(VARIADIC vals integer[]) RETURNS integer LANGUAGE sql AS $$ SELECT vals[1] $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void fnc0152() => CorpusAssert.Parses(@"CREATE FUNCTION fnc_returns_void_no_body() RETURNS void LANGUAGE sql;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void fnc0153() => CorpusAssert.Parses(@"CREATE FUNCTION fnc_bad_default_pos(a integer DEFAULT 1, b integer, c integer DEFAULT 3) RETURNS integer LANGUAGE sql AS $$ SELECT a + b + c $$;", "error");
     [Fact]
     public void fnc0154() => CorpusAssert.Parses(@"CREATE FUNCTION fnc_setof_void() RETURNS SETOF void LANGUAGE sql AS $$ SELECT 1 $$;", "ok");
