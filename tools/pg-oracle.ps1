@@ -64,11 +64,16 @@ $MARK = '@@@CASE::'
 # All psql stderr is merged into stdout *inside the container* (sh -c '... 2>&1')
 # so Windows PowerShell 5.1 never wraps native stderr lines in ErrorRecords.
 function New-Clone {
-    $name = 'corpus_chk_' + ([guid]::NewGuid().ToString('N').Substring(0, 12))
-    $r = ("CREATE DATABASE $name TEMPLATE $Template;" |
-          docker exec -i $Container sh -c "psql -U postgres -d postgres -v ON_ERROR_STOP=1 -f - 2>&1") | Out-String
-    if ($r -match 'ERROR:') { throw "clone failed: $r" }
-    return $name
+    # Concurrent agents clone the same template; Postgres may transiently report the template as
+    # "being accessed by other users" or serialize CREATE DATABASE. Retry with backoff.
+    for ($attempt = 1; $attempt -le 8; $attempt++) {
+        $name = 'corpus_chk_' + ([guid]::NewGuid().ToString('N').Substring(0, 12))
+        $r = ("CREATE DATABASE $name TEMPLATE $Template;" |
+              docker exec -i $Container sh -c "psql -U postgres -d postgres -v ON_ERROR_STOP=1 -f - 2>&1") | Out-String
+        if ($r -notmatch 'ERROR:') { return $name }
+        if ($attempt -eq 8) { throw "clone failed after 8 attempts: $r" }
+        Start-Sleep -Milliseconds (200 * $attempt)
+    }
 }
 
 function Drop-Clone([string] $name) {
