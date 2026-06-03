@@ -5,9 +5,9 @@ namespace PgProj.Core.Tests.Corpus;
 
 public class Corpus_PrepareExecute
 {
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void prxa0001() => CorpusAssert.Parses(@"PREPARE q1 AS SELECT 1", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void prxa0002() => CorpusAssert.Parses(@"PREPARE q2 AS SELECT * FROM s.t", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void prxa0003() => CorpusAssert.Parses(@"PREPARE q3 (integer) AS SELECT * FROM s.t WHERE id = $1", "ok");
@@ -19,7 +19,7 @@ public class Corpus_PrepareExecute
     public void prxa0006() => CorpusAssert.Parses(@"PREPARE q6 (integer, text) AS UPDATE s.t SET name = $2 WHERE id = $1", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void prxa0007() => CorpusAssert.Parses(@"PREPARE q7 (integer) AS DELETE FROM s.t WHERE id = $1", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void prxa0008() => CorpusAssert.Parses(@"PREPARE q8 AS VALUES (1, 'hello'), (2, 'world')", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void prxa0009() => CorpusAssert.Parses(@"PREPARE q9 (integer) AS SELECT id, name FROM s.t WHERE qty > $1 ORDER BY name", "ok");
@@ -27,7 +27,7 @@ public class Corpus_PrepareExecute
     public void prxa0010() => CorpusAssert.Parses(@"PREPARE q10 (integer) AS SELECT id, name FROM s.t WHERE qty > $1 LIMIT 10", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void prxa0011() => CorpusAssert.Parses(@"PREPARE q11 (integer) AS SELECT id, name FROM s.t WHERE qty > $1 LIMIT 10 OFFSET 5", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void prxa0012() => CorpusAssert.Parses(@"PREPARE q12 AS SELECT t.id, t2.label FROM s.t JOIN s.t2 ON t.id = t2.t_id", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void prxa0013() => CorpusAssert.Parses(@"PREPARE q13 (numeric) AS SELECT * FROM s.t WHERE val > $1", "ok");
@@ -45,61 +45,61 @@ public class Corpus_PrepareExecute
     public void prxa0019() => CorpusAssert.Parses(@"PREPARE q19 (int4range) AS SELECT * FROM s.t WHERE span = $1", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void prxa0020() => CorpusAssert.Parses(@"PREPARE q20 (integer, integer, integer) AS SELECT $1 + $2 + $3", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void prxa0021() => CorpusAssert.Parses(@"PREPARE q21 AS SELECT id FROM s.t WHERE id = ANY(ARRAY[1,2,3])", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void prxa0022() => CorpusAssert.Parses(@"PREPARE q22 (integer[]) AS SELECT * FROM s.t WHERE id = ANY($1)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void prxa0023() => CorpusAssert.Parses(@"PREPARE q23 AS SELECT status, count(*) FROM s.t GROUP BY status", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void prxa0024() => CorpusAssert.Parses(@"PREPARE q24 (integer) AS SELECT status, count(*) FROM s.t GROUP BY status HAVING count(*) > $1", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void prxa0025() => CorpusAssert.Parses(@"PREPARE q25 AS SELECT * FROM s.t UNION SELECT * FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void prxa0026() => CorpusAssert.Parses(@"PREPARE q26 AS SELECT * FROM s.t INTERSECT SELECT * FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void prxa0027() => CorpusAssert.Parses(@"PREPARE q27 AS SELECT * FROM s.t EXCEPT SELECT * FROM s.t WHERE id < 0", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void prxa0028() => CorpusAssert.Parses(@"PREPARE q28 AS WITH cte AS (SELECT id FROM s.t) SELECT * FROM cte", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void prxa0029() => CorpusAssert.Parses(@"PREPARE q29 AS INSERT INTO s.t (name, qty) VALUES ('x', 1) RETURNING id", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void prxa0030() => CorpusAssert.Parses(@"PREPARE q30 (integer) AS DELETE FROM s.t WHERE id = $1 RETURNING *", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void prxa0031() => CorpusAssert.Parses(@"PREPARE q31 (text, integer) AS UPDATE s.t SET name = $1 WHERE id = $2 RETURNING id, name", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void prxa0032() => CorpusAssert.Parses(@"PREPARE q32 AS INSERT INTO s.t2 (t_id, label) SELECT id, name FROM s.t WHERE id < 0", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void prxa0033() => CorpusAssert.Parses(@"PREPARE q33 (integer) AS SELECT * FROM s.t WHERE id = $1 FOR UPDATE", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void prxa0034() => CorpusAssert.Parses(@"PREPARE q34 (integer) AS SELECT * FROM s.t WHERE id = $1 FOR SHARE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void prxa0035() => CorpusAssert.Parses(@"PREPARE q35 AS SELECT id, name FROM s.t ORDER BY id DESC", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void prxa0036() => CorpusAssert.Parses(@"PREPARE q36 AS SELECT id, name FROM s.t ORDER BY id NULLS FIRST", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void prxa0037() => CorpusAssert.Parses(@"PREPARE q37 AS SELECT id, name FROM s.t ORDER BY id NULLS LAST", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void prxa0038() => CorpusAssert.Parses(@"PREPARE q38 (date) AS SELECT * FROM s.events WHERE occurred = $1", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void prxa0039() => CorpusAssert.Parses(@"PREPARE q39 AS SELECT * FROM s.v", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void prxa0040() => CorpusAssert.Parses(@"PREPARE q40 AS SELECT * FROM s.mv", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void prxa0041() => CorpusAssert.Parses(@"PREPARE q41 (integer) AS SELECT s.f($1)", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void prxa0042() => CorpusAssert.Parses(@"PREPARE q42 (integer, integer) AS SELECT s.g($1, $2)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void prxa0043() => CorpusAssert.Parses(@"PREPARE q43 AS SELECT * FROM s.rows_f()", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void prxa0044() => CorpusAssert.Parses(@"PREPARE ""MyPlan"" AS SELECT 1", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void prxa0045() => CorpusAssert.Parses(@"PREPARE plan_with_underscores AS SELECT 1", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void prxa0046() => CorpusAssert.Parses(@"PREPARE p123 AS SELECT 1", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void prxa0047() => CorpusAssert.Parses(@"PREPARE q47 (integer) AS SELECT * FROM s.t WHERE id = $1; EXECUTE q47 (42)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void prxa0048() => CorpusAssert.Parses(@"PREPARE q48 AS SELECT * FROM s.t; EXECUTE q48", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void prxa0049() => CorpusAssert.Parses(@"EXECUTE q49()", "error");
@@ -123,83 +123,83 @@ public class Corpus_PrepareExecute
     public void prxa0058() => CorpusAssert.Parses(@"PREPARE q58 (integer) AS DELETE FROM s.t WHERE id = $1; EXECUTE q58 (-1)", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void prxa0059() => CorpusAssert.Parses(@"PREPARE q59 (text) AS SELECT * FROM s.t WHERE name LIKE $1; EXECUTE q59 ('%foo%')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void prxa0060() => CorpusAssert.Parses(@"PREPARE q60 AS SELECT 1; DEALLOCATE q60", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void prxa0061() => CorpusAssert.Parses(@"PREPARE q61 AS SELECT 1; DEALLOCATE PREPARE q61", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void prxa0062() => CorpusAssert.Parses(@"PREPARE q62a AS SELECT 1; PREPARE q62b AS SELECT 2; DEALLOCATE ALL", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void prxa0063() => CorpusAssert.Parses(@"PREPARE q63a AS SELECT 1; PREPARE q63b AS SELECT 2; DEALLOCATE PREPARE ALL", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void prxa0064() => CorpusAssert.Parses(@"PREPARE q64 AS SELECT 1; EXECUTE q64; DEALLOCATE q64", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void prxa0065() => CorpusAssert.Parses(@"PREPARE q65 (integer) AS SELECT * FROM s.t WHERE id = $1; EXECUTE q65(10); DEALLOCATE q65", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void prxa0066() => CorpusAssert.Parses(@"PREPARE q66 AS INSERT INTO s.t (name) VALUES ('test'); EXECUTE q66; DEALLOCATE q66", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void prxa0067() => CorpusAssert.Parses(@"PREPARE q67 (integer, text, numeric) AS INSERT INTO s.t (id, name, val) VALUES ($1, $2, $3); DEALLOCATE q67", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void prxa0068() => CorpusAssert.Parses(@"PREPARE q68 AS SELECT count(*) FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void prxa0069() => CorpusAssert.Parses(@"PREPARE q69 AS SELECT sum(val), avg(val), max(val), min(val) FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void prxa0070() => CorpusAssert.Parses(@"PREPARE q70 AS SELECT id, name, row_number() OVER () FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void prxa0071() => CorpusAssert.Parses(@"PREPARE q71 AS SELECT id, sum(val) OVER (PARTITION BY status) FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void prxa0072() => CorpusAssert.Parses(@"PREPARE q72 AS SELECT DISTINCT status FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void prxa0073() => CorpusAssert.Parses(@"PREPARE q73 AS SELECT id FROM s.t WHERE EXISTS (SELECT 1 FROM s.t2 WHERE t2.t_id = s.t.id)", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void prxa0074() => CorpusAssert.Parses(@"PREPARE q74 (integer) AS SELECT id FROM s.t WHERE id IN (SELECT t_id FROM s.t2 WHERE amount > $1)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void prxa0075() => CorpusAssert.Parses(@"PREPARE q75 AS SELECT id, (SELECT label FROM s.t2 WHERE t2.t_id = t.id LIMIT 1) FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void prxa0076() => CorpusAssert.Parses(@"PREPARE q76 AS SELECT t.id, t2.label FROM s.t LEFT JOIN s.t2 ON t.id = t2.t_id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void prxa0077() => CorpusAssert.Parses(@"PREPARE q77 AS SELECT t.id, t2.label FROM s.t RIGHT JOIN s.t2 ON t.id = t2.t_id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void prxa0078() => CorpusAssert.Parses(@"PREPARE q78 AS SELECT t.id, t2.label FROM s.t FULL JOIN s.t2 ON t.id = t2.t_id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void prxa0079() => CorpusAssert.Parses(@"PREPARE q79 AS SELECT t.id FROM s.t CROSS JOIN s.t2", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void prxa0080() => CorpusAssert.Parses(@"PREPARE q80 AS SELECT * FROM s.t NATURAL JOIN s.t2", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void prxa0081() => CorpusAssert.Parses(@"PREPARE q81 (s.mood) AS SELECT * FROM s.t WHERE status = $1; EXECUTE q81 ('ok'::s.mood)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void prxa0082() => CorpusAssert.Parses(@"PREPARE q82 AS SELECT CASE WHEN val > 0 THEN 'positive' ELSE 'non-positive' END FROM s.t", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void prxa0083() => CorpusAssert.Parses(@"PREPARE q83 (integer) AS SELECT CASE $1 WHEN 1 THEN 'one' WHEN 2 THEN 'two' ELSE 'other' END", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void prxa0084() => CorpusAssert.Parses(@"PREPARE q84 AS SELECT COALESCE(val, 0) FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void prxa0085() => CorpusAssert.Parses(@"PREPARE q85 AS SELECT NULLIF(qty, 0) FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void prxa0086() => CorpusAssert.Parses(@"PREPARE q86 AS SELECT GREATEST(val, 0) FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void prxa0087() => CorpusAssert.Parses(@"PREPARE q87 AS SELECT LEAST(val, 100) FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void prxa0088() => CorpusAssert.Parses(@"PREPARE q88 AS SELECT data->>'key' FROM s.t", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void prxa0089() => CorpusAssert.Parses(@"PREPARE q89 (text) AS SELECT data->$1 FROM s.t", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void prxa0090() => CorpusAssert.Parses(@"PREPARE q90 AS SELECT (home).city FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void prxa0091() => CorpusAssert.Parses(@"PREPARE q91 AS SELECT tags[1] FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void prxa0092() => CorpusAssert.Parses(@"PREPARE q92 AS SELECT id FROM s.t WHERE tags @> ARRAY['a']", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void prxa0093() => CorpusAssert.Parses(@"PREPARE q93 AS SELECT id FROM s.t WHERE data @> '{""k"":1}'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void prxa0094() => CorpusAssert.Parses(@"PREPARE q94 AS SELECT id FROM s.t WHERE name ~* 'foo'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void prxa0095() => CorpusAssert.Parses(@"PREPARE q95 AS SELECT id FROM s.t WHERE span @> 5", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void prxa0096() => CorpusAssert.Parses(@"PREPARE q96 (integer) AS SELECT * FROM s.t WHERE id = $1; EXECUTE q96(1); EXECUTE q96(2); EXECUTE q96(3)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void prxa0097() => CorpusAssert.Parses(@"PREPARE q97 AS SELECT nextval('s.seq')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void prxa0098() => CorpusAssert.Parses(@"PREPARE q98 AS SELECT currval('s.seq')", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void prxa0099() => CorpusAssert.Parses(@"PREPARE q99 AS SELECT id, name FROM s.t FETCH FIRST 5 ROWS ONLY", "ok");
@@ -211,49 +211,49 @@ public class Corpus_PrepareExecute
     public void prxa0102() => CorpusAssert.Parses(@"PREPARE q102 (integer) AS SELECT * FROM s.t WHERE id = $1; EXPLAIN EXECUTE q102(1)", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void prxa0103() => CorpusAssert.Parses(@"PREPARE q103 (integer) AS SELECT * FROM s.t WHERE id = $1; EXPLAIN (ANALYZE false, COSTS true) EXECUTE q103(1)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void prxa0104() => CorpusAssert.Parses(@"PREPARE q104 AS SELECT * FROM s.parent UNION ALL SELECT id, kind FROM s.child", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void prxa0105() => CorpusAssert.Parses(@"PREPARE q105 AS SELECT * FROM s.t WHERE created_at BETWEEN '2020-01-01' AND '2025-01-01'", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void prxa0106() => CorpusAssert.Parses(@"PREPARE q106 (timestamptz, timestamptz) AS SELECT * FROM s.t WHERE created_at BETWEEN $1 AND $2", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void prxa0107() => CorpusAssert.Parses(@"PREPARE q107 AS SELECT id, name FROM s.t WHERE name IS NOT NULL", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void prxa0108() => CorpusAssert.Parses(@"PREPARE q108 AS SELECT id, name FROM s.t WHERE val IS NULL", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void prxa0109() => CorpusAssert.Parses(@"PREPARE q109 AS SELECT id, name FROM s.t WHERE name NOT LIKE '%test%'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void prxa0110() => CorpusAssert.Parses(@"PREPARE q110 AS SELECT id, name FROM s.t WHERE name ILIKE 'foo%'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void prxa0111() => CorpusAssert.Parses(@"PREPARE q111 AS SELECT id, name FROM s.t WHERE status IN ('ok', 'happy')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void prxa0112() => CorpusAssert.Parses(@"PREPARE q112 AS SELECT id, name FROM s.t WHERE status NOT IN ('sad')", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void prxa0113() => CorpusAssert.Parses(@"PREPARE q113 (text) AS SELECT * FROM s.t WHERE name SIMILAR TO $1", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void prxa0114() => CorpusAssert.Parses(@"PREPARE q114 AS INSERT INTO s.t (name, qty, flag) VALUES ('a', 1, true), ('b', 2, false)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void prxa0115() => CorpusAssert.Parses(@"PREPARE q115 AS UPDATE s.t SET qty = qty + 1 WHERE flag = true", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void prxa0116() => CorpusAssert.Parses(@"PREPARE q116 AS UPDATE s.t SET (name, qty) = ('updated', 99) WHERE id < 0", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void prxa0117() => CorpusAssert.Parses(@"PREPARE q117 (integer) AS UPDATE s.t2 SET amount = amount * 2 WHERE t_id = $1", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void prxa0118() => CorpusAssert.Parses(@"PREPARE q118 AS DELETE FROM s.t2 WHERE amount = 0", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void prxa0119() => CorpusAssert.Parses(@"PREPARE q119 AS DELETE FROM s.t WHERE id IN (SELECT t_id FROM s.t2 WHERE amount < 0)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void prxa0120() => CorpusAssert.Parses(@"PREPARE q120 AS SELECT id FROM s.t TABLESAMPLE SYSTEM(50)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void prxa0121() => CorpusAssert.Parses(@"PREPARE q121 AS SELECT id FROM s.t TABLESAMPLE BERNOULLI(25)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void prxa0122() => CorpusAssert.Parses(@"PREPARE q122 AS SELECT * FROM s.t WHERE data IS NOT NULL AND jsonb_typeof(data) = 'object'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void prxa0123() => CorpusAssert.Parses(@"PREPARE q123 AS SELECT id, name FROM s.t WHERE id = ANY(SELECT t_id FROM s.t2)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void prxa0124() => CorpusAssert.Parses(@"PREPARE q124 AS SELECT id, name FROM s.t WHERE id > ALL(SELECT t_id FROM s.t2 WHERE amount > 0)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void prxa0125() => CorpusAssert.Parses(@"PREPARE q125 AS WITH RECURSIVE nums(n) AS (SELECT 1 UNION ALL SELECT n+1 FROM nums WHERE n < 5) SELECT * FROM nums", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void prxa0126() => CorpusAssert.Parses(@"PREPARE q126 (integer) AS SELECT * FROM s.t WHERE id = $1; EXECUTE q126(1 + 1)", "ok");
@@ -261,9 +261,9 @@ public class Corpus_PrepareExecute
     public void prxa0127() => CorpusAssert.Parses(@"PREPARE q127 AS SELECT id, name FROM s.t WHERE id = $1", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void prxa0128() => CorpusAssert.Parses(@"PREPARE q128 (integer, text, numeric, boolean) AS INSERT INTO s.t (qty, name, val, flag) VALUES ($1, $2, $3, $4)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void prxa0129() => CorpusAssert.Parses(@"PREPARE q129 AS SELECT p.id, c.extra FROM s.parent p JOIN s.child c ON p.id = c.id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void prxa0130() => CorpusAssert.Parses(@"PREPARE q130 AS SELECT * FROM s.events_2024 WHERE occurred = '2024-06-01'", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void prxa0131() => CorpusAssert.Parses(@"PREPARE q131 (text) AS SELECT * FROM s.t WHERE to_tsvector('english', name) @@ plainto_tsquery('english', $1)", "ok");
@@ -273,33 +273,33 @@ public class Corpus_PrepareExecute
     public void prxa0133() => CorpusAssert.Parses(@"DEALLOCATE nonexistent_plan", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void prxa0134() => CorpusAssert.Parses(@"EXECUTE nonexistent_plan", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void prxa0135() => CorpusAssert.Parses(@"PREPARE AS SELECT 1", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void prxa0136() => CorpusAssert.Parses(@"PREPARE q136 SELECT 1", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void prxa0137() => CorpusAssert.Parses(@"PREPARE q137 AS", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void prxa0138() => CorpusAssert.Parses(@"PREPARE q138 AS CREATE TABLE foo (x int)", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void prxa0139() => CorpusAssert.Parses(@"PREPARE q139 AS BEGIN", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void prxa0140() => CorpusAssert.Parses(@"PREPARE q140 (badtype) AS SELECT $1", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void prxa0141() => CorpusAssert.Parses(@"PREPARE q141 () AS SELECT 1", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void prxa0142() => CorpusAssert.Parses(@"PREPARE 123bad AS SELECT 1", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void prxa0143() => CorpusAssert.Parses(@"PREPARE q143 (integer,) AS SELECT $1", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void prxa0144() => CorpusAssert.Parses(@"PREPARE q144 AS SELECT * FROM nonexistent_table_xyz", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void prxa0145() => CorpusAssert.Parses(@"PREPARE q145 AS VACUUM s.t", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void prxa0146() => CorpusAssert.Parses(@"DEALLOCATE", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void prxa0147() => CorpusAssert.Parses(@"PREPARE q147 (integer) AS SELECT * FROM s.t WHERE id = $1; EXECUTE q147(1, 2)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void prxa0148() => CorpusAssert.Parses(@"PREPARE q148 (integer, text) AS SELECT * FROM s.t WHERE id = $1 AND name = $2; EXECUTE q148(1)", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void prxa0149() => CorpusAssert.Parses(@"PREPARE q149 AS CALL s.p(1)", "error");

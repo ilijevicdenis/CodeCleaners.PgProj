@@ -5,83 +5,83 @@ namespace PgProj.Core.Tests.Corpus;
 
 public class Corpus_PlpgsqlCursors
 {
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0001() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR FOR SELECT id FROM s.t; BEGIN OPEN c; CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0002() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR FOR SELECT * FROM s.t; r s.t%ROWTYPE; BEGIN OPEN c; FETCH c INTO r; CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0003() => CorpusAssert.Parses(@"DO $$ DECLARE c refcursor; BEGIN OPEN c FOR SELECT id FROM s.t; CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0004() => CorpusAssert.Parses(@"DO $$ DECLARE c SCROLL CURSOR FOR SELECT id FROM s.t; BEGIN OPEN c; CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0005() => CorpusAssert.Parses(@"DO $$ DECLARE c NO SCROLL CURSOR FOR SELECT id FROM s.t; BEGIN OPEN c; CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0006() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR (k integer) FOR SELECT id FROM s.t WHERE id = k; BEGIN OPEN c(1); CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0007() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR (k integer) FOR SELECT id FROM s.t WHERE id = k; BEGIN OPEN c(k := 1); CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0008() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR (k integer) FOR SELECT id FROM s.t WHERE id = k; BEGIN OPEN c(k => 1); CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0009() => CorpusAssert.Parses(@"DO $$ DECLARE c refcursor; BEGIN OPEN c FOR EXECUTE 'SELECT id FROM s.t'; CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0010() => CorpusAssert.Parses(@"DO $$ DECLARE c refcursor; v bigint; BEGIN OPEN c FOR EXECUTE 'SELECT id FROM s.t WHERE id = $1' USING 1; FETCH c INTO v; CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0011() => CorpusAssert.Parses(@"DO $$ DECLARE c refcursor; v1 bigint; v2 bigint; BEGIN OPEN c FOR EXECUTE 'SELECT id, id+1 FROM s.t' USING 1, 2; FETCH c INTO v1, v2; CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0012() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR FOR SELECT id FROM s.t; v bigint; BEGIN OPEN c; FETCH NEXT FROM c INTO v; CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0013() => CorpusAssert.Parses(@"DO $$ DECLARE c SCROLL CURSOR FOR SELECT id FROM s.t; v bigint; BEGIN OPEN c; FETCH PRIOR FROM c INTO v; CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0014() => CorpusAssert.Parses(@"DO $$ DECLARE c SCROLL CURSOR FOR SELECT id FROM s.t; v bigint; BEGIN OPEN c; FETCH FIRST FROM c INTO v; CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0015() => CorpusAssert.Parses(@"DO $$ DECLARE c SCROLL CURSOR FOR SELECT id FROM s.t; v bigint; BEGIN OPEN c; FETCH LAST FROM c INTO v; CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0016() => CorpusAssert.Parses(@"DO $$ DECLARE c SCROLL CURSOR FOR SELECT id FROM s.t; v bigint; BEGIN OPEN c; FETCH ABSOLUTE 1 FROM c INTO v; CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0017() => CorpusAssert.Parses(@"DO $$ DECLARE c SCROLL CURSOR FOR SELECT id FROM s.t; v bigint; BEGIN OPEN c; FETCH RELATIVE 1 FROM c INTO v; CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0018() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR FOR SELECT id FROM s.t; v bigint; BEGIN OPEN c; FETCH FORWARD FROM c INTO v; CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0019() => CorpusAssert.Parses(@"DO $$ DECLARE c SCROLL CURSOR FOR SELECT id FROM s.t; v bigint; BEGIN OPEN c; FETCH BACKWARD FROM c INTO v; CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0020() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR FOR SELECT id FROM s.t; v bigint; BEGIN OPEN c; FETCH FROM c INTO v; CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0021() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR FOR SELECT id FROM s.t; v bigint; BEGIN OPEN c; FETCH IN c INTO v; CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0022() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR FOR SELECT id FROM s.t; v bigint; BEGIN OPEN c; FETCH NEXT IN c INTO v; CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0023() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR FOR SELECT id FROM s.t; BEGIN OPEN c; MOVE NEXT FROM c; CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0024() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR FOR SELECT id FROM s.t; BEGIN OPEN c; MOVE FROM c; CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0025() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR FOR SELECT id FROM s.t; BEGIN OPEN c; MOVE c; CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0026() => CorpusAssert.Parses(@"DO $$ DECLARE c SCROLL CURSOR FOR SELECT id FROM s.t; BEGIN OPEN c; MOVE LAST FROM c; CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0027() => CorpusAssert.Parses(@"DO $$ DECLARE c SCROLL CURSOR FOR SELECT id FROM s.t; BEGIN OPEN c; MOVE FIRST FROM c; CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0028() => CorpusAssert.Parses(@"DO $$ DECLARE c SCROLL CURSOR FOR SELECT id FROM s.t; BEGIN OPEN c; MOVE PRIOR FROM c; CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0029() => CorpusAssert.Parses(@"DO $$ DECLARE c SCROLL CURSOR FOR SELECT id FROM s.t; BEGIN OPEN c; MOVE ABSOLUTE 2 FROM c; CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0030() => CorpusAssert.Parses(@"DO $$ DECLARE c SCROLL CURSOR FOR SELECT id FROM s.t; BEGIN OPEN c; MOVE RELATIVE 1 FROM c; CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0031() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR FOR SELECT id FROM s.t; BEGIN OPEN c; MOVE FORWARD FROM c; CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0032() => CorpusAssert.Parses(@"DO $$ DECLARE c SCROLL CURSOR FOR SELECT id FROM s.t; BEGIN OPEN c; MOVE BACKWARD FROM c; CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0033() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR FOR SELECT id FROM s.t; BEGIN OPEN c; MOVE FORWARD 3 FROM c; CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0034() => CorpusAssert.Parses(@"DO $$ DECLARE c SCROLL CURSOR FOR SELECT id FROM s.t; BEGIN OPEN c; MOVE BACKWARD 2 FROM c; CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0035() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR FOR SELECT id FROM s.t; BEGIN FOR r IN c LOOP NULL; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0036() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR (k integer) FOR SELECT id FROM s.t WHERE id = k; BEGIN FOR r IN c(1) LOOP NULL; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0037() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR (k integer) FOR SELECT id FROM s.t WHERE id = k; BEGIN FOR r IN c(k := 42) LOOP NULL; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0038() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR (k integer) FOR SELECT id FROM s.t WHERE id = k; BEGIN FOR r IN c(k => 42) LOOP NULL; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0039() => CorpusAssert.Parses(@"DO $$ DECLARE c refcursor := 'myref'; BEGIN OPEN c FOR SELECT id FROM s.t; CLOSE c; END $$;", "ok");
     [Fact]
     public void ppca0040() => CorpusAssert.Parses(@"CREATE OR REPLACE FUNCTION s.f_refcur(c refcursor) RETURNS refcursor LANGUAGE plpgsql AS $$ BEGIN OPEN c FOR SELECT id FROM s.t; RETURN c; END $$;
@@ -89,80 +89,80 @@ SELECT s.f_refcur('testcursor');", "ok");
     [Fact]
     public void ppca0041() => CorpusAssert.Parses(@"CREATE OR REPLACE FUNCTION s.f_refcur2() RETURNS refcursor LANGUAGE plpgsql AS $$ DECLARE c refcursor; BEGIN OPEN c FOR SELECT id FROM s.t; RETURN c; END $$;
 SELECT s.f_refcur2();", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0042() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR FOR SELECT id, name FROM s.t; v_id bigint; v_name text; BEGIN OPEN c; FETCH c INTO v_id, v_name; CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0043() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR FOR SELECT id FROM s.t; r RECORD; BEGIN OPEN c; FETCH c INTO r; CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0044() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR FOR SELECT * FROM s.t; r s.t%ROWTYPE; BEGIN OPEN c; FETCH NEXT FROM c INTO r; CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0045() => CorpusAssert.Parses(@"DO $$ DECLARE c SCROLL CURSOR FOR SELECT id FROM s.t ORDER BY id; v bigint; BEGIN OPEN c; FETCH LAST FROM c INTO v; FETCH PRIOR FROM c INTO v; CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0046() => CorpusAssert.Parses(@"DO $$ DECLARE c SCROLL CURSOR FOR SELECT id FROM s.t ORDER BY id; v bigint; BEGIN OPEN c; FETCH ABSOLUTE 1 FROM c INTO v; FETCH ABSOLUTE -1 FROM c INTO v; CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0047() => CorpusAssert.Parses(@"DO $$ DECLARE c SCROLL CURSOR FOR SELECT id FROM s.t ORDER BY id; v bigint; BEGIN OPEN c; FETCH RELATIVE 0 FROM c INTO v; CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0048() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR FOR SELECT id FROM s.t; BEGIN OPEN c; CLOSE c; OPEN c; CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0049() => CorpusAssert.Parses(@"DO $$ DECLARE c refcursor; BEGIN OPEN c FOR SELECT id FROM s.t; MOVE FORWARD 5 FROM c; CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0050() => CorpusAssert.Parses(@"DO $$ DECLARE c refcursor; BEGIN OPEN c NO SCROLL FOR SELECT id FROM s.t; CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0051() => CorpusAssert.Parses(@"DO $$ DECLARE c refcursor; BEGIN OPEN c SCROLL FOR SELECT id FROM s.t; CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0052() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR FOR SELECT id FROM s.t FOR UPDATE; v bigint; BEGIN OPEN c; FETCH c INTO v; CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0053() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR FOR SELECT id FROM s.t FOR UPDATE; v bigint; BEGIN INSERT INTO s.t(name,qty,flag,status) VALUES('cur_test',1,false,'ok'); OPEN c; FETCH c INTO v; UPDATE s.t SET val = 1 WHERE CURRENT OF c; CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0054() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR FOR SELECT id FROM s.t FOR UPDATE; v bigint; BEGIN INSERT INTO s.t(name,qty,flag,status) VALUES('cur_del',1,false,'ok'); OPEN c; FETCH c INTO v; DELETE FROM s.t WHERE CURRENT OF c; CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0055() => CorpusAssert.Parses(@"DO $$ DECLARE c1 CURSOR FOR SELECT id FROM s.t; c2 CURSOR FOR SELECT id FROM s.t2; v1 bigint; v2 bigint; BEGIN OPEN c1; OPEN c2; FETCH c1 INTO v1; FETCH c2 INTO v2; CLOSE c1; CLOSE c2; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0056() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR FOR SELECT id FROM s.t; v bigint; cnt integer := 0; BEGIN OPEN c; LOOP FETCH c INTO v; EXIT WHEN NOT FOUND; cnt := cnt + 1; END LOOP; CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0057() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR FOR SELECT id FROM s.t; BEGIN FOR r IN c LOOP RAISE NOTICE '%', r.id; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0058() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR FOR SELECT id FROM s.t; BEGIN <<myloop>> FOR r IN c LOOP EXIT myloop WHEN r.id > 100; END LOOP myloop; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0059() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR FOR SELECT id FROM s.t; BEGIN FOR r IN c LOOP CONTINUE WHEN r.id IS NULL; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0060() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR (lim integer, off integer) FOR SELECT id FROM s.t LIMIT lim OFFSET off; BEGIN OPEN c(lim := 10, off := 0); CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0061() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR (lim integer, off integer) FOR SELECT id FROM s.t LIMIT lim OFFSET off; BEGIN OPEN c(10, 0); CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0062() => CorpusAssert.Parses(@"DO $$ DECLARE c refcursor; tbl text := 's.t'; BEGIN OPEN c FOR EXECUTE format('SELECT id FROM %s', tbl); CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0063() => CorpusAssert.Parses(@"DO $$ DECLARE c SCROLL CURSOR FOR SELECT id FROM s.t ORDER BY id; BEGIN OPEN c; MOVE FORWARD 2 FROM c; CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0064() => CorpusAssert.Parses(@"DO $$ DECLARE c SCROLL CURSOR FOR SELECT id FROM s.t ORDER BY id; v bigint; BEGIN OPEN c; FETCH LAST FROM c INTO v; MOVE BACKWARD 2 FROM c; CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0065() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR FOR SELECT id FROM s.t; BEGIN OPEN c; MOVE FORWARD ALL FROM c; CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0066() => CorpusAssert.Parses(@"DO $$ DECLARE c SCROLL CURSOR FOR SELECT id FROM s.t ORDER BY id; BEGIN OPEN c; MOVE ALL FROM c; CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0067() => CorpusAssert.Parses(@"DO $$ DECLARE c SCROLL CURSOR FOR SELECT id FROM s.t; BEGIN OPEN c; MOVE FORWARD ALL FROM c; CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0068() => CorpusAssert.Parses(@"DO $$ DECLARE c SCROLL CURSOR FOR SELECT id FROM s.t; BEGIN OPEN c; MOVE BACKWARD ALL FROM c; CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0069() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR FOR SELECT id FROM s.t; BEGIN OPEN c; CLOSE c; END $$;
 DO $$ DECLARE c CURSOR FOR SELECT id FROM s.t2; BEGIN OPEN c; CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0070() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR FOR SELECT id FROM s.t WHERE id = ANY(ARRAY[1,2,3]); v bigint; BEGIN OPEN c; FETCH c INTO v; CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0071() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR FOR SELECT a.id, b.label FROM s.t a JOIN s.t2 b ON a.id = b.t_id; r RECORD; BEGIN OPEN c; FETCH c INTO r; CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0072() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR FOR SELECT id FROM s.t ORDER BY id DESC LIMIT 10; v bigint; BEGIN OPEN c; FETCH c INTO v; CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0073() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR FOR SELECT id FROM s.t UNION SELECT id FROM s.t2; v bigint; BEGIN OPEN c; FETCH c INTO v; CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0074() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR FOR WITH cte AS (SELECT id FROM s.t) SELECT id FROM cte; v bigint; BEGIN OPEN c; FETCH c INTO v; CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0075() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR FOR SELECT id FROM s.t; BEGIN OPEN c; MOVE IN c; CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0076() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR FOR SELECT id FROM s.t; BEGIN OPEN c; MOVE NEXT IN c; CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0077() => CorpusAssert.Parses(@"DO $$ DECLARE c1 refcursor; c2 refcursor; v bigint; BEGIN OPEN c1 FOR SELECT id FROM s.t; OPEN c2 FOR SELECT id FROM s.t2; FETCH c1 INTO v; FETCH c2 INTO v; CLOSE c1; CLOSE c2; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0078() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR FOR SELECT id FROM s.t; v bigint; found_val boolean; BEGIN OPEN c; FETCH c INTO v; found_val := FOUND; CLOSE c; END $$;", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void ppca0079() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR FOR SELECT id FROM s.t; BEGIN OPEN c; CLOSE c; CLOSE c; END $$;", "error");
@@ -204,132 +204,132 @@ DO $$ DECLARE c CURSOR FOR SELECT id FROM s.t2; BEGIN OPEN c; CLOSE c; END $$;",
     public void ppca0097() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR FOR SELECT id FROM s.t; BEGIN CLOSE c; END $$;", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void ppca0098() => CorpusAssert.Parses(@"DO $$ DECLARE c refcursor; v bigint; BEGIN FETCH c INTO v; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0099() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR FOR SELECT id FROM s.t; v bigint; BEGIN OPEN c; FETCH ABSOLUTE 1 FROM c INTO v; CLOSE c; END $$;", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void ppca0100() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR FOR SELECT id FROM s.t; BEGIN OPEN c; MOVE ABSOLUTE FROM c; CLOSE c; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0101() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR FOR SELECT id FROM s.t; BEGIN OPEN c; MOVE FORWARD 0 FROM c; CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0102() => CorpusAssert.Parses(@"DO $$ DECLARE c SCROLL CURSOR FOR SELECT id FROM s.t ORDER BY id; v bigint; BEGIN OPEN c; FETCH RELATIVE 0 FROM c INTO v; FETCH NEXT FROM c INTO v; CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0103() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR FOR SELECT id FROM s.t; BEGIN OPEN c; MOVE BACKWARD 0 FROM c; CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0104() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR FOR SELECT id FROM s.t FOR UPDATE; BEGIN FOR r IN c LOOP UPDATE s.t SET val = 0 WHERE CURRENT OF c; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0105() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR FOR SELECT id FROM s.t; BEGIN FOR r IN c LOOP UPDATE s.t SET val = 0 WHERE CURRENT OF c; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0106() => CorpusAssert.Parses(@"DO $$ DECLARE c SCROLL CURSOR FOR SELECT id FROM s.t; v bigint; BEGIN OPEN c; FETCH RELATIVE -1 FROM c INTO v; CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0107() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR FOR SELECT id FROM s.t; r RECORD; BEGIN OPEN c; FETCH c INTO r; IF NOT FOUND THEN RAISE NOTICE 'no rows'; END IF; CLOSE c; END $$;", "ok");
     [Fact]
     public void ppca0108() => CorpusAssert.Parses(@"CREATE OR REPLACE FUNCTION s.multi_cur(c1 refcursor, c2 refcursor) RETURNS SETOF refcursor LANGUAGE plpgsql AS $$ BEGIN OPEN c1 FOR SELECT id FROM s.t; RETURN NEXT c1; OPEN c2 FOR SELECT id FROM s.t2; RETURN NEXT c2; END $$;
 SELECT s.multi_cur('ca', 'cb');", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0109() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR FOR SELECT id FROM s.t; v bigint; BEGIN OPEN c; FETCH NEXT FROM c INTO v; FETCH NEXT FROM c INTO v; FETCH NEXT FROM c INTO v; CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0110() => CorpusAssert.Parses(@"DO $$ DECLARE c SCROLL CURSOR FOR SELECT id FROM s.t ORDER BY id; v bigint; BEGIN OPEN c; FETCH FIRST FROM c INTO v; FETCH LAST FROM c INTO v; FETCH FIRST FROM c INTO v; CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0111() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR (nm text) FOR SELECT id FROM s.t WHERE name = nm; v bigint; BEGIN OPEN c(nm := 'Alice'); FETCH c INTO v; CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0112() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR (a integer, b text) FOR SELECT id FROM s.t WHERE id = a AND name = b; v bigint; BEGIN OPEN c(1, 'Alice'); FETCH c INTO v; CLOSE c; END $$;", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void ppca0113() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR FOR SELECT id FROM s.t; BEGIN OPEN c; MOVE FORWARD ALL FROM c; FETCH NEXT FROM c INTO (SELECT 1); CLOSE c; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0114() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR FOR SELECT id FROM s.t; v bigint; BEGIN OPEN c; FETCH c INTO v; RAISE NOTICE 'val: %', v; CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0115() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR FOR SELECT id FROM s.t; v bigint; BEGIN OPEN c; LOOP FETCH NEXT FROM c INTO v; EXIT WHEN NOT FOUND; END LOOP; CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0116() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR FOR SELECT id FROM s.t; cnt bigint := 0; r RECORD; BEGIN OPEN c; LOOP FETCH c INTO r; EXIT WHEN NOT FOUND; cnt := cnt + 1; END LOOP; GET DIAGNOSTICS cnt = ROW_COUNT; CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0117() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR FOR SELECT id FROM s.t; v bigint; w bigint; BEGIN OPEN c; FETCH c INTO v, w; CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0118() => CorpusAssert.Parses(@"DO $$ DECLARE c SCROLL CURSOR FOR SELECT id FROM s.t ORDER BY id; BEGIN OPEN c; MOVE ABSOLUTE -1 FROM c; CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0119() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR FOR SELECT id FROM s.t; v bigint; BEGIN OPEN c; FETCH NEXT FROM c INTO v; MOVE NEXT FROM c; FETCH NEXT FROM c INTO v; CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0120() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR FOR SELECT id FROM s.t; BEGIN OPEN c; MOVE FORWARD 10 FROM c; CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0121() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR FOR SELECT id FROM s.t; v bigint; BEGIN OPEN c; MOVE FORWARD ALL FROM c; FETCH NEXT FROM c INTO v; CLOSE c; END $$;", "ok");
     [Fact]
     public void ppca0122() => CorpusAssert.Parses(@"CREATE OR REPLACE FUNCTION s.get_refcur() RETURNS refcursor LANGUAGE plpgsql AS $$ DECLARE c refcursor; BEGIN OPEN c FOR SELECT * FROM s.t; RETURN c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0123() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR FOR SELECT id FROM s.t; v bigint; BEGIN OPEN c; FETCH c INTO v; IF FOUND THEN RAISE NOTICE 'found %', v; ELSE RAISE NOTICE 'not found'; END IF; CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0124() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR FOR SELECT id FROM s.t; v bigint; BEGIN OPEN c; FETCH NEXT FROM c INTO v; FETCH NEXT FROM c INTO v; FETCH NEXT FROM c INTO v; FETCH NEXT FROM c INTO v; FETCH NEXT FROM c INTO v; CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0125() => CorpusAssert.Parses(@"DO $$ DECLARE c refcursor; v bigint; BEGIN OPEN c SCROLL FOR SELECT id FROM s.t ORDER BY id; FETCH LAST FROM c INTO v; FETCH PRIOR FROM c INTO v; CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0126() => CorpusAssert.Parses(@"DO $$ DECLARE c refcursor; v bigint; BEGIN OPEN c NO SCROLL FOR SELECT id FROM s.t; FETCH NEXT FROM c INTO v; CLOSE c; END $$;", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void ppca0127() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR FOR SELECT id FROM s.t; BEGIN OPEN c; CLOSE c; DECLARE c2 CURSOR FOR SELECT id FROM s.t2; OPEN c2; CLOSE c2; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0128() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR FOR SELECT id FROM s.t; v bigint; BEGIN OPEN c; <<fetchloop>> LOOP FETCH c INTO v; EXIT fetchloop WHEN NOT FOUND; END LOOP fetchloop; CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0129() => CorpusAssert.Parses(@"DO $$ DECLARE curs1 refcursor; curs2 CURSOR FOR SELECT id FROM s.t; curs3 CURSOR (k integer) FOR SELECT id FROM s.t WHERE id = k; v bigint; BEGIN OPEN curs1 FOR SELECT id FROM s.t; OPEN curs2; OPEN curs3(1); FETCH curs1 INTO v; FETCH curs2 INTO v; FETCH curs3 INTO v; CLOSE curs1; CLOSE curs2; CLOSE curs3; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0130() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR FOR SELECT id FROM s.t FOR UPDATE; BEGIN FOR r IN c LOOP RAISE NOTICE '%', r.id; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0131() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR FOR SELECT id FROM s.t; v bigint; BEGIN OPEN c; FETCH FORWARD FROM c INTO v; CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0132() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR FOR SELECT id FROM s.t; BEGIN OPEN c; MOVE BACKWARD 0 FROM c; CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0133() => CorpusAssert.Parses(@"DO $$ DECLARE c refcursor; BEGIN OPEN c FOR EXECUTE $q$SELECT id FROM s.t$q$; CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0134() => CorpusAssert.Parses(@"DO $$ DECLARE c refcursor; v bigint; k integer := 5; BEGIN OPEN c FOR EXECUTE 'SELECT id FROM s.t WHERE id < $1' USING k; FETCH c INTO v; CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0135() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR FOR SELECT id FROM s.t; BEGIN OPEN c; MOVE RELATIVE 0 FROM c; CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0136() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR FOR SELECT id FROM s.t; BEGIN OPEN c; MOVE FORWARD FROM c; CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0137() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR FOR SELECT id FROM s.t; v integer; BEGIN OPEN c; FETCH c INTO v; CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0138() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR FOR SELECT name FROM s.t; v text; BEGIN OPEN c; FETCH c INTO v; CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0139() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR FOR SELECT data FROM s.t; v jsonb; BEGIN OPEN c; FETCH c INTO v; CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0140() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR FOR SELECT home FROM s.t; v s.addr; BEGIN OPEN c; FETCH c INTO v; CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0141() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR FOR SELECT status FROM s.t; v s.mood; BEGIN OPEN c; FETCH c INTO v; CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0142() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR FOR SELECT tags FROM s.t; v text[]; BEGIN OPEN c; FETCH c INTO v; CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0143() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR FOR SELECT id FROM s.t; v bigint; BEGIN OPEN c; FETCH c INTO v; CLOSE c; END $$;
 DO $$ DECLARE c CURSOR FOR SELECT name FROM s.t; v text; BEGIN OPEN c; FETCH c INTO v; CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0144() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR FOR SELECT id FROM s.t; BEGIN OPEN c; MOVE NEXT FROM c; MOVE NEXT FROM c; MOVE NEXT FROM c; CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0145() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR FOR SELECT id FROM s.t FOR UPDATE; v bigint; BEGIN INSERT INTO s.t(name,qty,flag,status) VALUES('upd2',1,false,'ok'); OPEN c; FETCH c INTO v; UPDATE s.t SET val = 99.99 WHERE CURRENT OF c; CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0146() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR FOR SELECT id FROM s.t FOR UPDATE; v bigint; BEGIN INSERT INTO s.t(name,qty,flag,status) VALUES('del2',1,false,'ok'); OPEN c; FETCH c INTO v; DELETE FROM s.t WHERE CURRENT OF c; CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0147() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR FOR SELECT id FROM s.t FOR UPDATE; BEGIN FOR r IN c LOOP DELETE FROM s.t WHERE CURRENT OF c; END LOOP; END $$;", "ok");
     [Fact]
     public void ppca0148() => CorpusAssert.Parses(@"CREATE OR REPLACE FUNCTION s.f_named_cur() RETURNS refcursor LANGUAGE plpgsql AS $$ DECLARE c refcursor := 'named_portal'; BEGIN OPEN c FOR SELECT id FROM s.t; RETURN c; END $$;
 SELECT s.f_named_cur();", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0149() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR FOR SELECT id FROM s.t; v bigint; BEGIN OPEN c; FETCH NEXT IN c INTO v; CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0150() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR FOR SELECT id FROM s.t; v bigint; BEGIN OPEN c; FETCH FORWARD IN c INTO v; CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0151() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR FOR SELECT id FROM s.t; BEGIN OPEN c; MOVE FORWARD 1 IN c; CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0152() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR FOR SELECT id FROM s.t; v bigint; BEGIN OPEN c; FETCH IN c INTO v; CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0153() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR FOR SELECT id FROM s.t; BEGIN FOR r IN c LOOP EXIT; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0154() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR (n integer) FOR SELECT id FROM s.t WHERE id > n; BEGIN FOR r IN c(n := 0) LOOP RAISE NOTICE '%', r.id; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0155() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR (n integer) FOR SELECT id FROM s.t WHERE id > n; BEGIN FOR r IN c(n => 0) LOOP NULL; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0156() => CorpusAssert.Parses(@"DO $$ DECLARE c SCROLL CURSOR FOR SELECT id FROM s.t ORDER BY id; v bigint; BEGIN OPEN c; FETCH ABSOLUTE 1 FROM c INTO v; FETCH RELATIVE -1 FROM c INTO v; CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0157() => CorpusAssert.Parses(@"DO $$ DECLARE c SCROLL CURSOR FOR SELECT id FROM s.t ORDER BY id; v bigint; BEGIN OPEN c; MOVE FORWARD ALL FROM c; MOVE BACKWARD ALL FROM c; FETCH FIRST FROM c INTO v; CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0158() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR FOR SELECT id FROM s.t; BEGIN OPEN c; MOVE ALL FROM c; CLOSE c; OPEN c; MOVE ALL FROM c; CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0159() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR FOR SELECT id FROM s.t; id_val bigint; BEGIN OPEN c; FETCH c INTO id_val; CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0160() => CorpusAssert.Parses(@"DO $$ DECLARE c NO SCROLL CURSOR FOR SELECT id FROM s.t; v bigint; BEGIN OPEN c; FETCH NEXT FROM c INTO v; CLOSE c; END $$;", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void ppca0161() => CorpusAssert.Parses(@"DO $$ DECLARE c NO SCROLL CURSOR FOR SELECT id FROM s.t; v bigint; BEGIN OPEN c; FETCH PRIOR FROM c INTO v; CLOSE c; END $$;", "error");
@@ -341,129 +341,129 @@ SELECT s.f_named_cur();", "ok");
     public void ppca0164() => CorpusAssert.Parses(@"DO $$ DECLARE c NO SCROLL CURSOR FOR SELECT id FROM s.t; BEGIN OPEN c; MOVE BACKWARD FROM c; CLOSE c; END $$;", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void ppca0165() => CorpusAssert.Parses(@"DO $$ DECLARE c refcursor; v bigint; BEGIN OPEN c NO SCROLL FOR SELECT id FROM s.t; FETCH PRIOR FROM c INTO v; CLOSE c; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0166() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR FOR SELECT id, name, val FROM s.t; v_id bigint; v_name text; v_val numeric; BEGIN OPEN c; FETCH c INTO v_id, v_name, v_val; CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0167() => CorpusAssert.Parses(@"DO $$ DECLARE c SCROLL CURSOR FOR SELECT id FROM s.t ORDER BY id; v bigint; BEGIN OPEN c; FETCH ABSOLUTE 1 FROM c INTO v; FETCH ABSOLUTE -1 FROM c INTO v; CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0168() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR FOR SELECT id FROM s.t; v bigint; BEGIN OPEN c; FETCH c INTO v; RAISE NOTICE 'id=%', v; CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0169() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR FOR SELECT id FROM s.t; v bigint; BEGIN OPEN c; FETCH RELATIVE 1 FROM c INTO v; CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppca0170() => CorpusAssert.Parses(@"DO $$ DECLARE c SCROLL CURSOR FOR SELECT id FROM s.t ORDER BY id; v bigint; BEGIN OPEN c; FETCH LAST FROM c INTO v; FETCH BACKWARD FROM c INTO v; CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppcb0001() => CorpusAssert.Parses(@"DO $$ DECLARE curs1 refcursor; BEGIN END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppcb0002() => CorpusAssert.Parses(@"DO $$ DECLARE curs2 CURSOR FOR SELECT * FROM s.t; BEGIN END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppcb0003() => CorpusAssert.Parses(@"DO $$ DECLARE curs3 CURSOR IS SELECT id FROM s.t; BEGIN END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppcb0004() => CorpusAssert.Parses(@"DO $$ DECLARE curs4 NO SCROLL CURSOR FOR SELECT * FROM s.t; BEGIN END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppcb0005() => CorpusAssert.Parses(@"DO $$ DECLARE curs5 SCROLL CURSOR FOR SELECT * FROM s.t; BEGIN END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppcb0006() => CorpusAssert.Parses(@"DO $$ DECLARE curs6 CURSOR (k integer) FOR SELECT * FROM s.t WHERE id = k; BEGIN END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppcb0007() => CorpusAssert.Parses(@"DO $$ DECLARE curs7 CURSOR (a integer, b text) FOR SELECT * FROM s.t WHERE id = a AND name = b; BEGIN END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppcb0008() => CorpusAssert.Parses(@"DO $$ DECLARE curs8 NO SCROLL CURSOR (k integer) FOR SELECT * FROM s.t WHERE id = k; BEGIN END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppcb0009() => CorpusAssert.Parses(@"DO $$ DECLARE curs9 SCROLL CURSOR (k integer) FOR SELECT * FROM s.t WHERE id = k; BEGIN END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppcb0010() => CorpusAssert.Parses(@"DO $$ DECLARE curs1 refcursor; r record; BEGIN OPEN curs1 FOR SELECT id, name FROM s.t; FETCH curs1 INTO r; CLOSE curs1; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppcb0011() => CorpusAssert.Parses(@"DO $$ DECLARE curs2 CURSOR FOR SELECT id FROM s.t; i bigint; BEGIN OPEN curs2; FETCH curs2 INTO i; CLOSE curs2; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppcb0012() => CorpusAssert.Parses(@"DO $$ DECLARE curs3 CURSOR (k integer) FOR SELECT id FROM s.t WHERE id = k; i bigint; BEGIN OPEN curs3(1); FETCH curs3 INTO i; CLOSE curs3; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppcb0013() => CorpusAssert.Parses(@"DO $$ DECLARE curs3 CURSOR (k integer) FOR SELECT id FROM s.t WHERE id = k; i bigint; BEGIN OPEN curs3(k := 1); FETCH curs3 INTO i; CLOSE curs3; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppcb0014() => CorpusAssert.Parses(@"DO $$ DECLARE curs3 CURSOR (k integer) FOR SELECT id FROM s.t WHERE id = k; i bigint; BEGIN OPEN curs3(k => 1); FETCH curs3 INTO i; CLOSE curs3; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppcb0015() => CorpusAssert.Parses(@"DO $$ DECLARE curs1 refcursor; r record; BEGIN OPEN curs1 FOR EXECUTE 'SELECT id, name FROM s.t'; FETCH curs1 INTO r; CLOSE curs1; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppcb0016() => CorpusAssert.Parses(@"DO $$ DECLARE curs1 refcursor; r record; v bigint := 1; BEGIN OPEN curs1 FOR EXECUTE 'SELECT id, name FROM s.t WHERE id = $1' USING v; FETCH curs1 INTO r; CLOSE curs1; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppcb0017() => CorpusAssert.Parses(@"DO $$ DECLARE curs1 refcursor; r record; a bigint := 1; b text := 'x'; BEGIN OPEN curs1 FOR EXECUTE 'SELECT id FROM s.t WHERE id = $1 AND name = $2' USING a, b; FETCH curs1 INTO r; CLOSE curs1; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppcb0018() => CorpusAssert.Parses(@"DO $$ DECLARE curs1 refcursor; r record; BEGIN OPEN curs1 NO SCROLL FOR SELECT * FROM s.t; FETCH curs1 INTO r; CLOSE curs1; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppcb0019() => CorpusAssert.Parses(@"DO $$ DECLARE curs1 refcursor; r record; BEGIN OPEN curs1 SCROLL FOR SELECT * FROM s.t; FETCH curs1 INTO r; CLOSE curs1; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppcb0020() => CorpusAssert.Parses(@"DO $$ DECLARE curs1 refcursor; BEGIN OPEN curs1 NO SCROLL FOR EXECUTE 'SELECT id FROM s.t'; CLOSE curs1; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppcb0021() => CorpusAssert.Parses(@"DO $$ DECLARE curs1 refcursor; BEGIN OPEN curs1 SCROLL FOR EXECUTE 'SELECT id FROM s.t'; CLOSE curs1; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppcb0022() => CorpusAssert.Parses(@"DO $$ DECLARE curs2 CURSOR FOR SELECT id FROM s.t; i bigint; BEGIN OPEN curs2; FETCH NEXT FROM curs2 INTO i; CLOSE curs2; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppcb0023() => CorpusAssert.Parses(@"DO $$ DECLARE curs2 SCROLL CURSOR FOR SELECT id FROM s.t; i bigint; BEGIN OPEN curs2; FETCH PRIOR FROM curs2 INTO i; CLOSE curs2; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppcb0024() => CorpusAssert.Parses(@"DO $$ DECLARE curs2 SCROLL CURSOR FOR SELECT id FROM s.t; i bigint; BEGIN OPEN curs2; FETCH FIRST FROM curs2 INTO i; CLOSE curs2; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppcb0025() => CorpusAssert.Parses(@"DO $$ DECLARE curs2 SCROLL CURSOR FOR SELECT id FROM s.t; i bigint; BEGIN OPEN curs2; FETCH LAST FROM curs2 INTO i; CLOSE curs2; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppcb0026() => CorpusAssert.Parses(@"DO $$ DECLARE curs2 SCROLL CURSOR FOR SELECT id FROM s.t; i bigint; BEGIN OPEN curs2; FETCH ABSOLUTE 1 FROM curs2 INTO i; CLOSE curs2; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppcb0027() => CorpusAssert.Parses(@"DO $$ DECLARE curs2 SCROLL CURSOR FOR SELECT id FROM s.t; i bigint; BEGIN OPEN curs2; FETCH RELATIVE 1 FROM curs2 INTO i; CLOSE curs2; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppcb0028() => CorpusAssert.Parses(@"DO $$ DECLARE curs2 SCROLL CURSOR FOR SELECT id FROM s.t; i bigint; BEGIN OPEN curs2; FETCH FORWARD FROM curs2 INTO i; CLOSE curs2; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppcb0029() => CorpusAssert.Parses(@"DO $$ DECLARE curs2 SCROLL CURSOR FOR SELECT id FROM s.t; i bigint; BEGIN OPEN curs2; FETCH BACKWARD FROM curs2 INTO i; CLOSE curs2; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppcb0030() => CorpusAssert.Parses(@"DO $$ DECLARE curs2 SCROLL CURSOR FOR SELECT id FROM s.t; i bigint; BEGIN OPEN curs2; FETCH ABSOLUTE -1 FROM curs2 INTO i; CLOSE curs2; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppcb0031() => CorpusAssert.Parses(@"DO $$ DECLARE curs2 SCROLL CURSOR FOR SELECT id FROM s.t; i bigint; BEGIN OPEN curs2; FETCH RELATIVE -1 FROM curs2 INTO i; CLOSE curs2; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppcb0032() => CorpusAssert.Parses(@"DO $$ DECLARE curs2 CURSOR FOR SELECT id FROM s.t; i bigint; BEGIN OPEN curs2; FETCH curs2 INTO i; CLOSE curs2; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppcb0033() => CorpusAssert.Parses(@"DO $$ DECLARE curs2 CURSOR FOR SELECT id FROM s.t; i bigint; BEGIN OPEN curs2; FETCH IN curs2 INTO i; CLOSE curs2; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppcb0034() => CorpusAssert.Parses(@"DO $$ DECLARE curs2 CURSOR FOR SELECT id, name FROM s.t; i bigint; n text; BEGIN OPEN curs2; FETCH curs2 INTO i, n; CLOSE curs2; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppcb0035() => CorpusAssert.Parses(@"DO $$ DECLARE curs2 CURSOR FOR SELECT id, name FROM s.t; r s.t%ROWTYPE; BEGIN OPEN curs2; FETCH curs2 INTO r; CLOSE curs2; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppcb0036() => CorpusAssert.Parses(@"DO $$ DECLARE curs2 CURSOR FOR SELECT id, name FROM s.t; r record; BEGIN OPEN curs2; FETCH NEXT IN curs2 INTO r; CLOSE curs2; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppcb0037() => CorpusAssert.Parses(@"DO $$ DECLARE curs2 SCROLL CURSOR FOR SELECT id FROM s.t; BEGIN OPEN curs2; MOVE curs2; CLOSE curs2; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppcb0038() => CorpusAssert.Parses(@"DO $$ DECLARE curs2 SCROLL CURSOR FOR SELECT id FROM s.t; BEGIN OPEN curs2; MOVE NEXT FROM curs2; CLOSE curs2; END $$;", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void ppcb0039() => CorpusAssert.Parses(@"DO $$ DECLARE curs2 SCROLL CURSOR FOR SELECT id FROM s.t; BEGIN OPEN curs2; FETCH FIRST FROM curs2 INTO i; MOVE PRIOR FROM curs2; CLOSE curs2; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppcb0040() => CorpusAssert.Parses(@"DO $$ DECLARE curs2 SCROLL CURSOR FOR SELECT id FROM s.t; i bigint; BEGIN OPEN curs2; FETCH FIRST FROM curs2 INTO i; MOVE PRIOR FROM curs2; CLOSE curs2; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppcb0041() => CorpusAssert.Parses(@"DO $$ DECLARE curs2 SCROLL CURSOR FOR SELECT id FROM s.t; BEGIN OPEN curs2; MOVE FIRST FROM curs2; CLOSE curs2; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppcb0042() => CorpusAssert.Parses(@"DO $$ DECLARE curs2 SCROLL CURSOR FOR SELECT id FROM s.t; BEGIN OPEN curs2; MOVE LAST FROM curs2; CLOSE curs2; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppcb0043() => CorpusAssert.Parses(@"DO $$ DECLARE curs2 SCROLL CURSOR FOR SELECT id FROM s.t; BEGIN OPEN curs2; MOVE ABSOLUTE 2 FROM curs2; CLOSE curs2; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppcb0044() => CorpusAssert.Parses(@"DO $$ DECLARE curs2 SCROLL CURSOR FOR SELECT id FROM s.t; BEGIN OPEN curs2; MOVE RELATIVE 1 FROM curs2; CLOSE curs2; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppcb0045() => CorpusAssert.Parses(@"DO $$ DECLARE curs2 CURSOR FOR SELECT id FROM s.t; BEGIN OPEN curs2; MOVE FORWARD FROM curs2; CLOSE curs2; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppcb0046() => CorpusAssert.Parses(@"DO $$ DECLARE curs2 SCROLL CURSOR FOR SELECT id FROM s.t; BEGIN OPEN curs2; MOVE BACKWARD FROM curs2; CLOSE curs2; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppcb0047() => CorpusAssert.Parses(@"DO $$ DECLARE curs2 CURSOR FOR SELECT id FROM s.t; BEGIN OPEN curs2; MOVE FORWARD 5 FROM curs2; CLOSE curs2; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppcb0048() => CorpusAssert.Parses(@"DO $$ DECLARE curs2 SCROLL CURSOR FOR SELECT id FROM s.t; BEGIN OPEN curs2; MOVE BACKWARD 3 FROM curs2; CLOSE curs2; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppcb0049() => CorpusAssert.Parses(@"DO $$ DECLARE curs2 CURSOR FOR SELECT id FROM s.t; BEGIN OPEN curs2; MOVE IN curs2; CLOSE curs2; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppcb0050() => CorpusAssert.Parses(@"DO $$ DECLARE curs2 CURSOR FOR SELECT id FROM s.t; BEGIN OPEN curs2; CLOSE curs2; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppcb0051() => CorpusAssert.Parses(@"DO $$ DECLARE curs1 refcursor; BEGIN OPEN curs1 FOR SELECT id FROM s.t; CLOSE curs1; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppcb0052() => CorpusAssert.Parses(@"DO $$ DECLARE curs2 CURSOR FOR SELECT id FROM s.t; r record; BEGIN FOR r IN curs2 LOOP NULL; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppcb0053() => CorpusAssert.Parses(@"DO $$ DECLARE curs3 CURSOR (k integer) FOR SELECT id FROM s.t WHERE id = k; r record; BEGIN FOR r IN curs3(1) LOOP NULL; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppcb0054() => CorpusAssert.Parses(@"DO $$ DECLARE curs3 CURSOR (k integer) FOR SELECT id FROM s.t WHERE id = k; r record; BEGIN FOR r IN curs3(k := 1) LOOP NULL; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppcb0055() => CorpusAssert.Parses(@"DO $$ DECLARE curs3 CURSOR (k integer) FOR SELECT id FROM s.t WHERE id = k; r record; BEGIN FOR r IN curs3(k => 1) LOOP NULL; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppcb0056() => CorpusAssert.Parses(@"DO $$ DECLARE curs3 CURSOR (a integer, b text) FOR SELECT id FROM s.t WHERE id = a AND name = b; r record; BEGIN FOR r IN curs3(1, 'foo') LOOP NULL; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppcb0057() => CorpusAssert.Parses(@"DO $$ DECLARE curs2 CURSOR FOR SELECT id FROM s.t; r record; BEGIN <<myloop>> FOR r IN curs2 LOOP EXIT myloop; END LOOP myloop; END $$;", "ok");
     [Fact]
     public void ppcb0058() => CorpusAssert.Parses(@"CREATE FUNCTION s.ret_cursor() RETURNS refcursor LANGUAGE plpgsql AS $$ DECLARE ref refcursor; BEGIN OPEN ref FOR SELECT id FROM s.t; RETURN ref; END $$;", "ok");
@@ -473,65 +473,65 @@ SELECT s.f_named_cur();", "ok");
     public void ppcb0060() => CorpusAssert.Parses(@"CREATE FUNCTION s.ret_two_cursors(c1 refcursor, c2 refcursor) RETURNS SETOF refcursor LANGUAGE plpgsql AS $$ BEGIN OPEN c1 FOR SELECT id FROM s.t; RETURN NEXT c1; OPEN c2 FOR SELECT name FROM s.t; RETURN NEXT c2; END $$;", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void ppcb0061() => CorpusAssert.Parses(@"DO $$ DECLARE curs2 CURSOR FOR SELECT id FROM s.t; i bigint; BEGIN OPEN curs2; FETCH FORWARD 0 FROM curs2 INTO i; CLOSE curs2; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppcb0062() => CorpusAssert.Parses(@"DO $$ DECLARE curs2 CURSOR FOR SELECT id FROM s.t; i bigint; BEGIN OPEN curs2; FETCH ABSOLUTE 0 FROM curs2 INTO i; CLOSE curs2; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppcb0063() => CorpusAssert.Parses(@"DO $$ DECLARE curs3 CURSOR (a integer, b text) FOR SELECT id FROM s.t WHERE id = a AND name = b; i bigint; BEGIN OPEN curs3(a := 1, b := 'test'); FETCH curs3 INTO i; CLOSE curs3; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppcb0064() => CorpusAssert.Parses(@"DO $$ DECLARE curs3 CURSOR (a integer, b text) FOR SELECT id FROM s.t WHERE id = a AND name = b; i bigint; BEGIN OPEN curs3(a => 1, b => 'test'); FETCH curs3 INTO i; CLOSE curs3; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppcb0065() => CorpusAssert.Parses(@"DO $$ DECLARE curs1 refcursor := 'myportal'; BEGIN OPEN curs1 FOR SELECT id FROM s.t; CLOSE curs1; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppcb0066() => CorpusAssert.Parses(@"DO $$ DECLARE curs2 CURSOR FOR SELECT * FROM s.t; r s.t%ROWTYPE; BEGIN FOR r IN curs2 LOOP NULL; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppcb0067() => CorpusAssert.Parses(@"DO $$ DECLARE curs1 refcursor; r record; BEGIN OPEN curs1 FOR SELECT id, name FROM s.t ORDER BY id; LOOP FETCH curs1 INTO r; EXIT WHEN NOT FOUND; END LOOP; CLOSE curs1; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppcb0068() => CorpusAssert.Parses(@"DO $$ DECLARE curs1 refcursor; r record; BEGIN OPEN curs1 FOR SELECT id, name FROM s.t; FETCH NEXT FROM curs1 INTO r; FETCH NEXT FROM curs1 INTO r; CLOSE curs1; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppcb0069() => CorpusAssert.Parses(@"DO $$ DECLARE curs1 refcursor; r record; BEGIN OPEN curs1 FOR SELECT * FROM s.t; MOVE FORWARD 5 FROM curs1; FETCH curs1 INTO r; CLOSE curs1; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppcb0070() => CorpusAssert.Parses(@"DO $$ DECLARE curs2 CURSOR FOR SELECT id FROM s.t; i bigint; n integer := 0; BEGIN OPEN curs2; LOOP FETCH curs2 INTO i; EXIT WHEN NOT FOUND; n := n + 1; END LOOP; CLOSE curs2; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppcb0071() => CorpusAssert.Parses(@"DO $$ DECLARE curs1 refcursor; r record; BEGIN OPEN curs1 FOR EXECUTE format('SELECT id FROM %I.%I', 's', 't'); FETCH curs1 INTO r; CLOSE curs1; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppcb0072() => CorpusAssert.Parses(@"DO $$ DECLARE curs1 refcursor; r record; col text := 'id'; BEGIN OPEN curs1 FOR EXECUTE 'SELECT ' || col || ' FROM s.t'; FETCH curs1 INTO r; CLOSE curs1; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppcb0073() => CorpusAssert.Parses(@"DO $$ DECLARE curs1 refcursor; i bigint; v integer := 1; BEGIN OPEN curs1 FOR EXECUTE 'SELECT id FROM s.t WHERE id >= $1' USING v; FETCH curs1 INTO i; CLOSE curs1; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppcb0074() => CorpusAssert.Parses(@"DO $$ DECLARE curs1 refcursor; i bigint; BEGIN OPEN curs1 FOR EXECUTE 'SELECT id FROM s.t WHERE id >= $1' USING 1 + 1; FETCH curs1 INTO i; CLOSE curs1; END $$;", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void ppcb0075() => CorpusAssert.Parses(@"DO $$ DECLARE curs2 CURSOR FOR SELECT id FROM s.t; i bigint; BEGIN OPEN curs2; FETCH NEXT curs2 INTO i; CLOSE curs2; END $$;", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void ppcb0076() => CorpusAssert.Parses(@"DO $$ DECLARE curs2 CURSOR FOR SELECT id FROM s.t; i bigint; BEGIN OPEN curs2; FETCH FORWARD 1 FROM curs2 INTO i; CLOSE curs2; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppcb0077() => CorpusAssert.Parses(@"DO $$ DECLARE curs2 CURSOR FOR SELECT id FROM s.t; i bigint; BEGIN OPEN curs2; FETCH RELATIVE 0 FROM curs2 INTO i; CLOSE curs2; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppcb0078() => CorpusAssert.Parses(@"DO $$ DECLARE curs1 refcursor; r record; BEGIN OPEN curs1 FOR SELECT id, name, val FROM s.t WHERE flag = true; FETCH curs1 INTO r; CLOSE curs1; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppcb0079() => CorpusAssert.Parses(@"DO $$ DECLARE curs1 refcursor; r record; BEGIN OPEN curs1 FOR SELECT id, name FROM s.t ORDER BY name DESC; FETCH curs1 INTO r; CLOSE curs1; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppcb0080() => CorpusAssert.Parses(@"DO $$ DECLARE curs1 refcursor; r record; BEGIN OPEN curs1 FOR SELECT t.id, t.name FROM s.t t JOIN s.t2 t2 ON t.id = t2.t_id; FETCH curs1 INTO r; CLOSE curs1; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppcb0081() => CorpusAssert.Parses(@"INSERT INTO s.t(name,qty) VALUES('cur_test',1);
 DO $$ DECLARE curs2 CURSOR FOR SELECT id FROM s.t FOR UPDATE; i bigint; BEGIN OPEN curs2; FETCH curs2 INTO i; UPDATE s.t SET name = 'updated' WHERE CURRENT OF curs2; CLOSE curs2; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppcb0082() => CorpusAssert.Parses(@"INSERT INTO s.t(name,qty) VALUES('del_test',1);
 DO $$ DECLARE curs2 CURSOR FOR SELECT id FROM s.t FOR UPDATE; i bigint; BEGIN OPEN curs2; FETCH curs2 INTO i; DELETE FROM s.t WHERE CURRENT OF curs2; CLOSE curs2; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppcb0083() => CorpusAssert.Parses(@"DO $$ DECLARE curs1 refcursor; BEGIN END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppcb0084() => CorpusAssert.Parses(@"DO $$ DECLARE curs2 CURSOR FOR SELECT id FROM s.t; r record; cnt int := 0; BEGIN FOR r IN curs2 LOOP cnt := cnt + 1; IF cnt > 10 THEN EXIT; END IF; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppcb0085() => CorpusAssert.Parses(@"DO $$ DECLARE curs2 CURSOR FOR SELECT id FROM s.t; r record; BEGIN FOR r IN curs2 LOOP CONTINUE; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppcb0086() => CorpusAssert.Parses(@"DO $$ DECLARE curs1 refcursor; r record; BEGIN OPEN curs1 FOR SELECT * FROM s.t WHERE id = ANY(ARRAY[1,2,3]::bigint[]); FETCH curs1 INTO r; CLOSE curs1; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppcb0087() => CorpusAssert.Parses(@"DO $$ DECLARE curs1 refcursor; r record; BEGIN OPEN curs1 FOR WITH cte AS (SELECT id FROM s.t) SELECT * FROM cte; FETCH curs1 INTO r; CLOSE curs1; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppcb0088() => CorpusAssert.Parses(@"DO $$ DECLARE curs1 refcursor; r record; BEGIN OPEN curs1 FOR SELECT id FROM s.t LIMIT 10 OFFSET 5; FETCH curs1 INTO r; CLOSE curs1; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppcb0089() => CorpusAssert.Parses(@"DO $$ DECLARE curs1 refcursor; r record; BEGIN OPEN curs1 FOR SELECT id FROM s.t UNION SELECT id FROM s.t2; FETCH curs1 INTO r; CLOSE curs1; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppcb0090() => CorpusAssert.Parses(@"DO $$ DECLARE curs2 CURSOR FOR SELECT id, name, val, qty FROM s.t; i bigint; n text; v numeric; q integer; BEGIN OPEN curs2; FETCH curs2 INTO i, n, v, q; CLOSE curs2; END $$;", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void ppcb0091() => CorpusAssert.Parses(@"DO $$ DECLARE curs2 CURSOR FOR SELECT id FROM s.t; BEGIN OPEN curs2; FETCH curs2 INTO i; CLOSE curs2; END $$;", "error");
@@ -551,9 +551,9 @@ DO $$ DECLARE curs2 CURSOR FOR SELECT id FROM s.t FOR UPDATE; i bigint; BEGIN OP
     public void ppcb0098() => CorpusAssert.Parses(@"DO $$ DECLARE curs2 CURSOR FOR; BEGIN END $$;", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void ppcb0099() => CorpusAssert.Parses(@"DO $$ DECLARE curs1 refcursor; i bigint; BEGIN OPEN curs1 FOR SELECT id FROM s.t; FETCH NEXT FROM curs1; CLOSE curs1; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppcb0100() => CorpusAssert.Parses(@"DO $$ DECLARE r record; BEGIN FOR r IN SELECT id FROM s.t LOOP NULL; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppcb0101() => CorpusAssert.Parses(@"DO $$ DECLARE curs1 refcursor; i bigint; BEGIN OPEN curs1 FOR SELECT id FROM s.t; MOVE FORWARD ALL FROM curs1; FETCH LAST FROM curs1 INTO i; CLOSE curs1; END $$;", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void ppcb0102() => CorpusAssert.Parses(@"DO $$ DECLARE curs1 SCROLL refcursor; BEGIN END $$;", "error");
@@ -571,41 +571,41 @@ DO $$ DECLARE curs2 CURSOR FOR SELECT id FROM s.t FOR UPDATE; i bigint; BEGIN OP
     public void ppcb0108() => CorpusAssert.Parses(@"DO $$ DECLARE curs2 CURSOR FOR SELECT id FROM s.t; i bigint; BEGIN OPEN curs2; FETCH ALL FROM curs2 INTO i; CLOSE curs2; END $$;", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void ppcb0109() => CorpusAssert.Parses(@"DO $$ DECLARE curs3 CURSOR (k integer) FOR SELECT id FROM s.t WHERE id = k; r record; BEGIN FOR r IN curs3(key := 1) LOOP NULL; END LOOP; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppcb0110() => CorpusAssert.Parses(@"DO $$ DECLARE curs2 CURSOR FOR SELECT id FROM s.t; BEGIN OPEN curs2; MOVE FORWARD ALL FROM curs2; CLOSE curs2; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppcb0111() => CorpusAssert.Parses(@"DO $$ DECLARE curs2 SCROLL CURSOR FOR SELECT id FROM s.t; BEGIN OPEN curs2; MOVE BACKWARD ALL FROM curs2; CLOSE curs2; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppcb0112() => CorpusAssert.Parses(@"DO $$ DECLARE curs2 CURSOR FOR SELECT id FROM s.t; i bigint; BEGIN OPEN curs2; MOVE FORWARD ALL FROM curs2; FETCH ABSOLUTE 1 FROM curs2 INTO i; CLOSE curs2; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppcb0113() => CorpusAssert.Parses(@"DO $$ DECLARE c1 refcursor; c2 refcursor; r1 record; r2 record; BEGIN OPEN c1 FOR SELECT id FROM s.t; OPEN c2 FOR SELECT name FROM s.t; FETCH c1 INTO r1; FETCH c2 INTO r2; CLOSE c1; CLOSE c2; END $$;", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void ppcb0114() => CorpusAssert.Parses(@"DO $$ DECLARE curs2 CURSOR FOR SELECT id FROM s.t; i bigint; BEGIN OPEN curs2; FETCH FORWARD 100 FROM curs2 INTO i; CLOSE curs2; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppcb0115() => CorpusAssert.Parses(@"DO $$ DECLARE curs1 refcursor; r record; BEGIN OPEN curs1 FOR SELECT id FROM s.t WHERE 1=0; FETCH curs1 INTO r; IF NOT FOUND THEN NULL; END IF; CLOSE curs1; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppcb0116() => CorpusAssert.Parses(@"DO $$ DECLARE curs2 CURSOR FOR SELECT id FROM s.t FOR UPDATE; i bigint; BEGIN OPEN curs2; FETCH curs2 INTO i; CLOSE curs2; END $$;", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void ppcb0117() => CorpusAssert.Parses(@"DO $$ DECLARE curs2 SCROLL CURSOR FOR SELECT id FROM s.t FOR UPDATE; i bigint; BEGIN OPEN curs2; FETCH curs2 INTO i; CLOSE curs2; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppcb0118() => CorpusAssert.Parses(@"DO $$ DECLARE curs1 refcursor; i bigint; BEGIN OPEN curs1 FOR SELECT id FROM s.t FOR UPDATE; FETCH curs1 INTO i; CLOSE curs1; END $$;", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void ppcb0119() => CorpusAssert.Parses(@"DO $$ DECLARE curs1 refcursor; i bigint; BEGIN OPEN curs1 SCROLL FOR SELECT id FROM s.t FOR UPDATE; FETCH curs1 INTO i; CLOSE curs1; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppcb0120() => CorpusAssert.Parses(@"DO $$ DECLARE curs1 refcursor; r record; BEGIN OPEN curs1 FOR SELECT id FROM s.v; FETCH curs1 INTO r; CLOSE curs1; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppcb0121() => CorpusAssert.Parses(@"DO $$ DECLARE curs1 refcursor; r record; BEGIN OPEN curs1 FOR SELECT id FROM s.t WHERE id IN (SELECT t_id FROM s.t2); FETCH curs1 INTO r; CLOSE curs1; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppcb0122() => CorpusAssert.Parses(@"DO $$ DECLARE curs2 CURSOR FOR SELECT id FROM s.t; i bigint; BEGIN OPEN curs2; FETCH NEXT FROM curs2 INTO i; MOVE ABSOLUTE 1 FROM curs2; FETCH curs2 INTO i; CLOSE curs2; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppcb0123() => CorpusAssert.Parses(@"DO $$ DECLARE curs1 refcursor; r record; tabname text := 't'; BEGIN OPEN curs1 FOR EXECUTE format('SELECT id, name FROM s.%I', tabname); FETCH curs1 INTO r; CLOSE curs1; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppcb0124() => CorpusAssert.Parses(@"DO $$ DECLARE curs1 refcursor; r record; BEGIN OPEN curs1 FOR EXECUTE $q$SELECT id FROM s.t$q$; FETCH curs1 INTO r; CLOSE curs1; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppcb0125() => CorpusAssert.Parses(@"DO $$ DECLARE curs2 CURSOR FOR SELECT id FROM s.t; r record; BEGIN FOR r IN curs2 LOOP RAISE NOTICE 'id=%', r.id; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppcb0126() => CorpusAssert.Parses(@"DO $$ DECLARE curs1 refcursor; r record; BEGIN OPEN curs1 FOR SELECT * FROM s.rows_f(); FETCH curs1 INTO r; CLOSE curs1; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppcb0127() => CorpusAssert.Parses(@"DO $$ DECLARE curs2 CURSOR FOR SELECT id FROM s.t; i bigint; BEGIN OPEN curs2; FETCH NEXT FROM curs2 INTO i, i; CLOSE curs2; END $$;", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void ppcb0128() => CorpusAssert.Parses(@"DO $$ DECLARE curs2 NO SCROLL CURSOR FOR SELECT id FROM s.t; i bigint; BEGIN OPEN curs2; FETCH PRIOR FROM curs2 INTO i; CLOSE curs2; END $$;", "error");

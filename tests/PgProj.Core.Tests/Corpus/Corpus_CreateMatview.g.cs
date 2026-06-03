@@ -81,11 +81,11 @@ REFRESH MATERIALIZED VIEW mvwa_mv34 WITH NO DATA", "ok");
     public void mvwa0035() => CorpusAssert.Parses(@"CREATE MATERIALIZED VIEW mvwa_mv35 AS SELECT id FROM s.t;
 CREATE UNIQUE INDEX ON mvwa_mv35 (id);
 REFRESH MATERIALIZED VIEW CONCURRENTLY mvwa_mv35", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void mvwa0036() => CorpusAssert.Parses(@"REFRESH MATERIALIZED VIEW s.mv", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void mvwa0037() => CorpusAssert.Parses(@"REFRESH MATERIALIZED VIEW s.mv WITH DATA", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void mvwa0038() => CorpusAssert.Parses(@"REFRESH MATERIALIZED VIEW s.mv WITH NO DATA", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void mvwa0039() => CorpusAssert.Parses(@"ALTER MATERIALIZED VIEW s.mv RENAME TO mv_renamed;

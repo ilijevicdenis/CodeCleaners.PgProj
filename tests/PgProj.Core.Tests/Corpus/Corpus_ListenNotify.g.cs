@@ -5,49 +5,49 @@ namespace PgProj.Core.Tests.Corpus;
 
 public class Corpus_ListenNotify
 {
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lsna0001() => CorpusAssert.Parses(@"LISTEN mychannel", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lsna0002() => CorpusAssert.Parses(@"NOTIFY mychannel", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lsna0003() => CorpusAssert.Parses(@"NOTIFY mychannel, 'hello world'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lsna0004() => CorpusAssert.Parses(@"UNLISTEN mychannel", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lsna0005() => CorpusAssert.Parses(@"UNLISTEN *", "ok");
     [Fact]
     public void lsna0006() => CorpusAssert.Parses(@"SELECT pg_notify('mychannel', 'payload text')", "ok");
     [Fact]
     public void lsna0007() => CorpusAssert.Parses(@"SELECT pg_notify('mychannel', NULL)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lsna0008() => CorpusAssert.Parses(@"LISTEN ""MyChannel""", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lsna0009() => CorpusAssert.Parses(@"NOTIFY ""MyChannel""", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lsna0010() => CorpusAssert.Parses(@"NOTIFY ""MyChannel"", 'payload'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lsna0011() => CorpusAssert.Parses(@"UNLISTEN ""MyChannel""", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lsna0012() => CorpusAssert.Parses(@"LISTEN a", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lsna0013() => CorpusAssert.Parses(@"NOTIFY a", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lsna0014() => CorpusAssert.Parses(@"NOTIFY a, ''", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lsna0015() => CorpusAssert.Parses(@"LISTEN channel_with_underscores", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lsna0016() => CorpusAssert.Parses(@"NOTIFY channel_with_underscores, 'msg'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lsna0017() => CorpusAssert.Parses(@"LISTEN channel123", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lsna0018() => CorpusAssert.Parses(@"NOTIFY channel123, 'data'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lsna0019() => CorpusAssert.Parses(@"LISTEN ""channel with spaces""", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lsna0020() => CorpusAssert.Parses(@"NOTIFY ""channel with spaces"", 'payload'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lsna0021() => CorpusAssert.Parses(@"UNLISTEN ""channel with spaces""", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lsna0022() => CorpusAssert.Parses(@"NOTIFY chan, 'line1\nline2'", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void lsna0023() => CorpusAssert.Parses(@"NOTIFY chan, E'tab\there'", "ok");
@@ -59,45 +59,45 @@ public class Corpus_ListenNotify
     public void lsna0026() => CorpusAssert.Parses(@"SELECT pg_notify('chan', 'hello')", "ok");
     [Fact]
     public void lsna0027() => CorpusAssert.Parses(@"SELECT pg_notify('chan', '')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lsna0028() => CorpusAssert.Parses(@"LISTEN listen", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lsna0029() => CorpusAssert.Parses(@"LISTEN notify", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lsna0030() => CorpusAssert.Parses(@"LISTEN unlisten", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lsna0031() => CorpusAssert.Parses(@"NOTIFY mychan, 'it''s escaped'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lsna0032() => CorpusAssert.Parses(@"LISTEN MYCHANNEL", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lsna0033() => CorpusAssert.Parses(@"NOTIFY MYCHANNEL", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lsna0034() => CorpusAssert.Parses(@"NOTIFY MYCHANNEL, 'msg'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lsna0035() => CorpusAssert.Parses(@"LISTEN MixedCase", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lsna0036() => CorpusAssert.Parses(@"listen mychannel", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lsna0037() => CorpusAssert.Parses(@"notify mychannel", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lsna0038() => CorpusAssert.Parses(@"unlisten *", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lsna0039() => CorpusAssert.Parses(@"LISTEN chan; UNLISTEN chan", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lsna0040() => CorpusAssert.Parses(@"LISTEN chan; LISTEN chan", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lsna0041() => CorpusAssert.Parses(@"UNLISTEN nosuchchan", "ok");
     [Fact]
     public void lsna0042() => CorpusAssert.Parses(@"SELECT pg_notify('a', 'b'), pg_notify('c', 'd')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lsna0043() => CorpusAssert.Parses(@"DO $$ BEGIN PERFORM pg_notify('chan', 'from do block'); END $$", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void lsna0044() => CorpusAssert.Parses(@"LISTEN """"", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lsna0045() => CorpusAssert.Parses(@"NOTIFY ""event.channel""", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lsna0046() => CorpusAssert.Parses(@"NOTIFY ""event.channel"", 'data'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lsna0047() => CorpusAssert.Parses(@"LISTEN ""event.channel""", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void lsna0048() => CorpusAssert.Parses(@"NOTIFY chan, U&'unicode \0041'", "ok");
@@ -105,93 +105,93 @@ public class Corpus_ListenNotify
     public void lsna0049() => CorpusAssert.Parses(@"SELECT pg_notify('ch', repeat('x', 100))", "ok");
     [Fact]
     public void lsna0050() => CorpusAssert.Parses(@"SELECT pg_notify('ch', (SELECT 'computed'))", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lsna0051() => CorpusAssert.Parses(@"NOTIFY", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lsna0052() => CorpusAssert.Parses(@"LISTEN", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lsna0053() => CorpusAssert.Parses(@"UNLISTEN", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lsna0054() => CorpusAssert.Parses(@"NOTIFY ,", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lsna0055() => CorpusAssert.Parses(@"NOTIFY chan 'payload'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lsna0056() => CorpusAssert.Parses(@"NOTIFY chan, 42", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lsna0057() => CorpusAssert.Parses(@"NOTIFY chan, 3.14", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lsna0058() => CorpusAssert.Parses(@"NOTIFY chan, true", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lsna0059() => CorpusAssert.Parses(@"NOTIFY chan, NULL", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lsna0060() => CorpusAssert.Parses(@"NOTIFY chan, chan", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lsna0061() => CorpusAssert.Parses(@"NOTIFY 'chan'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lsna0062() => CorpusAssert.Parses(@"LISTEN 'chan'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lsna0063() => CorpusAssert.Parses(@"UNLISTEN 'chan'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lsna0064() => CorpusAssert.Parses(@"LISTEN *", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lsna0065() => CorpusAssert.Parses(@"NOTIFY *", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lsna0066() => CorpusAssert.Parses(@"LISTEN chan1, chan2", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lsna0067() => CorpusAssert.Parses(@"UNLISTEN chan1, chan2", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lsna0068() => CorpusAssert.Parses(@"NOTIFY chan, 'p1', 'p2'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lsna0069() => CorpusAssert.Parses(@"NOTIFY chan,", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lsna0070() => CorpusAssert.Parses(@"LISTEN chan UNLISTEN chan", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void lsna0071() => CorpusAssert.Parses(@"pg_notify('chan', 'msg')", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lsna0072() => CorpusAssert.Parses(@"NOTIFY s.chan", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lsna0073() => CorpusAssert.Parses(@"LISTEN s.chan", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lsna0074() => CorpusAssert.Parses(@"UNLISTEN s.chan", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lsna0075() => CorpusAssert.Parses(@"NOTIFY chan, (SELECT 'sub')", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lsna0076() => CorpusAssert.Parses(@"LISTEN chan; NOTIFY chan, 'msg'; UNLISTEN chan", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lsna0077() => CorpusAssert.Parses(@"NOTIFY mychan, 'payload with ""quotes""'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lsna0078() => CorpusAssert.Parses(@"NOTIFY a_b_c, 'msg'", "ok");
     [Fact]
     public void lsna0079() => CorpusAssert.Parses(@"SELECT pg_notify('ch1', NULL::text)", "ok");
     [Fact]
     public void lsna0080() => CorpusAssert.Parses(@"SELECT pg_notify($$chan$$, $$msg$$)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lsna0081() => CorpusAssert.Parses(@"NOTIFY ""123starts_with_digit""", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lsna0082() => CorpusAssert.Parses(@"LISTEN ""123starts_with_digit""", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lsna0083() => CorpusAssert.Parses(@"NOTIFY chan, 'a'; NOTIFY chan, 'b'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lsna0084() => CorpusAssert.Parses(@"LISTEN c1; LISTEN c2; LISTEN c3", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lsna0085() => CorpusAssert.Parses(@"LISTEN c1; LISTEN c2; UNLISTEN *", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lsna0086() => CorpusAssert.Parses(@"NOTIFY ""special!chars""", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lsna0087() => CorpusAssert.Parses(@"NOTIFY ""special!chars"", 'payload'", "ok");
     [Fact]
     public void lsna0088() => CorpusAssert.Parses(@"SELECT pg_notify('c', 'x') FROM s.t LIMIT 1", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lsna0089() => CorpusAssert.Parses(@"DO $$ DECLARE i int; BEGIN FOR i IN 1..3 LOOP PERFORM pg_notify('ch', i::text); END LOOP; END $$", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lsna0090() => CorpusAssert.Parses(@"NOTIFY chan, ''''''", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lsna0091() => CorpusAssert.Parses(@"NOTIFY 123chan", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lsna0092() => CorpusAssert.Parses(@"LISTEN 123chan", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lsna0093() => CorpusAssert.Parses(@"NOTIFY chan = 'x'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lsna0094() => CorpusAssert.Parses(@"NOTIFY chan PAYLOAD 'msg'", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void lsna0095() => CorpusAssert.Parses(@"SELECT pg_notify()", "error");
@@ -199,9 +199,9 @@ public class Corpus_ListenNotify
     public void lsna0096() => CorpusAssert.Parses(@"SELECT pg_notify('chan')", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void lsna0097() => CorpusAssert.Parses(@"SELECT pg_notify('chan', 'msg', 'extra')", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lsna0098() => CorpusAssert.Parses(@"NOTIFY chan, 'x'; NOTIFY chan, 'y'; NOTIFY chan, 'z'; UNLISTEN *", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lsna0099() => CorpusAssert.Parses(@"LISTEN alpha; LISTEN beta; LISTEN gamma; UNLISTEN beta; UNLISTEN *", "ok");
     [Fact]
     public void lsna0100() => CorpusAssert.Parses(@"SELECT pg_notify('chan', name) FROM s.t LIMIT 1", "ok");

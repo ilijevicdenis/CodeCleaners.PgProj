@@ -174,9 +174,9 @@ CALL s.p34(0)", "ok");
     public void proca0083() => CorpusAssert.Parses(@"CREATE PROCEDURE s.p80() LANGUAGE plpgsql AS $$ BEGIN RAISE WARNING USING MESSAGE = 'warn'; END $$", "ok");
     [Fact]
     public void proca0084() => CorpusAssert.Parses(@"CREATE PROCEDURE s.p81(a integer, VARIADIC b text[]) LANGUAGE plpgsql AS $$ BEGIN END $$", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void proca0085() => CorpusAssert.Parses(@"CALL s.p(42)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void proca0086() => CorpusAssert.Parses(@"CALL s.p(n => 42)", "ok");
     [Fact]
     public void proca0087() => CorpusAssert.Parses(@"CREATE PROCEDURE s.p82(INOUT x integer, INOUT y integer) LANGUAGE plpgsql AS $$ BEGIN x := x + y; y := x - y; END $$;

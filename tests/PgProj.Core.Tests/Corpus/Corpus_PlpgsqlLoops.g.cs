@@ -5,65 +5,65 @@ namespace PgProj.Core.Tests.Corpus;
 
 public class Corpus_PlpgsqlLoops
 {
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppl0001() => CorpusAssert.Parses(@"DO $$ DECLARE i int; BEGIN i := 0; LOOP i := i + 1; EXIT WHEN i >= 5; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppl0002() => CorpusAssert.Parses(@"DO $$ DECLARE i int := 0; BEGIN WHILE i < 5 LOOP i := i + 1; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppl0003() => CorpusAssert.Parses(@"DO $$ DECLARE i int; BEGIN FOR i IN 1..10 LOOP NULL; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppl0004() => CorpusAssert.Parses(@"DO $$ DECLARE i int; BEGIN FOR i IN REVERSE 10..1 LOOP NULL; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppl0005() => CorpusAssert.Parses(@"DO $$ DECLARE i int; BEGIN FOR i IN 1..20 BY 3 LOOP NULL; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppl0006() => CorpusAssert.Parses(@"DO $$ DECLARE i int; BEGIN FOR i IN REVERSE 20..1 BY 4 LOOP NULL; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppl0007() => CorpusAssert.Parses(@"DO $$ DECLARE r record; BEGIN FOR r IN SELECT id, name FROM s.t LOOP NULL; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppl0008() => CorpusAssert.Parses(@"DO $$ DECLARE r s.t%ROWTYPE; BEGIN FOR r IN SELECT * FROM s.t LOOP NULL; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppl0009() => CorpusAssert.Parses(@"DO $$ DECLARE r record; BEGIN FOR r IN EXECUTE 'SELECT id, name FROM s.t' LOOP NULL; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppl0010() => CorpusAssert.Parses(@"DO $$ DECLARE r record; lim int := 5; BEGIN FOR r IN EXECUTE 'SELECT id FROM s.t WHERE id < $1' USING lim LOOP NULL; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppl0011() => CorpusAssert.Parses(@"DO $$ DECLARE x int; arr int[] := ARRAY[1,2,3,4,5]; BEGIN FOREACH x IN ARRAY arr LOOP NULL; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppl0012() => CorpusAssert.Parses(@"DO $$ DECLARE x int[]; arr int[] := ARRAY[[1,2],[3,4]]; BEGIN FOREACH x SLICE 1 IN ARRAY arr LOOP NULL; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppl0013() => CorpusAssert.Parses(@"DO $$ DECLARE x int[][]; arr int[] := ARRAY[[1,2],[3,4]]; BEGIN FOREACH x SLICE 2 IN ARRAY arr LOOP NULL; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppl0014() => CorpusAssert.Parses(@"DO $$ DECLARE i int := 0; BEGIN <<myloop>> LOOP i := i + 1; EXIT myloop WHEN i >= 3; END LOOP myloop; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppl0015() => CorpusAssert.Parses(@"DO $$ DECLARE i int := 0; BEGIN <<wloop>> WHILE i < 10 LOOP i := i + 1; CONTINUE wloop WHEN i < 5; NULL; END LOOP wloop; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppl0016() => CorpusAssert.Parses(@"DO $$ DECLARE i int; BEGIN <<outer>> FOR i IN 1..5 LOOP <<inner>> FOR i IN 1..5 LOOP EXIT outer WHEN i = 3; END LOOP inner; END LOOP outer; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppl0017() => CorpusAssert.Parses(@"DO $$ DECLARE i int; BEGIN <<outer>> FOR i IN 1..5 LOOP <<inner>> FOR i IN 1..5 LOOP CONTINUE outer WHEN i = 2; END LOOP inner; END LOOP outer; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppl0018() => CorpusAssert.Parses(@"DO $$ DECLARE i int := 0; BEGIN LOOP EXIT; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppl0019() => CorpusAssert.Parses(@"DO $$ DECLARE i int := 0; BEGIN LOOP i := i + 1; CONTINUE WHEN i < 5; EXIT WHEN i >= 10; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppl0020() => CorpusAssert.Parses(@"DO $$ DECLARE i int; BEGIN FOR i IN 5..1 LOOP NULL; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppl0021() => CorpusAssert.Parses(@"DO $$ DECLARE i int; BEGIN FOR i IN 1..1 LOOP NULL; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppl0022() => CorpusAssert.Parses(@"DO $$ DECLARE r record; BEGIN FOR r IN SELECT id FROM s.t2 WHERE t_id IS NULL LOOP NULL; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppl0023() => CorpusAssert.Parses(@"DO $$ DECLARE i int; BEGIN FOR i IN 1..10 BY 1 LOOP CONTINUE; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppl0024() => CorpusAssert.Parses(@"DO $$ DECLARE x text; arr text[] := ARRAY['a','b','c']; BEGIN FOREACH x IN ARRAY arr LOOP NULL; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppl0025() => CorpusAssert.Parses(@"DO $$ DECLARE x int; BEGIN <<lbl>> LOOP EXIT lbl; END LOOP lbl; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppl0026() => CorpusAssert.Parses(@"DO $$ DECLARE r record; BEGIN FOR r IN EXECUTE $q$SELECT id FROM s.t$q$ LOOP NULL; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppl0027() => CorpusAssert.Parses(@"DO $$ DECLARE i int; BEGIN FOR i IN 1..10 LOOP IF i = 5 THEN EXIT; END IF; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppl0028() => CorpusAssert.Parses(@"DO $$ DECLARE i int; s int := 0; BEGIN FOR i IN 1..100 BY 10 LOOP s := s + i; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppl0029() => CorpusAssert.Parses(@"DO $$ DECLARE i int; BEGIN <<outer>> FOR i IN 1..3 LOOP <<inner>> LOOP EXIT outer; END LOOP inner; END LOOP outer; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppl0030() => CorpusAssert.Parses(@"DO $$ DECLARE r record; q text := 'SELECT id FROM s.t'; BEGIN FOR r IN EXECUTE q USING 1 LOOP NULL; END LOOP; END $$;", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void ppl0031() => CorpusAssert.Parses(@"DO $$ BEGIN LOOP END LOOP; END $$;", "error");
@@ -85,212 +85,212 @@ public class Corpus_PlpgsqlLoops
     public void ppl0039() => CorpusAssert.Parses(@"DO $$ DECLARE i int; BEGIN FOR i IN 1..10 BY LOOP NULL; END LOOP; END $$;", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void ppl0040() => CorpusAssert.Parses(@"DO $$ DECLARE i int; BEGIN <<outer>> FOR i IN 1..3 LOOP EXIT nonexistent; END LOOP outer; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0001() => CorpusAssert.Parses(@"DO $$ DECLARE i int := 0; BEGIN LOOP i := i + 1; EXIT WHEN i = 1; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0002() => CorpusAssert.Parses(@"DO $$ DECLARE i int := 0; BEGIN LOOP i := i + 1; IF i > 10 THEN EXIT; END IF; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0003() => CorpusAssert.Parses(@"DO $$ DECLARE n int := 0; BEGIN <<top>> LOOP n := n + 1; EXIT top WHEN n >= 3; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0004() => CorpusAssert.Parses(@"DO $$ DECLARE i int := 0; BEGIN <<lp>> LOOP i := i + 1; EXIT lp WHEN i >= 5; END LOOP lp; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0005() => CorpusAssert.Parses(@"DO $$ DECLARE c int := 0; BEGIN LOOP c := c + 1; CONTINUE WHEN c < 3; EXIT WHEN c >= 5; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0006() => CorpusAssert.Parses(@"DO $$ BEGIN LOOP EXIT; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0007() => CorpusAssert.Parses(@"DO $$ DECLARE i int := 0; BEGIN LOOP NULL; i := i + 1; EXIT WHEN i = 2; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0008() => CorpusAssert.Parses(@"DO $$ DECLARE i int := 0; BEGIN <<a>> LOOP <<b>> LOOP EXIT a; END LOOP b; END LOOP a; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0009() => CorpusAssert.Parses(@"DO $$ DECLARE i int := 0; BEGIN <<a>> LOOP i := i + 1; <<b>> LOOP EXIT b; END LOOP b; CONTINUE a WHEN i < 2; EXIT a; END LOOP a; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0010() => CorpusAssert.Parses(@"DO $$ DECLARE i int := 0; BEGIN WHILE i < 3 LOOP i := i + 1; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0011() => CorpusAssert.Parses(@"DO $$ DECLARE b bool := true; BEGIN WHILE b LOOP b := false; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0012() => CorpusAssert.Parses(@"DO $$ DECLARE i int := 10; BEGIN WHILE i > 0 LOOP i := i - 2; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0013() => CorpusAssert.Parses(@"DO $$ DECLARE i int := 0; BEGIN WHILE i < 0 LOOP CONTINUE; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0014() => CorpusAssert.Parses(@"DO $$ DECLARE i int := 0; BEGIN <<wl>> WHILE i < 4 LOOP i := i + 1; END LOOP wl; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0015() => CorpusAssert.Parses(@"DO $$ DECLARE i int := 0; BEGIN <<wl>> WHILE i < 10 LOOP i := i + 1; EXIT wl WHEN i = 5; END LOOP wl; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0016() => CorpusAssert.Parses(@"DO $$ DECLARE i int := 0; BEGIN <<wl>> WHILE i < 10 LOOP i := i + 1; CONTINUE wl WHEN i < 5; NULL; END LOOP wl; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0017() => CorpusAssert.Parses(@"DO $$ DECLARE i int := 0; BEGIN WHILE false LOOP i := i + 1; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0018() => CorpusAssert.Parses(@"DO $$ DECLARE i int := 0; BEGIN WHILE i < 3 LOOP i := i + 1; CONTINUE WHEN i = 2; NULL; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0019() => CorpusAssert.Parses(@"DO $$ DECLARE i int; BEGIN FOR i IN 1..5 LOOP NULL; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0020() => CorpusAssert.Parses(@"DO $$ DECLARE i int; BEGIN FOR i IN 0..0 LOOP NULL; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0021() => CorpusAssert.Parses(@"DO $$ DECLARE i int; BEGIN FOR i IN -5..5 LOOP NULL; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0022() => CorpusAssert.Parses(@"DO $$ DECLARE i int; a int := 1; b int := 10; BEGIN FOR i IN a..b LOOP NULL; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0023() => CorpusAssert.Parses(@"DO $$ DECLARE i int; BEGIN FOR i IN 1..10 BY 2 LOOP NULL; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0024() => CorpusAssert.Parses(@"DO $$ DECLARE i int; BEGIN FOR i IN 0..100 BY 10 LOOP NULL; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0025() => CorpusAssert.Parses(@"DO $$ DECLARE i int; BEGIN FOR i IN REVERSE 5..1 LOOP NULL; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0026() => CorpusAssert.Parses(@"DO $$ DECLARE i int; BEGIN FOR i IN REVERSE 10..1 BY 2 LOOP NULL; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0027() => CorpusAssert.Parses(@"DO $$ DECLARE i int; BEGIN FOR i IN REVERSE 100..0 BY 25 LOOP NULL; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0028() => CorpusAssert.Parses(@"DO $$ DECLARE i int; BEGIN FOR i IN REVERSE 0..0 LOOP NULL; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0029() => CorpusAssert.Parses(@"DO $$ DECLARE i int; s int := 1; e int := 5; step int := 2; BEGIN FOR i IN s..e BY step LOOP NULL; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0030() => CorpusAssert.Parses(@"DO $$ DECLARE i int; BEGIN <<fl>> FOR i IN 1..5 LOOP NULL; END LOOP fl; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0031() => CorpusAssert.Parses(@"DO $$ DECLARE i int; BEGIN <<fl>> FOR i IN 1..10 LOOP EXIT fl WHEN i = 3; END LOOP fl; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0032() => CorpusAssert.Parses(@"DO $$ DECLARE i int; BEGIN <<fl>> FOR i IN 1..10 LOOP CONTINUE fl WHEN i < 5; NULL; END LOOP fl; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0033() => CorpusAssert.Parses(@"DO $$ DECLARE i int; BEGIN FOR i IN 1..5 LOOP CONTINUE WHEN i = 3; NULL; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0034() => CorpusAssert.Parses(@"DO $$ DECLARE i int; BEGIN FOR i IN 1..5 LOOP EXIT WHEN i = 3; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0035() => CorpusAssert.Parses(@"DO $$ DECLARE i int; j int; BEGIN FOR i IN 1..3 LOOP FOR j IN 1..3 LOOP NULL; END LOOP; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0036() => CorpusAssert.Parses(@"DO $$ DECLARE i int; j int; BEGIN <<outer>> FOR i IN 1..3 LOOP <<inner>> FOR j IN 1..3 LOOP EXIT outer WHEN i = 2 AND j = 2; END LOOP inner; END LOOP outer; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0037() => CorpusAssert.Parses(@"DO $$ DECLARE i int; j int; BEGIN <<outer>> FOR i IN 1..3 LOOP <<inner>> FOR j IN 1..3 LOOP CONTINUE outer WHEN j = 2; END LOOP inner; END LOOP outer; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0038() => CorpusAssert.Parses(@"DO $$ DECLARE i int; BEGIN FOR i IN 1..10 LOOP IF i = 5 THEN CONTINUE; END IF; NULL; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0039() => CorpusAssert.Parses(@"DO $$ DECLARE i int; BEGIN FOR i IN 1..10 LOOP IF i > 8 THEN EXIT; END IF; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0040() => CorpusAssert.Parses(@"DO $$ DECLARE r record; BEGIN FOR r IN SELECT id, name FROM s.t ORDER BY id LOOP NULL; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0041() => CorpusAssert.Parses(@"DO $$ DECLARE r record; BEGIN FOR r IN SELECT * FROM s.t2 LOOP NULL; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0042() => CorpusAssert.Parses(@"DO $$ DECLARE r s.t%ROWTYPE; BEGIN FOR r IN SELECT * FROM s.t LOOP NULL; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0043() => CorpusAssert.Parses(@"DO $$ DECLARE r record; BEGIN FOR r IN SELECT id, name FROM s.t WHERE id < 0 LOOP NULL; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0044() => CorpusAssert.Parses(@"DO $$ DECLARE r record; BEGIN FOR r IN SELECT count(*) AS n FROM s.t LOOP NULL; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0045() => CorpusAssert.Parses(@"DO $$ DECLARE r record; BEGIN FOR r IN SELECT id FROM s.t UNION SELECT id FROM s.t2 LOOP NULL; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0046() => CorpusAssert.Parses(@"DO $$ DECLARE r record; BEGIN FOR r IN WITH cte AS (SELECT id FROM s.t) SELECT * FROM cte LOOP NULL; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0047() => CorpusAssert.Parses(@"DO $$ DECLARE r record; BEGIN FOR r IN SELECT t.id, t2.label FROM s.t JOIN s.t2 ON t.id = t2.t_id LOOP NULL; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0048() => CorpusAssert.Parses(@"DO $$ DECLARE r record; BEGIN <<lp>> FOR r IN SELECT id FROM s.t LOOP EXIT lp; END LOOP lp; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0049() => CorpusAssert.Parses(@"DO $$ DECLARE r record; BEGIN FOR r IN EXECUTE 'SELECT 1 AS n' LOOP NULL; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0050() => CorpusAssert.Parses(@"DO $$ DECLARE r record; q text; BEGIN q := 'SELECT id FROM s.t'; FOR r IN EXECUTE q LOOP NULL; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0051() => CorpusAssert.Parses(@"DO $$ DECLARE r record; v int := 0; BEGIN FOR r IN EXECUTE 'SELECT $1 AS n' USING v LOOP NULL; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0052() => CorpusAssert.Parses(@"DO $$ DECLARE r record; a int := 1; b text := 'hello'; BEGIN FOR r IN EXECUTE 'SELECT $1 AS n, $2 AS s' USING a, b LOOP NULL; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0053() => CorpusAssert.Parses(@"DO $$ DECLARE r record; BEGIN FOR r IN EXECUTE $dyn$SELECT id FROM s.t WHERE id < 0$dyn$ LOOP NULL; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0054() => CorpusAssert.Parses(@"DO $$ DECLARE r record; tbl text := 's.t'; BEGIN FOR r IN EXECUTE 'SELECT id FROM ' || tbl LOOP NULL; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0055() => CorpusAssert.Parses(@"DO $$ DECLARE r record; BEGIN <<dlp>> FOR r IN EXECUTE 'SELECT 1 AS x' LOOP EXIT dlp; END LOOP dlp; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0056() => CorpusAssert.Parses(@"DO $$ DECLARE x int; arr int[] := ARRAY[10,20,30]; BEGIN FOREACH x IN ARRAY arr LOOP NULL; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0057() => CorpusAssert.Parses(@"DO $$ DECLARE x text; arr text[] := '{a,b,c}'::text[]; BEGIN FOREACH x IN ARRAY arr LOOP NULL; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0058() => CorpusAssert.Parses(@"DO $$ DECLARE x bool; arr bool[] := ARRAY[true, false, true]; BEGIN FOREACH x IN ARRAY arr LOOP NULL; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0059() => CorpusAssert.Parses(@"DO $$ DECLARE x numeric; arr numeric[] := ARRAY[1.1, 2.2, 3.3]; BEGIN FOREACH x IN ARRAY arr LOOP NULL; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0060() => CorpusAssert.Parses(@"DO $$ DECLARE x int; arr int[] := ARRAY[]::int[]; BEGIN FOREACH x IN ARRAY arr LOOP NULL; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0061() => CorpusAssert.Parses(@"DO $$ DECLARE x int[]; mat int[] := ARRAY[[1,2,3],[4,5,6]]; BEGIN FOREACH x SLICE 1 IN ARRAY mat LOOP NULL; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0062() => CorpusAssert.Parses(@"DO $$ DECLARE x int[]; mat int[] := ARRAY[[[1,2],[3,4]],[[5,6],[7,8]]]; BEGIN FOREACH x SLICE 2 IN ARRAY mat LOOP NULL; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0063() => CorpusAssert.Parses(@"DO $$ DECLARE x int[]; mat int[] := ARRAY[[1,2],[3,4]]; BEGIN FOREACH x SLICE 2 IN ARRAY mat LOOP NULL; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0064() => CorpusAssert.Parses(@"DO $$ DECLARE x int; arr int[] := ARRAY[1,2,3]; BEGIN <<fa>> FOREACH x IN ARRAY arr LOOP EXIT fa; END LOOP fa; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0065() => CorpusAssert.Parses(@"DO $$ DECLARE x int; arr int[] := ARRAY[1,2,3,4,5]; BEGIN FOREACH x IN ARRAY arr LOOP CONTINUE WHEN x = 3; NULL; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0066() => CorpusAssert.Parses(@"DO $$ DECLARE x int; arr int[] := ARRAY[1,2,3]; BEGIN FOREACH x IN ARRAY arr LOOP EXIT WHEN x = 2; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0067() => CorpusAssert.Parses(@"DO $$ DECLARE x int; arr int[] := s.f(1) || ARRAY[2,3]; BEGIN FOREACH x IN ARRAY arr LOOP NULL; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0068() => CorpusAssert.Parses(@"DO $$ DECLARE x text; BEGIN FOREACH x IN ARRAY ARRAY['p','q','r'] LOOP NULL; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0069() => CorpusAssert.Parses(@"DO $$ DECLARE i int; BEGIN <<o>> FOR i IN 1..2 LOOP <<m>> WHILE true LOOP EXIT o; END LOOP m; END LOOP o; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0070() => CorpusAssert.Parses(@"DO $$ DECLARE i int; x int; arr int[] := ARRAY[1,2]; BEGIN <<o>> FOR i IN 1..2 LOOP <<f>> FOREACH x IN ARRAY arr LOOP EXIT o WHEN i = 1 AND x = 2; END LOOP f; END LOOP o; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0071() => CorpusAssert.Parses(@"DO $$ DECLARE i int; j int; BEGIN <<a>> FOR i IN 1..3 LOOP <<b>> FOR j IN 1..3 LOOP <<c>> LOOP EXIT b WHEN j >= 2; EXIT c; END LOOP c; END LOOP b; END LOOP a; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0072() => CorpusAssert.Parses(@"DO $$ DECLARE i int := 0; BEGIN <<a>> LOOP i := i + 1; <<b>> LOOP EXIT b; END LOOP b; EXIT a WHEN i >= 2; END LOOP a; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0073() => CorpusAssert.Parses(@"DO $$ DECLARE i int := 0; BEGIN <<lp>> LOOP i := i + 1; EXIT WHEN i >= 3; CONTINUE lp; END LOOP lp; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0074() => CorpusAssert.Parses(@"DO $$ DECLARE i int; r record; BEGIN FOR i IN 1..2 LOOP FOR r IN SELECT id FROM s.t LOOP NULL; END LOOP; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0075() => CorpusAssert.Parses(@"DO $$ DECLARE r record; x int; arr int[] := ARRAY[1,2]; BEGIN FOR r IN SELECT id FROM s.t LOOP FOREACH x IN ARRAY arr LOOP NULL; END LOOP; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0076() => CorpusAssert.Parses(@"DO $$ DECLARE i int := 0; BEGIN WHILE i < 3 LOOP LOOP EXIT; END LOOP; i := i + 1; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0077() => CorpusAssert.Parses(@"DO $$ DECLARE i int; BEGIN FOR i IN 1..5 LOOP RAISE NOTICE '%', i; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0078() => CorpusAssert.Parses(@"DO $$ DECLARE i int; tot int := 0; BEGIN FOR i IN 1..10 LOOP tot := tot + i; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0079() => CorpusAssert.Parses(@"DO $$ DECLARE i int; BEGIN FOR i IN 1..3 LOOP PERFORM s.f(i); END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0080() => CorpusAssert.Parses(@"DO $$ DECLARE r record; BEGIN FOR r IN SELECT id, name FROM s.t LOOP RAISE NOTICE 'id=%', r.id; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0081() => CorpusAssert.Parses(@"DO $$ DECLARE i int; BEGIN FOR i IN 1..5 LOOP INSERT INTO s.t(name, qty) VALUES ('x', i); END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0082() => CorpusAssert.Parses(@"DO $$ DECLARE i int; BEGIN FOR i IN 1..3 LOOP UPDATE s.t SET qty = i WHERE id = i; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0083() => CorpusAssert.Parses(@"DO $$ DECLARE i int; BEGIN FOR i IN 1..5 LOOP IF i % 2 = 0 THEN CONTINUE; END IF; NULL; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0084() => CorpusAssert.Parses(@"DO $$ DECLARE i int; BEGIN <<lp>> FOR i IN 1..100 LOOP EXIT lp WHEN i * i > 50; END LOOP lp; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0085() => CorpusAssert.Parses(@"DO $$ DECLARE i int; BEGIN FOR i IN 1..3 LOOP DECLARE j int := i * 2; BEGIN NULL; END; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0086() => CorpusAssert.Parses(@"DO $$ DECLARE i int; BEGIN FOR i IN 1..3 LOOP BEGIN NULL; EXCEPTION WHEN OTHERS THEN NULL; END; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0087() => CorpusAssert.Parses(@"DO $$ DECLARE r record; BEGIN FOR r IN EXECUTE 'SELECT id FROM s.t' || ' ORDER BY id DESC' LOOP NULL; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0088() => CorpusAssert.Parses(@"DO $$ DECLARE r record; n int := 5; BEGIN FOR r IN EXECUTE format('SELECT * FROM s.t WHERE id < %s', n) LOOP NULL; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0089() => CorpusAssert.Parses(@"DO $$ DECLARE r record; v1 int := 1; v2 int := 10; v3 int := 100; BEGIN FOR r IN EXECUTE 'SELECT $1+$2+$3 AS total' USING v1, v2, v3 LOOP NULL; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0090() => CorpusAssert.Parses(@"DO $$ DECLARE i int; BEGIN FOR i IN 1..10 BY 3 LOOP EXIT WHEN i > 7; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0091() => CorpusAssert.Parses(@"DO $$ DECLARE i int; BEGIN FOR i IN REVERSE 9..1 BY 3 LOOP NULL; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0092() => CorpusAssert.Parses(@"DO $$ DECLARE i int; BEGIN FOR i IN REVERSE 5..5 BY 1 LOOP NULL; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0093() => CorpusAssert.Parses(@"DO $$ DECLARE i int; s int := 0; BEGIN FOR i IN REVERSE 10..1 LOOP s := s + i; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0094() => CorpusAssert.Parses(@"DO $$ DECLARE i int; BEGIN FOR i IN s.f(0)..s.f(4) LOOP NULL; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0095() => CorpusAssert.Parses(@"DO $$ DECLARE r record; BEGIN FOR r IN SELECT s.f(id::int) AS fid FROM s.t LOOP NULL; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0096() => CorpusAssert.Parses(@"DO $$ DECLARE x int; arr int[]; BEGIN SELECT ARRAY(SELECT id FROM s.t) INTO arr; FOREACH x IN ARRAY arr LOOP NULL; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0097() => CorpusAssert.Parses(@"DO $$ DECLARE x text; arr text[]; BEGIN arr := ARRAY['alpha','beta','gamma']; <<fe>> FOREACH x IN ARRAY arr LOOP CONTINUE fe WHEN x = 'beta'; NULL; END LOOP fe; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0098() => CorpusAssert.Parses(@"DO $$ DECLARE r record; BEGIN FOR r IN EXECUTE 'SELECT id, name FROM s.t' LOOP RAISE NOTICE 'name=%', r.name; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0099() => CorpusAssert.Parses(@"DO $$ DECLARE i int; j int; k int; BEGIN <<a>> FOR i IN 1..2 LOOP <<b>> FOR j IN 1..2 LOOP <<c>> FOR k IN 1..2 LOOP EXIT a WHEN i=2 AND j=2 AND k=2; END LOOP c; END LOOP b; END LOOP a; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0100() => CorpusAssert.Parses(@"DO $$ DECLARE i int := 0; BEGIN <<a>> LOOP <<b>> LOOP <<c>> LOOP EXIT a; END LOOP c; END LOOP b; END LOOP a; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0101() => CorpusAssert.Parses(@"DO $$ DECLARE i int := 0; BEGIN <<a>> LOOP i := i + 1; EXIT a WHEN i > 1; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0102() => CorpusAssert.Parses(@"DO $$ DECLARE i int; BEGIN FOR i IN 1..3 LOOP NULL; END LOOP; -- comment after loop
 END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0103() => CorpusAssert.Parses(@"DO $$ DECLARE
   i int;
 BEGIN
@@ -298,90 +298,90 @@ BEGIN
     NULL;
   END LOOP;
 END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0104() => CorpusAssert.Parses(@"DO $$ DECLARE i int; BEGIN FOR i IN 1..5 LOOP /* block comment */ NULL; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0105() => CorpusAssert.Parses(@"DO $$ DECLARE i INT; BEGIN FOR i IN 1..3 LOOP NULL; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0106() => CorpusAssert.Parses(@"DO $$ declare i int; begin for i in 1..3 loop null; end loop; end $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0107() => CorpusAssert.Parses(@"DO $$ Declare I Int; Begin For I In 1..3 Loop Null; End Loop; End $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0108() => CorpusAssert.Parses(@"DO $$ DECLARE i int; BEGIN FOR i IN 1..3 LOOP NULL; END LOOP; FOR i IN 4..6 LOOP NULL; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0109() => CorpusAssert.Parses(@"DO $$ DECLARE i int := 0; BEGIN WHILE i < 3 LOOP i := i + 1; END LOOP; WHILE i < 6 LOOP i := i + 1; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0110() => CorpusAssert.Parses(@"DO $$ DECLARE i int := 0; BEGIN LOOP i := i + 1; EXIT WHEN i = 1; END LOOP; LOOP i := i + 1; EXIT WHEN i = 2; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0111() => CorpusAssert.Parses(@"DO $$ DECLARE i int; x text; arr text[] := ARRAY['a','b']; BEGIN FOR i IN 1..2 LOOP FOREACH x IN ARRAY arr LOOP RAISE NOTICE '%, %', i, x; END LOOP; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0112() => CorpusAssert.Parses(@"DO $$ DECLARE i int; r record; BEGIN <<o>> FOR i IN 1..3 LOOP <<q>> FOR r IN SELECT id FROM s.t LOOP EXIT o WHEN i = 2; END LOOP q; END LOOP o; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0113() => CorpusAssert.Parses(@"DO $$ DECLARE i int; BEGIN FOR i IN 1..5 LOOP DECLARE msg text := 'item ' || i::text; BEGIN RAISE NOTICE '%', msg; END; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0114() => CorpusAssert.Parses(@"DO $$ DECLARE i int; BEGIN FOR i IN 1..3 LOOP BEGIN PERFORM s.f(i); EXCEPTION WHEN OTHERS THEN RAISE NOTICE 'error at %', i; END; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0115() => CorpusAssert.Parses(@"DO $$ DECLARE i int; j int; BEGIN <<outer>> FOR i IN 1..5 LOOP CONTINUE outer WHEN i = 3; FOR j IN 1..3 LOOP NULL; END LOOP; END LOOP outer; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0116() => CorpusAssert.Parses(@"DO $$ DECLARE r record; n int := 0; BEGIN FOR r IN SELECT id FROM s.t2 LOOP n := n + 1; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0117() => CorpusAssert.Parses(@"DO $$ DECLARE r record; BEGIN FOR r IN EXECUTE 'SELECT id FROM s.t LIMIT 1' LOOP RAISE NOTICE '%', r.id; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0118() => CorpusAssert.Parses(@"DO $$ DECLARE x int; arr int[] := ARRAY[1,2,3,4,5]; BEGIN <<fe>> FOREACH x IN ARRAY arr LOOP EXIT fe WHEN x = 3; END LOOP fe; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0119() => CorpusAssert.Parses(@"DO $$ DECLARE x int; i int := 0; arr int[] := ARRAY[10,20,30]; BEGIN FOREACH x IN ARRAY arr LOOP i := i + x; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0120() => CorpusAssert.Parses(@"DO $$ DECLARE r record; BEGIN FOR r IN SELECT id, (SELECT count(*) FROM s.t2 WHERE t_id = t.id) AS cnt FROM s.t LOOP NULL; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0121() => CorpusAssert.Parses(@"DO $$ DECLARE i int; BEGIN FOR i IN 1..10 BY 1 LOOP NULL; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0122() => CorpusAssert.Parses(@"DO $$ DECLARE i int; BEGIN FOR i IN REVERSE 1..10 LOOP NULL; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0123() => CorpusAssert.Parses(@"DO $$ DECLARE i int; BEGIN FOR i IN 1..10 LOOP NULL; END LOOP; NULL; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0124() => CorpusAssert.Parses(@"DO $$ DECLARE i int; BEGIN NULL; FOR i IN 1..3 LOOP NULL; END LOOP; NULL; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0125() => CorpusAssert.Parses(@"DO $$ DECLARE i int; BEGIN FOR i IN 1..3 LOOP NULL; END LOOP; RETURN; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0126() => CorpusAssert.Parses(@"DO $$ DECLARE i int; BEGIN FOR i IN 1..5 LOOP CONTINUE WHEN i = 3; EXIT WHEN i = 5; NULL; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0127() => CorpusAssert.Parses(@"DO $$ DECLARE i int; BEGIN <<lp>> FOR i IN 1..5 LOOP IF i < 3 THEN CONTINUE lp; END IF; IF i > 4 THEN EXIT lp; END IF; NULL; END LOOP lp; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0128() => CorpusAssert.Parses(@"DO $$ DECLARE x int; arr int[] := ARRAY[1,2,3]; BEGIN FOREACH x IN ARRAY arr LOOP IF x = 2 THEN CONTINUE; END IF; NULL; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0129() => CorpusAssert.Parses(@"DO $$ DECLARE x int; arr int[] := ARRAY[1,2,3]; BEGIN FOREACH x IN ARRAY arr LOOP IF x = 2 THEN EXIT; END IF; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0130() => CorpusAssert.Parses(@"DO $$ DECLARE i int; BEGIN FOR i IN 1..3 LOOP NULL; END LOOP; -- trailing comment
 END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0131() => CorpusAssert.Parses(@"DO $$ BEGIN LOOP EXIT; END LOOP; NULL; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0132() => CorpusAssert.Parses(@"DO $$ DECLARE i int; BEGIN FOR i IN 1..5 LOOP LOOP EXIT; END LOOP; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0133() => CorpusAssert.Parses(@"DO $$ DECLARE i int; j int; BEGIN <<o>> FOR i IN 1..3 LOOP <<i>> FOR j IN 1..3 LOOP EXIT i WHEN j = 1; END LOOP i; END LOOP o; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0134() => CorpusAssert.Parses(@"DO $$ DECLARE i int; BEGIN <<l1>> FOR i IN 1..2 LOOP <<l2>> FOR i IN 3..4 LOOP <<l3>> FOR i IN 5..6 LOOP EXIT l2 WHEN i = 5; END LOOP l3; END LOOP l2; END LOOP l1; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0135() => CorpusAssert.Parses(@"DO $$ DECLARE i int; BEGIN FOR i IN 1..5 LOOP IF i = 3 THEN NULL; ELSIF i = 4 THEN EXIT; END IF; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0136() => CorpusAssert.Parses(@"DO $$ DECLARE i int; found bool := false; BEGIN FOR i IN 1..10 LOOP IF i = 7 THEN found := true; EXIT; END IF; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0137() => CorpusAssert.Parses(@"DO $$ DECLARE r record; found bool := false; BEGIN FOR r IN SELECT id FROM s.t WHERE val > 1000 LOOP found := true; EXIT; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0138() => CorpusAssert.Parses(@"DO $$ DECLARE i int; BEGIN FOR i IN 1..5 LOOP RAISE NOTICE 'i=%', i; IF i = 3 THEN RAISE EXCEPTION 'stop at 3'; END IF; END LOOP; EXCEPTION WHEN OTHERS THEN NULL; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0139() => CorpusAssert.Parses(@"DO $$ DECLARE i int; BEGIN <<lp>> WHILE true LOOP i := COALESCE(i, 0) + 1; EXIT lp WHEN i >= 3; END LOOP lp; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0140() => CorpusAssert.Parses(@"DO $$ DECLARE i int; BEGIN FOR i IN 1..3 LOOP CALL s.p(i); END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0141() => CorpusAssert.Parses(@"DO $$ DECLARE i int; BEGIN FOR i IN 1..3 LOOP PERFORM s.g(i, i*2); END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0142() => CorpusAssert.Parses(@"DO $$ DECLARE i int; BEGIN FOR i IN 1..0 LOOP RAISE EXCEPTION 'should not run'; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0143() => CorpusAssert.Parses(@"DO $$ DECLARE r record; BEGIN FOR r IN EXECUTE 'SELECT * FROM s.t WHERE false' LOOP RAISE EXCEPTION 'should not run'; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0144() => CorpusAssert.Parses(@"DO $$ DECLARE x int; arr int[] := ARRAY[1]; BEGIN FOREACH x IN ARRAY arr LOOP EXIT WHEN x = 1; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0145() => CorpusAssert.Parses(@"DO $$ DECLARE i int; BEGIN <<lp>> FOR i IN 1..5 LOOP CONTINUE WHEN i % 2 = 0; EXIT lp WHEN i = 5; NULL; END LOOP lp; END $$;", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void pplb0146() => CorpusAssert.Parses(@"DO $$ DECLARE i int; BEGIN FOR i IN 1..5 LOOP NULL; END FOR; END $$;", "error");
@@ -417,21 +417,21 @@ END $$;", "ok");
     public void pplb0161() => CorpusAssert.Parses(@"DO $$ DECLARE i int; BEGIN FOR i IN 1..10 LOOP NULL; LOOP; END $$;", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void pplb0162() => CorpusAssert.Parses(@"DO $$ DECLARE i int; BEGIN FOR i IN 1..5; LOOP NULL; END LOOP; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0163() => CorpusAssert.Parses(@"DO $$ DECLARE i int; BEGIN FOREACH i SLICE 0 IN ARRAY ARRAY[1,2] LOOP NULL; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0164() => CorpusAssert.Parses(@"DO $$ DECLARE r record; BEGIN FOR r IN SELECT id FROM s.parent LOOP NULL; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0165() => CorpusAssert.Parses(@"DO $$ DECLARE r record; BEGIN FOR r IN SELECT id FROM ONLY s.parent LOOP NULL; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0166() => CorpusAssert.Parses(@"DO $$ DECLARE r record; BEGIN FOR r IN SELECT id FROM s.events LOOP NULL; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0167() => CorpusAssert.Parses(@"DO $$ DECLARE r record; BEGIN FOR r IN SELECT id FROM s.v LOOP NULL; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0168() => CorpusAssert.Parses(@"DO $$ DECLARE r record; BEGIN FOR r IN SELECT status, n FROM s.mv LOOP NULL; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0169() => CorpusAssert.Parses(@"DO $$ DECLARE i int; BEGIN FOR i IN 1..3 LOOP NULL; END loop; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0170() => CorpusAssert.Parses(@"DO $$ DECLARE i int; BEGIN FOR i IN 1..3 LOOP CONTINUE WHEN i = 1; CONTINUE WHEN i = 2; NULL; END LOOP; END $$;", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void pplb0171() => CorpusAssert.Parses(@"DO $$ DECLARE i int; BEGIN FOR i IN 1..5 LOOP NULL; END LOOP END LOOP; END $$;", "error");
@@ -475,19 +475,19 @@ END $$;", "ok");
     public void pplb0190() => CorpusAssert.Parses(@"DO $$ DECLARE i int; BEGIN FOR i IN 1..3 LOOP NULL; END LOOP; CONTINUE; END $$;", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void pplc0001() => CorpusAssert.Parses(@"DO $$ DECLARE x int[]; arr int[] := ARRAY[[1,2,3],[4,5,6],[7,8,9]]; BEGIN FOREACH x SLICE 0 IN ARRAY arr LOOP NULL; END LOOP; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplc0002() => CorpusAssert.Parses(@"DO $$ DECLARE r record; BEGIN FOR r IN SELECT s.t.id, s.t2.label FROM s.t JOIN s.t2 ON s.t2.t_id = s.t.id LOOP NULL; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplc0003() => CorpusAssert.Parses(@"DO $$ DECLARE i int; j int; BEGIN <<outer>> FOR i IN 1..3 LOOP <<inner>> WHILE j < 3 LOOP j := COALESCE(j, 0) + 1; CONTINUE outer WHEN j = 2; END LOOP inner; END LOOP outer; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplc0004() => CorpusAssert.Parses(@"DO $$ DECLARE r record; lim int := 10; off int := 0; BEGIN FOR r IN EXECUTE 'SELECT id FROM s.t WHERE id < $1 OFFSET $2' USING lim, off LOOP NULL; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplc0005() => CorpusAssert.Parses(@"DO $$ DECLARE i int := 0; BEGIN WHILE i < 3 AND s.f(i) > 0 LOOP i := i + 1; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplc0006() => CorpusAssert.Parses(@"DO $$ DECLARE i int; BEGIN FOR i IN REVERSE 5..1 BY 2 LOOP NULL; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplc0007() => CorpusAssert.Parses(@"DO $$ DECLARE x int; n int := 0; arr int[]; BEGIN SELECT COALESCE(ARRAY_AGG(qty), ARRAY[]::int[]) INTO arr FROM s.t; FOREACH x IN ARRAY arr LOOP n := n + 1; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplc0008() => CorpusAssert.Parses(@"DO $$ DECLARE i int; BEGIN FOR i IN REVERSE 1..10 LOOP NULL; END LOOP; END $$;", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void pplc0009() => CorpusAssert.Parses(@"DO $$ DECLARE i int; BEGIN FOREACH i ARRAY[1,2,3] LOOP NULL; END LOOP; END $$;", "error");

@@ -5,185 +5,185 @@ namespace PgProj.Core.Tests.Corpus;
 
 public class Corpus_TransactionControl
 {
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0001() => CorpusAssert.Parses(@"BEGIN", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0002() => CorpusAssert.Parses(@"BEGIN WORK", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0003() => CorpusAssert.Parses(@"BEGIN TRANSACTION", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0004() => CorpusAssert.Parses(@"START TRANSACTION", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0005() => CorpusAssert.Parses(@"BEGIN READ ONLY", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0006() => CorpusAssert.Parses(@"BEGIN READ WRITE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0007() => CorpusAssert.Parses(@"BEGIN DEFERRABLE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0008() => CorpusAssert.Parses(@"BEGIN NOT DEFERRABLE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0009() => CorpusAssert.Parses(@"BEGIN ISOLATION LEVEL SERIALIZABLE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0010() => CorpusAssert.Parses(@"BEGIN ISOLATION LEVEL REPEATABLE READ", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0011() => CorpusAssert.Parses(@"BEGIN ISOLATION LEVEL READ COMMITTED", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0012() => CorpusAssert.Parses(@"BEGIN ISOLATION LEVEL READ UNCOMMITTED", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0013() => CorpusAssert.Parses(@"BEGIN ISOLATION LEVEL SERIALIZABLE READ ONLY", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0014() => CorpusAssert.Parses(@"BEGIN ISOLATION LEVEL SERIALIZABLE READ WRITE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0015() => CorpusAssert.Parses(@"BEGIN ISOLATION LEVEL SERIALIZABLE DEFERRABLE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0016() => CorpusAssert.Parses(@"BEGIN ISOLATION LEVEL SERIALIZABLE NOT DEFERRABLE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0017() => CorpusAssert.Parses(@"BEGIN ISOLATION LEVEL SERIALIZABLE READ ONLY DEFERRABLE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0018() => CorpusAssert.Parses(@"BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0019() => CorpusAssert.Parses(@"BEGIN ISOLATION LEVEL READ COMMITTED READ WRITE NOT DEFERRABLE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0020() => CorpusAssert.Parses(@"BEGIN READ ONLY DEFERRABLE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0021() => CorpusAssert.Parses(@"BEGIN READ WRITE NOT DEFERRABLE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0022() => CorpusAssert.Parses(@"START TRANSACTION ISOLATION LEVEL SERIALIZABLE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0023() => CorpusAssert.Parses(@"START TRANSACTION ISOLATION LEVEL REPEATABLE READ", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0024() => CorpusAssert.Parses(@"START TRANSACTION ISOLATION LEVEL READ COMMITTED", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0025() => CorpusAssert.Parses(@"START TRANSACTION ISOLATION LEVEL READ UNCOMMITTED", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0026() => CorpusAssert.Parses(@"START TRANSACTION READ ONLY", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0027() => CorpusAssert.Parses(@"START TRANSACTION READ WRITE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0028() => CorpusAssert.Parses(@"START TRANSACTION DEFERRABLE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0029() => CorpusAssert.Parses(@"START TRANSACTION NOT DEFERRABLE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0030() => CorpusAssert.Parses(@"START TRANSACTION ISOLATION LEVEL SERIALIZABLE READ ONLY DEFERRABLE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0031() => CorpusAssert.Parses(@"COMMIT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0032() => CorpusAssert.Parses(@"COMMIT WORK", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0033() => CorpusAssert.Parses(@"COMMIT TRANSACTION", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0034() => CorpusAssert.Parses(@"END", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0035() => CorpusAssert.Parses(@"END WORK", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0036() => CorpusAssert.Parses(@"END TRANSACTION", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0037() => CorpusAssert.Parses(@"COMMIT AND CHAIN", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0038() => CorpusAssert.Parses(@"COMMIT AND NO CHAIN", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0039() => CorpusAssert.Parses(@"COMMIT WORK AND CHAIN", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0040() => CorpusAssert.Parses(@"COMMIT WORK AND NO CHAIN", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0041() => CorpusAssert.Parses(@"COMMIT TRANSACTION AND CHAIN", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0042() => CorpusAssert.Parses(@"COMMIT TRANSACTION AND NO CHAIN", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0043() => CorpusAssert.Parses(@"END AND CHAIN", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0044() => CorpusAssert.Parses(@"END AND NO CHAIN", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0045() => CorpusAssert.Parses(@"END WORK AND CHAIN", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0046() => CorpusAssert.Parses(@"END TRANSACTION AND NO CHAIN", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0047() => CorpusAssert.Parses(@"ROLLBACK", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0048() => CorpusAssert.Parses(@"ROLLBACK WORK", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0049() => CorpusAssert.Parses(@"ROLLBACK TRANSACTION", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0050() => CorpusAssert.Parses(@"ABORT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0051() => CorpusAssert.Parses(@"ABORT WORK", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0052() => CorpusAssert.Parses(@"ABORT TRANSACTION", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0053() => CorpusAssert.Parses(@"ROLLBACK AND CHAIN", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0054() => CorpusAssert.Parses(@"ROLLBACK AND NO CHAIN", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0055() => CorpusAssert.Parses(@"ROLLBACK WORK AND CHAIN", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0056() => CorpusAssert.Parses(@"ROLLBACK WORK AND NO CHAIN", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0057() => CorpusAssert.Parses(@"ROLLBACK TRANSACTION AND CHAIN", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0058() => CorpusAssert.Parses(@"ROLLBACK TRANSACTION AND NO CHAIN", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0059() => CorpusAssert.Parses(@"ABORT AND CHAIN", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0060() => CorpusAssert.Parses(@"ABORT AND NO CHAIN", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0061() => CorpusAssert.Parses(@"ABORT WORK AND CHAIN", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0062() => CorpusAssert.Parses(@"ABORT TRANSACTION AND NO CHAIN", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0063() => CorpusAssert.Parses(@"BEGIN; SAVEPOINT foo; ROLLBACK TO SAVEPOINT foo; COMMIT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0064() => CorpusAssert.Parses(@"BEGIN; SAVEPOINT my_save; COMMIT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0065() => CorpusAssert.Parses(@"BEGIN; SAVEPOINT sp1; SAVEPOINT sp2; ROLLBACK TO sp1; COMMIT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0066() => CorpusAssert.Parses(@"BEGIN; SAVEPOINT alpha; RELEASE SAVEPOINT alpha; COMMIT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0067() => CorpusAssert.Parses(@"BEGIN; SAVEPOINT beta; RELEASE beta; COMMIT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0068() => CorpusAssert.Parses(@"BEGIN; SAVEPOINT sp; ROLLBACK TO SAVEPOINT sp; COMMIT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0069() => CorpusAssert.Parses(@"BEGIN; SAVEPOINT sp; ROLLBACK TO sp; COMMIT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0070() => CorpusAssert.Parses(@"BEGIN; SAVEPOINT ""MyPoint""; ROLLBACK TO ""MyPoint""; COMMIT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0071() => CorpusAssert.Parses(@"BEGIN; SAVEPOINT s1; INSERT INTO s.t(name) VALUES('x'); ROLLBACK TO s1; COMMIT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0072() => CorpusAssert.Parses(@"BEGIN; SAVEPOINT a; SAVEPOINT b; RELEASE SAVEPOINT b; ROLLBACK TO a; COMMIT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0073() => CorpusAssert.Parses(@"BEGIN; SET TRANSACTION ISOLATION LEVEL SERIALIZABLE; COMMIT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0074() => CorpusAssert.Parses(@"BEGIN; SET TRANSACTION ISOLATION LEVEL REPEATABLE READ; COMMIT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0075() => CorpusAssert.Parses(@"BEGIN; SET TRANSACTION ISOLATION LEVEL READ COMMITTED; COMMIT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0076() => CorpusAssert.Parses(@"BEGIN; SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED; COMMIT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0077() => CorpusAssert.Parses(@"BEGIN; SET TRANSACTION READ ONLY; COMMIT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0078() => CorpusAssert.Parses(@"BEGIN; SET TRANSACTION READ WRITE; COMMIT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0079() => CorpusAssert.Parses(@"BEGIN; SET TRANSACTION DEFERRABLE; COMMIT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0080() => CorpusAssert.Parses(@"BEGIN; SET TRANSACTION NOT DEFERRABLE; COMMIT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0081() => CorpusAssert.Parses(@"BEGIN; SET TRANSACTION ISOLATION LEVEL SERIALIZABLE READ ONLY DEFERRABLE; COMMIT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0082() => CorpusAssert.Parses(@"BEGIN; SET TRANSACTION ISOLATION LEVEL REPEATABLE READ READ ONLY NOT DEFERRABLE; COMMIT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0083() => CorpusAssert.Parses(@"SET TRANSACTION ISOLATION LEVEL SERIALIZABLE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0084() => CorpusAssert.Parses(@"SET TRANSACTION READ ONLY", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0085() => CorpusAssert.Parses(@"SET TRANSACTION READ WRITE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0086() => CorpusAssert.Parses(@"BEGIN; SET CONSTRAINTS ALL DEFERRED; COMMIT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0087() => CorpusAssert.Parses(@"BEGIN; SET CONSTRAINTS ALL IMMEDIATE; COMMIT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0088() => CorpusAssert.Parses(@"BEGIN; CREATE TABLE tmp_ref(id int PRIMARY KEY); CREATE TABLE tmp_fk(fid int, CONSTRAINT fk_fid FOREIGN KEY (fid) REFERENCES tmp_ref(id) DEFERRABLE INITIALLY DEFERRED); SET CONSTRAINTS fk_fid IMMEDIATE; COMMIT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0089() => CorpusAssert.Parses(@"BEGIN; CREATE TABLE tmp_ref2(id int PRIMARY KEY); CREATE TABLE tmp_fk2(fid int, CONSTRAINT fk_fid2 FOREIGN KEY (fid) REFERENCES tmp_ref2(id) DEFERRABLE INITIALLY IMMEDIATE); SET CONSTRAINTS fk_fid2 DEFERRED; COMMIT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0090() => CorpusAssert.Parses(@"BEGIN; SET CONSTRAINTS ALL DEFERRED; SET CONSTRAINTS ALL IMMEDIATE; COMMIT", "ok");
     [Fact]
     public void txca0091() => CorpusAssert.Parses(@"BEGIN; CREATE TABLE tmpr(id int PRIMARY KEY); CREATE TABLE tmpfk(fid int, CONSTRAINT c1 FOREIGN KEY (fid) REFERENCES tmpr(id) DEFERRABLE, CONSTRAINT c2 FOREIGN KEY (fid) REFERENCES tmpr(id) DEFERRABLE); SET CONSTRAINTS c1, c2 DEFERRED; COMMIT", "ok");
@@ -197,23 +197,23 @@ public class Corpus_TransactionControl
     public void txca0095() => CorpusAssert.Parses(@"BEGIN LEVEL SERIALIZABLE", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void txca0096() => CorpusAssert.Parses(@"BEGIN READ", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0097() => CorpusAssert.Parses(@"BEGIN DEFERRABLE READ ONLY ISOLATION LEVEL SERIALIZABLE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0098() => CorpusAssert.Parses(@"START TRANSACTION ISOLATION LEVEL SERIALIZABLE, READ ONLY, DEFERRABLE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0099() => CorpusAssert.Parses(@"BEGIN ISOLATION LEVEL SERIALIZABLE, READ ONLY, DEFERRABLE", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void txca0100() => CorpusAssert.Parses(@"COMMIT CHAIN", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void txca0101() => CorpusAssert.Parses(@"ROLLBACK CHAIN", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0102() => CorpusAssert.Parses(@"SAVEPOINT", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0103() => CorpusAssert.Parses(@"RELEASE SAVEPOINT", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0104() => CorpusAssert.Parses(@"ROLLBACK TO", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0105() => CorpusAssert.Parses(@"ROLLBACK TO SAVEPOINT", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void txca0106() => CorpusAssert.Parses(@"BEGIN; SET TRANSACTION ISOLATION LEVEL PHANTOM; COMMIT", "error");
@@ -221,241 +221,241 @@ public class Corpus_TransactionControl
     public void txca0107() => CorpusAssert.Parses(@"SET CONSTRAINTS", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void txca0108() => CorpusAssert.Parses(@"SET CONSTRAINTS ALL", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0109() => CorpusAssert.Parses(@"BEGIN READ ONLY READ WRITE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0110() => CorpusAssert.Parses(@"BEGIN TRANSACTION ISOLATION LEVEL SERIALIZABLE READ ONLY", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0111() => CorpusAssert.Parses(@"BEGIN WORK ISOLATION LEVEL READ COMMITTED", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0112() => CorpusAssert.Parses(@"START TRANSACTION READ ONLY DEFERRABLE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0113() => CorpusAssert.Parses(@"BEGIN; SAVEPOINT abc123; COMMIT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0114() => CorpusAssert.Parses(@"BEGIN; SAVEPOINT _underscore_sp; RELEASE _underscore_sp; COMMIT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0115() => CorpusAssert.Parses(@"BEGIN; SAVEPOINT sp1; SAVEPOINT sp1; ROLLBACK TO sp1; COMMIT", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void txca0116() => CorpusAssert.Parses(@"BEGIN; SAVEPOINT s1; RELEASE SAVEPOINT s1; ROLLBACK TO s1; COMMIT", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void txca0117() => CorpusAssert.Parses(@"BEGIN; SET TRANSACTION SNAPSHOT 'not-a-real-snapshot-id'; COMMIT", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0118() => CorpusAssert.Parses(@"BEGIN; SET TRANSACTION ISOLATION LEVEL SERIALIZABLE; SET TRANSACTION ISOLATION LEVEL READ COMMITTED; COMMIT", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void txca0119() => CorpusAssert.Parses(@"BEGIN; INSERT INTO s.t(name) VALUES('txtest'); SET TRANSACTION ISOLATION LEVEL SERIALIZABLE; COMMIT", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void txca0120() => CorpusAssert.Parses(@"BEGIN; ROLLBACK TO nonexistent_sp; COMMIT", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0121() => CorpusAssert.Parses(@"begin", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0122() => CorpusAssert.Parses(@"begin work", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0123() => CorpusAssert.Parses(@"begin isolation level serializable", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0124() => CorpusAssert.Parses(@"commit", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0125() => CorpusAssert.Parses(@"rollback", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0126() => CorpusAssert.Parses(@"abort", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0127() => CorpusAssert.Parses(@"BEGIN; savepoint MySP; rollback to savepoint MySP; commit", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0128() => CorpusAssert.Parses(@"BEGIN; SET CONSTRAINTS ALL DEFERRED; ROLLBACK", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0129() => CorpusAssert.Parses(@"set constraints all deferred", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0130() => CorpusAssert.Parses(@"BEGIN; ROLLBACK", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0131() => CorpusAssert.Parses(@"BEGIN; ABORT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0132() => CorpusAssert.Parses(@"BEGIN; END", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0133() => CorpusAssert.Parses(@"BEGIN ISOLATION LEVEL SERIALIZABLE READ WRITE NOT DEFERRABLE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0134() => CorpusAssert.Parses(@"BEGIN ISOLATION LEVEL REPEATABLE READ READ WRITE DEFERRABLE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0135() => CorpusAssert.Parses(@"BEGIN ISOLATION LEVEL READ UNCOMMITTED READ ONLY DEFERRABLE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0136() => CorpusAssert.Parses(@"BEGIN ISOLATION LEVEL READ COMMITTED NOT DEFERRABLE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0137() => CorpusAssert.Parses(@"BEGIN; SET TRANSACTION READ ONLY; SELECT id FROM s.t; COMMIT", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void txca0138() => CorpusAssert.Parses(@"BEGIN; SET TRANSACTION READ ONLY; INSERT INTO s.t(name) VALUES('x'); COMMIT", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void txca0139() => CorpusAssert.Parses(@"BEGIN READ ONLY; INSERT INTO s.t(name) VALUES('y'); COMMIT", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0140() => CorpusAssert.Parses(@"BEGIN; SAVEPOINT sp_a; SAVEPOINT sp_b; RELEASE sp_a; COMMIT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0141() => CorpusAssert.Parses(@"BEGIN; SET TRANSACTION ISOLATION LEVEL SERIALIZABLE READ ONLY; COMMIT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0142() => CorpusAssert.Parses(@"BEGIN; SET TRANSACTION READ ONLY DEFERRABLE; COMMIT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0143() => CorpusAssert.Parses(@"BEGIN; SET TRANSACTION NOT DEFERRABLE; COMMIT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0144() => CorpusAssert.Parses(@"BEGIN; SET TRANSACTION DEFERRABLE; COMMIT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0145() => CorpusAssert.Parses(@"SET LOCAL TRANSACTION ISOLATION LEVEL SERIALIZABLE", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void txca0146() => CorpusAssert.Parses(@"BEGIN SNAPSHOT 'abc'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0147() => CorpusAssert.Parses(@"BEGIN ISOLATION LEVEL SERIALIZABLE ISOLATION LEVEL READ COMMITTED", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0148() => CorpusAssert.Parses(@"BEGIN DEFERRABLE DEFERRABLE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0149() => CorpusAssert.Parses(@"END ISOLATION LEVEL SERIALIZABLE", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void txca0150() => CorpusAssert.Parses(@"ABORT ISOLATION LEVEL SERIALIZABLE", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0151() => CorpusAssert.Parses(@"BEGIN; SAVEPOINT 1bad; COMMIT", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void txca0152() => CorpusAssert.Parses(@"BEGIN; RELEASE SAVEPOINT nonexistent_sp; COMMIT", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0153() => CorpusAssert.Parses(@"START TRANSACTION ISOLATION LEVEL SERIALIZABLE, READ WRITE, NOT DEFERRABLE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0154() => CorpusAssert.Parses(@"BEGIN ISOLATION LEVEL READ COMMITTED, READ ONLY", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0155() => CorpusAssert.Parses(@"BEGIN TRANSACTION ISOLATION LEVEL REPEATABLE READ, READ ONLY, NOT DEFERRABLE", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void txca0156() => CorpusAssert.Parses(@"BEGIN; SAVEPOINT sp1; SAVEPOINT sp2; ROLLBACK TO SAVEPOINT sp1; RELEASE SAVEPOINT sp2; COMMIT", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0157() => CorpusAssert.Parses(@"BEGIN; SAVEPOINT sp1; SAVEPOINT sp2; ROLLBACK TO SAVEPOINT sp1; SAVEPOINT sp2; RELEASE sp2; COMMIT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0158() => CorpusAssert.Parses(@"BEGIN; SET TRANSACTION ISOLATION LEVEL SERIALIZABLE, READ ONLY; COMMIT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0159() => CorpusAssert.Parses(@"BEGIN; SET TRANSACTION READ ONLY, NOT DEFERRABLE; COMMIT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0160() => CorpusAssert.Parses(@"BEGIN; SET TRANSACTION ISOLATION LEVEL REPEATABLE READ, READ WRITE, DEFERRABLE; COMMIT", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void txca0161() => CorpusAssert.Parses(@"COMMIT AND CHAIN; BEGIN", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void txca0162() => CorpusAssert.Parses(@"ROLLBACK AND CHAIN; COMMIT", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0163() => CorpusAssert.Parses(@"BEGIN; SAVEPOINT ""my savepoint""; ROLLBACK TO ""my savepoint""; COMMIT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0164() => CorpusAssert.Parses(@"BEGIN; SAVEPOINT transaction; RELEASE SAVEPOINT transaction; COMMIT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0165() => CorpusAssert.Parses(@"BEGIN TRANSACTION READ ONLY ISOLATION LEVEL SERIALIZABLE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0166() => CorpusAssert.Parses(@"BEGIN NOT DEFERRABLE READ ONLY ISOLATION LEVEL READ COMMITTED", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0167() => CorpusAssert.Parses(@"BEGIN; SET CONSTRAINTS ALL DEFERRED; SAVEPOINT sp; SET CONSTRAINTS ALL IMMEDIATE; ROLLBACK TO sp; COMMIT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0168() => CorpusAssert.Parses(@"SET TRANSACTION ISOLATION LEVEL SERIALIZABLE READ ONLY DEFERRABLE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0169() => CorpusAssert.Parses(@"SET TRANSACTION NOT DEFERRABLE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txca0170() => CorpusAssert.Parses(@"SET TRANSACTION DEFERRABLE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txcb0001() => CorpusAssert.Parses(@"BEGIN", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txcb0002() => CorpusAssert.Parses(@"BEGIN WORK", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txcb0003() => CorpusAssert.Parses(@"BEGIN TRANSACTION", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txcb0004() => CorpusAssert.Parses(@"START TRANSACTION", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txcb0005() => CorpusAssert.Parses(@"BEGIN ISOLATION LEVEL SERIALIZABLE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txcb0006() => CorpusAssert.Parses(@"BEGIN ISOLATION LEVEL REPEATABLE READ", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txcb0007() => CorpusAssert.Parses(@"BEGIN ISOLATION LEVEL READ COMMITTED", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txcb0008() => CorpusAssert.Parses(@"BEGIN ISOLATION LEVEL READ UNCOMMITTED", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txcb0009() => CorpusAssert.Parses(@"BEGIN READ ONLY", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txcb0010() => CorpusAssert.Parses(@"BEGIN READ WRITE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txcb0011() => CorpusAssert.Parses(@"BEGIN DEFERRABLE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txcb0012() => CorpusAssert.Parses(@"BEGIN NOT DEFERRABLE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txcb0013() => CorpusAssert.Parses(@"BEGIN ISOLATION LEVEL SERIALIZABLE READ ONLY", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txcb0014() => CorpusAssert.Parses(@"BEGIN ISOLATION LEVEL SERIALIZABLE READ ONLY DEFERRABLE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txcb0015() => CorpusAssert.Parses(@"BEGIN READ ONLY DEFERRABLE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txcb0016() => CorpusAssert.Parses(@"BEGIN READ WRITE NOT DEFERRABLE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txcb0017() => CorpusAssert.Parses(@"BEGIN ISOLATION LEVEL REPEATABLE READ READ WRITE DEFERRABLE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txcb0018() => CorpusAssert.Parses(@"BEGIN ISOLATION LEVEL READ COMMITTED READ ONLY NOT DEFERRABLE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txcb0019() => CorpusAssert.Parses(@"START TRANSACTION ISOLATION LEVEL SERIALIZABLE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txcb0020() => CorpusAssert.Parses(@"START TRANSACTION READ ONLY", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txcb0021() => CorpusAssert.Parses(@"START TRANSACTION DEFERRABLE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txcb0022() => CorpusAssert.Parses(@"START TRANSACTION ISOLATION LEVEL SERIALIZABLE READ ONLY DEFERRABLE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txcb0023() => CorpusAssert.Parses(@"COMMIT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txcb0024() => CorpusAssert.Parses(@"COMMIT WORK", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txcb0025() => CorpusAssert.Parses(@"COMMIT TRANSACTION", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txcb0026() => CorpusAssert.Parses(@"COMMIT AND CHAIN", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txcb0027() => CorpusAssert.Parses(@"COMMIT AND NO CHAIN", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txcb0028() => CorpusAssert.Parses(@"END", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txcb0029() => CorpusAssert.Parses(@"END WORK", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txcb0030() => CorpusAssert.Parses(@"END TRANSACTION", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txcb0031() => CorpusAssert.Parses(@"END AND CHAIN", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txcb0032() => CorpusAssert.Parses(@"END AND NO CHAIN", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txcb0033() => CorpusAssert.Parses(@"ROLLBACK", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txcb0034() => CorpusAssert.Parses(@"ROLLBACK WORK", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txcb0035() => CorpusAssert.Parses(@"ROLLBACK TRANSACTION", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txcb0036() => CorpusAssert.Parses(@"ROLLBACK AND CHAIN", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txcb0037() => CorpusAssert.Parses(@"ROLLBACK AND NO CHAIN", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txcb0038() => CorpusAssert.Parses(@"ABORT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txcb0039() => CorpusAssert.Parses(@"ABORT WORK", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txcb0040() => CorpusAssert.Parses(@"ABORT TRANSACTION", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txcb0041() => CorpusAssert.Parses(@"BEGIN; SAVEPOINT sp1; ROLLBACK TO SAVEPOINT sp1; COMMIT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txcb0042() => CorpusAssert.Parses(@"BEGIN; SAVEPOINT sp1; ROLLBACK TO sp1; COMMIT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txcb0043() => CorpusAssert.Parses(@"BEGIN; SAVEPOINT my_savepoint; RELEASE SAVEPOINT my_savepoint; COMMIT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txcb0044() => CorpusAssert.Parses(@"BEGIN; SAVEPOINT my_savepoint; RELEASE my_savepoint; COMMIT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txcb0045() => CorpusAssert.Parses(@"BEGIN; SAVEPOINT a; SAVEPOINT b; ROLLBACK TO SAVEPOINT a; COMMIT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txcb0046() => CorpusAssert.Parses(@"BEGIN; SAVEPOINT ""My SP""; ROLLBACK TO ""My SP""; COMMIT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txcb0047() => CorpusAssert.Parses(@"SET TRANSACTION ISOLATION LEVEL SERIALIZABLE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txcb0048() => CorpusAssert.Parses(@"SET TRANSACTION ISOLATION LEVEL REPEATABLE READ", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txcb0049() => CorpusAssert.Parses(@"SET TRANSACTION ISOLATION LEVEL READ COMMITTED", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txcb0050() => CorpusAssert.Parses(@"SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txcb0051() => CorpusAssert.Parses(@"SET TRANSACTION READ ONLY", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txcb0052() => CorpusAssert.Parses(@"SET TRANSACTION READ WRITE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txcb0053() => CorpusAssert.Parses(@"SET TRANSACTION DEFERRABLE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txcb0054() => CorpusAssert.Parses(@"SET TRANSACTION NOT DEFERRABLE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txcb0055() => CorpusAssert.Parses(@"SET TRANSACTION ISOLATION LEVEL SERIALIZABLE READ ONLY DEFERRABLE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txcb0056() => CorpusAssert.Parses(@"SET TRANSACTION ISOLATION LEVEL READ COMMITTED READ WRITE NOT DEFERRABLE", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void txcb0057() => CorpusAssert.Parses(@"SET SESSION CHARACTERISTICS AS TRANSACTION ISOLATION LEVEL SERIALIZABLE", "ok");
@@ -469,13 +469,13 @@ public class Corpus_TransactionControl
     public void txcb0061() => CorpusAssert.Parses(@"SET SESSION CHARACTERISTICS AS TRANSACTION NOT DEFERRABLE", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void txcb0062() => CorpusAssert.Parses(@"SET SESSION CHARACTERISTICS AS TRANSACTION ISOLATION LEVEL REPEATABLE READ READ ONLY DEFERRABLE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txcb0063() => CorpusAssert.Parses(@"SET CONSTRAINTS ALL DEFERRED", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txcb0064() => CorpusAssert.Parses(@"SET CONSTRAINTS ALL IMMEDIATE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txcb0065() => CorpusAssert.Parses(@"BEGIN; CREATE TABLE _tc_p (id int PRIMARY KEY); CREATE TABLE _tc_c (id int, pid int, CONSTRAINT _tc_fk FOREIGN KEY (pid) REFERENCES _tc_p(id) DEFERRABLE INITIALLY DEFERRED); SET CONSTRAINTS _tc_fk IMMEDIATE; ROLLBACK", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txcb0066() => CorpusAssert.Parses(@"BEGIN; CREATE TABLE _tc2_p (id int PRIMARY KEY); CREATE TABLE _tc2_c (pid int, CONSTRAINT _tc2_fk FOREIGN KEY (pid) REFERENCES _tc2_p(id) DEFERRABLE INITIALLY IMMEDIATE); SET CONSTRAINTS _tc2_fk DEFERRED; ROLLBACK", "ok");
     [Fact]
     public void txcb0067() => CorpusAssert.Parses(@"BEGIN; CREATE TABLE _tc3_p (id int PRIMARY KEY, code int UNIQUE); CREATE TABLE _tc3_c (pid int, code int, CONSTRAINT _tc3_fk1 FOREIGN KEY (pid) REFERENCES _tc3_p(id) DEFERRABLE, CONSTRAINT _tc3_fk2 FOREIGN KEY (code) REFERENCES _tc3_p(code) DEFERRABLE); SET CONSTRAINTS _tc3_fk1, _tc3_fk2 DEFERRED; ROLLBACK", "ok");
@@ -485,13 +485,13 @@ public class Corpus_TransactionControl
     public void txcb0069() => CorpusAssert.Parses(@"BEGIN LEVEL SERIALIZABLE", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void txcb0070() => CorpusAssert.Parses(@"BEGIN ISOLATION SERIALIZABLE", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txcb0071() => CorpusAssert.Parses(@"SAVEPOINT", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txcb0072() => CorpusAssert.Parses(@"RELEASE", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txcb0073() => CorpusAssert.Parses(@"ROLLBACK TO", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txcb0074() => CorpusAssert.Parses(@"BEGIN READ ONLY READ WRITE; ROLLBACK", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void txcb0075() => CorpusAssert.Parses(@"START", "error");
@@ -503,6 +503,6 @@ public class Corpus_TransactionControl
     public void txcb0078() => CorpusAssert.Parses(@"SET TRANSACTION SNAPSHOT", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void txcb0079() => CorpusAssert.Parses(@"SET CONSTRAINTS DEFERRED", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txcb0080() => CorpusAssert.Parses(@"BEGIN; SAVEPOINT sp1; ROLLBACK TO SAVEPOINT; COMMIT", "error");
 }

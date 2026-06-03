@@ -5,205 +5,205 @@ namespace PgProj.Core.Tests.Corpus;
 
 public class Corpus_PlpgsqlAssign
 {
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0001() => CorpusAssert.Parses(@"DO $$ DECLARE x int; BEGIN x := 42; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0002() => CorpusAssert.Parses(@"DO $$ DECLARE x int; BEGIN x = 42; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0003() => CorpusAssert.Parses(@"DO $$ DECLARE x text; BEGIN x := 'hello'; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0004() => CorpusAssert.Parses(@"DO $$ DECLARE x numeric; BEGIN x := 3.14; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0005() => CorpusAssert.Parses(@"DO $$ DECLARE x boolean; BEGIN x := true; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0006() => CorpusAssert.Parses(@"DO $$ DECLARE x boolean; BEGIN x := false; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0007() => CorpusAssert.Parses(@"DO $$ DECLARE x int; BEGIN x := 1 + 2; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0008() => CorpusAssert.Parses(@"DO $$ DECLARE x int; y int; BEGIN y := 5; x := y * 2; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0009() => CorpusAssert.Parses(@"DO $$ DECLARE x int := 10; BEGIN x := x + 1; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0010() => CorpusAssert.Parses(@"DO $$ DECLARE x text; BEGIN x := 'foo' || 'bar'; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0011() => CorpusAssert.Parses(@"DO $$ DECLARE x int; BEGIN x := s.f(5); END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0012() => CorpusAssert.Parses(@"DO $$ DECLARE x int; BEGIN x := s.g(3, 4); END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0013() => CorpusAssert.Parses(@"DO $$ DECLARE x bigint; BEGIN x := nextval('s.seq'); END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0014() => CorpusAssert.Parses(@"DO $$ DECLARE x int; BEGIN x := NULL; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0015() => CorpusAssert.Parses(@"DO $$ DECLARE x int; y int; z int; BEGIN x := 1; y := 2; z := x + y; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0016() => CorpusAssert.Parses(@"DO $$ DECLARE x s.mood; BEGIN x := 'happy'; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0017() => CorpusAssert.Parses(@"DO $$ DECLARE x s.mood; BEGIN x := 'ok'::s.mood; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0018() => CorpusAssert.Parses(@"DO $$ DECLARE x s.addr; BEGIN x := ROW('Main St', 'Springfield', '12345')::s.addr; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0019() => CorpusAssert.Parses(@"DO $$ DECLARE x s.addr; BEGIN x.street := 'Elm St'; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0020() => CorpusAssert.Parses(@"DO $$ DECLARE x s.addr; BEGIN x.city = 'Shelbyville'; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0021() => CorpusAssert.Parses(@"DO $$ DECLARE x s.addr; BEGIN x.street := 'A'; x.city := 'B'; x.zip := '00000'; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0022() => CorpusAssert.Parses(@"DO $$ DECLARE arr int[]; BEGIN arr := ARRAY[1,2,3]; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0023() => CorpusAssert.Parses(@"DO $$ DECLARE arr int[]; BEGIN arr[1] := 10; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0024() => CorpusAssert.Parses(@"DO $$ DECLARE arr int[]; BEGIN arr[1] = 10; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0025() => CorpusAssert.Parses(@"DO $$ DECLARE arr int[]; BEGIN arr := ARRAY[1,2,3]; arr[2] := 99; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0026() => CorpusAssert.Parses(@"DO $$ DECLARE arr int[]; BEGIN arr[1:3] := ARRAY[10,20,30]; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0027() => CorpusAssert.Parses(@"DO $$ DECLARE arr int[]; i int := 2; BEGIN arr := ARRAY[1,2,3]; arr[i] := 42; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0028() => CorpusAssert.Parses(@"DO $$ DECLARE r record; BEGIN SELECT id, name INTO r FROM s.t LIMIT 1; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0029() => CorpusAssert.Parses(@"DO $$ DECLARE v_id bigint; v_name text; BEGIN SELECT id, name INTO v_id, v_name FROM s.t LIMIT 1; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0030() => CorpusAssert.Parses(@"DO $$ DECLARE r s.t%ROWTYPE; BEGIN SELECT * INTO r FROM s.t LIMIT 1; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0031() => CorpusAssert.Parses(@"DO $$ DECLARE v_name text; BEGIN SELECT name INTO v_name FROM s.t WHERE id = -999; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0032() => CorpusAssert.Parses(@"DO $$ DECLARE v_name text; BEGIN SELECT name INTO STRICT v_name FROM s.t WHERE id = -999; EXCEPTION WHEN NO_DATA_FOUND THEN NULL; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0033() => CorpusAssert.Parses(@"DO $$ DECLARE v_name text; BEGIN INSERT INTO s.t(name) VALUES ('row_a'),('row_b'); SELECT name INTO STRICT v_name FROM s.t WHERE name IN ('row_a','row_b'); EXCEPTION WHEN TOO_MANY_ROWS THEN NULL; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0034() => CorpusAssert.Parses(@"DO $$ DECLARE v int; BEGIN SELECT count(*) INTO v FROM s.t; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0035() => CorpusAssert.Parses(@"DO $$ DECLARE v numeric; BEGIN SELECT val INTO v FROM s.t LIMIT 1; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0036() => CorpusAssert.Parses(@"DO $$ DECLARE v jsonb; BEGIN SELECT data INTO v FROM s.t LIMIT 1; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0037() => CorpusAssert.Parses(@"DO $$ DECLARE r record; BEGIN SELECT id, name, val INTO r FROM s.t ORDER BY id LIMIT 1; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0038() => CorpusAssert.Parses(@"DO $$ DECLARE v_id bigint; BEGIN INSERT INTO s.t(name) VALUES('ppaa0038') RETURNING id INTO v_id; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0039() => CorpusAssert.Parses(@"DO $$ DECLARE v_id bigint; v_name text; BEGIN INSERT INTO s.t(name) VALUES('ppaa0039') RETURNING id, name INTO v_id, v_name; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0040() => CorpusAssert.Parses(@"DO $$ DECLARE r record; BEGIN INSERT INTO s.t(name, qty) VALUES('ppaa0040', 7) RETURNING id, name, qty INTO r; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0041() => CorpusAssert.Parses(@"DO $$ DECLARE v_id bigint; BEGIN INSERT INTO s.t(name) VALUES('ppaa0041') RETURNING id INTO STRICT v_id; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0042() => CorpusAssert.Parses(@"DO $$ DECLARE v_id bigint; BEGIN INSERT INTO s.t(name) VALUES('ppaa0042'); SELECT lastval() INTO v_id; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0043() => CorpusAssert.Parses(@"DO $$ DECLARE v_name text; BEGIN INSERT INTO s.t(name) VALUES('ppaa0043'); UPDATE s.t SET name = 'updated' WHERE name = 'ppaa0043' RETURNING name INTO v_name; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0044() => CorpusAssert.Parses(@"DO $$ DECLARE r record; BEGIN INSERT INTO s.t(name, val) VALUES('ppaa0044', 5.5); UPDATE s.t SET val = val + 1 WHERE name = 'ppaa0044' RETURNING id, val INTO r; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0045() => CorpusAssert.Parses(@"DO $$ DECLARE v_id bigint; BEGIN INSERT INTO s.t(name) VALUES('ppaa0045'); DELETE FROM s.t WHERE name = 'ppaa0045' RETURNING id INTO v_id; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0046() => CorpusAssert.Parses(@"DO $$ DECLARE r record; BEGIN INSERT INTO s.t(name) VALUES('ppaa0046'); DELETE FROM s.t WHERE name = 'ppaa0046' RETURNING id, name INTO r; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0047() => CorpusAssert.Parses(@"DO $$ DECLARE rc bigint; BEGIN INSERT INTO s.t(name) VALUES('ppaa0047'); GET DIAGNOSTICS rc = ROW_COUNT; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0048() => CorpusAssert.Parses(@"DO $$ DECLARE rc bigint; BEGIN UPDATE s.t SET qty = qty + 1 WHERE id = -999; GET DIAGNOSTICS rc = ROW_COUNT; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0049() => CorpusAssert.Parses(@"DO $$ DECLARE rc bigint; BEGIN DELETE FROM s.t WHERE id = -999; GET DIAGNOSTICS rc = ROW_COUNT; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0050() => CorpusAssert.Parses(@"DO $$ DECLARE ctx text; BEGIN GET DIAGNOSTICS ctx = PG_CONTEXT; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0051() => CorpusAssert.Parses(@"DO $$ DECLARE rtn oid; BEGIN GET DIAGNOSTICS rtn = PG_ROUTINE_OID; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0052() => CorpusAssert.Parses(@"DO $$ DECLARE rc bigint; ctx text; BEGIN INSERT INTO s.t(name) VALUES('ppaa0052'); GET DIAGNOSTICS rc = ROW_COUNT, ctx = PG_CONTEXT; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0053() => CorpusAssert.Parses(@"DO $$ DECLARE rc bigint; BEGIN INSERT INTO s.t(name) VALUES('ppaa0053'); GET CURRENT DIAGNOSTICS rc = ROW_COUNT; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0054() => CorpusAssert.Parses(@"DO $$ DECLARE rc bigint; ctx text; rtn oid; BEGIN INSERT INTO s.t(name) VALUES('ppaa0054'); GET DIAGNOSTICS rc = ROW_COUNT, ctx = PG_CONTEXT, rtn = PG_ROUTINE_OID; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0055() => CorpusAssert.Parses(@"DO $$ DECLARE rc bigint; BEGIN INSERT INTO s.t(name) VALUES('ppaa0055'); GET DIAGNOSTICS rc := ROW_COUNT; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0056() => CorpusAssert.Parses(@"DO $$ BEGIN PERFORM s.f(1); END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0057() => CorpusAssert.Parses(@"DO $$ BEGIN PERFORM count(*) FROM s.t; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0058() => CorpusAssert.Parses(@"DO $$ BEGIN PERFORM * FROM s.t WHERE id = -999; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0059() => CorpusAssert.Parses(@"DO $$ BEGIN PERFORM * FROM s.t; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0060() => CorpusAssert.Parses(@"DO $$ DECLARE f boolean; BEGIN PERFORM * FROM s.t WHERE id = -999; f := FOUND; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0061() => CorpusAssert.Parses(@"DO $$ DECLARE f boolean; BEGIN SELECT 1 INTO STRICT f; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0062() => CorpusAssert.Parses(@"DO $$ DECLARE v int; f boolean; BEGIN SELECT id INTO v FROM s.t WHERE id = -999; f := FOUND; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0063() => CorpusAssert.Parses(@"DO $$ DECLARE v int; f boolean; BEGIN SELECT 42 INTO v; f := FOUND; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0064() => CorpusAssert.Parses(@"DO $$ DECLARE x int; BEGIN x := (SELECT 1 + 1); END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0065() => CorpusAssert.Parses(@"DO $$ DECLARE x int; BEGIN x := (SELECT count(*) FROM s.t); END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0066() => CorpusAssert.Parses(@"DO $$ DECLARE x int := 5; BEGIN x := CASE WHEN x > 3 THEN 100 ELSE 0 END; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0067() => CorpusAssert.Parses(@"DO $$ DECLARE x text; BEGIN x := COALESCE(NULL, 'default'); END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0068() => CorpusAssert.Parses(@"DO $$ DECLARE x int; BEGIN x := GREATEST(1, 2, 3); END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0069() => CorpusAssert.Parses(@"DO $$ DECLARE x int; BEGIN x := LEAST(5, 3, 7); END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0070() => CorpusAssert.Parses(@"DO $$ DECLARE x text; BEGIN x := upper('hello'); END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0071() => CorpusAssert.Parses(@"DO $$ DECLARE x int; BEGIN x := length('abcde'); END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0072() => CorpusAssert.Parses(@"DO $$ DECLARE x timestamptz; BEGIN x := now(); END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0073() => CorpusAssert.Parses(@"DO $$ DECLARE x date; BEGIN x := current_date; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0074() => CorpusAssert.Parses(@"DO $$ DECLARE x int; BEGIN x := abs(-42); END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0075() => CorpusAssert.Parses(@"DO $$ DECLARE x int; BEGIN x := 10 / 2; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0076() => CorpusAssert.Parses(@"DO $$ DECLARE x int; BEGIN x := 10 % 3; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0077() => CorpusAssert.Parses(@"DO $$ DECLARE x bigint; BEGIN x := 2^32; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0078() => CorpusAssert.Parses(@"DO $$ DECLARE x int; BEGIN x := -5; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0079() => CorpusAssert.Parses(@"DO $$ DECLARE x text[]; BEGIN x := ARRAY['a','b','c']; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0080() => CorpusAssert.Parses(@"DO $$ DECLARE x int[]; BEGIN x := ARRAY[1,2,3]; x[1] := 99; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0081() => CorpusAssert.Parses(@"DO $$ DECLARE x int[][]; BEGIN x := ARRAY[[1,2],[3,4]]; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0082() => CorpusAssert.Parses(@"DO $$ DECLARE x int[]; BEGIN x := ARRAY[1,2,3]; x[2:3] := ARRAY[20,30]; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0083() => CorpusAssert.Parses(@"DO $$ DECLARE r s.t%ROWTYPE; BEGIN SELECT * INTO r FROM s.t LIMIT 1; r.name := 'changed'; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0084() => CorpusAssert.Parses(@"DO $$ DECLARE r record; BEGIN SELECT id, name INTO r FROM s.t LIMIT 1; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0085() => CorpusAssert.Parses(@"DO $$ DECLARE x int; BEGIN SELECT 42 INTO x; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0086() => CorpusAssert.Parses(@"DO $$ DECLARE x int; y int; BEGIN SELECT 1, 2 INTO x, y; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0087() => CorpusAssert.Parses(@"DO $$ DECLARE v_id bigint; v_qty int; BEGIN SELECT id, qty INTO v_id, v_qty FROM s.t LIMIT 1; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0088() => CorpusAssert.Parses(@"DO $$ DECLARE x int; BEGIN SELECT id INTO x FROM s.t ORDER BY id DESC LIMIT 1; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0089() => CorpusAssert.Parses(@"DO $$ DECLARE x int; BEGIN SELECT id INTO x FROM s.t WHERE id > 0 ORDER BY id LIMIT 1; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0090() => CorpusAssert.Parses(@"DO $$ DECLARE x int; BEGIN SELECT t.id INTO x FROM s.t t JOIN s.t2 t2 ON t.id = t2.t_id LIMIT 1; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0091() => CorpusAssert.Parses(@"DO $$ DECLARE x bigint; BEGIN SELECT count(*) INTO x FROM s.t GROUP BY status LIMIT 1; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0092() => CorpusAssert.Parses(@"DO $$ DECLARE x text; BEGIN SELECT name INTO x FROM s.t WHERE name LIKE 'a%' LIMIT 1; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0093() => CorpusAssert.Parses(@"DO $$ DECLARE v_id bigint; BEGIN UPDATE s.t SET qty = qty WHERE id = -999 RETURNING id INTO v_id; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0094() => CorpusAssert.Parses(@"DO $$ DECLARE v_id bigint; BEGIN INSERT INTO s.t(name) VALUES('ppaa0094') RETURNING id INTO v_id; DELETE FROM s.t WHERE id = v_id RETURNING id INTO v_id; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0095() => CorpusAssert.Parses(@"DO $$ DECLARE v_id bigint; v_name text; BEGIN INSERT INTO s.t(name, qty) VALUES('ppaa0095', 3) RETURNING id, name INTO STRICT v_id, v_name; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0096() => CorpusAssert.Parses(@"DO $$ DECLARE x int := 0; BEGIN x = x + 10; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0097() => CorpusAssert.Parses(@"DO $$ DECLARE x int; BEGIN x := 2#10; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0098() => CorpusAssert.Parses(@"DO $$ DECLARE x int; BEGIN x := x'FF'::int; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0099() => CorpusAssert.Parses(@"DO $$ DECLARE x s.pos_int; BEGIN x := 5; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0100() => CorpusAssert.Parses(@"DO $$ DECLARE x s.pos_int; BEGIN x := -1; EXCEPTION WHEN check_violation THEN NULL; END $$;", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void ppaa0101() => CorpusAssert.Parses(@"DO $$ DECLARE x int; BEGIN x 42; END $$;", "error");
@@ -231,7 +231,7 @@ public class Corpus_PlpgsqlAssign
     public void ppaa0112() => CorpusAssert.Parses(@"DO $$ DECLARE x int; BEGIN x := 'not_a_number'; END $$;", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void ppaa0113() => CorpusAssert.Parses(@"DO $$ DECLARE x int; BEGIN SELECT 'notanumber' INTO x; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0114() => CorpusAssert.Parses(@"DO $$ DECLARE x int; y int; BEGIN x := 1; y := 2; x = y; y = x; END $$;", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void ppaa0115() => CorpusAssert.Parses(@"DO $$ DECLARE x int; BEGIN x := undeclared_var; END $$;", "error");
@@ -248,158 +248,158 @@ public class Corpus_PlpgsqlAssign
     [Fact(Skip = "pending: parser not yet complete")]
     public void ppaa0121() => CorpusAssert.Parses(@"DO $$ DECLARE x int; BEGIN x := 42
 END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0122() => CorpusAssert.Parses(@"DO $$ DECLARE x int; BEGIN x := 1 + 2 * 3; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0123() => CorpusAssert.Parses(@"DO $$ DECLARE x boolean; BEGIN x := NOT true; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0124() => CorpusAssert.Parses(@"DO $$ DECLARE x boolean; BEGIN x := true AND false; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0125() => CorpusAssert.Parses(@"DO $$ DECLARE x boolean; BEGIN x := true OR false; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0126() => CorpusAssert.Parses(@"DO $$ DECLARE x boolean; BEGIN x := 5 BETWEEN 1 AND 10; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0127() => CorpusAssert.Parses(@"DO $$ DECLARE x boolean; BEGIN x := 5 IN (1, 2, 5); END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0128() => CorpusAssert.Parses(@"DO $$ DECLARE x boolean; BEGIN x := 5 NOT IN (1, 2, 3); END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0129() => CorpusAssert.Parses(@"DO $$ DECLARE x boolean; BEGIN x := NULL IS NULL; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0130() => CorpusAssert.Parses(@"DO $$ DECLARE x boolean; BEGIN x := 1 IS NOT NULL; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0131() => CorpusAssert.Parses(@"DO $$ DECLARE x int; BEGIN x := (1 + 2) * 3; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0132() => CorpusAssert.Parses(@"DO $$ DECLARE x text; BEGIN x := trim('  hello  '); END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0133() => CorpusAssert.Parses(@"DO $$ DECLARE x int; BEGIN x := char_length('hello'); END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0134() => CorpusAssert.Parses(@"DO $$ DECLARE x text; BEGIN x := substring('hello world' FROM 1 FOR 5); END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0135() => CorpusAssert.Parses(@"DO $$ DECLARE x text; BEGIN x := to_char(42, '999'); END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0136() => CorpusAssert.Parses(@"DO $$ DECLARE x int; BEGIN x := to_number('42', '99'); END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0137() => CorpusAssert.Parses(@"DO $$ DECLARE x jsonb; BEGIN x := '{""a"":1}'::jsonb; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0138() => CorpusAssert.Parses(@"DO $$ DECLARE x jsonb; BEGIN x := jsonb_build_object('key', 'val'); END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0139() => CorpusAssert.Parses(@"DO $$ DECLARE x int; BEGIN x := EXTRACT(YEAR FROM now())::int; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0140() => CorpusAssert.Parses(@"DO $$ DECLARE x interval; BEGIN x := INTERVAL '1 day'; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0141() => CorpusAssert.Parses(@"DO $$ DECLARE x int; BEGIN x := CAST('42' AS int); END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0142() => CorpusAssert.Parses(@"DO $$ DECLARE x int; BEGIN x := '42'::int; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0143() => CorpusAssert.Parses(@"DO $$ DECLARE x int; y int; BEGIN x := 10; y := 20; x := x + y; y := x - y; x := x - y; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0144() => CorpusAssert.Parses(@"DO $$ DECLARE x int; BEGIN x := (SELECT id FROM s.t WHERE id = -999 LIMIT 1); END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0145() => CorpusAssert.Parses(@"DO $$ DECLARE x int; BEGIN x := (SELECT 1 UNION SELECT 2 LIMIT 1); END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0146() => CorpusAssert.Parses(@"DO $$ DECLARE x int; BEGIN SELECT id INTO x FROM s.t WHERE id = -999; IF NOT FOUND THEN x := 0; END IF; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0147() => CorpusAssert.Parses(@"DO $$ DECLARE f boolean; BEGIN PERFORM s.f(1); f := FOUND; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0148() => CorpusAssert.Parses(@"DO $$ DECLARE x int; BEGIN x := pg_backend_pid(); END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0149() => CorpusAssert.Parses(@"DO $$ DECLARE x oid; BEGIN x := 'pg_class'::regclass; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0150() => CorpusAssert.Parses(@"DO $$ DECLARE x text; BEGIN x := version(); END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0151() => CorpusAssert.Parses(@"DO $$ DECLARE x int[]; BEGIN x := ARRAY(SELECT id FROM s.t LIMIT 3); END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0152() => CorpusAssert.Parses(@"DO $$ DECLARE x int; BEGIN SELECT id INTO STRICT x FROM s.t LIMIT 1; EXCEPTION WHEN NO_DATA_FOUND THEN x := -1; WHEN TOO_MANY_ROWS THEN x := -2; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0153() => CorpusAssert.Parses(@"DO $$ DECLARE x int; BEGIN x := 0; BEGIN x := 1 / 0; EXCEPTION WHEN division_by_zero THEN x := -1; END; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0154() => CorpusAssert.Parses(@"DO $$ DECLARE x int := 100; BEGIN DECLARE x int := 200; BEGIN NULL; END; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0155() => CorpusAssert.Parses(@"DO $$ DECLARE x int; BEGIN SELECT val::int INTO x FROM s.t WHERE val IS NOT NULL LIMIT 1; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0156() => CorpusAssert.Parses(@"DO $$ DECLARE rc bigint; BEGIN SELECT count(*) INTO rc FROM s.t; GET DIAGNOSTICS rc = ROW_COUNT; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0157() => CorpusAssert.Parses(@"DO $$ DECLARE x int; BEGIN x := 42; -- inline comment
 END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0158() => CorpusAssert.Parses(@"DO $$ DECLARE x int; BEGIN x := /* block comment */ 42; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0159() => CorpusAssert.Parses(@"DO $$ DECLARE ""my var"" int; BEGIN ""my var"" := 99; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0160() => CorpusAssert.Parses(@"DO $$ DECLARE MyVar int; BEGIN MyVar := 1; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0161() => CorpusAssert.Parses(@"DO $$ DECLARE x int; BEGIN x := 1_000_000; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0162() => CorpusAssert.Parses(@"DO $$ DECLARE x float8; BEGIN x := 1.5e2; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0163() => CorpusAssert.Parses(@"DO $$ DECLARE x text; BEGIN x := $tag$hello world$tag$; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0164() => CorpusAssert.Parses(@"DO $$ DECLARE x text; BEGIN x := E'tab\there'; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0165() => CorpusAssert.Parses(@"DO $$ DECLARE x text; BEGIN x := U&'\0041'; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0166() => CorpusAssert.Parses(@"DO $$ DECLARE x text; BEGIN x := 'it''s a test'; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0167() => CorpusAssert.Parses(@"DO $$ DECLARE x s.addr; BEGIN x := ('123 Main', 'Anytown', '99999')::s.addr; x.zip := '11111'; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0168() => CorpusAssert.Parses(@"DO $$ DECLARE r record; rc bigint; BEGIN INSERT INTO s.t(name) VALUES ('ppaa0168') RETURNING id, name INTO r; GET DIAGNOSTICS rc = ROW_COUNT; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0169() => CorpusAssert.Parses(@"DO $$ DECLARE x int; BEGIN SELECT id INTO x FROM s.t WHERE id = (SELECT min(id) FROM s.t); END $$;", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void ppaa0170() => CorpusAssert.Parses(@"DO $$ DECLARE x int; BEGIN x := 42 END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppab0001() => CorpusAssert.Parses(@"DO $$ DECLARE x int; BEGIN x := 42; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppab0002() => CorpusAssert.Parses(@"DO $$ DECLARE x int; BEGIN x = 42; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppab0003() => CorpusAssert.Parses(@"DO $$ DECLARE x text; BEGIN x := 'hello'; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppab0004() => CorpusAssert.Parses(@"DO $$ DECLARE x numeric; BEGIN x := 3.14 * 2; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppab0005() => CorpusAssert.Parses(@"DO $$ DECLARE r s.t%ROWTYPE; BEGIN SELECT * INTO r FROM s.t LIMIT 1; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppab0006() => CorpusAssert.Parses(@"DO $$ DECLARE r s.t%ROWTYPE; BEGIN SELECT * INTO STRICT r FROM s.t WHERE id = -1; EXCEPTION WHEN NO_DATA_FOUND THEN NULL; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppab0007() => CorpusAssert.Parses(@"DO $$ DECLARE n text; v numeric; BEGIN SELECT name, val INTO n, v FROM s.t LIMIT 1; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppab0008() => CorpusAssert.Parses(@"DO $$ DECLARE r record; BEGIN SELECT id, name INTO r FROM s.t LIMIT 1; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppab0009() => CorpusAssert.Parses(@"DO $$ DECLARE x int; BEGIN INSERT INTO s.t(name, qty) VALUES('ppab9', 1) RETURNING id INTO x; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppab0010() => CorpusAssert.Parses(@"DO $$ DECLARE x int; n text; BEGIN INSERT INTO s.t(name, qty) VALUES('ppab10', 2) RETURNING id, name INTO x, n; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppab0011() => CorpusAssert.Parses(@"DO $$ DECLARE x int; BEGIN INSERT INTO s.t(name) VALUES('ppab11') RETURNING id INTO STRICT x; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppab0012() => CorpusAssert.Parses(@"DO $$ DECLARE x int; BEGIN UPDATE s.t SET qty = 0 WHERE id = -1 RETURNING id INTO x; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppab0013() => CorpusAssert.Parses(@"DO $$ DECLARE x int; BEGIN DELETE FROM s.t WHERE id = -1 RETURNING id INTO x; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppab0014() => CorpusAssert.Parses(@"DO $$ DECLARE rc bigint; BEGIN DELETE FROM s.t WHERE id = -1; GET DIAGNOSTICS rc = ROW_COUNT; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppab0015() => CorpusAssert.Parses(@"DO $$ DECLARE ctx text; BEGIN GET DIAGNOSTICS ctx = PG_CONTEXT; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppab0016() => CorpusAssert.Parses(@"DO $$ DECLARE rc bigint; ctx text; BEGIN DELETE FROM s.t WHERE id = -1; GET DIAGNOSTICS rc = ROW_COUNT, ctx = PG_CONTEXT; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppab0017() => CorpusAssert.Parses(@"DO $$ DECLARE rc bigint; BEGIN DELETE FROM s.t WHERE id = -1; GET CURRENT DIAGNOSTICS rc = ROW_COUNT; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppab0018() => CorpusAssert.Parses(@"DO $$ DECLARE rc bigint; BEGIN DELETE FROM s.t WHERE id = -1; GET DIAGNOSTICS rc := ROW_COUNT; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppab0019() => CorpusAssert.Parses(@"DO $$ DECLARE found_flag boolean; BEGIN PERFORM s.f(1); found_flag := FOUND; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppab0020() => CorpusAssert.Parses(@"DO $$ BEGIN PERFORM s.f(1); END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppab0021() => CorpusAssert.Parses(@"DO $$ BEGIN PERFORM * FROM s.t WHERE id = -1; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppab0022() => CorpusAssert.Parses(@"DO $$ DECLARE a int[]; BEGIN a := ARRAY[1, 2, 3]; a[2] := 99; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppab0023() => CorpusAssert.Parses(@"DO $$ DECLARE a int[]; BEGIN a := ARRAY[1,2,3,4,5]; a[1:3] := ARRAY[10,20,30]; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppab0024() => CorpusAssert.Parses(@"DO $$ DECLARE r s.t%ROWTYPE; BEGIN SELECT * INTO r FROM s.t LIMIT 1; r.qty := 99; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppab0025() => CorpusAssert.Parses(@"DO $$ DECLARE x int; BEGIN x := (SELECT count(*) FROM s.t); END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppab0026() => CorpusAssert.Parses(@"DO $$ DECLARE x int; BEGIN SELECT count(*) FROM s.t INTO x; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppab0027() => CorpusAssert.Parses(@"DO $$ DECLARE oid_var oid; BEGIN GET DIAGNOSTICS oid_var = PG_ROUTINE_OID; END $$;", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void ppab0028() => CorpusAssert.Parses(@"DO $$ DECLARE x int; BEGIN x 42; END $$;", "error");
