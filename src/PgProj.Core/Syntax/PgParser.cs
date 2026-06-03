@@ -111,6 +111,9 @@ public sealed partial class PgParser
             break;
         }
         c.MatchWord("RECURSIVE");                       // CREATE [OR REPLACE] RECURSIVE VIEW
+        bool constraintTrigger = c.AtWord("CONSTRAINT") && c.Peek()?.IsWord("TRIGGER") == true;
+        if (constraintTrigger) c.Advance();             // CREATE CONSTRAINT TRIGGER
+        if (c.MatchWord("TRIGGER")) return ParseCreateTrigger(c, constraintTrigger);
         if (c.MatchWord("TABLE")) return ParseCreateTable(c, persistence);
         if (c.MatchWord("SCHEMA")) return ParseCreateSchema(c);
         if (c.MatchWords("MATERIALIZED", "VIEW")) return ParseCreateView(c, materialized: true);

@@ -133,39 +133,39 @@ public class Corpus_CreateTrigger
     public void trga0063() => CorpusAssert.Parses(@"CREATE TRIGGER trig_uof_stmt AFTER UPDATE OF name ON s.t FOR EACH STATEMENT EXECUTE FUNCTION s.trg()", "ok");
     [Fact]
     public void trga0064() => CorpusAssert.Parses(@"CREATE TRIGGER trig_iod_stmt AFTER INSERT OR DELETE ON s.t FOR EACH STATEMENT EXECUTE FUNCTION s.trg()", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void trga0065() => CorpusAssert.Parses(@"CREATE TRIGGER trig_trunc_row BEFORE TRUNCATE ON s.t FOR EACH ROW EXECUTE FUNCTION s.trg()", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void trga0066() => CorpusAssert.Parses(@"CREATE TRIGGER trig_io_row INSTEAD OF INSERT ON s.t FOR EACH ROW EXECUTE FUNCTION s.trg()", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void trga0067() => CorpusAssert.Parses(@"CREATE TRIGGER trig_io_stmt INSTEAD OF INSERT ON s.v FOR EACH STATEMENT EXECUTE FUNCTION s.trg()", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void trga0068() => CorpusAssert.Parses(@"CREATE TRIGGER trig_io_trunc INSTEAD OF TRUNCATE ON s.v FOR EACH ROW EXECUTE FUNCTION s.trg()", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void trga0069() => CorpusAssert.Parses(@"CREATE TRIGGER trig_no_exec BEFORE INSERT ON s.t FOR EACH ROW", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void trga0070() => CorpusAssert.Parses(@"CREATE TRIGGER BEFORE INSERT ON s.t FOR EACH ROW EXECUTE FUNCTION s.trg()", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void trga0071() => CorpusAssert.Parses(@"CREATE TRIGGER trig_no_on BEFORE INSERT FOR EACH ROW EXECUTE FUNCTION s.trg()", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void trga0072() => CorpusAssert.Parses(@"CREATE TRIGGER trig_no_event BEFORE ON s.t FOR EACH ROW EXECUTE FUNCTION s.trg()", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void trga0073() => CorpusAssert.Parses(@"CREATE TRIGGER trig_bad_timing DURING INSERT ON s.t FOR EACH ROW EXECUTE FUNCTION s.trg()", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void trga0074() => CorpusAssert.Parses(@"CREATE TRIGGER trig_bad_event BEFORE SELECT ON s.t FOR EACH ROW EXECUTE FUNCTION s.trg()", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void trga0075() => CorpusAssert.Parses(@"CREATE TRIGGER trig_bad_freq BEFORE INSERT ON s.t FOR EACH TRANSACTION EXECUTE FUNCTION s.trg()", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void trga0076() => CorpusAssert.Parses(@"CREATE TRIGGER trig_ref_before BEFORE INSERT ON s.t REFERENCING NEW TABLE AS n FOR EACH STATEMENT EXECUTE FUNCTION s.trg()", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void trga0077() => CorpusAssert.Parses(@"CREATE TRIGGER trig_ref_iof INSTEAD OF INSERT ON s.v REFERENCING NEW TABLE AS n FOR EACH ROW EXECUTE FUNCTION s.trg()", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void trga0078() => CorpusAssert.Parses(@"CREATE TRIGGER trig_ref_uof AFTER UPDATE OF name ON s.t REFERENCING NEW TABLE AS n FOR EACH STATEMENT EXECUTE FUNCTION s.trg()", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void trga0079() => CorpusAssert.Parses(@"CREATE TRIGGER trig_dup_new AFTER INSERT ON s.t REFERENCING NEW TABLE AS a NEW TABLE AS b FOR EACH STATEMENT EXECUTE FUNCTION s.trg()", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void trga0080() => CorpusAssert.Parses(@"CREATE TRIGGER trig_dup_old AFTER DELETE ON s.t REFERENCING OLD TABLE AS a OLD TABLE AS b FOR EACH STATEMENT EXECUTE FUNCTION s.trg()", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void trga0081() => CorpusAssert.Parses(@"CREATE TRIGGER trig_cstr_before CONSTRAINT TRIGGER ctbad BEFORE INSERT ON s.t FOR EACH ROW EXECUTE FUNCTION s.trg()", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void trga0082() => CorpusAssert.Parses(@"CREATE CONSTRAINT TRIGGER ctbad2 BEFORE INSERT ON s.t FOR EACH ROW EXECUTE FUNCTION s.trg()", "error");
@@ -177,9 +177,9 @@ public class Corpus_CreateTrigger
     public void trga0085() => CorpusAssert.Parses(@"CREATE TRIGGER trig_io_view_row INSTEAD OF UPDATE ON s.v FOR EACH ROW WHEN (NEW.id > 0) EXECUTE FUNCTION s.trg()", "error");
     [Fact]
     public void trga0086() => CorpusAssert.Parses(@"CREATE TRIGGER trig_trunc_when BEFORE TRUNCATE ON s.t FOR EACH STATEMENT WHEN (true) EXECUTE FUNCTION s.trg()", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void trga0087() => CorpusAssert.Parses(@"CREATE TRIGGER trig_missing_paren BEFORE INSERT ON s.t FOR EACH ROW WHEN NEW.val > 0 EXECUTE FUNCTION s.trg()", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void trga0088() => CorpusAssert.Parses(@"CREATE TRIGGER trig_no_table BEFORE INSERT FOR EACH ROW EXECUTE FUNCTION s.trg()", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void trga0089() => CorpusAssert.Parses(@"TRIGGER trig_nokw BEFORE INSERT ON s.t FOR EACH ROW EXECUTE FUNCTION s.trg()", "error");
@@ -201,7 +201,7 @@ CREATE OR REPLACE TRIGGER trig_orreplace2 AFTER DELETE ON s.t FOR EACH ROW EXECU
     public void trga0096() => CorpusAssert.Parses(@"CREATE TRIGGER trig_lowercase before insert on s.t for each row execute function s.trg()", "ok");
     [Fact]
     public void trga0097() => CorpusAssert.Parses(@"CREATE TRIGGER trig_mixed BEFORE INSERT OR UPDATE OF val, qty ON s.t FOR EACH ROW EXECUTE FUNCTION s.trg()", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void trga0098() => CorpusAssert.Parses(@"CREATE TRIGGER trig_wrong_order BEFORE INSERT ON s.t EXECUTE FUNCTION s.trg() FOR EACH ROW", "error");
     [Fact]
     public void trga0099() => CorpusAssert.Parses(@"CREATE TRIGGER trig_when_stmt BEFORE INSERT ON s.t FOR EACH STATEMENT WHEN (true) EXECUTE FUNCTION s.trg()", "ok");
@@ -215,7 +215,7 @@ CREATE OR REPLACE TRIGGER trig_orreplace2 AFTER DELETE ON s.t FOR EACH ROW EXECU
     public void trga0103() => CorpusAssert.Parses(@"CREATE TRIGGER trig_ref_ins_new AFTER INSERT ON s.t REFERENCING NEW TABLE AS n FOR EACH ROW EXECUTE FUNCTION s.trg()", "ok");
     [Fact]
     public void trga0104() => CorpusAssert.Parses(@"CREATE TRIGGER trig_ref_del_old AFTER DELETE ON s.t REFERENCING OLD TABLE AS o FOR EACH ROW EXECUTE FUNCTION s.trg()", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void trga0105() => CorpusAssert.Parses(@"CREATE TRIGGER trig_cstr_imm CONSTRAINT TRIGGER ctimm AFTER UPDATE ON s.t INITIALLY IMMEDIATE FOR EACH ROW EXECUTE FUNCTION s.trg()", "error");
     [Fact]
     public void trga0106() => CorpusAssert.Parses(@"CREATE CONSTRAINT TRIGGER ctimm2 AFTER UPDATE ON s.t INITIALLY IMMEDIATE FOR EACH ROW EXECUTE FUNCTION s.trg()", "ok");
@@ -305,7 +305,7 @@ CREATE TRIGGER trig_func2 BEFORE INSERT ON s.t FOR EACH ROW EXECUTE FUNCTION s.t
     public void trga0145() => CorpusAssert.Parses(@"CREATE TRIGGER trig_quoted_arg BEFORE INSERT ON s.t FOR EACH ROW EXECUTE FUNCTION s.trg('it''s a test')", "ok");
     [Fact]
     public void trga0146() => CorpusAssert.Parses(@"CREATE TRIGGER trig_dollar_arg BEFORE INSERT ON s.t FOR EACH ROW EXECUTE FUNCTION s.trg($tag$hello world$tag$)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void trga0147() => CorpusAssert.Parses(@"CREATE TRIGGER trig_noexec_kw BEFORE INSERT ON s.t FOR EACH ROW RUN FUNCTION s.trg()", "error");
     [Fact]
     public void trga0148() => CorpusAssert.Parses(@"CREATE TRIGGER trig_uof_only BEFORE UPDATE OF val ON s.t FOR EACH ROW EXECUTE FUNCTION s.trg()", "ok");
@@ -314,7 +314,7 @@ CREATE TRIGGER trig_func2 BEFORE INSERT ON s.t FOR EACH ROW EXECUTE FUNCTION s.t
 DROP TRIGGER trig_schema_qual ON s.t", "ok");
     [Fact]
     public void trga0150() => CorpusAssert.Parses(@"CREATE TRIGGER trig_part_row_ref AFTER INSERT ON s.events REFERENCING NEW TABLE AS n FOR EACH STATEMENT EXECUTE FUNCTION s.trg()", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void trga0151() => CorpusAssert.Parses(@"CREATE TRIGGER trig_deferred_row CONSTRAINT TRIGGER ctr_def AFTER UPDATE ON s.t2 DEFERRABLE INITIALLY DEFERRED FOR EACH ROW EXECUTE FUNCTION s.trg()", "error");
     [Fact]
     public void trga0152() => CorpusAssert.Parses(@"CREATE CONSTRAINT TRIGGER ctr_t2 AFTER DELETE ON s.t2 DEFERRABLE INITIALLY DEFERRED FOR EACH ROW EXECUTE FUNCTION s.trg()", "ok");
@@ -346,11 +346,11 @@ DROP TRIGGER trig_schema_qual ON s.t", "ok");
     public void trga0165() => CorpusAssert.Parses(@"CREATE TRIGGER trig_or_trunc BEFORE INSERT OR TRUNCATE ON s.t FOR EACH STATEMENT EXECUTE FUNCTION s.trg()", "ok");
     [Fact]
     public void trga0166() => CorpusAssert.Parses(@"CREATE TRIGGER trig_or_trunc2 AFTER UPDATE OR TRUNCATE ON s.t FOR EACH STATEMENT EXECUTE FUNCTION s.trg()", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void trga0167() => CorpusAssert.Parses(@"CREATE TRIGGER trig_cstr_uof CONSTRAINT TRIGGER ctuof AFTER UPDATE OF name ON s.t FOR EACH ROW EXECUTE FUNCTION s.trg()", "error");
     [Fact]
     public void trga0168() => CorpusAssert.Parses(@"CREATE CONSTRAINT TRIGGER ctuof2 AFTER UPDATE OF name ON s.t FOR EACH ROW EXECUTE FUNCTION s.trg()", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void trga0169() => CorpusAssert.Parses(@"CREATE TRIGGER trig_io_trunc2 INSTEAD OF TRUNCATE ON s.t FOR EACH STATEMENT EXECUTE FUNCTION s.trg()", "error");
     [Fact]
     public void trga0170() => CorpusAssert.Parses(@"CREATE TRIGGER trig_when_depth AFTER INSERT ON s.t FOR EACH ROW WHEN (pg_trigger_depth() < 5) EXECUTE FUNCTION s.trg()", "ok");
@@ -553,31 +553,31 @@ SELECT tgname FROM pg_trigger WHERE tgname = 'trg90'", "ok");
     public void trgb0094() => CorpusAssert.Parses(@"CREATE TRIGGER trg94 BEFORE INSERT ON s.t FOR EACH ROW EXECUTE FUNCTION pg_catalog.suppress_redundant_updates_trigger()", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void trgb0095() => CorpusAssert.Parses(@"CREATE TRIGGER trg95 AFTER UPDATE ON s.v FOR EACH ROW EXECUTE FUNCTION s.trg()", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void trgb0096() => CorpusAssert.Parses(@"CREATE TRIGGER BEFORE INSERT ON s.t FOR EACH ROW EXECUTE FUNCTION s.trg()", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void trgb0097() => CorpusAssert.Parses(@"CREATE TRIGGER trg97 INSERT ON s.t FOR EACH ROW EXECUTE FUNCTION s.trg()", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void trgb0098() => CorpusAssert.Parses(@"CREATE TRIGGER trg98 BEFORE ON s.t FOR EACH ROW EXECUTE FUNCTION s.trg()", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void trgb0099() => CorpusAssert.Parses(@"CREATE TRIGGER trg99 BEFORE INSERT s.t FOR EACH ROW EXECUTE FUNCTION s.trg()", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void trgb0100() => CorpusAssert.Parses(@"CREATE TRIGGER trg100 BEFORE INSERT ON FOR EACH ROW EXECUTE FUNCTION s.trg()", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void trgb0101() => CorpusAssert.Parses(@"CREATE TRIGGER trg101 BEFORE INSERT ON s.t FOR EACH ROW", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void trgb0102() => CorpusAssert.Parses(@"CREATE TRIGGER trg102 BEFORE INSERT ON s.t FOR EACH ROW EXECUTE s.trg()", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void trgb0103() => CorpusAssert.Parses(@"CREATE TRIGGER trg103 BEFORE INSERT ON s.t FOR EACH ROW EXECUTE FUNCTION", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void trgb0104() => CorpusAssert.Parses(@"CREATE TRIGGER trg104 INSTEAD OF TRUNCATE ON s.v FOR EACH ROW EXECUTE FUNCTION s.trg()", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void trgb0105() => CorpusAssert.Parses(@"CREATE TRIGGER trg105 INSTEAD OF INSERT ON s.t FOR EACH ROW EXECUTE FUNCTION s.trg()", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void trgb0106() => CorpusAssert.Parses(@"CREATE TRIGGER trg106 INSTEAD OF INSERT ON s.v FOR EACH STATEMENT EXECUTE FUNCTION s.trg()", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void trgb0107() => CorpusAssert.Parses(@"CREATE TRIGGER trg107 BEFORE TRUNCATE ON s.t FOR EACH ROW EXECUTE FUNCTION s.trg()", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void trgb0108() => CorpusAssert.Parses(@"CREATE TRIGGER trg108 AFTER TRUNCATE ON s.t FOR EACH ROW EXECUTE FUNCTION s.trg()", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void trgb0109() => CorpusAssert.Parses(@"CREATE CONSTRAINT TRIGGER trg109 BEFORE INSERT ON s.t FOR EACH ROW EXECUTE FUNCTION s.trg()", "error");
@@ -585,19 +585,19 @@ SELECT tgname FROM pg_trigger WHERE tgname = 'trg90'", "ok");
     public void trgb0110() => CorpusAssert.Parses(@"CREATE CONSTRAINT TRIGGER trg110 AFTER TRUNCATE ON s.t FOR EACH STATEMENT EXECUTE FUNCTION s.trg()", "error");
     [Fact]
     public void trgb0111() => CorpusAssert.Parses(@"CREATE TRIGGER trg111 AFTER INSERT ON s.t REFERENCING NEW TABLE AS new_rows FOR EACH ROW EXECUTE FUNCTION s.trg()", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void trgb0112() => CorpusAssert.Parses(@"CREATE TRIGGER trg112 AFTER UPDATE OF name ON s.t REFERENCING NEW TABLE AS new_rows OLD TABLE AS old_rows FOR EACH STATEMENT EXECUTE FUNCTION s.trg()", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void trgb0113() => CorpusAssert.Parses(@"CREATE TRIGGER trg113 INSTEAD OF UPDATE OF name ON s.v FOR EACH ROW EXECUTE FUNCTION s.trg()", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void trgb0114() => CorpusAssert.Parses(@"CREATE TRIGGER trg114 BEFORE INSERT ON s.t FOR EACH ROW WHEN (SELECT 1) EXECUTE FUNCTION s.trg()", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void trgb0115() => CorpusAssert.Parses(@"CREATE TRIGGER trg115 BEFORE INSERT ON s.t FOR EACH ROW WHEN NEW.val > 0 EXECUTE FUNCTION s.trg()", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void trgb0116() => CorpusAssert.Parses(@"CREATE TRIGGER trg116 BEFORE INSERT ON s.t FOR EACH ROW EXECUTE FUNCTION s.nonexistent()", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void trgb0117() => CorpusAssert.Parses(@"CREATE TRIGGER trg117 AFTER INSERT ON s.nonexistent FOR EACH ROW EXECUTE FUNCTION s.trg()", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void trgb0118() => CorpusAssert.Parses(@"CREATE TRIGGER trg118 BEFORE INSERT ON s.t REFERENCING NEW TABLE AS new_rows FOR EACH STATEMENT EXECUTE FUNCTION s.trg()", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void trgb0119() => CorpusAssert.Parses(@"CREATE TRIGGER trg119 AFTER TRUNCATE ON s.t REFERENCING OLD TABLE AS old_rows FOR EACH STATEMENT EXECUTE FUNCTION s.trg()", "error");
@@ -605,7 +605,7 @@ SELECT tgname FROM pg_trigger WHERE tgname = 'trg90'", "ok");
     public void trgb0120() => CorpusAssert.Parses(@"CREATE TRIGGER trg120 AFTER INSERT ON s.v REFERENCING NEW TABLE AS new_rows FOR EACH STATEMENT EXECUTE FUNCTION s.trg()", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void trgb0121() => CorpusAssert.Parses(@"CREATE CONSTRAINT TRIGGER trg121 AFTER INSERT ON s.t REFERENCING NEW TABLE AS nr FOR EACH ROW EXECUTE FUNCTION s.trg()", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void trgb0122() => CorpusAssert.Parses(@"CREATE TRIGGER trg122 BEFORE INSERT OR TRUNCATE ON s.t FOR EACH ROW EXECUTE FUNCTION s.trg()", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void trgb0123() => CorpusAssert.Parses(@"CREATE TRIGGER trg123 BEFORE INSERT ON s.t FOR EACH ROW EXECUTE FUNCTION s.trg();
@@ -614,7 +614,7 @@ CREATE TRIGGER trg123 BEFORE UPDATE ON s.t FOR EACH ROW EXECUTE FUNCTION s.trg()
     public void trgb0124() => CorpusAssert.Parses(@"CREATE TRIGGER trg124 BEFORE INSERT ON s.seq FOR EACH ROW EXECUTE FUNCTION s.trg()", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void trgb0125() => CorpusAssert.Parses(@"CREATE OR REPLACE CONSTRAINT TRIGGER trg125 AFTER INSERT ON s.t FOR EACH ROW EXECUTE FUNCTION s.trg()", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void trgb0126() => CorpusAssert.Parses(@"CREATE TRIGGER trg126 BEFORE INSERT ON s.t FOR EACH ROW EXECUTE FUNCTION s.trg() WHEN (NEW.val > 0)", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void trgb0127() => CorpusAssert.Parses(@"CREATE TRIGGER trg127 AFTER INSERT ON s.t FOR EACH ROW EXECUTE FUNCTION s.f()", "error");
@@ -704,9 +704,9 @@ DROP TRIGGER trg159 ON s.v", "ok");
     public void trgb0161() => CorpusAssert.Parses(@"CREATE TRIGGER trg161 BEFORE INSERT ON s.t FOR EACH ROW WHEN (NEW.tags && ARRAY['a','b']::text[]) EXECUTE FUNCTION s.trg()", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void trgb0162() => CorpusAssert.Parses(@"CREATE TRIGGER trg162 AFTER INSERT ON s.t FOR EACH ROW WHEN (NEW.span @> 5::int4range) EXECUTE FUNCTION s.trg()", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void trgb0163() => CorpusAssert.Parses(@"CREATE TRIGGER AFTER INSERT ON s.t FOR EACH ROW EXECUTE FUNCTION s.trg()", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void trgb0164() => CorpusAssert.Parses(@"CREATE TRIGGER trg164 BEFORE INSERT ON s.t FOR EACH ROW EXECUTE FUNCTION", "error");
     [Fact]
     public void trgb0165() => CorpusAssert.Parses(@"CREATE TRIGGER trg165 BEFORE INSERT ON s.t EXECUTE FUNCTION s.trg()", "ok");
@@ -790,21 +790,21 @@ CREATE TRIGGER trgc28 INSTEAD OF INSERT OR UPDATE OR DELETE ON s.vtrg4 FOR EACH 
 CREATE OR REPLACE TRIGGER trgc31 AFTER INSERT ON s.t FOR EACH ROW EXECUTE FUNCTION s.trg()", "ok");
     [Fact]
     public void trgc0032() => CorpusAssert.Parses(@"CREATE TRIGGER trgc32 BEFORE INSERT OR UPDATE OR DELETE OR TRUNCATE ON s.t FOR EACH STATEMENT EXECUTE FUNCTION s.trg()", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void trgc0033() => CorpusAssert.Parses(@"CREATE TRIGGER BEFORE INSERT ON s.t FOR EACH ROW EXECUTE FUNCTION s.trg()", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void trgc0034() => CorpusAssert.Parses(@"CREATE TRIGGER trgc34 INSERT ON s.t FOR EACH ROW EXECUTE FUNCTION s.trg()", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void trgc0035() => CorpusAssert.Parses(@"CREATE TRIGGER trgc35 BEFORE INSERT ON s.t FOR EACH ROW", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void trgc0036() => CorpusAssert.Parses(@"CREATE TRIGGER trgc36 INSTEAD OF INSERT ON s.t FOR EACH ROW EXECUTE FUNCTION s.trg()", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void trgc0037() => CorpusAssert.Parses(@"CREATE VIEW s.vtrg5 AS SELECT id FROM s.t;
 CREATE TRIGGER trgc37 INSTEAD OF INSERT ON s.vtrg5 FOR EACH STATEMENT EXECUTE FUNCTION s.trg()", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void trgc0038() => CorpusAssert.Parses(@"CREATE TRIGGER trgc38 BEFORE TRUNCATE ON s.t FOR EACH ROW EXECUTE FUNCTION s.trg()", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void trgc0039() => CorpusAssert.Parses(@"CREATE CONSTRAINT TRIGGER trgc39 BEFORE INSERT ON s.t FOR EACH ROW EXECUTE FUNCTION s.trg()", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void trgc0040() => CorpusAssert.Parses(@"CREATE TRIGGER trgc40 BEFORE INSERT ON s.t REFERENCING NEW TABLE AS new_rows FOR EACH STATEMENT EXECUTE FUNCTION s.trg()", "error");
 }
