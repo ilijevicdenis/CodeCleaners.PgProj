@@ -89,7 +89,7 @@ public sealed partial class PgParser
 
     // ( key = value [, …] ) — shared by RANGE and base-type options. Rejects an empty list, a missing '='
     // or value, a duplicate key, and (when knownKeys is given) an unknown key. Returns the set of keys seen.
-    private HashSet<string> ParseKeyValueOptions(TokenCursor c, HashSet<string>? knownKeys, string what)
+    private HashSet<string> ParseKeyValueOptions(TokenCursor c, HashSet<string>? knownKeys, string what, bool rejectDuplicates = true)
     {
         c.ExpectSymbol('(');
         var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -99,7 +99,7 @@ public sealed partial class PgParser
             if (c.AtSymbol(')')) throw new ParseException($"trailing comma in {what} list", c.Here);
             var key = c.ExpectIdentifier();
             if (knownKeys is not null && !knownKeys.Contains(key)) throw new ParseException($"unknown {what} \"{key}\"", c.Here);
-            if (!seen.Add(key)) throw new ParseException($"duplicate {what} \"{key}\"", c.Here);
+            if (!seen.Add(key) && rejectDuplicates) throw new ParseException($"duplicate {what} \"{key}\"", c.Here);
             if (!c.MatchOperator("=")) throw new ParseException($"expected '=' after {what} \"{key}\"", c.Here);
             if (c.AtEnd || c.AtSymbol(',') || c.AtSymbol(')')) throw new ParseException($"missing value for {what} \"{key}\"", c.Here);
             ParseOptionValue(c);
