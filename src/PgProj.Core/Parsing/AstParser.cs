@@ -89,16 +89,25 @@ public sealed class AstParser
         }
 
         if (r.Cur is not { Kind: TokenKind.Word } kindTok) return null;
-        switch (kindTok.Value.ToUpperInvariant())
+        SqlStatement? node = kindTok.Value.ToUpperInvariant() switch
         {
-            case "SCHEMA": r.Next(); return ParseSchema(r);
-            case "TABLE": r.Next(); return ParseTable(r, tokens);
-            case "VIEW": r.Next(); return ParseView(r, materialized, tokens);
-            case "FUNCTION":
-            case "PROCEDURE": r.Next(); return ParseFunction(r, tokens, kindTok.Value.ToUpperInvariant() == "PROCEDURE");
-            // INDEX/SEQUENCE and the long tail are captured raw for the analysis tree.
-            default: return ParseRaw(tokens, r);
-        }
+            "SCHEMA" => Run(r, ParseSchema),
+            "TABLE" => Run(r, rr => ParseTable(rr, tokens)),
+            "VIEW" => Run(r, rr => ParseView(rr, materialized, tokens)),
+            "INDEX" => Run(r, rr => ParseIndex(rr, unique, tokens)),
+            "SEQUENCE" => Run(r, ParseSequence),
+            "FUNCTION" => Run(r, rr => ParseFunction(rr, tokens, false)),
+            "PROCEDURE" => Run(r, rr => ParseFunction(rr, tokens, true)),
+            _ => ParseRaw(tokens, r),
+        };
+        if (node is not null) node.RawText = Token.Render(tokens);
+        return node;
+    }
+
+    private static SqlStatement Run(TokenReader r, Func<TokenReader, SqlStatement> body)
+    {
+        r.Next(); // consume the kind keyword
+        return body(r);
     }
 
     // ---- schema -------------------------------------------------------------------------
@@ -169,8 +178,8 @@ public sealed class AstParser
         }
         if (r.MatchWord("CHECK"))
         {
-            var inner = CaptureParenTokens(r);
-            return new CheckConstraintNode { Name = name, Expression = ExpressionParser.Parse(inner) };
+            var withParens = CaptureParenTokensWithParens(r);
+            return new CheckConstraintNode { Name = name, Expression = ExpressionParser.Parse(Inner(withParens)), RawText = Token.Render(withParens) };
         }
         // EXCLUDE etc.
         var rest = CaptureToElementEnd(r);
@@ -209,10 +218,10 @@ public sealed class AstParser
                 else if (r.MatchWord("BY")) { r.MatchWord("DEFAULT"); kind = "BY DEFAULT"; }
                 r.MatchWord("AS");
                 if (r.MatchWord("IDENTITY")) { if (r.IsSymbol('(')) SkipBalancedParens(r); cons.Add(new IdentityConstraintNode { Kind = kind }); }
-                else if (r.IsSymbol('(')) { var toks = CaptureParenTokensWithParens(r); r.MatchWord("STORED"); cons.Add(new GeneratedConstraintNode { Expression = ExpressionParser.Parse(Inner(toks)) }); }
+                else if (r.IsSymbol('(')) { var toks = CaptureParenTokensWithParens(r); r.MatchWord("STORED"); cons.Add(new GeneratedConstraintNode { Expression = ExpressionParser.Parse(Inner(toks)), RawText = Token.Render(toks) }); }
                 continue;
             }
-            if (r.MatchWord("CHECK")) { var inner = CaptureParenTokens(r); cons.Add(new CheckColumnConstraintNode { Expression = ExpressionParser.Parse(inner) }); continue; }
+            if (r.MatchWord("CHECK")) { var withParens = CaptureParenTokensWithParens(r); cons.Add(new CheckColumnConstraintNode { Expression = ExpressionParser.Parse(Inner(withParens)), RawText = Token.Render(withParens) }); continue; }
             if (r.MatchWord("COLLATE")) { cons.Add(new CollateConstraintNode { Collation = r.ParseIdentifier() }); continue; }
             r.Next();
         }
@@ -337,21 +346,232 @@ public sealed class AstParser
         return new RawStatement { Kind = ObjectKind.Comment, Identity = identity, BodyText = Token.Render(tokens) };
     }
 
-    private SqlStatement ParseRaw(List<Token> tokens, TokenReader r)
+    private SqlStatement ParseIndex(TokenReader r, bool unique, List<Token> raw)
     {
-        var kindWord = r.Cur?.Value.ToUpperInvariant() ?? "";
-        var kind = kindWord switch
+        r.MatchWord("CONCURRENTLY");
+        SkipIfNotExists(r);
+        var name = r.IsWord("ON") ? "" : r.ParseIdentifier();
+        r.MatchWord("ON");
+        r.MatchWord("ONLY");
+        var (schema, table) = ParseQualifiedName(r);
+        string? method = null;
+        if (r.MatchWord("USING")) method = r.ParseIdentifier();
+        var cols = ParseExpressionList(r);
+        string? where = null;
+        if (r.MatchWord("WHERE")) { var rest = new List<Token>(); while (!r.Eof) rest.Add(r.Next()); where = Token.Render(rest); }
+        if (string.IsNullOrEmpty(name)) name = $"{table}_{string.Join("_", cols)}_idx";
+        return new CreateIndexStatement { Name = name, Schema = schema, Table = table, Unique = unique, Method = method, Columns = cols, Where = where };
+    }
+
+    private SqlStatement ParseSequence(TokenReader r)
+    {
+        SkipIfNotExists(r);
+        var (schema, name) = ParseQualifiedName(r);
+        string? dataType = null; long? incr = null, min = null, max = null, start = null, cache = null; var cycle = false;
+        while (!r.Eof)
         {
-            "INDEX" => ObjectKind.Statistics, // placeholder; index handled by model parser, raw here
-            "TYPE" => ObjectKind.Type,
-            "DOMAIN" => ObjectKind.Domain,
-            "TRIGGER" => ObjectKind.Trigger,
-            "POLICY" => ObjectKind.Policy,
-            "EXTENSION" => ObjectKind.Extension,
-            "SEQUENCE" => ObjectKind.Statistics,
-            _ => ObjectKind.Statistics,
+            if (r.MatchWord("AS")) { dataType = TypeNormalizer.Normalize(r.ParseIdentifier()); continue; }
+            if (r.MatchWord("INCREMENT")) { r.MatchWord("BY"); incr = ParseSignedLong(r); continue; }
+            if (r.MatchWord("MINVALUE")) { min = ParseSignedLong(r); continue; }
+            if (r.MatchWord("MAXVALUE")) { max = ParseSignedLong(r); continue; }
+            if (r.MatchWord("START")) { r.MatchWord("WITH"); start = ParseSignedLong(r); continue; }
+            if (r.MatchWord("CACHE")) { cache = ParseSignedLong(r); continue; }
+            if (r.MatchWord("CYCLE")) { cycle = true; continue; }
+            if (r.MatchWord("NO")) { if (r.MatchWord("CYCLE")) cycle = false; else r.Next(); continue; }
+            if (r.MatchWord("OWNED")) { r.MatchWord("BY"); break; }
+            r.Next();
+        }
+        return new CreateSequenceStatement { Schema = schema, Name = name, DataType = dataType, Increment = incr, MinValue = min, MaxValue = max, Start = start, Cache = cache, Cycle = cycle };
+    }
+
+    private SqlStatement? ParseRaw(List<Token> tokens, TokenReader r)
+    {
+        var kind = DetectRawKind(r);
+        if (kind is null) return null;
+
+        string schema = "", name = "", onObject = "";
+        try
+        {
+            switch (kind)
+            {
+                case ObjectKind.Type or ObjectKind.Domain or ObjectKind.Collation or ObjectKind.Conversion
+                    or ObjectKind.Statistics or ObjectKind.ForeignTable or ObjectKind.TextSearchConfiguration
+                    or ObjectKind.TextSearchDictionary or ObjectKind.TextSearchParser or ObjectKind.TextSearchTemplate:
+                    SkipIfNotExists(r);
+                    (schema, name) = ParseQualifiedName(r);
+                    break;
+                case ObjectKind.Extension or ObjectKind.Language or ObjectKind.Server
+                    or ObjectKind.ForeignDataWrapper or ObjectKind.EventTrigger:
+                    SkipIfNotExists(r);
+                    name = r.ParseIdentifier();
+                    break;
+                case ObjectKind.Trigger or ObjectKind.Policy:
+                    name = r.ParseIdentifier();
+                    onObject = ScanForKeywordThenQualified(r, "ON");
+                    schema = SchemaOf(onObject);
+                    break;
+                case ObjectKind.Rule:
+                    name = r.ParseIdentifier();
+                    onObject = ScanForKeywordThenQualified(r, "TO");
+                    schema = SchemaOf(onObject);
+                    break;
+                case ObjectKind.Aggregate:
+                    (schema, var an) = ParseQualifiedName(r);
+                    name = $"{schema}.{an}" + (r.IsSymbol('(') ? Token.Render(CaptureParenTokensWithParens(r)) : "");
+                    break;
+                case ObjectKind.Operator:
+                    name = CaptureUntilSymbol(r, '(') + (r.IsSymbol('(') ? Token.Render(CaptureParenTokensWithParens(r)) : "");
+                    break;
+                case ObjectKind.OperatorClass or ObjectKind.OperatorFamily:
+                    (schema, var ocn) = ParseQualifiedName(r);
+                    var method = ScanForKeywordThenIdentifier(r, "USING");
+                    name = $"{schema}.{ocn}" + (method.Length > 0 ? $" USING {method}" : "");
+                    break;
+                case ObjectKind.Cast:
+                    name = r.IsSymbol('(') ? Token.Render(CaptureParenTokensWithParens(r)) : "";
+                    break;
+                case ObjectKind.Transform:
+                    r.MatchWord("FOR");
+                    var type = CaptureUntilWord(r, "LANGUAGE");
+                    var lang = r.MatchWord("LANGUAGE") ? r.ParseIdentifier() : "";
+                    name = $"FOR {type} LANGUAGE {lang}";
+                    break;
+                case ObjectKind.UserMapping:
+                    SkipIfNotExists(r);
+                    r.MatchWord("FOR");
+                    var usr = r.ParseIdentifier();
+                    var srv = ScanForKeywordThenIdentifier(r, "SERVER");
+                    name = $"FOR {usr} SERVER {srv}";
+                    break;
+            }
+        }
+        catch (ParseException) { /* fall back to body-based identity */ }
+
+        var body = Token.Render(tokens);
+        var identity = !string.IsNullOrEmpty(name)
+            ? BuildIdentity(kind.Value, schema, name, onObject)
+            : $"{kind}:{Normalize(body)}";
+
+        return new RawStatement
+        {
+            Kind = kind.Value, Schema = schema, Name = name, Identity = identity,
+            BodyText = body, OnObject = string.IsNullOrEmpty(onObject) ? null : onObject,
         };
-        return new RawStatement { Kind = kind, Identity = Normalize(Token.Render(tokens.Take(8).ToList())), BodyText = Token.Render(tokens) };
+    }
+
+    private static ObjectKind? DetectRawKind(TokenReader r)
+    {
+        if (r.Eof) return null;
+        var first = r.Next().Value.ToUpperInvariant();
+        switch (first)
+        {
+            case "EXTENSION": return ObjectKind.Extension;
+            case "LANGUAGE": return ObjectKind.Language;
+            case "TRUSTED": r.MatchWord("PROCEDURAL"); r.MatchWord("LANGUAGE"); return ObjectKind.Language;
+            case "PROCEDURAL": r.MatchWord("LANGUAGE"); return ObjectKind.Language;
+            case "TYPE": return ObjectKind.Type;
+            case "DOMAIN": return ObjectKind.Domain;
+            case "COLLATION": return ObjectKind.Collation;
+            case "CONVERSION": return ObjectKind.Conversion;
+            case "CAST": return ObjectKind.Cast;
+            case "AGGREGATE": return ObjectKind.Aggregate;
+            case "TRIGGER": return ObjectKind.Trigger;
+            case "RULE": return ObjectKind.Rule;
+            case "POLICY": return ObjectKind.Policy;
+            case "STATISTICS": return ObjectKind.Statistics;
+            case "SERVER": return ObjectKind.Server;
+            case "TRANSFORM": return ObjectKind.Transform;
+            case "CONSTRAINT": return r.MatchWord("TRIGGER") ? ObjectKind.Trigger : null;
+            case "OPERATOR":
+                if (r.MatchWord("CLASS")) return ObjectKind.OperatorClass;
+                if (r.MatchWord("FAMILY")) return ObjectKind.OperatorFamily;
+                return ObjectKind.Operator;
+            case "EVENT": return r.MatchWord("TRIGGER") ? ObjectKind.EventTrigger : null;
+            case "FOREIGN":
+                if (r.MatchWord("TABLE")) return ObjectKind.ForeignTable;
+                if (r.MatchWord("DATA")) { r.MatchWord("WRAPPER"); return ObjectKind.ForeignDataWrapper; }
+                return null;
+            case "USER": return r.MatchWord("MAPPING") ? ObjectKind.UserMapping : null;
+            case "TEXT":
+                if (!r.MatchWord("SEARCH")) return null;
+                if (r.MatchWord("CONFIGURATION")) return ObjectKind.TextSearchConfiguration;
+                if (r.MatchWord("DICTIONARY")) return ObjectKind.TextSearchDictionary;
+                if (r.MatchWord("PARSER")) return ObjectKind.TextSearchParser;
+                if (r.MatchWord("TEMPLATE")) return ObjectKind.TextSearchTemplate;
+                return null;
+            default: return null;
+        }
+    }
+
+    private static string BuildIdentity(ObjectKind kind, string schema, string name, string onObject)
+    {
+        var tag = kind.ToString().ToLowerInvariant();
+        if (!string.IsNullOrEmpty(onObject)) return $"{tag}:{name} on {onObject}".ToLowerInvariant();
+        var qualified = string.IsNullOrEmpty(schema) ? name : $"{schema}.{name}";
+        return $"{tag}:{qualified}".ToLowerInvariant();
+    }
+
+    private static string SchemaOf(string qualified)
+    {
+        var dot = qualified.IndexOf('.');
+        return dot > 0 ? qualified[..dot] : string.Empty;
+    }
+
+    private string ScanForKeywordThenQualified(TokenReader r, string keyword)
+    {
+        while (!r.Eof && !r.IsWord(keyword)) r.Next();
+        if (!r.MatchWord(keyword)) return string.Empty;
+        var (s, n) = ParseQualifiedName(r);
+        return $"{s}.{n}";
+    }
+
+    private static string ScanForKeywordThenIdentifier(TokenReader r, string keyword)
+    {
+        while (!r.Eof && !r.IsWord(keyword)) r.Next();
+        return r.MatchWord(keyword) ? r.ParseIdentifier() : string.Empty;
+    }
+
+    private static string CaptureUntilSymbol(TokenReader r, char stop)
+    {
+        var toks = new List<Token>();
+        while (!r.Eof && !r.IsSymbol(stop)) toks.Add(r.Next());
+        return Token.Render(toks);
+    }
+
+    private static string CaptureUntilWord(TokenReader r, string stopWord)
+    {
+        var toks = new List<Token>();
+        while (!r.Eof && !r.IsWord(stopWord)) toks.Add(r.Next());
+        return Token.Render(toks);
+    }
+
+    private static List<string> ParseExpressionList(TokenReader r)
+    {
+        var items = new List<string>();
+        r.ExpectSymbol('(');
+        while (!r.Eof && !r.IsSymbol(')'))
+        {
+            var toks = new List<Token>(); var depth = 0;
+            while (!r.Eof)
+            {
+                var t = r.Cur!;
+                if (t.IsSymbol('(')) { depth++; toks.Add(r.Next()); continue; }
+                if (t.IsSymbol(')')) { if (depth == 0) break; depth--; toks.Add(r.Next()); continue; }
+                if (depth == 0 && t.IsSymbol(',')) break;
+                toks.Add(r.Next());
+            }
+            items.Add(Token.Render(toks).Trim());
+            if (!r.MatchSymbol(',')) break;
+        }
+        r.ExpectSymbol(')');
+        return items;
+    }
+
+    private static long? ParseSignedLong(TokenReader r)
+    {
+        var negative = r.MatchSymbol('-');
+        if (r.Cur is { Kind: TokenKind.Number } t && long.TryParse(t.Value, out var v)) { r.Next(); return negative ? -v : v; }
+        return null;
     }
 
     // ---- shared helpers -----------------------------------------------------------------

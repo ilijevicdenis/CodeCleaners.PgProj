@@ -23,7 +23,11 @@ public sealed class SqlScript : SqlNode
     public override IEnumerable<SqlNode> Children => Statements;
 }
 
-public abstract class SqlStatement : SqlNode { }
+public abstract class SqlStatement : SqlNode
+{
+    /// <summary>The full source text of this statement (used to rebuild function/raw object bodies).</summary>
+    public string RawText { get; set; } = "";
+}
 
 public sealed class CreateSchemaStatement : SqlStatement
 {
@@ -62,10 +66,8 @@ public sealed class CreateIndexStatement : SqlStatement
     public required string Table { get; init; }
     public bool Unique { get; init; }
     public string? Method { get; init; }
-    public IReadOnlyList<Expression> Columns { get; init; } = new List<Expression>();
-    public Expression? Where { get; init; }
-    public override IEnumerable<SqlNode> Children =>
-        Where is null ? Columns : Columns.Append(Where);
+    public IReadOnlyList<string> Columns { get; init; } = new List<string>(); // rendered column/expression text
+    public string? Where { get; init; }
 }
 
 public sealed class CreateViewStatement : SqlStatement
@@ -135,11 +137,13 @@ public sealed class IdentityConstraintNode : ColumnConstraintNode { public requi
 public sealed class GeneratedConstraintNode : ColumnConstraintNode
 {
     public required Expression Expression { get; init; }
+    public string RawText { get; init; } = ""; // the "(expr)" form, for faithful re-emission
     public override IEnumerable<SqlNode> Children => new[] { Expression };
 }
 public sealed class CheckColumnConstraintNode : ColumnConstraintNode
 {
     public required Expression Expression { get; init; }
+    public string RawText { get; init; } = "";
     public override IEnumerable<SqlNode> Children => new[] { Expression };
 }
 public sealed class CollateConstraintNode : ColumnConstraintNode { public required string Collation { get; init; } }
@@ -159,6 +163,7 @@ public sealed class ForeignKeyConstraintNode : TableConstraintNode
 public sealed class CheckConstraintNode : TableConstraintNode
 {
     public required Expression Expression { get; init; }
+    public string RawText { get; init; } = ""; // the "(expr)" form, for faithful re-emission
     public override IEnumerable<SqlNode> Children => new[] { Expression };
 }
 public sealed class RawConstraintNode : TableConstraintNode { public required string Text { get; init; } }
