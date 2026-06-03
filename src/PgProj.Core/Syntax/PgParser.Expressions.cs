@@ -362,7 +362,7 @@ public sealed partial class PgParser
             c.ExpectSymbol(')');
         }
         // post-call: WITHIN GROUP (ORDER BY …), FILTER (WHERE …), OVER (…)
-        if (c.MatchWords("WITHIN", "GROUP")) { c.ExpectSymbol('('); c.MatchWords("ORDER", "BY"); call.WithinGroup.AddRange(ParseOrderByList(c)); c.ExpectSymbol(')'); }
+        if (c.MatchWords("WITHIN", "GROUP")) { c.ExpectSymbol('('); c.ExpectWord("ORDER"); c.ExpectWord("BY"); call.WithinGroup.AddRange(ParseOrderByList(c)); c.ExpectSymbol(')'); }
         if (c.MatchWord("FILTER")) { c.ExpectSymbol('('); c.ExpectWord("WHERE"); call.Filter = ParseExpression(c); c.ExpectSymbol(')'); }
         if (c.MatchWord("OVER")) call.Over = ParseWindowSpecOrName(c);
         return call;

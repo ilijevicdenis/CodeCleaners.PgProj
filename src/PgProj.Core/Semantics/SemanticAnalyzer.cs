@@ -158,7 +158,7 @@ public sealed class SemanticAnalyzer
             case PostfixExpr p: CheckExpr(p.Operand); break;
             case CastExpr c: CheckConstCast(c); CheckExpr(c.Operand); break;
             case CollateExpr cl: CheckExpr(cl.Operand); break;
-            case FuncCallExpr f: CheckFuncDomain(f); foreach (var a in f.Args) CheckExpr(a); CheckExpr(f.Filter); break;
+            case FuncCallExpr f: CheckFuncDomain(f); CheckFuncCall(f); foreach (var a in f.Args) CheckExpr(a); CheckExpr(f.Filter); break;
             case CaseExpr cs: CheckExpr(cs.Operand); foreach (var (w, t) in cs.Branches) { CheckExpr(w); CheckExpr(t); } CheckExpr(cs.Else); break;
             case BetweenExpr bt: CheckExpr(bt.Operand); CheckExpr(bt.Low); CheckExpr(bt.High); break;
             case InExpr inx: CheckExpr(inx.Operand); if (inx.List is not null) foreach (var x in inx.List) CheckExpr(x); AnalyzeQuery(inx.Subquery); break;
@@ -185,6 +185,67 @@ public sealed class SemanticAnalyzer
             case "ln" when a <= 0: Report("argument of ln must be positive"); break;
             case "log" when a <= 0: Report("argument of log must be positive"); break;
         }
+    }
+
+    // Built-in scalar/aggregate functions whose argument count is fixed and unambiguous, as (min, max).
+    // Used to catch arity mistakes (abs(), round(1,2,3), sum(a,b)). Only applied to an UNQUALIFIED call
+    // whose name is NOT shadowed by a user-defined function in the catalog, so it never rejects valid SQL.
+    private const int Unbounded = int.MaxValue;
+    private static readonly Dictionary<string, (int Min, int Max)> BuiltinArity = new(StringComparer.OrdinalIgnoreCase)
+    {
+        // numeric
+        ["abs"] = (1, 1), ["sign"] = (1, 1), ["ceil"] = (1, 1), ["ceiling"] = (1, 1), ["floor"] = (1, 1),
+        ["sqrt"] = (1, 1), ["cbrt"] = (1, 1), ["exp"] = (1, 1), ["ln"] = (1, 1), ["factorial"] = (1, 1),
+        ["degrees"] = (1, 1), ["radians"] = (1, 1), ["round"] = (1, 2), ["trunc"] = (1, 2), ["log"] = (1, 2),
+        ["mod"] = (2, 2), ["power"] = (2, 2), ["div"] = (2, 2), ["atan2"] = (2, 2), ["gcd"] = (2, 2), ["lcm"] = (2, 2),
+        ["sin"] = (1, 1), ["cos"] = (1, 1), ["tan"] = (1, 1), ["cot"] = (1, 1), ["asin"] = (1, 1), ["acos"] = (1, 1),
+        ["atan"] = (1, 1), ["sinh"] = (1, 1), ["cosh"] = (1, 1), ["tanh"] = (1, 1), ["asinh"] = (1, 1),
+        ["acosh"] = (1, 1), ["atanh"] = (1, 1), ["pi"] = (0, 0),
+        // string
+        ["length"] = (1, 1), ["char_length"] = (1, 1), ["character_length"] = (1, 1), ["octet_length"] = (1, 1),
+        ["bit_length"] = (1, 1), ["upper"] = (1, 1), ["lower"] = (1, 1), ["initcap"] = (1, 1), ["reverse"] = (1, 1),
+        ["ascii"] = (1, 1), ["chr"] = (1, 1), ["md5"] = (1, 1), ["to_hex"] = (1, 1), ["quote_ident"] = (1, 1),
+        ["quote_literal"] = (1, 1), ["quote_nullable"] = (1, 1), ["ltrim"] = (1, 2), ["rtrim"] = (1, 2),
+        ["btrim"] = (1, 2), ["lpad"] = (2, 3), ["rpad"] = (2, 3), ["left"] = (2, 2), ["right"] = (2, 2),
+        ["repeat"] = (2, 2), ["strpos"] = (2, 2), ["starts_with"] = (2, 2), ["substr"] = (2, 3),
+        ["replace"] = (3, 3), ["translate"] = (3, 3), ["split_part"] = (3, 3),
+        ["concat_ws"] = (1, Unbounded), ["format"] = (1, Unbounded),
+        // ordinary aggregates
+        ["sum"] = (1, 1), ["avg"] = (1, 1), ["min"] = (1, 1), ["max"] = (1, 1), ["array_agg"] = (1, 1),
+        ["bool_and"] = (1, 1), ["bool_or"] = (1, 1), ["every"] = (1, 1), ["bit_and"] = (1, 1), ["bit_or"] = (1, 1),
+        ["stddev"] = (1, 1), ["variance"] = (1, 1), ["var_pop"] = (1, 1), ["var_samp"] = (1, 1),
+        ["stddev_pop"] = (1, 1), ["stddev_samp"] = (1, 1), ["json_agg"] = (1, 1), ["jsonb_agg"] = (1, 1),
+        ["string_agg"] = (2, 2), ["corr"] = (2, 2), ["covar_pop"] = (2, 2), ["covar_samp"] = (2, 2),
+    };
+    private static readonly HashSet<string> OrderedSetRequired = new(StringComparer.OrdinalIgnoreCase)
+    { "percentile_cont", "percentile_disc", "mode" };
+    private static readonly HashSet<string> WithinGroupAllowed = new(StringComparer.OrdinalIgnoreCase)
+    { "percentile_cont", "percentile_disc", "mode", "rank", "dense_rank", "percent_rank", "cume_dist" };
+
+    private void CheckFuncCall(FuncCallExpr f)
+    {
+        if (f.Name.Count != 1) return;                       // only unqualified calls
+        var name = f.Name[0];
+        if (_catalog.HasFunction(name)) return;              // user-defined function may have a different arity
+
+        if (f.Distinct && f.Args.Any(a => a is StarExpr)) { Report("DISTINCT cannot be used with * in an aggregate"); return; }
+        if (f.WithinGroup.Count > 0 && !WithinGroupAllowed.Contains(name)) { Report($"{name.ToLowerInvariant()} is not an ordered-set aggregate and cannot use WITHIN GROUP"); return; }
+        if (OrderedSetRequired.Contains(name) && f.WithinGroup.Count == 0) { Report($"{name.ToLowerInvariant()} must be used as an ordered-set aggregate with WITHIN GROUP"); return; }
+        if ((name.Equals("percentile_cont", StringComparison.OrdinalIgnoreCase) || name.Equals("percentile_disc", StringComparison.OrdinalIgnoreCase))
+            && f.Args.Count == 1 && Fold(f.Args[0]) is { } p && (p < 0 || p > 1))
+        { Report("percentile value must be between 0 and 1"); return; }
+
+        if (name.Equals("count", StringComparison.OrdinalIgnoreCase))
+        {
+            if (!f.Star && f.Args.Count != 1) Report("count requires exactly one argument or *");
+            return;
+        }
+
+        if (f.Variadic || f.Star) return;                    // variadic / star calls don't have a fixed plain-arg count
+        if (!BuiltinArity.TryGetValue(name, out var ar)) return;
+        int n = f.Args.Count;
+        if (n < ar.Min || n > ar.Max)
+            Report($"function {name.ToLowerInvariant()} cannot be called with {n} argument{(n == 1 ? "" : "s")}");
     }
 
     private void CheckConstCast(CastExpr c)

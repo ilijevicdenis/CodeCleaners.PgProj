@@ -293,9 +293,9 @@ public class Corpus_RangeOps
     public void rnga0143() => CorpusAssert.Parses(@"SELECT int4range(1, 5) @> numrange(2.0, 4.0)", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void rnga0144() => CorpusAssert.Parses(@"SELECT int4range(1, 5) && numrange(2.0, 4.0)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void rnga0145() => CorpusAssert.Parses(@"SELECT lower()", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void rnga0146() => CorpusAssert.Parses(@"SELECT upper()", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void rnga0147() => CorpusAssert.Parses(@"SELECT isempty(1, 2)", "error");

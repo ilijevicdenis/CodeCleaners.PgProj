@@ -21,9 +21,9 @@ public class Corpus_NumericFuncs
     public void numfa0007() => CorpusAssert.Parses(@"SELECT @ -5.0", "ok");
     [Fact]
     public void numfa0008() => CorpusAssert.Parses(@"SELECT @ 5", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void numfa0009() => CorpusAssert.Parses(@"SELECT abs()", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void numfa0010() => CorpusAssert.Parses(@"SELECT abs(1, 2)", "error");
     [Fact]
     public void numfa0011() => CorpusAssert.Parses(@"SELECT ceil(42.2)", "ok");
@@ -37,7 +37,7 @@ public class Corpus_NumericFuncs
     public void numfa0015() => CorpusAssert.Parses(@"SELECT ceiling(-95.3)", "ok");
     [Fact]
     public void numfa0016() => CorpusAssert.Parses(@"SELECT ceil(42)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void numfa0017() => CorpusAssert.Parses(@"SELECT ceil()", "error");
     [Fact]
     public void numfa0018() => CorpusAssert.Parses(@"SELECT floor(42.8)", "ok");
@@ -47,7 +47,7 @@ public class Corpus_NumericFuncs
     public void numfa0020() => CorpusAssert.Parses(@"SELECT floor(42.8::double precision)", "ok");
     [Fact]
     public void numfa0021() => CorpusAssert.Parses(@"SELECT floor(42)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void numfa0022() => CorpusAssert.Parses(@"SELECT floor()", "error");
     [Fact]
     public void numfa0023() => CorpusAssert.Parses(@"SELECT round(42.4)", "ok");
@@ -63,9 +63,9 @@ public class Corpus_NumericFuncs
     public void numfa0028() => CorpusAssert.Parses(@"SELECT round(42.4382, -1)", "ok");
     [Fact]
     public void numfa0029() => CorpusAssert.Parses(@"SELECT round(42.4::double precision)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void numfa0030() => CorpusAssert.Parses(@"SELECT round()", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void numfa0031() => CorpusAssert.Parses(@"SELECT round(1.5, 2, 3)", "error");
     [Fact]
     public void numfa0032() => CorpusAssert.Parses(@"SELECT trunc(42.8)", "ok");
@@ -79,7 +79,7 @@ public class Corpus_NumericFuncs
     public void numfa0036() => CorpusAssert.Parses(@"SELECT trunc(42.4382, -1)", "ok");
     [Fact]
     public void numfa0037() => CorpusAssert.Parses(@"SELECT trunc(42.8::double precision)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void numfa0038() => CorpusAssert.Parses(@"SELECT trunc()", "error");
     [Fact]
     public void numfa0039() => CorpusAssert.Parses(@"SELECT mod(9, 4)", "ok");
@@ -91,9 +91,9 @@ public class Corpus_NumericFuncs
     public void numfa0042() => CorpusAssert.Parses(@"SELECT mod(9, -4)", "ok");
     [Fact]
     public void numfa0043() => CorpusAssert.Parses(@"SELECT 9 % 4", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void numfa0044() => CorpusAssert.Parses(@"SELECT mod()", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void numfa0045() => CorpusAssert.Parses(@"SELECT mod(9)", "error");
     [Fact]
     public void numfa0046() => CorpusAssert.Parses(@"SELECT power(9, 3)", "ok");
@@ -109,9 +109,9 @@ public class Corpus_NumericFuncs
     public void numfa0051() => CorpusAssert.Parses(@"SELECT 2 ^ 3 ^ 3", "ok");
     [Fact]
     public void numfa0052() => CorpusAssert.Parses(@"SELECT 2.0 ^ 0.5", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void numfa0053() => CorpusAssert.Parses(@"SELECT power()", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void numfa0054() => CorpusAssert.Parses(@"SELECT power(2)", "error");
     [Fact]
     public void numfa0055() => CorpusAssert.Parses(@"SELECT sqrt(2)", "ok");
@@ -121,7 +121,7 @@ public class Corpus_NumericFuncs
     public void numfa0057() => CorpusAssert.Parses(@"SELECT sqrt(25.0::double precision)", "ok");
     [Fact]
     public void numfa0058() => CorpusAssert.Parses(@"SELECT |/ 25.0", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void numfa0059() => CorpusAssert.Parses(@"SELECT sqrt()", "error");
     [Fact]
     public void numfa0060() => CorpusAssert.Parses(@"SELECT sqrt(-1.0)", "error");
@@ -133,7 +133,7 @@ public class Corpus_NumericFuncs
     public void numfa0063() => CorpusAssert.Parses(@"SELECT cbrt(0.0)", "ok");
     [Fact]
     public void numfa0064() => CorpusAssert.Parses(@"SELECT ||/ 64.0", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void numfa0065() => CorpusAssert.Parses(@"SELECT cbrt()", "error");
     [Fact]
     public void numfa0066() => CorpusAssert.Parses(@"SELECT exp(1.0)", "ok");
@@ -143,7 +143,7 @@ public class Corpus_NumericFuncs
     public void numfa0068() => CorpusAssert.Parses(@"SELECT exp(-1.0)", "ok");
     [Fact]
     public void numfa0069() => CorpusAssert.Parses(@"SELECT exp(1.0::double precision)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void numfa0070() => CorpusAssert.Parses(@"SELECT exp()", "error");
     [Fact]
     public void numfa0071() => CorpusAssert.Parses(@"SELECT ln(2.0)", "ok");
@@ -155,7 +155,7 @@ public class Corpus_NumericFuncs
     public void numfa0074() => CorpusAssert.Parses(@"SELECT ln(0.0)", "error");
     [Fact]
     public void numfa0075() => CorpusAssert.Parses(@"SELECT ln(-1.0)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void numfa0076() => CorpusAssert.Parses(@"SELECT ln()", "error");
     [Fact]
     public void numfa0077() => CorpusAssert.Parses(@"SELECT log(100)", "ok");
@@ -171,7 +171,7 @@ public class Corpus_NumericFuncs
     public void numfa0082() => CorpusAssert.Parses(@"SELECT log(10.0, 1000.0)", "ok");
     [Fact]
     public void numfa0083() => CorpusAssert.Parses(@"SELECT log(2.0, 1.0)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void numfa0084() => CorpusAssert.Parses(@"SELECT log()", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void numfa0085() => CorpusAssert.Parses(@"SELECT log10()", "error");
@@ -187,9 +187,9 @@ public class Corpus_NumericFuncs
     public void numfa0090() => CorpusAssert.Parses(@"SELECT div(9, -4)", "ok");
     [Fact]
     public void numfa0091() => CorpusAssert.Parses(@"SELECT div(9.5, 4.0)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void numfa0092() => CorpusAssert.Parses(@"SELECT div()", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void numfa0093() => CorpusAssert.Parses(@"SELECT div(9)", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void numfa0094() => CorpusAssert.Parses(@"SELECT div(9, 0)", "error");
@@ -203,7 +203,7 @@ public class Corpus_NumericFuncs
     public void numfa0098() => CorpusAssert.Parses(@"SELECT gcd(-12, 8)", "ok");
     [Fact]
     public void numfa0099() => CorpusAssert.Parses(@"SELECT gcd(12::bigint, 8::bigint)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void numfa0100() => CorpusAssert.Parses(@"SELECT gcd()", "error");
     [Fact]
     public void numfa0101() => CorpusAssert.Parses(@"SELECT lcm(1071, 462)", "ok");
@@ -213,7 +213,7 @@ public class Corpus_NumericFuncs
     public void numfa0103() => CorpusAssert.Parses(@"SELECT lcm(-12, 8)", "ok");
     [Fact]
     public void numfa0104() => CorpusAssert.Parses(@"SELECT lcm(12::bigint, 8::bigint)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void numfa0105() => CorpusAssert.Parses(@"SELECT lcm()", "error");
     [Fact]
     public void numfa0106() => CorpusAssert.Parses(@"SELECT sign(-8.4)", "ok");
@@ -223,7 +223,7 @@ public class Corpus_NumericFuncs
     public void numfa0108() => CorpusAssert.Parses(@"SELECT sign(0)", "ok");
     [Fact]
     public void numfa0109() => CorpusAssert.Parses(@"SELECT sign(-8.4::double precision)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void numfa0110() => CorpusAssert.Parses(@"SELECT sign()", "error");
     [Fact]
     public void numfa0111() => CorpusAssert.Parses(@"SELECT scale(8.4100)", "ok");
@@ -257,7 +257,7 @@ public class Corpus_NumericFuncs
     public void numfa0125() => CorpusAssert.Parses(@"SELECT factorial(10)", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void numfa0126() => CorpusAssert.Parses(@"SELECT factorial(-1)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void numfa0127() => CorpusAssert.Parses(@"SELECT factorial()", "error");
     [Fact]
     public void numfa0128() => CorpusAssert.Parses(@"SELECT bit_count(44::bit(8))", "ok");
@@ -327,11 +327,11 @@ public class Corpus_NumericFuncs
     public void numfa0160() => CorpusAssert.Parses(@"SELECT asin(2.0)", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void numfa0161() => CorpusAssert.Parses(@"SELECT acos(-2.0)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void numfa0162() => CorpusAssert.Parses(@"SELECT sin()", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void numfa0163() => CorpusAssert.Parses(@"SELECT cos()", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void numfa0164() => CorpusAssert.Parses(@"SELECT atan2()", "error");
     [Fact]
     public void numfa0165() => CorpusAssert.Parses(@"SELECT sind(30.0)", "ok");
@@ -377,7 +377,7 @@ public class Corpus_NumericFuncs
     public void numfa0185() => CorpusAssert.Parses(@"SELECT atanh(0.5)", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void numfa0186() => CorpusAssert.Parses(@"SELECT atanh(1.5)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void numfa0187() => CorpusAssert.Parses(@"SELECT sinh()", "error");
     [Fact]
     public void numfa0188() => CorpusAssert.Parses(@"SELECT degrees(0.5)", "ok");
@@ -389,9 +389,9 @@ public class Corpus_NumericFuncs
     public void numfa0191() => CorpusAssert.Parses(@"SELECT radians(180.0)", "ok");
     [Fact]
     public void numfa0192() => CorpusAssert.Parses(@"SELECT pi()", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void numfa0193() => CorpusAssert.Parses(@"SELECT degrees()", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void numfa0194() => CorpusAssert.Parses(@"SELECT radians()", "error");
     [Fact]
     public void numfa0195() => CorpusAssert.Parses(@"SELECT to_number('12,454.8-', '99G999D9S')", "ok");
@@ -493,13 +493,13 @@ public class Corpus_NumericFuncs
     public void numfa0243() => CorpusAssert.Parses(@"SELECT round(1.5 2)", "error");
     [Fact]
     public void numfa0244() => CorpusAssert.Parses(@"SELECT log(, 64.0)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void numfa0245() => CorpusAssert.Parses(@"SELECT pi(1)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void numfa0246() => CorpusAssert.Parses(@"SELECT sin(1.0, 2.0)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void numfa0247() => CorpusAssert.Parses(@"SELECT atan2(1.0)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void numfa0248() => CorpusAssert.Parses(@"SELECT log(2.0, 3.0, 4.0)", "error");
     [Fact]
     public void numfa0249() => CorpusAssert.Parses(@"SELECT factorial(20::bigint)", "ok");
@@ -511,7 +511,7 @@ public class Corpus_NumericFuncs
     public void numfb0002() => CorpusAssert.Parses(@"SELECT abs(-3.14::numeric)", "ok");
     [Fact]
     public void numfb0003() => CorpusAssert.Parses(@"SELECT abs(-2.7::double precision)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void numfb0004() => CorpusAssert.Parses(@"SELECT abs()", "error");
     [Fact]
     public void numfb0005() => CorpusAssert.Parses(@"SELECT ceil(4.5)", "ok");
@@ -533,7 +533,7 @@ public class Corpus_NumericFuncs
     public void numfb0013() => CorpusAssert.Parses(@"SELECT round(42.4567::numeric, 0)", "ok");
     [Fact]
     public void numfb0014() => CorpusAssert.Parses(@"SELECT round(42.4567::numeric, -1)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void numfb0015() => CorpusAssert.Parses(@"SELECT round(4.5, 2, 'extra')", "error");
     [Fact]
     public void numfb0016() => CorpusAssert.Parses(@"SELECT trunc(4.7)", "ok");
@@ -549,7 +549,7 @@ public class Corpus_NumericFuncs
     public void numfb0021() => CorpusAssert.Parses(@"SELECT mod(9::bigint, 4::bigint)", "ok");
     [Fact]
     public void numfb0022() => CorpusAssert.Parses(@"SELECT mod(9.5::numeric, 2.1::numeric)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void numfb0023() => CorpusAssert.Parses(@"SELECT mod(9)", "error");
     [Fact]
     public void numfb0024() => CorpusAssert.Parses(@"SELECT power(2.0, 10.0)", "ok");

@@ -323,27 +323,27 @@ public class Corpus_AggregateFuncs
     public void aggfa0158() => CorpusAssert.Parses(@"SELECT count(*) FILTER WHERE val > 0 FROM s.t", "error");
     [Fact]
     public void aggfa0159() => CorpusAssert.Parses(@"SELECT count(*) FILTER (val > 0) FROM s.t", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void aggfa0160() => CorpusAssert.Parses(@"SELECT percentile_cont(0.5) FROM s.t", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void aggfa0161() => CorpusAssert.Parses(@"SELECT mode() FROM s.t", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void aggfa0162() => CorpusAssert.Parses(@"SELECT count(*) WITHIN GROUP (ORDER BY val) FROM s.t", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void aggfa0163() => CorpusAssert.Parses(@"SELECT sum(val) WITHIN GROUP (ORDER BY val) FROM s.t", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void aggfa0164() => CorpusAssert.Parses(@"SELECT percentile_cont(0.5) WITHIN GROUP (val) FROM s.t", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void aggfa0165() => CorpusAssert.Parses(@"SELECT string_agg(name) FROM s.t", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void aggfa0166() => CorpusAssert.Parses(@"SELECT array_agg() FROM s.t", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void aggfa0167() => CorpusAssert.Parses(@"SELECT count(DISTINCT *) FROM s.t", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void aggfa0168() => CorpusAssert.Parses(@"SELECT sum(val, qty) FROM s.t", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void aggfa0169() => CorpusAssert.Parses(@"SELECT avg() FROM s.t", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void aggfa0170() => CorpusAssert.Parses(@"SELECT percentile_cont(1.5) WITHIN GROUP (ORDER BY val) FROM s.t", "error");
     [Fact]
     public void aggfb0001() => CorpusAssert.Parses(@"SELECT count(*) FROM s.t", "ok");
@@ -353,17 +353,17 @@ public class Corpus_AggregateFuncs
     public void aggfb0003() => CorpusAssert.Parses(@"SELECT count(DISTINCT val) FROM s.t", "ok");
     [Fact]
     public void aggfb0004() => CorpusAssert.Parses(@"SELECT count(ALL val) FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void aggfb0005() => CorpusAssert.Parses(@"SELECT count(DISTINCT name, val) FROM s.t", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void aggfb0006() => CorpusAssert.Parses(@"SELECT count() FROM s.t", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void aggfb0007() => CorpusAssert.Parses(@"SELECT count(DISTINCT *) FROM s.t", "error");
     [Fact]
     public void aggfb0008() => CorpusAssert.Parses(@"SELECT sum(val) FROM s.t", "ok");
     [Fact]
     public void aggfb0009() => CorpusAssert.Parses(@"SELECT sum(DISTINCT val) FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void aggfb0010() => CorpusAssert.Parses(@"SELECT sum() FROM s.t", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void aggfb0011() => CorpusAssert.Parses(@"SELECT sum(name) FROM s.t", "error");
@@ -371,7 +371,7 @@ public class Corpus_AggregateFuncs
     public void aggfb0012() => CorpusAssert.Parses(@"SELECT avg(val) FROM s.t", "ok");
     [Fact]
     public void aggfb0013() => CorpusAssert.Parses(@"SELECT avg(DISTINCT val) FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void aggfb0014() => CorpusAssert.Parses(@"SELECT avg() FROM s.t", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void aggfb0015() => CorpusAssert.Parses(@"SELECT avg(name) FROM s.t", "error");
@@ -379,13 +379,13 @@ public class Corpus_AggregateFuncs
     public void aggfb0016() => CorpusAssert.Parses(@"SELECT min(val) FROM s.t", "ok");
     [Fact]
     public void aggfb0017() => CorpusAssert.Parses(@"SELECT min(name) FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void aggfb0018() => CorpusAssert.Parses(@"SELECT min() FROM s.t", "error");
     [Fact]
     public void aggfb0019() => CorpusAssert.Parses(@"SELECT max(val) FROM s.t", "ok");
     [Fact]
     public void aggfb0020() => CorpusAssert.Parses(@"SELECT max(name) FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void aggfb0021() => CorpusAssert.Parses(@"SELECT max() FROM s.t", "error");
     [Fact]
     public void aggfb0022() => CorpusAssert.Parses(@"SELECT min(val), max(val), avg(val) FROM s.t", "ok");
@@ -409,7 +409,7 @@ public class Corpus_AggregateFuncs
     public void aggfb0031() => CorpusAssert.Parses(@"SELECT array_agg(val ORDER BY val ASC NULLS FIRST) FROM s.t", "ok");
     [Fact]
     public void aggfb0032() => CorpusAssert.Parses(@"SELECT array_agg(DISTINCT val) FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void aggfb0033() => CorpusAssert.Parses(@"SELECT array_agg() FROM s.t", "error");
     [Fact]
     public void aggfb0034() => CorpusAssert.Parses(@"SELECT name, array_agg(val ORDER BY val) FROM s.t GROUP BY name", "ok");
@@ -423,11 +423,11 @@ public class Corpus_AggregateFuncs
     public void aggfb0038() => CorpusAssert.Parses(@"SELECT string_agg(DISTINCT name, ',') FROM s.t", "ok");
     [Fact]
     public void aggfb0039() => CorpusAssert.Parses(@"SELECT name, string_agg(name, '|' ORDER BY val) FROM s.t GROUP BY name", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void aggfb0040() => CorpusAssert.Parses(@"SELECT string_agg(name) FROM s.t", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void aggfb0041() => CorpusAssert.Parses(@"SELECT string_agg() FROM s.t", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void aggfb0042() => CorpusAssert.Parses(@"SELECT string_agg(name, ',', ';') FROM s.t", "error");
     [Fact]
     public void aggfb0043() => CorpusAssert.Parses(@"SELECT json_agg(name) FROM s.t", "ok");
@@ -449,7 +449,7 @@ public class Corpus_AggregateFuncs
     public void aggfb0051() => CorpusAssert.Parses(@"SELECT json_object_agg(name) FROM s.t", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void aggfb0052() => CorpusAssert.Parses(@"SELECT jsonb_object_agg(name) FROM s.t", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void aggfb0053() => CorpusAssert.Parses(@"SELECT json_agg() FROM s.t", "error");
     [Fact]
     public void aggfb0054() => CorpusAssert.Parses(@"SELECT bool_and(flag) FROM s.t", "ok");
@@ -461,9 +461,9 @@ public class Corpus_AggregateFuncs
     public void aggfb0057() => CorpusAssert.Parses(@"SELECT bool_and(val > 0) FROM s.t", "ok");
     [Fact]
     public void aggfb0058() => CorpusAssert.Parses(@"SELECT name, bool_and(flag), bool_or(flag) FROM s.t GROUP BY name", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void aggfb0059() => CorpusAssert.Parses(@"SELECT bool_and() FROM s.t", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void aggfb0060() => CorpusAssert.Parses(@"SELECT bool_or() FROM s.t", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void aggfb0061() => CorpusAssert.Parses(@"SELECT bool_and(name) FROM s.t", "error");
@@ -475,7 +475,7 @@ public class Corpus_AggregateFuncs
     public void aggfb0064() => CorpusAssert.Parses(@"SELECT bit_xor(qty) FROM s.t", "ok");
     [Fact]
     public void aggfb0065() => CorpusAssert.Parses(@"SELECT name, bit_and(qty), bit_or(qty), bit_xor(qty) FROM s.t GROUP BY name", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void aggfb0066() => CorpusAssert.Parses(@"SELECT bit_and() FROM s.t", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void aggfb0067() => CorpusAssert.Parses(@"SELECT bit_xor(qty, val) FROM s.t", "error");
@@ -527,17 +527,17 @@ public class Corpus_AggregateFuncs
     public void aggfb0090() => CorpusAssert.Parses(@"SELECT percentile_cont(0.5) WITHIN GROUP (ORDER BY val) FILTER (WHERE val IS NOT NULL) FROM s.t", "ok");
     [Fact]
     public void aggfb0091() => CorpusAssert.Parses(@"SELECT mode() WITHIN GROUP (ORDER BY name) FILTER (WHERE name IS NOT NULL) FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void aggfb0092() => CorpusAssert.Parses(@"SELECT count(*) WITHIN GROUP (ORDER BY val) FROM s.t", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void aggfb0093() => CorpusAssert.Parses(@"SELECT sum(val) WITHIN GROUP (ORDER BY val) FROM s.t", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void aggfb0094() => CorpusAssert.Parses(@"SELECT bool_and(flag) WITHIN GROUP (ORDER BY val) FROM s.t", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void aggfb0095() => CorpusAssert.Parses(@"SELECT array_agg(val) WITHIN GROUP (ORDER BY val) FROM s.t", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void aggfb0096() => CorpusAssert.Parses(@"SELECT percentile_cont(0.5) FROM s.t", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void aggfb0097() => CorpusAssert.Parses(@"SELECT percentile_disc(0.5) FROM s.t", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void aggfb0098() => CorpusAssert.Parses(@"SELECT mode(val) WITHIN GROUP (ORDER BY val) FROM s.t", "error");
@@ -575,11 +575,11 @@ public class Corpus_AggregateFuncs
     public void aggfb0114() => CorpusAssert.Parses(@"SELECT var_pop(val) FROM s.t", "ok");
     [Fact]
     public void aggfb0115() => CorpusAssert.Parses(@"SELECT var_samp(val) FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void aggfb0116() => CorpusAssert.Parses(@"SELECT corr(val) FROM s.t", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void aggfb0117() => CorpusAssert.Parses(@"SELECT regr_slope(val) FROM s.t", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void aggfb0118() => CorpusAssert.Parses(@"SELECT covar_pop(val) FROM s.t", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void aggfb0119() => CorpusAssert.Parses(@"SELECT stddev(name) FROM s.t", "error");
@@ -705,8 +705,8 @@ public class Corpus_AggregateFuncs
     public void aggfc0009() => CorpusAssert.Parses(@"SELECT range_agg(span), range_intersect_agg(span) FROM s.t", "ok");
     [Fact]
     public void aggfc0010() => CorpusAssert.Parses(@"SELECT sum(val) FILTER (val > 0) FROM s.t", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void aggfc0011() => CorpusAssert.Parses(@"SELECT percentile_cont(0.5) FROM s.t", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void aggfc0012() => CorpusAssert.Parses(@"SELECT count(*) WITHIN GROUP (ORDER BY val) FROM s.t", "error");
 }
