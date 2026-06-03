@@ -120,21 +120,21 @@ CREATE AGGREGATE agga0024_myagg (integer, integer) (SFUNC = agga0024_sfunc, STYP
     public void agga0056() => CorpusAssert.Parses(@"CREATE AGGREGATE agga0056_myagg (integer) (SFUNC = int4pl, STYPE = integer, FINALFUNC_MODIFY = READ_ONLY, FINALFUNC_EXTRA)", "ok");
     [Fact]
     public void agga0057() => CorpusAssert.Parses(@"CREATE AGGREGATE (integer) (SFUNC = int4pl, STYPE = integer)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void agga0058() => CorpusAssert.Parses(@"CREATE AGGREGATE agga0058_myagg (integer) (STYPE = integer)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void agga0059() => CorpusAssert.Parses(@"CREATE AGGREGATE agga0059_myagg (integer) (SFUNC = int4pl)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void agga0060() => CorpusAssert.Parses(@"CREATE AGGREGATE agga0060_myagg (integer) ()", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void agga0061() => CorpusAssert.Parses(@"CREATE AGGREGATE agga0061_myagg (integer) (SFUNC = int4pl, STYPE = integer, PARALLEL = SUPER)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void agga0062() => CorpusAssert.Parses(@"CREATE AGGREGATE agga0062_myagg (integer) (SFUNC = int4pl, STYPE = integer, FINALFUNC_MODIFY = EXCLUSIVE)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void agga0063() => CorpusAssert.Parses(@"CREATE AGGREGATE agga0063_myagg integer (SFUNC = int4pl, STYPE = integer)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void agga0064() => CorpusAssert.Parses(@"CREATE AGGREGATE agga0064_myagg (integer) SFUNC = int4pl, STYPE = integer", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void agga0065() => CorpusAssert.Parses(@"CREATE AGGREGATE agga0065_myagg (integer) (SFUNC int4pl, STYPE integer)", "error");
     [Fact]
     public void agga0066() => CorpusAssert.Parses(@"CREATE AGGREGATE agga0066_myagg (integer) (SFUNC = int4pl, STYPE = integer, SFUNC = int4pl)", "ok");
@@ -422,15 +422,15 @@ CREATE AGGREGATE agga0159_hypo (float8, float8 ORDER BY float8, float8) (SFUNC =
     public void aggb0021() => CorpusAssert.Parses(@"CREATE AGGREGATE s.my_schema_qual(integer) (SFUNC = pg_catalog.int4pl, STYPE = pg_catalog.int4, INITCOND = '0');", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void aggb0022() => CorpusAssert.Parses(@"CREATE AGGREGATE s.my_two_arg(integer, integer) (SFUNC = int4pl, STYPE = integer, INITCOND = '0');", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void aggb0023() => CorpusAssert.Parses(@"CREATE AGGREGATE s.no_sfunc(integer) (STYPE = integer);", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void aggb0024() => CorpusAssert.Parses(@"CREATE AGGREGATE s.no_stype(integer) (SFUNC = int4pl);", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void aggb0025() => CorpusAssert.Parses(@"CREATE AGGREGATE s.bad_syntax (integer) SFUNC = int4pl, STYPE = integer;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void aggb0026() => CorpusAssert.Parses(@"CREATE AGGREGATE s.bad_parallel(integer) (SFUNC = int4pl, STYPE = integer, PARALLEL = MAYBE);", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void aggb0027() => CorpusAssert.Parses(@"CREATE AGGREGATE s.bad_finalfunc_mod(integer) (SFUNC = int4pl, STYPE = integer, FINALFUNC_MODIFY = PARTIAL);", "error");
     [Fact]
     public void aggb0028() => CorpusAssert.Parses(@"CREATE AGGREGATE s.hyp_agg(""any"" ORDER BY ""any"") (SFUNC = ordered_set_transition_multi, STYPE = internal, FINALFUNC = percent_rank_final, FINALFUNC_MODIFY = READ_WRITE, HYPOTHETICAL);", "ok");

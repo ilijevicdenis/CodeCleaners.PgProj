@@ -6,14 +6,6 @@ agga0023
 agga0027
 agga0033
 agga0044
-agga0058
-agga0059
-agga0060
-agga0061
-agga0062
-agga0063
-agga0064
-agga0065
 agga0067
 agga0069
 agga0070
@@ -51,11 +43,6 @@ agga0168
 agga0169
 aggb0020
 aggb0022
-aggb0023
-aggb0024
-aggb0025
-aggb0026
-aggb0027
 aggb0029
 aggfa0160
 aggfa0161
