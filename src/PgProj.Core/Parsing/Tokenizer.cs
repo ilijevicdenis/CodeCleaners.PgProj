@@ -139,7 +139,8 @@ public sealed class Tokenizer
     {
         var start = _i;
         while (_i < _s.Length && (char.IsDigit(_s[_i]) || _s[_i] == '.' || _s[_i] == 'e' || _s[_i] == 'E'
-                                  || ((_s[_i] == '+' || _s[_i] == '-') && (_s[_i - 1] == 'e' || _s[_i - 1] == 'E'))))
+                                  || ((_s[_i] == '+' || _s[_i] == '-') && (_s[_i - 1] == 'e' || _s[_i - 1] == 'E'))
+                                  || (_s[_i] == '_' && _i > start && char.IsDigit(_s[_i - 1]) && char.IsDigit(Peek(1)))))  // digit group separators (PG16)
             _i++;
         return _s.Substring(start, _i - start);
     }

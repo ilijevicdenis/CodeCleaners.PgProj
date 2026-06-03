@@ -536,7 +536,13 @@ public sealed partial class PgParser
     }
 
     private static readonly HashSet<string> TypeKeywords = new(StringComparer.OrdinalIgnoreCase)
-    { "date", "time", "timestamp", "timestamptz", "boolean", "interval", "bit", "numeric", "decimal", "real", "money", "json", "jsonb", "uuid", "inet", "cidr", "macaddr" };
+    {
+        "date", "time", "timestamp", "timestamptz", "boolean", "bool", "interval", "bit", "varbit",
+        "numeric", "decimal", "real", "double", "money", "json", "jsonb", "jsonpath", "uuid", "xml",
+        "inet", "cidr", "macaddr", "macaddr8", "bytea", "text", "char", "character", "varchar", "bpchar",
+        "name", "smallint", "int", "integer", "int2", "int4", "int8", "bigint", "float", "float4", "float8",
+        "oid", "tsvector", "tsquery", "point", "line", "lseg", "box", "path", "polygon", "circle", "pg_lsn",
+    };
     private static bool IsTypeKeyword(string w) => TypeKeywords.Contains(w);
 
     private static readonly HashSet<string> TypeContinuations = new(StringComparer.OrdinalIgnoreCase)

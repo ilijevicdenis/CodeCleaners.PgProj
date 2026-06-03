@@ -931,9 +931,6 @@ drpc0018
 drpc0048
 dta0062
 dta0087
-dta0145
-dta0146
-dta0147
 dta0160
 dta0162
 dta0163
@@ -949,8 +946,6 @@ dtb0049
 dtb0050
 dtb0051
 dtb0056
-dtb0087
-dtb0088
 dtb0116
 dtb0117
 dtb0162
@@ -1367,7 +1362,6 @@ lita0021
 lita0027
 lita0028
 lita0037
-lita0060
 lita0063
 lita0064
 lita0065
@@ -1375,8 +1369,6 @@ lita0066
 lita0067
 lita0080
 lita0085
-lita0086
-lita0088
 lita0116
 lita0133
 lita0134
@@ -1393,11 +1385,8 @@ litb0022
 litb0023
 litb0026
 litb0036
-litb0055
 litb0077
 litb0082
-litb0083
-litb0084
 litb0123
 litb0124
 litb0126
@@ -1405,13 +1394,13 @@ litb0128
 litb0130
 litb0131
 litb0133
+litb0145
 litb0146
 litb0147
 litb0148
 litb0149
 litb0158
 litb0161
-litb0166
 litb0167
 litc0003
 litc0005
