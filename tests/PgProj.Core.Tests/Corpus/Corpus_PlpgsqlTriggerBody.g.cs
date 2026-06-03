@@ -114,11 +114,11 @@ CREATE OR REPLACE FUNCTION s.trg_or_replace() RETURNS trigger LANGUAGE plpgsql A
     public void pptba0053() => CorpusAssert.Parses(@"CREATE FUNCTION s.trg_bad_return() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN RETURN 42; END $$;", "ok");
     [Fact]
     public void pptba0054() => CorpusAssert.Parses(@"CREATE FUNCTION s.trg_no_return() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN RAISE NOTICE 'hi'; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pptba0055() => CorpusAssert.Parses(@"CREATE FUNCTION s.trg_no_parens RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN RETURN NEW; END $$;", "error");
     [Fact]
     public void pptba0056() => CorpusAssert.Parses(@"CREATE FUNCTION s.trg_missing_begin() RETURNS trigger LANGUAGE plpgsql AS $$ RETURN NEW; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pptba0057() => CorpusAssert.Parses(@"CREATE FUNCTION s.trg_no_as() RETURNS trigger LANGUAGE plpgsql $body$ BEGIN RETURN NEW; END $body$;", "error");
     [Fact]
     public void pptba0058() => CorpusAssert.Parses(@"CREATE FUNCTION s.trg_return_int_var() RETURNS trigger LANGUAGE plpgsql AS $$ DECLARE v integer := 5; BEGIN RETURN v; END $$;", "ok");

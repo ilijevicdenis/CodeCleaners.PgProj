@@ -198,7 +198,7 @@ CALL s.p85(1)", "error");
     public void proca0093() => CorpusAssert.Parses(@"CREATE PROCEDURE s.p88() RETURNS TABLE(x int) LANGUAGE plpgsql AS $$ BEGIN END $$", "error");
     [Fact]
     public void proca0094() => CorpusAssert.Parses(@"CREATE PROCEDURE () LANGUAGE sql AS $$ SELECT 1 $$", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void proca0095() => CorpusAssert.Parses(@"CREATE PROCEDURE s.p89 LANGUAGE sql AS $$ SELECT 1 $$", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void proca0096() => CorpusAssert.Parses(@"PROCEDURE s.p90() LANGUAGE sql AS $$ SELECT 1 $$", "error");
@@ -208,7 +208,7 @@ CALL s.p85(1)", "error");
     public void proca0098() => CorpusAssert.Parses(@"CREATE PROCEDURE s.p92() LANGUAGE sql", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void proca0099() => CorpusAssert.Parses(@"CREATE PROCEDURE s.p93() AS $$ SELECT 1 $$", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void proca0100() => CorpusAssert.Parses(@"CREATE PROCEDURE s.p94 LANGUAGE plpgsql () AS $$ BEGIN END $$", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void proca0101() => CorpusAssert.Parses(@"CREATE PROCEDURE s.p95() LANGUAGE badlang AS $$ BEGIN END $$", "error");

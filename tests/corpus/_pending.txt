@@ -999,7 +999,6 @@ fdwb0081
 fdwb0090
 fdwb0105
 fna0064
-fna0083
 fna0084
 fna0085
 fna0086
@@ -1007,14 +1006,10 @@ fna0087
 fna0088
 fna0089
 fna0169
-fna0170
 fnb0096
 fnb0098
 fnb0101
-fnb0102
 fnb0103
-fnb0104
-fnb0105
 fnb0106
 fnb0109
 fnb0110
@@ -1023,16 +1018,13 @@ fnb0115
 fnb0116
 fnb0122
 fnb0158
-fnb0164
 fnb0165
 fnb0167
-fnc0101
 fnc0102
 fnc0103
 fnc0104
 fnc0105
 fnc0107
-fnc0108
 fnc0111
 fnc0113
 fnc0115
@@ -1043,7 +1035,6 @@ fnc0121
 fnc0129
 fnc0133
 fnc0134
-fnc0139
 grva0153
 grva0156
 grva0157
@@ -1791,8 +1782,6 @@ pprb0056
 pprb0060
 pprb0061
 pptba0052
-pptba0055
-pptba0057
 pptba0060
 pptba0082
 pptba0121
@@ -1805,10 +1794,8 @@ proca0090
 proca0091
 proca0092
 proca0093
-proca0095
 proca0096
 proca0099
-proca0100
 proca0101
 proca0103
 proca0108

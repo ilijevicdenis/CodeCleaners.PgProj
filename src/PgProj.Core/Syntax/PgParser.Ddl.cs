@@ -140,13 +140,10 @@ public sealed partial class PgParser
         var (s, n) = ParseQualifiedName(c);
         var node = new CreateFunctionStatement { Schema = s, Name = n, IsProcedure = isProc };
 
-        bool hasOut = false;
-        if (c.AtSymbol('('))
-        {
-            var argInner = CaptureBalancedParens(c);
-            node.ArgTypes = ExtractArgTypes(argInner);            // unchanged — model identity depends on this
-            hasOut = ValidateFunctionArgs(argInner);              // overlay validation, no effect on the model
-        }
+        if (!c.AtSymbol('(')) throw new ParseException("expected '(' for the function parameter list", c.Here);
+        var argInner = CaptureBalancedParens(c);
+        node.ArgTypes = ExtractArgTypes(argInner);                // unchanged — model identity depends on this
+        bool hasOut = ValidateFunctionArgs(argInner);            // overlay validation, no effect on the model
         node.HasOutParams = hasOut;
 
         // RETURNS … and the option/body tail — captured as before, validated via a sub-cursor.
@@ -252,6 +249,7 @@ public sealed partial class PgParser
             if (o.MatchWord("AS")) { hasBody = true; if (o.Current is { Kind: TokenKind.DollarString or TokenKind.String } b) node.Body = b.Value; ConsumeRest(o); continue; }
             if (o.MatchWords("BEGIN", "ATOMIC")) { hasBody = true; ConsumeRest(o); continue; }
             if (o.MatchWord("RETURN")) { hasBody = true; ConsumeRest(o); continue; }
+            if (o.Current is { Kind: TokenKind.DollarString or TokenKind.String }) throw new ParseException("expected AS before the function body", o.Here);
             clean = false; break;                                // unknown token — stop validating, stay lenient
         }
         if (clean)
