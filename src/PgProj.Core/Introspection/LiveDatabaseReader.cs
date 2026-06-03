@@ -67,6 +67,9 @@ public sealed class LiveDatabaseReader
             Read(c => ReadPoliciesAsync(c, ct)),
             Read(c => ReadEventTriggersAsync(c, ct)),
             Read(c => ReadCommentsAsync(c, ct)),
+            Read(c => ReadConversionsAsync(c, ct)),
+            Read(c => ReadForeignDataWrappersAsync(c, ct)),
+            Read(c => ReadServersAsync(c, ct)),
             Read(c => ReadExistenceObjectsAsync(c, ct)),
         };
 
@@ -817,8 +820,8 @@ public sealed class LiveDatabaseReader
                 list.Add(MakeRaw(kind, "", r.GetString(0), $"{tag}:{r.GetString(0)}", string.Empty, bodyComparable: false));
         }
 
-        await Schema(ObjectKind.Conversion, "conversion",
-            "SELECT n.nspname, c.conname FROM pg_conversion c JOIN pg_namespace n ON n.oid=c.connamespace");
+        // Conversion, FDW, and Server now have real DDL reconstruction (below); the rest stay
+        // existence-only until they get a clean reconstruction too.
         await Schema(ObjectKind.Statistics, "statistics",
             "SELECT n.nspname, s.stxname FROM pg_statistic_ext s JOIN pg_namespace n ON n.oid=s.stxnamespace");
         await Schema(ObjectKind.ForeignTable, "foreigntable",
@@ -827,9 +830,98 @@ public sealed class LiveDatabaseReader
             "SELECT n.nspname, t.cfgname FROM pg_ts_config t JOIN pg_namespace n ON n.oid=t.cfgnamespace");
         await Schema(ObjectKind.TextSearchDictionary, "textsearchdictionary",
             "SELECT n.nspname, d.dictname FROM pg_ts_dict d JOIN pg_namespace n ON n.oid=d.dictnamespace");
-
-        await Global(ObjectKind.ForeignDataWrapper, "foreigndatawrapper", "SELECT fdwname FROM pg_foreign_data_wrapper");
-        await Global(ObjectKind.Server, "server", "SELECT srvname FROM pg_foreign_server");
         return list;
+    }
+
+    // ---- foreign-data + conversion: full DDL reconstruction (was existence-only) -------------
+
+    private async Task<List<RawObjectDefinition>> ReadConversionsAsync(NpgsqlConnection conn, CancellationToken ct)
+    {
+        const string sql = @"
+            SELECT n.nspname, c.conname,
+                   pg_encoding_to_char(c.conforencoding) AS src,
+                   pg_encoding_to_char(c.contoencoding) AS dst,
+                   c.conproc::regproc::text AS func,
+                   c.condefault
+            FROM pg_conversion c
+            JOIN pg_namespace n ON n.oid = c.connamespace
+            WHERE n.nspname NOT IN ('pg_catalog','information_schema') AND n.nspname NOT LIKE 'pg_%'
+            ORDER BY n.nspname, c.conname;";
+
+        var list = new List<RawObjectDefinition>();
+        await using var cmd = new NpgsqlCommand(sql, conn);
+        await using var r = await cmd.ExecuteReaderAsync(ct);
+        while (await r.ReadAsync(ct))
+        {
+            var schema = r.GetString(0);
+            var name = r.GetString(1);
+            var keyword = !r.IsDBNull(5) && r.GetBoolean(5) ? "CREATE DEFAULT CONVERSION" : "CREATE CONVERSION";
+            var body = $"{keyword} {schema}.{name} FOR '{r.GetString(2)}' TO '{r.GetString(3)}' FROM {r.GetString(4)};";
+            list.Add(MakeRaw(ObjectKind.Conversion, schema, name, $"conversion:{schema}.{name}", body));
+        }
+        return list;
+    }
+
+    private async Task<List<RawObjectDefinition>> ReadForeignDataWrappersAsync(NpgsqlConnection conn, CancellationToken ct)
+    {
+        const string sql = @"
+            SELECT w.fdwname,
+                   NULLIF(w.fdwhandler,0)::regproc::text AS handler,
+                   NULLIF(w.fdwvalidator,0)::regproc::text AS validator,
+                   w.fdwoptions
+            FROM pg_foreign_data_wrapper w
+            ORDER BY w.fdwname;";
+
+        var list = new List<RawObjectDefinition>();
+        await using var cmd = new NpgsqlCommand(sql, conn);
+        await using var r = await cmd.ExecuteReaderAsync(ct);
+        while (await r.ReadAsync(ct))
+        {
+            var name = r.GetString(0);
+            var body = $"CREATE FOREIGN DATA WRAPPER {name}";
+            if (!r.IsDBNull(1)) body += $" HANDLER {r.GetString(1)}";
+            if (!r.IsDBNull(2)) body += $" VALIDATOR {r.GetString(2)}";
+            body += OptionsClause(r.IsDBNull(3) ? null : r.GetFieldValue<string[]>(3));
+            list.Add(MakeRaw(ObjectKind.ForeignDataWrapper, "", name, $"foreigndatawrapper:{name}", body + ";"));
+        }
+        return list;
+    }
+
+    private async Task<List<RawObjectDefinition>> ReadServersAsync(NpgsqlConnection conn, CancellationToken ct)
+    {
+        const string sql = @"
+            SELECT s.srvname, w.fdwname, s.srvtype, s.srvversion, s.srvoptions
+            FROM pg_foreign_server s
+            JOIN pg_foreign_data_wrapper w ON w.oid = s.srvfdw
+            ORDER BY s.srvname;";
+
+        var list = new List<RawObjectDefinition>();
+        await using var cmd = new NpgsqlCommand(sql, conn);
+        await using var r = await cmd.ExecuteReaderAsync(ct);
+        while (await r.ReadAsync(ct))
+        {
+            var name = r.GetString(0);
+            var body = $"CREATE SERVER {name}";
+            if (!r.IsDBNull(2)) body += $" TYPE '{r.GetString(2).Replace("'", "''")}'";
+            if (!r.IsDBNull(3)) body += $" VERSION '{r.GetString(3).Replace("'", "''")}'";
+            body += $" FOREIGN DATA WRAPPER {r.GetString(1)}";
+            body += OptionsClause(r.IsDBNull(4) ? null : r.GetFieldValue<string[]>(4));
+            list.Add(MakeRaw(ObjectKind.Server, "", name, $"server:{name}", body + ";"));
+        }
+        return list;
+    }
+
+    // pg_*options is text[] of "key=value"; render as an OPTIONS (key 'value', …) clause.
+    private static string OptionsClause(string[]? opts)
+    {
+        if (opts is null || opts.Length == 0) return string.Empty;
+        var parts = opts.Select(o =>
+        {
+            var eq = o.IndexOf('=');
+            var key = eq >= 0 ? o[..eq] : o;
+            var val = eq >= 0 ? o[(eq + 1)..] : string.Empty;
+            return $"{key} '{val.Replace("'", "''")}'";
+        });
+        return $" OPTIONS ({string.Join(", ", parts)})";
     }
 }
