@@ -57,9 +57,9 @@ public class Corpus_CreateSchema
     public void scma0025() => CorpusAssert.Parses(@"CREATE SCHEMA IF NOT EXISTS", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void scma0026() => CorpusAssert.Parses(@"CREATE SCHEMA IF EXISTS scma_bad", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void scma0027() => CorpusAssert.Parses(@"CREATE SCHEMA AUTHORIZATION", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void scma0028() => CorpusAssert.Parses(@"CREATE SCHEMA scma_bad AUTHORIZATION", "error");
     [Fact]
     public void scma0029() => CorpusAssert.Parses(@"CREATE SCHEMA 123bad", "error");

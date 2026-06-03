@@ -57,9 +57,14 @@ public sealed class TokenCursor
         return true;
     }
 
+    /// <summary>The current token as an operator (merged multi-char symbol), or null.</summary>
+    public string? CurrentOperator => Current is { Kind: TokenKind.Symbol } t ? t.Value : null;
+    public bool AtOperator(string op) => Current is { Kind: TokenKind.Symbol } t && t.Value == op;
+
     // ---- optional matches (return false if absent) --------------------------
     public bool MatchWord(string word) { if (AtWord(word)) { _i++; return true; } return false; }
     public bool MatchSymbol(char c) { if (AtSymbol(c)) { _i++; return true; } return false; }
+    public bool MatchOperator(string op) { if (AtOperator(op)) { _i++; return true; } return false; }
 
     /// <summary>Consume a sequence of words only if all are present in order.</summary>
     public bool MatchWords(params string[] words)

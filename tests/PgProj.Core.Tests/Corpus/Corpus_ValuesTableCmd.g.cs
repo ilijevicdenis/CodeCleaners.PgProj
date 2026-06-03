@@ -5,65 +5,65 @@ namespace PgProj.Core.Tests.Corpus;
 
 public class Corpus_ValuesTableCmd
 {
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vala0001() => CorpusAssert.Parses(@"VALUES (1)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vala0002() => CorpusAssert.Parses(@"VALUES (1, 2, 3)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vala0003() => CorpusAssert.Parses(@"VALUES (1), (2), (3)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vala0004() => CorpusAssert.Parses(@"VALUES (1, 'a'), (2, 'b'), (3, 'c')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vala0005() => CorpusAssert.Parses(@"VALUES ('hello', true, 3.14)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vala0006() => CorpusAssert.Parses(@"VALUES (NULL)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vala0007() => CorpusAssert.Parses(@"VALUES (NULL, NULL, NULL)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vala0008() => CorpusAssert.Parses(@"VALUES (1, NULL), (NULL, 2)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vala0009() => CorpusAssert.Parses(@"VALUES (1 + 2)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vala0010() => CorpusAssert.Parses(@"VALUES (1 + 1, 2 * 3, 10 / 2)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vala0011() => CorpusAssert.Parses(@"VALUES (now())", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vala0012() => CorpusAssert.Parses(@"VALUES (ARRAY[1,2,3])", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vala0013() => CorpusAssert.Parses(@"VALUES ('{""a"":1}'::jsonb)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vala0014() => CorpusAssert.Parses(@"VALUES (CAST(42 AS bigint))", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vala0015() => CorpusAssert.Parses(@"VALUES (1, 2) ORDER BY 1", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vala0016() => CorpusAssert.Parses(@"VALUES (3), (1), (2) ORDER BY 1", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vala0017() => CorpusAssert.Parses(@"VALUES (3), (1), (2) ORDER BY 1 ASC", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vala0018() => CorpusAssert.Parses(@"VALUES (3), (1), (2) ORDER BY 1 DESC", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vala0019() => CorpusAssert.Parses(@"VALUES (1, 'b'), (2, 'a') ORDER BY 2", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vala0020() => CorpusAssert.Parses(@"VALUES (1, 'b'), (2, 'a') ORDER BY 2 ASC", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vala0021() => CorpusAssert.Parses(@"VALUES (1, 'b'), (2, 'a') ORDER BY 2 DESC", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vala0022() => CorpusAssert.Parses(@"VALUES (1, 2), (3, 4) ORDER BY 1 ASC, 2 DESC", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vala0023() => CorpusAssert.Parses(@"VALUES (3), (1), (2) ORDER BY 1 LIMIT 2", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vala0024() => CorpusAssert.Parses(@"VALUES (1), (2), (3) LIMIT 2", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vala0025() => CorpusAssert.Parses(@"VALUES (1), (2), (3) LIMIT ALL", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vala0026() => CorpusAssert.Parses(@"VALUES (1), (2), (3) OFFSET 1", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vala0027() => CorpusAssert.Parses(@"VALUES (1), (2), (3) OFFSET 1 ROW", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vala0028() => CorpusAssert.Parses(@"VALUES (1), (2), (3) OFFSET 1 ROWS", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vala0029() => CorpusAssert.Parses(@"VALUES (1), (2), (3) LIMIT 2 OFFSET 1", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vala0030() => CorpusAssert.Parses(@"VALUES (3), (1), (2) ORDER BY 1 LIMIT 2 OFFSET 1", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void vala0031() => CorpusAssert.Parses(@"VALUES (1), (2), (3) FETCH FIRST 2 ROWS ONLY", "ok");
@@ -81,11 +81,11 @@ public class Corpus_ValuesTableCmd
     public void vala0037() => CorpusAssert.Parses(@"VALUES (1), (2), (3) OFFSET 1 ROWS FETCH NEXT 1 ROW ONLY", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void vala0038() => CorpusAssert.Parses(@"SELECT * FROM (VALUES (1, 'a'), (2, 'b')) AS v(num, letter)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vala0039() => CorpusAssert.Parses(@"SELECT * FROM (VALUES (1, 'a'), (2, 'b')) AS v", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vala0040() => CorpusAssert.Parses(@"SELECT v.num FROM (VALUES (1), (2)) AS v(num)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vala0041() => CorpusAssert.Parses(@"SELECT v.num * 2 FROM (VALUES (3), (5)) AS v(num) ORDER BY 1", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void vala0042() => CorpusAssert.Parses(@"INSERT INTO s.t(name, qty) VALUES ('x', 1)", "ok");
@@ -95,77 +95,77 @@ public class Corpus_ValuesTableCmd
     public void vala0044() => CorpusAssert.Parses(@"INSERT INTO s.t2(label, amount) VALUES ('a', 9.99), ('b', 19.99), ('c', 0.50)", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void vala0045() => CorpusAssert.Parses(@"INSERT INTO s.t(name, qty, flag) VALUES ('z', DEFAULT, DEFAULT)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vala0046() => CorpusAssert.Parses(@"SELECT column1, column2 FROM (VALUES (1, 'hello'), (2, 'world')) AS t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vala0047() => CorpusAssert.Parses(@"WITH v AS (VALUES (1,'a'),(2,'b')) SELECT * FROM v", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vala0048() => CorpusAssert.Parses(@"WITH v(n,s) AS (VALUES (1,'a'),(2,'b')) SELECT n, s FROM v", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vala0049() => CorpusAssert.Parses(@"VALUES (1) UNION VALUES (2)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vala0050() => CorpusAssert.Parses(@"VALUES (1) UNION ALL VALUES (2)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vala0051() => CorpusAssert.Parses(@"VALUES (1) INTERSECT VALUES (1)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vala0052() => CorpusAssert.Parses(@"VALUES (1),(2),(3) EXCEPT VALUES (2)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vala0053() => CorpusAssert.Parses(@"SELECT id FROM s.t UNION VALUES (999)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vala0054() => CorpusAssert.Parses(@"VALUES (1,'a') UNION SELECT id, name FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vala0055() => CorpusAssert.Parses(@"VALUES (1::integer, 'hello'::text)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vala0056() => CorpusAssert.Parses(@"VALUES ('2024-01-15'::date)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vala0057() => CorpusAssert.Parses(@"VALUES (INTERVAL '1 day')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vala0058() => CorpusAssert.Parses(@"VALUES (POINT(1.0, 2.0))", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vala0059() => CorpusAssert.Parses(@"VALUES (ROW(1, 'hello'))", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void vala0060() => CorpusAssert.Parses(@"VALUES (ROW(1, 'foo')::s.addr)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vala0061() => CorpusAssert.Parses(@"VALUES ('sad'::s.mood)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vala0062() => CorpusAssert.Parses(@"VALUES (5::s.pos_int)", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void vala0063() => CorpusAssert.Parses(@"SELECT * FROM s.t WHERE id IN (SELECT column1 FROM (VALUES (1::bigint),(2::bigint)) AS v)", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void vala0064() => CorpusAssert.Parses(@"SELECT * FROM s.t JOIN (VALUES (0::numeric)) AS v(val) ON s.t.val = v.val", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vala0065() => CorpusAssert.Parses(@"TABLE s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vala0066() => CorpusAssert.Parses(@"TABLE s.t2", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vala0067() => CorpusAssert.Parses(@"TABLE s.v", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vala0068() => CorpusAssert.Parses(@"TABLE s.mv", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vala0069() => CorpusAssert.Parses(@"TABLE s.parent", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vala0070() => CorpusAssert.Parses(@"TABLE s.child", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vala0071() => CorpusAssert.Parses(@"TABLE s.events", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vala0072() => CorpusAssert.Parses(@"TABLE s.events_2024", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vala0073() => CorpusAssert.Parses(@"TABLE s.t ORDER BY id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vala0074() => CorpusAssert.Parses(@"TABLE s.t ORDER BY id DESC", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vala0075() => CorpusAssert.Parses(@"TABLE s.t ORDER BY name ASC, id DESC", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vala0076() => CorpusAssert.Parses(@"TABLE s.t LIMIT 5", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vala0077() => CorpusAssert.Parses(@"TABLE s.t LIMIT ALL", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vala0078() => CorpusAssert.Parses(@"TABLE s.t OFFSET 2", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vala0079() => CorpusAssert.Parses(@"TABLE s.t OFFSET 2 ROWS", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vala0080() => CorpusAssert.Parses(@"TABLE s.t LIMIT 5 OFFSET 2", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vala0081() => CorpusAssert.Parses(@"TABLE s.t ORDER BY id LIMIT 3 OFFSET 1", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void vala0082() => CorpusAssert.Parses(@"TABLE s.t FETCH FIRST 3 ROWS ONLY", "ok");
@@ -183,21 +183,21 @@ public class Corpus_ValuesTableCmd
     public void vala0088() => CorpusAssert.Parses(@"TABLE ONLY s.parent ORDER BY id LIMIT 10", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void vala0089() => CorpusAssert.Parses(@"TABLE s.t UNION TABLE s.t2", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vala0090() => CorpusAssert.Parses(@"SELECT id, name, val FROM s.t UNION TABLE s.v", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vala0091() => CorpusAssert.Parses(@"TABLE s.v UNION SELECT id, name, val FROM s.t", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void vala0092() => CorpusAssert.Parses(@"SELECT * FROM (TABLE s.t) AS sub", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vala0093() => CorpusAssert.Parses(@"WITH cte AS (TABLE s.t) SELECT id FROM cte", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vala0094() => CorpusAssert.Parses(@"VALUES", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vala0095() => CorpusAssert.Parses(@"VALUES ()", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vala0096() => CorpusAssert.Parses(@"VALUES (1,), (2,)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vala0097() => CorpusAssert.Parses(@"VALUES (1 2)", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void vala0098() => CorpusAssert.Parses(@"VALUES (1) ORDER BY name", "error");
@@ -205,43 +205,43 @@ public class Corpus_ValuesTableCmd
     public void vala0099() => CorpusAssert.Parses(@"VALUES (1) ORDER BY 0", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void vala0100() => CorpusAssert.Parses(@"VALUES (1) ORDER BY 2", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vala0101() => CorpusAssert.Parses(@"VALUES (1) LIMIT -1", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vala0102() => CorpusAssert.Parses(@"VALUES (1) OFFSET -1", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vala0103() => CorpusAssert.Parses(@"TABLE", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void vala0104() => CorpusAssert.Parses(@"TABLE s.nonexistent_table", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vala0105() => CorpusAssert.Parses(@"TABLE s.t WHERE id = 1", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vala0106() => CorpusAssert.Parses(@"VALUES (1) WHERE 1=1", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vala0107() => CorpusAssert.Parses(@"VALUES (1) HAVING 1=1", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vala0108() => CorpusAssert.Parses(@"VALUES (1) GROUP BY 1", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void vala0109() => CorpusAssert.Parses(@"SELECT * FROM (VALUES (1,'a'),(2,'b')) AS v(x,y) WHERE v.x > 1", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vala0110() => CorpusAssert.Parses(@"SELECT column1 FROM (VALUES (1),(2),(3)) AS v ORDER BY column1 DESC", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void vala0111() => CorpusAssert.Parses(@"INSERT INTO s.t(name) SELECT v.nm FROM (VALUES ('inserted_via_values')) AS v(nm)", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void vala0112() => CorpusAssert.Parses(@"INSERT INTO s.t(name) TABLE s.v", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vala0113() => CorpusAssert.Parses(@"VALUES (1) USING operator", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vala0114() => CorpusAssert.Parses(@"VALUES (3),(1),(2) ORDER BY 1 USING <", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vala0115() => CorpusAssert.Parses(@"VALUES (3),(1),(2) ORDER BY 1 USING >", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vala0116() => CorpusAssert.Parses(@"VALUES (1),(2),(3) ORDER BY 1 NULLS FIRST", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vala0117() => CorpusAssert.Parses(@"VALUES (1),(NULL),(3) ORDER BY 1 DESC NULLS LAST", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vala0118() => CorpusAssert.Parses(@"VALUES (1),(NULL),(3) ORDER BY 1 ASC NULLS FIRST", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vala0119() => CorpusAssert.Parses(@"SELECT count(*) FROM (VALUES (1),(2),(3)) AS v", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void vala0120() => CorpusAssert.Parses(@"VALUES (3),(1),(2) ORDER BY 1 FETCH FIRST 2 ROWS WITH TIES", "ok");

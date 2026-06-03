@@ -14,7 +14,7 @@ namespace PgProj.Core.Syntax;
 /// reports <see cref="ParseResult.FullyRecognized"/> = false so the caller can defer to the legacy
 /// parser during migration. As kinds are added here, they stop falling back.
 /// </summary>
-public sealed class PgParser
+public sealed partial class PgParser
 {
     private static readonly string[] Persistence = { "GLOBAL", "LOCAL", "TEMP", "TEMPORARY", "UNLOGGED" };
 
@@ -30,7 +30,7 @@ public sealed class PgParser
     {
         var result = new ParseResult();
         List<Token> tokens;
-        try { tokens = Tokenizer.Tokenize(sql); }
+        try { tokens = OperatorLexer.Merge(Tokenizer.Tokenize(sql)); }
         catch (Exception ex) { result.Diagnostics.Add(new ParseDiagnostic("tokenize failed: " + ex.Message, 1, 1, 0)); return result; }
 
         foreach (var segment in SplitStatements(tokens))
@@ -55,6 +55,11 @@ public sealed class PgParser
             {
                 result.Diagnostics.Add(ToDiagnostic(pe, sql));
             }
+            catch (Exception ex)
+            {
+                // A parser bug must surface as a rejection, never crash the caller.
+                result.Diagnostics.Add(new ParseDiagnostic("internal parser error: " + ex.Message, 1, 1, 0));
+            }
         }
         return result;
     }
@@ -63,6 +68,7 @@ public sealed class PgParser
 
     private static string? ClassifyLeading(TokenCursor c)
     {
+        if (c.AtAnyWord("SELECT", "WITH", "VALUES", "TABLE")) return "QUERY";
         if (!c.AtWord("CREATE")) return null;
         int k = 1;
         while (c.Peek(k) is { } t && t.Kind == TokenKind.Word
@@ -75,6 +81,9 @@ public sealed class PgParser
 
     private SqlStatement ParseStatement(TokenCursor c)
     {
+        if (c.AtAnyWord("SELECT", "WITH", "VALUES", "TABLE"))
+            return new QueryStatement { Query = ParseSelectStatement(c) };
+
         c.ExpectWord("CREATE");
         string? persistence = null;
         while (true)

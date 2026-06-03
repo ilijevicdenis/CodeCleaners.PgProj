@@ -5,26 +5,26 @@ namespace PgProj.Core.Tests.Corpus;
 
 public class Corpus_LiteralsQuoting
 {
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0001() => CorpusAssert.Parses(@"SELECT 'hello'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0002() => CorpusAssert.Parses(@"SELECT 'it''s a test'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0003() => CorpusAssert.Parses(@"SELECT ''''", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0004() => CorpusAssert.Parses(@"SELECT ''", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0005() => CorpusAssert.Parses(@"SELECT 'foo'
 'bar'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0006() => CorpusAssert.Parses(@"SELECT 'foo'
   'bar'
   'baz'", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void lita0007() => CorpusAssert.Parses(@"SELECT 'foo' 'bar'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0008() => CorpusAssert.Parses(@"SELECT ''bad'' ''concat''", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0009() => CorpusAssert.Parses(@"SELECT 'embedded
 newline'", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
@@ -49,89 +49,89 @@ newline'", "ok");
     public void lita0019() => CorpusAssert.Parses(@"SELECT E'\u0041'", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void lita0020() => CorpusAssert.Parses(@"SELECT E'\U00000041'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0021() => CorpusAssert.Parses(@"SELECT E'\u004'", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void lita0022() => CorpusAssert.Parses(@"SELECT e'lowercase prefix'", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void lita0023() => CorpusAssert.Parses(@"SELECT E'\q'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0024() => CorpusAssert.Parses(@"SELECT U&'d\0061t\0061'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0025() => CorpusAssert.Parses(@"SELECT U&'\0048\0065\006C\006C\006F'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0026() => CorpusAssert.Parses(@"SELECT U&'\+01F600'", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void lita0027() => CorpusAssert.Parses(@"SELECT U&'!0041' UESCAPE '!'", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void lita0028() => CorpusAssert.Parses(@"SELECT U&'abc\005'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0029() => CorpusAssert.Parses(@"SELECT U&'abc' UESCAPE '+-'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0030() => CorpusAssert.Parses(@"SELECT U&'abc' UESCAPE '""'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0031() => CorpusAssert.Parses(@"SELECT $$dollar quoted string$$", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0032() => CorpusAssert.Parses(@"SELECT $tag$dollar quoted with tag$tag$", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0033() => CorpusAssert.Parses(@"SELECT $$it's got a single quote$$", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0034() => CorpusAssert.Parses(@"SELECT $$backslash \ no escape$$", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0035() => CorpusAssert.Parses(@"SELECT $outer$nested $$inner$$ content$outer$", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0036() => CorpusAssert.Parses(@"SELECT $bad-tag$text$bad-tag$", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void lita0037() => CorpusAssert.Parses(@"SELECT $1tag$content$1tag$", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0038() => CorpusAssert.Parses(@"SELECT $$$$", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0039() => CorpusAssert.Parses(@"SELECT $my_tag$content$my_tag$", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0040() => CorpusAssert.Parses(@"SELECT 42", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0041() => CorpusAssert.Parses(@"SELECT 0", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0042() => CorpusAssert.Parses(@"SELECT 2147483647", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0043() => CorpusAssert.Parses(@"SELECT 2147483648", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0044() => CorpusAssert.Parses(@"SELECT 9999999999999999999", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0045() => CorpusAssert.Parses(@"SELECT 3.14", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0046() => CorpusAssert.Parses(@"SELECT 3.", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0047() => CorpusAssert.Parses(@"SELECT .5", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0048() => CorpusAssert.Parses(@"SELECT 1e10", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0049() => CorpusAssert.Parses(@"SELECT 1.5e2", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0050() => CorpusAssert.Parses(@"SELECT 1.925e-3", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0051() => CorpusAssert.Parses(@"SELECT 1.5E+10", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0052() => CorpusAssert.Parses(@"SELECT 0x1A2B", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0053() => CorpusAssert.Parses(@"SELECT 0XFFFF", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0054() => CorpusAssert.Parses(@"SELECT 0xDEAD_BEEF", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0055() => CorpusAssert.Parses(@"SELECT 0o755", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0056() => CorpusAssert.Parses(@"SELECT 0O644", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0057() => CorpusAssert.Parses(@"SELECT 0b1010", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0058() => CorpusAssert.Parses(@"SELECT 0B1100_1010", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0059() => CorpusAssert.Parses(@"SELECT 1_000_000", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void lita0060() => CorpusAssert.Parses(@"SELECT 1_500_000.25", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0061() => CorpusAssert.Parses(@"SELECT 1.618_034", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0062() => CorpusAssert.Parses(@"SELECT 1_000e2", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void lita0063() => CorpusAssert.Parses(@"SELECT 1000_", "error");
@@ -143,19 +143,19 @@ newline'", "ok");
     public void lita0066() => CorpusAssert.Parses(@"SELECT 0o8", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void lita0067() => CorpusAssert.Parses(@"SELECT 0b2", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0068() => CorpusAssert.Parses(@"SELECT 1.e5", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0069() => CorpusAssert.Parses(@"SELECT true", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0070() => CorpusAssert.Parses(@"SELECT false", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0071() => CorpusAssert.Parses(@"SELECT TRUE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0072() => CorpusAssert.Parses(@"SELECT FALSE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0073() => CorpusAssert.Parses(@"SELECT NULL", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0074() => CorpusAssert.Parses(@"SELECT null", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void lita0075() => CorpusAssert.Parses(@"SELECT B'1010'", "ok");
@@ -167,7 +167,7 @@ newline'", "ok");
     public void lita0078() => CorpusAssert.Parses(@"SELECT B'10101010'", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void lita0079() => CorpusAssert.Parses(@"SELECT b'1100'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0080() => CorpusAssert.Parses(@"SELECT B'2'", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void lita0081() => CorpusAssert.Parses(@"SELECT X'1FF'", "ok");
@@ -177,99 +177,99 @@ newline'", "ok");
     public void lita0083() => CorpusAssert.Parses(@"SELECT X''", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void lita0084() => CorpusAssert.Parses(@"SELECT x'FF'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0085() => CorpusAssert.Parses(@"SELECT X'GG'", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void lita0086() => CorpusAssert.Parses(@"SELECT integer '42'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0087() => CorpusAssert.Parses(@"SELECT real '1.5'", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void lita0088() => CorpusAssert.Parses(@"SELECT float8 '3.14'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0089() => CorpusAssert.Parses(@"SELECT numeric '1.23456789'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0090() => CorpusAssert.Parses(@"SELECT boolean 'true'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0091() => CorpusAssert.Parses(@"SELECT boolean 'false'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0092() => CorpusAssert.Parses(@"SELECT '42'::integer", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0093() => CorpusAssert.Parses(@"SELECT '3.14'::float8", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0094() => CorpusAssert.Parses(@"SELECT '2024-01-15'::date", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0095() => CorpusAssert.Parses(@"SELECT '2024-01-15 10:30:00'::timestamp", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0096() => CorpusAssert.Parses(@"SELECT CAST('42' AS integer)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0097() => CorpusAssert.Parses(@"SELECT CAST('3.14' AS numeric(10,4))", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0098() => CorpusAssert.Parses(@"SELECT CAST('hello' AS text)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0099() => CorpusAssert.Parses(@"SELECT CAST('true' AS boolean)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0100() => CorpusAssert.Parses(@"SELECT '42'::integer::text", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0101() => CorpusAssert.Parses(@"SELECT '1.5'::real::numeric(10,2)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0102() => CorpusAssert.Parses(@"SELECT INTERVAL '1' YEAR", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0103() => CorpusAssert.Parses(@"SELECT INTERVAL '3' MONTH", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0104() => CorpusAssert.Parses(@"SELECT INTERVAL '7' DAY", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0105() => CorpusAssert.Parses(@"SELECT INTERVAL '12' HOUR", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0106() => CorpusAssert.Parses(@"SELECT INTERVAL '30' MINUTE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0107() => CorpusAssert.Parses(@"SELECT INTERVAL '45' SECOND", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0108() => CorpusAssert.Parses(@"SELECT INTERVAL '1-6' YEAR TO MONTH", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0109() => CorpusAssert.Parses(@"SELECT INTERVAL '2 03:04:05'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0110() => CorpusAssert.Parses(@"SELECT INTERVAL '5' SECOND(3)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0111() => CorpusAssert.Parses(@"SELECT INTERVAL '01:30' HOUR TO MINUTE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0112() => CorpusAssert.Parses(@"SELECT INTERVAL '01:30:45' HOUR TO SECOND", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0113() => CorpusAssert.Parses(@"SELECT INTERVAL '15:30' MINUTE TO SECOND", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0114() => CorpusAssert.Parses(@"SELECT INTERVAL '1 year 2 months 3 days'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0115() => CorpusAssert.Parses(@"SELECT INTERVAL 'P1Y2M3DT4H5M6S'", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void lita0116() => CorpusAssert.Parses(@"SELECT INTERVAL '1' SECOND YEAR", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0117() => CorpusAssert.Parses(@"SELECT ARRAY[1, 2, 3]", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0118() => CorpusAssert.Parses(@"SELECT ARRAY['a', 'b', 'c']", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0119() => CorpusAssert.Parses(@"SELECT ARRAY[[1,2],[3,4]]", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0120() => CorpusAssert.Parses(@"SELECT ARRAY[]::int[]", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0121() => CorpusAssert.Parses(@"SELECT '{1,2,3}'::int[]", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0122() => CorpusAssert.Parses(@"SELECT '{""a"",""b""}'::text[]", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0123() => CorpusAssert.Parses(@"SELECT ARRAY[true, false, true]", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0124() => CorpusAssert.Parses(@"SELECT ARRAY[1.1, 2.2, 3.3]", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0125() => CorpusAssert.Parses(@"SELECT ARRAY[NULL, 1, NULL]", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0126() => CorpusAssert.Parses(@"SELECT ROW(1, 'hello', true)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0127() => CorpusAssert.Parses(@"SELECT ROW(1, NULL, 3.14)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0128() => CorpusAssert.Parses(@"SELECT (1, 'hello', true)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0129() => CorpusAssert.Parses(@"SELECT 1 AS ""my column""", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0130() => CorpusAssert.Parses(@"SELECT 1 AS ""CaseSensitive""", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0131() => CorpusAssert.Parses(@"SELECT 1 AS ""with """"quotes"""" inside""", "ok");
     [Fact]
     public void lita0132() => CorpusAssert.Parses(@"CREATE TABLE s.""My Table"" (id int); DROP TABLE s.""My Table""", "ok");
@@ -279,70 +279,70 @@ newline'", "ok");
     public void lita0134() => CorpusAssert.Parses(@"SELECT 1 AS U&""\0041lpha""", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void lita0135() => CorpusAssert.Parses(@"SELECT 1 AS U&""!0041BC"" UESCAPE '!'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0136() => CorpusAssert.Parses(@"SELECT 1 AS unquoted_ident", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0137() => CorpusAssert.Parses(@"SELECT 1 AS _leading_underscore", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0138() => CorpusAssert.Parses(@"SELECT 1 AS ident$with$dollar", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0139() => CorpusAssert.Parses(@"SELECT 1 AS ""MixedCase""", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0140() => CorpusAssert.Parses(@"SELECT date '2024-01-15'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0141() => CorpusAssert.Parses(@"SELECT time '10:30:00'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0142() => CorpusAssert.Parses(@"SELECT timestamp '2024-01-15 10:30:00'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0143() => CorpusAssert.Parses(@"SELECT timestamptz '2024-01-15 10:30:00+02'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0144() => CorpusAssert.Parses(@"SELECT '2024-01-15'::date", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0145() => CorpusAssert.Parses(@"SELECT '10:30:00'::time", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0146() => CorpusAssert.Parses(@"SELECT '1 hour'::interval", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0147() => CorpusAssert.Parses(@"SELECT CAST('2024-01-15' AS date)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0148() => CorpusAssert.Parses(@"SELECT '42'::text::integer", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void lita0149() => CorpusAssert.Parses(@"SELECT 'hello' = E'hello'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0150() => CorpusAssert.Parses(@"SELECT $$test$$ = 'test'", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void lita0151() => CorpusAssert.Parses(@"SELECT E'\n' = chr(10)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0152() => CorpusAssert.Parses(@"SELECT 'abc'
 E'def'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0153() => CorpusAssert.Parses(@"SELECT +42", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0154() => CorpusAssert.Parses(@"SELECT -42", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0155() => CorpusAssert.Parses(@"SELECT -3.14", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0156() => CorpusAssert.Parses(@"SELECT 'hello'::varchar(3)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0157() => CorpusAssert.Parses(@"SELECT CAST('hello' AS char(5))", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void lita0158() => CorpusAssert.Parses(@"SELECT B'1010'::varbit", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void lita0159() => CorpusAssert.Parses(@"SELECT X'FF'::bit(8)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0160() => CorpusAssert.Parses(@"SELECT INTERVAL '1 2:03:04' DAY TO SECOND", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void lita0161() => CorpusAssert.Parses(@"SELECT INTERVAL '5' DAY(3)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0162() => CorpusAssert.Parses(@"SELECT 'NaN'::float8", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0163() => CorpusAssert.Parses(@"SELECT 'Infinity'::float8", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0164() => CorpusAssert.Parses(@"SELECT '-Infinity'::float8", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void lita0165() => CorpusAssert.Parses(@"SELECT 'bad date'::date", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void lita0166() => CorpusAssert.Parses(@"SELECT U&'\ZZZZ'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0167() => CorpusAssert.Parses(@"SELECT '\x00'", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void lita0168() => CorpusAssert.Parses(@"SELECT 'hello'::integer", "error");
@@ -350,26 +350,26 @@ E'def'", "error");
     public void lita0169() => CorpusAssert.Parses(@"SELECT INTERVAL '99' YEAR(2)", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void lita0170() => CorpusAssert.Parses(@"SELECT '5'::bit(4)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0001() => CorpusAssert.Parses(@"SELECT 'hello'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0002() => CorpusAssert.Parses(@"SELECT 'it''s a test'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0003() => CorpusAssert.Parses(@"SELECT ''''", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0004() => CorpusAssert.Parses(@"SELECT ''", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0005() => CorpusAssert.Parses(@"SELECT 'line1'
 'line2'", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void litb0006() => CorpusAssert.Parses(@"SELECT 'foo' 'bar'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0007() => CorpusAssert.Parses(@"SELECT 'abc'
   'def'
   'ghi'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0008() => CorpusAssert.Parses(@"SELECT E'\UFFFFFFFF'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0009() => CorpusAssert.Parses(@"SELECT 'line1\nline2'", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void litb0010() => CorpusAssert.Parses(@"SELECT E'hello\nworld'", "ok");
@@ -389,111 +389,111 @@ E'def'", "error");
     public void litb0017() => CorpusAssert.Parses(@"SELECT E'\101'", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void litb0018() => CorpusAssert.Parses(@"SELECT e'lowercase e prefix'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0019() => CorpusAssert.Parses(@"SELECT E'\u00'", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void litb0020() => CorpusAssert.Parses(@"SELECT E'\q'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0021() => CorpusAssert.Parses(@"SELECT U&'d\0061t\+000061'", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void litb0022() => CorpusAssert.Parses(@"SELECT U&'hello #0041' UESCAPE '#'", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void litb0023() => CorpusAssert.Parses(@"SELECT U&'hello !0041' UESCAPE '!'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0024() => CorpusAssert.Parses(@"SELECT U&'\0041'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0025() => CorpusAssert.Parses(@"SELECT U&'\+01F600'", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void litb0026() => CorpusAssert.Parses(@"SELECT U&'bad \ZZZZ'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0027() => CorpusAssert.Parses(@"SELECT U&'!ZZZZ' UESCAPE '!'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0028() => CorpusAssert.Parses(@"SELECT U&'hello' UESCAPE '12'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0029() => CorpusAssert.Parses(@"SELECT U&'hello' UESCAPE '+'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0030() => CorpusAssert.Parses(@"SELECT $$dollar quoted$$", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0031() => CorpusAssert.Parses(@"SELECT $tag$dollar quoted with tag$tag$", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0032() => CorpusAssert.Parses(@"SELECT $abc$contains 'single' and ""double"" quotes$abc$", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0033() => CorpusAssert.Parses(@"SELECT $outer$contains $inner$ nested $inner$ tags$outer$", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0034() => CorpusAssert.Parses(@"SELECT $q$line1\nline2$q$", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0035() => CorpusAssert.Parses(@"SELECT $a b$hello$a b$", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void litb0036() => CorpusAssert.Parses(@"SELECT 0xAB_", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0037() => CorpusAssert.Parses(@"SELECT 42", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0038() => CorpusAssert.Parses(@"SELECT 0", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0039() => CorpusAssert.Parses(@"SELECT 9999999999999999999", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0040() => CorpusAssert.Parses(@"SELECT 3.14", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0041() => CorpusAssert.Parses(@"SELECT .5", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0042() => CorpusAssert.Parses(@"SELECT 1.", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0043() => CorpusAssert.Parses(@"SELECT 1e10", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0044() => CorpusAssert.Parses(@"SELECT 1.5e3", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0045() => CorpusAssert.Parses(@"SELECT 1.5E+3", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0046() => CorpusAssert.Parses(@"SELECT 2.0e-4", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0047() => CorpusAssert.Parses(@"SELECT 0x1FF", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0048() => CorpusAssert.Parses(@"SELECT 0xDEADBEEF", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0049() => CorpusAssert.Parses(@"SELECT 0xdeadbeef", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0050() => CorpusAssert.Parses(@"SELECT 0o755", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0051() => CorpusAssert.Parses(@"SELECT 0o17", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0052() => CorpusAssert.Parses(@"SELECT 0b1010", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0053() => CorpusAssert.Parses(@"SELECT 0b11111111", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0054() => CorpusAssert.Parses(@"SELECT 1_000_000", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void litb0055() => CorpusAssert.Parses(@"SELECT 1_000.500_000", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0056() => CorpusAssert.Parses(@"SELECT 0x1_FF", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0057() => CorpusAssert.Parses(@"SELECT 0b1010_1010", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0058() => CorpusAssert.Parses(@"SELECT 1_ + 1", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0059() => CorpusAssert.Parses(@"SELECT 1__2 + 1", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0060() => CorpusAssert.Parses(@"SELECT 1_000_ + 1", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0061() => CorpusAssert.Parses(@"SELECT 0x + 1", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0062() => CorpusAssert.Parses(@"SELECT 0b + 1", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0063() => CorpusAssert.Parses(@"SELECT 0o + 1", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0064() => CorpusAssert.Parses(@"SELECT 0b2 + 1", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0065() => CorpusAssert.Parses(@"SELECT 0o9 + 1", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0066() => CorpusAssert.Parses(@"SELECT true", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0067() => CorpusAssert.Parses(@"SELECT false", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0068() => CorpusAssert.Parses(@"SELECT TRUE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0069() => CorpusAssert.Parses(@"SELECT FALSE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0070() => CorpusAssert.Parses(@"SELECT NULL", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0071() => CorpusAssert.Parses(@"SELECT null", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void litb0072() => CorpusAssert.Parses(@"SELECT B'101'", "ok");
@@ -505,7 +505,7 @@ E'def'", "error");
     public void litb0075() => CorpusAssert.Parses(@"SELECT B''", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void litb0076() => CorpusAssert.Parses(@"SELECT b'1010'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0077() => CorpusAssert.Parses(@"SELECT B'102' & B'101'", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void litb0078() => CorpusAssert.Parses(@"SELECT X'1FF'", "ok");
@@ -515,87 +515,87 @@ E'def'", "error");
     public void litb0080() => CorpusAssert.Parses(@"SELECT X''", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void litb0081() => CorpusAssert.Parses(@"SELECT x'FF'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0082() => CorpusAssert.Parses(@"SELECT X'GG' | X'FF'", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void litb0083() => CorpusAssert.Parses(@"SELECT integer '42'", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void litb0084() => CorpusAssert.Parses(@"SELECT float8 '3.14'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0085() => CorpusAssert.Parses(@"SELECT boolean 'true'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0086() => CorpusAssert.Parses(@"SELECT date '2024-01-15'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0087() => CorpusAssert.Parses(@"SELECT timestamp '2024-01-15 12:00:00'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0088() => CorpusAssert.Parses(@"SELECT timestamptz '2024-01-15 12:00:00+00'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0089() => CorpusAssert.Parses(@"SELECT time '12:30:00'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0090() => CorpusAssert.Parses(@"SELECT interval '1 hour'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0091() => CorpusAssert.Parses(@"SELECT '42'::integer", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0092() => CorpusAssert.Parses(@"SELECT '3.14'::float8", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0093() => CorpusAssert.Parses(@"SELECT 'true'::boolean", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0094() => CorpusAssert.Parses(@"SELECT CAST('42' AS integer)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0095() => CorpusAssert.Parses(@"SELECT CAST('3.14' AS numeric)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0096() => CorpusAssert.Parses(@"SELECT CAST('2024-01-15' AS date)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0097() => CorpusAssert.Parses(@"SELECT '2024-01-15'::date", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0098() => CorpusAssert.Parses(@"SELECT interval '1 year 2 months 3 days'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0099() => CorpusAssert.Parses(@"SELECT interval '1:30:00' HOUR TO SECOND", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0100() => CorpusAssert.Parses(@"SELECT interval '5' YEAR", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0101() => CorpusAssert.Parses(@"SELECT interval '3' MONTH", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0102() => CorpusAssert.Parses(@"SELECT interval '2' DAY", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0103() => CorpusAssert.Parses(@"SELECT interval '4' HOUR", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0104() => CorpusAssert.Parses(@"SELECT interval '30' MINUTE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0105() => CorpusAssert.Parses(@"SELECT interval '45' SECOND", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0106() => CorpusAssert.Parses(@"SELECT interval '1:30' HOUR TO MINUTE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0107() => CorpusAssert.Parses(@"SELECT interval '1' YEAR TO MONTH", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0108() => CorpusAssert.Parses(@"SELECT interval '1.5' SECOND(2)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0109() => CorpusAssert.Parses(@"SELECT interval '01:02:03.456' HOUR TO SECOND(3)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0110() => CorpusAssert.Parses(@"SELECT interval DAY TO HOUR", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0111() => CorpusAssert.Parses(@"SELECT ARRAY[1, 2, 3]", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0112() => CorpusAssert.Parses(@"SELECT ARRAY['a', 'b', 'c']", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0113() => CorpusAssert.Parses(@"SELECT ARRAY[true, false, true]", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0114() => CorpusAssert.Parses(@"SELECT ARRAY[]::integer[]", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0115() => CorpusAssert.Parses(@"SELECT ARRAY[[1,2],[3,4]]", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0116() => CorpusAssert.Parses(@"SELECT '{1,2,3}'::integer[]", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0117() => CorpusAssert.Parses(@"SELECT '{""a"",""b""}'::text[]", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0118() => CorpusAssert.Parses(@"SELECT '{NULL,1,2}'::integer[]", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0119() => CorpusAssert.Parses(@"SELECT ROW(1, 'hello', true)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0120() => CorpusAssert.Parses(@"SELECT ROW(42, NULL, 3.14)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0121() => CorpusAssert.Parses(@"SELECT (1, 'hello', true)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0122() => CorpusAssert.Parses(@"SELECT ROW()", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void litb0123() => CorpusAssert.Parses(@"SELECT ""identifier""", "error");
@@ -619,81 +619,81 @@ E'def'", "error");
     public void litb0132() => CorpusAssert.Parses(@"CREATE TABLE s.u_id (x integer); SELECT x FROM s.u_id", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void litb0133() => CorpusAssert.Parses(@"SELECT U&""d\0061t\+000061""", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0134() => CorpusAssert.Parses(@"SELECT U&""hello"" UESCAPE '!'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0135() => CorpusAssert.Parses(@"SELECT 'hello' = 'hello'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0136() => CorpusAssert.Parses(@"SELECT length('hello world')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0137() => CorpusAssert.Parses(@"SELECT 'foo' || 'bar'", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void litb0138() => CorpusAssert.Parses(@"SELECT 'foo' || E'\n' || 'bar'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0139() => CorpusAssert.Parses(@"SELECT 42::text", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0140() => CorpusAssert.Parses(@"SELECT 3.14::text", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0141() => CorpusAssert.Parses(@"SELECT true::text", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0142() => CorpusAssert.Parses(@"SELECT NULL::integer", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0143() => CorpusAssert.Parses(@"SELECT NULL::text", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void litb0144() => CorpusAssert.Parses(@"SELECT 'not a number'::integer", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0145() => CorpusAssert.Parses(@"SELECT integer 'not a number'", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void litb0146() => CorpusAssert.Parses(@"SELECT '2024-99-99'::date", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0147() => CorpusAssert.Parses(@"SELECT $1", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void litb0148() => CorpusAssert.Parses(@"SELECT 1e+", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void litb0149() => CorpusAssert.Parses(@"SELECT 1.2.3", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0150() => CorpusAssert.Parses(@"SELECT 'abc' 42", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0151() => CorpusAssert.Parses(@"SELECT interval '1 year' + interval '2 months'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0152() => CorpusAssert.Parses(@"SELECT '2024-01-15'::timestamp", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0153() => CorpusAssert.Parses(@"SELECT '12:30:00'::time", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0154() => CorpusAssert.Parses(@"SELECT '1 day'::interval", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0155() => CorpusAssert.Parses(@"SELECT '\xDEAD'::bytea", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void litb0156() => CorpusAssert.Parses(@"SELECT E'\x41\x42'::bytea", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0157() => CorpusAssert.Parses(@"SELECT 'sad'::s.mood", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void litb0158() => CorpusAssert.Parses(@"SELECT 'notavalue'::s.mood", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0159() => CorpusAssert.Parses(@"SELECT '(Main St,Springfield,12345)'::s.addr", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0160() => CorpusAssert.Parses(@"SELECT 5::s.pos_int", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void litb0161() => CorpusAssert.Parses(@"SELECT (-1)::s.pos_int", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0162() => CorpusAssert.Parses(@"SELECT U&'\0041' = 'A'", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void litb0163() => CorpusAssert.Parses(@"SELECT E'\n' = chr(10)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0164() => CorpusAssert.Parses(@"SELECT $body$SELECT 1$body$", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0165() => CorpusAssert.Parses(@"SELECT $$it's fine in $$dollar$$", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void litb0166() => CorpusAssert.Parses(@"SELECT 1_000 + 2_000", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void litb0167() => CorpusAssert.Parses(@"SELECT 0xFF + 0b11", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0168() => CorpusAssert.Parses(@"SELECT (ARRAY[1,2,3])[1]", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0169() => CorpusAssert.Parses(@"SELECT '{hello}'::text[]", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void litb0170() => CorpusAssert.Parses(@"SELECT B'1010' | B'0101'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litc0001() => CorpusAssert.Parses(@"SELECT 'it''s a test' AS a,
 'hello'
 'world' AS b", "ok");
@@ -701,17 +701,17 @@ E'def'", "error");
     public void litc0002() => CorpusAssert.Parses(@"SELECT E'line1\nline2\ttabbed\u0041\x42' AS esc", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void litc0003() => CorpusAssert.Parses(@"SELECT U&'d\0061t\+000061' UESCAPE '\' AS uni", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litc0004() => CorpusAssert.Parses(@"SELECT $$dollar quoted$$ AS dq, $tag$nested $$dollar$$ here$tag$ AS dq2", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void litc0005() => CorpusAssert.Parses(@"SELECT 42, 3.14, 1e10, .5, 1_000_000, 0xFF, 0o77, 0b1010 AS nums", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void litc0006() => CorpusAssert.Parses(@"SELECT B'101' AS bits, X'1FF' AS hex_bits, B'1010'::integer AS bint", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litc0007() => CorpusAssert.Parses(@"SELECT INTERVAL '2 years 3 months 4 days' AS i1, INTERVAL '01:30:00' HOUR TO MINUTE AS i2, INTERVAL '5.5' SECOND(2) AS i3", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litc0008() => CorpusAssert.Parses(@"SELECT true, false, TRUE AND FALSE, 'yes'::boolean AS b", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litc0009() => CorpusAssert.Parses(@"SELECT ARRAY[1,2,3] AS arr, ROW(1, 'hello', NULL) AS r, NULL::text AS n", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void litc0010() => CorpusAssert.Parses(@"SELECT 'bad", "error");

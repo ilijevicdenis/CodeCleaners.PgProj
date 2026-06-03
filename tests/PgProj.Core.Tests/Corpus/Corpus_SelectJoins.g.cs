@@ -5,17 +5,17 @@ namespace PgProj.Core.Tests.Corpus;
 
 public class Corpus_SelectJoins
 {
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0001() => CorpusAssert.Parses(@"SELECT t.id, t2.label FROM s.t JOIN s.t2 ON t.id = t2.t_id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0002() => CorpusAssert.Parses(@"SELECT t.id, t2.label FROM s.t INNER JOIN s.t2 ON t.id = t2.t_id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0003() => CorpusAssert.Parses(@"SELECT t.id FROM s.t LEFT JOIN s.t2 ON t.id = t2.t_id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0004() => CorpusAssert.Parses(@"SELECT t.id FROM s.t LEFT OUTER JOIN s.t2 ON t.id = t2.t_id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0005() => CorpusAssert.Parses(@"SELECT t2.id FROM s.t RIGHT JOIN s.t2 ON t.id = t2.t_id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0006() => CorpusAssert.Parses(@"SELECT t2.id FROM s.t RIGHT OUTER JOIN s.t2 ON t.id = t2.t_id", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void selja0007() => CorpusAssert.Parses(@"SELECT * FROM s.t FULL JOIN s.t2 ON t.id = t2.t_id", "ok");
@@ -39,85 +39,85 @@ public class Corpus_SelectJoins
     public void selja0016() => CorpusAssert.Parses(@"SELECT * FROM s.t NATURAL FULL JOIN s.t2", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void selja0017() => CorpusAssert.Parses(@"SELECT * FROM s.t NATURAL FULL OUTER JOIN s.t2", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0018() => CorpusAssert.Parses(@"SELECT t.id, t2.label FROM s.t JOIN s.t2 USING (id)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0019() => CorpusAssert.Parses(@"SELECT id, label FROM s.t JOIN s.t2 USING (id)", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void selja0020() => CorpusAssert.Parses(@"SELECT * FROM s.parent JOIN s.child USING (id)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0021() => CorpusAssert.Parses(@"SELECT a1.id, a2.id AS id2 FROM s.t AS a1 JOIN s.t AS a2 ON a1.id <> a2.id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0022() => CorpusAssert.Parses(@"SELECT a.id, b.id FROM s.t a, s.t b WHERE a.id <> b.id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0023() => CorpusAssert.Parses(@"SELECT t.id, t2.label, t.name FROM s.t JOIN s.t2 ON t.id = t2.t_id JOIN s.t AS t3 ON t.id = t3.id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0024() => CorpusAssert.Parses(@"SELECT t.id, t2.label FROM s.t JOIN s.t2 ON t.id = t2.t_id LEFT JOIN s.parent ON t.id = s.parent.id", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void selja0025() => CorpusAssert.Parses(@"SELECT * FROM s.t JOIN (SELECT id, label FROM s.t2) AS sub ON s.t.id = sub.id", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void selja0026() => CorpusAssert.Parses(@"SELECT * FROM s.t LEFT JOIN (SELECT t_id, sum(amount) AS total FROM s.t2 GROUP BY t_id) AS agg ON s.t.id = agg.t_id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0027() => CorpusAssert.Parses(@"SELECT t.id, sub.label FROM s.t CROSS JOIN (SELECT label FROM s.t2) AS sub", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0028() => CorpusAssert.Parses(@"SELECT t.id, f.x FROM s.t, LATERAL (SELECT s.f(t.val::integer) AS x) AS f", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0029() => CorpusAssert.Parses(@"SELECT t.id, lat.x FROM s.t JOIN LATERAL (SELECT s.f(t.qty) AS x) AS lat ON true", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0030() => CorpusAssert.Parses(@"SELECT t.id, lat.x FROM s.t LEFT JOIN LATERAL (SELECT s.f(t.qty) AS x) AS lat ON true", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0031() => CorpusAssert.Parses(@"SELECT t.id, r.* FROM s.t, LATERAL s.rows_f() AS r", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0032() => CorpusAssert.Parses(@"SELECT t.id, r.* FROM s.t JOIN LATERAL s.rows_f() AS r ON true", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0033() => CorpusAssert.Parses(@"SELECT t.id, r.* FROM s.t LEFT JOIN LATERAL s.rows_f() AS r ON true", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0034() => CorpusAssert.Parses(@"SELECT t.id FROM (s.t JOIN s.t2 ON t.id = t2.t_id)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0035() => CorpusAssert.Parses(@"SELECT t.id FROM (s.t LEFT JOIN s.t2 ON t.id = t2.t_id) LEFT JOIN s.parent ON t.id = s.parent.id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0036() => CorpusAssert.Parses(@"SELECT a.id FROM (s.t AS a JOIN s.t2 AS b ON a.id = b.t_id)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0037() => CorpusAssert.Parses(@"SELECT t.id, t2.label FROM s.t JOIN s.t2 ON t.id = t2.t_id WHERE t.val > 0", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0038() => CorpusAssert.Parses(@"SELECT t.id, t2.label FROM s.t JOIN s.t2 ON t.id = t2.t_id ORDER BY t.id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0039() => CorpusAssert.Parses(@"SELECT t.id, count(t2.id) FROM s.t LEFT JOIN s.t2 ON t.id = t2.t_id GROUP BY t.id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0040() => CorpusAssert.Parses(@"SELECT t.id, count(t2.id) FROM s.t LEFT JOIN s.t2 ON t.id = t2.t_id GROUP BY t.id HAVING count(t2.id) > 0", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0041() => CorpusAssert.Parses(@"SELECT t.id FROM s.t JOIN s.t2 ON t.id = t2.t_id LIMIT 10", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0042() => CorpusAssert.Parses(@"SELECT t.id FROM s.t JOIN s.t2 ON t.id = t2.t_id OFFSET 5", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0043() => CorpusAssert.Parses(@"SELECT t.id FROM s.t JOIN s.t2 ON t.id = t2.t_id LIMIT 10 OFFSET 5", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0044() => CorpusAssert.Parses(@"SELECT t.name FROM s.t JOIN s.t2 ON t.id = t2.t_id ORDER BY t.name ASC", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0045() => CorpusAssert.Parses(@"SELECT t.name FROM s.t JOIN s.t2 ON t.id = t2.t_id ORDER BY t.name DESC", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0046() => CorpusAssert.Parses(@"SELECT t.id, t2.label FROM s.t JOIN s.t2 ON t.id = t2.t_id AND t2.amount > 0", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0047() => CorpusAssert.Parses(@"SELECT t.id, t2.label FROM s.t JOIN s.t2 ON t.id = t2.t_id AND t.flag = true AND t2.amount > 0", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0048() => CorpusAssert.Parses(@"SELECT t.id FROM s.t JOIN s.t2 ON t.id = t2.t_id OR t2.t_id IS NULL", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0049() => CorpusAssert.Parses(@"SELECT t.id, t2.label FROM s.t JOIN s.t2 ON (t.id = t2.t_id)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0050() => CorpusAssert.Parses(@"SELECT DISTINCT t.id FROM s.t JOIN s.t2 ON t.id = t2.t_id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0051() => CorpusAssert.Parses(@"SELECT ALL t.id FROM s.t JOIN s.t2 ON t.id = t2.t_id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0052() => CorpusAssert.Parses(@"SELECT s.t.id, s.t2.label FROM s.t JOIN s.t2 ON s.t.id = s.t2.t_id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0053() => CorpusAssert.Parses(@"SELECT t.id FROM s.t JOIN s.t2 ON t.id = t2.t_id JOIN s.parent ON t.id = s.parent.id JOIN s.child ON s.parent.id = s.child.id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0054() => CorpusAssert.Parses(@"SELECT p.id, c.extra FROM s.parent p JOIN s.child c ON p.id = c.id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0055() => CorpusAssert.Parses(@"SELECT t.id, v.name FROM s.t JOIN s.v ON t.id = v.id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0056() => CorpusAssert.Parses(@"SELECT t.id, mv.n FROM s.t JOIN s.mv ON t.status = mv.status", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0057() => CorpusAssert.Parses(@"SELECT e.id, t.name FROM s.events e JOIN s.t ON t.id = e.id", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void selja0058() => CorpusAssert.Parses(@"SELECT * FROM s.t JOIN s.t2 ON t.id = t2.t_id WHERE t.data IS NOT NULL", "ok");
@@ -125,63 +125,63 @@ public class Corpus_SelectJoins
     public void selja0059() => CorpusAssert.Parses(@"SELECT * FROM s.t LEFT JOIN s.t2 ON t.id = t2.t_id WHERE t2.id IS NULL", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void selja0060() => CorpusAssert.Parses(@"SELECT * FROM s.t RIGHT JOIN s.t2 ON t.id = t2.t_id WHERE t.id IS NULL", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0061() => CorpusAssert.Parses(@"SELECT t.id, t2.label FROM s.t AS t JOIN s.t2 AS t2 ON t.id = t2.t_id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0062() => CorpusAssert.Parses(@"SELECT t.id FROM s.t t JOIN s.t2 t2 ON t.id = t2.t_id", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void selja0063() => CorpusAssert.Parses(@"SELECT * FROM s.t JOIN s.t2 USING (id) WHERE t2.amount > 10", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0064() => CorpusAssert.Parses(@"SELECT id FROM s.t JOIN s.t2 USING (id) ORDER BY id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0065() => CorpusAssert.Parses(@"SELECT t.id, t2.t_id FROM s.t FULL OUTER JOIN s.t2 ON t.id = t2.t_id WHERE t.id IS NULL OR t2.t_id IS NULL", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void selja0066() => CorpusAssert.Parses(@"SELECT * FROM s.t, s.t2 WHERE t.id = t2.t_id", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void selja0067() => CorpusAssert.Parses(@"SELECT * FROM s.t, s.t2, s.parent WHERE t.id = t2.t_id AND t.id = s.parent.id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0068() => CorpusAssert.Parses(@"SELECT t.id FROM s.t JOIN s.t2 ON t.id = t2.t_id FOR UPDATE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0069() => CorpusAssert.Parses(@"SELECT t.id FROM s.t JOIN s.t2 ON t.id = t2.t_id FOR SHARE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0070() => CorpusAssert.Parses(@"SELECT t.id FROM s.t JOIN s.t2 ON t.id = t2.t_id FOR UPDATE OF t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0071() => CorpusAssert.Parses(@"SELECT t.id FROM s.t JOIN s.t2 ON t.id = t2.t_id FOR UPDATE SKIP LOCKED", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0072() => CorpusAssert.Parses(@"SELECT t.id FROM s.t JOIN s.t2 ON t.id = t2.t_id FOR UPDATE NOWAIT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0073() => CorpusAssert.Parses(@"WITH cte AS (SELECT id FROM s.t WHERE val > 0) SELECT cte.id, t2.label FROM cte JOIN s.t2 ON cte.id = t2.t_id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0074() => CorpusAssert.Parses(@"SELECT t.id FROM s.t JOIN s.t2 ON t.id = t2.t_id UNION SELECT t.id FROM s.t LEFT JOIN s.t2 ON t.id = t2.t_id WHERE t2.id IS NULL", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0075() => CorpusAssert.Parses(@"SELECT t.id, COALESCE(t2.label, 'none') FROM s.t LEFT JOIN s.t2 ON t.id = t2.t_id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0076() => CorpusAssert.Parses(@"SELECT t.id, CASE WHEN t2.id IS NULL THEN 'no match' ELSE t2.label END FROM s.t LEFT JOIN s.t2 ON t.id = t2.t_id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0077() => CorpusAssert.Parses(@"SELECT t.id, count(*) OVER (PARTITION BY t.status) FROM s.t JOIN s.t2 ON t.id = t2.t_id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0078() => CorpusAssert.Parses(@"SELECT row_number() OVER (ORDER BY t.id), t.id, t2.label FROM s.t JOIN s.t2 ON t.id = t2.t_id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0079() => CorpusAssert.Parses(@"SELECT t.id FROM s.t JOIN s.t2 ON t.id = t2.t_id WHERE t.id IN (SELECT t_id FROM s.t2 WHERE amount > 5)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0080() => CorpusAssert.Parses(@"SELECT t.id FROM s.t WHERE EXISTS (SELECT 1 FROM s.t2 WHERE s.t2.t_id = s.t.id)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0081() => CorpusAssert.Parses(@"SELECT t.id, lat.val FROM s.t CROSS JOIN LATERAL (SELECT t.val * 2 AS val) AS lat", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0082() => CorpusAssert.Parses(@"SELECT t.id, u.n FROM s.t JOIN LATERAL (SELECT count(*) AS n FROM s.t2 WHERE t2.t_id = t.id) u ON true", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0083() => CorpusAssert.Parses(@"SELECT t.id, u.n FROM s.t LEFT JOIN LATERAL (SELECT count(*) AS n FROM s.t2 WHERE t2.t_id = t.id) u ON true", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0084() => CorpusAssert.Parses(@"SELECT t.id FROM s.t JOIN s.t2 ON t.id = t2.t_id WHERE t.name LIKE '%x%'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0085() => CorpusAssert.Parses(@"SELECT t.id FROM s.t JOIN s.t2 ON t.id = t2.t_id WHERE t.status = 'ok'::s.mood", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0086() => CorpusAssert.Parses(@"SELECT t.id, t2.label FROM s.t JOIN s.t2 ON t.id = t2.t_id ORDER BY t.id ASC NULLS FIRST", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0087() => CorpusAssert.Parses(@"SELECT t.id, t2.label FROM s.t JOIN s.t2 ON t.id = t2.t_id ORDER BY t.id DESC NULLS LAST", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0088() => CorpusAssert.Parses(@"SELECT t.id, t2.label FROM s.t JOIN s.t2 ON t.id = t2.t_id ORDER BY 1, 2", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0089() => CorpusAssert.Parses(@"SELECT t.*, t2.label FROM s.t JOIN s.t2 ON t.id = t2.t_id", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void selja0090() => CorpusAssert.Parses(@"SELECT t.id FROM s.t JOIN s.t2 ON t.id = t2.t_id FETCH FIRST 5 ROWS ONLY", "ok");
@@ -191,49 +191,49 @@ public class Corpus_SelectJoins
     public void selja0092() => CorpusAssert.Parses(@"SELECT t.id FROM s.t JOIN s.t2 ON t.id = t2.t_id OFFSET 2 ROWS FETCH NEXT 3 ROWS ONLY", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void selja0093() => CorpusAssert.Parses(@"SELECT t.id FROM s.t JOIN s.t2 ON t.id = t2.t_id ORDER BY t.id FETCH FIRST 5 ROWS WITH TIES", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0094() => CorpusAssert.Parses(@"SELECT t.id, t2.label FROM s.t JOIN s.t2 ON t.id = t2.t_id WHERE t.val BETWEEN 1 AND 100", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0095() => CorpusAssert.Parses(@"SELECT t.id FROM s.t JOIN s.t2 ON t.id = t2.t_id WHERE t.tags && ARRAY['a','b']", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0096() => CorpusAssert.Parses(@"SELECT t.id, t2.amount FROM s.t JOIN s.t2 ON t.id = t2.t_id WHERE t.data @> '{""key"":1}'::jsonb", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0097() => CorpusAssert.Parses(@"SELECT a.id FROM s.t AS a JOIN s.t AS b ON a.name = b.name AND a.id <> b.id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0098() => CorpusAssert.Parses(@"SELECT a.id, b.id AS b_id FROM s.t a JOIN s.t b ON a.id < b.id", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void selja0099() => CorpusAssert.Parses(@"SELECT * FROM s.t JOIN s.t2 ON t.id = t2.t_id WHERE t.qty > 0 AND t2.amount != 0", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0100() => CorpusAssert.Parses(@"SELECT t.id, string_agg(t2.label, ',') FROM s.t LEFT JOIN s.t2 ON t.id = t2.t_id GROUP BY t.id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0101() => CorpusAssert.Parses(@"SELECT t.id FROM s.t JOIN s.t2 ON t.id = t2.t_id WHERE t.created_at > '2020-01-01'::timestamptz", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0102() => CorpusAssert.Parses(@"SELECT t.id, t2.label FROM s.t TABLESAMPLE BERNOULLI(50) JOIN s.t2 ON t.id = t2.t_id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0103() => CorpusAssert.Parses(@"SELECT p.id FROM ONLY s.parent AS p JOIN s.child ON p.id = s.child.id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0104() => CorpusAssert.Parses(@"SELECT t.id, sub.total FROM s.t JOIN (SELECT t_id, sum(amount) AS total FROM s.t2 GROUP BY t_id HAVING sum(amount) > 0) AS sub ON t.id = sub.t_id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0105() => CorpusAssert.Parses(@"SELECT t.id FROM s.t JOIN s.t2 ON t.id = t2.t_id WHERE NOT t.flag", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0106() => CorpusAssert.Parses(@"SELECT t.id, t.name FROM s.t JOIN s.t2 ON t.id = t2.t_id WHERE t.id = ANY(ARRAY[1,2,3]::bigint[])", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0107() => CorpusAssert.Parses(@"SELECT t.id FROM s.t JOIN s.t2 ON t.id = t2.t_id WHERE t.id = ALL(ARRAY[1]::bigint[])", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void selja0108() => CorpusAssert.Parses(@"SELECT t.id, t2.label FROM s.t JOIN s.t2 ON t.id = t2.t_id WHERE t.span @> 5::int4range", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0109() => CorpusAssert.Parses(@"SELECT t.id, t2.label FROM s.t JOIN s.t2 ON t.id = t2.t_id WHERE t.span @> int4range(1, 10)", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void selja0110() => CorpusAssert.Parses(@"SELECT t.id FROM s.t JOIN s.t2 ON t.id = t2.t_id WHERE (t.home).city = 'NYC'", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void selja0111() => CorpusAssert.Parses(@"SELECT (t.home).street, t2.label FROM s.t JOIN s.t2 ON t.id = t2.t_id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0112() => CorpusAssert.Parses(@"SELECT t.id FROM s.t JOIN s.t2 ON t.id = t2.t_id WHERE t.val::integer > 10", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0113() => CorpusAssert.Parses(@"SELECT t.id FROM s.t JOIN s.t2 ON t.id = t2.t_id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0114() => CorpusAssert.Parses(@"SELECT t.id, t2.label FROM s.t LEFT JOIN s.t2 ON true", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0115() => CorpusAssert.Parses(@"SELECT t.id, t2.label FROM s.t JOIN s.t2 ON false", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void selja0116() => CorpusAssert.Parses(@"SELECT * FROM (SELECT id, name FROM s.t) AS sub1 JOIN (SELECT t_id, label FROM s.t2) AS sub2 ON sub1.id = sub2.t_id", "ok");
@@ -241,25 +241,25 @@ public class Corpus_SelectJoins
     public void selja0117() => CorpusAssert.Parses(@"SELECT * FROM (SELECT id FROM s.t) AS sub1 CROSS JOIN (SELECT label FROM s.t2) AS sub2", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void selja0118() => CorpusAssert.Parses(@"SELECT * FROM (SELECT id FROM s.t) AS sub1 LEFT JOIN (SELECT t_id, label FROM s.t2) AS sub2 ON sub1.id = sub2.t_id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0119() => CorpusAssert.Parses(@"SELECT t.id FROM s.t JOIN s.t2 ON t.id = t2.t_id WHERE t.id BETWEEN SYMMETRIC 5 AND 1", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0120() => CorpusAssert.Parses(@"SELECT t.id, t2.label FROM s.t JOIN s.t2 ON t.id = t2.t_id WHERE t.name IS DISTINCT FROM t2.label", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0121() => CorpusAssert.Parses(@"SELECT t.id FROM s.t JOIN s.t2 ON t.id = t2.t_id WHERE t.name IS NOT DISTINCT FROM t2.label", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0122() => CorpusAssert.Parses(@"SELECT t.id FROM s.t JOIN LATERAL unnest(t.tags) AS tag ON true", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0123() => CorpusAssert.Parses(@"SELECT t.id, tag FROM s.t LEFT JOIN LATERAL unnest(t.tags) AS tag ON true", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0124() => CorpusAssert.Parses(@"SELECT t.id FROM s.t JOIN s.t2 ON t.id = t2.t_id WHERE t.id NOT IN (1, 2, 3)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0125() => CorpusAssert.Parses(@"SELECT t.id FROM s.t JOIN s.t2 ON t.id = t2.t_id WHERE t.name SIMILAR TO '%x%'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0126() => CorpusAssert.Parses(@"SELECT t.id FROM s.t JOIN s.t2 ON t.id = t2.t_id WHERE t.name ~ '^a'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0127() => CorpusAssert.Parses(@"SELECT t.id FROM s.t JOIN s.t2 ON t.id = t2.t_id WHERE t.name !~ '^a'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0128() => CorpusAssert.Parses(@"SELECT t.id FROM s.t JOIN s.t2 ON t.id = t2.t_id WHERE t.name ~* '^a'", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void selja0129() => CorpusAssert.Parses(@"SELECT * FROM s.t JOIN s.t2 ON t.id = t2.t_id WHERE t.created_at AT TIME ZONE 'UTC' > '2020-01-01'", "ok");
@@ -267,29 +267,29 @@ public class Corpus_SelectJoins
     public void selja0130() => CorpusAssert.Parses(@"SELECT * FROM s.t JOIN s.t2 USING (id) NATURAL JOIN s.parent", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void selja0131() => CorpusAssert.Parses(@"SELECT t.id FROM s.t JOIN s.t2", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0132() => CorpusAssert.Parses(@"SELECT t.id FROM s.t JOIN ON t.id = t2.t_id", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0133() => CorpusAssert.Parses(@"SELECT t.id FROM s.t JOIN s.t2 USING id", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0134() => CorpusAssert.Parses(@"SELECT t.id FROM s.t JOIN s.t2 USING (t.id)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0135() => CorpusAssert.Parses(@"SELECT t.id FROM s.t JOIN s.t2 ON", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0136() => CorpusAssert.Parses(@"SELECT t.id FROM s.t CROSS JOIN s.t2 ON t.id = t2.t_id", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0137() => CorpusAssert.Parses(@"SELECT t.id FROM s.t CROSS JOIN s.t2 USING (id)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0138() => CorpusAssert.Parses(@"SELECT t.id FROM s.t NATURAL JOIN s.t2 ON t.id = t2.t_id", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0139() => CorpusAssert.Parses(@"SELECT t.id FROM s.t NATURAL JOIN s.t2 USING (id)", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void selja0140() => CorpusAssert.Parses(@"SELECT t.id FROM s.t INNER JOIN s.t2", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0141() => CorpusAssert.Parses(@"SELECT * FROM JOIN s.t2 ON true", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0142() => CorpusAssert.Parses(@"SELECT t.id FROM s.t LEFT s.t2 ON t.id = t2.t_id", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0143() => CorpusAssert.Parses(@"SELECT t.id FROM s.t JOIN s.t2 ON t.id = t2.t_id ON t.id = t2.t_id", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void selja0144() => CorpusAssert.Parses(@"SELECT t.id FROM s.t JOIN s.t2 USING (nonexistent_col)", "error");
@@ -299,75 +299,75 @@ public class Corpus_SelectJoins
     public void selja0146() => CorpusAssert.Parses(@"SELECT t.id FROM s.t JOIN s.t2 ON t.id = t2.nonexistent_col", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void selja0147() => CorpusAssert.Parses(@"SELECT t.id FROM s.t LATERAL JOIN s.t2 ON t.id = t2.t_id", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0148() => CorpusAssert.Parses(@"SELECT t.id FROM s.t JOIN LATERAL (SELECT id, t_id FROM s.t2) AS sub ON t.id = sub.t_id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0149() => CorpusAssert.Parses(@"SELECT * FROM s.t FULL s.t2 ON t.id = t2.t_id", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0150() => CorpusAssert.Parses(@"SELECT t.id FROM s.t, LATERAL (SELECT 1 AS x WHERE t.val > 0) lat", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void selja0151() => CorpusAssert.Parses(@"SELECT t.id FROM s.t JOIN (SELECT * FROM s.t2 WHERE amount > 0) AS sub ON t.id = sub.t_id WHERE sub.label IS NOT NULL", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0152() => CorpusAssert.Parses(@"SELECT t.id FROM s.t JOIN s.t2 ON t.id = t2.t_id INTERSECT SELECT t.id FROM s.t JOIN s.parent ON t.id = s.parent.id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0153() => CorpusAssert.Parses(@"SELECT t.id FROM s.t JOIN s.t2 ON t.id = t2.t_id EXCEPT SELECT t.id FROM s.t JOIN s.parent ON t.id = s.parent.id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0154() => CorpusAssert.Parses(@"SELECT t.id FROM s.t INNER JOIN s.t2 ON t.id = t2.t_id INNER JOIN s.parent ON t.id = s.parent.id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0155() => CorpusAssert.Parses(@"SELECT t1.id FROM s.t t1 JOIN s.t t2 ON t1.name = t2.name JOIN s.t t3 ON t2.val = t3.val", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0156() => CorpusAssert.Parses(@"SELECT t.id FROM s.t WHERE t.id IN (SELECT t_id FROM s.t2 JOIN s.parent ON s.t2.id = s.parent.id)", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void selja0157() => CorpusAssert.Parses(@"SELECT combined.id FROM (s.t CROSS JOIN s.t2) AS combined (id)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0158() => CorpusAssert.Parses(@"SELECT t.id FROM s.t JOIN s.t2 ON t.id = t2.t_id WHERE t.qty > 0 ORDER BY t.id LIMIT 10 OFFSET 0", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0159() => CorpusAssert.Parses(@"SELECT t.id, t2.label FROM s.t LEFT JOIN s.t2 ON t.id = t2.t_id WHERE t.id > 0 GROUP BY t.id, t2.label ORDER BY t.id LIMIT 5", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0160() => CorpusAssert.Parses(@"SELECT t.id FROM s.t JOIN s.t2 ON t.id = t2.t_id AND t.qty > 0 AND t2.amount > 0 WHERE t.flag", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0161() => CorpusAssert.Parses(@"SELECT t.id, t2.label FROM s.t JOIN s.t2 ON t.id = t2.t_id WHERE t.name IN ('a', 'b', 'c')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0162() => CorpusAssert.Parses(@"SELECT t.id FROM s.t JOIN s.t2 ON t.id = t2.t_id WHERE t.id = (SELECT max(id) FROM s.t)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0163() => CorpusAssert.Parses(@"SELECT t.id, coalesce(agg.total, 0) AS total FROM s.t LEFT JOIN LATERAL (SELECT sum(amount) AS total FROM s.t2 WHERE t2.t_id = t.id) AS agg ON true", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0164() => CorpusAssert.Parses(@"SELECT t.id FROM s.t JOIN s.t2 ON t.id = t2.t_id WHERE t.data IS NOT NULL AND t.data ? 'key'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0165() => CorpusAssert.Parses(@"SELECT t.id FROM s.t JOIN s.t2 ON t.id = t2.t_id WHERE t.data #>> '{a,b}' = 'val'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0166() => CorpusAssert.Parses(@"SELECT count(*) FROM s.t JOIN s.t2 ON t.id = t2.t_id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0167() => CorpusAssert.Parses(@"SELECT t.id FROM s.t JOIN s.t2 ON t.id = t2.t_id WHERE t.span && int4range(1, 10)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0168() => CorpusAssert.Parses(@"SELECT t.id FROM s.t JOIN s.t2 ON t.id = t2.t_id WHERE t.val IS NOT NULL ORDER BY t.val DESC NULLS LAST LIMIT 20", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void selja0169() => CorpusAssert.Parses(@"SELECT RIGHT FROM s.t JOIN s.t2 ON t.id = t2.t_id", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0170() => CorpusAssert.Parses(@"SELECT t.id FROM s.t JOIN s.t2 ON t.id = t2.t_id WHERE t.id BETWEEN 1 AND 100 AND t2.amount > 0 GROUP BY t.id HAVING t.id > 0 ORDER BY t.id LIMIT 100 OFFSET 0", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljb0001() => CorpusAssert.Parses(@"SELECT t.id, t2.label FROM s.t JOIN s.t2 ON t.id = t2.t_id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljb0002() => CorpusAssert.Parses(@"SELECT t.id, t2.label FROM s.t INNER JOIN s.t2 ON t.id = t2.t_id", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void seljb0003() => CorpusAssert.Parses(@"SELECT * FROM s.t JOIN s.t2 USING (id)", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void seljb0004() => CorpusAssert.Parses(@"SELECT * FROM s.t INNER JOIN s.t2 USING (id)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljb0005() => CorpusAssert.Parses(@"SELECT t.id, t2.label FROM s.t LEFT JOIN s.t2 ON t.id = t2.t_id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljb0006() => CorpusAssert.Parses(@"SELECT t.id, t2.label FROM s.t LEFT OUTER JOIN s.t2 ON t.id = t2.t_id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljb0007() => CorpusAssert.Parses(@"SELECT t.id, t2.label FROM s.t RIGHT JOIN s.t2 ON t.id = t2.t_id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljb0008() => CorpusAssert.Parses(@"SELECT t.id, t2.label FROM s.t RIGHT OUTER JOIN s.t2 ON t.id = t2.t_id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljb0009() => CorpusAssert.Parses(@"SELECT t.id, t2.label FROM s.t FULL JOIN s.t2 ON t.id = t2.t_id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljb0010() => CorpusAssert.Parses(@"SELECT t.id, t2.label FROM s.t FULL OUTER JOIN s.t2 ON t.id = t2.t_id", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void seljb0011() => CorpusAssert.Parses(@"SELECT * FROM s.t CROSS JOIN s.t2", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljb0012() => CorpusAssert.Parses(@"SELECT t.name, t2.label FROM s.t, s.t2 WHERE t.id = t2.t_id", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void seljb0013() => CorpusAssert.Parses(@"SELECT * FROM s.t NATURAL JOIN s.t2", "ok");
@@ -383,11 +383,11 @@ public class Corpus_SelectJoins
     public void seljb0018() => CorpusAssert.Parses(@"SELECT * FROM s.t NATURAL LEFT OUTER JOIN s.t2", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void seljb0019() => CorpusAssert.Parses(@"SELECT * FROM s.t NATURAL FULL OUTER JOIN s.t2", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljb0020() => CorpusAssert.Parses(@"SELECT a.id, b.id FROM s.t AS a JOIN s.t AS b ON a.id <> b.id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljb0021() => CorpusAssert.Parses(@"SELECT a.name, b.name FROM s.t a JOIN s.t b ON a.id < b.id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljb0022() => CorpusAssert.Parses(@"SELECT t.id, t2.label, p.kind FROM s.t JOIN s.t2 ON t.id = t2.t_id JOIN s.parent p ON t.id = p.id", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void seljb0023() => CorpusAssert.Parses(@"SELECT * FROM s.t JOIN s.t2 ON t.id = t2.t_id LEFT JOIN s.parent ON t.id = s.parent.id", "ok");
@@ -399,17 +399,17 @@ public class Corpus_SelectJoins
     public void seljb0026() => CorpusAssert.Parses(@"SELECT * FROM s.t LEFT JOIN (SELECT t_id, count(*) AS cnt FROM s.t2 GROUP BY t_id) AS agg ON s.t.id = agg.t_id", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void seljb0027() => CorpusAssert.Parses(@"SELECT * FROM s.t JOIN (SELECT * FROM s.t2 WHERE amount > 0) sq ON s.t.id = sq.t_id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljb0028() => CorpusAssert.Parses(@"SELECT t.id, sub.label FROM s.t, LATERAL (SELECT label FROM s.t2 WHERE s.t2.t_id = s.t.id LIMIT 1) AS sub", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljb0029() => CorpusAssert.Parses(@"SELECT t.id, sub.label FROM s.t JOIN LATERAL (SELECT label FROM s.t2 WHERE s.t2.t_id = s.t.id LIMIT 1) AS sub ON true", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljb0030() => CorpusAssert.Parses(@"SELECT t.id, sub.label FROM s.t LEFT JOIN LATERAL (SELECT label FROM s.t2 WHERE s.t2.t_id = s.t.id LIMIT 1) AS sub ON true", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljb0031() => CorpusAssert.Parses(@"SELECT t.id, r.* FROM s.t JOIN LATERAL s.rows_f() AS r ON true", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljb0032() => CorpusAssert.Parses(@"SELECT t.id, r.* FROM s.t LEFT JOIN LATERAL s.rows_f() AS r ON true", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljb0033() => CorpusAssert.Parses(@"SELECT t.id, r.* FROM s.t, LATERAL s.rows_f() AS r", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void seljb0034() => CorpusAssert.Parses(@"SELECT * FROM (s.t JOIN s.t2 ON s.t.id = s.t2.t_id)", "ok");
@@ -417,59 +417,59 @@ public class Corpus_SelectJoins
     public void seljb0035() => CorpusAssert.Parses(@"SELECT * FROM (s.t LEFT JOIN s.t2 ON s.t.id = s.t2.t_id) AS pj", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void seljb0036() => CorpusAssert.Parses(@"SELECT * FROM (s.t CROSS JOIN s.t2) AS cross_result", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljb0037() => CorpusAssert.Parses(@"SELECT t.id FROM s.t JOIN s.t2 ON t.id = t2.t_id WHERE t.id > 0", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljb0038() => CorpusAssert.Parses(@"SELECT t.id, count(*) FROM s.t JOIN s.t2 ON t.id = t2.t_id GROUP BY t.id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljb0039() => CorpusAssert.Parses(@"SELECT t.id, count(*) FROM s.t JOIN s.t2 ON t.id = t2.t_id GROUP BY t.id HAVING count(*) > 0", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljb0040() => CorpusAssert.Parses(@"SELECT t.id, t2.label FROM s.t JOIN s.t2 ON t.id = t2.t_id ORDER BY t.id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljb0041() => CorpusAssert.Parses(@"SELECT t.id, t2.label FROM s.t JOIN s.t2 ON t.id = t2.t_id LIMIT 10", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljb0042() => CorpusAssert.Parses(@"SELECT t.id, t2.label FROM s.t JOIN s.t2 ON t.id = t2.t_id LIMIT 10 OFFSET 5", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljb0043() => CorpusAssert.Parses(@"SELECT DISTINCT t.id FROM s.t JOIN s.t2 ON t.id = t2.t_id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljb0044() => CorpusAssert.Parses(@"SELECT t.id FROM s.t JOIN s.t2 ON t.id = t2.t_id AND t2.amount > 0", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljb0045() => CorpusAssert.Parses(@"SELECT t.id FROM s.t JOIN s.t2 ON t.id = t2.t_id AND t.val IS NOT NULL AND t2.label IS NOT NULL", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljb0046() => CorpusAssert.Parses(@"SELECT t.id FROM s.t JOIN s.t2 ON t.id = t2.t_id OR t.id = 0", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljb0047() => CorpusAssert.Parses(@"SELECT * FROM s.t USING (id)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljb0048() => CorpusAssert.Parses(@"SELECT * FROM s.t JOIN s.t2", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljb0049() => CorpusAssert.Parses(@"SELECT * FROM s.t INNER JOIN s.t2", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljb0050() => CorpusAssert.Parses(@"SELECT * FROM s.t LEFT JOIN s.t2", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljb0051() => CorpusAssert.Parses(@"SELECT * FROM s.t RIGHT JOIN s.t2", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljb0052() => CorpusAssert.Parses(@"SELECT * FROM s.t FULL JOIN s.t2", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljb0053() => CorpusAssert.Parses(@"SELECT * FROM s.t JOIN s.t2 USING id", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljb0054() => CorpusAssert.Parses(@"SELECT * FROM s.t CROSS JOIN s.t2 ON true", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljb0055() => CorpusAssert.Parses(@"SELECT * FROM s.t NATURAL JOIN s.t2 ON true", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljb0056() => CorpusAssert.Parses(@"SELECT * FROM s.t NATURAL JOIN s.t2 USING (id)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljb0057() => CorpusAssert.Parses(@"SELECT * FROM JOIN s.t2 ON true", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljb0058() => CorpusAssert.Parses(@"SELECT * FROM s.t OUTER JOIN s.t2 ON s.t.id = s.t2.t_id", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljb0059() => CorpusAssert.Parses(@"SELECT * FROM s.t JOIN ON s.t.id = s.t2.t_id", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljb0060() => CorpusAssert.Parses(@"SELECT * FROM s.t JOIN s.t2 ON", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljb0061() => CorpusAssert.Parses(@"SELECT t.id FROM s.t JOIN s.t2 ON t.id = t2.t_id JOIN s.parent ON t.id = s.parent.id LEFT JOIN s.child ON s.parent.id = s.child.id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljb0062() => CorpusAssert.Parses(@"SELECT a.id, b.id, c.id FROM s.t a, s.t b, s.t c WHERE a.id < b.id AND b.id < c.id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljb0063() => CorpusAssert.Parses(@"SELECT * FROM s.t JOIN s.t2 USING (id, id)", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void seljb0064() => CorpusAssert.Parses(@"SELECT * FROM s.parent JOIN s.child ON s.parent.id = s.child.id", "ok");
@@ -477,11 +477,11 @@ public class Corpus_SelectJoins
     public void seljb0065() => CorpusAssert.Parses(@"SELECT * FROM s.t LEFT JOIN s.t2 ON s.t.id = s.t2.t_id WHERE s.t2.id IS NULL", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void seljb0066() => CorpusAssert.Parses(@"SELECT * FROM s.t RIGHT JOIN s.t2 ON s.t.id = s.t2.t_id WHERE s.t.id IS NULL", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljb0067() => CorpusAssert.Parses(@"SELECT coalesce(a.id, b.id) AS id FROM s.t a FULL JOIN s.t2 b ON a.id = b.t_id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljb0068() => CorpusAssert.Parses(@"SELECT t.name, v.name FROM s.t JOIN s.v ON s.t.id = s.v.id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljb0069() => CorpusAssert.Parses(@"SELECT t.name FROM s.t JOIN s.mv ON s.t.status = s.mv.status", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void seljb0070() => CorpusAssert.Parses(@"SELECT * FROM s.t JOIN s.t2 ON s.t.id = s.t2.t_id FOR UPDATE", "ok");
@@ -493,25 +493,25 @@ public class Corpus_SelectJoins
     public void seljb0073() => CorpusAssert.Parses(@"SELECT * FROM s.t JOIN s.t2 ON s.t.id = s.t2.t_id FOR UPDATE NOWAIT", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void seljb0074() => CorpusAssert.Parses(@"SELECT * FROM s.t JOIN s.t2 ON s.t.id = s.t2.t_id FOR UPDATE SKIP LOCKED", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljb0075() => CorpusAssert.Parses(@"SELECT t.id FROM s.t WHERE EXISTS (SELECT 1 FROM s.t2 WHERE s.t2.t_id = s.t.id)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljb0076() => CorpusAssert.Parses(@"SELECT t.id FROM s.t WHERE t.id IN (SELECT t_id FROM s.t2)", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void seljb0077() => CorpusAssert.Parses(@"SELECT * FROM s.t JOIN s.t2 ON s.t.id = s.t2.t_id WHERE s.t.name LIKE '%a%'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljb0078() => CorpusAssert.Parses(@"SELECT t.id, t.name FROM s.t JOIN s.t2 ON t.id = t2.t_id ORDER BY t.name DESC NULLS LAST", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljb0079() => CorpusAssert.Parses(@"SELECT t.id FROM s.t JOIN s.t2 ON t.id = t2.t_id UNION SELECT t.id FROM s.t LEFT JOIN s.t2 ON t.id = t2.t_id WHERE t2.id IS NULL", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljb0080() => CorpusAssert.Parses(@"SELECT t.id FROM s.t JOIN s.t2 ON t.id = t2.t_id INTERSECT SELECT t.id FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljb0081() => CorpusAssert.Parses(@"SELECT t.id FROM s.t EXCEPT SELECT t.id FROM s.t JOIN s.t2 ON t.id = t2.t_id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljb0082() => CorpusAssert.Parses(@"WITH cte AS (SELECT id, t_id FROM s.t2) SELECT t.id FROM s.t JOIN cte ON t.id = cte.t_id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljb0083() => CorpusAssert.Parses(@"WITH RECURSIVE cte(id) AS (SELECT 1 UNION ALL SELECT id+1 FROM cte WHERE id < 5) SELECT t.id FROM s.t JOIN cte ON s.t.id = cte.id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljb0084() => CorpusAssert.Parses(@"SELECT t.id FROM s.t JOIN s.t2 ON t.id = t2.t_id WHERE t.id BETWEEN 1 AND 100", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void seljb0085() => CorpusAssert.Parses(@"SELECT * FROM s.t t1 JOIN s.t t2 USING (val)", "ok");
@@ -519,9 +519,9 @@ public class Corpus_SelectJoins
     public void seljb0086() => CorpusAssert.Parses(@"SELECT * FROM s.t t1 JOIN s.t t2 USING (status)", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void seljb0087() => CorpusAssert.Parses(@"SELECT * FROM s.t JOIN s.t2 ON s.t.id = s.t2.t_id JOIN s.parent ON s.t.id = s.parent.id WHERE s.parent.kind = 'A'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljb0088() => CorpusAssert.Parses(@"SELECT sub.id, s.t.name FROM (SELECT id FROM s.t2 WHERE amount > 0) AS sub JOIN s.t ON sub.id = s.t.id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljb0089() => CorpusAssert.Parses(@"SELECT a.id FROM s.t a JOIN s.t b ON a.id = b.id WHERE a.id = b.id", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void seljb0090() => CorpusAssert.Parses(@"SELECT * FROM s.t JOIN s.t2 ON s.t.id = s.t2.t_id FETCH FIRST 5 ROWS ONLY", "ok");
@@ -529,67 +529,67 @@ public class Corpus_SelectJoins
     public void seljb0091() => CorpusAssert.Parses(@"SELECT * FROM s.t JOIN s.t2 ON s.t.id = s.t2.t_id FETCH FIRST 1 ROW ONLY", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void seljb0092() => CorpusAssert.Parses(@"SELECT * FROM s.t JOIN s.t2 ON s.t.id = s.t2.t_id OFFSET 0 ROWS FETCH NEXT 10 ROWS ONLY", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljb0093() => CorpusAssert.Parses(@"SELECT t.id, sum(t2.amount) FROM s.t JOIN s.t2 ON t.id = t2.t_id GROUP BY t.id ORDER BY sum(t2.amount) DESC", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljb0094() => CorpusAssert.Parses(@"SELECT t.id, row_number() OVER (PARTITION BY t.status ORDER BY t.id) FROM s.t JOIN s.t2 ON t.id = t2.t_id", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void seljb0095() => CorpusAssert.Parses(@"SELECT * FROM s.t AS t(tid, tname, tval, tqty, tflag, ttags, tdata, thome, tstatus, tspan, tcreated) JOIN s.t2 ON tid = s.t2.t_id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljb0096() => CorpusAssert.Parses(@"SELECT t.id FROM s.t JOIN s.t2 ON t.id = t2.t_id AND t2.label IS NOT NULL AND t2.amount != 0", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void seljb0097() => CorpusAssert.Parses(@"SELECT * FROM LATERAL (SELECT 1 AS x) AS lat1 JOIN LATERAL (SELECT 2 AS y) AS lat2 ON true", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljb0098() => CorpusAssert.Parses(@"SELECT t.id FROM s.t JOIN s.t2 ON t.id = t2.t_id AND (t.val > 0 OR t2.amount > 0)", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void seljb0099() => CorpusAssert.Parses(@"SELECT * FROM s.t JOIN s.t2 ON (s.t.id = s.t2.t_id)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljb0100() => CorpusAssert.Parses(@"SELECT count(*) FROM s.t CROSS JOIN s.t2", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljb0101() => CorpusAssert.Parses(@"SELECT t.id FROM s.t JOIN s.t2 ON t.id = t2.t_id JOIN s.t2 t2b ON t.id = t2b.t_id", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void seljb0102() => CorpusAssert.Parses(@"SELECT * FROM s.t LEFT JOIN s.t2 ON false", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void seljb0103() => CorpusAssert.Parses(@"SELECT * FROM s.t JOIN s.t2 ON true", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljb0104() => CorpusAssert.Parses(@"SELECT t.id FROM s.t JOIN s.t2 ON t.id = t2.t_id WHERE t.flag = true", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljb0105() => CorpusAssert.Parses(@"SELECT t.name FROM s.t JOIN s.t2 ON t.id = t2.t_id WHERE t.status = 'ok'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljb0106() => CorpusAssert.Parses(@"SELECT t.name FROM s.t JOIN s.t2 ON t.id = t2.t_id WHERE t.tags @> ARRAY['a']", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljb0107() => CorpusAssert.Parses(@"SELECT t.name FROM s.t JOIN s.t2 ON t.id = t2.t_id WHERE t.data @> '{""key"":""val""}'::jsonb", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljb0108() => CorpusAssert.Parses(@"SELECT t.id FROM s.t NATURAL INNER JOIN s.t2", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void seljb0109() => CorpusAssert.Parses(@"SELECT * FROM s.t NATURAL RIGHT OUTER JOIN s.t2", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void seljb0110() => CorpusAssert.Parses(@"SELECT * FROM s.t JOIN s.t2 ON s.t.id = s.t2.t_id JOIN s.parent p ON s.t.id = p.id WHERE p.kind IS NOT NULL ORDER BY p.id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljb0111() => CorpusAssert.Parses(@"SELECT t.id, t2.label FROM s.t JOIN s.t2 ON t.id = t2.t_id WHERE t.created_at > '2020-01-01'", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void seljb0112() => CorpusAssert.Parses(@"SELECT * FROM s.t t1 JOIN s.t t2 ON t1.id + 1 = t2.id", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void seljb0113() => CorpusAssert.Parses(@"SELECT * FROM s.t JOIN s.t2 ON s.t.id = s.t2.t_id WHERE s.t.id IN (1,2,3)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljb0114() => CorpusAssert.Parses(@"SELECT t.*, t2.label FROM s.t JOIN s.t2 ON t.id = t2.t_id", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void seljb0115() => CorpusAssert.Parses(@"SELECT * FROM s.t JOIN s.t2 ON s.t.id = s.t2.t_id WHERE NOT s.t.flag", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljb0116() => CorpusAssert.Parses(@"SELECT t.id FROM s.t CROSS JOIN LATERAL (SELECT generate_series(1,3) AS n) gs", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljb0117() => CorpusAssert.Parses(@"SELECT t.id, f.x FROM s.t JOIN LATERAL (SELECT s.f(t.id::integer) AS x) AS f ON true", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljb0118() => CorpusAssert.Parses(@"SELECT t.id FROM s.t JOIN s.t2 ON t.id = t2.t_id GROUP BY t.id, t.name HAVING sum(t2.amount) > 100", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void seljb0119() => CorpusAssert.Parses(@"SELECT * FROM (SELECT id FROM s.t) t1 JOIN (SELECT t_id FROM s.t2) t2 ON t1.id = t2.t_id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljb0120() => CorpusAssert.Parses(@"SELECT t.id FROM s.t LEFT JOIN s.t2 ON t.id = t2.t_id AND t2.amount > 10 WHERE t.id < 1000", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljb0121() => CorpusAssert.Parses(@"SELECT t.name FROM s.t JOIN s.t2 ON t.id = t2.t_id WHERE t.span && int4range(1,10)", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void seljb0122() => CorpusAssert.Parses(@"SELECT (t.home).city FROM s.t JOIN s.t2 ON t.id = t2.t_id WHERE (t.home).zip IS NOT NULL", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljb0123() => CorpusAssert.Parses(@"SELECT t.id FROM s.t JOIN s.t2 ON t.id = t2.t_id JOIN s.t2 AS t2c ON t.id = t2c.t_id AND t2c.label <> t2.label", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void seljb0124() => CorpusAssert.Parses(@"SELECT * FROM s.events JOIN s.events_2024 ON s.events.id = s.events_2024.id", "ok");
@@ -597,39 +597,39 @@ public class Corpus_SelectJoins
     public void seljb0125() => CorpusAssert.Parses(@"SELECT * FROM s.t JOIN s.t2 ON s.t.id = s.t2.t_id WHERE s.t.val IS DISTINCT FROM NULL", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void seljb0126() => CorpusAssert.Parses(@"SELECT * FROM s.t JOIN s.t2 ON s.t.id = s.t2.t_id WHERE s.t.val IS NOT DISTINCT FROM s.t2.amount", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljb0127() => CorpusAssert.Parses(@"SELECT * FROM s.t JOIN s.t2 USING ()", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljb0128() => CorpusAssert.Parses(@"SELECT * FROM s.t CROSS JOIN", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljb0129() => CorpusAssert.Parses(@"SELECT * FROM s.t NATURAL CROSS JOIN s.t2", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljb0130() => CorpusAssert.Parses(@"SELECT * FROM s.t JOIN s.t2 ON s.t.id = s.t2.t_id ON s.t.id = s.t2.t_id", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljb0131() => CorpusAssert.Parses(@"SELECT * FROM s.t JOIN s.t2 USING (id) ON s.t.id = s.t2.t_id", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljb0132() => CorpusAssert.Parses(@"SELECT * FROM s.t LATERAL JOIN s.t2 ON s.t.id = s.t2.t_id", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljb0133() => CorpusAssert.Parses(@"SELECT * FROM LATERAL s.t JOIN s.t2 ON s.t.id = s.t2.t_id", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljb0134() => CorpusAssert.Parses(@"SELECT * FROM s.t JOIN s.t2 ON s.t.nosuchcol = s.t2.t_id", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void seljb0135() => CorpusAssert.Parses(@"SELECT * FROM s.t NATURAL JOIN s.t2 NATURAL JOIN s.parent", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljb0136() => CorpusAssert.Parses(@"SELECT t.id FROM s.t JOIN s.t2 ON t.id = t2.t_id WHERE s.g(t.id::integer, t2.id::integer) > 0", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljb0137() => CorpusAssert.Parses(@"SELECT t.id FROM s.t JOIN s.t2 ON t.id = t2.t_id ORDER BY t.id NULLS FIRST", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljb0138() => CorpusAssert.Parses(@"SELECT t.id FROM s.t JOIN s.t2 ON t.id = t2.t_id ORDER BY t.id ASC, t2.label DESC", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void seljb0139() => CorpusAssert.Parses(@"SELECT * FROM s.t, s.t2 WHERE s.t.id = s.t2.t_id AND s.t2.label = 'x'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljb0140() => CorpusAssert.Parses(@"SELECT t.id FROM s.t JOIN s.t2 ON t.id = t2.t_id WHERE t.qty BETWEEN 0 AND 100 ORDER BY t.qty", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljb0141() => CorpusAssert.Parses(@"SELECT * FROM s.t JOIN s.nosuchschema.nosuch ON true", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljb0142() => CorpusAssert.Parses(@"SELECT id FROM s.t JOIN s.t2 USING (id)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljb0143() => CorpusAssert.Parses(@"SELECT t.id, t2.t_id FROM s.t JOIN s.t2 USING (id)", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void seljb0144() => CorpusAssert.Parses(@"SELECT * FROM s.t JOIN s.t2 ON s.t.id = s.t2.t_id CROSS JOIN s.parent", "ok");
@@ -639,9 +639,9 @@ public class Corpus_SelectJoins
     public void seljb0146() => CorpusAssert.Parses(@"SELECT * FROM s.t JOIN (s.t2 JOIN s.parent ON s.t2.id = s.parent.id) ON s.t.id = s.t2.t_id", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void seljb0147() => CorpusAssert.Parses(@"SELECT * FROM s.t JOIN s.t2 ON s.t.id = s.t2.t_id WHERE s.t.name ~* 'test'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljb0148() => CorpusAssert.Parses(@"SELECT t.id FROM s.t LEFT JOIN LATERAL (SELECT max(amount) AS ma FROM s.t2 WHERE t2.t_id = t.id) lq ON true", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljb0149() => CorpusAssert.Parses(@"SELECT t.id, lq.ma FROM s.t LEFT JOIN LATERAL (SELECT max(amount) AS ma FROM s.t2 WHERE t2.t_id = t.id GROUP BY t_id) lq ON true", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void seljb0150() => CorpusAssert.Parses(@"SELECT * FROM s.t JOIN s.t2 ON s.t.id = s.t2.t_id WHERE s.t.id = ANY(ARRAY[1,2,3])", "ok");
@@ -657,17 +657,17 @@ public class Corpus_SelectJoins
     public void seljb0155() => CorpusAssert.Parses(@"SELECT * FROM s.t JOIN s.t2 ON s.t.id = s.t2.t_id WHERE s.t.data ->> 'k' = 'v'", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void seljb0156() => CorpusAssert.Parses(@"SELECT * FROM s.t, LATERAL (VALUES (1,'a'),(2,'b')) AS v(n, lbl)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljb0157() => CorpusAssert.Parses(@"SELECT t.id FROM s.t JOIN (VALUES (1::bigint),(2::bigint)) AS v(vid) ON t.id = v.vid", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void seljb0158() => CorpusAssert.Parses(@"SELECT * FROM s.t JOIN s.t2 ON s.t.id = s.t2.t_id WHERE s.t.id = s.t2.t_id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljb0159() => CorpusAssert.Parses(@"SELECT * FROM s.t JOIN s.t2 ON s.t.id = s.t2.t_id HAVING count(*) > 0", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljb0160() => CorpusAssert.Parses(@"SELECT t.id FROM s.t JOIN s.t2 ON t.id = t2.t_id WHERE t.id = (SELECT min(id) FROM s.t)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljb0161() => CorpusAssert.Parses(@"SELECT * FROM s.t JOIN s.t2 USING (nonexistent_column)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljb0162() => CorpusAssert.Parses(@"SELECT t.id FROM s.t JOIN s.t2 ON t.id = t2.t_id OFFSET -1", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void seljb0163() => CorpusAssert.Parses(@"SELECT * FROM s.t FULL OUTER JOIN s.t2 USING (id) FULL OUTER JOIN s.parent USING (id)", "ok");
@@ -675,84 +675,84 @@ public class Corpus_SelectJoins
     public void seljb0164() => CorpusAssert.Parses(@"SELECT * FROM s.t LEFT JOIN s.t2 ON s.t.id = s.t2.t_id LEFT JOIN s.parent ON s.t.id = s.parent.id LEFT JOIN s.child ON s.parent.id = s.child.id", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void seljb0165() => CorpusAssert.Parses(@"SELECT * FROM s.t JOIN s.t2 ON s.t.id = s.t2.t_id WHERE s.t.id NOT IN (SELECT t_id FROM s.t2 WHERE amount > 100)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljb0166() => CorpusAssert.Parses(@"SELECT t.id, count(DISTINCT t2.id) FROM s.t JOIN s.t2 ON t.id = t2.t_id GROUP BY t.id", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void seljb0167() => CorpusAssert.Parses(@"SELECT * FROM s.t TABLESAMPLE BERNOULLI(50) JOIN s.t2 TABLESAMPLE BERNOULLI(100) ON s.t.id = s.t2.t_id", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void seljb0168() => CorpusAssert.Parses(@"SELECT * FROM s.t TABLESAMPLE BERNOULLI(100) JOIN s.t2 ON s.t.id = s.t2.t_id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljb0169() => CorpusAssert.Parses(@"SELECT t.id FROM s.t JOIN s.t2 ON t.id = t2.t_id WHERE t.id = t2.t_id AND t.id > 0 AND t2.amount >= 0", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void seljb0170() => CorpusAssert.Parses(@"SELECT * FROM s.t JOIN s.t2 ON s.t.id = s.t2.t_id WHERE s.t.val IS NULL OR s.t2.label IS NULL", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljc0001() => CorpusAssert.Parses(@"SELECT t.id, t2.label FROM s.t JOIN s.t2 ON t.id = t2.t_id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljc0002() => CorpusAssert.Parses(@"SELECT t.id, t2.label FROM s.t INNER JOIN s.t2 ON t.id = t2.t_id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljc0003() => CorpusAssert.Parses(@"SELECT t2.id, t2.t_id FROM s.t2 LEFT JOIN s.t ON t2.t_id = t.id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljc0004() => CorpusAssert.Parses(@"SELECT t2.id, t2.t_id FROM s.t2 LEFT OUTER JOIN s.t ON t2.t_id = t.id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljc0005() => CorpusAssert.Parses(@"SELECT t.id, t2.label FROM s.t RIGHT JOIN s.t2 ON t.id = t2.t_id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljc0006() => CorpusAssert.Parses(@"SELECT t.id, t2.label FROM s.t RIGHT OUTER JOIN s.t2 ON t.id = t2.t_id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljc0007() => CorpusAssert.Parses(@"SELECT t.id, t2.label FROM s.t FULL JOIN s.t2 ON t.id = t2.t_id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljc0008() => CorpusAssert.Parses(@"SELECT t.id, t2.label FROM s.t FULL OUTER JOIN s.t2 ON t.id = t2.t_id", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void seljc0009() => CorpusAssert.Parses(@"SELECT * FROM s.t CROSS JOIN s.t2", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljc0010() => CorpusAssert.Parses(@"SELECT t.id, t2.t_id FROM s.t JOIN s.t2 USING (id)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljc0011() => CorpusAssert.Parses(@"SELECT a.id, b.id FROM s.t AS a JOIN s.t AS b ON a.id <> b.id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljc0012() => CorpusAssert.Parses(@"SELECT t.id, sub.label FROM s.t JOIN (SELECT t_id, label FROM s.t2) AS sub ON t.id = sub.t_id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljc0013() => CorpusAssert.Parses(@"SELECT t.id, t2.label, p.kind FROM s.t JOIN s.t2 ON t.id = t2.t_id JOIN s.parent AS p ON t.id = p.id", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void seljc0014() => CorpusAssert.Parses(@"SELECT t.id, lf.* FROM s.t, LATERAL (SELECT * FROM s.t2 WHERE t2.t_id = t.id) AS lf", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void seljc0015() => CorpusAssert.Parses(@"SELECT t.id, lf.* FROM s.t JOIN LATERAL (SELECT * FROM s.t2 WHERE t2.t_id = t.id) AS lf ON true", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljc0016() => CorpusAssert.Parses(@"SELECT t.id FROM (s.t JOIN s.t2 ON s.t.id = s.t2.t_id)", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void seljc0017() => CorpusAssert.Parses(@"SELECT * FROM s.t NATURAL JOIN s.t2", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void seljc0018() => CorpusAssert.Parses(@"SELECT * FROM s.t2 NATURAL LEFT JOIN s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljc0019() => CorpusAssert.Parses(@"SELECT t.id, rf.* FROM s.t LEFT JOIN LATERAL s.rows_f() AS rf ON true", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljc0020() => CorpusAssert.Parses(@"SELECT * FROM s.t JOIN s.t2", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljc0021() => CorpusAssert.Parses(@"SELECT * FROM s.t JOIN s.t2 USING id", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljc0022() => CorpusAssert.Parses(@"SELECT * FROM s.t CROSS JOIN s.t2 ON s.t.id = s.t2.t_id", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljc0023() => CorpusAssert.Parses(@"SELECT * FROM s.t NATURAL JOIN s.t2 ON s.t.id = s.t2.t_id", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void seljc0024() => CorpusAssert.Parses(@"SELECT t.id FROM s.t JOIN USING (id)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljc0025() => CorpusAssert.Parses(@"SELECT t.id, t.name, t2.label, p.kind FROM s.t LEFT JOIN s.t2 ON t.id = t2.t_id JOIN s.parent AS p ON t.id = p.id WHERE t.id IS NOT NULL", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljc0026() => CorpusAssert.Parses(@"SELECT t.id FROM s.t JOIN s.t2 ON t.id = t2.t_id AND t2.amount > 0", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljc0027() => CorpusAssert.Parses(@"SELECT COALESCE(a.id, b.id) AS id FROM s.t AS a FULL JOIN s.t AS b USING (id)", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void seljc0028() => CorpusAssert.Parses(@"SELECT * FROM s.t JOIN s.t2 ON s.t.id = s.t2.t_id ORDER BY s.t.id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljc0029() => CorpusAssert.Parses(@"SELECT count(*) FROM s.t JOIN s.t2 ON t.id = t2.t_id GROUP BY t.status HAVING count(*) > 0", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljc0030() => CorpusAssert.Parses(@"SELECT t.id FROM s.t LEFT JOIN s.t2 ON t.id = t2.t_id WHERE t2.id IS NULL", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljc0031() => CorpusAssert.Parses(@"SELECT * FROM s.t INNER s.t2 ON s.t.id = s.t2.t_id", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljc0032() => CorpusAssert.Parses(@"SELECT * FROM s.t JOIN s.t2 ON", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljc0033() => CorpusAssert.Parses(@"SELECT * FROM s.t OUTER JOIN s.t2 ON s.t.id = s.t2.t_id", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljc0034() => CorpusAssert.Parses(@"SELECT t.id FROM s.t JOIN s.t2 USING ()", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljc0035() => CorpusAssert.Parses(@"SELECT * FROM s.t NATURAL CROSS JOIN s.t2", "error");
 }

@@ -5,213 +5,213 @@ namespace PgProj.Core.Tests.Corpus;
 
 public class Corpus_DatetimeOps
 {
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0001() => CorpusAssert.Parses(@"SELECT CURRENT_DATE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0002() => CorpusAssert.Parses(@"SELECT CURRENT_TIME", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0003() => CorpusAssert.Parses(@"SELECT CURRENT_TIMESTAMP", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0004() => CorpusAssert.Parses(@"SELECT CURRENT_TIME(3)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0005() => CorpusAssert.Parses(@"SELECT CURRENT_TIMESTAMP(0)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0006() => CorpusAssert.Parses(@"SELECT LOCALTIME", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0007() => CorpusAssert.Parses(@"SELECT LOCALTIMESTAMP", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0008() => CorpusAssert.Parses(@"SELECT LOCALTIME(2)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0009() => CorpusAssert.Parses(@"SELECT LOCALTIMESTAMP(6)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0010() => CorpusAssert.Parses(@"SELECT now()", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0011() => CorpusAssert.Parses(@"SELECT clock_timestamp()", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0012() => CorpusAssert.Parses(@"SELECT statement_timestamp()", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0013() => CorpusAssert.Parses(@"SELECT transaction_timestamp()", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0014() => CorpusAssert.Parses(@"SELECT timeofday()", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0015() => CorpusAssert.Parses(@"SELECT DATE '2024-01-15'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0016() => CorpusAssert.Parses(@"SELECT TIME '12:30:00'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0017() => CorpusAssert.Parses(@"SELECT TIMESTAMP '2024-01-15 12:30:00'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0018() => CorpusAssert.Parses(@"SELECT TIMESTAMPTZ '2024-01-15 12:30:00+05'", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void dta0019() => CorpusAssert.Parses(@"SELECT TIMESTAMP WITH TIME ZONE '2024-01-15 12:30:00 UTC'", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void dta0020() => CorpusAssert.Parses(@"SELECT TIME WITH TIME ZONE '12:30:00+00'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0021() => CorpusAssert.Parses(@"SELECT INTERVAL '1' YEAR", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0022() => CorpusAssert.Parses(@"SELECT INTERVAL '3' MONTH", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0023() => CorpusAssert.Parses(@"SELECT INTERVAL '7' DAY", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0024() => CorpusAssert.Parses(@"SELECT INTERVAL '5' HOUR", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0025() => CorpusAssert.Parses(@"SELECT INTERVAL '30' MINUTE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0026() => CorpusAssert.Parses(@"SELECT INTERVAL '45' SECOND", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0027() => CorpusAssert.Parses(@"SELECT INTERVAL '1-6' YEAR TO MONTH", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0028() => CorpusAssert.Parses(@"SELECT INTERVAL '2 12:00:00' DAY TO SECOND", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0029() => CorpusAssert.Parses(@"SELECT INTERVAL '12:30' HOUR TO MINUTE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0030() => CorpusAssert.Parses(@"SELECT INTERVAL '12:30:45' HOUR TO SECOND", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0031() => CorpusAssert.Parses(@"SELECT INTERVAL '30:45' MINUTE TO SECOND", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0032() => CorpusAssert.Parses(@"SELECT INTERVAL '1 year 2 months 3 days'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0033() => CorpusAssert.Parses(@"SELECT INTERVAL '1 day 2 hours 30 minutes'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0034() => CorpusAssert.Parses(@"SELECT INTERVAL '1.5' SECOND", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0035() => CorpusAssert.Parses(@"SELECT INTERVAL '1' SECOND(3)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0036() => CorpusAssert.Parses(@"SELECT INTERVAL '2 12:30:45' DAY TO SECOND(2)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0037() => CorpusAssert.Parses(@"SELECT INTERVAL '00:00:00'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0038() => CorpusAssert.Parses(@"SELECT INTERVAL '-1 day'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0039() => CorpusAssert.Parses(@"SELECT EXTRACT(YEAR FROM DATE '2024-06-15')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0040() => CorpusAssert.Parses(@"SELECT EXTRACT(MONTH FROM DATE '2024-06-15')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0041() => CorpusAssert.Parses(@"SELECT EXTRACT(DAY FROM DATE '2024-06-15')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0042() => CorpusAssert.Parses(@"SELECT EXTRACT(HOUR FROM TIMESTAMP '2024-06-15 10:30:00')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0043() => CorpusAssert.Parses(@"SELECT EXTRACT(MINUTE FROM TIMESTAMP '2024-06-15 10:30:00')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0044() => CorpusAssert.Parses(@"SELECT EXTRACT(SECOND FROM TIMESTAMP '2024-06-15 10:30:45.123')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0045() => CorpusAssert.Parses(@"SELECT EXTRACT(DOW FROM DATE '2024-06-15')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0046() => CorpusAssert.Parses(@"SELECT EXTRACT(DOY FROM DATE '2024-06-15')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0047() => CorpusAssert.Parses(@"SELECT EXTRACT(WEEK FROM DATE '2024-06-15')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0048() => CorpusAssert.Parses(@"SELECT EXTRACT(QUARTER FROM DATE '2024-06-15')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0049() => CorpusAssert.Parses(@"SELECT EXTRACT(EPOCH FROM TIMESTAMP '2024-01-01 00:00:00')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0050() => CorpusAssert.Parses(@"SELECT EXTRACT(CENTURY FROM DATE '2024-01-01')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0051() => CorpusAssert.Parses(@"SELECT EXTRACT(DECADE FROM DATE '2024-01-01')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0052() => CorpusAssert.Parses(@"SELECT EXTRACT(MILLENNIUM FROM DATE '2024-01-01')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0053() => CorpusAssert.Parses(@"SELECT EXTRACT(MICROSECONDS FROM TIME '10:30:45.123456')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0054() => CorpusAssert.Parses(@"SELECT EXTRACT(MILLISECONDS FROM TIME '10:30:45.123')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0055() => CorpusAssert.Parses(@"SELECT EXTRACT(ISODOW FROM DATE '2024-06-15')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0056() => CorpusAssert.Parses(@"SELECT EXTRACT(ISOYEAR FROM DATE '2024-01-01')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0057() => CorpusAssert.Parses(@"SELECT EXTRACT(TIMEZONE FROM TIMESTAMPTZ '2024-01-01 00:00:00+05:30')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0058() => CorpusAssert.Parses(@"SELECT EXTRACT(TIMEZONE_HOUR FROM TIMESTAMPTZ '2024-01-01 00:00:00+05:30')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0059() => CorpusAssert.Parses(@"SELECT EXTRACT(TIMEZONE_MINUTE FROM TIMESTAMPTZ '2024-01-01 00:00:00+05:30')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0060() => CorpusAssert.Parses(@"SELECT EXTRACT(EPOCH FROM INTERVAL '1 day')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0061() => CorpusAssert.Parses(@"SELECT EXTRACT(YEAR FROM)", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void dta0062() => CorpusAssert.Parses(@"SELECT EXTRACT(FOOBAR FROM DATE '2024-01-01')", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0063() => CorpusAssert.Parses(@"SELECT EXTRACT YEAR FROM DATE '2024-01-01'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0064() => CorpusAssert.Parses(@"SELECT EXTRACT(FROM DATE '2024-01-01')", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0065() => CorpusAssert.Parses(@"SELECT date_part('year', TIMESTAMP '2024-06-15 10:30:00')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0066() => CorpusAssert.Parses(@"SELECT date_part('month', DATE '2024-06-15')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0067() => CorpusAssert.Parses(@"SELECT date_part('day', TIMESTAMP '2024-06-15 10:30:00')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0068() => CorpusAssert.Parses(@"SELECT date_part('hour', INTERVAL '2 hours 30 minutes')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0069() => CorpusAssert.Parses(@"SELECT date_part('epoch', now())", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0070() => CorpusAssert.Parses(@"SELECT date_part('dow', CURRENT_DATE)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0071() => CorpusAssert.Parses(@"SELECT date_part('quarter', DATE '2024-06-15')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0072() => CorpusAssert.Parses(@"SELECT date_trunc('year', TIMESTAMP '2024-06-15 10:30:00')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0073() => CorpusAssert.Parses(@"SELECT date_trunc('month', TIMESTAMP '2024-06-15 10:30:00')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0074() => CorpusAssert.Parses(@"SELECT date_trunc('day', TIMESTAMP '2024-06-15 10:30:00')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0075() => CorpusAssert.Parses(@"SELECT date_trunc('hour', TIMESTAMP '2024-06-15 10:30:00')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0076() => CorpusAssert.Parses(@"SELECT date_trunc('minute', TIMESTAMP '2024-06-15 10:30:45')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0077() => CorpusAssert.Parses(@"SELECT date_trunc('second', TIMESTAMP '2024-06-15 10:30:45.123')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0078() => CorpusAssert.Parses(@"SELECT date_trunc('week', DATE '2024-06-15')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0079() => CorpusAssert.Parses(@"SELECT date_trunc('quarter', TIMESTAMP '2024-06-15 10:30:00')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0080() => CorpusAssert.Parses(@"SELECT date_trunc('century', TIMESTAMP '2024-06-15 10:30:00')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0081() => CorpusAssert.Parses(@"SELECT date_trunc('decade', TIMESTAMP '2024-06-15 10:30:00')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0082() => CorpusAssert.Parses(@"SELECT date_trunc('millennium', TIMESTAMP '2024-06-15 10:30:00')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0083() => CorpusAssert.Parses(@"SELECT date_trunc('hour', TIMESTAMPTZ '2024-06-15 10:30:00+00', 'America/New_York')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0084() => CorpusAssert.Parses(@"SELECT date_trunc('day', TIMESTAMPTZ '2024-06-15 10:30:00+00', 'UTC')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0085() => CorpusAssert.Parses(@"SELECT date_trunc('microseconds', TIMESTAMP '2024-06-15 10:30:45.123456')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0086() => CorpusAssert.Parses(@"SELECT date_trunc('milliseconds', TIMESTAMP '2024-06-15 10:30:45.123')", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void dta0087() => CorpusAssert.Parses(@"SELECT date_trunc('foobar', TIMESTAMP '2024-06-15 10:30:00')", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0088() => CorpusAssert.Parses(@"SELECT DATE '2024-01-15' + INTERVAL '1 day'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0089() => CorpusAssert.Parses(@"SELECT DATE '2024-01-15' - INTERVAL '1 month'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0090() => CorpusAssert.Parses(@"SELECT DATE '2024-03-01' - DATE '2024-01-01'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0091() => CorpusAssert.Parses(@"SELECT TIMESTAMP '2024-01-15 10:00:00' + INTERVAL '2 hours'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0092() => CorpusAssert.Parses(@"SELECT TIMESTAMP '2024-01-15 10:00:00' - INTERVAL '30 minutes'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0093() => CorpusAssert.Parses(@"SELECT TIMESTAMP '2024-06-01 12:00:00' - TIMESTAMP '2024-01-01 00:00:00'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0094() => CorpusAssert.Parses(@"SELECT INTERVAL '1 hour' + INTERVAL '30 minutes'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0095() => CorpusAssert.Parses(@"SELECT INTERVAL '2 hours' - INTERVAL '30 minutes'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0096() => CorpusAssert.Parses(@"SELECT INTERVAL '1 hour' * 3", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0097() => CorpusAssert.Parses(@"SELECT 3 * INTERVAL '1 hour'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0098() => CorpusAssert.Parses(@"SELECT INTERVAL '6 hours' / 2", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0099() => CorpusAssert.Parses(@"SELECT -INTERVAL '1 day'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0100() => CorpusAssert.Parses(@"SELECT TIMESTAMP '2024-01-15 10:00:00' AT TIME ZONE 'UTC'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0101() => CorpusAssert.Parses(@"SELECT TIMESTAMPTZ '2024-01-15 10:00:00+00' AT TIME ZONE 'America/New_York'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0102() => CorpusAssert.Parses(@"SELECT TIME '10:00:00' AT TIME ZONE 'UTC'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0103() => CorpusAssert.Parses(@"SELECT TIMESTAMP '2024-01-15 10:00:00' AT TIME ZONE '+05:30'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0104() => CorpusAssert.Parses(@"SELECT TIMESTAMP '2024-01-15 10:00:00' AT TIME ZONE INTERVAL '+05:30'", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void dta0105() => CorpusAssert.Parses(@"SELECT (DATE '2024-01-01', DATE '2024-12-31') OVERLAPS (DATE '2024-06-01', DATE '2025-01-01')", "ok");
@@ -221,77 +221,77 @@ public class Corpus_DatetimeOps
     public void dta0107() => CorpusAssert.Parses(@"SELECT (DATE '2024-01-01', INTERVAL '6 months') OVERLAPS (DATE '2024-06-01', INTERVAL '6 months')", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void dta0108() => CorpusAssert.Parses(@"SELECT (TIMESTAMP '2024-01-01 00:00:00', INTERVAL '90 days') OVERLAPS (TIMESTAMP '2024-03-01 00:00:00', INTERVAL '60 days')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0109() => CorpusAssert.Parses(@"SELECT age(TIMESTAMP '2024-01-01 00:00:00', TIMESTAMP '2020-01-01 00:00:00')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0110() => CorpusAssert.Parses(@"SELECT age(TIMESTAMP '1990-06-15 00:00:00')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0111() => CorpusAssert.Parses(@"SELECT make_date(2024, 6, 15)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0112() => CorpusAssert.Parses(@"SELECT make_time(10, 30, 45.5)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0113() => CorpusAssert.Parses(@"SELECT make_timestamp(2024, 6, 15, 10, 30, 45.0)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0114() => CorpusAssert.Parses(@"SELECT make_timestamptz(2024, 6, 15, 10, 30, 45.0, 'UTC')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0115() => CorpusAssert.Parses(@"SELECT make_timestamptz(2024, 6, 15, 10, 30, 45.0)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0116() => CorpusAssert.Parses(@"SELECT make_interval(years := 1, months := 6, days := 15)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0117() => CorpusAssert.Parses(@"SELECT make_interval(hours := 2, mins := 30, secs := 45.0)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0118() => CorpusAssert.Parses(@"SELECT make_interval(weeks := 2)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0119() => CorpusAssert.Parses(@"SELECT make_interval(0, 0, 0, 0, 0, 0, 0.0)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0120() => CorpusAssert.Parses(@"SELECT to_char(TIMESTAMP '2024-06-15 10:30:45', 'YYYY-MM-DD HH24:MI:SS')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0121() => CorpusAssert.Parses(@"SELECT to_char(CURRENT_DATE, 'Day, DD Month YYYY')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0122() => CorpusAssert.Parses(@"SELECT to_char(INTERVAL '2 hours 30 minutes', 'HH24:MI:SS')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0123() => CorpusAssert.Parses(@"SELECT to_char(TIMESTAMP '2024-06-15 10:30:45', 'YYYY')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0124() => CorpusAssert.Parses(@"SELECT to_char(TIMESTAMP '2024-06-15 10:30:45', 'Q')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0125() => CorpusAssert.Parses(@"SELECT to_char(TIMESTAMP '2024-06-15 10:30:45', 'WW')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0126() => CorpusAssert.Parses(@"SELECT to_char(TIMESTAMP '2024-06-15 10:30:45', 'TZ')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0127() => CorpusAssert.Parses(@"SELECT to_date('2024-06-15', 'YYYY-MM-DD')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0128() => CorpusAssert.Parses(@"SELECT to_date('15/06/2024', 'DD/MM/YYYY')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0129() => CorpusAssert.Parses(@"SELECT to_date('June 15, 2024', 'Month DD, YYYY')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0130() => CorpusAssert.Parses(@"SELECT to_timestamp('2024-06-15 10:30:45', 'YYYY-MM-DD HH24:MI:SS')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0131() => CorpusAssert.Parses(@"SELECT to_timestamp('15/06/2024 10:30', 'DD/MM/YYYY HH24:MI')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0132() => CorpusAssert.Parses(@"SELECT to_timestamp(0)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0133() => CorpusAssert.Parses(@"SELECT to_timestamp(1718444400.5)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0134() => CorpusAssert.Parses(@"SELECT justify_days(INTERVAL '40 days')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0135() => CorpusAssert.Parses(@"SELECT justify_hours(INTERVAL '30 hours')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0136() => CorpusAssert.Parses(@"SELECT justify_interval(INTERVAL '1 month -1 hour')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0137() => CorpusAssert.Parses(@"SELECT isfinite(DATE '2024-01-01')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0138() => CorpusAssert.Parses(@"SELECT isfinite(TIMESTAMP '2024-01-01 00:00:00')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0139() => CorpusAssert.Parses(@"SELECT isfinite(INTERVAL '1 day')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0140() => CorpusAssert.Parses(@"SELECT isfinite(DATE 'infinity')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0141() => CorpusAssert.Parses(@"SELECT isfinite(TIMESTAMP 'infinity')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0142() => CorpusAssert.Parses(@"SELECT date_bin(INTERVAL '15 minutes', TIMESTAMP '2024-06-15 10:37:00', TIMESTAMP '2024-06-15 00:00:00')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0143() => CorpusAssert.Parses(@"SELECT date_bin(INTERVAL '1 hour', TIMESTAMP '2024-06-15 10:37:00', TIMESTAMP '2024-06-15 00:00:00')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0144() => CorpusAssert.Parses(@"SELECT date_bin(INTERVAL '1 day', TIMESTAMPTZ '2024-06-15 10:37:00+00', TIMESTAMPTZ '2024-01-01 00:00:00+00')", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void dta0145() => CorpusAssert.Parses(@"SELECT DATE '2024-01-01' + INTEGER '30'", "ok");
@@ -299,33 +299,33 @@ public class Corpus_DatetimeOps
     public void dta0146() => CorpusAssert.Parses(@"SELECT INTEGER '30' + DATE '2024-01-01'", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void dta0147() => CorpusAssert.Parses(@"SELECT DATE '2024-01-31' - INTEGER '10'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0148() => CorpusAssert.Parses(@"SELECT TIMESTAMP '2024-01-15 10:00:00' + TIME '02:30:00'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0149() => CorpusAssert.Parses(@"SELECT INTERVAL '1 day' + INTERVAL '2 hours'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0150() => CorpusAssert.Parses(@"SELECT INTERVAL '1 year' * 2.5", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0151() => CorpusAssert.Parses(@"SELECT EXTRACT(EPOCH FROM TIMESTAMPTZ '2024-01-01 00:00:00+00')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0152() => CorpusAssert.Parses(@"SELECT EXTRACT(YEAR FROM INTERVAL '14 months')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0153() => CorpusAssert.Parses(@"SELECT EXTRACT(MONTH FROM INTERVAL '14 months')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0154() => CorpusAssert.Parses(@"SELECT EXTRACT(DAY FROM INTERVAL '3 days 5 hours')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0155() => CorpusAssert.Parses(@"SELECT TIMESTAMP '2024-01-15 10:00:00' AT TIME ZONE 'Europe/London'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0156() => CorpusAssert.Parses(@"SELECT DATE '2024-01-01' < DATE '2024-12-31'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0157() => CorpusAssert.Parses(@"SELECT DATE '2024-01-01' = DATE '2024-01-01'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0158() => CorpusAssert.Parses(@"SELECT TIMESTAMP '2024-01-01' BETWEEN TIMESTAMP '2023-01-01' AND TIMESTAMP '2025-01-01'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0159() => CorpusAssert.Parses(@"SELECT INTERVAL '1 day' < INTERVAL '2 days'", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void dta0160() => CorpusAssert.Parses(@"SELECT INTERVAL '1-6' MONTH TO YEAR", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0161() => CorpusAssert.Parses(@"SELECT EXTRACT(YEAR, DATE '2024-01-01')", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void dta0162() => CorpusAssert.Parses(@"SELECT date_trunc(TIMESTAMP '2024-06-15 10:30:00', 'year')", "error");
@@ -343,103 +343,103 @@ public class Corpus_DatetimeOps
     public void dta0168() => CorpusAssert.Parses(@"SELECT DATE '2024-13-01'", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void dta0169() => CorpusAssert.Parses(@"SELECT TIME '25:00:00'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0170() => CorpusAssert.Parses(@"SELECT INTERVAL '1' DAY TO HOUR", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0001() => CorpusAssert.Parses(@"SELECT DATE '2024-01-15'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0002() => CorpusAssert.Parses(@"SELECT TIME '13:30:00'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0003() => CorpusAssert.Parses(@"SELECT TIME '13:30:00.123456'", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void dtb0004() => CorpusAssert.Parses(@"SELECT TIMETZ '13:30:00+05:30'", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void dtb0005() => CorpusAssert.Parses(@"SELECT TIME WITH TIME ZONE '13:30:00+02:00'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0006() => CorpusAssert.Parses(@"SELECT TIMESTAMP '2024-01-15 13:30:00'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0007() => CorpusAssert.Parses(@"SELECT TIMESTAMPTZ '2024-01-15 13:30:00+00'", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void dtb0008() => CorpusAssert.Parses(@"SELECT TIMESTAMP WITH TIME ZONE '2024-01-15 13:30:00 UTC'", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void dtb0009() => CorpusAssert.Parses(@"SELECT TIMESTAMP WITHOUT TIME ZONE '2024-01-15 13:30:00'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0010() => CorpusAssert.Parses(@"SELECT INTERVAL '1 year 2 months 3 days'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0011() => CorpusAssert.Parses(@"SELECT INTERVAL '5' YEAR", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0012() => CorpusAssert.Parses(@"SELECT INTERVAL '3' MONTH", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0013() => CorpusAssert.Parses(@"SELECT INTERVAL '10' DAY", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0014() => CorpusAssert.Parses(@"SELECT INTERVAL '4' HOUR", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0015() => CorpusAssert.Parses(@"SELECT INTERVAL '30' MINUTE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0016() => CorpusAssert.Parses(@"SELECT INTERVAL '45' SECOND", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0017() => CorpusAssert.Parses(@"SELECT INTERVAL '1-2' YEAR TO MONTH", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0018() => CorpusAssert.Parses(@"SELECT INTERVAL '5 04' DAY TO HOUR", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0019() => CorpusAssert.Parses(@"SELECT INTERVAL '5 04:30' DAY TO MINUTE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0020() => CorpusAssert.Parses(@"SELECT INTERVAL '5 04:30:15' DAY TO SECOND", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0021() => CorpusAssert.Parses(@"SELECT INTERVAL '04:30' HOUR TO MINUTE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0022() => CorpusAssert.Parses(@"SELECT INTERVAL '04:30:15' HOUR TO SECOND", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0023() => CorpusAssert.Parses(@"SELECT INTERVAL '30:15' MINUTE TO SECOND", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0024() => CorpusAssert.Parses(@"SELECT INTERVAL '1.5' SECOND(3)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0025() => CorpusAssert.Parses(@"SELECT INTERVAL '00:01:30.5' MINUTE TO SECOND(2)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0026() => CorpusAssert.Parses(@"SELECT INTERVAL '5 04:30:15.123' DAY TO SECOND(3)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0027() => CorpusAssert.Parses(@"SELECT TIMESTAMP '2024-06-01 12:00:00' AT TIME ZONE 'UTC'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0028() => CorpusAssert.Parses(@"SELECT TIMESTAMP '2024-06-01 12:00:00' AT TIME ZONE 'America/New_York'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0029() => CorpusAssert.Parses(@"SELECT TIMESTAMPTZ '2024-06-01 12:00:00+00' AT TIME ZONE 'Europe/London'", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void dtb0030() => CorpusAssert.Parses(@"SELECT TIMETZ '13:00:00+00' AT TIME ZONE 'Asia/Tokyo'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0031() => CorpusAssert.Parses(@"SELECT EXTRACT(YEAR FROM DATE '2024-03-15')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0032() => CorpusAssert.Parses(@"SELECT EXTRACT(MONTH FROM DATE '2024-03-15')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0033() => CorpusAssert.Parses(@"SELECT EXTRACT(DAY FROM DATE '2024-03-15')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0034() => CorpusAssert.Parses(@"SELECT EXTRACT(HOUR FROM TIMESTAMP '2024-03-15 14:30:45')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0035() => CorpusAssert.Parses(@"SELECT EXTRACT(MINUTE FROM TIMESTAMP '2024-03-15 14:30:45')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0036() => CorpusAssert.Parses(@"SELECT EXTRACT(SECOND FROM TIMESTAMP '2024-03-15 14:30:45.123')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0037() => CorpusAssert.Parses(@"SELECT EXTRACT(DOW FROM DATE '2024-03-15')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0038() => CorpusAssert.Parses(@"SELECT EXTRACT(DOY FROM DATE '2024-03-15')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0039() => CorpusAssert.Parses(@"SELECT EXTRACT(WEEK FROM DATE '2024-03-15')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0040() => CorpusAssert.Parses(@"SELECT EXTRACT(QUARTER FROM DATE '2024-03-15')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0041() => CorpusAssert.Parses(@"SELECT EXTRACT(EPOCH FROM TIMESTAMP '2024-01-01 00:00:00')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0042() => CorpusAssert.Parses(@"SELECT EXTRACT(ISODOW FROM DATE '2024-03-15')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0043() => CorpusAssert.Parses(@"SELECT EXTRACT(ISOYEAR FROM DATE '2024-01-01')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0044() => CorpusAssert.Parses(@"SELECT EXTRACT(CENTURY FROM DATE '2024-01-01')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0045() => CorpusAssert.Parses(@"SELECT EXTRACT(DECADE FROM DATE '2024-01-01')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0046() => CorpusAssert.Parses(@"SELECT EXTRACT(MILLENNIUM FROM DATE '2024-01-01')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0047() => CorpusAssert.Parses(@"SELECT EXTRACT(MICROSECONDS FROM TIME '14:30:45.123456')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0048() => CorpusAssert.Parses(@"SELECT EXTRACT(MILLISECONDS FROM TIME '14:30:45.123')", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void dtb0049() => CorpusAssert.Parses(@"SELECT EXTRACT(TIMEZONE FROM TIMETZ '14:30:00+05:00')", "ok");
@@ -447,67 +447,67 @@ public class Corpus_DatetimeOps
     public void dtb0050() => CorpusAssert.Parses(@"SELECT EXTRACT(TIMEZONE_HOUR FROM TIMETZ '14:30:00+05:30')", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void dtb0051() => CorpusAssert.Parses(@"SELECT EXTRACT(TIMEZONE_MINUTE FROM TIMETZ '14:30:00+05:30')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0052() => CorpusAssert.Parses(@"SELECT EXTRACT(EPOCH FROM INTERVAL '3 days 2 hours')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0053() => CorpusAssert.Parses(@"SELECT EXTRACT(YEAR FROM INTERVAL '1 year 3 months')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0054() => CorpusAssert.Parses(@"SELECT EXTRACT(MONTH FROM INTERVAL '14 months')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0055() => CorpusAssert.Parses(@"SELECT EXTRACT YEAR FROM DATE '2024-01-01'", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void dtb0056() => CorpusAssert.Parses(@"SELECT EXTRACT(BADFIELD FROM DATE '2024-01-01')", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0057() => CorpusAssert.Parses(@"SELECT EXTRACT(YEAR DATE '2024-01-01')", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0058() => CorpusAssert.Parses(@"SELECT date_part('year', DATE '2024-03-15')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0059() => CorpusAssert.Parses(@"SELECT date_part('month', DATE '2024-03-15')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0060() => CorpusAssert.Parses(@"SELECT date_part('day', TIMESTAMP '2024-03-15 14:30:00')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0061() => CorpusAssert.Parses(@"SELECT date_part('epoch', TIMESTAMPTZ '2024-01-01 00:00:00+00')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0062() => CorpusAssert.Parses(@"SELECT date_part('hour', INTERVAL '3 days 2 hours 15 minutes')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0063() => CorpusAssert.Parses(@"SELECT date_part('dow', DATE '2024-03-15')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0064() => CorpusAssert.Parses(@"SELECT date_part('quarter', DATE '2024-07-01')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0065() => CorpusAssert.Parses(@"SELECT date_trunc('year', TIMESTAMP '2024-07-15 14:30:00')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0066() => CorpusAssert.Parses(@"SELECT date_trunc('month', TIMESTAMP '2024-07-15 14:30:00')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0067() => CorpusAssert.Parses(@"SELECT date_trunc('day', TIMESTAMP '2024-07-15 14:30:00')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0068() => CorpusAssert.Parses(@"SELECT date_trunc('hour', TIMESTAMP '2024-07-15 14:30:45')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0069() => CorpusAssert.Parses(@"SELECT date_trunc('minute', TIMESTAMP '2024-07-15 14:30:45')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0070() => CorpusAssert.Parses(@"SELECT date_trunc('second', TIMESTAMP '2024-07-15 14:30:45.789')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0071() => CorpusAssert.Parses(@"SELECT date_trunc('week', TIMESTAMP '2024-07-15 14:30:00')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0072() => CorpusAssert.Parses(@"SELECT date_trunc('quarter', TIMESTAMP '2024-07-15 14:30:00')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0073() => CorpusAssert.Parses(@"SELECT date_trunc('decade', TIMESTAMP '2024-07-15 14:30:00')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0074() => CorpusAssert.Parses(@"SELECT date_trunc('century', TIMESTAMP '2024-07-15 14:30:00')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0075() => CorpusAssert.Parses(@"SELECT date_trunc('millennium', TIMESTAMP '2024-07-15 14:30:00')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0076() => CorpusAssert.Parses(@"SELECT date_trunc('hour', TIMESTAMPTZ '2024-07-15 14:30:45+02', 'America/New_York')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0077() => CorpusAssert.Parses(@"SELECT date_trunc('day', TIMESTAMPTZ '2024-07-15 14:30:00+00', 'UTC')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0078() => CorpusAssert.Parses(@"SELECT date_trunc('month', INTERVAL '1 year 7 months 15 days')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0079() => CorpusAssert.Parses(@"SELECT date_trunc('hour', INTERVAL '3 days 14 hours 45 minutes')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0080() => CorpusAssert.Parses(@"SELECT date_bin(INTERVAL '15 minutes', TIMESTAMP '2024-07-15 14:37:00', TIMESTAMP '2024-01-01 00:00:00')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0081() => CorpusAssert.Parses(@"SELECT date_bin(INTERVAL '1 hour', TIMESTAMP '2024-07-15 14:37:00', TIMESTAMP '2024-07-15 00:00:00')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0082() => CorpusAssert.Parses(@"SELECT date_bin(INTERVAL '1 day', TIMESTAMPTZ '2024-07-15 14:37:00+00', TIMESTAMPTZ '2024-01-01 00:00:00+00')", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void dtb0083() => CorpusAssert.Parses(@"SELECT (DATE '2024-03-15', DATE '2024-03-20') OVERLAPS (DATE '2024-03-18', DATE '2024-03-25')", "ok");
@@ -521,155 +521,155 @@ public class Corpus_DatetimeOps
     public void dtb0087() => CorpusAssert.Parses(@"SELECT DATE '2024-03-15' + INTEGER '5'", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void dtb0088() => CorpusAssert.Parses(@"SELECT DATE '2024-03-15' - INTEGER '5'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0089() => CorpusAssert.Parses(@"SELECT DATE '2024-03-20' - DATE '2024-03-15'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0090() => CorpusAssert.Parses(@"SELECT DATE '2024-03-15' + INTERVAL '2 months'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0091() => CorpusAssert.Parses(@"SELECT DATE '2024-03-15' - INTERVAL '2 months'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0092() => CorpusAssert.Parses(@"SELECT TIMESTAMP '2024-03-15 12:00:00' + INTERVAL '1 day 3 hours'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0093() => CorpusAssert.Parses(@"SELECT TIMESTAMP '2024-03-15 12:00:00' - INTERVAL '1 day 3 hours'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0094() => CorpusAssert.Parses(@"SELECT TIMESTAMP '2024-03-20 12:00:00' - TIMESTAMP '2024-03-15 10:00:00'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0095() => CorpusAssert.Parses(@"SELECT TIMESTAMPTZ '2024-03-15 12:00:00+00' + INTERVAL '6 hours'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0096() => CorpusAssert.Parses(@"SELECT TIMESTAMPTZ '2024-03-15 18:00:00+00' - INTERVAL '6 hours'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0097() => CorpusAssert.Parses(@"SELECT TIMESTAMPTZ '2024-03-20 12:00:00+00' - TIMESTAMPTZ '2024-03-15 12:00:00+00'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0098() => CorpusAssert.Parses(@"SELECT INTERVAL '2 hours' + INTERVAL '30 minutes'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0099() => CorpusAssert.Parses(@"SELECT INTERVAL '2 hours' - INTERVAL '30 minutes'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0100() => CorpusAssert.Parses(@"SELECT INTERVAL '1 hour' * 3", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0101() => CorpusAssert.Parses(@"SELECT 3 * INTERVAL '1 hour'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0102() => CorpusAssert.Parses(@"SELECT INTERVAL '3 hours' / 2", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0103() => CorpusAssert.Parses(@"SELECT INTERVAL '1 hour' * 1.5", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0104() => CorpusAssert.Parses(@"SELECT -INTERVAL '1 day'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0105() => CorpusAssert.Parses(@"SELECT age(TIMESTAMP '2024-01-01', TIMESTAMP '2020-06-15')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0106() => CorpusAssert.Parses(@"SELECT age(TIMESTAMPTZ '2024-01-01 00:00:00+00', TIMESTAMPTZ '2020-06-15 00:00:00+00')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0107() => CorpusAssert.Parses(@"SELECT make_date(2024, 3, 15)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0108() => CorpusAssert.Parses(@"SELECT make_time(14, 30, 45.5)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0109() => CorpusAssert.Parses(@"SELECT make_timestamp(2024, 3, 15, 14, 30, 45.0)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0110() => CorpusAssert.Parses(@"SELECT make_timestamptz(2024, 3, 15, 14, 30, 45.0)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0111() => CorpusAssert.Parses(@"SELECT make_timestamptz(2024, 3, 15, 14, 30, 45.0, 'America/New_York')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0112() => CorpusAssert.Parses(@"SELECT make_interval(years => 1, months => 6, days => 15)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0113() => CorpusAssert.Parses(@"SELECT make_interval(hours => 3, mins => 30, secs => 45.5)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0114() => CorpusAssert.Parses(@"SELECT make_interval(weeks => 2)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0115() => CorpusAssert.Parses(@"SELECT make_interval(years => 1)", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void dtb0116() => CorpusAssert.Parses(@"SELECT make_date(2024, 2, 30)", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void dtb0117() => CorpusAssert.Parses(@"SELECT make_time(25, 0, 0)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0118() => CorpusAssert.Parses(@"SELECT to_char(TIMESTAMP '2024-03-15 14:30:45', 'YYYY-MM-DD HH24:MI:SS')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0119() => CorpusAssert.Parses(@"SELECT to_char(DATE '2024-03-15', 'Day, DD Month YYYY')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0120() => CorpusAssert.Parses(@"SELECT to_char(TIMESTAMPTZ '2024-03-15 14:30:00+00', 'YYYY-MM-DD HH12:MI:SS AM TZ')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0121() => CorpusAssert.Parses(@"SELECT to_char(INTERVAL '2 years 3 months 15 days', 'YYYY MM DD')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0122() => CorpusAssert.Parses(@"SELECT to_char(TIME '14:30:45', 'HH24:MI:SS.MS')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0123() => CorpusAssert.Parses(@"SELECT to_date('2024-03-15', 'YYYY-MM-DD')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0124() => CorpusAssert.Parses(@"SELECT to_date('15/03/2024', 'DD/MM/YYYY')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0125() => CorpusAssert.Parses(@"SELECT to_date('March 15, 2024', 'Month DD, YYYY')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0126() => CorpusAssert.Parses(@"SELECT to_timestamp('2024-03-15 14:30:45', 'YYYY-MM-DD HH24:MI:SS')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0127() => CorpusAssert.Parses(@"SELECT to_timestamp('15/03/2024 02:30 PM', 'DD/MM/YYYY HH12:MI AM')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0128() => CorpusAssert.Parses(@"SELECT to_timestamp(0)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0129() => CorpusAssert.Parses(@"SELECT to_timestamp(1710000000)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0130() => CorpusAssert.Parses(@"SELECT current_date", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0131() => CorpusAssert.Parses(@"SELECT current_time", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0132() => CorpusAssert.Parses(@"SELECT current_time(3)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0133() => CorpusAssert.Parses(@"SELECT current_timestamp", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0134() => CorpusAssert.Parses(@"SELECT current_timestamp(0)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0135() => CorpusAssert.Parses(@"SELECT current_timestamp(6)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0136() => CorpusAssert.Parses(@"SELECT localtime", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0137() => CorpusAssert.Parses(@"SELECT localtime(2)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0138() => CorpusAssert.Parses(@"SELECT localtimestamp", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0139() => CorpusAssert.Parses(@"SELECT localtimestamp(4)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0140() => CorpusAssert.Parses(@"SELECT now()", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0141() => CorpusAssert.Parses(@"SELECT clock_timestamp()", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0142() => CorpusAssert.Parses(@"SELECT statement_timestamp()", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0143() => CorpusAssert.Parses(@"SELECT transaction_timestamp()", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0144() => CorpusAssert.Parses(@"SELECT timeofday()", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0145() => CorpusAssert.Parses(@"SELECT justify_days(INTERVAL '35 days')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0146() => CorpusAssert.Parses(@"SELECT justify_hours(INTERVAL '27 hours')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0147() => CorpusAssert.Parses(@"SELECT justify_interval(INTERVAL '1 year 35 days 27 hours')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0148() => CorpusAssert.Parses(@"SELECT isfinite(DATE '2024-01-01')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0149() => CorpusAssert.Parses(@"SELECT isfinite(TIMESTAMP '2024-01-01 00:00:00')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0150() => CorpusAssert.Parses(@"SELECT isfinite(TIMESTAMPTZ '2024-01-01 00:00:00+00')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0151() => CorpusAssert.Parses(@"SELECT isfinite(INTERVAL '1 year')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0152() => CorpusAssert.Parses(@"SELECT isfinite('infinity'::date)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0153() => CorpusAssert.Parses(@"SELECT isfinite('-infinity'::timestamp)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0154() => CorpusAssert.Parses(@"SELECT DATE '2024-01-15' < DATE '2024-06-01'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0155() => CorpusAssert.Parses(@"SELECT TIMESTAMP '2024-01-15 00:00:00' = TIMESTAMP '2024-01-15 00:00:00'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0156() => CorpusAssert.Parses(@"SELECT INTERVAL '2 days' > INTERVAL '1 day'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0157() => CorpusAssert.Parses(@"SELECT DATE '2024-01-15' BETWEEN DATE '2024-01-01' AND DATE '2024-01-31'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0158() => CorpusAssert.Parses(@"SELECT TIMESTAMP '2024-07-15 12:00:00' AT TIME ZONE INTERVAL '+05:30'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0159() => CorpusAssert.Parses(@"SELECT EXTRACT(YEAR FROM s.t.created_at) FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0160() => CorpusAssert.Parses(@"SELECT date_trunc('month', s.t.created_at) FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0161() => CorpusAssert.Parses(@"SELECT age(s.t.created_at, TIMESTAMPTZ '2020-01-01 00:00:00+00') FROM s.t", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void dtb0162() => CorpusAssert.Parses(@"SELECT INTERVAL '1' MONTH TO SECOND", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0163() => CorpusAssert.Parses(@"SELECT EXTRACT(SECOND FROM)", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void dtb0164() => CorpusAssert.Parses(@"SELECT TIMESTAMP '2024-13-01'", "error");
@@ -679,60 +679,60 @@ public class Corpus_DatetimeOps
     public void dtb0166() => CorpusAssert.Parses(@"SELECT DATE '2024-02-30'", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void dtb0167() => CorpusAssert.Parses(@"SELECT INTERVAL '1 year' YEAR TO MONTH TO DAY", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0168() => CorpusAssert.Parses(@"SELECT to_char(TIMESTAMP '2024-03-15 14:30:45', 'IYYY-IW-ID')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0169() => CorpusAssert.Parses(@"SELECT to_char(TIMESTAMP '2024-03-15 14:30:45', 'J')", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void dtb0170() => CorpusAssert.Parses(@"SELECT make_date(2024, 0, 1)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtc0001() => CorpusAssert.Parses(@"SELECT DATE '2024-03-15', TIME '13:45:00', TIMESTAMP '2024-03-15 13:45:00', TIMESTAMPTZ '2024-03-15 13:45:00+02'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtc0002() => CorpusAssert.Parses(@"SELECT INTERVAL '1 year 2 months 3 days 4 hours 5 minutes 6 seconds'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtc0003() => CorpusAssert.Parses(@"SELECT INTERVAL '5' YEAR, INTERVAL '3' MONTH, INTERVAL '10' DAY, INTERVAL '2' HOUR, INTERVAL '30' MINUTE, INTERVAL '15' SECOND", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtc0004() => CorpusAssert.Parses(@"SELECT INTERVAL '1-6' YEAR TO MONTH, INTERVAL '2 12:30:00' DAY TO SECOND, INTERVAL '5:30' HOUR TO MINUTE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtc0005() => CorpusAssert.Parses(@"SELECT INTERVAL '1.5' SECOND(3), INTERVAL '2 04:05:06.789' DAY TO SECOND(3)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtc0006() => CorpusAssert.Parses(@"SELECT TIMESTAMP '2024-06-01 12:00:00' AT TIME ZONE 'UTC', TIMESTAMP '2024-06-01 12:00:00' AT TIME ZONE 'America/New_York'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtc0007() => CorpusAssert.Parses(@"SELECT EXTRACT(YEAR FROM DATE '2024-03-15'), EXTRACT(MONTH FROM DATE '2024-03-15'), EXTRACT(DAY FROM DATE '2024-03-15'), EXTRACT(DOW FROM DATE '2024-03-15'), EXTRACT(EPOCH FROM TIMESTAMP '2024-01-01 00:00:00')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtc0008() => CorpusAssert.Parses(@"SELECT EXTRACT(QUARTER FROM TIMESTAMP '2024-06-15 10:00:00'), EXTRACT(WEEK FROM DATE '2024-06-15'), EXTRACT(ISOYEAR FROM DATE '2024-01-01'), EXTRACT(JULIAN FROM DATE '2024-03-15')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtc0009() => CorpusAssert.Parses(@"SELECT EXTRACT(YEAR FROM)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtc0010() => CorpusAssert.Parses(@"SELECT date_part('year', TIMESTAMP '2024-06-15 10:30:00'), date_part('hour', TIMESTAMP '2024-06-15 10:30:00'), date_part('epoch', TIMESTAMP '2024-06-15 10:30:00')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtc0011() => CorpusAssert.Parses(@"SELECT date_trunc('year', TIMESTAMP '2024-06-15 10:30:45'), date_trunc('month', TIMESTAMP '2024-06-15 10:30:45'), date_trunc('day', TIMESTAMP '2024-06-15 10:30:45'), date_trunc('hour', TIMESTAMP '2024-06-15 10:30:45')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtc0012() => CorpusAssert.Parses(@"SELECT date_trunc('hour', TIMESTAMPTZ '2024-06-15 10:30:45+00', 'America/New_York')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtc0013() => CorpusAssert.Parses(@"SELECT date_bin(INTERVAL '15 minutes', TIMESTAMP '2024-06-15 10:37:00', TIMESTAMP '2024-06-15 00:00:00')", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void dtc0014() => CorpusAssert.Parses(@"SELECT (DATE '2024-03-15', DATE '2024-06-15') OVERLAPS (DATE '2024-05-01', DATE '2024-12-31')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtc0015() => CorpusAssert.Parses(@"SELECT TIMESTAMP '2024-01-01' + INTERVAL '30 days', TIMESTAMP '2024-03-15 12:00:00' - INTERVAL '2 hours', DATE '2024-06-01' - DATE '2024-01-01'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtc0016() => CorpusAssert.Parses(@"SELECT age(TIMESTAMP '2024-06-01 00:00:00', TIMESTAMP '2020-03-15 00:00:00'), age(TIMESTAMP '2020-01-01 00:00:00')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtc0017() => CorpusAssert.Parses(@"SELECT make_date(2024, 6, 15), make_time(13, 45, 30.5), make_timestamp(2024, 6, 15, 13, 45, 30.5), make_timestamptz(2024, 6, 15, 13, 45, 30.5, 'UTC')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtc0018() => CorpusAssert.Parses(@"SELECT make_interval(years := 1, months := 6, days := 15, hours := 2, mins := 30, secs := 45.5)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtc0019() => CorpusAssert.Parses(@"SELECT to_char(TIMESTAMP '2024-06-15 13:45:30', 'YYYY-MM-DD HH24:MI:SS'), to_date('2024-06-15', 'YYYY-MM-DD'), to_timestamp('2024-06-15 13:45:30', 'YYYY-MM-DD HH24:MI:SS')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtc0020() => CorpusAssert.Parses(@"SELECT current_date, current_time, current_timestamp, localtime, localtimestamp, now(), clock_timestamp(), statement_timestamp()", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtc0021() => CorpusAssert.Parses(@"SELECT justify_days(INTERVAL '35 days'), justify_hours(INTERVAL '27 hours'), justify_interval(INTERVAL '1 month -1 hour')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtc0022() => CorpusAssert.Parses(@"SELECT isfinite(DATE '2024-06-15'), isfinite(TIMESTAMP '2024-06-15 00:00:00'), isfinite(INTERVAL '1 day')", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void dtc0023() => CorpusAssert.Parses(@"SELECT EXTRACT(BADFIELD FROM DATE '2024-01-01')", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void dtc0024() => CorpusAssert.Parses(@"SELECT INTERVAL '1' TO SECOND", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtc0025() => CorpusAssert.Parses(@"SELECT EXTRACT(YEAR, DATE '2024-01-01')", "error");
 }

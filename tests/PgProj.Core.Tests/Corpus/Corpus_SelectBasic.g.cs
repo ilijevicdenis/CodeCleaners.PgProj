@@ -5,159 +5,159 @@ namespace PgProj.Core.Tests.Corpus;
 
 public class Corpus_SelectBasic
 {
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0001() => CorpusAssert.Parses(@"SELECT 1", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0002() => CorpusAssert.Parses(@"SELECT 'hello'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0003() => CorpusAssert.Parses(@"SELECT true", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0004() => CorpusAssert.Parses(@"SELECT NULL", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0005() => CorpusAssert.Parses(@"SELECT 1, 2, 3", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0006() => CorpusAssert.Parses(@"SELECT 1 + 1", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0007() => CorpusAssert.Parses(@"SELECT 1 AS one", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0008() => CorpusAssert.Parses(@"SELECT 1 one", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0009() => CorpusAssert.Parses(@"SELECT 'x' AS ""myAlias""", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0010() => CorpusAssert.Parses(@"SELECT 42 AS ""the answer""", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0011() => CorpusAssert.Parses(@"SELECT id FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0012() => CorpusAssert.Parses(@"SELECT id, name FROM s.t", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void selba0013() => CorpusAssert.Parses(@"SELECT * FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0014() => CorpusAssert.Parses(@"SELECT s.t.id FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0015() => CorpusAssert.Parses(@"SELECT t.id FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0016() => CorpusAssert.Parses(@"SELECT t.* FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0017() => CorpusAssert.Parses(@"SELECT s.t.* FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0018() => CorpusAssert.Parses(@"SELECT id, name, val, qty, flag FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0019() => CorpusAssert.Parses(@"SELECT id AS identifier, name AS full_name FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0020() => CorpusAssert.Parses(@"SELECT id + 1 AS next_id FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0021() => CorpusAssert.Parses(@"SELECT name || ' suffix' AS labeled FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0022() => CorpusAssert.Parses(@"SELECT qty * 2 AS doubled FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0023() => CorpusAssert.Parses(@"SELECT DISTINCT name FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0024() => CorpusAssert.Parses(@"SELECT DISTINCT name, status FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0025() => CorpusAssert.Parses(@"SELECT ALL name FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0026() => CorpusAssert.Parses(@"SELECT DISTINCT ON (status) id, name, status FROM s.t ORDER BY status, id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0027() => CorpusAssert.Parses(@"SELECT DISTINCT ON (status, name) id, name FROM s.t ORDER BY status, name", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0028() => CorpusAssert.Parses(@"SELECT DISTINCT ON (qty) id, qty FROM s.t ORDER BY qty", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0029() => CorpusAssert.Parses(@"SELECT id FROM s.t WHERE id = 1", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0030() => CorpusAssert.Parses(@"SELECT id FROM s.t WHERE id <> 1", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0031() => CorpusAssert.Parses(@"SELECT id FROM s.t WHERE id != 1", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0032() => CorpusAssert.Parses(@"SELECT id FROM s.t WHERE qty > 0", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0033() => CorpusAssert.Parses(@"SELECT id FROM s.t WHERE qty >= 0", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0034() => CorpusAssert.Parses(@"SELECT id FROM s.t WHERE qty < 100", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0035() => CorpusAssert.Parses(@"SELECT id FROM s.t WHERE qty <= 100", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0036() => CorpusAssert.Parses(@"SELECT id FROM s.t WHERE name = 'Alice'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0037() => CorpusAssert.Parses(@"SELECT id FROM s.t WHERE flag = true", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0038() => CorpusAssert.Parses(@"SELECT id FROM s.t WHERE flag IS TRUE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0039() => CorpusAssert.Parses(@"SELECT id FROM s.t WHERE flag IS FALSE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0040() => CorpusAssert.Parses(@"SELECT id FROM s.t WHERE val IS NULL", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0041() => CorpusAssert.Parses(@"SELECT id FROM s.t WHERE val IS NOT NULL", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0042() => CorpusAssert.Parses(@"SELECT id FROM s.t WHERE name LIKE 'A%'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0043() => CorpusAssert.Parses(@"SELECT id FROM s.t WHERE name ILIKE 'a%'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0044() => CorpusAssert.Parses(@"SELECT id FROM s.t WHERE name NOT LIKE 'A%'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0045() => CorpusAssert.Parses(@"SELECT id FROM s.t WHERE name SIMILAR TO 'A%'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0046() => CorpusAssert.Parses(@"SELECT id FROM s.t WHERE id BETWEEN 1 AND 10", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0047() => CorpusAssert.Parses(@"SELECT id FROM s.t WHERE id NOT BETWEEN 1 AND 10", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0048() => CorpusAssert.Parses(@"SELECT id FROM s.t WHERE id IN (1, 2, 3)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0049() => CorpusAssert.Parses(@"SELECT id FROM s.t WHERE id NOT IN (1, 2, 3)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0050() => CorpusAssert.Parses(@"SELECT id FROM s.t WHERE name = ANY(ARRAY['Alice','Bob'])", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0051() => CorpusAssert.Parses(@"SELECT id FROM s.t WHERE name = ALL(ARRAY['Alice'])", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0052() => CorpusAssert.Parses(@"SELECT id FROM s.t WHERE qty > 0 AND flag = true", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0053() => CorpusAssert.Parses(@"SELECT id FROM s.t WHERE qty > 0 OR flag = true", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0054() => CorpusAssert.Parses(@"SELECT id FROM s.t WHERE NOT flag", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0055() => CorpusAssert.Parses(@"SELECT id FROM s.t WHERE (qty > 0 AND flag) OR val IS NULL", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0056() => CorpusAssert.Parses(@"SELECT id FROM s.t WHERE EXISTS (SELECT 1 FROM s.t2 WHERE s.t2.t_id = s.t.id)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0057() => CorpusAssert.Parses(@"SELECT id FROM s.t WHERE NOT EXISTS (SELECT 1 FROM s.t2 WHERE s.t2.t_id = s.t.id)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0058() => CorpusAssert.Parses(@"SELECT id FROM s.t WHERE id IN (SELECT t_id FROM s.t2 WHERE t_id IS NOT NULL)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0059() => CorpusAssert.Parses(@"SELECT id FROM s.t WHERE id = (SELECT MAX(id) FROM s.t)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0060() => CorpusAssert.Parses(@"SELECT id FROM s.t WHERE name ~ '^A'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0061() => CorpusAssert.Parses(@"SELECT id FROM s.t WHERE name !~ '^A'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0062() => CorpusAssert.Parses(@"SELECT id FROM s.t WHERE name ~* '^a'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0063() => CorpusAssert.Parses(@"SELECT id FROM s.t WHERE status = 'ok'::s.mood", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0064() => CorpusAssert.Parses(@"SELECT id FROM s.t WHERE data @> '{""key"":1}'::jsonb", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0065() => CorpusAssert.Parses(@"SELECT id, name FROM s.t WHERE id > 0 ORDER BY id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0066() => CorpusAssert.Parses(@"SELECT id, name FROM s.t ORDER BY name ASC", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0067() => CorpusAssert.Parses(@"SELECT id, name FROM s.t ORDER BY name DESC", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0068() => CorpusAssert.Parses(@"SELECT id, name FROM s.t ORDER BY 1", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0069() => CorpusAssert.Parses(@"SELECT id, name FROM s.t ORDER BY 2, 1", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0070() => CorpusAssert.Parses(@"SELECT id, name FROM s.t ORDER BY name NULLS FIRST", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0071() => CorpusAssert.Parses(@"SELECT id, name FROM s.t ORDER BY name NULLS LAST", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0072() => CorpusAssert.Parses(@"SELECT id, name FROM s.t ORDER BY name ASC NULLS LAST", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0073() => CorpusAssert.Parses(@"SELECT id, name FROM s.t ORDER BY name DESC NULLS FIRST", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0074() => CorpusAssert.Parses(@"SELECT id FROM s.t LIMIT 10", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0075() => CorpusAssert.Parses(@"SELECT id FROM s.t LIMIT 10 OFFSET 5", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0076() => CorpusAssert.Parses(@"SELECT id FROM s.t OFFSET 5", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0077() => CorpusAssert.Parses(@"SELECT id FROM s.t OFFSET 5 ROWS", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void selba0078() => CorpusAssert.Parses(@"SELECT id FROM s.t FETCH FIRST 5 ROWS ONLY", "ok");
@@ -171,133 +171,133 @@ public class Corpus_SelectBasic
     public void selba0082() => CorpusAssert.Parses(@"SELECT id FROM s.t ORDER BY id FETCH FIRST 5 ROWS WITH TIES", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void selba0083() => CorpusAssert.Parses(@"SELECT id, name FROM s.t ORDER BY id FETCH FIRST 5 ROWS WITH TIES", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0084() => CorpusAssert.Parses(@"SELECT id FROM s.t LIMIT NULL", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0085() => CorpusAssert.Parses(@"SELECT id FROM s.t LIMIT ALL", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0086() => CorpusAssert.Parses(@"SELECT id, name FROM s.t AS t1", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0087() => CorpusAssert.Parses(@"SELECT id, name FROM s.t t1", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0088() => CorpusAssert.Parses(@"SELECT t1.id, t1.name FROM s.t AS t1", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0089() => CorpusAssert.Parses(@"SELECT a.id, b.label FROM s.t a, s.t2 b", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0090() => CorpusAssert.Parses(@"SELECT a.id FROM s.t a CROSS JOIN s.t2 b", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0091() => CorpusAssert.Parses(@"SELECT a.id FROM s.t a INNER JOIN s.t2 b ON a.id = b.t_id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0092() => CorpusAssert.Parses(@"SELECT a.id FROM s.t a LEFT JOIN s.t2 b ON a.id = b.t_id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0093() => CorpusAssert.Parses(@"SELECT a.id FROM s.t a LEFT OUTER JOIN s.t2 b ON a.id = b.t_id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0094() => CorpusAssert.Parses(@"SELECT a.id FROM s.t a RIGHT JOIN s.t2 b ON a.id = b.t_id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0095() => CorpusAssert.Parses(@"SELECT a.id FROM s.t a RIGHT OUTER JOIN s.t2 b ON a.id = b.t_id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0096() => CorpusAssert.Parses(@"SELECT a.id FROM s.t a FULL JOIN s.t2 b ON a.id = b.t_id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0097() => CorpusAssert.Parses(@"SELECT a.id FROM s.t a FULL OUTER JOIN s.t2 b ON a.id = b.t_id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0098() => CorpusAssert.Parses(@"SELECT a.id FROM s.t a JOIN s.t2 b USING (id)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0099() => CorpusAssert.Parses(@"SELECT a.id FROM s.t a NATURAL JOIN s.t2 b", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0100() => CorpusAssert.Parses(@"SELECT a.id FROM s.t a JOIN s.t2 b ON a.id = b.t_id WHERE b.amount > 0", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0101() => CorpusAssert.Parses(@"SELECT id FROM s.t WHERE id = (SELECT id FROM s.t LIMIT 1)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0102() => CorpusAssert.Parses(@"SELECT (SELECT name FROM s.t LIMIT 1) AS first_name", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0103() => CorpusAssert.Parses(@"SELECT id FROM (SELECT id FROM s.t) sub", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0104() => CorpusAssert.Parses(@"SELECT id FROM (SELECT id FROM s.t) AS sub", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0105() => CorpusAssert.Parses(@"SELECT sub.id FROM (SELECT id, name FROM s.t) AS sub WHERE sub.id > 0", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0106() => CorpusAssert.Parses(@"SELECT id FROM s.t UNION SELECT id FROM s.t2", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0107() => CorpusAssert.Parses(@"SELECT id FROM s.t UNION ALL SELECT id FROM s.t2", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0108() => CorpusAssert.Parses(@"SELECT id FROM s.t INTERSECT SELECT id FROM s.t2", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0109() => CorpusAssert.Parses(@"SELECT id FROM s.t INTERSECT ALL SELECT id FROM s.t2", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0110() => CorpusAssert.Parses(@"SELECT id FROM s.t EXCEPT SELECT id FROM s.t2", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0111() => CorpusAssert.Parses(@"SELECT id FROM s.t EXCEPT ALL SELECT id FROM s.t2", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0112() => CorpusAssert.Parses(@"SELECT COUNT(*) FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0113() => CorpusAssert.Parses(@"SELECT COUNT(id), SUM(qty), AVG(qty), MIN(qty), MAX(qty) FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0114() => CorpusAssert.Parses(@"SELECT status, COUNT(*) FROM s.t GROUP BY status", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0115() => CorpusAssert.Parses(@"SELECT status, flag, COUNT(*) FROM s.t GROUP BY status, flag", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0116() => CorpusAssert.Parses(@"SELECT status, COUNT(*) FROM s.t GROUP BY status HAVING COUNT(*) > 0", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0117() => CorpusAssert.Parses(@"SELECT status, COUNT(*) AS n FROM s.t GROUP BY status ORDER BY n DESC", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0118() => CorpusAssert.Parses(@"SELECT CASE WHEN qty > 0 THEN 'positive' ELSE 'zero' END FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0119() => CorpusAssert.Parses(@"SELECT CASE qty WHEN 0 THEN 'zero' WHEN 1 THEN 'one' ELSE 'many' END FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0120() => CorpusAssert.Parses(@"SELECT COALESCE(val, 0) FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0121() => CorpusAssert.Parses(@"SELECT NULLIF(qty, 0) FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0122() => CorpusAssert.Parses(@"SELECT GREATEST(qty, 0) FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0123() => CorpusAssert.Parses(@"SELECT LEAST(qty, 100) FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0124() => CorpusAssert.Parses(@"SELECT id::text FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0125() => CorpusAssert.Parses(@"SELECT CAST(id AS text) FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0126() => CorpusAssert.Parses(@"SELECT id, name FROM s.t FOR UPDATE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0127() => CorpusAssert.Parses(@"SELECT id FROM s.t FOR SHARE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0128() => CorpusAssert.Parses(@"SELECT id FROM s.t FOR UPDATE OF t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0129() => CorpusAssert.Parses(@"SELECT id FROM s.t FOR UPDATE NOWAIT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0130() => CorpusAssert.Parses(@"SELECT id FROM s.t FOR UPDATE SKIP LOCKED", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0131() => CorpusAssert.Parses(@"SELECT id FROM s.t FOR NO KEY UPDATE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0132() => CorpusAssert.Parses(@"SELECT id FROM s.t FOR KEY SHARE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0133() => CorpusAssert.Parses(@"SELECT s.f(5)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0134() => CorpusAssert.Parses(@"SELECT s.g(3, 4)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0135() => CorpusAssert.Parses(@"SELECT s.g(a => 3, b => 4)", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void selba0136() => CorpusAssert.Parses(@"SELECT * FROM s.rows_f()", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0137() => CorpusAssert.Parses(@"SELECT id, name FROM s.rows_f()", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0138() => CorpusAssert.Parses(@"SELECT nextval('s.seq')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0139() => CorpusAssert.Parses(@"SELECT current_timestamp", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0140() => CorpusAssert.Parses(@"SELECT current_date", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0141() => CorpusAssert.Parses(@"SELECT current_user", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0142() => CorpusAssert.Parses(@"SELECT session_user", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0143() => CorpusAssert.Parses(@"SELECT version()", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0144() => CorpusAssert.Parses(@"SELECT id FROM s.t WHERE id > 0 ORDER BY id LIMIT 5 OFFSET 2", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0145() => CorpusAssert.Parses(@"SELECT DISTINCT id FROM s.t WHERE flag ORDER BY id LIMIT 10", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0146() => CorpusAssert.Parses(@"SELECT id FROM s.v", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0147() => CorpusAssert.Parses(@"SELECT status, n FROM s.mv", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void selba0148() => CorpusAssert.Parses(@"SELECT * FROM s.parent", "ok");
@@ -313,59 +313,59 @@ public class Corpus_SelectBasic
     public void selba0153() => CorpusAssert.Parses(@"SELECT id, (home).street FROM s.t", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void selba0154() => CorpusAssert.Parses(@"SELECT id, (home).city AS city FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0155() => CorpusAssert.Parses(@"SELECT tags[1] FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0156() => CorpusAssert.Parses(@"SELECT tags[1:2] FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0157() => CorpusAssert.Parses(@"SELECT data->>'key' FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0158() => CorpusAssert.Parses(@"SELECT data->'nested' FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0159() => CorpusAssert.Parses(@"SELECT id, row_number() OVER () FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0160() => CorpusAssert.Parses(@"SELECT id, rank() OVER (ORDER BY id) FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0161() => CorpusAssert.Parses(@"SELECT id, lag(id) OVER (ORDER BY id) FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0162() => CorpusAssert.Parses(@"SELECT id, sum(qty) OVER (PARTITION BY status ORDER BY id) FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0163() => CorpusAssert.Parses(@"SELECT id, sum(qty) OVER (PARTITION BY status) FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0164() => CorpusAssert.Parses(@"SELECT ROW(1, 'a', true)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0165() => CorpusAssert.Parses(@"SELECT ARRAY[1, 2, 3]", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0166() => CorpusAssert.Parses(@"SELECT ARRAY(SELECT id FROM s.t)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0167() => CorpusAssert.Parses(@"SELECT id FROM s.t TABLESAMPLE BERNOULLI(100)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0168() => CorpusAssert.Parses(@"SELECT id FROM s.t TABLESAMPLE SYSTEM(100)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0169() => CorpusAssert.Parses(@"SELECT 1 WHERE true", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0170() => CorpusAssert.Parses(@"SELECT generate_series(1, 5)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0171() => CorpusAssert.Parses(@"SELECT id FROM s.t UNION", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0172() => CorpusAssert.Parses(@"SELECT FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0173() => CorpusAssert.Parses(@"SELECT id, FROM s.t", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0174() => CorpusAssert.Parses(@"SELECT id FROM", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0175() => CorpusAssert.Parses(@"SELECT id FROM s.t WHERE", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0176() => CorpusAssert.Parses(@"SELECT id FROM s.t ORDER BY", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0177() => CorpusAssert.Parses(@"SELECT id FROM s.t LIMIT", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0178() => CorpusAssert.Parses(@"SELECT DISTINCT ON id FROM s.t ORDER BY id", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0179() => CorpusAssert.Parses(@"SELECT id FROM s.t GROUP BY", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void selba0180() => CorpusAssert.Parses(@"SELECT id WHERE id = 1", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0181() => CorpusAssert.Parses(@"SELECT *, FROM s.t", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void selba0182() => CorpusAssert.Parses(@"SELECT id FROM s.t JOIN s.t2", "error");
@@ -375,177 +375,177 @@ public class Corpus_SelectBasic
     public void selba0184() => CorpusAssert.Parses(@"SELECT ALL DISTINCT id FROM s.t", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void selba0185() => CorpusAssert.Parses(@"SELECT id FROM s.t FETCH FIRST ROWS ONLY", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0186() => CorpusAssert.Parses(@"SELECT id name extra FROM s.t", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0187() => CorpusAssert.Parses(@"SELECT 1 + * FROM s.t", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0188() => CorpusAssert.Parses(@"SELECT id FROM s.t WHERE id =", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0189() => CorpusAssert.Parses(@"SELECT id FROM s.t WHERE BETWEEN 1 AND 10", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0190() => CorpusAssert.Parses(@"SELECT id FROM s.t OFFSET -1", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void selba0191() => CorpusAssert.Parses(@"SELECT id FROM s.nonexistent_table", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void selba0192() => CorpusAssert.Parses(@"SELECT no_col FROM s.t", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0193() => CorpusAssert.Parses(@"SELECT id FROM s.t ORDER BY id LIMIT 5 FOR UPDATE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0194() => CorpusAssert.Parses(@"SELECT status::text FROM s.t", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void selba0195() => CorpusAssert.Parses(@"SELECT DISTINCT ON (status) * FROM s.t ORDER BY status", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0196() => CorpusAssert.Parses(@"SELECT id, name FROM s.t WHERE id > ALL(SELECT t_id FROM s.t2 WHERE t_id IS NOT NULL)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0197() => CorpusAssert.Parses(@"SELECT id FROM s.t WHERE id > SOME(SELECT t_id FROM s.t2 WHERE t_id IS NOT NULL)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0198() => CorpusAssert.Parses(@"SELECT 1 AS n UNION SELECT 2 UNION SELECT 3 ORDER BY n", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0199() => CorpusAssert.Parses(@"SELECT id FROM s.t WHERE id IS DISTINCT FROM NULL", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0200() => CorpusAssert.Parses(@"SELECT id FROM s.t WHERE id IS NOT DISTINCT FROM NULL", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0001() => CorpusAssert.Parses(@"SELECT 1", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0002() => CorpusAssert.Parses(@"SELECT 'hello'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0003() => CorpusAssert.Parses(@"SELECT true", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0004() => CorpusAssert.Parses(@"SELECT NULL", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0005() => CorpusAssert.Parses(@"SELECT 1 + 2", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0006() => CorpusAssert.Parses(@"SELECT 1 + 2 AS result", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0007() => CorpusAssert.Parses(@"SELECT 1 + 2 result", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0008() => CorpusAssert.Parses(@"SELECT 3.14::float AS pi", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0009() => CorpusAssert.Parses(@"SELECT 'foo' AS ""My Column""", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0010() => CorpusAssert.Parses(@"SELECT id FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0011() => CorpusAssert.Parses(@"SELECT name FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0012() => CorpusAssert.Parses(@"SELECT id, name FROM s.t", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void selbb0013() => CorpusAssert.Parses(@"SELECT * FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0014() => CorpusAssert.Parses(@"SELECT s.t.* FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0015() => CorpusAssert.Parses(@"SELECT t.* FROM s.t t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0016() => CorpusAssert.Parses(@"SELECT t.id, t.name FROM s.t t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0017() => CorpusAssert.Parses(@"SELECT s.t.id, s.t.name FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0018() => CorpusAssert.Parses(@"SELECT id, name, val, qty, flag FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0019() => CorpusAssert.Parses(@"SELECT id AS pk, name AS label FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0020() => CorpusAssert.Parses(@"SELECT id pk, name label FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0021() => CorpusAssert.Parses(@"SELECT DISTINCT name FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0022() => CorpusAssert.Parses(@"SELECT DISTINCT name, status FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0023() => CorpusAssert.Parses(@"SELECT ALL name FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0024() => CorpusAssert.Parses(@"SELECT DISTINCT ON (name) id, name FROM s.t ORDER BY name", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0025() => CorpusAssert.Parses(@"SELECT DISTINCT ON (status, name) id, status, name FROM s.t ORDER BY status, name", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void selbb0026() => CorpusAssert.Parses(@"SELECT DISTINCT ON (name) * FROM s.t ORDER BY name, id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0027() => CorpusAssert.Parses(@"SELECT id FROM s.t WHERE id = 1", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0028() => CorpusAssert.Parses(@"SELECT id FROM s.t WHERE id > 0", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0029() => CorpusAssert.Parses(@"SELECT id FROM s.t WHERE id >= 1 AND id <= 100", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0030() => CorpusAssert.Parses(@"SELECT id FROM s.t WHERE id < 10 OR id > 100", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0031() => CorpusAssert.Parses(@"SELECT id FROM s.t WHERE NOT flag", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0032() => CorpusAssert.Parses(@"SELECT id FROM s.t WHERE flag IS TRUE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0033() => CorpusAssert.Parses(@"SELECT id FROM s.t WHERE flag IS FALSE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0034() => CorpusAssert.Parses(@"SELECT id FROM s.t WHERE val IS NULL", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0035() => CorpusAssert.Parses(@"SELECT id FROM s.t WHERE val IS NOT NULL", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0036() => CorpusAssert.Parses(@"SELECT id FROM s.t WHERE name LIKE 'A%'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0037() => CorpusAssert.Parses(@"SELECT id FROM s.t WHERE name ILIKE 'a%'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0038() => CorpusAssert.Parses(@"SELECT id FROM s.t WHERE name NOT LIKE 'A%'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0039() => CorpusAssert.Parses(@"SELECT id FROM s.t WHERE qty BETWEEN 1 AND 10", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0040() => CorpusAssert.Parses(@"SELECT id FROM s.t WHERE qty NOT BETWEEN 1 AND 10", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0041() => CorpusAssert.Parses(@"SELECT id FROM s.t WHERE id IN (1, 2, 3)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0042() => CorpusAssert.Parses(@"SELECT id FROM s.t WHERE id NOT IN (1, 2, 3)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0043() => CorpusAssert.Parses(@"SELECT id FROM s.t WHERE name = ANY(ARRAY['a','b'])", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0044() => CorpusAssert.Parses(@"SELECT id FROM s.t WHERE qty = ALL(ARRAY[0])", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0045() => CorpusAssert.Parses(@"SELECT id FROM s.t WHERE status = 'ok'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0046() => CorpusAssert.Parses(@"SELECT id FROM s.t WHERE (id + qty) > 5", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0047() => CorpusAssert.Parses(@"SELECT id FROM s.t WHERE name ~ '^A'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0048() => CorpusAssert.Parses(@"SELECT id FROM s.t WHERE name !~ '^A'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0049() => CorpusAssert.Parses(@"SELECT id FROM s.t WHERE name ~* '^a'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0050() => CorpusAssert.Parses(@"SELECT id + 1 AS next_id FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0051() => CorpusAssert.Parses(@"SELECT id * 2, name || ' suffix' FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0052() => CorpusAssert.Parses(@"SELECT upper(name) FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0053() => CorpusAssert.Parses(@"SELECT upper(name) AS uname, length(name) AS nlen FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0054() => CorpusAssert.Parses(@"SELECT CASE WHEN flag THEN 'yes' ELSE 'no' END FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0055() => CorpusAssert.Parses(@"SELECT CASE status WHEN 'ok' THEN 1 WHEN 'happy' THEN 2 ELSE 0 END FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0056() => CorpusAssert.Parses(@"SELECT COALESCE(val, 0) FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0057() => CorpusAssert.Parses(@"SELECT NULLIF(qty, 0) FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0058() => CorpusAssert.Parses(@"SELECT GREATEST(qty, 0) FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0059() => CorpusAssert.Parses(@"SELECT LEAST(qty, 100) FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0060() => CorpusAssert.Parses(@"SELECT id, name FROM s.t ORDER BY name", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0061() => CorpusAssert.Parses(@"SELECT id, name FROM s.t ORDER BY name ASC", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0062() => CorpusAssert.Parses(@"SELECT id, name FROM s.t ORDER BY name DESC", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0063() => CorpusAssert.Parses(@"SELECT id, name FROM s.t ORDER BY name ASC NULLS FIRST", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0064() => CorpusAssert.Parses(@"SELECT id, name FROM s.t ORDER BY name DESC NULLS LAST", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0065() => CorpusAssert.Parses(@"SELECT id, name FROM s.t ORDER BY 2", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0066() => CorpusAssert.Parses(@"SELECT id, name, val FROM s.t ORDER BY name, val DESC", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0067() => CorpusAssert.Parses(@"SELECT id FROM s.t LIMIT 10", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0068() => CorpusAssert.Parses(@"SELECT id FROM s.t LIMIT ALL", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0069() => CorpusAssert.Parses(@"SELECT id FROM s.t OFFSET 5", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0070() => CorpusAssert.Parses(@"SELECT id FROM s.t LIMIT 10 OFFSET 5", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0071() => CorpusAssert.Parses(@"SELECT id FROM s.t OFFSET 5 LIMIT 10", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void selbb0072() => CorpusAssert.Parses(@"SELECT id FROM s.t FETCH FIRST 5 ROWS ONLY", "ok");
@@ -555,103 +555,103 @@ public class Corpus_SelectBasic
     public void selbb0074() => CorpusAssert.Parses(@"SELECT id FROM s.t FETCH FIRST 1 ROW ONLY", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void selbb0075() => CorpusAssert.Parses(@"SELECT id FROM s.t OFFSET 0 ROWS FETCH NEXT 5 ROWS ONLY", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0076() => CorpusAssert.Parses(@"SELECT id FROM s.t FETCH FIRST 5 ROWS WITH TIES", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void selbb0077() => CorpusAssert.Parses(@"SELECT id FROM s.t ORDER BY id FETCH FIRST 5 ROWS WITH TIES", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0078() => CorpusAssert.Parses(@"SELECT s.t.id, s.t.name FROM s.t, s.t2", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0079() => CorpusAssert.Parses(@"SELECT t.id, t2.label FROM s.t t, s.t2 t2 WHERE t.id = t2.t_id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0080() => CorpusAssert.Parses(@"SELECT t.id, t2.label FROM s.t t INNER JOIN s.t2 t2 ON t.id = t2.t_id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0081() => CorpusAssert.Parses(@"SELECT t.id, t2.label FROM s.t t LEFT JOIN s.t2 t2 ON t.id = t2.t_id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0082() => CorpusAssert.Parses(@"SELECT t.id, t2.label FROM s.t t RIGHT JOIN s.t2 t2 ON t.id = t2.t_id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0083() => CorpusAssert.Parses(@"SELECT t.id, t2.label FROM s.t t FULL JOIN s.t2 t2 ON t.id = t2.t_id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0084() => CorpusAssert.Parses(@"SELECT t.id, t2.label FROM s.t t LEFT OUTER JOIN s.t2 t2 ON t.id = t2.t_id", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void selbb0085() => CorpusAssert.Parses(@"SELECT * FROM s.t CROSS JOIN s.t2", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void selbb0086() => CorpusAssert.Parses(@"SELECT * FROM s.t NATURAL JOIN s.t2", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0087() => CorpusAssert.Parses(@"SELECT t.id, t2.label FROM s.t t JOIN s.t2 t2 USING (id)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0088() => CorpusAssert.Parses(@"SELECT t.id, t2.label FROM s.t t JOIN s.t2 t2 ON t.id = t2.t_id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0089() => CorpusAssert.Parses(@"SELECT id, name FROM s.t WHERE id IN (SELECT t_id FROM s.t2)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0090() => CorpusAssert.Parses(@"SELECT id FROM s.t WHERE EXISTS (SELECT 1 FROM s.t2 WHERE t2.t_id = t.id)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0091() => CorpusAssert.Parses(@"SELECT id FROM s.t WHERE NOT EXISTS (SELECT 1 FROM s.t2 WHERE t2.t_id = t.id)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0092() => CorpusAssert.Parses(@"SELECT (SELECT count(*) FROM s.t2 WHERE t2.t_id = t.id) AS cnt FROM s.t t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0093() => CorpusAssert.Parses(@"SELECT id FROM (SELECT id FROM s.t) sub", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0094() => CorpusAssert.Parses(@"SELECT sub.id FROM (SELECT id, name FROM s.t) AS sub", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0095() => CorpusAssert.Parses(@"WITH cte AS (SELECT id, name FROM s.t) SELECT * FROM cte", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0096() => CorpusAssert.Parses(@"WITH a AS (SELECT id FROM s.t), b AS (SELECT t_id FROM s.t2) SELECT * FROM a, b", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0097() => CorpusAssert.Parses(@"SELECT id FROM s.t GROUP BY id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0098() => CorpusAssert.Parses(@"SELECT status, count(*) FROM s.t GROUP BY status", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0099() => CorpusAssert.Parses(@"SELECT status, flag, count(*) FROM s.t GROUP BY status, flag", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0100() => CorpusAssert.Parses(@"SELECT status, count(*) FROM s.t GROUP BY status HAVING count(*) > 0", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0101() => CorpusAssert.Parses(@"SELECT status, count(*) FROM s.t GROUP BY 1", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0102() => CorpusAssert.Parses(@"SELECT id FROM s.t UNION SELECT id FROM s.t2", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0103() => CorpusAssert.Parses(@"SELECT id FROM s.t UNION ALL SELECT id FROM s.t2", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0104() => CorpusAssert.Parses(@"SELECT id FROM s.t INTERSECT SELECT id FROM s.t2", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0105() => CorpusAssert.Parses(@"SELECT id FROM s.t EXCEPT SELECT id FROM s.t2", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0106() => CorpusAssert.Parses(@"SELECT id FROM s.t INTERSECT ALL SELECT id FROM s.t2", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0107() => CorpusAssert.Parses(@"SELECT id FROM s.t EXCEPT ALL SELECT id FROM s.t2", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0108() => CorpusAssert.Parses(@"SELECT data->>'key' FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0109() => CorpusAssert.Parses(@"SELECT data->'nested' FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0110() => CorpusAssert.Parses(@"SELECT tags[1] FROM s.t", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void selbb0111() => CorpusAssert.Parses(@"SELECT (home).city FROM s.t", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void selbb0112() => CorpusAssert.Parses(@"SELECT home.city FROM s.t", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0113() => CorpusAssert.Parses(@"SELECT id::text FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0114() => CorpusAssert.Parses(@"SELECT CAST(id AS text) FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0115() => CorpusAssert.Parses(@"SELECT id FROM s.t WHERE id = $1", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0116() => CorpusAssert.Parses(@"SELECT 1, 2, 3", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0117() => CorpusAssert.Parses(@"SELECT 1 AS a, 'hello' AS b, true AS c, NULL AS d", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0118() => CorpusAssert.Parses(@"SELECT current_date", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0119() => CorpusAssert.Parses(@"SELECT current_timestamp", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0120() => CorpusAssert.Parses(@"SELECT current_user", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0121() => CorpusAssert.Parses(@"SELECT session_user", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0122() => CorpusAssert.Parses(@"SELECT pg_catalog.version()", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void selbb0123() => CorpusAssert.Parses(@"SELECT * FROM s.v", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0124() => CorpusAssert.Parses(@"SELECT status, n FROM s.mv", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void selbb0125() => CorpusAssert.Parses(@"SELECT * FROM s.rows_f()", "ok");
@@ -659,41 +659,41 @@ public class Corpus_SelectBasic
     public void selbb0126() => CorpusAssert.Parses(@"SELECT * FROM s.parent", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void selbb0127() => CorpusAssert.Parses(@"SELECT * FROM ONLY s.parent", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0128() => CorpusAssert.Parses(@"SELECT id FROM s.t FOR UPDATE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0129() => CorpusAssert.Parses(@"SELECT id FROM s.t FOR SHARE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0130() => CorpusAssert.Parses(@"SELECT id FROM s.t FOR NO KEY UPDATE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0131() => CorpusAssert.Parses(@"SELECT id FROM s.t FOR KEY SHARE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0132() => CorpusAssert.Parses(@"SELECT id FROM s.t FOR UPDATE SKIP LOCKED", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0133() => CorpusAssert.Parses(@"SELECT id FROM s.t FOR UPDATE NOWAIT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0134() => CorpusAssert.Parses(@"SELECT FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0135() => CorpusAssert.Parses(@"SELECT WHERE true", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0136() => CorpusAssert.Parses(@"SELECT id, FROM s.t", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0137() => CorpusAssert.Parses(@"SELECT DISTINCT ON () id FROM s.t ORDER BY id", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0138() => CorpusAssert.Parses(@"SELECT id name extra FROM s.t", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0139() => CorpusAssert.Parses(@"SELECT id FROM", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0140() => CorpusAssert.Parses(@"SELECT id FROM s.t WHERE", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0141() => CorpusAssert.Parses(@"SELECT id FROM s.t ORDER BY", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0142() => CorpusAssert.Parses(@"SELECT id FROM s.t LIMIT", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0143() => CorpusAssert.Parses(@"SELECT id FROM s.t OFFSET", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void selbb0144() => CorpusAssert.Parses(@"DISTINCT SELECT id FROM s.t", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0145() => CorpusAssert.Parses(@"SELECT id FROM s.t GROUP", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void selbb0146() => CorpusAssert.Parses(@"SELECT id FROM s.t HAVING count(*) > 0", "error");
@@ -707,23 +707,23 @@ public class Corpus_SelectBasic
     public void selbb0150() => CorpusAssert.Parses(@"SELECT id FROM s.t WHERE id = 'not_a_number'", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void selbb0151() => CorpusAssert.Parses(@"SELECT (SELECT id, name FROM s.t LIMIT 1)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0152() => CorpusAssert.Parses(@"SELECT id FROM s.t AS t2 WHERE t2.id > 0", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0153() => CorpusAssert.Parses(@"SELECT id FROM s.t t2 WHERE t2.id > 0", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0154() => CorpusAssert.Parses(@"SELECT nextval('s.seq')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0155() => CorpusAssert.Parses(@"SELECT ARRAY[1, 2, 3] AS arr", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0156() => CorpusAssert.Parses(@"SELECT ROW(1, 'text', true) AS r", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0157() => CorpusAssert.Parses(@"SELECT count(*) FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0158() => CorpusAssert.Parses(@"SELECT count(DISTINCT name) FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0159() => CorpusAssert.Parses(@"SELECT sum(val), avg(val), min(val), max(val) FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0160() => CorpusAssert.Parses(@"SELECT id FROM s.t WHERE id = (SELECT max(id) FROM s.t)", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void selbb0161() => CorpusAssert.Parses(@"SELECT FROM WHERE true", "error");

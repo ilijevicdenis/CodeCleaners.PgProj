@@ -10,13 +10,15 @@ namespace PgProj.Core.Tests;
 
 /// <summary>
 /// Code-generates one [Fact] per corpus case under Corpus/*.g.cs (one partial class per category).
-/// Cases the parser does not yet handle are emitted with [Fact(Skip=...)] based on the committed
-/// tests/corpus/_pending.txt list, so `dotnet test` stays GREEN while the suite drives TDD: to work
-/// a feature, remove its ids from _pending.txt, regenerate, and the now-active tests must pass.
+/// Cases the parser does not yet satisfy are emitted with [Fact(Skip=...)] from tests/corpus/
+/// _pending.txt, so `dotnet test` stays GREEN and the active count is the coverage metric.
 ///
-/// Run:   PGPROJ_GEN_CORPUS_TESTS=1 dotnet test --filter FullyQualifiedName~Generate_per_case_corpus_tests
-/// Reseed pending from current parser behaviour (first time / deliberate reset):
-///        PGPROJ_GEN_CORPUS_TESTS=1 PGPROJ_GEN_RECOMPUTE_PENDING=1 dotnet test --filter ...Generate_per_case...
+/// Workflow: improve the parser, then RE-BASELINE the pending set to current parser behaviour:
+///   PGPROJ_GEN_CORPUS_TESTS=1 PGPROJ_GEN_RECOMPUTE_PENDING=1 dotnet test --filter ...Generate_per_case...
+/// Review the committed _pending.txt diff — active count should rise; a *valid* case newly pended is
+/// a regression to investigate. Between re-baselines, regeneration without RECOMPUTE keeps the
+/// committed pending so a regression in an active case fails the build. The hand-written
+/// CreateTableSyntaxTests / SelectSyntaxTests are the primary, non-gated regression guard.
 /// </summary>
 public class CorpusTestGenerator
 {

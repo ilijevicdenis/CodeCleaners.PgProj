@@ -39,15 +39,15 @@ public class Corpus_Xml
     public void xmla0016() => CorpusAssert.Parses(@"SELECT xmlelement('foo')", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void xmla0017() => CorpusAssert.Parses(@"SELECT xmlelement(NAME)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void xmla0018() => CorpusAssert.Parses(@"SELECT xmlelement(NAME foo, xmlattributes('constant'))", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void xmla0019() => CorpusAssert.Parses(@"SELECT xmlelement(NAME foo, xmlattributes())", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void xmla0020() => CorpusAssert.Parses(@"SELECT xmlforest('hello' AS greeting)", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void xmla0021() => CorpusAssert.Parses(@"SELECT xmlforest(1 AS a, 2 AS b, 3 AS c)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void xmla0022() => CorpusAssert.Parses(@"SELECT xmlforest(name, val, qty) FROM s.t LIMIT 1", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void xmla0023() => CorpusAssert.Parses(@"SELECT xmlforest(name AS nm, val AS value) FROM s.t LIMIT 1", "ok");
@@ -65,7 +65,7 @@ public class Corpus_Xml
     public void xmla0029() => CorpusAssert.Parses(@"SELECT xmlconcat(xmlelement(NAME a), xmlelement(NAME b), xmlelement(NAME c))", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void xmla0030() => CorpusAssert.Parses(@"SELECT xmlconcat(NULL::xml, xmlelement(NAME a))", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void xmla0031() => CorpusAssert.Parses(@"SELECT xmlconcat(NULL::xml, NULL::xml)", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void xmla0032() => CorpusAssert.Parses(@"SELECT xmlconcat(xmlelement(NAME x, 1), xmlelement(NAME y, 2))", "ok");
@@ -79,21 +79,21 @@ public class Corpus_Xml
     public void xmla0036() => CorpusAssert.Parses(@"SELECT xmlpi(NAME foo, 'bar=1')", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void xmla0037() => CorpusAssert.Parses(@"SELECT xmlpi(NAME php, 'echo 1;')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void xmla0038() => CorpusAssert.Parses(@"SELECT xmlpi(NAME xml, 'version=""1.0""')", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void xmla0039() => CorpusAssert.Parses(@"SELECT xmlpi(NAME foo, 'contains ?> inside')", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void xmla0040() => CorpusAssert.Parses(@"SELECT xmlpi('foo')", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void xmla0041() => CorpusAssert.Parses(@"SELECT xmlpi(NAME)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void xmla0042() => CorpusAssert.Parses(@"SELECT xmlcomment('hello world')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void xmla0043() => CorpusAssert.Parses(@"SELECT xmlcomment('no dashes here')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void xmla0044() => CorpusAssert.Parses(@"SELECT xmlcomment('')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void xmla0045() => CorpusAssert.Parses(@"SELECT xmlcomment(NULL)", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void xmla0046() => CorpusAssert.Parses(@"SELECT xmlcomment('has -- double dash')", "error");
@@ -113,7 +113,7 @@ public class Corpus_Xml
     public void xmla0053() => CorpusAssert.Parses(@"SELECT xmlroot(xmlelement(NAME doc), VERSION NO VALUE, STANDALONE YES)", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void xmla0054() => CorpusAssert.Parses(@"SELECT xmlroot(xmlelement(NAME doc), VERSION NO VALUE, STANDALONE NO)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void xmla0055() => CorpusAssert.Parses(@"SELECT xmlroot(xmlelement(NAME doc))", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void xmla0056() => CorpusAssert.Parses(@"SELECT xmlroot('bad')", "error");
@@ -127,9 +127,9 @@ public class Corpus_Xml
     public void xmla0060() => CorpusAssert.Parses(@"SELECT xmlparse(CONTENT 'hello &amp; world')", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void xmla0061() => CorpusAssert.Parses(@"SELECT xmlparse(DOCUMENT '<root><child/></root>')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void xmla0062() => CorpusAssert.Parses(@"SELECT xmlparse(DOCUMENT '<unclosed>')", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void xmla0063() => CorpusAssert.Parses(@"SELECT xmlparse(CONTENT '<a>1</a><b>2</b')", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void xmla0064() => CorpusAssert.Parses(@"SELECT xmlparse('<root/>')", "error");
@@ -145,11 +145,11 @@ public class Corpus_Xml
     public void xmla0069() => CorpusAssert.Parses(@"SELECT xmlserialize(DOCUMENT xmlparse(DOCUMENT '<root/>') AS varchar(100))", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void xmla0070() => CorpusAssert.Parses(@"SELECT xmlserialize(CONTENT xmlelement(NAME x, 1) AS character varying)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void xmla0071() => CorpusAssert.Parses(@"SELECT xmlserialize(DOCUMENT xmlelement(NAME root) AS xml)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void xmla0072() => CorpusAssert.Parses(@"SELECT xmlserialize(xmlelement(NAME root) AS text)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void xmla0073() => CorpusAssert.Parses(@"SELECT xmlserialize(DOCUMENT xmlparse(DOCUMENT '<r/>') AS clob)", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void xmla0074() => CorpusAssert.Parses(@"SELECT xpath('/root/child', xmlparse(DOCUMENT '<root><child>val</child></root>'))", "ok");
@@ -167,7 +167,7 @@ public class Corpus_Xml
     public void xmla0080() => CorpusAssert.Parses(@"SELECT xpath('//ns:el', xmlparse(DOCUMENT '<root xmlns:ns=""http://x.com""><ns:el/></root>'), ARRAY[ARRAY['ns','http://x.com']])", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void xmla0081() => CorpusAssert.Parses(@"SELECT xpath('/root', 'not xml')", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void xmla0082() => CorpusAssert.Parses(@"SELECT xpath('/root', xmlparse(DOCUMENT '<root/>'), ARRAY['ns','http://x.com'])", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void xmla0083() => CorpusAssert.Parses(@"SELECT xpath_exists('/root', xmlparse(DOCUMENT '<root/>'))", "ok");
@@ -185,7 +185,7 @@ public class Corpus_Xml
     public void xmla0089() => CorpusAssert.Parses(@"SELECT xmlparse(DOCUMENT '<root/>') IS DOCUMENT", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void xmla0090() => CorpusAssert.Parses(@"SELECT xmlparse(CONTENT '<a/><b/>') IS DOCUMENT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void xmla0091() => CorpusAssert.Parses(@"SELECT NULL::xml IS DOCUMENT", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void xmla0092() => CorpusAssert.Parses(@"SELECT xmlparse(DOCUMENT '<root/>') IS NOT DOCUMENT", "ok");
@@ -193,27 +193,27 @@ public class Corpus_Xml
     public void xmla0093() => CorpusAssert.Parses(@"SELECT xmlparse(CONTENT '<a/><b/>') IS NOT DOCUMENT", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void xmla0094() => CorpusAssert.Parses(@"SELECT 42 IS DOCUMENT", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void xmla0095() => CorpusAssert.Parses(@"SELECT table_to_xml('s.t'::regclass, false, false, '')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void xmla0096() => CorpusAssert.Parses(@"SELECT table_to_xml('s.t'::regclass, true, false, '')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void xmla0097() => CorpusAssert.Parses(@"SELECT table_to_xml('s.t'::regclass, false, true, '')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void xmla0098() => CorpusAssert.Parses(@"SELECT table_to_xml('s.t'::regclass, true, true, 'http://example.com')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void xmla0099() => CorpusAssert.Parses(@"SELECT table_to_xml('s.t2'::regclass, false, false, '')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void xmla0100() => CorpusAssert.Parses(@"SELECT table_to_xmlschema('s.t'::regclass, false, false, '')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void xmla0101() => CorpusAssert.Parses(@"SELECT table_to_xml_and_xmlschema('s.t'::regclass, false, false, '')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void xmla0102() => CorpusAssert.Parses(@"SELECT query_to_xml('SELECT id, name FROM s.t', false, false, '')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void xmla0103() => CorpusAssert.Parses(@"SELECT query_to_xml('SELECT id, name FROM s.t', true, true, 'http://ns.example.com')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void xmla0104() => CorpusAssert.Parses(@"SELECT schema_to_xml('s', false, false, '')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void xmla0105() => CorpusAssert.Parses(@"SELECT schema_to_xmlschema('s', false, false, '')", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void xmla0106() => CorpusAssert.Parses(@"SELECT xmlagg(xmlelement(NAME item, name)) FROM s.t", "ok");
@@ -249,15 +249,15 @@ public class Corpus_Xml
     public void xmla0121() => CorpusAssert.Parses(@"SELECT * FROM xmltable('/r/row' PASSING xmlparse(DOCUMENT '<r><row><x>1</x><y>2</y></row></r>') COLUMNS x numeric PATH 'x', y numeric PATH 'y')", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void xmla0122() => CorpusAssert.Parses(@"SELECT * FROM xmltable(XMLNAMESPACES('http://example.com' AS ns), '/ns:root/ns:row' PASSING xmlparse(DOCUMENT '<root xmlns=""http://example.com""><row><v>1</v></row></root>') COLUMNS v text PATH 'v')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void xmla0123() => CorpusAssert.Parses(@"SELECT * FROM xmltable('/rows/row' PASSING xmlparse(DOCUMENT '<rows><row/></rows>') COLUMNS a text PATH 'a' NOT NULL)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void xmla0124() => CorpusAssert.Parses(@"SELECT * FROM xmltable('/rows/row' PASSING xmlparse(DOCUMENT '<rows><row><n>1</n></row></rows>') COLUMNS rn FOR ORDINALITY, rn2 FOR ORDINALITY, n int PATH 'n')", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void xmla0125() => CorpusAssert.Parses(@"SELECT * FROM xmltable('/rows/row' PASSING '<rows><row/></rows>' COLUMNS a text)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void xmla0126() => CorpusAssert.Parses(@"SELECT * FROM xmltable(PASSING xmlparse(DOCUMENT '<rows><row/></rows>') COLUMNS a text)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void xmla0127() => CorpusAssert.Parses(@"SELECT * FROM xmltable('/row' PASSING xmlparse(DOCUMENT '<rows><row/></rows>') COLUMNS)", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void xmla0128() => CorpusAssert.Parses(@"SELECT XMLEXISTS('/root' PASSING BY VALUE xmlparse(DOCUMENT '<root/>'))", "ok");
@@ -269,31 +269,31 @@ public class Corpus_Xml
     public void xmla0131() => CorpusAssert.Parses(@"SELECT XMLEXISTS('//missing' PASSING xmlparse(DOCUMENT '<root/>'))", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void xmla0132() => CorpusAssert.Parses(@"SELECT XMLEXISTS('//item' PASSING xmlparse(DOCUMENT '<list><item/><item/></list>'))", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void xmla0133() => CorpusAssert.Parses(@"SELECT XMLEXISTS('/r' PASSING 'bad xml')", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void xmla0134() => CorpusAssert.Parses(@"SELECT XMLEXISTS('/r' xmlparse(DOCUMENT '<r/>'))", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void xmla0135() => CorpusAssert.Parses(@"SELECT xml_is_well_formed('<root/>')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void xmla0136() => CorpusAssert.Parses(@"SELECT xml_is_well_formed('<unclosed>')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void xmla0137() => CorpusAssert.Parses(@"SELECT xml_is_well_formed_document('<root/>')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void xmla0138() => CorpusAssert.Parses(@"SELECT xml_is_well_formed_document('<a/><b/>')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void xmla0139() => CorpusAssert.Parses(@"SELECT xml_is_well_formed_content('<a/><b/>')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void xmla0140() => CorpusAssert.Parses(@"SELECT xml_is_well_formed_content('<bad')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void xmla0141() => CorpusAssert.Parses(@"SELECT xml_is_well_formed(NULL)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void xmla0142() => CorpusAssert.Parses(@"SELECT xmltext('hello & world')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void xmla0143() => CorpusAssert.Parses(@"SELECT xmltext('<b>bold</b>')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void xmla0144() => CorpusAssert.Parses(@"SELECT xmltext('')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void xmla0145() => CorpusAssert.Parses(@"SELECT xmltext(NULL)", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void xmla0146() => CorpusAssert.Parses(@"SELECT xmlelement(NAME foo, xmlattributes(id AS id), xmlforest(name AS n, val AS v)) FROM s.t LIMIT 1", "ok");
@@ -325,7 +325,7 @@ public class Corpus_Xml
     public void xmla0159() => CorpusAssert.Parses(@"SELECT xmlelement(NAME foo, xmlattributes('v1' AS a1, 'v2' AS a2, 'v3' AS a3), xmlelement(NAME bar, xmlattributes('x' AS bx), 'inner'))", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void xmla0160() => CorpusAssert.Parses(@"SELECT xmlagg(xmlelement(NAME r, id)) OVER () FROM s.t LIMIT 1", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void xmla0161() => CorpusAssert.Parses(@"SELECT xmlelement(NAME root, VARIADIC ARRAY['a','b','c'])", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void xmla0162() => CorpusAssert.Parses(@"SELECT xmlparse(DOCUMENT '<root>' || '</root>')", "ok");
@@ -373,7 +373,7 @@ public class Corpus_Xml
     public void xmlb0013() => CorpusAssert.Parses(@"SELECT xmlpi(name target)", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void xmlb0014() => CorpusAssert.Parses(@"SELECT xmlpi('target')", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void xmlb0015() => CorpusAssert.Parses(@"SELECT xmlcomment('this is a comment')", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void xmlb0016() => CorpusAssert.Parses(@"SELECT xmlcomment('bad--comment')", "error");
@@ -387,7 +387,7 @@ public class Corpus_Xml
     public void xmlb0020() => CorpusAssert.Parses(@"SELECT xmlparse(document '<?xml version=""1.0""?><root><child>text</child></root>')", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void xmlb0021() => CorpusAssert.Parses(@"SELECT xmlparse(content '<a>one</a><b>two</b>')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void xmlb0022() => CorpusAssert.Parses(@"SELECT xmlparse(fragment '<a/>')", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void xmlb0023() => CorpusAssert.Parses(@"SELECT xmlserialize(document xmlparse(document '<?xml version=""1.0""?><root/>') AS text)", "ok");
@@ -419,11 +419,11 @@ public class Corpus_Xml
     public void xmlb0036() => CorpusAssert.Parses(@"SELECT * FROM XMLTABLE('/r/item' PASSING xmlparse(document '<?xml version=""1.0""?><r><item/></r>') COLUMNS val text PATH 'missing' DEFAULT 'none')", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void xmlb0037() => CorpusAssert.Parses(@"SELECT * FROM XMLTABLE(XMLNAMESPACES('http://example.com' AS ns), '/ns:root/ns:item' PASSING xmlparse(document '<?xml version=""1.0""?><root xmlns=""http://example.com""><item>x</item></root>') COLUMNS v text PATH 'text()')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void xmlb0038() => CorpusAssert.Parses(@"SELECT table_to_xml('s.t'::regclass, false, false, '')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void xmlb0039() => CorpusAssert.Parses(@"SELECT table_to_xml('s.t'::regclass, true, true, 'http://example.com')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void xmlb0040() => CorpusAssert.Parses(@"SELECT query_to_xml('SELECT id, name FROM s.t LIMIT 0', false, false, '')", "ok");
     [Fact]
     public void xmlb0041() => CorpusAssert.Parses(@"CREATE TABLE xmlb_agg_test (x xml);
@@ -433,34 +433,34 @@ SELECT xmlagg(x) FROM xmlb_agg_test", "ok");
     public void xmlb0042() => CorpusAssert.Parses(@"CREATE TABLE xmlb_agg_ord (x xml, y int);
 INSERT INTO xmlb_agg_ord VALUES (xmlelement(name a), 2), (xmlelement(name b), 1);
 SELECT xmlagg(x ORDER BY y) FROM xmlb_agg_ord", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void xmlb0043() => CorpusAssert.Parses(@"SELECT xml_is_well_formed('<abc/>')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void xmlb0044() => CorpusAssert.Parses(@"SELECT xml_is_well_formed('not xml <<')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void xmlb0045() => CorpusAssert.Parses(@"SELECT xml_is_well_formed_document('<?xml version=""1.0""?><root/>')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void xmlb0046() => CorpusAssert.Parses(@"SELECT xml_is_well_formed_content('<a/><b/>')", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void xmlb0047() => CorpusAssert.Parses(@"SELECT xmlelement(name foo, xmlattributes(1 AS n, true AS flag), xmlforest('x' AS child))", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void xmlb0048() => CorpusAssert.Parses(@"SELECT xmlroot(xmlparse(document '<?xml version=""1.0""?><r/>'), version '1.0', standalone no value)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void xmlb0049() => CorpusAssert.Parses(@"SELECT xmlelement(name foo, xmlattributes())", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void xmlb0050() => CorpusAssert.Parses(@"SELECT xmlroot(xmlelement(name r), standalone yes)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void xmlb0051() => CorpusAssert.Parses(@"SELECT xmlserialize(xmlelement(name x) AS text)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void xmlb0052() => CorpusAssert.Parses(@"SELECT xmlparse(document '<not-closed>')", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void xmlb0053() => CorpusAssert.Parses(@"SELECT * FROM XMLTABLE('/r' PASSING xmlparse(content '<r/>'))", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void xmlb0054() => CorpusAssert.Parses(@"SELECT xmlpi(name xml)", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void xmlb0055() => CorpusAssert.Parses(@"SELECT xmlforest()", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void xmlb0056() => CorpusAssert.Parses(@"SELECT xmlconcat()", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void xmlb0057() => CorpusAssert.Parses(@"SELECT xmlexists('/root' PASSING BY COPY xmlparse(content '<root/>'))", "error");
 }

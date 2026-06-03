@@ -75,7 +75,7 @@ public class Corpus_CreateSequence
     public void seqa0034() => CorpusAssert.Parses(@"CREATE SEQUENCE myseq34; SELECT nextval('myseq34')", "ok");
     [Fact]
     public void seqa0035() => CorpusAssert.Parses(@"CREATE SEQUENCE myseq35 START WITH 500; SELECT nextval('myseq35'); SELECT nextval('myseq35')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seqa0036() => CorpusAssert.Parses(@"SELECT nextval('s.seq')", "ok");
     [Fact]
     public void seqa0037() => CorpusAssert.Parses(@"CREATE SEQUENCE myseq37 START WITH 10; SELECT nextval('myseq37'); SELECT currval('myseq37')", "ok");
@@ -262,7 +262,7 @@ public class Corpus_CreateSequence
     public void seqa0127() => CorpusAssert.Parses(@"CREATE SEQUENCE myseq127 INCREMENT BY -1 START WITH -1 MINVALUE -100 MAXVALUE -1", "ok");
     [Fact]
     public void seqa0128() => CorpusAssert.Parses(@"CREATE SEQUENCE myseq128 NO CYCLE NO MINVALUE NO MAXVALUE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seqa0129() => CorpusAssert.Parses(@"SELECT nextval('s.seq'), currval('s.seq')", "ok");
     [Fact]
     public void seqa0130() => CorpusAssert.Parses(@"CREATE SEQUENCE myseq130; SELECT setval('myseq130', 1, false); SELECT nextval('myseq130')", "ok");
@@ -336,7 +336,7 @@ public class Corpus_CreateSequence
     public void seqa0164() => CorpusAssert.Parses(@"CREATE SEQUENCE s.myseq164 START 1; ALTER SEQUENCE s.myseq164 RENAME TO myseq164_renamed; SELECT nextval('s.myseq164_renamed')", "ok");
     [Fact]
     public void seqa0165() => CorpusAssert.Parses(@"CREATE UNLOGGED SEQUENCE myseq165; ALTER SEQUENCE myseq165 SET LOGGED", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seqa0166() => CorpusAssert.Parses(@"SELECT nextval('s.seq'), nextval('s.seq'), nextval('s.seq')", "ok");
     [Fact]
     public void seqa0167() => CorpusAssert.Parses(@"CREATE SEQUENCE myseq167 START WITH 1 INCREMENT BY 1;
