@@ -193,9 +193,9 @@ public class Corpus_TypeSyntax
     public void tysa0093() => CorpusAssert.Parses(@"SELECT CAST('{[2024-01-01,2024-06-01)}' AS datemultirange)", "ok");
     [Fact]
     public void tysa0094() => CorpusAssert.Parses(@"SELECT CAST(ARRAY[1,2,3] AS integer[])", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tysa0095() => CorpusAssert.Parses(@"SELECT CAST(ARRAY[1,2,3] AS integer ARRAY)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tysa0096() => CorpusAssert.Parses(@"SELECT CAST(ARRAY[1,2,3] AS integer ARRAY[3])", "ok");
     [Fact]
     public void tysa0097() => CorpusAssert.Parses(@"SELECT CAST(ARRAY[1,2,3] AS integer[3])", "ok");

@@ -93,6 +93,9 @@ public sealed class SemanticAnalyzer
     private void AnalyzeQuery(SelectQuery? q)
     {
         if (q is null) return;
+        // LIMIT / OFFSET apply to a set-operation query too, so validate them before the SetOp early-return.
+        CheckExpr(q.LimitExpr); CheckExpr(q.OffsetExpr);
+        CheckRowCount(q.LimitExpr, "LIMIT"); CheckRowCount(q.OffsetExpr, "OFFSET");
         foreach (var cte in q.With) AnalyzeQuery(cte.Query);
         if (q.SetOp is not null) { AnalyzeQuery(q.SetOp.Left); AnalyzeQuery(q.SetOp.Right); return; }
         if (q.From is not null) AnalyzeFrom(q.From);
@@ -101,6 +104,16 @@ public sealed class SemanticAnalyzer
         CheckExpr(q.Having);
         foreach (var g in q.GroupBy) CheckExpr(g);
         foreach (var row in q.ValuesRows) foreach (var e in row) CheckExpr(e);
+    }
+
+    // LIMIT / OFFSET must be a non-negative integer. Catch the statically-decidable bad cases:
+    // a constant that folds negative, or a string literal that isn't a valid non-negative integer.
+    private void CheckRowCount(Expr? e, string clause)
+    {
+        if (e is null) return;
+        if (Fold(e) is { } v && v < 0) { Report($"{clause} must not be negative"); return; }
+        if (e is LiteralExpr { Kind: "string", Text: var s } && !(long.TryParse(s.Trim(), out var iv) && iv >= 0))
+            Report($"{clause} value '{s}' is not a valid non-negative integer");
     }
 
     private void AnalyzeFrom(FromClause from)

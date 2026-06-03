@@ -37,6 +37,7 @@ public sealed partial class PgParser
             c.MatchWord("COLUMN"); c.MatchWord("CONSTRAINT"); c.MatchWord("ATTRIBUTE"); c.MatchWord("VALUE");
             if (!c.AtWord("TO")) ConsumeNameOrString(c);   // enum RENAME VALUE 'old' uses a string
             c.ExpectWord("TO"); ConsumeNameOrString(c);
+            MatchCascadeRestrict(c);                        // RENAME ATTRIBUTE … TO … CASCADE|RESTRICT
             alter.Actions.Add("RENAME");
         }
         else if (c.MatchWords("OWNER", "TO")) { ParseRoleSpec(c); alter.Actions.Add("OWNER"); }
@@ -98,10 +99,12 @@ public sealed partial class PgParser
     private string ParseAlterAdd(TokenCursor c)
     {
         if (c.MatchWord("COLUMN")) { c.MatchWords("IF", "NOT", "EXISTS"); var b = MakeTableHolder(); ParseColumnInto(c, b); return "ADD COLUMN"; }
-        if (c.AtWord("CONSTRAINT") || c.AtAnyWord("PRIMARY", "UNIQUE", "FOREIGN", "CHECK", "EXCLUDE"))
+        if (c.AtWord("CONSTRAINT") || c.AtAnyWord("PRIMARY", "UNIQUE", "FOREIGN", "CHECK", "EXCLUDE", "NOT"))
         {
             string? name = null;
             if (c.MatchWord("CONSTRAINT")) name = c.ExpectIdentifier();
+            if (c.AtWord("NOT"))   // PG18 table-level NOT NULL column [NO INHERIT]
+            { c.ExpectWord("NOT"); c.ExpectWord("NULL"); c.ExpectIdentifier(); c.MatchWords("NO", "INHERIT"); c.MatchWords("NOT", "VALID"); return "ADD CONSTRAINT"; }
             ParseTableConstraint(c, name);
             c.MatchWords("NOT", "VALID");
             return "ADD CONSTRAINT";
@@ -256,6 +259,7 @@ public sealed partial class PgParser
         if (c.MatchWords("TEXT", "SEARCH", "TEMPLATE")) return "TEXT SEARCH TEMPLATE";
         if (c.MatchWords("OPERATOR", "CLASS")) return "OPERATOR CLASS";
         if (c.MatchWords("OPERATOR", "FAMILY")) return "OPERATOR FAMILY";
+        if (c.MatchWords("PROCEDURAL", "LANGUAGE")) return "LANGUAGE";   // CREATE/DROP PROCEDURAL LANGUAGE
         return c.ExpectIdentifier().ToUpperInvariant();    // TABLE/VIEW/INDEX/SEQUENCE/TYPE/DOMAIN/FUNCTION/…
     }
 

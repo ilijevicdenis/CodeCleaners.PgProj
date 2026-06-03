@@ -101,6 +101,7 @@ public sealed partial class PgParser
         var m = new MergeStatement { Only = c.MatchWord("ONLY") };
         AttachWith(m, ctes, recursive);
         (m.Schema, m.Table) = ParseQualifiedName(c);
+        c.MatchSymbol('*');                                  // MERGE INTO t * — include descendant tables
         if (c.MatchWord("AS")) m.Alias = c.ExpectIdentifier();
         else if (c.Current is { Kind: TokenKind.Word } w && !w.IsWord("USING")) m.Alias = c.Advance().Value;
 

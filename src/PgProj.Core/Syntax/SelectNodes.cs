@@ -36,6 +36,8 @@ public sealed class SelectQuery
     public List<OrderByItem> OrderBy { get; } = new();
     public string? Limit { get; set; }
     public string? Offset { get; set; }
+    public Expr? LimitExpr { get; set; }    // parsed LIMIT / FETCH count, for constant-folding validation
+    public Expr? OffsetExpr { get; set; }   // parsed OFFSET count
     public List<LockingClause> Locking { get; } = new();
 }
 

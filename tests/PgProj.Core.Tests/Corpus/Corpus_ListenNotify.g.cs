@@ -49,11 +49,11 @@ public class Corpus_ListenNotify
     public void lsna0021() => CorpusAssert.Parses(@"UNLISTEN ""channel with spaces""", "ok");
     [Fact]
     public void lsna0022() => CorpusAssert.Parses(@"NOTIFY chan, 'line1\nline2'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lsna0023() => CorpusAssert.Parses(@"NOTIFY chan, E'tab\there'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lsna0024() => CorpusAssert.Parses(@"NOTIFY chan, $$dollar quoted payload$$", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lsna0025() => CorpusAssert.Parses(@"NOTIFY chan, $tag$tagged dollar quote$tag$", "ok");
     [Fact]
     public void lsna0026() => CorpusAssert.Parses(@"SELECT pg_notify('chan', 'hello')", "ok");

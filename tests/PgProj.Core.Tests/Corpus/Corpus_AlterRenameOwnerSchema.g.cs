@@ -107,9 +107,9 @@ public class Corpus_AlterRenameOwnerSchema
     public void aroa0050() => CorpusAssert.Parses(@"ALTER TYPE s.mood RENAME TO", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void aroa0051() => CorpusAssert.Parses(@"ALTER TYPE s.mood OWNER TO no_such_role_xyz", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void aroa0052() => CorpusAssert.Parses(@"ALTER TYPE s.addr RENAME ATTRIBUTE street TO street_name CASCADE; ALTER TYPE s.addr RENAME ATTRIBUTE street_name TO street CASCADE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void aroa0053() => CorpusAssert.Parses(@"ALTER TYPE s.addr RENAME ATTRIBUTE street TO street_name RESTRICT; ALTER TYPE s.addr RENAME ATTRIBUTE street_name TO street RESTRICT", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void aroa0054() => CorpusAssert.Parses(@"ALTER TYPE s.addr RENAME ATTRIBUTE no_such_attr TO other", "error");

@@ -138,6 +138,16 @@ public sealed class Tokenizer
     private string ReadNumber()
     {
         var start = _i;
+        // PG16 non-decimal integer literals: 0x… (hex), 0o… (octal), 0b… (binary), with optional '_'
+        // separators. Only consume when at least one radix-valid digit follows; otherwise fall through to
+        // decimal so malformed forms (0x, 0b2, 0o9) surface as a parse error like Postgres rejects them.
+        if (_s[_i] == '0' && _i + 1 < _s.Length && "xXoObB".IndexOf(_s[_i + 1]) >= 0)
+        {
+            char radix = char.ToLowerInvariant(_s[_i + 1]);
+            int j = _i + 2, digits = 0;
+            while (j < _s.Length && (IsRadixDigit(_s[j], radix) || (_s[j] == '_' && digits > 0))) { if (_s[j] != '_') digits++; j++; }
+            if (digits > 0) { _i = j; return _s.Substring(start, _i - start); }
+        }
         while (_i < _s.Length && (char.IsDigit(_s[_i]) || _s[_i] == '.' || _s[_i] == 'e' || _s[_i] == 'E'
                                   || ((_s[_i] == '+' || _s[_i] == '-') && (_s[_i - 1] == 'e' || _s[_i - 1] == 'E'))
                                   || (_s[_i] == '_' && _i > start && char.IsDigit(_s[_i - 1]) && char.IsDigit(Peek(1)))))  // digit group separators (PG16)
@@ -151,6 +161,13 @@ public sealed class Tokenizer
         while (_i < _s.Length && IsIdentPart(_s[_i])) _i++;
         return _s.Substring(start, _i - start);
     }
+
+    private static bool IsRadixDigit(char c, char radix) => radix switch
+    {
+        'x' => Uri.IsHexDigit(c),
+        'o' => c >= '0' && c <= '7',
+        _   => c == '0' || c == '1',   // binary
+    };
 
     private static bool IsIdentStart(char c) => char.IsLetter(c) || c == '_';
     private static bool IsIdentPart(char c) => char.IsLetterOrDigit(c) || c == '_' || c == '$';

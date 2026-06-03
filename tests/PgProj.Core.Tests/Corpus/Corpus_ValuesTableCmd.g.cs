@@ -173,13 +173,13 @@ public class Corpus_ValuesTableCmd
     public void vala0083() => CorpusAssert.Parses(@"TABLE s.t FETCH NEXT 1 ROW ONLY", "ok");
     [Fact]
     public void vala0084() => CorpusAssert.Parses(@"TABLE s.t ORDER BY id FETCH FIRST 5 ROWS ONLY", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vala0085() => CorpusAssert.Parses(@"TABLE ONLY s.parent", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vala0086() => CorpusAssert.Parses(@"TABLE ONLY s.child", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vala0087() => CorpusAssert.Parses(@"TABLE ONLY s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vala0088() => CorpusAssert.Parses(@"TABLE ONLY s.parent ORDER BY id LIMIT 10", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void vala0089() => CorpusAssert.Parses(@"TABLE s.t UNION TABLE s.t2", "error");

@@ -118,7 +118,7 @@ public sealed partial class PgParser
             return inner;
         }
         if (c.AtWord("VALUES")) return ParseValues(c);
-        if (c.AtWord("TABLE")) { c.Advance(); var (s, n) = ParseQualifiedName(c); return new SelectQuery { IsTableCommand = true, TableName = s is null ? n : $"{s}.{n}" }; }
+        if (c.AtWord("TABLE")) { c.Advance(); c.MatchWord("ONLY"); var (s, n) = ParseQualifiedName(c); c.MatchSymbol('*'); return new SelectQuery { IsTableCommand = true, TableName = s is null ? n : $"{s}.{n}" }; }
         return ParseSelectCore(c);
     }
 
@@ -311,9 +311,9 @@ public sealed partial class PgParser
 
         while (c.AtAnyWord("LIMIT", "OFFSET", "FETCH"))
         {
-            if (c.MatchWord("LIMIT")) { if (c.MatchWord("ALL")) q.Limit = "ALL"; else q.Limit = ExprText(c); }
-            else if (c.MatchWord("OFFSET")) { q.Offset = ExprText(c); c.MatchWord("ROW"); c.MatchWord("ROWS"); }
-            else { c.ExpectWord("FETCH"); c.MatchWord("FIRST"); c.MatchWord("NEXT"); if (!c.AtWord("ROW") && !c.AtWord("ROWS")) q.Limit = ExprText(c); c.MatchWord("ROW"); c.MatchWord("ROWS"); if (!c.MatchWord("ONLY")) c.MatchWords("WITH", "TIES"); }
+            if (c.MatchWord("LIMIT")) { if (c.MatchWord("ALL")) q.Limit = "ALL"; else { q.LimitExpr = LimitExpr(c, out var t); q.Limit = t; } }
+            else if (c.MatchWord("OFFSET")) { q.OffsetExpr = LimitExpr(c, out var t); q.Offset = t; c.MatchWord("ROW"); c.MatchWord("ROWS"); }
+            else { c.ExpectWord("FETCH"); c.MatchWord("FIRST"); c.MatchWord("NEXT"); if (!c.AtWord("ROW") && !c.AtWord("ROWS")) { q.LimitExpr = LimitExpr(c, out var t); q.Limit = t; } c.MatchWord("ROW"); c.MatchWord("ROWS"); if (!c.MatchWord("ONLY")) c.MatchWords("WITH", "TIES"); }
         }
 
         while (c.MatchWord("FOR"))
@@ -377,12 +377,14 @@ public sealed partial class PgParser
 
     // ---- small helpers ------------------------------------------------------
 
-    private static string ExprText(TokenCursor c)
+    // LIMIT / OFFSET / FETCH count: a full expression (5 + 5, 5::bigint, (SELECT …)). Returns the parsed
+    // node (for constant-folding checks) and, via out, its captured source text (for the model/round-trip).
+    private Expr LimitExpr(TokenCursor c, out string text)
     {
-        // a numeric/parameter/parenthesised limit value
-        if (c.Current is { Kind: TokenKind.Number } n) { c.Advance(); return n.Value; }
-        if (c.AtSymbol('(')) return Token.Render(WithParensList(CaptureBalancedParens(c)));
-        return c.ExpectIdentifier();
+        int m = c.Mark();
+        var e = ParseExpression(c);
+        text = Token.Render(c.Range(m, c.Mark()));
+        return e;
     }
 
     private static List<Token> WithParensList(List<Token> inner)

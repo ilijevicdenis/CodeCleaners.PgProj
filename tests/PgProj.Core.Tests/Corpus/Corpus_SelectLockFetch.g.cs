@@ -95,7 +95,7 @@ public class Corpus_SelectLockFetch
     public void sellfa0044() => CorpusAssert.Parses(@"SELECT id FROM s.t LIMIT NULL", "ok");
     [Fact]
     public void sellfa0045() => CorpusAssert.Parses(@"SELECT id FROM s.t LIMIT (2 + 3)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void sellfa0046() => CorpusAssert.Parses(@"SELECT id FROM s.t LIMIT 5 + 5", "ok");
     [Fact]
     public void sellfa0047() => CorpusAssert.Parses(@"SELECT id FROM s.t OFFSET 0", "ok");
@@ -241,9 +241,9 @@ public class Corpus_SelectLockFetch
     public void sellfa0117() => CorpusAssert.Parses(@"SELECT id FROM s.t OFFSET (10-5)", "ok");
     [Fact]
     public void sellfa0118() => CorpusAssert.Parses(@"SELECT id FROM s.t FETCH FIRST (2*3) ROWS ONLY", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void sellfa0119() => CorpusAssert.Parses(@"SELECT id FROM s.t LIMIT 5::bigint", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void sellfa0120() => CorpusAssert.Parses(@"SELECT id FROM s.t OFFSET 2::bigint", "ok");
     [Fact]
     public void sellfa0121() => CorpusAssert.Parses(@"SELECT id FROM s.t ORDER BY id ASC LIMIT 5", "ok");

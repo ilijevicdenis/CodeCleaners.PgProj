@@ -67,9 +67,13 @@ public sealed partial class PgParser
     private CommandStatement ParseSet(TokenCursor c)
     {
         c.ExpectWord("SET");
-        bool session = c.MatchWord("SESSION"); c.MatchWord("LOCAL");
+        bool local = c.MatchWord("LOCAL");
+        // SESSION is either a scope keyword (mutually exclusive with LOCAL) or the first word of the
+        // targets SESSION AUTHORIZATION / SESSION CHARACTERISTICS. A scope SESSION after LOCAL is illegal.
+        if (c.AtWord("SESSION") && (c.Peek()?.IsWord("AUTHORIZATION") == true || c.Peek()?.IsWord("CHARACTERISTICS") == true)) c.Advance();
+        else if (!local) c.MatchWord("SESSION");
 
-        if (session && c.MatchWord("CHARACTERISTICS")) { ConsumeRest(c); return new CommandStatement { Kind = "SET" }; }  // SET SESSION CHARACTERISTICS AS …
+        if (c.MatchWord("CHARACTERISTICS")) { ConsumeRest(c); return new CommandStatement { Kind = "SET" }; }  // SET SESSION CHARACTERISTICS AS …
         if (c.MatchWord("AUTHORIZATION")) { ConsumeRest(c); return new CommandStatement { Kind = "SET" }; }
         if (c.MatchWords("TIME", "ZONE")) { ConsumeRest(c); return new CommandStatement { Kind = "SET" }; }
         if (c.MatchWord("CONSTRAINTS")) { ConsumeRest(c); return new CommandStatement { Kind = "SET CONSTRAINTS" }; }
@@ -108,6 +112,8 @@ public sealed partial class PgParser
     {
         c.ExpectWord("RESET");
         if (c.MatchWord("ALL")) return new CommandStatement { Kind = "RESET", Detail = "ALL" };
+        if (c.MatchWords("TIME", "ZONE")) return new CommandStatement { Kind = "RESET", Detail = "TIME ZONE" };
+        if (c.MatchWords("SESSION", "AUTHORIZATION")) return new CommandStatement { Kind = "RESET", Detail = "SESSION AUTHORIZATION" };
         var name = ParseDottedName(c);
         return new CommandStatement { Kind = "RESET", Detail = name };
     }
@@ -178,8 +184,12 @@ public sealed partial class PgParser
         c.ExpectIdentifier();
         if (c.MatchSymbol(','))
         {
-            if (c.Current is not { Kind: TokenKind.String }) throw new ParseException("NOTIFY payload must be a string literal", c.Here);
-            c.Advance();
+            var t = c.Current;
+            if (t is { Kind: TokenKind.String } or { Kind: TokenKind.DollarString }) c.Advance();   // 'x' / $$x$$ / $tag$x$tag$
+            else if (t is { Kind: TokenKind.Word } w && w.Value.Length == 1 && "EBXebx".IndexOf(w.Value[0]) >= 0
+                     && c.Peek() is { Kind: TokenKind.String } ps && ps.Position == w.Position + 1) { c.Advance(); c.Advance(); }  // E'…' etc
+            else throw new ParseException("NOTIFY payload must be a string literal", c.Here);
+            while (c.Current is { Kind: TokenKind.String }) c.Advance();   // adjacent string concatenation
         }
         return new CommandStatement { Kind = "NOTIFY" };
     }

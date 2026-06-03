@@ -227,7 +227,7 @@ public class Corpus_Xml
     public void xmla0110() => CorpusAssert.Parses(@"SELECT xmlagg(xmlelement(NAME r, id, name) ORDER BY id ASC) FROM s.t", "ok");
     [Fact]
     public void xmla0111() => CorpusAssert.Parses(@"SELECT xmlagg(xmlelement(NAME r, name) ORDER BY id, name) FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void xmla0112() => CorpusAssert.Parses(@"SELECT xmlagg(xmlelement(NAME item, name)) FILTER (WHERE val > 0) FROM s.t", "ok");
     [Fact]
     public void xmla0113() => CorpusAssert.Parses(@"SELECT xmlelement(NAME root, xmlagg(xmlelement(NAME r, name))) FROM s.t", "ok");
@@ -323,7 +323,7 @@ public class Corpus_Xml
     public void xmla0158() => CorpusAssert.Parses(@"SELECT xmlparse(DOCUMENT '<r xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xsi:nil=""true""/>') IS DOCUMENT", "ok");
     [Fact]
     public void xmla0159() => CorpusAssert.Parses(@"SELECT xmlelement(NAME foo, xmlattributes('v1' AS a1, 'v2' AS a2, 'v3' AS a3), xmlelement(NAME bar, xmlattributes('x' AS bx), 'inner'))", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void xmla0160() => CorpusAssert.Parses(@"SELECT xmlagg(xmlelement(NAME r, id)) OVER () FROM s.t LIMIT 1", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void xmla0161() => CorpusAssert.Parses(@"SELECT xmlelement(NAME root, VARIADIC ARRAY['a','b','c'])", "error");

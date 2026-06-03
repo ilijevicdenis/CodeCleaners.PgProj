@@ -351,7 +351,7 @@ public class Corpus_DatetimeOps
     public void dtb0002() => CorpusAssert.Parses(@"SELECT TIME '13:30:00'", "ok");
     [Fact]
     public void dtb0003() => CorpusAssert.Parses(@"SELECT TIME '13:30:00.123456'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0004() => CorpusAssert.Parses(@"SELECT TIMETZ '13:30:00+05:30'", "ok");
     [Fact]
     public void dtb0005() => CorpusAssert.Parses(@"SELECT TIME WITH TIME ZONE '13:30:00+02:00'", "ok");
@@ -403,7 +403,7 @@ public class Corpus_DatetimeOps
     public void dtb0028() => CorpusAssert.Parses(@"SELECT TIMESTAMP '2024-06-01 12:00:00' AT TIME ZONE 'America/New_York'", "ok");
     [Fact]
     public void dtb0029() => CorpusAssert.Parses(@"SELECT TIMESTAMPTZ '2024-06-01 12:00:00+00' AT TIME ZONE 'Europe/London'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0030() => CorpusAssert.Parses(@"SELECT TIMETZ '13:00:00+00' AT TIME ZONE 'Asia/Tokyo'", "ok");
     [Fact]
     public void dtb0031() => CorpusAssert.Parses(@"SELECT EXTRACT(YEAR FROM DATE '2024-03-15')", "ok");
@@ -441,11 +441,11 @@ public class Corpus_DatetimeOps
     public void dtb0047() => CorpusAssert.Parses(@"SELECT EXTRACT(MICROSECONDS FROM TIME '14:30:45.123456')", "ok");
     [Fact]
     public void dtb0048() => CorpusAssert.Parses(@"SELECT EXTRACT(MILLISECONDS FROM TIME '14:30:45.123')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0049() => CorpusAssert.Parses(@"SELECT EXTRACT(TIMEZONE FROM TIMETZ '14:30:00+05:00')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0050() => CorpusAssert.Parses(@"SELECT EXTRACT(TIMEZONE_HOUR FROM TIMETZ '14:30:00+05:30')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0051() => CorpusAssert.Parses(@"SELECT EXTRACT(TIMEZONE_MINUTE FROM TIMETZ '14:30:00+05:30')", "ok");
     [Fact]
     public void dtb0052() => CorpusAssert.Parses(@"SELECT EXTRACT(EPOCH FROM INTERVAL '3 days 2 hours')", "ok");

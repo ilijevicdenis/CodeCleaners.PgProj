@@ -336,7 +336,7 @@ ALTER TABLE s.events ATTACH PARTITION s.alta_part_new FOR VALUES FROM ('2025-01-
     public void alta0156() => CorpusAssert.Parses(@"ALTER TABLE s.t ADD CONSTRAINT uq_name UNIQUE (name) DEFERRABLE INITIALLY DEFERRED", "ok");
     [Fact]
     public void alta0157() => CorpusAssert.Parses(@"ALTER TABLE s.t ADD CONSTRAINT uq_name UNIQUE (name) NOT DEFERRABLE INITIALLY IMMEDIATE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void alta0158() => CorpusAssert.Parses(@"CREATE TABLE s.alta_idx (id int, name text);
 CREATE UNIQUE INDEX alta_idx_uid ON s.alta_idx(id);
 ALTER TABLE s.alta_idx ADD CONSTRAINT uq_idx UNIQUE USING INDEX alta_idx_uid", "ok");
@@ -357,7 +357,7 @@ ALTER TABLE s.alta_gen ALTER COLUMN y DROP EXPRESSION", "ok");
     public void alta0165() => CorpusAssert.Parses(@"ALTER TABLE s.t ENABLE DISABLE TRIGGER ALL", "error");
     [Fact]
     public void alta0166() => CorpusAssert.Parses(@"ALTER TABLE s.t ADD CONSTRAINT chk_flag CHECK (flag IN (true, false)) NOT VALID", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void alta0167() => CorpusAssert.Parses(@"ALTER TABLE s.t ADD CONSTRAINT nn_val NOT NULL val", "ok");
     [Fact]
     public void alta0168() => CorpusAssert.Parses(@"ALTER TABLE s.t DROP CONSTRAINT IF EXISTS nonexistent_constraint RESTRICT", "ok");

@@ -146,10 +146,10 @@ ALTER TYPE s.c19 ALTER ATTRIBUTE y TYPE varchar(50) CASCADE", "ok");
     [Fact]
     public void tyeca0054() => CorpusAssert.Parses(@"CREATE TYPE s.c20 AS (x integer, y text);
 ALTER TYPE s.c20 ALTER ATTRIBUTE y TYPE varchar(50) RESTRICT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tyeca0055() => CorpusAssert.Parses(@"CREATE TYPE s.c21 AS (x integer, y text);
 ALTER TYPE s.c21 RENAME ATTRIBUTE x TO id CASCADE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tyeca0056() => CorpusAssert.Parses(@"CREATE TYPE s.c22 AS (x integer, y text);
 ALTER TYPE s.c22 RENAME ATTRIBUTE x TO id RESTRICT", "ok");
     [Fact]

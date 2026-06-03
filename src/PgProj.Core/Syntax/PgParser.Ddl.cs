@@ -48,7 +48,7 @@ public sealed partial class PgParser
             else if (c.MatchWord("CACHE")) node.Cache = ParseSignedLong(c);
             else if (c.MatchWords("NO", "CYCLE")) node.Cycle = false;
             else if (c.MatchWord("CYCLE")) node.Cycle = true;
-            else if (c.MatchWords("OWNED", "BY")) { if (!c.MatchWord("NONE")) { ParseQualifiedName(c); } }
+            else if (c.MatchWords("OWNED", "BY")) { if (!c.MatchWord("NONE")) { c.ExpectIdentifier(); while (c.MatchSymbol('.')) c.ExpectIdentifier(); } }   // schema.table.column
             else break;
         }
         return node;

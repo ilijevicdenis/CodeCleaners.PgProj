@@ -35,6 +35,14 @@ public sealed class TokenCursor
     public int Mark() => _i;
     public void Reset(int mark) => _i = mark;
 
+    /// <summary>The tokens consumed between two marks — used to recover the source text of a parsed sub-expression.</summary>
+    public System.Collections.Generic.List<Token> Range(int from, int to)
+    {
+        var list = new System.Collections.Generic.List<Token>();
+        for (int k = from; k < to && k < _tokens.Count; k++) list.Add(_tokens[k]);
+        return list;
+    }
+
     public Token Advance()
     {
         if (AtEnd) throw new ParseException("unexpected end of input", Here);

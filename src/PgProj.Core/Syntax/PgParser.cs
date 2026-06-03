@@ -355,6 +355,7 @@ public sealed partial class PgParser
         if (b.MatchWords("PRIMARY", "KEY"))
         {
             var pk = new PrimaryKeyConstraint { Name = name };
+            if (IsUsingExistingIndex(b)) { b.MatchWords("USING", "INDEX"); b.ExpectIdentifier(); while (TryDeferrable(b, pk.Deferrability)) { } return pk; }
             pk.Columns.AddRange(ParseColumnNameList(b));
             ParseIndexTrailing(b, pk.Include, pk.Deferrability);
             return pk;
@@ -364,6 +365,7 @@ public sealed partial class PgParser
             var u = new UniqueConstraint { Name = name };
             if (b.MatchWords("NULLS", "NOT", "DISTINCT")) u.NullsNotDistinct = true;
             else b.MatchWords("NULLS", "DISTINCT");
+            if (IsUsingExistingIndex(b)) { b.MatchWords("USING", "INDEX"); b.ExpectIdentifier(); while (TryDeferrable(b, u.Deferrability)) { } return u; }
             u.Columns.AddRange(ParseColumnNameList(b));
             ParseIndexTrailing(b, u.Include, u.Deferrability);
             return u;
@@ -402,6 +404,11 @@ public sealed partial class PgParser
 
         throw new ParseException($"expected a table constraint but found {Render(b.Current)}", b.Here);
     }
+
+    // ALTER TABLE ADD [CONSTRAINT n] {PRIMARY KEY|UNIQUE} USING INDEX existing_index — no column list.
+    // Distinguish from the CREATE-TABLE "USING INDEX TABLESPACE x" trailing form (which has columns first).
+    private static bool IsUsingExistingIndex(TokenCursor b)
+        => b.AtWord("USING") && b.Peek()?.IsWord("INDEX") == true && b.Peek(2)?.IsWord("TABLESPACE") != true;
 
     /// <summary>INCLUDE (cols), WITH (params), USING INDEX TABLESPACE, then deferrability — shared by PK/UNIQUE.</summary>
     private void ParseIndexTrailing(TokenCursor b, List<string> include, Deferrability defer)

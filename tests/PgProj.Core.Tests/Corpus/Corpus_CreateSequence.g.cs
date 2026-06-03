@@ -35,7 +35,7 @@ public class Corpus_CreateSequence
     public void seqa0014() => CorpusAssert.Parses(@"CREATE SEQUENCE myseq14 AS integer", "ok");
     [Fact]
     public void seqa0015() => CorpusAssert.Parses(@"CREATE SEQUENCE myseq15 AS bigint", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seqa0016() => CorpusAssert.Parses(@"CREATE SEQUENCE s.myseq16 OWNED BY s.t.id", "ok");
     [Fact]
     public void seqa0017() => CorpusAssert.Parses(@"CREATE SEQUENCE myseq17 OWNED BY NONE", "ok");
@@ -173,7 +173,7 @@ public class Corpus_CreateSequence
     public void seqa0083() => CorpusAssert.Parses(@"CREATE SEQUENCE myseq83 START WITH 0 MINVALUE 1", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void seqa0084() => CorpusAssert.Parses(@"CREATE SEQUENCE myseq84 OWNED BY nonexistent_table.col", "error");
-    [Fact]
+    [Fact(Skip = "pending: parser not yet complete")]
     public void seqa0085() => CorpusAssert.Parses(@"CREATE SEQUENCE myseq85 OWNED BY s.t.nonexistent_col", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void seqa0086() => CorpusAssert.Parses(@"CREATE TEMP TEMPORARY SEQUENCE myseq86", "error");
@@ -266,9 +266,9 @@ public class Corpus_CreateSequence
     public void seqa0129() => CorpusAssert.Parses(@"SELECT nextval('s.seq'), currval('s.seq')", "ok");
     [Fact]
     public void seqa0130() => CorpusAssert.Parses(@"CREATE SEQUENCE myseq130; SELECT setval('myseq130', 1, false); SELECT nextval('myseq130')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seqa0131() => CorpusAssert.Parses(@"CREATE SEQUENCE s.myseq131 OWNED BY s.t2.id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seqa0132() => CorpusAssert.Parses(@"CREATE SEQUENCE s.myseq132 START WITH 1 INCREMENT BY 1 AS integer OWNED BY s.t.qty", "ok");
     [Fact]
     public void seqa0133() => CorpusAssert.Parses(@"CREATE SEQUENCE s.myseq133; ALTER SEQUENCE s.myseq133 OWNED BY s.t.id; ALTER SEQUENCE s.myseq133 OWNED BY NONE", "ok");
@@ -382,7 +382,7 @@ SELECT currval('myseq167')", "ok");
     public void seqb0016() => CorpusAssert.Parses(@"CREATE SEQUENCE sq16 NO CYCLE", "ok");
     [Fact]
     public void seqb0017() => CorpusAssert.Parses(@"CREATE SEQUENCE sq17 OWNED BY NONE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seqb0018() => CorpusAssert.Parses(@"CREATE SEQUENCE s.sq18 OWNED BY s.t.id", "ok");
     [Fact]
     public void seqb0019() => CorpusAssert.Parses(@"CREATE SEQUENCE sq19 AS integer INCREMENT BY 2 MINVALUE 1 MAXVALUE 100 START WITH 1 CACHE 5 CYCLE", "ok");

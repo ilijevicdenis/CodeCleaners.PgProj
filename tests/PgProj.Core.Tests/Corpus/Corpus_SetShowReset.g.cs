@@ -355,7 +355,7 @@ public class Corpus_SetShowReset
     public void ssra0174() => CorpusAssert.Parses(@"SET work_mem TO ON", "error");
     [Fact]
     public void ssra0175() => CorpusAssert.Parses(@"SET LOCAL SESSION work_mem TO '64MB'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ssra0176() => CorpusAssert.Parses(@"RESET TIME ZONE", "ok");
     [Fact]
     public void ssra0177() => CorpusAssert.Parses(@"SET work_mem DEFAULT", "error");
@@ -411,7 +411,7 @@ public class Corpus_SetShowReset
     public void ssra0202() => CorpusAssert.Parses(@"SHOW ALL; SET work_mem TO '64MB'", "ok");
     [Fact]
     public void ssra0203() => CorpusAssert.Parses(@"SET transaction_deferrable TO on", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ssra0204() => CorpusAssert.Parses(@"SET LOCAL SESSION AUTHORIZATION DEFAULT", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void ssra0205() => CorpusAssert.Parses(@"SET xmloption TO 'invalid_xmloption'", "error");

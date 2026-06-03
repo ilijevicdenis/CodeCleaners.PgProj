@@ -266,6 +266,16 @@ public sealed partial class PgParser
         if (c.AtAnyWord("INTERVAL")) return ParseTypedLiteralWord(c);
         if (c.AtAnyWord("EXTRACT", "POSITION", "OVERLAY", "SUBSTRING", "TRIM")) return ParseSpecialFunction(c);
 
+        // unicode string literal: U&'…' [UESCAPE 'c']  (the & and quote immediately abut the U)
+        if (t.Kind == TokenKind.Word && (t.Value == "U" || t.Value == "u")
+            && c.Peek() is { } amp && amp.IsSymbol('&') && amp.Position == t.Position + 1
+            && c.Peek(2) is { Kind: TokenKind.String } us && us.Position == amp.Position + 1)
+        {
+            c.Advance(); c.Advance(); var sv = c.Advance();
+            if (c.MatchWord("UESCAPE") && c.Current is { Kind: TokenKind.String }) c.Advance();
+            return new LiteralExpr { Kind = "prefixed", Text = $"U&'{sv.Value}'" };
+        }
+
         // prefixed string literals: E'…', B'…', X'…'  (prefix immediately precedes the quote)
         if (t.Kind == TokenKind.Word && t.Value.Length == 1 && "EBXebx".IndexOf(t.Value[0]) >= 0
             && c.Peek() is { Kind: TokenKind.String } ps && ps.Position == t.Position + 1)
@@ -448,6 +458,9 @@ public sealed partial class PgParser
         var call = new FuncCallExpr();
         call.Name.Add(c.Advance().Value);
         CaptureBalancedParens(c);
+        // aggregate/window tails also apply to keyword-calls like xmlagg(...) FILTER (WHERE …) OVER (…)
+        if (c.MatchWord("FILTER")) { c.ExpectSymbol('('); c.ExpectWord("WHERE"); call.Filter = ParseExpression(c); c.ExpectSymbol(')'); }
+        if (c.MatchWord("OVER")) call.Over = ParseWindowSpecOrName(c);
         return call;
     }
 
@@ -507,6 +520,7 @@ public sealed partial class PgParser
         while (true)
         {
             if (c.Current is { Kind: TokenKind.Word } w && IsTypeContinuation(w.Value)) { toks.Add(c.Advance()); continue; }
+            if (c.AtWord("ARRAY")) { toks.Add(c.Advance()); continue; }   // integer ARRAY / integer ARRAY[3] (the [n] is caught next loop)
             if (c.AtSymbol('(')) { toks.AddRange(WithParens(CaptureBalancedParens(c))); continue; }
             if (c.AtSymbol('[')) { toks.AddRange(CaptureBracketWith(c)); continue; }
             break;
@@ -547,7 +561,7 @@ public sealed partial class PgParser
 
     private static readonly HashSet<string> TypeKeywords = new(StringComparer.OrdinalIgnoreCase)
     {
-        "date", "time", "timestamp", "timestamptz", "boolean", "bool", "interval", "bit", "varbit",
+        "date", "time", "timetz", "timestamp", "timestamptz", "boolean", "bool", "interval", "bit", "varbit",
         "numeric", "decimal", "real", "double", "money", "json", "jsonb", "jsonpath", "uuid", "xml",
         "inet", "cidr", "macaddr", "macaddr8", "bytea", "text", "char", "character", "varchar", "bpchar",
         "name", "smallint", "int", "integer", "int2", "int4", "int8", "bigint", "float", "float4", "float8",

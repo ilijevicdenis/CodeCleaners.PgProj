@@ -281,7 +281,7 @@ public class Corpus_CastCoercion
     public void cst2a0137() => CorpusAssert.Parses(@"SELECT '999999999999'::numeric(5,2)", "error");
     [Fact]
     public void cst2a0138() => CorpusAssert.Parses(@"SELECT CAST('{1,2,3}' AS integer[])", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void cst2a0139() => CorpusAssert.Parses(@"SELECT CAST('{1,2,3}' AS integer ARRAY)", "ok");
     [Fact]
     public void cst2a0140() => CorpusAssert.Parses(@"SELECT 42::text::numeric::bigint", "ok");
