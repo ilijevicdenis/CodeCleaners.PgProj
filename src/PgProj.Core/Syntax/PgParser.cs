@@ -25,6 +25,8 @@ public sealed partial class PgParser
         "REFERENCES", "CHECK", "GENERATED", "COLLATE", "DEFERRABLE", "INITIALLY",
         "STORAGE", "COMPRESSION",
     };
+    private static readonly HashSet<string> StorageModes = new(StringComparer.OrdinalIgnoreCase) { "PLAIN", "EXTERNAL", "EXTENDED", "MAIN", "DEFAULT" };
+    private static readonly HashSet<string> MatchTypes = new(StringComparer.OrdinalIgnoreCase) { "FULL", "SIMPLE" };
 
     public ParseResult Parse(string sql)
     {
@@ -279,6 +281,20 @@ public sealed partial class PgParser
             made.Name = cname;
             col.Constraints.Add(made);
         }
+
+        // reject contradictory / duplicate column constraints — pure structure, no catalog
+        int defaults = 0, generated = 0; bool notNull = false, nullable = false;
+        foreach (var cc in col.Constraints)
+        {
+            if (cc is DefaultConstraint) defaults++;
+            else if (cc is GeneratedStored or GeneratedIdentity) generated++;
+            else if (cc is NotNullConstraint) notNull = true;
+            else if (cc is NullConstraint) nullable = true;
+        }
+        if (notNull && nullable) throw new ParseException($"conflicting NULL / NOT NULL declarations for column \"{col.Name}\"", b.Here);
+        if (defaults > 1) throw new ParseException($"multiple default values specified for column \"{col.Name}\"", b.Here);
+        if (generated > 1) throw new ParseException($"multiple generation clauses specified for column \"{col.Name}\"", b.Here);
+        if (defaults > 0 && generated > 0) throw new ParseException($"both default and generation expression specified for column \"{col.Name}\"", b.Here);
     }
 
     private ColumnConstraint? ParseOneColumnConstraint(TokenCursor b)
@@ -287,7 +303,7 @@ public sealed partial class PgParser
         if (b.MatchWord("NULL")) return new NullConstraint();
         if (b.MatchWord("DEFAULT")) return new DefaultConstraint { Expression = CaptureExpression(b) };
         if (b.MatchWord("COLLATE")) { var (cs, cn) = ParseQualifiedName(b); return new CollateConstraint { Collation = cs is null ? cn : $"{cs}.{cn}" }; }
-        if (b.MatchWord("STORAGE")) return new StorageOption { Kind = "STORAGE", Value = b.ExpectIdentifier() };
+        if (b.MatchWord("STORAGE")) { var v = b.ExpectIdentifier(); if (!StorageModes.Contains(v)) throw new ParseException($"invalid storage mode \"{v}\"", b.Here); return new StorageOption { Kind = "STORAGE", Value = v }; }
         if (b.MatchWord("COMPRESSION")) return new StorageOption { Kind = "COMPRESSION", Value = b.ExpectIdentifier() };
 
         if (b.MatchWords("PRIMARY", "KEY"))
@@ -343,7 +359,7 @@ public sealed partial class PgParser
         if (b.AtSymbol('(')) node.RefColumns.AddRange(ParseColumnNameList(b));
         while (true)
         {
-            if (b.MatchWord("MATCH")) { node.Match = b.ExpectIdentifier(); continue; }
+            if (b.MatchWord("MATCH")) { var m = b.ExpectIdentifier(); if (!MatchTypes.Contains(m)) throw new ParseException($"invalid MATCH type \"{m}\" (expected FULL or SIMPLE)", b.Here); node.Match = m; continue; }
             if (b.MatchWords("ON", "DELETE")) { node.OnDelete = ParseRefAction(b, allowColumns: true); continue; }
             if (b.MatchWords("ON", "UPDATE")) { node.OnUpdate = ParseRefAction(b, allowColumns: false); continue; }
             if (b.LookaheadWords("NOT", "VALID")) { b.MatchWords("NOT", "VALID"); node.NotValid = true; continue; }

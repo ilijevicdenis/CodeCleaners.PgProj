@@ -480,7 +480,7 @@ CREATE TABLE IF NOT EXISTS s.ctcb_ifnx1 (id integer PRIMARY KEY)", "ok");
     public void ctcc0013() => CorpusAssert.Parses(@"CREATE TABLE s.ctcc_fk_update_noaction (id integer, t_id bigint REFERENCES s.t (id) ON UPDATE NO ACTION)", "ok");
     [Fact]
     public void ctcc0014() => CorpusAssert.Parses(@"CREATE TABLE s.ctcc_fk_update_setdef (id integer, t_id bigint DEFAULT 1 REFERENCES s.t (id) ON UPDATE SET DEFAULT)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ctcc0015() => CorpusAssert.Parses(@"CREATE TABLE s.ctcc_fk_match_partial (id integer, t_id bigint REFERENCES s.t (id) MATCH PARTIAL)", "error");
     [Fact]
     public void ctcc0016() => CorpusAssert.Parses(@"CREATE TABLE s.ctcc_fk_match_full_del_cascade (id integer, t_id bigint REFERENCES s.t (id) MATCH FULL ON DELETE CASCADE)", "ok");
@@ -566,7 +566,7 @@ CREATE TABLE IF NOT EXISTS s.ctcb_ifnx1 (id integer PRIMARY KEY)", "ok");
     public void ctcc0056() => CorpusAssert.Parses(@"CREATE TABLE s.ctcc_fk_err_bad_action (id integer, t_id bigint REFERENCES s.t (id) ON DELETE DENY)", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void ctcc0057() => CorpusAssert.Parses(@"CREATE TABLE s.ctcc_fk_err_no_ref (id integer, t_id bigint FOREIGN KEY REFERENCES s.t (id))", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ctcc0058() => CorpusAssert.Parses(@"CREATE TABLE s.ctcc_fk_err_match_bad (id integer, t_id bigint REFERENCES s.t (id) MATCH EXACT)", "error");
     [Fact]
     public void ctcc0059() => CorpusAssert.Parses(@"CREATE TABLE s.ctcc_ck_err_no_paren (id integer, val integer CHECK val > 0)", "error");
