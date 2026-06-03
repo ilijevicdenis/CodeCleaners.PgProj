@@ -1,0 +1,50 @@
+{"id":"jsn0001","category":"json-jsonb","sql":"SELECT data -> 'key' FROM s.t","expect":"ok","ref":"functions-json","note":"jsonb -> text key operator"}
+{"id":"jsn0002","category":"json-jsonb","sql":"SELECT data ->> 'key' FROM s.t","expect":"ok","ref":"functions-json","note":"jsonb ->> text key returns text"}
+{"id":"jsn0003","category":"json-jsonb","sql":"SELECT data -> 0 FROM s.t","expect":"ok","ref":"functions-json","note":"jsonb -> integer index operator"}
+{"id":"jsn0004","category":"json-jsonb","sql":"SELECT data ->> 0 FROM s.t","expect":"ok","ref":"functions-json","note":"jsonb ->> integer index returns text"}
+{"id":"jsn0005","category":"json-jsonb","sql":"SELECT data #> '{a,b}' FROM s.t","expect":"ok","ref":"functions-json","note":"jsonb #> path array operator"}
+{"id":"jsn0006","category":"json-jsonb","sql":"SELECT data #>> '{a,b}' FROM s.t","expect":"ok","ref":"functions-json","note":"jsonb #>> path array returns text"}
+{"id":"jsn0007","category":"json-jsonb","sql":"SELECT data @> '{\"x\":1}'::jsonb FROM s.t","expect":"ok","ref":"functions-json","note":"jsonb @> containment operator"}
+{"id":"jsn0008","category":"json-jsonb","sql":"SELECT data <@ '{\"x\":1}'::jsonb FROM s.t","expect":"ok","ref":"functions-json","note":"jsonb <@ contained-by operator"}
+{"id":"jsn0009","category":"json-jsonb","sql":"SELECT data ? 'key' FROM s.t","expect":"ok","ref":"functions-json","note":"jsonb ? key-exists operator"}
+{"id":"jsn0010","category":"json-jsonb","sql":"SELECT data ?| ARRAY['a','b'] FROM s.t","expect":"ok","ref":"functions-json","note":"jsonb ?| any-key-exists operator"}
+{"id":"jsn0011","category":"json-jsonb","sql":"SELECT data ?& ARRAY['a','b'] FROM s.t","expect":"ok","ref":"functions-json","note":"jsonb ?& all-keys-exist operator"}
+{"id":"jsn0012","category":"json-jsonb","sql":"SELECT data || '{\"y\":2}'::jsonb FROM s.t","expect":"ok","ref":"functions-json","note":"jsonb || concatenation operator"}
+{"id":"jsn0013","category":"json-jsonb","sql":"SELECT data #- '{a,b}' FROM s.t","expect":"ok","ref":"functions-json","note":"jsonb #- delete path operator"}
+{"id":"jsn0014","category":"json-jsonb","sql":"SELECT data @? '$.key' FROM s.t","expect":"ok","ref":"functions-json","note":"jsonb @? jsonpath exists operator"}
+{"id":"jsn0015","category":"json-jsonb","sql":"SELECT data @@ '$.val > 0' FROM s.t","expect":"ok","ref":"functions-json","note":"jsonb @@ jsonpath predicate operator"}
+{"id":"jsn0016","category":"json-jsonb","sql":"SELECT jsonb_path_query(data, '$.key') FROM s.t","expect":"ok","ref":"functions-json","note":"jsonb_path_query basic usage"}
+{"id":"jsn0017","category":"json-jsonb","sql":"SELECT jsonb_path_query(data, '$.items[*]') FROM s.t","expect":"ok","ref":"functions-json","note":"jsonb_path_query with array wildcard"}
+{"id":"jsn0018","category":"json-jsonb","sql":"SELECT jsonb_path_query_first(data, '$.key') FROM s.t","expect":"ok","ref":"functions-json","note":"jsonb_path_query_first returns first match"}
+{"id":"jsn0019","category":"json-jsonb","sql":"SELECT jsonb_path_exists(data, '$.key') FROM s.t","expect":"ok","ref":"functions-json","note":"jsonb_path_exists boolean result"}
+{"id":"jsn0020","category":"json-jsonb","sql":"SELECT jsonb_path_match(data, '$.val > 0') FROM s.t","expect":"ok","ref":"functions-json","note":"jsonb_path_match predicate result"}
+{"id":"jsn0021","category":"json-jsonb","sql":"SELECT json_build_object('a', 1, 'b', 'hello') FROM s.t","expect":"ok","ref":"functions-json","note":"json_build_object variadic key-value pairs"}
+{"id":"jsn0022","category":"json-jsonb","sql":"SELECT jsonb_build_array(1, 'two', true, NULL) FROM s.t","expect":"ok","ref":"functions-json","note":"jsonb_build_array variadic elements"}
+{"id":"jsn0023","category":"json-jsonb","sql":"SELECT json_object(ARRAY['a','b'], ARRAY['1','2']) FROM s.t","expect":"ok","ref":"functions-json","note":"json_object from two text arrays"}
+{"id":"jsn0024","category":"json-jsonb","sql":"SELECT to_jsonb(val) FROM s.t","expect":"ok","ref":"functions-json","note":"to_jsonb converts scalar to jsonb"}
+{"id":"jsn0025","category":"json-jsonb","sql":"SELECT to_jsonb(ROW(name, val)) FROM s.t","expect":"ok","ref":"functions-json","note":"to_jsonb converts row to jsonb object"}
+{"id":"jsn0026","category":"json-jsonb","sql":"SELECT row_to_json(t) FROM s.t AS t","expect":"ok","ref":"functions-json","note":"row_to_json converts whole row"}
+{"id":"jsn0027","category":"json-jsonb","sql":"SELECT row_to_json(t, true) FROM s.t AS t","expect":"ok","ref":"functions-json","note":"row_to_json with pretty_bool true"}
+{"id":"jsn0028","category":"json-jsonb","sql":"SELECT json_agg(name ORDER BY id) FROM s.t","expect":"ok","ref":"functions-json","note":"json_agg aggregate with ORDER BY"}
+{"id":"jsn0029","category":"json-jsonb","sql":"SELECT jsonb_agg(data) FROM s.t","expect":"ok","ref":"functions-json","note":"jsonb_agg aggregate collects jsonb values"}
+{"id":"jsn0030","category":"json-jsonb","sql":"SELECT jsonb_object_agg(name, val) FROM s.t","expect":"ok","ref":"functions-json","note":"jsonb_object_agg builds object from key-value pairs"}
+{"id":"jsn0031","category":"json-jsonb","sql":"SELECT json_object_agg(name, qty ORDER BY name) FROM s.t","expect":"ok","ref":"functions-json","note":"json_object_agg with ORDER BY"}
+{"id":"jsn0032","category":"json-jsonb","sql":"SELECT data['key'] FROM s.t","expect":"ok","ref":"functions-json","note":"jsonb subscript operator data['key']"}
+{"id":"jsn0033","category":"json-jsonb","sql":"SELECT data['a']['b'] FROM s.t","expect":"ok","ref":"functions-json","note":"jsonb chained subscript access"}
+{"id":"jsn0034","category":"json-jsonb","sql":"SELECT '{}' IS JSON FROM s.t","expect":"ok","ref":"functions-json","note":"IS JSON predicate on text literal"}
+{"id":"jsn0035","category":"json-jsonb","sql":"SELECT data IS NOT JSON FROM s.t","expect":"ok","ref":"functions-json","note":"IS NOT JSON predicate on jsonb column"}
+{"id":"jsn0036","category":"json-jsonb","sql":"SELECT '{\"a\":1}' IS JSON OBJECT FROM s.t","expect":"ok","ref":"functions-json","note":"IS JSON OBJECT predicate"}
+{"id":"jsn0037","category":"json-jsonb","sql":"SELECT '[1,2]' IS JSON ARRAY FROM s.t","expect":"ok","ref":"functions-json","note":"IS JSON ARRAY predicate"}
+{"id":"jsn0038","category":"json-jsonb","sql":"SELECT '1' IS JSON SCALAR FROM s.t","expect":"ok","ref":"functions-json","note":"IS JSON SCALAR predicate"}
+{"id":"jsn0039","category":"json-jsonb","sql":"SELECT jt.* FROM s.t, JSON_TABLE(data, '$' COLUMNS (jval text PATH '$.key')) AS jt","expect":"ok","ref":"functions-json","note":"JSON_TABLE basic usage with COLUMNS"}
+{"id":"jsn0040","category":"json-jsonb","sql":"SELECT data -> FROM s.t","expect":"error","ref":"functions-json","note":"syntax error: -> missing right operand"}
+{"id":"jsn0041","category":"json-jsonb","sql":"SELECT data @? FROM s.t","expect":"error","ref":"functions-json","note":"syntax error: @? missing jsonpath argument"}
+{"id":"jsn0042","category":"json-jsonb","sql":"SELECT data @@ FROM s.t","expect":"error","ref":"functions-json","note":"syntax error: @@ missing jsonpath argument"}
+{"id":"jsn0043","category":"json-jsonb","sql":"SELECT jsonb_path_query(data '$.key') FROM s.t","expect":"error","ref":"functions-json","note":"syntax error: missing comma in function call"}
+{"id":"jsn0044","category":"json-jsonb","sql":"SELECT data @> FROM s.t","expect":"error","ref":"functions-json","note":"syntax error: @> missing right operand"}
+{"id":"jsn0045","category":"json-jsonb","sql":"SELECT data #- FROM s.t","expect":"error","ref":"functions-json","note":"syntax error: #- missing right operand"}
+{"id":"jsn0046","category":"json-jsonb","sql":"SELECT '{bad json' IS JSON FROM s.t","expect":"ok","ref":"functions-json","note":"IS JSON predicate returns false for invalid JSON, not error"}
+{"id":"jsn0047","category":"json-jsonb","sql":"SELECT data #>> FROM s.t","expect":"error","ref":"functions-json","note":"syntax error: #>> missing right operand"}
+{"id":"jsn0048","category":"json-jsonb","sql":"SELECT jsonb_path_query(data, '$[') FROM s.t","expect":"error","ref":"functions-json","note":"error: invalid jsonpath - unclosed bracket"}
+{"id":"jsn0049","category":"json-jsonb","sql":"SELECT data || FROM s.t","expect":"error","ref":"functions-json","note":"syntax error: || missing right operand"}
+{"id":"jsn0050","category":"json-jsonb","sql":"SELECT jsonb_path_query(data, '$.a', vars := '{\"x\":1}'::jsonb, silent := true) FROM s.t","expect":"ok","ref":"functions-json","note":"jsonb_path_query with vars and silent named params"}

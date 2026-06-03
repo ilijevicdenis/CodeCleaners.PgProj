@@ -87,6 +87,10 @@ function Invoke-Batch([string] $db, $cases) {
     $sb = [System.Text.StringBuilder]::new()
     [void]$sb.AppendLine('\set VERBOSITY verbose')
     [void]$sb.AppendLine('\set ON_ERROR_STOP off')
+    # Session-level guards so a runaway case (infinite loop, lock wait) fails fast as an
+    # error instead of hanging the oracle. Survive per-case ROLLBACK (not SET LOCAL).
+    [void]$sb.AppendLine('SET statement_timeout = ''15s'';')
+    [void]$sb.AppendLine('SET lock_timeout = ''5s'';')
     foreach ($c in $cases) {
         [void]$sb.AppendLine("\warn $MARK$($c.id)$MARK")
         [void]$sb.AppendLine('BEGIN;')
@@ -104,7 +108,7 @@ function Invoke-Batch([string] $db, $cases) {
 function Invoke-Solo($case) {
     $db = New-Clone
     try {
-        $script = "\set VERBOSITY verbose`n\set ON_ERROR_STOP off`n\warn $MARK$($case.id)$MARK`n$($case.sql)`n\warn ${MARK}__END__$MARK`n"
+        $script = "\set VERBOSITY verbose`n\set ON_ERROR_STOP off`nSET statement_timeout = '15s';`nSET lock_timeout = '5s';`n\warn $MARK$($case.id)$MARK`n$($case.sql)`n\warn ${MARK}__END__$MARK`n"
         $raw = ($script | docker exec -i $Container sh -c "psql -U postgres -d $db -q -f - 2>&1") | Out-String
         return Parse-Output $raw @($case)
     }
