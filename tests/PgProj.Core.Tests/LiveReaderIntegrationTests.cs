@@ -54,6 +54,14 @@ public sealed class LiveReaderIntegrationTests
 
         // Idempotence: re-comparing the live model to itself yields no changes (stable read).
         Assert.Empty(new SchemaComparer().Compare(live, live));
+
+        // Gold-standard round-trip: the extracted model must itself re-deploy cleanly — this proves
+        // every reconstructed raw-object DDL (aggregates, FDW/server/foreign table, collation, …) is
+        // valid and correctly ordered, not just parseable.
+        var recreate = new SchemaComparer().Compare(live, new DatabaseModel());
+        var script2 = new DeployScriptGenerator().Generate(recreate, new DeployOptions { WrapInTransaction = true });
+        await deployer.ExecuteAsync(conn, "DROP SCHEMA IF EXISTS afd CASCADE; DROP SCHEMA IF EXISTS reporting CASCADE;");
+        await deployer.ExecuteAsync(conn, script2);
     }
 
     private static string FindSampleProject()

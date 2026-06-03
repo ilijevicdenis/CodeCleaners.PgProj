@@ -57,6 +57,10 @@ public sealed class LiveDatabaseReader
             Read(c => ReadExtensionsAsync(c, ct)),
             Read(c => ReadEnumTypesAsync(c, ct)),
             Read(c => ReadCompositeTypesAsync(c, ct)),
+            Read(c => ReadRangeTypesAsync(c, ct)),
+            Read(c => ReadShellTypesAsync(c, ct)),
+            Read(c => ReadCollationsAsync(c, ct)),
+            Read(c => ReadAggregatesAsync(c, ct)),
             Read(c => ReadDomainsAsync(c, ct)),
             Read(c => ReadTriggersAsync(c, ct)),
             Read(c => ReadRulesAsync(c, ct)),
@@ -347,17 +351,17 @@ public sealed class LiveDatabaseReader
     private async Task<List<ViewDefinition>> ReadViewsAsync(NpgsqlConnection conn, CancellationToken ct)
     {
         const string sql = @"
-            SELECT n.nspname, c.relname, pg_get_viewdef(c.oid, true) AS def
+            SELECT n.nspname, c.relname, pg_get_viewdef(c.oid, true) AS def, c.relkind
             FROM pg_class c
             JOIN pg_namespace n ON n.oid = c.relnamespace
-            WHERE c.relkind = 'v' AND n.nspname NOT IN ('pg_catalog','information_schema') AND n.nspname NOT LIKE 'pg_%'
+            WHERE c.relkind IN ('v','m') AND n.nspname NOT IN ('pg_catalog','information_schema') AND n.nspname NOT LIKE 'pg_%'
             ORDER BY n.nspname, c.relname;";
 
         var list = new List<ViewDefinition>();
         await using var cmd = new NpgsqlCommand(sql, conn);
         await using var r = await cmd.ExecuteReaderAsync(ct);
         while (await r.ReadAsync(ct))
-            list.Add(new ViewDefinition(r.GetString(0), r.GetString(1), r.GetString(2)));
+            list.Add(new ViewDefinition(r.GetString(0), r.GetString(1), r.GetString(2), IsMaterialized: ReadChar(r, 3, 'v') == 'm'));
         return list;
     }
 
@@ -425,7 +429,7 @@ public sealed class LiveDatabaseReader
     private async Task<List<RawObjectDefinition>> ReadCommentsAsync(NpgsqlConnection conn, CancellationToken ct)
     {
         const string sql = @"
-            SELECT n.nspname, c.relname, a.attname, d.description
+            SELECT n.nspname, c.relname, a.attname, d.description, c.relkind
             FROM pg_description d
             JOIN pg_class c ON c.oid = d.objoid
             JOIN pg_namespace n ON n.oid = c.relnamespace
@@ -443,9 +447,12 @@ public sealed class LiveDatabaseReader
             var rel = r.GetString(1);
             var col = r.IsDBNull(2) ? null : r.GetString(2);
             var desc = r.GetString(3).Replace("'", "''");
+            var relkind = ReadChar(r, 4, 'r');
+            // A view/matview/foreign-table needs its own COMMENT keyword — COMMENT ON TABLE rejects them.
+            var relWord = relkind switch { 'v' => "VIEW", 'm' => "MATERIALIZED VIEW", 'f' => "FOREIGN TABLE", _ => "TABLE" };
 
             var (target, identity) = col is null
-                ? ($"TABLE {schema}.{rel}", $"comment:table {schema}.{rel}")
+                ? ($"{relWord} {schema}.{rel}", $"comment:{relWord.ToLowerInvariant()} {schema}.{rel}")
                 : ($"COLUMN {schema}.{rel}.{col}", $"comment:column {schema}.{rel}.{col}");
             list.Add(MakeRaw(ObjectKind.Comment, "", "", identity, $"COMMENT ON {target} IS '{desc}';"));
         }
@@ -525,13 +532,137 @@ public sealed class LiveDatabaseReader
         }).ToList();
     }
 
+    private async Task<List<RawObjectDefinition>> ReadRangeTypesAsync(NpgsqlConnection conn, CancellationToken ct)
+    {
+        const string sql = @"
+            SELECT n.nspname, t.typname, format_type(r.rngsubtype, NULL) AS subtype
+            FROM pg_range r
+            JOIN pg_type t ON t.oid = r.rngtypid
+            JOIN pg_namespace n ON n.oid = t.typnamespace
+            WHERE n.nspname NOT IN ('pg_catalog','information_schema') AND n.nspname NOT LIKE 'pg_%'
+            ORDER BY n.nspname, t.typname;";
+
+        var list = new List<RawObjectDefinition>();
+        await using var cmd = new NpgsqlCommand(sql, conn);
+        await using var r = await cmd.ExecuteReaderAsync(ct);
+        while (await r.ReadAsync(ct))
+        {
+            var schema = r.GetString(0);
+            var name = r.GetString(1);
+            list.Add(MakeRaw(ObjectKind.Type, schema, name, $"type:{schema}.{name}",
+                $"CREATE TYPE {schema}.{name} AS RANGE (SUBTYPE = {r.GetString(2)});"));
+        }
+        return list;
+    }
+
+    // Shell types: a bare `CREATE TYPE name;` (typisdefined = false). Defined enum/composite/range/base
+    // types are excluded by the typisdefined filter.
+    private async Task<List<RawObjectDefinition>> ReadShellTypesAsync(NpgsqlConnection conn, CancellationToken ct)
+    {
+        const string sql = @"
+            SELECT n.nspname, t.typname
+            FROM pg_type t
+            JOIN pg_namespace n ON n.oid = t.typnamespace
+            WHERE NOT t.typisdefined AND t.typtype <> 'b'
+              AND n.nspname NOT IN ('pg_catalog','information_schema') AND n.nspname NOT LIKE 'pg_%'
+            ORDER BY n.nspname, t.typname;";
+
+        var list = new List<RawObjectDefinition>();
+        await using var cmd = new NpgsqlCommand(sql, conn);
+        await using var r = await cmd.ExecuteReaderAsync(ct);
+        while (await r.ReadAsync(ct))
+        {
+            var schema = r.GetString(0);
+            var name = r.GetString(1);
+            list.Add(MakeRaw(ObjectKind.Type, schema, name, $"type:{schema}.{name}", $"CREATE TYPE {schema}.{name};"));
+        }
+        return list;
+    }
+
+    private async Task<List<RawObjectDefinition>> ReadCollationsAsync(NpgsqlConnection conn, CancellationToken ct)
+    {
+        const string sql = @"
+            SELECT n.nspname, c.collname, c.collprovider, c.collisdeterministic,
+                   c.collcollate, c.collctype, c.colllocale
+            FROM pg_collation c
+            JOIN pg_namespace n ON n.oid = c.collnamespace
+            WHERE n.nspname NOT IN ('pg_catalog','information_schema') AND n.nspname NOT LIKE 'pg_%'
+            ORDER BY n.nspname, c.collname;";
+
+        var list = new List<RawObjectDefinition>();
+        await using var cmd = new NpgsqlCommand(sql, conn);
+        await using var r = await cmd.ExecuteReaderAsync(ct);
+        while (await r.ReadAsync(ct))
+        {
+            var schema = r.GetString(0);
+            var name = r.GetString(1);
+            var provider = ReadChar(r, 2, 'd') switch { 'i' => "icu", 'c' => "libc", 'b' => "builtin", _ => null };
+            var deterministic = !r.IsDBNull(3) && r.GetBoolean(3);
+            var collate = r.IsDBNull(4) ? null : r.GetString(4);
+            var ctype = r.IsDBNull(5) ? null : r.GetString(5);
+            var locale = r.IsDBNull(6) ? null : r.GetString(6);
+
+            var opts = new List<string>();
+            if (provider is not null) opts.Add($"PROVIDER = {provider}");
+            var loc = locale ?? (collate is not null && collate == ctype ? collate : null);
+            if (loc is not null) opts.Add($"LOCALE = '{loc.Replace("'", "''")}'");
+            else
+            {
+                if (collate is not null) opts.Add($"LC_COLLATE = '{collate.Replace("'", "''")}'");
+                if (ctype is not null) opts.Add($"LC_CTYPE = '{ctype.Replace("'", "''")}'");
+            }
+            if (!deterministic) opts.Add("DETERMINISTIC = false");
+
+            list.Add(MakeRaw(ObjectKind.Collation, schema, name, $"collation:{schema}.{name}",
+                $"CREATE COLLATION {schema}.{name} ({string.Join(", ", opts)});"));
+        }
+        return list;
+    }
+
+    private async Task<List<RawObjectDefinition>> ReadAggregatesAsync(NpgsqlConnection conn, CancellationToken ct)
+    {
+        const string sql = @"
+            SELECT n.nspname, p.proname,
+                   pg_get_function_identity_arguments(p.oid) AS args,
+                   a.aggtransfn::regproc::text AS sfunc,
+                   format_type(a.aggtranstype, NULL) AS stype,
+                   NULLIF(a.aggfinalfn, 0)::regproc::text AS finalfunc,
+                   NULLIF(a.aggcombinefn, 0)::regproc::text AS combinefunc,
+                   a.agginitval AS initcond
+            FROM pg_aggregate a
+            JOIN pg_proc p ON p.oid = a.aggfnoid
+            JOIN pg_namespace n ON n.oid = p.pronamespace
+            WHERE n.nspname NOT IN ('pg_catalog','information_schema') AND n.nspname NOT LIKE 'pg_%'
+            ORDER BY n.nspname, p.proname;";
+
+        var list = new List<RawObjectDefinition>();
+        await using var cmd = new NpgsqlCommand(sql, conn);
+        await using var r = await cmd.ExecuteReaderAsync(ct);
+        while (await r.ReadAsync(ct))
+        {
+            var schema = r.GetString(0);
+            var name = r.GetString(1);
+            var args = r.IsDBNull(2) || r.GetString(2).Length == 0 ? "*" : r.GetString(2);
+            var opts = new List<string> { $"SFUNC = {r.GetString(3)}", $"STYPE = {r.GetString(4)}" };
+            if (!r.IsDBNull(5)) opts.Add($"FINALFUNC = {r.GetString(5)}");
+            if (!r.IsDBNull(6)) opts.Add($"COMBINEFUNC = {r.GetString(6)}");
+            if (!r.IsDBNull(7)) opts.Add($"INITCOND = '{r.GetString(7).Replace("'", "''")}'");
+
+            list.Add(MakeRaw(ObjectKind.Aggregate, schema, name, $"aggregate:{schema}.{name}({NormalizeArgs(args)})",
+                $"CREATE AGGREGATE {schema}.{name} ({args}) ({string.Join(", ", opts)});"));
+        }
+        return list;
+    }
+
+    private static string NormalizeArgs(string args) => args.Trim();
+
     private async Task<List<RawObjectDefinition>> ReadDomainsAsync(NpgsqlConnection conn, CancellationToken ct)
     {
         const string sql = @"
             SELECT n.nspname, t.typname, format_type(t.typbasetype, t.typtypmod) AS basetype,
                    t.typnotnull, t.typdefault,
                    (SELECT string_agg(pg_get_constraintdef(c.oid), ' ')
-                      FROM pg_constraint c WHERE c.contypid = t.oid) AS checks
+                      FROM pg_constraint c WHERE c.contypid = t.oid AND c.contype = 'c') AS checks
             FROM pg_type t
             JOIN pg_namespace n ON n.oid = t.typnamespace
             WHERE t.typtype = 'd'
@@ -686,8 +817,6 @@ public sealed class LiveDatabaseReader
                 list.Add(MakeRaw(kind, "", r.GetString(0), $"{tag}:{r.GetString(0)}", string.Empty, bodyComparable: false));
         }
 
-        await Schema(ObjectKind.Collation, "collation",
-            "SELECT n.nspname, c.collname FROM pg_collation c JOIN pg_namespace n ON n.oid=c.collnamespace");
         await Schema(ObjectKind.Conversion, "conversion",
             "SELECT n.nspname, c.conname FROM pg_conversion c JOIN pg_namespace n ON n.oid=c.connamespace");
         await Schema(ObjectKind.Statistics, "statistics",
