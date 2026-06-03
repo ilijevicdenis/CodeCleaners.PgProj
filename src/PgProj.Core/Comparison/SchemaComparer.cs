@@ -185,16 +185,19 @@ public sealed class SchemaComparer
     {
         foreach (var src in source.Indexes)
         {
+            // An index whose relation is a materialized view must deploy after that view is created.
+            var onMv = source.Views.Any(v => v.IsMaterialized
+                && DatabaseModel.NameEquals(v.Schema, src.Schema) && DatabaseModel.NameEquals(v.Name, src.Table));
             var tgt = target.Indexes.FirstOrDefault(i =>
                 DatabaseModel.NameEquals(i.Schema, src.Schema) && DatabaseModel.NameEquals(i.Name, src.Name));
             if (tgt is null)
             {
-                changes.Add(new CreateIndexChange(src));
+                changes.Add(new CreateIndexChange(src, onMv));
             }
             else if (!IndexesEqual(src, tgt))
             {
                 changes.Add(new DropIndexChange(src.Schema, src.Name));
-                changes.Add(new CreateIndexChange(src));
+                changes.Add(new CreateIndexChange(src, onMv));
             }
         }
 

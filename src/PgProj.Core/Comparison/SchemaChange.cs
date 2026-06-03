@@ -177,9 +177,11 @@ public sealed record DropIndexChange(string Schema, string Name) : SchemaChange
     public override string ToSql() => $"DROP INDEX IF EXISTS {SqlEmitter.Qualified(Schema, Name)};";
 }
 
-public sealed record CreateIndexChange(IndexDefinition Index) : SchemaChange
+public sealed record CreateIndexChange(IndexDefinition Index, bool OnMaterializedView = false) : SchemaChange
 {
-    public override int Phase => 65;
+    // Table indexes go at 65 (after tables at 40); an index ON a materialized view must wait until the
+    // matview itself exists, which is created with the other views at 75.
+    public override int Phase => OnMaterializedView ? 76 : 65;
     public override bool IsDestructive => false;
     public override string Describe() => $"Create index {Index.Schema}.{Index.Name}";
     public override string ToSql() => SqlEmitter.CreateIndex(Index);
