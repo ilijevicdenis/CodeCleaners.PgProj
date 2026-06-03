@@ -106,7 +106,8 @@ public sealed class DatabaseProject
         foreach (var file in files)
         {
             var parsed = new Syntax.PgParser().Parse(File.ReadAllText(file));
-            foreach (var d in parsed.Diagnostics) diagnostics.Add(d.ToString());
+            var rel = Path.GetRelativePath(ProjectDirectory, file);
+            foreach (var d in parsed.Diagnostics) diagnostics.Add($"{rel}: {d}");   // attribute to the project file to fix
             builder.Build(parsed, model);
         }
 
@@ -147,7 +148,8 @@ public sealed class DatabaseProject
         {
             var parsed = new Syntax.PgParser().Parse(File.ReadAllText(path)); // fresh instance → isolated per worker
             var model = new Syntax.ModelBuilder(DefaultSchema).Build(parsed);
-            return new PartialParse(model, parsed.Diagnostics.Select(d => d.ToString()).ToList());
+            var rel = Path.GetRelativePath(ProjectDirectory, path);
+            return new PartialParse(model, parsed.Diagnostics.Select(d => $"{rel}: {d}").ToList());
         }
         catch (Exception ex) // unreadable file / catastrophic parser failure → isolate to this file
         {
