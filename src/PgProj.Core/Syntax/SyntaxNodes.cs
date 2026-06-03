@@ -81,6 +81,9 @@ public sealed class CreateFunctionStatement : SqlStatement
     public bool IsProcedure { get; init; }
     public string? Language { get; set; }            // LANGUAGE name (lowercased), if given
     public string? Body { get; set; }                // the AS body token, verbatim (dollar-quoted or string)
+    public bool ReturnsVoid { get; set; }            // RETURNS void
+    public bool ReturnsSetof { get; set; }           // RETURNS SETOF … / RETURNS TABLE(…)
+    public bool HasOutParams { get; set; }           // any OUT / INOUT parameter
 }
 
 // ---- CREATE TABLE -----------------------------------------------------------

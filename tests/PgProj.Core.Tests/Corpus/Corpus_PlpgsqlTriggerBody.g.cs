@@ -315,7 +315,7 @@ CREATE TRIGGER t_bad3 BEFORE INSERT ON s.t FOR EACH ROW EXECUTE FUNCTION s.trg_i
     public void pptba0152() => CorpusAssert.Parses(@"CREATE FUNCTION s.trg_composite_addr() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN IF (NEW.home).city IS NULL THEN NEW.home := ROW('unknown', 'unknown', '00000')::s.addr; END IF; RETURN NEW; END $$;", "ok");
     [Fact]
     public void pptba0153() => CorpusAssert.Parses(@"CREATE FUNCTION s.trg_set_default_val() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN IF NEW.val IS NULL THEN NEW.val := 0.00; END IF; RETURN NEW; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pptba0154() => CorpusAssert.Parses(@"CREATE FUNCTION s.trg_bad_return_keyword() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN RETURN NEXT; END $$;", "error");
     [Fact]
     public void pptba0155() => CorpusAssert.Parses(@"CREATE FUNCTION s.trg_bad_elsif_syntax() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN IF TG_OP = 'INSERT' THEN RETURN NEW; ELSEIF TG_OP = 'UPDATE' THEN RETURN NEW; END IF; RETURN NULL; END $$;", "ok");

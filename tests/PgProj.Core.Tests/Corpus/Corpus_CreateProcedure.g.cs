@@ -220,7 +220,7 @@ CALL s.p85(1)", "error");
     public void proca0104() => CorpusAssert.Parses(@"CREATE PROCEDURE s.p98(INOUT INOUT x integer) LANGUAGE plpgsql AS $$ BEGIN END $$", "error");
     [Fact]
     public void proca0105() => CorpusAssert.Parses(@"CREATE PROCEDURE s.p99() LANGUAGE plpgsql SECURITY AS $$ BEGIN END $$", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void proca0106() => CorpusAssert.Parses(@"CREATE PROCEDURE s.p100() LANGUAGE plpgsql AS $$ BEGIN RETURN 1; END $$", "error");
     [Fact]
     public void proca0107() => CorpusAssert.Parses(@"CREATE OR REPLACE PROCEDURE s.p(text) LANGUAGE plpgsql AS $$ BEGIN END $$", "ok");

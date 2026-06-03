@@ -198,7 +198,7 @@ END $$;", "ok");
     public void doca0090() => CorpusAssert.Parses(@"DO LANGUAGE plpgsql;", "error");
     [Fact]
     public void doca0091() => CorpusAssert.Parses(@"DO;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void doca0092() => CorpusAssert.Parses(@"DO $$ BEGIN RETURN 1; END $$;", "error");
     [Fact]
     public void doca0093() => CorpusAssert.Parses(@"DO $$ DECLARE x integer; y integer; BEGIN x := 1; y := 2; END $$;", "ok");

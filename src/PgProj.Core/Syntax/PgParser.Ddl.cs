@@ -147,6 +147,7 @@ public sealed partial class PgParser
             node.ArgTypes = ExtractArgTypes(argInner);            // unchanged — model identity depends on this
             hasOut = ValidateFunctionArgs(argInner);              // overlay validation, no effect on the model
         }
+        node.HasOutParams = hasOut;
 
         // RETURNS … and the option/body tail — captured as before, validated via a sub-cursor.
         int m = c.Mark();
@@ -226,8 +227,9 @@ public sealed partial class PgParser
         if (o.MatchWord("RETURNS"))
         {
             if (o.MatchWord("TABLE")) { returnsTable = true; returnsSet = true; if (!o.AtSymbol('(')) throw new ParseException("expected '(' after RETURNS TABLE", o.Here); CaptureBalancedParens(o); }
-            else { if (o.MatchWord("SETOF")) returnsSet = true; ParseCastType(o); }
+            else { if (o.MatchWord("SETOF")) returnsSet = true; var rt = ParseCastType(o); if (rt.Trim().Equals("void", System.StringComparison.OrdinalIgnoreCase)) node.ReturnsVoid = true; }
         }
+        node.ReturnsSetof = returnsSet;
         if (hasOut && returnsTable) throw new ParseException("cannot use OUT parameters together with RETURNS TABLE", o.Here);
 
         var seen = new System.Collections.Generic.HashSet<string>(System.StringComparer.OrdinalIgnoreCase);

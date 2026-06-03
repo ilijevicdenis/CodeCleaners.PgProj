@@ -15,13 +15,17 @@ namespace PgProj.Core.Semantics;
 /// Out of scope (left unreported): run-time behaviour (a RAISE that fires, 1/0, double CLOSE) and any
 /// catalog-dependent check (unknown type, missing column for %TYPE).
 /// </summary>
+/// <summary>The surrounding routine's shape, used for context-dependent PL/pgSQL checks (mainly RETURN).</summary>
+public readonly record struct PlpgsqlContext(bool IsDo, bool IsProcedure, bool ReturnsVoid, bool ReturnsSetof, bool HasOutParams);
+
 public sealed class PlpgsqlValidator
 {
     private readonly TokenCursor _c;
     private readonly List<string> _errors = new();
+    private readonly PlpgsqlContext _ctx;
     private int _loopDepth;
 
-    private PlpgsqlValidator(TokenCursor c) => _c = c;
+    private PlpgsqlValidator(TokenCursor c, PlpgsqlContext ctx) { _c = c; _ctx = ctx; }
 
     private static readonly HashSet<string> NotAssignmentTargets = new(StringComparer.OrdinalIgnoreCase)
     {
@@ -42,14 +46,14 @@ public sealed class PlpgsqlValidator
     private static readonly HashSet<string> StatementStoppers = new(StringComparer.OrdinalIgnoreCase)
     { "END", "EXCEPTION", "WHEN", "ELSIF", "ELSEIF", "ELSE" };
 
-    public static IReadOnlyList<string> Validate(string rawBody)
+    public static IReadOnlyList<string> Validate(string rawBody, PlpgsqlContext ctx)
     {
         var src = StripDollar(rawBody);
         if (src is null) return Array.Empty<string>();          // not dollar-quoted — skip (escape ambiguity)
         List<Token> toks;
         try { toks = OperatorLexer.Merge(Tokenizer.Tokenize(src)); }
         catch { return Array.Empty<string>(); }
-        var v = new PlpgsqlValidator(new TokenCursor(toks));
+        var v = new PlpgsqlValidator(new TokenCursor(toks), ctx);
         try { v.ParseBlock(); }
         catch (ParseException) { /* lost the thread — never report a generic failure */ }
         return v._errors;
@@ -106,12 +110,36 @@ public sealed class PlpgsqlValidator
         if (_c.MatchWord("WHILE")) { ConsumeUntilWord("LOOP"); ExpectWord("LOOP"); _loopDepth++; ParseStatements(); _loopDepth--; ExpectEnd("LOOP"); return; }
         if (_c.AtWord("FOR") || _c.AtWord("FOREACH")) { _c.Advance(); ConsumeUntilWord("LOOP"); ExpectWord("LOOP"); _loopDepth++; ParseStatements(); _loopDepth--; ExpectEnd("LOOP"); return; }
         if (_c.AtAnyWord("EXIT", "CONTINUE")) { var kw = _c.Advance().Value.ToUpperInvariant(); if ((_c.AtSymbol(';') || _c.AtWord("WHEN")) && _loopDepth == 0) Err($"{kw} cannot be used outside a loop"); ConsumeToSemicolon(); return; }
+        if (_c.MatchWord("RETURN")) { ParseReturn(); return; }
         if (_c.MatchWord("RAISE")) { ParseRaise(); return; }
         if (_c.AtAnyWord("FETCH", "MOVE")) { ParseFetchMove(); return; }
         if (_c.MatchWord("CLOSE")) { if (_c.AtEnd || _c.AtSymbol(';')) Err("CLOSE requires a cursor name"); ConsumeToSemicolon(); return; }
         if (_c.AtOperator(":=")) { Err("missing assignment target before :="); throw Lost(); }
         if (TryParseAssignment()) return;
         // anything else: a plain statement up to ';'
+        ConsumeToSemicolon();
+    }
+
+    private void ParseReturn()
+    {
+        if (_c.MatchWord("NEXT"))
+        {
+            if (!_ctx.ReturnsSetof) Err("RETURN NEXT can only be used in a set-returning function");
+            ConsumeToSemicolon(); return;
+        }
+        if (_c.MatchWord("QUERY"))
+        {
+            if (!_ctx.ReturnsSetof) Err("RETURN QUERY can only be used in a set-returning function");
+            else if (_c.AtEnd || _c.AtSymbol(';')) Err("RETURN QUERY requires a query");
+            ConsumeToSemicolon(); return;
+        }
+        bool hasValue = !(_c.AtEnd || _c.AtSymbol(';'));
+        if (hasValue)
+        {
+            if (_ctx.IsDo) Err("a DO block cannot RETURN a value");
+            else if (_ctx.IsProcedure) Err("a procedure cannot RETURN a value");
+            else if (_ctx.ReturnsVoid) Err("a function returning void cannot RETURN a value");
+        }
         ConsumeToSemicolon();
     }
 
