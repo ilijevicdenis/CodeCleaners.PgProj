@@ -41,7 +41,7 @@ public sealed partial class PgParser
             if (lead is null)
             {
                 result.FullyRecognized = false;
-                result.Statements.Add(new UnsupportedStatement { LeadingKeyword = c.Current?.Value ?? "" });
+                result.Statements.Add(new UnsupportedStatement { LeadingKeyword = c.Current?.Value ?? "", SourceText = Token.Render(segment) });
                 continue;
             }
             try

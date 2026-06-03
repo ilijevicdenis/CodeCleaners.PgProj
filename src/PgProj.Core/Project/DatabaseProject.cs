@@ -98,16 +98,19 @@ public sealed class DatabaseProject
     /// <summary>Parses every included .sql file into one model and reports build diagnostics.</summary>
     public ProjectBuildResult Build()
     {
-        var parser = new SqlParser(DefaultSchema);
         var model = new DatabaseModel();
+        var diagnostics = new List<string>();
         var files = ResolveSqlFiles();
+        var builder = new Syntax.ModelBuilder(DefaultSchema);
 
         foreach (var file in files)
-            parser.ParseInto(model, File.ReadAllText(file));
+        {
+            var parsed = new Syntax.PgParser().Parse(File.ReadAllText(file));
+            foreach (var d in parsed.Diagnostics) diagnostics.Add(d.ToString());
+            builder.Build(parsed, model);
+        }
 
-        var diagnostics = new List<string>(parser.Diagnostics);
         diagnostics.AddRange(FindDuplicates(model));
-
         return new ProjectBuildResult(model, diagnostics, files);
     }
 
@@ -142,9 +145,9 @@ public sealed class DatabaseProject
     {
         try
         {
-            var parser = new SqlParser(DefaultSchema); // private instance → isolated per worker
-            var model = parser.Parse(File.ReadAllText(path));
-            return new PartialParse(model, new List<string>(parser.Diagnostics));
+            var parsed = new Syntax.PgParser().Parse(File.ReadAllText(path)); // fresh instance → isolated per worker
+            var model = new Syntax.ModelBuilder(DefaultSchema).Build(parsed);
+            return new PartialParse(model, parsed.Diagnostics.Select(d => d.ToString()).ToList());
         }
         catch (Exception ex) // unreadable file / catastrophic parser failure → isolate to this file
         {
