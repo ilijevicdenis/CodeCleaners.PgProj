@@ -67,6 +67,7 @@ public sealed class SemanticAnalyzer
                 if (!ct.IfNotExists && _preExisting.HasRelation(ct.Schema, ct.Name))
                     Report($"relation \"{Qual(ct.Schema, ct.Name)}\" already exists");
                 break;
+            case CreateIndexStatement ix: ResolveTable(ix.Schema, ix.Table); break;   // CREATE INDEX ON a missing table
         }
     }
 

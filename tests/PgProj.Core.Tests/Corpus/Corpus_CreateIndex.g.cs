@@ -281,7 +281,7 @@ INSERT INTO idxa_tbl2 VALUES (1,'x'),(2,'y')", "ok");
     public void idxa0135() => CorpusAssert.Parses(@"CREATE INDEX ON s.t (name) USING btree", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void idxa0136() => CorpusAssert.Parses(@"CREATE INDEX ON s.t USING badmethod (name)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void idxa0137() => CorpusAssert.Parses(@"CREATE INDEX ON s.no_such_table (name)", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void idxa0138() => CorpusAssert.Parses(@"CREATE INDEX ON s.t (no_such_col)", "error");
@@ -585,7 +585,7 @@ CREATE INDEX ON idxa_inc_tbl (a) INCLUDE (b, c)", "ok");
     public void idxb0116() => CorpusAssert.Parses(@"CREATE UNIQUE INDEX ON s.t USING brin (val)", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void idxb0117() => CorpusAssert.Parses(@"CREATE INDEX ON s.t USING badmethod (name)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void idxb0118() => CorpusAssert.Parses(@"CREATE INDEX ON s.nonexistent (name)", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void idxb0119() => CorpusAssert.Parses(@"CREATE INDEX ON s.t (nonexistent_col)", "error");

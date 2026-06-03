@@ -898,7 +898,6 @@ grvb0127
 grvb0129
 grvb0130
 idxa0136
-idxa0137
 idxa0138
 idxa0150
 idxa0155
@@ -907,7 +906,6 @@ idxa0170
 idxb0111
 idxb0112
 idxb0117
-idxb0118
 idxb0119
 idxb0120
 idxb0124
