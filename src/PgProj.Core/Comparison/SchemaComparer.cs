@@ -1,0 +1,237 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text.RegularExpressions;
+using PgProj.Core.Model;
+
+namespace PgProj.Core.Comparison;
+
+public sealed class ComparerOptions
+{
+    /// <summary>
+    /// When false (the default, matching SSDT's "block on data loss" instinct) objects present in
+    /// the target but absent from the project are left alone. When true, they are dropped.
+    /// </summary>
+    public bool DropObjectsNotInSource { get; init; }
+}
+
+/// <summary>
+/// Diffs a <em>source</em> model (the desired state — your project) against a <em>target</em>
+/// model (the actual state — usually a live server) and produces the ordered set of changes that
+/// would migrate the target to the source. This is the engine behind both <c>compare</c> and
+/// <c>publish</c>.
+/// </summary>
+public sealed class SchemaComparer
+{
+    private static readonly Regex Whitespace = new(@"\s+", RegexOptions.Compiled);
+
+    public IReadOnlyList<SchemaChange> Compare(DatabaseModel source, DatabaseModel target, ComparerOptions? options = null)
+    {
+        options ??= new ComparerOptions();
+        var changes = new List<SchemaChange>();
+
+        CompareSchemas(source, target, changes);
+        CompareSequences(source, target, changes);
+        CompareTables(source, target, changes, options);
+        CompareIndexes(source, target, changes, options);
+        CompareViews(source, target, changes, options);
+        CompareFunctions(source, target, changes);
+
+        return changes.OrderBy(c => c.Phase).ToList();
+    }
+
+    private static void CompareSchemas(DatabaseModel source, DatabaseModel target, List<SchemaChange> changes)
+    {
+        foreach (var s in source.Schemas)
+        {
+            if (DatabaseModel.NameEquals(s.Name, "public")) continue; // always present
+            if (!target.HasSchema(s.Name))
+                changes.Add(new CreateSchemaChange(s.Name));
+        }
+    }
+
+    private static void CompareSequences(DatabaseModel source, DatabaseModel target, List<SchemaChange> changes)
+    {
+        foreach (var s in source.Sequences)
+        {
+            var exists = target.Sequences.Any(t => DatabaseModel.NameEquals(t.Schema, s.Schema) && DatabaseModel.NameEquals(t.Name, s.Name));
+            if (!exists) changes.Add(new CreateSequenceChange(s));
+        }
+    }
+
+    private void CompareTables(DatabaseModel source, DatabaseModel target, List<SchemaChange> changes, ComparerOptions options)
+    {
+        foreach (var src in source.Tables)
+        {
+            var tgt = target.FindTable(src.Schema, src.Name);
+            if (tgt is null)
+            {
+                changes.Add(new CreateTableChange(src));
+                foreach (var fk in src.ForeignKeys)
+                    changes.Add(new AddForeignKeyChange(src, fk));
+                continue;
+            }
+
+            // Columns present in source but not target -> add.
+            foreach (var col in src.Columns)
+            {
+                var existing = tgt.FindColumn(col.Name);
+                if (existing is null)
+                    changes.Add(new AddColumnChange(src.Schema, src.Name, col));
+                else if (!ColumnsEqual(existing, col))
+                    changes.Add(new AlterColumnChange(src.Schema, src.Name, existing, col));
+            }
+
+            // Columns present in target but not source -> drop (guarded).
+            if (options.DropObjectsNotInSource)
+            {
+                foreach (var col in tgt.Columns.Where(c => src.FindColumn(c.Name) is null))
+                    changes.Add(new DropColumnChange(src.Schema, src.Name, col.Name));
+            }
+
+            CompareForeignKeys(src, tgt, changes, options);
+            ComparePrimaryKey(src, tgt, changes, options);
+        }
+
+        if (options.DropObjectsNotInSource)
+        {
+            foreach (var tgt in target.Tables.Where(t => source.FindTable(t.Schema, t.Name) is null))
+                changes.Add(new DropTableChange(tgt.Schema, tgt.Name));
+        }
+    }
+
+    private static void ComparePrimaryKey(TableDefinition src, TableDefinition tgt, List<SchemaChange> changes, ComparerOptions options)
+    {
+        var srcPk = src.PrimaryKey;
+        var tgtPk = tgt.PrimaryKey;
+
+        if (srcPk is null)
+        {
+            if (tgtPk is not null && options.DropObjectsNotInSource)
+                changes.Add(new DropPrimaryKeyChange(src.Schema, src.Name, tgtPk.Name ?? $"{src.Name}_pkey"));
+            return;
+        }
+
+        if (tgtPk is null)
+        {
+            changes.Add(new AddPrimaryKeyChange(src.Schema, src.Name, srcPk));
+            return;
+        }
+
+        if (!srcPk.Columns.SequenceEqual(tgtPk.Columns, StringComparer.OrdinalIgnoreCase))
+        {
+            changes.Add(new DropPrimaryKeyChange(src.Schema, src.Name, tgtPk.Name ?? $"{src.Name}_pkey"));
+            changes.Add(new AddPrimaryKeyChange(src.Schema, src.Name, srcPk));
+        }
+    }
+
+    private void CompareForeignKeys(TableDefinition src, TableDefinition tgt, List<SchemaChange> changes, ComparerOptions options)
+    {
+        var targetSigs = tgt.ForeignKeys.Select(ForeignKeySignature).ToHashSet(StringComparer.OrdinalIgnoreCase);
+        foreach (var fk in src.ForeignKeys)
+        {
+            if (!targetSigs.Contains(ForeignKeySignature(fk)))
+                changes.Add(new AddForeignKeyChange(src, fk));
+        }
+
+        if (options.DropObjectsNotInSource)
+        {
+            var sourceSigs = src.ForeignKeys.Select(ForeignKeySignature).ToHashSet(StringComparer.OrdinalIgnoreCase);
+            foreach (var fk in tgt.ForeignKeys.Where(f => !sourceSigs.Contains(ForeignKeySignature(f))))
+                changes.Add(new DropForeignKeyChange(src.Schema, src.Name, fk.Name ?? $"{src.Name}_fkey"));
+        }
+    }
+
+    private void CompareIndexes(DatabaseModel source, DatabaseModel target, List<SchemaChange> changes, ComparerOptions options)
+    {
+        foreach (var src in source.Indexes)
+        {
+            var tgt = target.Indexes.FirstOrDefault(i =>
+                DatabaseModel.NameEquals(i.Schema, src.Schema) && DatabaseModel.NameEquals(i.Name, src.Name));
+            if (tgt is null)
+            {
+                changes.Add(new CreateIndexChange(src));
+            }
+            else if (!IndexesEqual(src, tgt))
+            {
+                changes.Add(new DropIndexChange(src.Schema, src.Name));
+                changes.Add(new CreateIndexChange(src));
+            }
+        }
+
+        if (options.DropObjectsNotInSource)
+        {
+            foreach (var tgt in target.Indexes.Where(t =>
+                !source.Indexes.Any(s => DatabaseModel.NameEquals(s.Schema, t.Schema) && DatabaseModel.NameEquals(s.Name, t.Name))))
+                changes.Add(new DropIndexChange(tgt.Schema, tgt.Name));
+        }
+    }
+
+    private void CompareViews(DatabaseModel source, DatabaseModel target, List<SchemaChange> changes, ComparerOptions options)
+    {
+        foreach (var src in source.Views)
+        {
+            var tgt = target.Views.FirstOrDefault(v =>
+                DatabaseModel.NameEquals(v.Schema, src.Schema) && DatabaseModel.NameEquals(v.Name, src.Name));
+            if (tgt is null || NormalizeText(src.Body) != NormalizeText(tgt.Body))
+                changes.Add(new CreateOrReplaceViewChange(src));
+        }
+
+        if (options.DropObjectsNotInSource)
+        {
+            foreach (var tgt in target.Views.Where(t =>
+                !source.Views.Any(s => DatabaseModel.NameEquals(s.Schema, t.Schema) && DatabaseModel.NameEquals(s.Name, t.Name))))
+                changes.Add(new DropViewChange(tgt.Schema, tgt.Name));
+        }
+    }
+
+    private void CompareFunctions(DatabaseModel source, DatabaseModel target, List<SchemaChange> changes)
+    {
+        foreach (var src in source.Functions)
+        {
+            // Match on schema.name rather than full signature: the project signature carries
+            // argument names while the catalog reports identity arguments (types only), so a
+            // signature match would never succeed against a live DB. (Overloads collapse here —
+            // tracked in BUGS.md.) CREATE OR REPLACE is idempotent, so re-emitting is safe.
+            var tgt = target.Functions.FirstOrDefault(f =>
+                DatabaseModel.NameEquals(f.Schema, src.Schema) && DatabaseModel.NameEquals(f.Name, src.Name));
+            if (tgt is null || NormalizeText(src.Body) != NormalizeText(tgt.Body))
+                changes.Add(new CreateOrReplaceFunctionChange(src));
+        }
+    }
+
+    // ---- equality helpers ----------------------------------------------------------------
+
+    private bool ColumnsEqual(ColumnDefinition a, ColumnDefinition b) =>
+        string.Equals(a.DataType, b.DataType, StringComparison.OrdinalIgnoreCase)
+        && a.IsNullable == b.IsNullable
+        && DefaultsEqual(a.Default, b.Default);
+
+    private bool DefaultsEqual(string? a, string? b)
+    {
+        var na = NormalizeDefault(a);
+        var nb = NormalizeDefault(b);
+        return na == nb;
+    }
+
+    private string NormalizeDefault(string? d) =>
+        string.IsNullOrWhiteSpace(d) ? string.Empty : NormalizeText(d);
+
+    private static bool IndexesEqual(IndexDefinition a, IndexDefinition b) =>
+        a.IsUnique == b.IsUnique
+        && string.Equals(a.Method ?? "btree", b.Method ?? "btree", StringComparison.OrdinalIgnoreCase)
+        && a.Columns.Select(NormalizeIndexColumn).SequenceEqual(b.Columns.Select(NormalizeIndexColumn))
+        && NormalizeText(a.WhereClause ?? "") == NormalizeText(b.WhereClause ?? "");
+
+    // Index columns come quoted from the catalog (pg_get_indexdef) but usually bare from a
+    // project file; strip quotes so "email" and email compare equal.
+    private static string NormalizeIndexColumn(string c) => NormalizeText(c).Replace("\"", "");
+
+    private static string ForeignKeySignature(ForeignKeyDefinition fk) =>
+        string.Join(",", fk.Columns.Select(c => c.ToLowerInvariant()))
+        + "->" + fk.ReferencedSchema.ToLowerInvariant() + "." + fk.ReferencedTable.ToLowerInvariant()
+        + "(" + string.Join(",", fk.ReferencedColumns.Select(c => c.ToLowerInvariant())) + ")";
+
+    private static string NormalizeText(string s) =>
+        Whitespace.Replace(s.Trim(), " ").ToLowerInvariant();
+}

@@ -1,0 +1,10 @@
+<Project Sdk="PgProj.Sdk/0.1.0">
+  <PropertyGroup>
+    <Name>SampleDb</Name>
+    <DefaultSchema>app</DefaultSchema>
+    <TargetPostgresVersion>16</TargetPostgresVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <Build Include="**/*.sql" />
+  </ItemGroup>
+</Project>

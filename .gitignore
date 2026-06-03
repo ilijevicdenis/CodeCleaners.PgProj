@@ -1,0 +1,22 @@
+# Build output
+bin/
+obj/
+[Dd]ebug/
+[Rr]elease/
+*.user
+
+# Test results
+TestResults/
+*.trx
+
+# Rider / VS
+.idea/
+.vs/
+
+# PgProj build artifacts
+*.model.json
+extracted/
+
+# OS
+Thumbs.db
+.DS_Store

@@ -1,0 +1,63 @@
+using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace PgProj.Core.Parsing;
+
+public enum TokenKind
+{
+    Word,         // unquoted identifier or keyword
+    QuotedIdent,  // "..."  (Value holds the unquoted content)
+    String,       // '...'  (Value holds the unescaped content)
+    DollarString, // $tag$...$tag$ (Value holds the full raw text, tags included)
+    Number,
+    Symbol,       // a single punctuation char
+}
+
+public sealed record Token(TokenKind Kind, string Value, int Position)
+{
+    public bool IsWord(string keyword) =>
+        Kind == TokenKind.Word && string.Equals(Value, keyword, StringComparison.OrdinalIgnoreCase);
+
+    public bool IsSymbol(char c) =>
+        Kind == TokenKind.Symbol && Value.Length == 1 && Value[0] == c;
+
+    public bool IsIdentifierLike => Kind is TokenKind.Word or TokenKind.QuotedIdent;
+
+    /// <summary>True for tokens that should be space-separated from an adjacent value token.</summary>
+    public bool IsValueLike =>
+        Kind is TokenKind.Word or TokenKind.QuotedIdent or TokenKind.String
+             or TokenKind.DollarString or TokenKind.Number;
+
+    /// <summary>Re-serialise a token to valid SQL source (used to rebuild view/function bodies).</summary>
+    public string Render() => Kind switch
+    {
+        TokenKind.QuotedIdent => "\"" + Value.Replace("\"", "\"\"") + "\"",
+        TokenKind.String => "'" + Value.Replace("'", "''") + "'",
+        TokenKind.DollarString => Value,
+        _ => Value,
+    };
+
+    /// <summary>
+    /// Re-serialise a run of tokens with minimal, valid spacing: a space is inserted only
+    /// between two value-like tokens (so "numeric ( 12 , 2 )" round-trips tightly while
+    /// "timestamp without time zone" keeps its spaces).
+    /// </summary>
+    public static string Render(IReadOnlyList<Token> tokens)
+    {
+        var sb = new StringBuilder();
+        Token? prev = null;
+        foreach (var t in tokens)
+        {
+            // Separate a value token from a preceding value token or a closing bracket, so
+            // "count(o.id) AS x" and "timestamp without time zone" both read naturally while
+            // "numeric(12, 2)" stays tight.
+            if (prev is not null && t.IsValueLike
+                && (prev.IsValueLike || prev.IsSymbol(')') || prev.IsSymbol(']')))
+                sb.Append(' ');
+            sb.Append(t.Render());
+            prev = t;
+        }
+        return sb.ToString();
+    }
+}

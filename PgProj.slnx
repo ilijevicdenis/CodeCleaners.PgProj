@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/PgProj.Cli/PgProj.Cli.csproj" />
+    <Project Path="src/PgProj.Core/PgProj.Core.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/PgProj.Core.Tests/PgProj.Core.Tests.csproj" />
+  </Folder>
+</Solution>
