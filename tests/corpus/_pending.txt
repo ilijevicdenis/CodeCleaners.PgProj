@@ -71,7 +71,6 @@ alta0041
 alta0043
 alta0052
 alta0055
-alta0074
 alta0085
 alta0096
 alta0106
@@ -92,14 +91,12 @@ alta0163
 alta0165
 altb0014
 altb0024
-altb0043
 altb0055
 altb0062
 altb0065
 altb0071
 altb0075
 altb0098
-altb0104
 altb0105
 altb0107
 altb0110
@@ -119,7 +116,6 @@ altb0151
 altb0159
 altb0165
 altb0166
-altb0170
 altc0022
 altc0042
 altc0047
@@ -127,7 +123,6 @@ altc0052
 altc0056
 altc0062
 altc0063
-altc0075
 altc0083
 altc0092
 altc0099

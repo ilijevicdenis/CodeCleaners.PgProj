@@ -161,7 +161,7 @@ ALTER TABLE s.alta_gi3 ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY (START W
     public void alta0072() => CorpusAssert.Parses(@"ALTER TABLE s.t ALTER COLUMN name SET STORAGE MAIN", "ok");
     [Fact]
     public void alta0073() => CorpusAssert.Parses(@"ALTER TABLE s.t ALTER COLUMN name SET STORAGE DEFAULT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void alta0074() => CorpusAssert.Parses(@"ALTER TABLE s.t ALTER COLUMN name SET STORAGE INVALID_OPTION", "error");
     [Fact]
     public void alta0075() => CorpusAssert.Parses(@"ALTER TABLE s.t ALTER COLUMN name SET COMPRESSION pglz", "ok");
@@ -449,7 +449,7 @@ ALTER TABLE s.alta_gen ALTER COLUMN y DROP EXPRESSION", "ok");
     public void altb0041() => CorpusAssert.Parses(@"ALTER TABLE s.t ALTER COLUMN name SET STORAGE MAIN", "ok");
     [Fact]
     public void altb0042() => CorpusAssert.Parses(@"ALTER TABLE s.t ALTER COLUMN name SET STORAGE DEFAULT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void altb0043() => CorpusAssert.Parses(@"ALTER TABLE s.t ALTER COLUMN name SET STORAGE INVALID_OPT", "error");
     [Fact]
     public void altb0044() => CorpusAssert.Parses(@"ALTER TABLE s.t ALTER COLUMN data SET COMPRESSION pglz", "ok");
@@ -571,7 +571,7 @@ ALTER TABLE s.alta_gen ALTER COLUMN y DROP EXPRESSION", "ok");
     public void altb0102() => CorpusAssert.Parses(@"ALTER TABLE s.t RESET (fillfactor)", "ok");
     [Fact]
     public void altb0103() => CorpusAssert.Parses(@"ALTER TABLE s.t RESET (fillfactor, autovacuum_enabled)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void altb0104() => CorpusAssert.Parses(@"ALTER TABLE s.t SET ()", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void altb0105() => CorpusAssert.Parses(@"ALTER TABLE s.child INHERIT s.parent", "error");
@@ -703,7 +703,7 @@ ALTER TABLE s.alta_gen ALTER COLUMN y DROP EXPRESSION", "ok");
     public void altb0168() => CorpusAssert.Parses(@"ALTER TABLE s.t ADD COLUMN extra text, ALTER COLUMN qty SET STATISTICS 100, ADD CONSTRAINT chk_qty CHECK (qty >= 0), SET (fillfactor = 90)", "ok");
     [Fact]
     public void altb0169() => CorpusAssert.Parses(@"ALTER TABLE s.t RENAME name TO", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void altb0170() => CorpusAssert.Parses(@"ALTER TABLE s.t ALTER COLUMN name SET STORAGE TOAST", "error");
     [Fact]
     public void altc0001() => CorpusAssert.Parses(@"ALTER TABLE s.t ADD COLUMN new_col text", "ok");
@@ -853,7 +853,7 @@ ALTER TABLE s.alta_gen ALTER COLUMN y DROP EXPRESSION", "ok");
     public void altc0073() => CorpusAssert.Parses(@"ALTER TABLE s.t ALTER COLUMN name SET STORAGE EXTERNAL", "ok");
     [Fact]
     public void altc0074() => CorpusAssert.Parses(@"ALTER TABLE s.t ALTER COLUMN name SET STORAGE PLAIN", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void altc0075() => CorpusAssert.Parses(@"ALTER TABLE s.t ALTER COLUMN name SET STORAGE INVALID_STORAGE", "error");
     [Fact]
     public void altc0076() => CorpusAssert.Parses(@"ALTER TABLE s.t ALTER COLUMN name SET COMPRESSION pglz", "ok");

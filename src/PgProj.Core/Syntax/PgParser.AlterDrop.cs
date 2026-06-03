@@ -87,7 +87,7 @@ public sealed partial class PgParser
         if (c.MatchWords("SET", "SCHEMA")) { c.ExpectIdentifier(); return "SET SCHEMA"; }
         if (c.MatchWords("SET", "TABLESPACE")) { c.ExpectIdentifier(); return "SET TABLESPACE"; }
         if (c.MatchWords("SET", "LOGGED") || c.MatchWords("SET", "UNLOGGED")) return "SET LOGGED";
-        if (c.MatchWord("SET")) { if (c.AtSymbol('(')) CaptureBalancedParens(c); else ConsumeActionRest(c); return "SET"; }
+        if (c.MatchWord("SET")) { if (c.AtSymbol('(')) CaptureNonEmptyParens(c); else ConsumeActionRest(c); return "SET"; }
         if (c.MatchWord("RESET")) { if (c.AtSymbol('(')) CaptureBalancedParens(c); return "RESET"; }
         if (c.AtAnyWord("ENABLE", "DISABLE", "FORCE")) { ConsumeActionRest(c); return "ENABLE/DISABLE"; }
         if (c.MatchWords("NO", "FORCE")) { ConsumeActionRest(c); return "NO FORCE"; }
@@ -151,9 +151,9 @@ public sealed partial class PgParser
         if (c.MatchWords("SET", "GENERATED")) { ConsumeActionRest(c); return "SET GENERATED"; }
         if (c.MatchWords("DROP", "IDENTITY")) { c.MatchWords("IF", "EXISTS"); return "DROP IDENTITY"; }
         if (c.MatchWords("SET", "STATISTICS")) { ConsumeActionRest(c); return "SET STATISTICS"; }
-        if (c.MatchWords("SET", "STORAGE")) { c.ExpectIdentifier(); return "SET STORAGE"; }
+        if (c.MatchWords("SET", "STORAGE")) { var v = c.ExpectIdentifier(); if (!StorageModes.Contains(v)) throw new ParseException($"invalid storage mode \"{v}\"", c.Here); return "SET STORAGE"; }
         if (c.MatchWords("SET", "COMPRESSION")) { c.ExpectIdentifier(); return "SET COMPRESSION"; }
-        if (c.MatchWord("SET")) { if (c.AtSymbol('(')) CaptureBalancedParens(c); else ConsumeActionRest(c); return "SET opts"; }
+        if (c.MatchWord("SET")) { if (c.AtSymbol('(')) CaptureNonEmptyParens(c); else ConsumeActionRest(c); return "SET opts"; }
         if (c.MatchWord("RESET")) { if (c.AtSymbol('(')) CaptureBalancedParens(c); return "RESET"; }
         if (c.MatchWord("RESTART")) { ConsumeActionRest(c); return "RESTART"; }
         throw new ParseException($"unknown ALTER COLUMN action at {Render(c.Current)}", c.Here);
@@ -277,6 +277,12 @@ public sealed partial class PgParser
 
     private static string? MatchCascadeRestrict(TokenCursor c)
         => c.MatchWord("CASCADE") ? "CASCADE" : (c.MatchWord("RESTRICT") ? "RESTRICT" : null);
+
+    private void CaptureNonEmptyParens(TokenCursor c)
+    {
+        if (c.AtSymbol('(') && c.Peek()?.IsSymbol(')') == true) throw new ParseException("option list cannot be empty", c.Here);
+        CaptureBalancedParens(c);
+    }
 
     private static void ExpectStringLit(TokenCursor c, string what)
     {
