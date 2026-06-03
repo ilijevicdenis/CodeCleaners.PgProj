@@ -73,6 +73,9 @@ public sealed class LiveDatabaseReader
             Read(c => ReadStatisticsAsync(c, ct)),
             Read(c => ReadCastsAsync(c, ct)),
             Read(c => ReadForeignTablesAsync(c, ct)),
+            Read(c => ReadOperatorsAsync(c, ct)),
+            Read(c => ReadTextSearchDictionariesAsync(c, ct)),
+            Read(c => ReadTextSearchConfigurationsAsync(c, ct)),
             Read(c => ReadExistenceObjectsAsync(c, ct)),
         };
 
@@ -828,10 +831,129 @@ public sealed class LiveDatabaseReader
         // Expression statistics (stxexprs set) we don't reconstruct yet → keep existence-only.
         await Schema(ObjectKind.Statistics, "statistics",
             "SELECT n.nspname, s.stxname FROM pg_statistic_ext s JOIN pg_namespace n ON n.oid=s.stxnamespace WHERE s.stxexprs IS NOT NULL");
-        await Schema(ObjectKind.TextSearchConfiguration, "textsearchconfiguration",
-            "SELECT n.nspname, t.cfgname FROM pg_ts_config t JOIN pg_namespace n ON n.oid=t.cfgnamespace");
-        await Schema(ObjectKind.TextSearchDictionary, "textsearchdictionary",
-            "SELECT n.nspname, d.dictname FROM pg_ts_dict d JOIN pg_namespace n ON n.oid=d.dictnamespace");
+        return list;
+    }
+
+    // ---- operators + text search: full DDL reconstruction (was existence-only / unread) -------
+
+    private async Task<List<RawObjectDefinition>> ReadOperatorsAsync(NpgsqlConnection conn, CancellationToken ct)
+    {
+        const string sql = @"
+            SELECT n.nspname, o.oprname,
+                   CASE WHEN o.oprleft  <> 0 THEN format_type(o.oprleft,  NULL) END AS leftarg,
+                   CASE WHEN o.oprright <> 0 THEN format_type(o.oprright, NULL) END AS rightarg,
+                   o.oprcode::regproc::text AS func,
+                   (SELECT cn.nspname||'.'||c.oprname FROM pg_operator c JOIN pg_namespace cn ON cn.oid=c.oprnamespace WHERE c.oid=o.oprcom)    AS commutator,
+                   (SELECT gn.nspname||'.'||g.oprname FROM pg_operator g JOIN pg_namespace gn ON gn.oid=g.oprnamespace WHERE g.oid=o.oprnegate) AS negator,
+                   CASE WHEN o.oprrest <> 0 THEN o.oprrest::regproc::text END AS res,
+                   CASE WHEN o.oprjoin <> 0 THEN o.oprjoin::regproc::text END AS joi,
+                   o.oprcanmerge, o.oprcanhash
+            FROM pg_operator o
+            JOIN pg_namespace n ON n.oid = o.oprnamespace
+            WHERE n.nspname NOT IN ('pg_catalog','information_schema') AND n.nspname NOT LIKE 'pg_%'
+              AND NOT EXISTS (SELECT 1 FROM pg_depend d WHERE d.classid='pg_operator'::regclass
+                                AND d.objid=o.oid AND d.deptype IN ('i','a','e'))
+            ORDER BY n.nspname, o.oprname;";
+
+        var list = new List<RawObjectDefinition>();
+        await using var cmd = new NpgsqlCommand(sql, conn);
+        await using var r = await cmd.ExecuteReaderAsync(ct);
+        while (await r.ReadAsync(ct))
+        {
+            var schema = r.GetString(0);
+            var op = r.GetString(1);
+            var left = r.IsDBNull(2) ? null : r.GetString(2);
+            var right = r.IsDBNull(3) ? null : r.GetString(3);
+
+            var opts = new List<string> { $"FUNCTION = {r.GetString(4)}" };
+            if (left is not null) opts.Add($"LEFTARG = {left}");
+            if (right is not null) opts.Add($"RIGHTARG = {right}");
+            if (!r.IsDBNull(5)) opts.Add($"COMMUTATOR = OPERATOR({r.GetString(5)})");
+            if (!r.IsDBNull(6)) opts.Add($"NEGATOR = OPERATOR({r.GetString(6)})");
+            if (!r.IsDBNull(7)) opts.Add($"RESTRICT = {r.GetString(7)}");
+            if (!r.IsDBNull(8)) opts.Add($"JOIN = {r.GetString(8)}");
+            if (!r.IsDBNull(9) && r.GetBoolean(9)) opts.Add("MERGES");
+            if (!r.IsDBNull(10) && r.GetBoolean(10)) opts.Add("HASHES");
+
+            // Name carries the DROP OPERATOR target shape: name (lefttype, righttype) with NONE for unary.
+            var dropName = $"{schema}.{op} ({left ?? "NONE"}, {right ?? "NONE"})";
+            var body = $"CREATE OPERATOR {schema}.{op} ({string.Join(", ", opts)});";
+            list.Add(MakeRaw(ObjectKind.Operator, "", dropName, $"operator:{schema}.{op}({left},{right})", body));
+        }
+        return list;
+    }
+
+    private async Task<List<RawObjectDefinition>> ReadTextSearchDictionariesAsync(NpgsqlConnection conn, CancellationToken ct)
+    {
+        const string sql = @"
+            SELECT n.nspname, d.dictname, tn.nspname||'.'||t.tmplname AS template, d.dictinitoption
+            FROM pg_ts_dict d
+            JOIN pg_namespace n  ON n.oid  = d.dictnamespace
+            JOIN pg_ts_template t ON t.oid = d.dicttemplate
+            JOIN pg_namespace tn ON tn.oid = t.tmplnamespace
+            WHERE n.nspname NOT IN ('pg_catalog','information_schema') AND n.nspname NOT LIKE 'pg_%'
+            ORDER BY n.nspname, d.dictname;";
+
+        var list = new List<RawObjectDefinition>();
+        await using var cmd = new NpgsqlCommand(sql, conn);
+        await using var r = await cmd.ExecuteReaderAsync(ct);
+        while (await r.ReadAsync(ct))
+        {
+            var schema = r.GetString(0);
+            var name = r.GetString(1);
+            var opts = $"TEMPLATE = {r.GetString(2)}";
+            if (!r.IsDBNull(3) && r.GetString(3).Length > 0) opts += $", {r.GetString(3)}";
+            var body = $"CREATE TEXT SEARCH DICTIONARY {schema}.{name} ({opts});";
+            list.Add(MakeRaw(ObjectKind.TextSearchDictionary, schema, name, $"textsearchdictionary:{schema}.{name}", body));
+        }
+        return list;
+    }
+
+    private async Task<List<RawObjectDefinition>> ReadTextSearchConfigurationsAsync(NpgsqlConnection conn, CancellationToken ct)
+    {
+        // Pass 1: the configurations (and their parser). Read fully before issuing per-config map queries.
+        const string cfgSql = @"
+            SELECT n.nspname, c.cfgname, c.oid, c.cfgparser,
+                   pn.nspname||'.'||p.prsname AS parser
+            FROM pg_ts_config c
+            JOIN pg_namespace n  ON n.oid  = c.cfgnamespace
+            JOIN pg_ts_parser p  ON p.oid  = c.cfgparser
+            JOIN pg_namespace pn ON pn.oid = p.prsnamespace
+            WHERE n.nspname NOT IN ('pg_catalog','information_schema') AND n.nspname NOT LIKE 'pg_%'
+            ORDER BY n.nspname, c.cfgname;";
+
+        var configs = new List<(string Schema, string Name, uint Oid, uint Parser, string ParserName)>();
+        await using (var cmd = new NpgsqlCommand(cfgSql, conn))
+        await using (var r = await cmd.ExecuteReaderAsync(ct))
+            while (await r.ReadAsync(ct))
+                configs.Add((r.GetString(0), r.GetString(1), r.GetFieldValue<uint>(2), r.GetFieldValue<uint>(3), r.GetString(4)));
+
+        var list = new List<RawObjectDefinition>();
+        foreach (var c in configs)
+        {
+            var sb = new System.Text.StringBuilder();
+            sb.Append($"CREATE TEXT SEARCH CONFIGURATION {c.Schema}.{c.Name} (PARSER = {c.ParserName});");
+
+            // Pass 2: token-type → dictionary-list mappings, one ADD MAPPING per token type.
+            const string mapSql = @"
+                SELECT tt.alias, string_agg(dn.nspname||'.'||d.dictname, ', ' ORDER BY m.mapseqno) AS dicts
+                FROM pg_ts_config_map m
+                JOIN pg_ts_dict d ON d.oid = m.mapdict
+                JOIN pg_namespace dn ON dn.oid = d.dictnamespace
+                JOIN ts_token_type(@parser) tt ON tt.tokid = m.maptokentype
+                WHERE m.mapcfg = @cfg
+                GROUP BY tt.alias, m.maptokentype
+                ORDER BY m.maptokentype;";
+            await using var mc = new NpgsqlCommand(mapSql, conn);
+            mc.Parameters.AddWithValue("parser", NpgsqlTypes.NpgsqlDbType.Oid, c.Parser);
+            mc.Parameters.AddWithValue("cfg", NpgsqlTypes.NpgsqlDbType.Oid, c.Oid);
+            await using (var mr = await mc.ExecuteReaderAsync(ct))
+                while (await mr.ReadAsync(ct))
+                    sb.Append($"\nALTER TEXT SEARCH CONFIGURATION {c.Schema}.{c.Name} ADD MAPPING FOR {mr.GetString(0)} WITH {mr.GetString(1)};");
+
+            list.Add(MakeRaw(ObjectKind.TextSearchConfiguration, c.Schema, c.Name,
+                $"textsearchconfiguration:{c.Schema}.{c.Name}", sb.ToString()));
+        }
         return list;
     }
 

@@ -19,7 +19,7 @@ public static class RawObjectMeta
         ObjectKind.TextSearchParser => 12,
         ObjectKind.TextSearchTemplate => 12,
         ObjectKind.TextSearchDictionary => 13,
-        ObjectKind.TextSearchConfiguration => 13,
+        ObjectKind.TextSearchConfiguration => 14,   // after its dictionaries (ADD MAPPING references them)
         ObjectKind.Type => 14,
         ObjectKind.Domain => 15,
         ObjectKind.Conversion => 16,
