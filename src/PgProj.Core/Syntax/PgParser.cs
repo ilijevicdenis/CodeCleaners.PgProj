@@ -445,6 +445,29 @@ public sealed partial class PgParser
         if (defaults > 1) throw new ParseException($"multiple default values specified for column \"{col.Name}\"", b.Here);
         if (generated > 1) throw new ParseException($"multiple generation clauses specified for column \"{col.Name}\"", b.Here);
         if (defaults > 0 && generated > 0) throw new ParseException($"both default and generation expression specified for column \"{col.Name}\"", b.Here);
+
+        // Type-aware checks for KNOWN built-in types only (a domain/custom type → skipped, so zero-FP).
+        var baseType = ColumnBaseType(col.Type.Text);
+        if (IsTypeKeyword(baseType))
+        {
+            if (col.Constraints.Any(c => c is CollateConstraint) && !CollatableTypes.Contains(baseType))
+                throw new ParseException($"collations are not supported for type \"{baseType}\"", b.Here);
+            if (col.Constraints.Any(c => c is GeneratedIdentity) && !IdentityTypes.Contains(baseType))
+                throw new ParseException($"identity column \"{col.Name}\" must be an integer type, not \"{baseType}\"", b.Here);
+        }
+    }
+
+    private static readonly HashSet<string> CollatableTypes = new(StringComparer.OrdinalIgnoreCase)
+    { "text", "varchar", "char", "character", "bpchar", "name" };
+    private static readonly HashSet<string> IdentityTypes = new(StringComparer.OrdinalIgnoreCase)
+    { "smallint", "int2", "int", "int4", "integer", "bigint", "int8", "numeric", "decimal" };
+
+    private static string ColumnBaseType(string text)
+    {
+        var s = text.Trim().ToLowerInvariant();
+        var p = s.IndexOf('(');
+        if (p >= 0) s = s[..p];
+        return s.Replace("[]", "").Trim();
     }
 
     private ColumnConstraint? ParseOneColumnConstraint(TokenCursor b)

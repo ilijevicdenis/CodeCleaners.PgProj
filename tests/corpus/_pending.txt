@@ -573,15 +573,11 @@ ctcc0101
 ctcola0167
 ctcolb0065
 ctcolb0074
-ctcolb0075
-ctcolb0083
 ctcolb0089
 ctcolb0090
 ctcolb0091
 ctcolb0105
 ctcolb0126
-ctcolc0068
-ctcolc0081
 ctcolc0095
 ctcolc0096
 ctcolc0100
