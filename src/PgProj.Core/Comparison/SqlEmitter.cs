@@ -42,7 +42,7 @@ public static class SqlEmitter
 
         sb.Append(c.DataType);
         if (!string.IsNullOrWhiteSpace(c.GeneratedExpression))
-            sb.Append(" GENERATED ALWAYS AS ").Append(c.GeneratedExpression).Append(" STORED");
+            sb.Append(" GENERATED ALWAYS AS ").Append(WrapParens(c.GeneratedExpression!)).Append(" STORED");
         else if (c.IsIdentity)
             sb.Append(" GENERATED ").Append(c.IdentityKind ?? "BY DEFAULT").Append(" AS IDENTITY");
         if (!c.IsNullable) sb.Append(" NOT NULL");
@@ -51,8 +51,28 @@ public static class SqlEmitter
         return sb.ToString();
     }
 
+    // A generated/CHECK expression needs exactly one surrounding parenthesis group. The project parser
+    // stores the inner expression (no outer parens) while the catalog reader wraps it — normalise both.
+    private static string WrapParens(string expr)
+    {
+        var e = expr.Trim();
+        return IsSingleBalancedGroup(e) ? e : $"({e})";
+    }
+
+    private static bool IsSingleBalancedGroup(string e)
+    {
+        if (e.Length < 2 || e[0] != '(' || e[^1] != ')') return false;
+        int depth = 0;
+        for (int i = 0; i < e.Length; i++)
+        {
+            if (e[i] == '(') depth++;
+            else if (e[i] == ')') { depth--; if (depth == 0) return i == e.Length - 1; }
+        }
+        return false;
+    }
+
     public static string Check(CheckConstraintDefinition c) =>
-        $"{ConstraintPrefix(c.Name)}CHECK {c.Expression}";
+        $"{ConstraintPrefix(c.Name)}CHECK {WrapParens(c.Expression)}";
 
     public static string CreateTable(TableDefinition t)
     {

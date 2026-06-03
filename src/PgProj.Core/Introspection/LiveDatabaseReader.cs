@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,51 +11,102 @@ namespace PgProj.Core.Introspection;
 
 /// <summary>
 /// Reads the live schema of a Postgres server into a <see cref="DatabaseModel"/> by querying the
-/// system catalogs. Types come straight from <c>format_type()</c> (the same canonical spelling we
-/// normalise project types to), so the model it produces can be diffed directly against a project
-/// model with minimal phantom differences. This is the reverse direction of the project build —
-/// the input to both <c>compare</c> and <c>extract</c>.
+/// system catalogs with raw ADO.NET (Npgsql — no ORM, to avoid materialisation/tracking overhead).
+/// Types come straight from <c>format_type()</c>, the same canonical spelling project types normalise
+/// to, so the model diffs against a project model with minimal phantom differences.
+///
+/// Reads run CONCURRENTLY: a single Npgsql connection cannot multiplex commands, so each catalog
+/// query gets its own pooled connection and the independent reads fan out (bounded by a semaphore).
+/// Each read returns its own data — nothing mutates the shared <see cref="DatabaseModel"/> off-thread —
+/// and the results are merged single-threaded at the end. Table-dependent reads (PK/unique/check/FK)
+/// run as a second wave once the table map exists, touching disjoint members of each table object.
 /// </summary>
 public sealed class LiveDatabaseReader
 {
-    private static readonly string[] SystemSchemas = { "pg_catalog", "information_schema" };
+    private const int MaxConcurrentReads = 8;
 
     public async Task<DatabaseModel> ReadAsync(string connectionString, CancellationToken ct = default)
     {
-        await using var conn = new NpgsqlConnection(connectionString);
-        await conn.OpenAsync(ct);
+        using var gate = new SemaphoreSlim(MaxConcurrentReads);
 
+        // Run a read on its own pooled connection (commands on one connection can't run concurrently).
+        async Task<T> Read<T>(Func<NpgsqlConnection, Task<T>> body)
+        {
+            await gate.WaitAsync(ct);
+            try
+            {
+                await using var conn = new NpgsqlConnection(connectionString);
+                await conn.OpenAsync(ct);
+                return await body(conn);
+            }
+            finally { gate.Release(); }
+        }
+        // Non-result variant for the table-dependent reads (they mutate the shared table objects).
+        Task ReadVoid(Func<NpgsqlConnection, Task> body) => Read<object?>(async c => { await body(c); return null; });
+
+        // ---- wave 1: everything that doesn't depend on the table map, in parallel ----
+        var schemasTask   = Read(c => ReadSchemasAsync(c, ct));
+        var tablesTask    = Read(c => ReadTablesAndColumnsAsync(c, ct));
+        var indexesTask   = Read(c => ReadIndexesAsync(c, ct));
+        var viewsTask     = Read(c => ReadViewsAsync(c, ct));
+        var sequencesTask = Read(c => ReadSequencesAsync(c, ct));
+        var functionsTask = Read(c => ReadFunctionsAsync(c, ct));
+
+        var rawTasks = new[]
+        {
+            Read(c => ReadExtensionsAsync(c, ct)),
+            Read(c => ReadEnumTypesAsync(c, ct)),
+            Read(c => ReadCompositeTypesAsync(c, ct)),
+            Read(c => ReadDomainsAsync(c, ct)),
+            Read(c => ReadTriggersAsync(c, ct)),
+            Read(c => ReadRulesAsync(c, ct)),
+            Read(c => ReadPoliciesAsync(c, ct)),
+            Read(c => ReadEventTriggersAsync(c, ct)),
+            Read(c => ReadCommentsAsync(c, ct)),
+            Read(c => ReadExistenceObjectsAsync(c, ct)),
+        };
+
+        // ---- wave 2: table-dependent reads, started as soon as the table map is ready ----
+        var (tables, byKey) = await tablesTask;
+        var constraintsTask = ReadVoid(c => ReadConstraintsAsync(c, byKey, ct));
+        var checksTask      = ReadVoid(c => ReadChecksAsync(c, byKey, ct));
+        var fksTask         = ReadVoid(c => ReadForeignKeysAsync(c, byKey, ct));
+
+        await Task.WhenAll(rawTasks);
+        await Task.WhenAll(schemasTask, indexesTask, viewsTask, sequencesTask, functionsTask,
+                           constraintsTask, checksTask, fksTask);
+
+        // ---- merge (single-threaded) ----
         var model = new DatabaseModel();
-        await ReadSchemasAsync(conn, model, ct);
-        var tablesByKey = await ReadTablesAndColumnsAsync(conn, model, ct);
-        await ReadConstraintsAsync(conn, tablesByKey, ct);
-        await ReadChecksAsync(conn, tablesByKey, ct);
-        await ReadForeignKeysAsync(conn, tablesByKey, ct);
-        await ReadIndexesAsync(conn, model, ct);
-        await ReadViewsAsync(conn, model, ct);
-        await ReadSequencesAsync(conn, model, ct);
-        await ReadFunctionsAsync(conn, model, ct);
-        await ReadRawObjectsAsync(conn, model, ct);
+        model.Schemas.AddRange(schemasTask.Result);
+        model.Tables.AddRange(tables);
+        model.Indexes.AddRange(indexesTask.Result);
+        model.Views.AddRange(viewsTask.Result);
+        model.Sequences.AddRange(sequencesTask.Result);
+        model.Functions.AddRange(functionsTask.Result);
+        foreach (var t in rawTasks) model.Objects.AddRange(t.Result);
         return model;
     }
 
-    private static bool IsUserSchema(string schema) =>
-        !SystemSchemas.Contains(schema) && !schema.StartsWith("pg_", StringComparison.Ordinal);
-
-    private async Task ReadSchemasAsync(NpgsqlConnection conn, DatabaseModel model, CancellationToken ct)
+    private async Task<List<SchemaDefinition>> ReadSchemasAsync(NpgsqlConnection conn, CancellationToken ct)
     {
         const string sql = "SELECT nspname FROM pg_namespace ORDER BY nspname;";
+        var list = new List<SchemaDefinition>();
         await using var cmd = new NpgsqlCommand(sql, conn);
         await using var r = await cmd.ExecuteReaderAsync(ct);
         while (await r.ReadAsync(ct))
         {
             var name = r.GetString(0);
-            if (IsUserSchema(name)) model.Schemas.Add(new SchemaDefinition(name));
+            if (IsUserSchema(name)) list.Add(new SchemaDefinition(name));
         }
+        return list;
     }
 
-    private async Task<Dictionary<string, TableDefinition>> ReadTablesAndColumnsAsync(
-        NpgsqlConnection conn, DatabaseModel model, CancellationToken ct)
+    private static bool IsUserSchema(string schema) =>
+        schema is not ("pg_catalog" or "information_schema") && !schema.StartsWith("pg_", StringComparison.Ordinal);
+
+    private async Task<(List<TableDefinition> Tables, Dictionary<string, TableDefinition> ByKey)> ReadTablesAndColumnsAsync(
+        NpgsqlConnection conn, CancellationToken ct)
     {
         const string sql = @"
             SELECT n.nspname, c.relname, a.attname,
@@ -71,6 +121,7 @@ public sealed class LiveDatabaseReader
               AND n.nspname NOT IN ('pg_catalog','information_schema') AND n.nspname NOT LIKE 'pg_%'
             ORDER BY n.nspname, c.relname, a.attnum;";
 
+        var tables = new List<TableDefinition>();
         var byKey = new Dictionary<string, TableDefinition>(StringComparer.OrdinalIgnoreCase);
         await using var cmd = new NpgsqlCommand(sql, conn);
         await using var r = await cmd.ExecuteReaderAsync(ct);
@@ -83,7 +134,7 @@ public sealed class LiveDatabaseReader
             {
                 def = new TableDefinition { Schema = schema, Name = table };
                 byKey[key] = def;
-                model.Tables.Add(def);
+                tables.Add(def);
             }
 
             var dataType = TypeNormalizer.Normalize(r.GetString(3));
@@ -109,7 +160,7 @@ public sealed class LiveDatabaseReader
                 GeneratedExpression: generatedExpr,
                 IsSerial: isSerial));
         }
-        return byKey;
+        return (tables, byKey);
     }
 
     private async Task ReadConstraintsAsync(NpgsqlConnection conn, Dictionary<string, TableDefinition> tables, CancellationToken ct)
@@ -125,7 +176,6 @@ public sealed class LiveDatabaseReader
               AND n.nspname NOT IN ('pg_catalog','information_schema')
             ORDER BY n.nspname, c.relname, con.conname, k.ord;";
 
-        // (schema,table,conname,type) -> ordered columns
         var pk = new Dictionary<(string, string, string), List<string>>();
         var uq = new Dictionary<(string, string, string), List<string>>();
 
@@ -221,13 +271,12 @@ public sealed class LiveDatabaseReader
                     FkAction(v.del), FkAction(v.upd)));
     }
 
-    // The catalog's confdeltype/confupdtype are the single-byte internal "char" type; read
-    // defensively so a provider that surfaces it as a string doesn't blow up.
+    // The catalog's char-type columns (contype, confdeltype, …) are the single-byte internal "char";
+    // read defensively so a provider that surfaces it as a string doesn't blow up.
     private static char ReadChar(NpgsqlDataReader r, int ordinal, char fallback = 'a')
     {
         if (r.IsDBNull(ordinal)) return fallback;
-        var v = r.GetValue(ordinal);
-        return v switch
+        return r.GetValue(ordinal) switch
         {
             char c => c,
             string s => s.Length > 0 ? s[0] : fallback,
@@ -244,7 +293,7 @@ public sealed class LiveDatabaseReader
         _ => null, // 'a' = NO ACTION (the default — omit to keep scripts terse)
     };
 
-    private async Task ReadIndexesAsync(NpgsqlConnection conn, DatabaseModel model, CancellationToken ct)
+    private async Task<List<IndexDefinition>> ReadIndexesAsync(NpgsqlConnection conn, CancellationToken ct)
     {
         const string sql = @"
             SELECT n.nspname, c.relname AS tbl, ic.relname AS idx, ix.indisunique,
@@ -259,19 +308,16 @@ public sealed class LiveDatabaseReader
               AND n.nspname NOT IN ('pg_catalog','information_schema') AND n.nspname NOT LIKE 'pg_%'
             ORDER BY n.nspname, ic.relname;";
 
+        var list = new List<IndexDefinition>();
         await using var cmd = new NpgsqlCommand(sql, conn);
         await using var r = await cmd.ExecuteReaderAsync(ct);
         while (await r.ReadAsync(ct))
         {
-            var schema = r.GetString(0);
-            var table = r.GetString(1);
-            var name = r.GetString(2);
-            var unique = r.GetBoolean(3);
-            var method = r.GetString(4);
-            var def = r.GetString(5);
-            var (cols, where) = ParseIndexDef(def);
-            model.Indexes.Add(new IndexDefinition(name, schema, table, cols, unique, method, where));
+            var (cols, where) = ParseIndexDef(r.GetString(5));
+            list.Add(new IndexDefinition(r.GetString(2), r.GetString(0), r.GetString(1), cols,
+                r.GetBoolean(3), r.GetString(4), where));
         }
+        return list;
     }
 
     /// <summary>Pulls the column list and optional WHERE out of a pg_get_indexdef() string.</summary>
@@ -298,7 +344,7 @@ public sealed class LiveDatabaseReader
         return (cols, where);
     }
 
-    private async Task ReadViewsAsync(NpgsqlConnection conn, DatabaseModel model, CancellationToken ct)
+    private async Task<List<ViewDefinition>> ReadViewsAsync(NpgsqlConnection conn, CancellationToken ct)
     {
         const string sql = @"
             SELECT n.nspname, c.relname, pg_get_viewdef(c.oid, true) AS def
@@ -307,13 +353,15 @@ public sealed class LiveDatabaseReader
             WHERE c.relkind = 'v' AND n.nspname NOT IN ('pg_catalog','information_schema') AND n.nspname NOT LIKE 'pg_%'
             ORDER BY n.nspname, c.relname;";
 
+        var list = new List<ViewDefinition>();
         await using var cmd = new NpgsqlCommand(sql, conn);
         await using var r = await cmd.ExecuteReaderAsync(ct);
         while (await r.ReadAsync(ct))
-            model.Views.Add(new ViewDefinition(r.GetString(0), r.GetString(1), r.GetString(2)));
+            list.Add(new ViewDefinition(r.GetString(0), r.GetString(1), r.GetString(2)));
+        return list;
     }
 
-    private async Task ReadSequencesAsync(NpgsqlConnection conn, DatabaseModel model, CancellationToken ct)
+    private async Task<List<SequenceDefinition>> ReadSequencesAsync(NpgsqlConnection conn, CancellationToken ct)
     {
         // pg_sequences (PG 10+) exposes every configured option directly.
         const string sql = @"
@@ -323,11 +371,12 @@ public sealed class LiveDatabaseReader
             WHERE schemaname NOT IN ('pg_catalog','information_schema') AND schemaname NOT LIKE 'pg_%'
             ORDER BY schemaname, sequencename;";
 
+        var list = new List<SequenceDefinition>();
         await using var cmd = new NpgsqlCommand(sql, conn);
         await using var r = await cmd.ExecuteReaderAsync(ct);
         while (await r.ReadAsync(ct))
         {
-            model.Sequences.Add(new SequenceDefinition(
+            list.Add(new SequenceDefinition(
                 r.GetString(0), r.GetString(1),
                 DataType: r.IsDBNull(2) ? null : TypeNormalizer.Normalize(r.GetString(2)),
                 Increment: r.IsDBNull(3) ? null : r.GetInt64(3),
@@ -337,9 +386,10 @@ public sealed class LiveDatabaseReader
                 Cache: r.IsDBNull(7) ? null : r.GetInt64(7),
                 Cycle: !r.IsDBNull(8) && r.GetBoolean(8)));
         }
+        return list;
     }
 
-    private async Task ReadFunctionsAsync(NpgsqlConnection conn, DatabaseModel model, CancellationToken ct)
+    private async Task<List<FunctionDefinition>> ReadFunctionsAsync(NpgsqlConnection conn, CancellationToken ct)
     {
         const string sql = @"
             SELECT n.nspname, p.proname,
@@ -351,6 +401,7 @@ public sealed class LiveDatabaseReader
               AND p.prokind IN ('f','p')
             ORDER BY n.nspname, p.proname;";
 
+        var list = new List<FunctionDefinition>();
         await using var cmd = new NpgsqlCommand(sql, conn);
         await using var r = await cmd.ExecuteReaderAsync(ct);
         while (await r.ReadAsync(ct))
@@ -359,33 +410,20 @@ public sealed class LiveDatabaseReader
             var name = r.GetString(1);
             var args = r.IsDBNull(2) ? string.Empty : r.GetString(2);
             var def = r.GetString(3);
-            // pg_get_function_identity_arguments already yields types only; normalize each so it
-            // lines up with the parser's ExtractArgTypes output.
             var argTypes = string.Join(", ", args.Split(',', StringSplitOptions.RemoveEmptyEntries)
                 .Select(a => TypeNormalizer.Normalize(a.Trim())));
-            model.Functions.Add(new FunctionDefinition(schema, name, $"{schema}.{name}({argTypes})", def, argTypes));
+            list.Add(new FunctionDefinition(schema, name, $"{schema}.{name}({argTypes})", def, argTypes));
         }
+        return list;
     }
 
-    // Introspects the common raw-object kinds. Identities match SqlParser.BuildIdentity exactly so
-    // a project object and its live counterpart line up. (Remaining kinds: see COVERAGE.md / BUGS.)
-    private async Task ReadRawObjectsAsync(NpgsqlConnection conn, DatabaseModel model, CancellationToken ct)
-    {
-        await ReadExtensionsAsync(conn, model, ct);
-        await ReadEnumTypesAsync(conn, model, ct);
-        await ReadCompositeTypesAsync(conn, model, ct);
-        await ReadDomainsAsync(conn, model, ct);
-        await ReadTriggersAsync(conn, model, ct);
-        await ReadRulesAsync(conn, model, ct);
-        await ReadPoliciesAsync(conn, model, ct);
-        await ReadEventTriggersAsync(conn, model, ct);
-        await ReadCommentsAsync(conn, model, ct);
-        await ReadExistenceObjectsAsync(conn, model, ct);
-    }
+    // ---- raw objects (each returns its own list; merged after the parallel reads) -----------
 
-    private async Task ReadCommentsAsync(NpgsqlConnection conn, DatabaseModel model, CancellationToken ct)
+    private static RawObjectDefinition MakeRaw(ObjectKind kind, string schema, string name, string identity, string body, string? on = null, bool bodyComparable = true) =>
+        new(kind, schema, name, identity.ToLowerInvariant(), body, on, bodyComparable);
+
+    private async Task<List<RawObjectDefinition>> ReadCommentsAsync(NpgsqlConnection conn, CancellationToken ct)
     {
-        // Table/view comments (objsubid = 0) and column comments (objsubid > 0).
         const string sql = @"
             SELECT n.nspname, c.relname, a.attname, d.description
             FROM pg_description d
@@ -396,6 +434,7 @@ public sealed class LiveDatabaseReader
               AND n.nspname NOT IN ('pg_catalog','information_schema') AND n.nspname NOT LIKE 'pg_%'
             ORDER BY n.nspname, c.relname, d.objsubid;";
 
+        var list = new List<RawObjectDefinition>();
         await using var cmd = new NpgsqlCommand(sql, conn);
         await using var r = await cmd.ExecuteReaderAsync(ct);
         while (await r.ReadAsync(ct))
@@ -405,37 +444,29 @@ public sealed class LiveDatabaseReader
             var col = r.IsDBNull(2) ? null : r.GetString(2);
             var desc = r.GetString(3).Replace("'", "''");
 
-            string target, identity;
-            if (col is null)
-            {
-                target = $"TABLE {schema}.{rel}";
-                identity = $"comment:table {schema}.{rel}";
-            }
-            else
-            {
-                target = $"COLUMN {schema}.{rel}.{col}";
-                identity = $"comment:column {schema}.{rel}.{col}";
-            }
-            AddRaw(model, ObjectKind.Comment, "", "", identity, $"COMMENT ON {target} IS '{desc}';");
+            var (target, identity) = col is null
+                ? ($"TABLE {schema}.{rel}", $"comment:table {schema}.{rel}")
+                : ($"COLUMN {schema}.{rel}.{col}", $"comment:column {schema}.{rel}.{col}");
+            list.Add(MakeRaw(ObjectKind.Comment, "", "", identity, $"COMMENT ON {target} IS '{desc}';"));
         }
+        return list;
     }
 
-    private static void AddRaw(DatabaseModel model, ObjectKind kind, string schema, string name, string identity, string body, string? on = null, bool bodyComparable = true) =>
-        model.Objects.Add(new RawObjectDefinition(kind, schema, name, identity.ToLowerInvariant(), body, on, bodyComparable));
-
-    private async Task ReadExtensionsAsync(NpgsqlConnection conn, DatabaseModel model, CancellationToken ct)
+    private async Task<List<RawObjectDefinition>> ReadExtensionsAsync(NpgsqlConnection conn, CancellationToken ct)
     {
+        var list = new List<RawObjectDefinition>();
         await using var cmd = new NpgsqlCommand("SELECT extname FROM pg_extension ORDER BY extname;", conn);
         await using var r = await cmd.ExecuteReaderAsync(ct);
         while (await r.ReadAsync(ct))
         {
             var name = r.GetString(0);
-            AddRaw(model, ObjectKind.Extension, "", name, $"extension:{name}",
-                $"CREATE EXTENSION IF NOT EXISTS {SqlEmitter.Quote(name)};");
+            list.Add(MakeRaw(ObjectKind.Extension, "", name, $"extension:{name}",
+                $"CREATE EXTENSION IF NOT EXISTS {SqlEmitter.Quote(name)};"));
         }
+        return list;
     }
 
-    private async Task ReadEnumTypesAsync(NpgsqlConnection conn, DatabaseModel model, CancellationToken ct)
+    private async Task<List<RawObjectDefinition>> ReadEnumTypesAsync(NpgsqlConnection conn, CancellationToken ct)
     {
         const string sql = @"
             SELECT n.nspname, t.typname, e.enumlabel
@@ -451,19 +482,20 @@ public sealed class LiveDatabaseReader
             while (await r.ReadAsync(ct))
             {
                 var key = (r.GetString(0), r.GetString(1));
-                if (!labels.TryGetValue(key, out var list)) labels[key] = list = new List<string>();
-                list.Add(r.GetString(2));
+                if (!labels.TryGetValue(key, out var l)) labels[key] = l = new List<string>();
+                l.Add(r.GetString(2));
             }
 
-        foreach (var ((schema, name), vals) in labels)
+        return labels.Select(kv =>
         {
+            var ((schema, name), vals) = kv;
             var literals = string.Join(", ", vals.Select(v => "'" + v.Replace("'", "''") + "'"));
-            AddRaw(model, ObjectKind.Type, schema, name, $"type:{schema}.{name}",
+            return MakeRaw(ObjectKind.Type, schema, name, $"type:{schema}.{name}",
                 $"CREATE TYPE {schema}.{name} AS ENUM ({literals});");
-        }
+        }).ToList();
     }
 
-    private async Task ReadCompositeTypesAsync(NpgsqlConnection conn, DatabaseModel model, CancellationToken ct)
+    private async Task<List<RawObjectDefinition>> ReadCompositeTypesAsync(NpgsqlConnection conn, CancellationToken ct)
     {
         const string sql = @"
             SELECT n.nspname, t.typname, a.attname, format_type(a.atttypid, a.atttypmod)
@@ -481,16 +513,19 @@ public sealed class LiveDatabaseReader
             while (await r.ReadAsync(ct))
             {
                 var key = (r.GetString(0), r.GetString(1));
-                if (!attrs.TryGetValue(key, out var list)) attrs[key] = list = new List<string>();
-                list.Add($"{r.GetString(2)} {r.GetString(3)}");
+                if (!attrs.TryGetValue(key, out var l)) attrs[key] = l = new List<string>();
+                l.Add($"{r.GetString(2)} {r.GetString(3)}");
             }
 
-        foreach (var ((schema, name), cols) in attrs)
-            AddRaw(model, ObjectKind.Type, schema, name, $"type:{schema}.{name}",
+        return attrs.Select(kv =>
+        {
+            var ((schema, name), cols) = kv;
+            return MakeRaw(ObjectKind.Type, schema, name, $"type:{schema}.{name}",
                 $"CREATE TYPE {schema}.{name} AS ({string.Join(", ", cols)});");
+        }).ToList();
     }
 
-    private async Task ReadDomainsAsync(NpgsqlConnection conn, DatabaseModel model, CancellationToken ct)
+    private async Task<List<RawObjectDefinition>> ReadDomainsAsync(NpgsqlConnection conn, CancellationToken ct)
     {
         const string sql = @"
             SELECT n.nspname, t.typname, format_type(t.typbasetype, t.typtypmod) AS basetype,
@@ -503,6 +538,7 @@ public sealed class LiveDatabaseReader
               AND n.nspname NOT IN ('pg_catalog','information_schema') AND n.nspname NOT LIKE 'pg_%'
             ORDER BY n.nspname, t.typname;";
 
+        var list = new List<RawObjectDefinition>();
         await using var cmd = new NpgsqlCommand(sql, conn);
         await using var r = await cmd.ExecuteReaderAsync(ct);
         while (await r.ReadAsync(ct))
@@ -518,11 +554,12 @@ public sealed class LiveDatabaseReader
             if (notNull) body += " NOT NULL";
             if (!string.IsNullOrWhiteSpace(def)) body += $" DEFAULT {def}";
             if (!string.IsNullOrWhiteSpace(checks)) body += $" {checks}";
-            AddRaw(model, ObjectKind.Domain, schema, name, $"domain:{schema}.{name}", body + ";");
+            list.Add(MakeRaw(ObjectKind.Domain, schema, name, $"domain:{schema}.{name}", body + ";"));
         }
+        return list;
     }
 
-    private async Task ReadTriggersAsync(NpgsqlConnection conn, DatabaseModel model, CancellationToken ct)
+    private async Task<List<RawObjectDefinition>> ReadTriggersAsync(NpgsqlConnection conn, CancellationToken ct)
     {
         const string sql = @"
             SELECT n.nspname, c.relname, t.tgname, pg_get_triggerdef(t.oid, true) AS def
@@ -533,20 +570,20 @@ public sealed class LiveDatabaseReader
               AND n.nspname NOT IN ('pg_catalog','information_schema') AND n.nspname NOT LIKE 'pg_%'
             ORDER BY n.nspname, c.relname, t.tgname;";
 
+        var list = new List<RawObjectDefinition>();
         await using var cmd = new NpgsqlCommand(sql, conn);
         await using var r = await cmd.ExecuteReaderAsync(ct);
         while (await r.ReadAsync(ct))
         {
             var schema = r.GetString(0);
-            var table = r.GetString(1);
+            var on = $"{schema}.{r.GetString(1)}";
             var name = r.GetString(2);
-            var def = r.GetString(3);
-            var on = $"{schema}.{table}";
-            AddRaw(model, ObjectKind.Trigger, schema, name, $"trigger:{name} on {on}", def, on);
+            list.Add(MakeRaw(ObjectKind.Trigger, schema, name, $"trigger:{name} on {on}", r.GetString(3), on));
         }
+        return list;
     }
 
-    private async Task ReadRulesAsync(NpgsqlConnection conn, DatabaseModel model, CancellationToken ct)
+    private async Task<List<RawObjectDefinition>> ReadRulesAsync(NpgsqlConnection conn, CancellationToken ct)
     {
         const string sql = @"
             SELECT n.nspname, c.relname, r.rulename, pg_get_ruledef(r.oid, true) AS def
@@ -557,6 +594,7 @@ public sealed class LiveDatabaseReader
               AND n.nspname NOT IN ('pg_catalog','information_schema') AND n.nspname NOT LIKE 'pg_%'
             ORDER BY n.nspname, c.relname, r.rulename;";
 
+        var list = new List<RawObjectDefinition>();
         await using var cmd = new NpgsqlCommand(sql, conn);
         await using var r = await cmd.ExecuteReaderAsync(ct);
         while (await r.ReadAsync(ct))
@@ -564,11 +602,12 @@ public sealed class LiveDatabaseReader
             var schema = r.GetString(0);
             var on = $"{schema}.{r.GetString(1)}";
             var name = r.GetString(2);
-            AddRaw(model, ObjectKind.Rule, schema, name, $"rule:{name} on {on}", r.GetString(3), on);
+            list.Add(MakeRaw(ObjectKind.Rule, schema, name, $"rule:{name} on {on}", r.GetString(3), on));
         }
+        return list;
     }
 
-    private async Task ReadPoliciesAsync(NpgsqlConnection conn, DatabaseModel model, CancellationToken ct)
+    private async Task<List<RawObjectDefinition>> ReadPoliciesAsync(NpgsqlConnection conn, CancellationToken ct)
     {
         const string sql = @"
             SELECT n.nspname, c.relname, pol.polname, pol.polcmd, pol.polpermissive,
@@ -580,6 +619,7 @@ public sealed class LiveDatabaseReader
             WHERE n.nspname NOT IN ('pg_catalog','information_schema') AND n.nspname NOT LIKE 'pg_%'
             ORDER BY n.nspname, c.relname, pol.polname;";
 
+        var list = new List<RawObjectDefinition>();
         await using var cmd = new NpgsqlCommand(sql, conn);
         await using var r = await cmd.ExecuteReaderAsync(ct);
         while (await r.ReadAsync(ct))
@@ -597,11 +637,12 @@ public sealed class LiveDatabaseReader
             if (!string.IsNullOrWhiteSpace(usingExpr)) body += $" USING ({usingExpr})";
             if (!string.IsNullOrWhiteSpace(checkExpr)) body += $" WITH CHECK ({checkExpr})";
             // Roles (TO ...) are omitted from this reconstruction, so don't body-compare.
-            AddRaw(model, ObjectKind.Policy, schema, name, $"policy:{name} on {on}", body + ";", on, bodyComparable: false);
+            list.Add(MakeRaw(ObjectKind.Policy, schema, name, $"policy:{name} on {on}", body + ";", on, bodyComparable: false));
         }
+        return list;
     }
 
-    private async Task ReadEventTriggersAsync(NpgsqlConnection conn, DatabaseModel model, CancellationToken ct)
+    private async Task<List<RawObjectDefinition>> ReadEventTriggersAsync(NpgsqlConnection conn, CancellationToken ct)
     {
         const string sql = @"
             SELECT e.evtname, e.evtevent, np.nspname, p.proname
@@ -610,64 +651,56 @@ public sealed class LiveDatabaseReader
             JOIN pg_namespace np ON np.oid = p.pronamespace
             ORDER BY e.evtname;";
 
+        var list = new List<RawObjectDefinition>();
         await using var cmd = new NpgsqlCommand(sql, conn);
         await using var r = await cmd.ExecuteReaderAsync(ct);
         while (await r.ReadAsync(ct))
         {
             var name = r.GetString(0);
-            var ev = r.GetString(1);
-            var fn = $"{r.GetString(2)}.{r.GetString(3)}";
-            var body = $"CREATE EVENT TRIGGER {name} ON {ev} EXECUTE FUNCTION {fn}();";
-            AddRaw(model, ObjectKind.EventTrigger, "", name, $"eventtrigger:{name}", body, bodyComparable: false);
+            var body = $"CREATE EVENT TRIGGER {name} ON {r.GetString(1)} EXECUTE FUNCTION {r.GetString(2)}.{r.GetString(3)}();";
+            list.Add(MakeRaw(ObjectKind.EventTrigger, "", name, $"eventtrigger:{name}", body, bodyComparable: false));
         }
+        return list;
     }
 
-    // Existence-only introspection for kinds without a clean reconstruction: record the identity
-    // (so live compare/extract know they exist) with no body, so they are never spuriously
-    // recreated or body-diffed. Faithful bodies for these are tracked in BUGS.md.
-    private async Task ReadExistenceObjectsAsync(NpgsqlConnection conn, DatabaseModel model, CancellationToken ct)
+    // Existence-only introspection for kinds without a clean reconstruction yet: record the identity
+    // (so live compare/extract know they exist) with no body, so they are never spuriously recreated
+    // or body-diffed. Runs its small queries on one connection (this whole method is one parallel task).
+    private async Task<List<RawObjectDefinition>> ReadExistenceObjectsAsync(NpgsqlConnection conn, CancellationToken ct)
     {
-        await SchemaQualified(conn, model, ObjectKind.Collation, "collation",
-            "SELECT n.nspname, c.collname FROM pg_collation c JOIN pg_namespace n ON n.oid=c.collnamespace", ct);
-        await SchemaQualified(conn, model, ObjectKind.Conversion, "conversion",
-            "SELECT n.nspname, c.conname FROM pg_conversion c JOIN pg_namespace n ON n.oid=c.connamespace", ct);
-        await SchemaQualified(conn, model, ObjectKind.Statistics, "statistics",
-            "SELECT n.nspname, s.stxname FROM pg_statistic_ext s JOIN pg_namespace n ON n.oid=s.stxnamespace", ct);
-        await SchemaQualified(conn, model, ObjectKind.ForeignTable, "foreigntable",
-            "SELECT n.nspname, c.relname FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE c.relkind='f'", ct);
-        await SchemaQualified(conn, model, ObjectKind.TextSearchConfiguration, "textsearchconfiguration",
-            "SELECT n.nspname, t.cfgname FROM pg_ts_config t JOIN pg_namespace n ON n.oid=t.cfgnamespace", ct);
-        await SchemaQualified(conn, model, ObjectKind.TextSearchDictionary, "textsearchdictionary",
-            "SELECT n.nspname, d.dictname FROM pg_ts_dict d JOIN pg_namespace n ON n.oid=d.dictnamespace", ct);
-
-        await GlobalName(conn, model, ObjectKind.ForeignDataWrapper, "foreigndatawrapper",
-            "SELECT fdwname FROM pg_foreign_data_wrapper", ct);
-        await GlobalName(conn, model, ObjectKind.Server, "server",
-            "SELECT srvname FROM pg_foreign_server", ct);
-    }
-
-    private async Task SchemaQualified(NpgsqlConnection conn, DatabaseModel model, ObjectKind kind, string tag, string baseSql, CancellationToken ct)
-    {
-        var sql = baseSql + (baseSql.Contains("WHERE", StringComparison.OrdinalIgnoreCase) ? " AND" : " WHERE")
-                  + " n.nspname NOT IN ('pg_catalog','information_schema') AND n.nspname NOT LIKE 'pg_%'";
-        await using var cmd = new NpgsqlCommand(sql, conn);
-        await using var r = await cmd.ExecuteReaderAsync(ct);
-        while (await r.ReadAsync(ct))
+        var list = new List<RawObjectDefinition>();
+        async Task Schema(ObjectKind kind, string tag, string baseSql)
         {
-            var schema = r.GetString(0);
-            var name = r.GetString(1);
-            AddRaw(model, kind, schema, name, $"{tag}:{schema}.{name}", string.Empty, bodyComparable: false);
+            var sql = baseSql + (baseSql.Contains("WHERE", StringComparison.OrdinalIgnoreCase) ? " AND" : " WHERE")
+                      + " n.nspname NOT IN ('pg_catalog','information_schema') AND n.nspname NOT LIKE 'pg_%'";
+            await using var cmd = new NpgsqlCommand(sql, conn);
+            await using var r = await cmd.ExecuteReaderAsync(ct);
+            while (await r.ReadAsync(ct))
+                list.Add(MakeRaw(kind, r.GetString(0), r.GetString(1), $"{tag}:{r.GetString(0)}.{r.GetString(1)}", string.Empty, bodyComparable: false));
         }
-    }
-
-    private async Task GlobalName(NpgsqlConnection conn, DatabaseModel model, ObjectKind kind, string tag, string sql, CancellationToken ct)
-    {
-        await using var cmd = new NpgsqlCommand(sql, conn);
-        await using var r = await cmd.ExecuteReaderAsync(ct);
-        while (await r.ReadAsync(ct))
+        async Task Global(ObjectKind kind, string tag, string sql)
         {
-            var name = r.GetString(0);
-            AddRaw(model, kind, "", name, $"{tag}:{name}", string.Empty, bodyComparable: false);
+            await using var cmd = new NpgsqlCommand(sql, conn);
+            await using var r = await cmd.ExecuteReaderAsync(ct);
+            while (await r.ReadAsync(ct))
+                list.Add(MakeRaw(kind, "", r.GetString(0), $"{tag}:{r.GetString(0)}", string.Empty, bodyComparable: false));
         }
+
+        await Schema(ObjectKind.Collation, "collation",
+            "SELECT n.nspname, c.collname FROM pg_collation c JOIN pg_namespace n ON n.oid=c.collnamespace");
+        await Schema(ObjectKind.Conversion, "conversion",
+            "SELECT n.nspname, c.conname FROM pg_conversion c JOIN pg_namespace n ON n.oid=c.connamespace");
+        await Schema(ObjectKind.Statistics, "statistics",
+            "SELECT n.nspname, s.stxname FROM pg_statistic_ext s JOIN pg_namespace n ON n.oid=s.stxnamespace");
+        await Schema(ObjectKind.ForeignTable, "foreigntable",
+            "SELECT n.nspname, c.relname FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE c.relkind='f'");
+        await Schema(ObjectKind.TextSearchConfiguration, "textsearchconfiguration",
+            "SELECT n.nspname, t.cfgname FROM pg_ts_config t JOIN pg_namespace n ON n.oid=t.cfgnamespace");
+        await Schema(ObjectKind.TextSearchDictionary, "textsearchdictionary",
+            "SELECT n.nspname, d.dictname FROM pg_ts_dict d JOIN pg_namespace n ON n.oid=d.dictnamespace");
+
+        await Global(ObjectKind.ForeignDataWrapper, "foreigndatawrapper", "SELECT fdwname FROM pg_foreign_data_wrapper");
+        await Global(ObjectKind.Server, "server", "SELECT srvname FROM pg_foreign_server");
+        return list;
     }
 }
