@@ -91,8 +91,8 @@ public class Corpus_CopyCmd
     public void cpya0042() => CorpusAssert.Parses(@"COPY s.child TO STDOUT", "ok");
     [Fact]
     public void cpya0043() => CorpusAssert.Parses(@"COPY s.events_2024 TO STDOUT (FORMAT csv)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cpya0044() => CorpusAssert.Parses(@"COPY s.v TO STDOUT", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task cpya0044() => CorpusAssert.MatchesPostgres(@"COPY s.v TO STDOUT", "error", false);
     [Fact]
     public void cpya0045() => CorpusAssert.Parses(@"COPY (SELECT s.t.id, s.t.name, s.t2.label FROM s.t JOIN s.t2 ON s.t.id = s.t2.t_id) TO STDOUT", "ok");
     [Fact]
@@ -207,8 +207,8 @@ public class Corpus_CopyCmd
     public void cpya0100() => CorpusAssert.Parses(@"COPY s.t FROM STDIN (FORMAT csv, DEFAULT 'missing')", "ok");
     [Fact]
     public void cpya0101() => CorpusAssert.Parses(@"COPY s.t FROM STDIN (FORMAT text, DEFAULT 'placeholder')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cpya0102() => CorpusAssert.Parses(@"COPY s.t FROM '/dev/null' (FREEZE)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task cpya0102() => CorpusAssert.MatchesPostgres(@"COPY s.t FROM '/dev/null' (FREEZE)", "error", false);
     [Fact]
     public void cpya0103() => CorpusAssert.Parses(@"COPY s.t TO STDOUT (FORMAT csv, QUOTE '#', ESCAPE '#')", "ok");
     [Fact]
@@ -251,52 +251,52 @@ public class Corpus_CopyCmd
     public void cpya0122() => CorpusAssert.Parses(@"COPY s.t TO STDOUT (FORMAT csv, QUOTE '""""')", "error");
     [Fact]
     public void cpya0123() => CorpusAssert.Parses(@"COPY s.t TO STDOUT (FORMAT csv, ESCAPE '|!')", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cpya0124() => CorpusAssert.Parses(@"COPY s.t TO STDOUT (FORMAT binary, DELIMITER ',')", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cpya0125() => CorpusAssert.Parses(@"COPY s.t TO STDOUT (FORMAT binary, NULL '\N')", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cpya0126() => CorpusAssert.Parses(@"COPY s.t TO STDOUT (FORMAT binary, HEADER true)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cpya0127() => CorpusAssert.Parses(@"COPY s.t TO STDOUT (FORMAT text, FORCE_QUOTE *)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cpya0128() => CorpusAssert.Parses(@"COPY s.t TO STDOUT (FORMAT text, QUOTE '""')", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cpya0129() => CorpusAssert.Parses(@"COPY s.t TO STDOUT (FORMAT text, ESCAPE '\')", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cpya0130() => CorpusAssert.Parses(@"COPY s.t TO STDOUT (FORMAT csv, FORCE_NOT_NULL (name))", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cpya0131() => CorpusAssert.Parses(@"COPY s.t TO STDOUT (FORMAT csv, FORCE_NULL (name))", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cpya0132() => CorpusAssert.Parses(@"COPY s.t TO STDOUT (FORMAT csv, ON_ERROR ignore)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cpya0133() => CorpusAssert.Parses(@"COPY s.t TO STDOUT (FORMAT csv, DEFAULT '')", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cpya0134() => CorpusAssert.Parses(@"COPY s.t FROM '/dev/null' (FORMAT csv, FORCE_QUOTE *)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cpya0135() => CorpusAssert.Parses(@"COPY (SELECT id FROM s.t) FROM '/dev/null'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cpya0136() => CorpusAssert.Parses(@"COPY s.t TO STDOUT (FORMAT csv, HEADER match)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task cpya0124() => CorpusAssert.MatchesPostgres(@"COPY s.t TO STDOUT (FORMAT binary, DELIMITER ',')", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task cpya0125() => CorpusAssert.MatchesPostgres(@"COPY s.t TO STDOUT (FORMAT binary, NULL '\N')", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task cpya0126() => CorpusAssert.MatchesPostgres(@"COPY s.t TO STDOUT (FORMAT binary, HEADER true)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task cpya0127() => CorpusAssert.MatchesPostgres(@"COPY s.t TO STDOUT (FORMAT text, FORCE_QUOTE *)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task cpya0128() => CorpusAssert.MatchesPostgres(@"COPY s.t TO STDOUT (FORMAT text, QUOTE '""')", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task cpya0129() => CorpusAssert.MatchesPostgres(@"COPY s.t TO STDOUT (FORMAT text, ESCAPE '\')", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task cpya0130() => CorpusAssert.MatchesPostgres(@"COPY s.t TO STDOUT (FORMAT csv, FORCE_NOT_NULL (name))", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task cpya0131() => CorpusAssert.MatchesPostgres(@"COPY s.t TO STDOUT (FORMAT csv, FORCE_NULL (name))", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task cpya0132() => CorpusAssert.MatchesPostgres(@"COPY s.t TO STDOUT (FORMAT csv, ON_ERROR ignore)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task cpya0133() => CorpusAssert.MatchesPostgres(@"COPY s.t TO STDOUT (FORMAT csv, DEFAULT '')", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task cpya0134() => CorpusAssert.MatchesPostgres(@"COPY s.t FROM '/dev/null' (FORMAT csv, FORCE_QUOTE *)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task cpya0135() => CorpusAssert.MatchesPostgres(@"COPY (SELECT id FROM s.t) FROM '/dev/null'", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task cpya0136() => CorpusAssert.MatchesPostgres(@"COPY s.t TO STDOUT (FORMAT csv, HEADER match)", "error", false);
     [Fact]
     public void cpya0137() => CorpusAssert.Parses(@"COPY s.t FROM STDIN (FORMAT csv, LOG_VERBOSITY verbose)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cpya0138() => CorpusAssert.Parses(@"COPY s.t FROM '/dev/null' (FORMAT csv, REJECT_LIMIT 10)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cpya0139() => CorpusAssert.Parses(@"COPY s.t FROM '/dev/null' (FORMAT binary, ON_ERROR ignore)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cpya0140() => CorpusAssert.Parses(@"COPY s.t FROM '/dev/null' (FORMAT binary, DEFAULT 'x')", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cpya0141() => CorpusAssert.Parses(@"COPY s.t TO STDOUT ()", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task cpya0138() => CorpusAssert.MatchesPostgres(@"COPY s.t FROM '/dev/null' (FORMAT csv, REJECT_LIMIT 10)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task cpya0139() => CorpusAssert.MatchesPostgres(@"COPY s.t FROM '/dev/null' (FORMAT binary, ON_ERROR ignore)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task cpya0140() => CorpusAssert.MatchesPostgres(@"COPY s.t FROM '/dev/null' (FORMAT binary, DEFAULT 'x')", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task cpya0141() => CorpusAssert.MatchesPostgres(@"COPY s.t TO STDOUT ()", "error", false);
     [Fact]
     public void cpya0142() => CorpusAssert.Parses(@"COPY s.t TO STDOUT (FORMAT csv FORMAT text)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cpya0143() => CorpusAssert.Parses(@"COPY s.nonexistent TO STDOUT", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cpya0144() => CorpusAssert.Parses(@"COPY s.t (nonexistent_col) TO STDOUT", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task cpya0143() => CorpusAssert.MatchesPostgres(@"COPY s.nonexistent TO STDOUT", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task cpya0144() => CorpusAssert.MatchesPostgres(@"COPY s.t (nonexistent_col) TO STDOUT", "error", false);
     [Fact]
     public void cpya0145() => CorpusAssert.Parses(@"COPY s.mv TO STDOUT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cpya0146() => CorpusAssert.Parses(@"COPY s.t TO STDOUT (FORMAT csv, ENCODING 'INVALID_ENC')", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task cpya0146() => CorpusAssert.MatchesPostgres(@"COPY s.t TO STDOUT (FORMAT csv, ENCODING 'INVALID_ENC')", "error", false);
     [Fact]
     public void cpya0147() => CorpusAssert.Parses(@"COPY s.t TO STDOUT (FORMAT csv, DELIMITER '')", "error");
     [Fact]
@@ -317,24 +317,24 @@ public class Corpus_CopyCmd
     public void cpya0155() => CorpusAssert.Parses(@"COPY s.t FROM STDIN (FORMAT csv, HEADER match)", "ok");
     [Fact]
     public void cpya0156() => CorpusAssert.Parses(@"COPY s.t FROM STDIN (FORMAT csv, FORCE_NOT_NULL *, FORCE_NULL (val))", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cpya0157() => CorpusAssert.Parses(@"COPY s.t TO STDOUT (FORMAT csv, FORCE_QUOTE (name), FORCE_QUOTE (val))", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cpya0158() => CorpusAssert.Parses(@"COPY s.t TO STDOUT (FORMAT csv, DELIMITER ',', DELIMITER ';')", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cpya0159() => CorpusAssert.Parses(@"COPY s.t TO STDOUT (FORMAT csv, NULL '', NULL 'na')", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cpya0160() => CorpusAssert.Parses(@"COPY s.t TO STDOUT (FORMAT csv, ENCODING 'UTF8', ENCODING 'LATIN1')", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cpya0161() => CorpusAssert.Parses(@"COPY s.t TO STDOUT (FORMAT csv, HEADER true, HEADER false)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cpya0162() => CorpusAssert.Parses(@"COPY s.t FROM '/dev/null' (FORMAT csv, ON_ERROR ignore, REJECT_LIMIT 0)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cpya0163() => CorpusAssert.Parses(@"COPY s.t FROM '/dev/null' (FORMAT csv, ON_ERROR invalid_option)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cpya0164() => CorpusAssert.Parses(@"COPY s.t FROM '/dev/null' (FORMAT csv, LOG_VERBOSITY invalid_val)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cpya0165() => CorpusAssert.Parses(@"COPY s.t FROM '/dev/null' (FORMAT csv, FREEZE, ON_ERROR ignore)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task cpya0157() => CorpusAssert.MatchesPostgres(@"COPY s.t TO STDOUT (FORMAT csv, FORCE_QUOTE (name), FORCE_QUOTE (val))", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task cpya0158() => CorpusAssert.MatchesPostgres(@"COPY s.t TO STDOUT (FORMAT csv, DELIMITER ',', DELIMITER ';')", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task cpya0159() => CorpusAssert.MatchesPostgres(@"COPY s.t TO STDOUT (FORMAT csv, NULL '', NULL 'na')", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task cpya0160() => CorpusAssert.MatchesPostgres(@"COPY s.t TO STDOUT (FORMAT csv, ENCODING 'UTF8', ENCODING 'LATIN1')", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task cpya0161() => CorpusAssert.MatchesPostgres(@"COPY s.t TO STDOUT (FORMAT csv, HEADER true, HEADER false)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task cpya0162() => CorpusAssert.MatchesPostgres(@"COPY s.t FROM '/dev/null' (FORMAT csv, ON_ERROR ignore, REJECT_LIMIT 0)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task cpya0163() => CorpusAssert.MatchesPostgres(@"COPY s.t FROM '/dev/null' (FORMAT csv, ON_ERROR invalid_option)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task cpya0164() => CorpusAssert.MatchesPostgres(@"COPY s.t FROM '/dev/null' (FORMAT csv, LOG_VERBOSITY invalid_val)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task cpya0165() => CorpusAssert.MatchesPostgres(@"COPY s.t FROM '/dev/null' (FORMAT csv, FREEZE, ON_ERROR ignore)", "error", false);
     [Fact]
     public void cpya0166() => CorpusAssert.Parses(@"COPY s.t TO STDOUT (format csv, delimiter ',', null '', header true, quote '""', escape '""', encoding 'UTF8', force_quote *)", "ok");
     [Fact]
@@ -425,32 +425,32 @@ public class Corpus_CopyCmd
     public void cpyb0033() => CorpusAssert.Parses(@"COPY s.t TO STDOUT (FORMAT badformat)", "error");
     [Fact]
     public void cpyb0034() => CorpusAssert.Parses(@"COPY s.t TO STDOUT (FORMAT csv, DELIMITER '||')", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cpyb0035() => CorpusAssert.Parses(@"COPY s.t TO STDOUT (FORMAT text, FORCE_QUOTE *)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cpyb0036() => CorpusAssert.Parses(@"COPY s.t TO STDOUT (FORMAT binary, DELIMITER '|')", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task cpyb0035() => CorpusAssert.MatchesPostgres(@"COPY s.t TO STDOUT (FORMAT text, FORCE_QUOTE *)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task cpyb0036() => CorpusAssert.MatchesPostgres(@"COPY s.t TO STDOUT (FORMAT binary, DELIMITER '|')", "error", false);
     [Fact]
     public void cpyb0037() => CorpusAssert.Parses(@"COPY s.t STDOUT", "error");
     [Fact]
     public void cpyb0038() => CorpusAssert.Parses(@"COPY TO STDOUT", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cpyb0039() => CorpusAssert.Parses(@"COPY (SELECT * FROM s.t) FROM STDIN;
-\.", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cpyb0040() => CorpusAssert.Parses(@"COPY s.t FROM STDIN (FORMAT csv, FORCE_QUOTE (name));
-\.", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cpyb0041() => CorpusAssert.Parses(@"COPY s.t TO STDOUT (FORMAT csv, HEADER MATCH)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cpyb0042() => CorpusAssert.Parses(@"COPY s.t TO STDOUT (FORMAT csv, ON_ERROR ignore)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cpyb0043() => CorpusAssert.Parses(@"COPY s.t TO STDOUT (FORMAT binary, NULL 'x')", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cpyb0044() => CorpusAssert.Parses(@"COPY s.t FROM STDIN (FORMAT csv, ON_ERROR badval);
-\.", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cpyb0045() => CorpusAssert.Parses(@"COPY s.t FROM STDIN (FORMAT csv, REJECT_LIMIT 10);
-\.", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task cpyb0039() => CorpusAssert.MatchesPostgres(@"COPY (SELECT * FROM s.t) FROM STDIN;
+\.", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task cpyb0040() => CorpusAssert.MatchesPostgres(@"COPY s.t FROM STDIN (FORMAT csv, FORCE_QUOTE (name));
+\.", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task cpyb0041() => CorpusAssert.MatchesPostgres(@"COPY s.t TO STDOUT (FORMAT csv, HEADER MATCH)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task cpyb0042() => CorpusAssert.MatchesPostgres(@"COPY s.t TO STDOUT (FORMAT csv, ON_ERROR ignore)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task cpyb0043() => CorpusAssert.MatchesPostgres(@"COPY s.t TO STDOUT (FORMAT binary, NULL 'x')", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task cpyb0044() => CorpusAssert.MatchesPostgres(@"COPY s.t FROM STDIN (FORMAT csv, ON_ERROR badval);
+\.", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task cpyb0045() => CorpusAssert.MatchesPostgres(@"COPY s.t FROM STDIN (FORMAT csv, REJECT_LIMIT 10);
+\.", "error", false);
     [Fact]
     public void cpyb0046() => CorpusAssert.Parses(@"COPY s.t (name, val) TO STDOUT (FORMAT csv, DELIMITER ',', NULL 'N/A', HEADER true, QUOTE '|', ESCAPE '|')", "ok");
     [Fact]

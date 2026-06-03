@@ -187,26 +187,26 @@ public class Corpus_TransactionControl
     public void txca0090() => CorpusAssert.Parses(@"BEGIN; SET CONSTRAINTS ALL DEFERRED; SET CONSTRAINTS ALL IMMEDIATE; COMMIT", "ok");
     [Fact]
     public void txca0091() => CorpusAssert.Parses(@"BEGIN; CREATE TABLE tmpr(id int PRIMARY KEY); CREATE TABLE tmpfk(fid int, CONSTRAINT c1 FOREIGN KEY (fid) REFERENCES tmpr(id) DEFERRABLE, CONSTRAINT c2 FOREIGN KEY (fid) REFERENCES tmpr(id) DEFERRABLE); SET CONSTRAINTS c1, c2 DEFERRED; COMMIT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void txca0092() => CorpusAssert.Parses(@"BEGIN ISOLATION LEVEL PHANTOM", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void txca0093() => CorpusAssert.Parses(@"BEGIN ISOLATION LEVEL", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void txca0094() => CorpusAssert.Parses(@"BEGIN ISOLATION SERIALIZABLE", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void txca0095() => CorpusAssert.Parses(@"BEGIN LEVEL SERIALIZABLE", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void txca0096() => CorpusAssert.Parses(@"BEGIN READ", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task txca0092() => CorpusAssert.MatchesPostgres(@"BEGIN ISOLATION LEVEL PHANTOM", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task txca0093() => CorpusAssert.MatchesPostgres(@"BEGIN ISOLATION LEVEL", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task txca0094() => CorpusAssert.MatchesPostgres(@"BEGIN ISOLATION SERIALIZABLE", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task txca0095() => CorpusAssert.MatchesPostgres(@"BEGIN LEVEL SERIALIZABLE", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task txca0096() => CorpusAssert.MatchesPostgres(@"BEGIN READ", "error", false);
     [Fact]
     public void txca0097() => CorpusAssert.Parses(@"BEGIN DEFERRABLE READ ONLY ISOLATION LEVEL SERIALIZABLE", "ok");
     [Fact]
     public void txca0098() => CorpusAssert.Parses(@"START TRANSACTION ISOLATION LEVEL SERIALIZABLE, READ ONLY, DEFERRABLE", "ok");
     [Fact]
     public void txca0099() => CorpusAssert.Parses(@"BEGIN ISOLATION LEVEL SERIALIZABLE, READ ONLY, DEFERRABLE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void txca0100() => CorpusAssert.Parses(@"COMMIT CHAIN", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void txca0101() => CorpusAssert.Parses(@"ROLLBACK CHAIN", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task txca0100() => CorpusAssert.MatchesPostgres(@"COMMIT CHAIN", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task txca0101() => CorpusAssert.MatchesPostgres(@"ROLLBACK CHAIN", "error", false);
     [Fact]
     public void txca0102() => CorpusAssert.Parses(@"SAVEPOINT", "error");
     [Fact]
@@ -215,12 +215,12 @@ public class Corpus_TransactionControl
     public void txca0104() => CorpusAssert.Parses(@"ROLLBACK TO", "error");
     [Fact]
     public void txca0105() => CorpusAssert.Parses(@"ROLLBACK TO SAVEPOINT", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void txca0106() => CorpusAssert.Parses(@"BEGIN; SET TRANSACTION ISOLATION LEVEL PHANTOM; COMMIT", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void txca0107() => CorpusAssert.Parses(@"SET CONSTRAINTS", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void txca0108() => CorpusAssert.Parses(@"SET CONSTRAINTS ALL", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task txca0106() => CorpusAssert.MatchesPostgres(@"BEGIN; SET TRANSACTION ISOLATION LEVEL PHANTOM; COMMIT", "error", true);
+    [DbFact]
+    public System.Threading.Tasks.Task txca0107() => CorpusAssert.MatchesPostgres(@"SET CONSTRAINTS", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task txca0108() => CorpusAssert.MatchesPostgres(@"SET CONSTRAINTS ALL", "error", false);
     [Fact]
     public void txca0109() => CorpusAssert.Parses(@"BEGIN READ ONLY READ WRITE", "ok");
     [Fact]
@@ -235,16 +235,16 @@ public class Corpus_TransactionControl
     public void txca0114() => CorpusAssert.Parses(@"BEGIN; SAVEPOINT _underscore_sp; RELEASE _underscore_sp; COMMIT", "ok");
     [Fact]
     public void txca0115() => CorpusAssert.Parses(@"BEGIN; SAVEPOINT sp1; SAVEPOINT sp1; ROLLBACK TO sp1; COMMIT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void txca0116() => CorpusAssert.Parses(@"BEGIN; SAVEPOINT s1; RELEASE SAVEPOINT s1; ROLLBACK TO s1; COMMIT", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void txca0117() => CorpusAssert.Parses(@"BEGIN; SET TRANSACTION SNAPSHOT 'not-a-real-snapshot-id'; COMMIT", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task txca0116() => CorpusAssert.MatchesPostgres(@"BEGIN; SAVEPOINT s1; RELEASE SAVEPOINT s1; ROLLBACK TO s1; COMMIT", "error", true);
+    [DbFact]
+    public System.Threading.Tasks.Task txca0117() => CorpusAssert.MatchesPostgres(@"BEGIN; SET TRANSACTION SNAPSHOT 'not-a-real-snapshot-id'; COMMIT", "error", true);
     [Fact]
     public void txca0118() => CorpusAssert.Parses(@"BEGIN; SET TRANSACTION ISOLATION LEVEL SERIALIZABLE; SET TRANSACTION ISOLATION LEVEL READ COMMITTED; COMMIT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void txca0119() => CorpusAssert.Parses(@"BEGIN; INSERT INTO s.t(name) VALUES('txtest'); SET TRANSACTION ISOLATION LEVEL SERIALIZABLE; COMMIT", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void txca0120() => CorpusAssert.Parses(@"BEGIN; ROLLBACK TO nonexistent_sp; COMMIT", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task txca0119() => CorpusAssert.MatchesPostgres(@"BEGIN; INSERT INTO s.t(name) VALUES('txtest'); SET TRANSACTION ISOLATION LEVEL SERIALIZABLE; COMMIT", "error", true);
+    [DbFact]
+    public System.Threading.Tasks.Task txca0120() => CorpusAssert.MatchesPostgres(@"BEGIN; ROLLBACK TO nonexistent_sp; COMMIT", "error", true);
     [Fact]
     public void txca0121() => CorpusAssert.Parses(@"begin", "ok");
     [Fact]
@@ -279,10 +279,10 @@ public class Corpus_TransactionControl
     public void txca0136() => CorpusAssert.Parses(@"BEGIN ISOLATION LEVEL READ COMMITTED NOT DEFERRABLE", "ok");
     [Fact]
     public void txca0137() => CorpusAssert.Parses(@"BEGIN; SET TRANSACTION READ ONLY; SELECT id FROM s.t; COMMIT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void txca0138() => CorpusAssert.Parses(@"BEGIN; SET TRANSACTION READ ONLY; INSERT INTO s.t(name) VALUES('x'); COMMIT", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void txca0139() => CorpusAssert.Parses(@"BEGIN READ ONLY; INSERT INTO s.t(name) VALUES('y'); COMMIT", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task txca0138() => CorpusAssert.MatchesPostgres(@"BEGIN; SET TRANSACTION READ ONLY; INSERT INTO s.t(name) VALUES('x'); COMMIT", "error", true);
+    [DbFact]
+    public System.Threading.Tasks.Task txca0139() => CorpusAssert.MatchesPostgres(@"BEGIN READ ONLY; INSERT INTO s.t(name) VALUES('y'); COMMIT", "error", true);
     [Fact]
     public void txca0140() => CorpusAssert.Parses(@"BEGIN; SAVEPOINT sp_a; SAVEPOINT sp_b; RELEASE sp_a; COMMIT", "ok");
     [Fact]
@@ -295,28 +295,28 @@ public class Corpus_TransactionControl
     public void txca0144() => CorpusAssert.Parses(@"BEGIN; SET TRANSACTION DEFERRABLE; COMMIT", "ok");
     [Fact]
     public void txca0145() => CorpusAssert.Parses(@"SET LOCAL TRANSACTION ISOLATION LEVEL SERIALIZABLE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void txca0146() => CorpusAssert.Parses(@"BEGIN SNAPSHOT 'abc'", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task txca0146() => CorpusAssert.MatchesPostgres(@"BEGIN SNAPSHOT 'abc'", "error", false);
     [Fact]
     public void txca0147() => CorpusAssert.Parses(@"BEGIN ISOLATION LEVEL SERIALIZABLE ISOLATION LEVEL READ COMMITTED", "ok");
     [Fact]
     public void txca0148() => CorpusAssert.Parses(@"BEGIN DEFERRABLE DEFERRABLE", "ok");
     [Fact]
     public void txca0149() => CorpusAssert.Parses(@"END ISOLATION LEVEL SERIALIZABLE", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void txca0150() => CorpusAssert.Parses(@"ABORT ISOLATION LEVEL SERIALIZABLE", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task txca0150() => CorpusAssert.MatchesPostgres(@"ABORT ISOLATION LEVEL SERIALIZABLE", "error", false);
     [Fact]
     public void txca0151() => CorpusAssert.Parses(@"BEGIN; SAVEPOINT 1bad; COMMIT", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void txca0152() => CorpusAssert.Parses(@"BEGIN; RELEASE SAVEPOINT nonexistent_sp; COMMIT", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task txca0152() => CorpusAssert.MatchesPostgres(@"BEGIN; RELEASE SAVEPOINT nonexistent_sp; COMMIT", "error", true);
     [Fact]
     public void txca0153() => CorpusAssert.Parses(@"START TRANSACTION ISOLATION LEVEL SERIALIZABLE, READ WRITE, NOT DEFERRABLE", "ok");
     [Fact]
     public void txca0154() => CorpusAssert.Parses(@"BEGIN ISOLATION LEVEL READ COMMITTED, READ ONLY", "ok");
     [Fact]
     public void txca0155() => CorpusAssert.Parses(@"BEGIN TRANSACTION ISOLATION LEVEL REPEATABLE READ, READ ONLY, NOT DEFERRABLE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void txca0156() => CorpusAssert.Parses(@"BEGIN; SAVEPOINT sp1; SAVEPOINT sp2; ROLLBACK TO SAVEPOINT sp1; RELEASE SAVEPOINT sp2; COMMIT", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task txca0156() => CorpusAssert.MatchesPostgres(@"BEGIN; SAVEPOINT sp1; SAVEPOINT sp2; ROLLBACK TO SAVEPOINT sp1; RELEASE SAVEPOINT sp2; COMMIT", "error", true);
     [Fact]
     public void txca0157() => CorpusAssert.Parses(@"BEGIN; SAVEPOINT sp1; SAVEPOINT sp2; ROLLBACK TO SAVEPOINT sp1; SAVEPOINT sp2; RELEASE sp2; COMMIT", "ok");
     [Fact]
@@ -325,10 +325,10 @@ public class Corpus_TransactionControl
     public void txca0159() => CorpusAssert.Parses(@"BEGIN; SET TRANSACTION READ ONLY, NOT DEFERRABLE; COMMIT", "ok");
     [Fact]
     public void txca0160() => CorpusAssert.Parses(@"BEGIN; SET TRANSACTION ISOLATION LEVEL REPEATABLE READ, READ WRITE, DEFERRABLE; COMMIT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void txca0161() => CorpusAssert.Parses(@"COMMIT AND CHAIN; BEGIN", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void txca0162() => CorpusAssert.Parses(@"ROLLBACK AND CHAIN; COMMIT", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task txca0161() => CorpusAssert.MatchesPostgres(@"COMMIT AND CHAIN; BEGIN", "error", true);
+    [DbFact]
+    public System.Threading.Tasks.Task txca0162() => CorpusAssert.MatchesPostgres(@"ROLLBACK AND CHAIN; COMMIT", "error", true);
     [Fact]
     public void txca0163() => CorpusAssert.Parses(@"BEGIN; SAVEPOINT ""my savepoint""; ROLLBACK TO ""my savepoint""; COMMIT", "ok");
     [Fact]
@@ -479,12 +479,12 @@ public class Corpus_TransactionControl
     public void txcb0066() => CorpusAssert.Parses(@"BEGIN; CREATE TABLE _tc2_p (id int PRIMARY KEY); CREATE TABLE _tc2_c (pid int, CONSTRAINT _tc2_fk FOREIGN KEY (pid) REFERENCES _tc2_p(id) DEFERRABLE INITIALLY IMMEDIATE); SET CONSTRAINTS _tc2_fk DEFERRED; ROLLBACK", "ok");
     [Fact]
     public void txcb0067() => CorpusAssert.Parses(@"BEGIN; CREATE TABLE _tc3_p (id int PRIMARY KEY, code int UNIQUE); CREATE TABLE _tc3_c (pid int, code int, CONSTRAINT _tc3_fk1 FOREIGN KEY (pid) REFERENCES _tc3_p(id) DEFERRABLE, CONSTRAINT _tc3_fk2 FOREIGN KEY (code) REFERENCES _tc3_p(code) DEFERRABLE); SET CONSTRAINTS _tc3_fk1, _tc3_fk2 DEFERRED; ROLLBACK", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void txcb0068() => CorpusAssert.Parses(@"BEGIN ISOLATION LEVEL PHANTOM", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void txcb0069() => CorpusAssert.Parses(@"BEGIN LEVEL SERIALIZABLE", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void txcb0070() => CorpusAssert.Parses(@"BEGIN ISOLATION SERIALIZABLE", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task txcb0068() => CorpusAssert.MatchesPostgres(@"BEGIN ISOLATION LEVEL PHANTOM", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task txcb0069() => CorpusAssert.MatchesPostgres(@"BEGIN LEVEL SERIALIZABLE", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task txcb0070() => CorpusAssert.MatchesPostgres(@"BEGIN ISOLATION SERIALIZABLE", "error", false);
     [Fact]
     public void txcb0071() => CorpusAssert.Parses(@"SAVEPOINT", "error");
     [Fact]
@@ -493,16 +493,16 @@ public class Corpus_TransactionControl
     public void txcb0073() => CorpusAssert.Parses(@"ROLLBACK TO", "error");
     [Fact]
     public void txcb0074() => CorpusAssert.Parses(@"BEGIN READ ONLY READ WRITE; ROLLBACK", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void txcb0075() => CorpusAssert.Parses(@"START", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void txcb0076() => CorpusAssert.Parses(@"COMMIT CHAIN", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void txcb0077() => CorpusAssert.Parses(@"SET TRANSACTION ISOLATION LEVEL", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void txcb0078() => CorpusAssert.Parses(@"SET TRANSACTION SNAPSHOT", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void txcb0079() => CorpusAssert.Parses(@"SET CONSTRAINTS DEFERRED", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task txcb0075() => CorpusAssert.MatchesPostgres(@"START", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task txcb0076() => CorpusAssert.MatchesPostgres(@"COMMIT CHAIN", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task txcb0077() => CorpusAssert.MatchesPostgres(@"SET TRANSACTION ISOLATION LEVEL", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task txcb0078() => CorpusAssert.MatchesPostgres(@"SET TRANSACTION SNAPSHOT", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task txcb0079() => CorpusAssert.MatchesPostgres(@"SET CONSTRAINTS DEFERRED", "error", false);
     [Fact]
     public void txcb0080() => CorpusAssert.Parses(@"BEGIN; SAVEPOINT sp1; ROLLBACK TO SAVEPOINT; COMMIT", "error");
 }

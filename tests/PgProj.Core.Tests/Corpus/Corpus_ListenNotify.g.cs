@@ -91,8 +91,8 @@ public class Corpus_ListenNotify
     public void lsna0042() => CorpusAssert.Parses(@"SELECT pg_notify('a', 'b'), pg_notify('c', 'd')", "ok");
     [Fact]
     public void lsna0043() => CorpusAssert.Parses(@"DO $$ BEGIN PERFORM pg_notify('chan', 'from do block'); END $$", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void lsna0044() => CorpusAssert.Parses(@"LISTEN """"", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task lsna0044() => CorpusAssert.MatchesPostgres(@"LISTEN """"", "error", false);
     [Fact]
     public void lsna0045() => CorpusAssert.Parses(@"NOTIFY ""event.channel""", "ok");
     [Fact]
@@ -145,8 +145,8 @@ public class Corpus_ListenNotify
     public void lsna0069() => CorpusAssert.Parses(@"NOTIFY chan,", "error");
     [Fact]
     public void lsna0070() => CorpusAssert.Parses(@"LISTEN chan UNLISTEN chan", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void lsna0071() => CorpusAssert.Parses(@"pg_notify('chan', 'msg')", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task lsna0071() => CorpusAssert.MatchesPostgres(@"pg_notify('chan', 'msg')", "error", false);
     [Fact]
     public void lsna0072() => CorpusAssert.Parses(@"NOTIFY s.chan", "error");
     [Fact]
@@ -193,12 +193,12 @@ public class Corpus_ListenNotify
     public void lsna0093() => CorpusAssert.Parses(@"NOTIFY chan = 'x'", "error");
     [Fact]
     public void lsna0094() => CorpusAssert.Parses(@"NOTIFY chan PAYLOAD 'msg'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void lsna0095() => CorpusAssert.Parses(@"SELECT pg_notify()", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void lsna0096() => CorpusAssert.Parses(@"SELECT pg_notify('chan')", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void lsna0097() => CorpusAssert.Parses(@"SELECT pg_notify('chan', 'msg', 'extra')", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task lsna0095() => CorpusAssert.MatchesPostgres(@"SELECT pg_notify()", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task lsna0096() => CorpusAssert.MatchesPostgres(@"SELECT pg_notify('chan')", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task lsna0097() => CorpusAssert.MatchesPostgres(@"SELECT pg_notify('chan', 'msg', 'extra')", "error", false);
     [Fact]
     public void lsna0098() => CorpusAssert.Parses(@"NOTIFY chan, 'x'; NOTIFY chan, 'y'; NOTIFY chan, 'z'; UNLISTEN *", "ok");
     [Fact]

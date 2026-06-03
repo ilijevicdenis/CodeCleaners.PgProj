@@ -87,24 +87,24 @@ public class Corpus_CreatePublication
     public void puba0040() => CorpusAssert.Parses(@"CREATE PUBLICATION pub40 FOR TABLE ONLY s.parent", "ok");
     [Fact]
     public void puba0041() => CorpusAssert.Parses(@"CREATE PUBLICATION; ", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void puba0042() => CorpusAssert.Parses(@"CREATE PUBLICATION pub_err FOR", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void puba0043() => CorpusAssert.Parses(@"CREATE PUBLICATION pub_err FOR TABLE", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void puba0044() => CorpusAssert.Parses(@"CREATE PUBLICATION pub_err FOR ALL", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void puba0045() => CorpusAssert.Parses(@"CREATE PUBLICATION pub_err FOR TABLES IN", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void puba0046() => CorpusAssert.Parses(@"CREATE PUBLICATION pub_err FOR TABLES IN SCHEMA", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void puba0047() => CorpusAssert.Parses(@"CREATE PUBLICATION pub_err FOR TABLE s.t WITH (publish = 'bad_value')", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task puba0042() => CorpusAssert.MatchesPostgres(@"CREATE PUBLICATION pub_err FOR", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task puba0043() => CorpusAssert.MatchesPostgres(@"CREATE PUBLICATION pub_err FOR TABLE", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task puba0044() => CorpusAssert.MatchesPostgres(@"CREATE PUBLICATION pub_err FOR ALL", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task puba0045() => CorpusAssert.MatchesPostgres(@"CREATE PUBLICATION pub_err FOR TABLES IN", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task puba0046() => CorpusAssert.MatchesPostgres(@"CREATE PUBLICATION pub_err FOR TABLES IN SCHEMA", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task puba0047() => CorpusAssert.MatchesPostgres(@"CREATE PUBLICATION pub_err FOR TABLE s.t WITH (publish = 'bad_value')", "error", false);
     [Fact]
     public void puba0048() => CorpusAssert.Parses(@"CREATE PUBLICATION pub_err FOR TABLE s.t WITH (publish = 'INSERT')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void puba0049() => CorpusAssert.Parses(@"CREATE PUBLICATION pub_err2 FOR TABLE s.t WITH (nonexistent_param = true)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void puba0050() => CorpusAssert.Parses(@"CREATE PUBLICATION pub_err3 FOR TABLE s.nonexistent", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task puba0049() => CorpusAssert.MatchesPostgres(@"CREATE PUBLICATION pub_err2 FOR TABLE s.t WITH (nonexistent_param = true)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task puba0050() => CorpusAssert.MatchesPostgres(@"CREATE PUBLICATION pub_err3 FOR TABLE s.nonexistent", "error", false);
     [Fact]
     public void puba0051() => CorpusAssert.Parses(@"CREATE PUBLICATION pub51 FOR TABLE s.t;
 ALTER PUBLICATION pub51 ADD TABLE s.t2", "ok");
@@ -157,8 +157,8 @@ ALTER PUBLICATION pub66 OWNER TO SESSION_USER", "ok");
     [Fact]
     public void puba0067() => CorpusAssert.Parses(@"CREATE PUBLICATION pub67 FOR TABLE s.t;
 ALTER PUBLICATION pub67 SET (publish = 'insert, update, delete')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void puba0068() => CorpusAssert.Parses(@"ALTER PUBLICATION nonexistent_pub ADD TABLE s.t", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task puba0068() => CorpusAssert.MatchesPostgres(@"ALTER PUBLICATION nonexistent_pub ADD TABLE s.t", "error", false);
     [Fact]
     public void puba0069() => CorpusAssert.Parses(@"ALTER PUBLICATION", "error");
     [Fact]
@@ -181,8 +181,8 @@ DROP PUBLICATION pub74", "ok");
 DROP PUBLICATION IF EXISTS pub75", "ok");
     [Fact]
     public void puba0076() => CorpusAssert.Parses(@"DROP PUBLICATION IF EXISTS nonexistent_pub", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void puba0077() => CorpusAssert.Parses(@"DROP PUBLICATION nonexistent_pub", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task puba0077() => CorpusAssert.MatchesPostgres(@"DROP PUBLICATION nonexistent_pub", "error", false);
     [Fact]
     public void puba0078() => CorpusAssert.Parses(@"CREATE PUBLICATION pub78a FOR TABLE s.t;
 CREATE PUBLICATION pub78b FOR TABLE s.t2;
@@ -239,12 +239,12 @@ DROP PUBLICATION pub80 RESTRICT", "ok");
     public void puba0102() => CorpusAssert.Parses(@"CREATE SUBSCRIPTION sub_err CONNECTION 'host=localhost' WITH (connect = false)", "error");
     [Fact]
     public void puba0103() => CorpusAssert.Parses(@"CREATE SUBSCRIPTION", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void puba0104() => CorpusAssert.Parses(@"CREATE SUBSCRIPTION sub_err CONNECTION 'host=localhost' PUBLICATION pub_x WITH (connect = false, create_slot = true)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void puba0105() => CorpusAssert.Parses(@"CREATE SUBSCRIPTION sub_err CONNECTION 'host=localhost' PUBLICATION pub_x WITH (connect = false, enabled = true)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void puba0106() => CorpusAssert.Parses(@"CREATE SUBSCRIPTION sub_err CONNECTION 'host=localhost' PUBLICATION pub_x WITH (connect = false, copy_data = true)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task puba0104() => CorpusAssert.MatchesPostgres(@"CREATE SUBSCRIPTION sub_err CONNECTION 'host=localhost' PUBLICATION pub_x WITH (connect = false, create_slot = true)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task puba0105() => CorpusAssert.MatchesPostgres(@"CREATE SUBSCRIPTION sub_err CONNECTION 'host=localhost' PUBLICATION pub_x WITH (connect = false, enabled = true)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task puba0106() => CorpusAssert.MatchesPostgres(@"CREATE SUBSCRIPTION sub_err CONNECTION 'host=localhost' PUBLICATION pub_x WITH (connect = false, copy_data = true)", "error", false);
     [Fact]
     public void puba0107() => CorpusAssert.Parses(@"CREATE SUBSCRIPTION sub107 CONNECTION 'host=localhost' PUBLICATION pub107 WITH (connect = false);
 DROP SUBSCRIPTION sub107", "ok");
@@ -253,8 +253,8 @@ DROP SUBSCRIPTION sub107", "ok");
 DROP SUBSCRIPTION IF EXISTS sub108", "ok");
     [Fact]
     public void puba0109() => CorpusAssert.Parses(@"DROP SUBSCRIPTION IF EXISTS nonexistent_sub", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void puba0110() => CorpusAssert.Parses(@"DROP SUBSCRIPTION nonexistent_sub", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task puba0110() => CorpusAssert.MatchesPostgres(@"DROP SUBSCRIPTION nonexistent_sub", "error", false);
     [Fact]
     public void puba0111() => CorpusAssert.Parses(@"CREATE SUBSCRIPTION sub111 CONNECTION 'host=localhost' PUBLICATION pub111 WITH (connect = false);
 DROP SUBSCRIPTION sub111 CASCADE", "ok");
@@ -306,8 +306,8 @@ ALTER SUBSCRIPTION sub126 OWNER TO CURRENT_USER", "ok");
     public void puba0127() => CorpusAssert.Parses(@"CREATE SUBSCRIPTION sub127 CONNECTION 'host=localhost' PUBLICATION pub127 WITH (connect = false);
 ALTER SUBSCRIPTION sub127 RENAME TO sub127_renamed;
 ALTER SUBSCRIPTION sub127_renamed RENAME TO sub127", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void puba0128() => CorpusAssert.Parses(@"ALTER SUBSCRIPTION nonexistent_sub DISABLE", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task puba0128() => CorpusAssert.MatchesPostgres(@"ALTER SUBSCRIPTION nonexistent_sub DISABLE", "error", false);
     [Fact]
     public void puba0129() => CorpusAssert.Parses(@"ALTER SUBSCRIPTION", "error");
     [Fact]
@@ -350,12 +350,12 @@ ALTER PUBLICATION pub142 SET (publish = 'insert, update')", "ok");
     public void puba0145() => CorpusAssert.Parses(@"CREATE PUBLICATION pub145 FOR TABLE s.t WHERE (NOT flag)", "ok");
     [Fact]
     public void puba0146() => CorpusAssert.Parses(@"CREATE PUBLICATION pub146 FOR TABLE s.t WHERE (qty > 0 OR val > 0)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void puba0147() => CorpusAssert.Parses(@"CREATE PUBLICATION pub_err4 FOR TABLE s.t WHERE qty > 0", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void puba0148() => CorpusAssert.Parses(@"CREATE PUBLICATION pub_err5 FOR TABLE s.t ()", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void puba0149() => CorpusAssert.Parses(@"CREATE PUBLICATION pub_err6 FOR ALL TABLES, TABLE s.t", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task puba0147() => CorpusAssert.MatchesPostgres(@"CREATE PUBLICATION pub_err4 FOR TABLE s.t WHERE qty > 0", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task puba0148() => CorpusAssert.MatchesPostgres(@"CREATE PUBLICATION pub_err5 FOR TABLE s.t ()", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task puba0149() => CorpusAssert.MatchesPostgres(@"CREATE PUBLICATION pub_err6 FOR ALL TABLES, TABLE s.t", "error", false);
     [Fact]
     public void puba0150() => CorpusAssert.Parses(@"CREATE PUBLICATION pub150 FOR TABLE s.t WITH (publish = 'insert');
 ALTER PUBLICATION pub150 ADD TABLE s.t2 (label) WHERE (label IS NOT NULL)", "ok");
@@ -405,8 +405,8 @@ ALTER SUBSCRIPTION sub167 ADD PUBLICATION pub167b, pub167c WITH (refresh = false
     public void puba0168() => CorpusAssert.Parses(@"CREATE PUBLICATION pub168 FOR TABLE s.t WITH (publish_via_partition_root = on)", "ok");
     [Fact]
     public void puba0169() => CorpusAssert.Parses(@"CREATE PUBLICATION pub169 FOR TABLE s.t WITH (publish_via_partition_root = off)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void puba0170() => CorpusAssert.Parses(@"CREATE PUBLICATION pub_err8 FOR TABLE s.t WITH (publish = 'insert'; publish_via_partition_root = true)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task puba0170() => CorpusAssert.MatchesPostgres(@"CREATE PUBLICATION pub_err8 FOR TABLE s.t WITH (publish = 'insert'; publish_via_partition_root = true)", "error", false);
     [Fact]
     public void pubb0001() => CorpusAssert.Parses(@"CREATE PUBLICATION pub1 FOR TABLE s.t", "ok");
     [Fact]
@@ -437,10 +437,10 @@ DROP PUBLICATION pub8_renamed", "ok");
     public void pubb0010() => CorpusAssert.Parses(@"CREATE SUBSCRIPTION sub2 CONNECTION 'host=localhost dbname=doesnotexist' PUBLICATION pub_fake WITH (connect = false);
 ALTER SUBSCRIPTION sub2 SET (slot_name = 'myslot');
 DROP SUBSCRIPTION sub2", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void pubb0011() => CorpusAssert.Parses(@"CREATE PUBLICATION bad_pub FOR TABLE", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void pubb0012() => CorpusAssert.Parses(@"CREATE PUBLICATION bad_pub WITH (publish = 'bogus_action')", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task pubb0011() => CorpusAssert.MatchesPostgres(@"CREATE PUBLICATION bad_pub FOR TABLE", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task pubb0012() => CorpusAssert.MatchesPostgres(@"CREATE PUBLICATION bad_pub WITH (publish = 'bogus_action')", "error", false);
     [Fact]
     public void pubb0013() => CorpusAssert.Parses(@"CREATE SUBSCRIPTION bad_sub PUBLICATION pub_fake WITH (connect = false)", "error");
     [Fact]

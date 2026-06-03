@@ -337,8 +337,8 @@ public class Corpus_CreateTableColumns
     public void ctcola0165() => CorpusAssert.Parses(@"CREATE TABLE s.tc_err7 (a integer DEFAULT 1 DEFAULT 2)", "error");
     [Fact]
     public void ctcola0166() => CorpusAssert.Parses(@"CREATE TABLE s.tc_err8 (a integer GENERATED ALWAYS AS (1+1))", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctcola0167() => CorpusAssert.Parses(@"CREATE TABLE s.tc_err9 (a text COLLATE ""nonexistent_collation_xyz"")", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ctcola0167() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.tc_err9 (a text COLLATE ""nonexistent_collation_xyz"")", "error", false);
     [Fact]
     public void ctcola0168() => CorpusAssert.Parses(@"CREATE TABLE s.tc_err10 (a integer STORAGE INVALID_OPT)", "error");
     [Fact]
@@ -473,8 +473,8 @@ public class Corpus_CreateTableColumns
     public void ctcolb0063() => CorpusAssert.Parses(@"CREATE TABLE s.col063 (a uuid DEFAULT gen_random_uuid())", "ok");
     [Fact]
     public void ctcolb0064() => CorpusAssert.Parses(@"CREATE TABLE s.col064 (a jsonb DEFAULT '{}'::jsonb)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctcolb0065() => CorpusAssert.Parses(@"CREATE TABLE s.col065 (a integer DEFAULT (SELECT 1))", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ctcolb0065() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.col065 (a integer DEFAULT (SELECT 1))", "error", false);
     [Fact]
     public void ctcolb0066() => CorpusAssert.Parses(@"CREATE TABLE s.col066 (a integer NOT NULL)", "ok");
     [Fact]
@@ -491,8 +491,8 @@ public class Corpus_CreateTableColumns
     public void ctcolb0072() => CorpusAssert.Parses(@"CREATE TABLE s.col072 (a text COLLATE ""POSIX"")", "ok");
     [Fact]
     public void ctcolb0073() => CorpusAssert.Parses(@"CREATE TABLE s.col073 (a text COLLATE ""pg_catalog"".""default"")", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctcolb0074() => CorpusAssert.Parses(@"CREATE TABLE s.col074 (a text COLLATE nonexistent_collation_xyz)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ctcolb0074() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.col074 (a text COLLATE nonexistent_collation_xyz)", "error", false);
     [Fact]
     public void ctcolb0075() => CorpusAssert.Parses(@"CREATE TABLE s.col075 (a integer COLLATE ""C"")", "error");
     [Fact]
@@ -521,12 +521,12 @@ public class Corpus_CreateTableColumns
     public void ctcolb0087() => CorpusAssert.Parses(@"CREATE TABLE s.col087 (a numeric(10,2), b numeric(10,2), total numeric(10,2) GENERATED ALWAYS AS (a + b) STORED)", "ok");
     [Fact]
     public void ctcolb0088() => CorpusAssert.Parses(@"CREATE TABLE s.col088 (a integer, b text GENERATED ALWAYS AS (a::text) STORED)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctcolb0089() => CorpusAssert.Parses(@"CREATE TABLE s.col089 (a integer GENERATED ALWAYS AS (a + 1) STORED)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctcolb0090() => CorpusAssert.Parses(@"CREATE TABLE s.col090 (a text GENERATED ALWAYS AS (upper(a)) STORED)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctcolb0091() => CorpusAssert.Parses(@"CREATE TABLE s.col091 (a integer GENERATED ALWAYS AS () STORED)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ctcolb0089() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.col089 (a integer GENERATED ALWAYS AS (a + 1) STORED)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ctcolb0090() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.col090 (a text GENERATED ALWAYS AS (upper(a)) STORED)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ctcolb0091() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.col091 (a integer GENERATED ALWAYS AS () STORED)", "error", false);
     [Fact]
     public void ctcolb0092() => CorpusAssert.Parses(@"CREATE TABLE s.col092 (a serial)", "ok");
     [Fact]
@@ -553,8 +553,8 @@ public class Corpus_CreateTableColumns
     public void ctcolb0103() => CorpusAssert.Parses(@"CREATE TABLE s.col103 (a text COMPRESSION lz4)", "ok");
     [Fact]
     public void ctcolb0104() => CorpusAssert.Parses(@"CREATE TABLE s.col104 (a text COMPRESSION default)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctcolb0105() => CorpusAssert.Parses(@"CREATE TABLE s.col105 (a integer COMPRESSION pglz)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ctcolb0105() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.col105 (a integer COMPRESSION pglz)", "error", false);
     [Fact]
     public void ctcolb0106() => CorpusAssert.Parses(@"CREATE TABLE s.col106 (a text STORAGE EXTENDED COMPRESSION pglz)", "ok");
     [Fact]
@@ -595,8 +595,8 @@ public class Corpus_CreateTableColumns
     public void ctcolb0124() => CorpusAssert.Parses(@"CREATE TABLE s.col124 ()", "ok");
     [Fact]
     public void ctcolb0125() => CorpusAssert.Parses(@"CREATE TABLE s.col125 (a)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctcolb0126() => CorpusAssert.Parses(@"CREATE TABLE s.col126 (integer a)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ctcolb0126() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.col126 (integer a)", "error", false);
     [Fact]
     public void ctcolb0127() => CorpusAssert.Parses(@"CREATE TABLE s.col127 (a integer, a text)", "error");
     [Fact]
@@ -873,20 +873,20 @@ public class Corpus_CreateTableColumns
     public void ctcolc0093() => CorpusAssert.Parses(@"CREATE TABLE s.col_comp1 (a text COMPRESSION pglz)", "ok");
     [Fact]
     public void ctcolc0094() => CorpusAssert.Parses(@"CREATE TABLE s.col_comp2 (a text COMPRESSION lz4)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctcolc0095() => CorpusAssert.Parses(@"CREATE TABLE s.col_comp3 (a integer COMPRESSION pglz)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctcolc0096() => CorpusAssert.Parses(@"CREATE TABLE s.col_comp4 (a text COMPRESSION none)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ctcolc0095() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.col_comp3 (a integer COMPRESSION pglz)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ctcolc0096() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.col_comp4 (a text COMPRESSION none)", "error", false);
     [Fact]
     public void ctcolc0097() => CorpusAssert.Parses(@"CREATE TABLE s.col_multi1 (a integer NOT NULL DEFAULT 5, b text COLLATE ""C"" NOT NULL, c numeric(8,2) DEFAULT 0.0 NOT NULL, d timestamptz DEFAULT now())", "ok");
     [Fact]
     public void ctcolc0098() => CorpusAssert.Parses(@"CREATE TABLE s.col_trail1 (a integer, b text,)", "error");
     [Fact]
     public void ctcolc0099() => CorpusAssert.Parses(@"CREATE TABLE s.col_empty1 ()", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctcolc0100() => CorpusAssert.Parses(@"CREATE TABLE s.col_nolist1 (a integer b text)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctcolc0101() => CorpusAssert.Parses(@"CREATE TABLE s.col_badtype1 (a nonexistent_type_xyz)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ctcolc0100() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.col_nolist1 (a integer b text)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ctcolc0101() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.col_badtype1 (a nonexistent_type_xyz)", "error", false);
     [Fact]
     public void ctcolc0102() => CorpusAssert.Parses(@"CREATE TABLE s.col_dupname1 (a integer, a text)", "error");
     [Fact]

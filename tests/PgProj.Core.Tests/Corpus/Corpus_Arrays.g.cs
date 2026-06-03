@@ -323,10 +323,10 @@ public class Corpus_Arrays
     public void arra0158() => CorpusAssert.Parses(@"SELECT array_fill(0, ARRAY[0])", "ok");
     [Fact]
     public void arra0159() => CorpusAssert.Parses(@"SELECT cardinality(ARRAY[1,2,3]) = array_length(ARRAY[1,2,3], 1)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void arra0160() => CorpusAssert.Parses(@"SELECT ARRAY[1,2,3][2]", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void arra0161() => CorpusAssert.Parses(@"SELECT ARRAY[ARRAY[1,2],ARRAY[3,4]][1][2]", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task arra0160() => CorpusAssert.MatchesPostgres(@"SELECT ARRAY[1,2,3][2]", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task arra0161() => CorpusAssert.MatchesPostgres(@"SELECT ARRAY[ARRAY[1,2],ARRAY[3,4]][1][2]", "error", false);
     [Fact]
     public void arra0162() => CorpusAssert.Parses(@"SELECT '{hello,""world with spaces"",foo}'::text[]", "ok");
     [Fact]
@@ -335,26 +335,26 @@ public class Corpus_Arrays
     public void arra0164() => CorpusAssert.Parses(@"SELECT ARRAY[", "error");
     [Fact]
     public void arra0165() => CorpusAssert.Parses(@"SELECT ARRAY[1,2,]", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void arra0166() => CorpusAssert.Parses(@"SELECT (ARRAY[1,2,3])[1", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void arra0167() => CorpusAssert.Parses(@"SELECT '{{1,2},{3}}'::int[]", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void arra0168() => CorpusAssert.Parses(@"SELECT ARRAY[[1,2],[3]]", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void arra0169() => CorpusAssert.Parses(@"SELECT array_length(ARRAY[1,2,3])", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void arra0170() => CorpusAssert.Parses(@"SELECT array_append(ARRAY[1,2], ARRAY[3,4])", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void arra0171() => CorpusAssert.Parses(@"SELECT ARRAY[1,'two',3]", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task arra0166() => CorpusAssert.MatchesPostgres(@"SELECT (ARRAY[1,2,3])[1", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task arra0167() => CorpusAssert.MatchesPostgres(@"SELECT '{{1,2},{3}}'::int[]", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task arra0168() => CorpusAssert.MatchesPostgres(@"SELECT ARRAY[[1,2],[3]]", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task arra0169() => CorpusAssert.MatchesPostgres(@"SELECT array_length(ARRAY[1,2,3])", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task arra0170() => CorpusAssert.MatchesPostgres(@"SELECT array_append(ARRAY[1,2], ARRAY[3,4])", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task arra0171() => CorpusAssert.MatchesPostgres(@"SELECT ARRAY[1,'two',3]", "error", false);
     [Fact]
     public void arra0172() => CorpusAssert.Parses(@"SELECT 1 = ANY(1,2,3)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void arra0173() => CorpusAssert.Parses(@"SELECT (ARRAY[1,2,3])[1:2:3]", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void arra0174() => CorpusAssert.Parses(@"SELECT array_dims()", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void arra0175() => CorpusAssert.Parses(@"SELECT unnest()", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task arra0173() => CorpusAssert.MatchesPostgres(@"SELECT (ARRAY[1,2,3])[1:2:3]", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task arra0174() => CorpusAssert.MatchesPostgres(@"SELECT array_dims()", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task arra0175() => CorpusAssert.MatchesPostgres(@"SELECT unnest()", "error", false);
     [Fact]
     public void arrb0001() => CorpusAssert.Parses(@"SELECT ARRAY[1, 2, 3]", "ok");
     [Fact]
@@ -613,38 +613,38 @@ public class Corpus_Arrays
     public void arrb0128() => CorpusAssert.Parses(@"SELECT ARRAY[1,,2]", "error");
     [Fact]
     public void arrb0129() => CorpusAssert.Parses(@"SELECT '{1,2,3}'::int", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void arrb0130() => CorpusAssert.Parses(@"SELECT array_length(ARRAY[1,2,3])", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void arrb0131() => CorpusAssert.Parses(@"SELECT array_fill(0, 3)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void arrb0132() => CorpusAssert.Parses(@"SELECT ARRAY[1,2,3][1:2:3]", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task arrb0130() => CorpusAssert.MatchesPostgres(@"SELECT array_length(ARRAY[1,2,3])", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task arrb0131() => CorpusAssert.MatchesPostgres(@"SELECT array_fill(0, 3)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task arrb0132() => CorpusAssert.MatchesPostgres(@"SELECT ARRAY[1,2,3][1:2:3]", "error", false);
     [Fact]
     public void arrb0133() => CorpusAssert.Parses(@"SELECT 1 = ANY(1, 2, 3)", "error");
     [Fact]
     public void arrb0134() => CorpusAssert.Parses(@"SELECT ARRAY(1, 2, 3)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void arrb0135() => CorpusAssert.Parses(@"SELECT unnest()", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void arrb0136() => CorpusAssert.Parses(@"SELECT array_append(1, 2)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void arrb0137() => CorpusAssert.Parses(@"SELECT '{1,2,3}'::int[-1]", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void arrb0138() => CorpusAssert.Parses(@"SELECT ARRAY[1, 'hello']", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task arrb0135() => CorpusAssert.MatchesPostgres(@"SELECT unnest()", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task arrb0136() => CorpusAssert.MatchesPostgres(@"SELECT array_append(1, 2)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task arrb0137() => CorpusAssert.MatchesPostgres(@"SELECT '{1,2,3}'::int[-1]", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task arrb0138() => CorpusAssert.MatchesPostgres(@"SELECT ARRAY[1, 'hello']", "error", false);
     [Fact]
     public void arrb0139() => CorpusAssert.Parses(@"SELECT 1 ANY(ARRAY[1,2,3])", "error");
     [Fact]
     public void arrb0140() => CorpusAssert.Parses(@"SELECT string_to_array()", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void arrb0141() => CorpusAssert.Parses(@"SELECT ARRAY[1,2,3] @@ ARRAY[1,2]", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void arrb0142() => CorpusAssert.Parses(@"SELECT array_position()", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void arrb0143() => CorpusAssert.Parses(@"SELECT a[1 FROM s.t", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task arrb0141() => CorpusAssert.MatchesPostgres(@"SELECT ARRAY[1,2,3] @@ ARRAY[1,2]", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task arrb0142() => CorpusAssert.MatchesPostgres(@"SELECT array_position()", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task arrb0143() => CorpusAssert.MatchesPostgres(@"SELECT a[1 FROM s.t", "error", false);
     [Fact]
     public void arrb0144() => CorpusAssert.Parses(@"SELECT ARRAY[1,2,3] WHERE", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void arrb0145() => CorpusAssert.Parses(@"SELECT int[] FROM s.t", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task arrb0145() => CorpusAssert.MatchesPostgres(@"SELECT int[] FROM s.t", "error", false);
     [Fact]
     public void arrb0146() => CorpusAssert.Parses(@"SELECT array_agg(id ORDER BY) FROM s.t", "error");
     [Fact]
@@ -655,8 +655,8 @@ public class Corpus_Arrays
     public void arrb0149() => CorpusAssert.Parses(@"SELECT array_positions(ARRAY[NULL, 1, NULL]::int[], NULL)", "ok");
     [Fact]
     public void arrb0150() => CorpusAssert.Parses(@"SELECT array_remove(ARRAY[1,2,3], NULL::int)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void arrb0151() => CorpusAssert.Parses(@"SELECT ARRAY[1,2,3] = ANY(ARRAY[ARRAY[1,2,3], ARRAY[4,5,6]])", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task arrb0151() => CorpusAssert.MatchesPostgres(@"SELECT ARRAY[1,2,3] = ANY(ARRAY[ARRAY[1,2,3], ARRAY[4,5,6]])", "error", false);
     [Fact]
     public void arrb0152() => CorpusAssert.Parses(@"SELECT string_to_array('', ',')", "ok");
     [Fact]
@@ -771,8 +771,8 @@ public class Corpus_Arrays
     public void arrc0037() => CorpusAssert.Parses(@"CREATE TABLE _arr_test (id serial, nums int[], tags text[][]); INSERT INTO _arr_test(nums, tags) VALUES (ARRAY[1,2,3], '{{""a"",""b""},{""c"",""d""}}'); SELECT nums[1], tags[1][2] FROM _arr_test", "ok");
     [Fact]
     public void arrc0038() => CorpusAssert.Parses(@"SELECT ARRAY[1,2,3", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void arrc0039() => CorpusAssert.Parses(@"SELECT '{1,2,3}'::int[", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void arrc0040() => CorpusAssert.Parses(@"SELECT (ARRAY[1,2,3])[1 2]", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task arrc0039() => CorpusAssert.MatchesPostgres(@"SELECT '{1,2,3}'::int[", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task arrc0040() => CorpusAssert.MatchesPostgres(@"SELECT (ARRAY[1,2,3])[1 2]", "error", false);
 }

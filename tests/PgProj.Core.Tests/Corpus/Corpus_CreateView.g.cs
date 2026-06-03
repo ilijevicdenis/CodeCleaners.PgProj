@@ -248,44 +248,44 @@ WHERE qty > 0", "ok");
     public void vwa0118() => CorpusAssert.Parses(@"CREATE VIEW vwa_returning AS SELECT id FROM s.t", "ok");
     [Fact]
     public void vwa0119() => CorpusAssert.Parses(@"CREATE RECURSIVE VIEW vwa_recursive_ok (n) AS VALUES(1) UNION ALL SELECT n+1 FROM vwa_recursive_ok WHERE n < 3", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void vwa0120() => CorpusAssert.Parses(@"CREATE VIEW vwa_collist_mismatch (a, b, c) AS SELECT id, name FROM s.t", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task vwa0120() => CorpusAssert.MatchesPostgres(@"CREATE VIEW vwa_collist_mismatch (a, b, c) AS SELECT id, name FROM s.t", "error", false);
     [Fact]
     public void vwa0121() => CorpusAssert.Parses(@"CREATE VIEW AS SELECT 1", "error");
     [Fact]
     public void vwa0122() => CorpusAssert.Parses(@"CREATE VIEW vwa_noas SELECT id FROM s.t", "error");
     [Fact]
     public void vwa0123() => CorpusAssert.Parses(@"CREATE VIEW vwa_empty AS", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void vwa0124() => CorpusAssert.Parses(@"CREATE VIEW vwa_bad_option WITH (bad_option = true) AS SELECT 1", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void vwa0125() => CorpusAssert.Parses(@"CREATE VIEW vwa_bad_co WITH (check_option = invalid_value) AS SELECT 1", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void vwa0126() => CorpusAssert.Parses(@"CREATE RECURSIVE VIEW vwa_rec_nocollist AS VALUES(1) UNION ALL SELECT n+1 FROM vwa_rec_nocollist WHERE n < 3", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void vwa0127() => CorpusAssert.Parses(@"CREATE VIEW vwa_check_on_group AS SELECT status, count(*) AS cnt FROM s.t GROUP BY status WITH CHECK OPTION", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void vwa0128() => CorpusAssert.Parses(@"CREATE VIEW vwa_bad_sb WITH (security_barrier = 42) AS SELECT 1", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void vwa0129() => CorpusAssert.Parses(@"CREATE VIEW vwa_emptylist () AS SELECT 1", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void vwa0130() => CorpusAssert.Parses(@"CREATE VIEW vwa_extra_comma (a, b,) AS SELECT 1, 2", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void vwa0131() => CorpusAssert.Parses(@"CREATE VIEW vwa_temp_temp TEMP TEMPORARY AS SELECT 1", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void vwa0132() => CorpusAssert.Parses(@"CREATE TEMP RECURSIVE VIEW vwa_temp_rec_no_col AS VALUES(1) UNION ALL SELECT n+1 FROM vwa_temp_rec_no_col WHERE n < 3", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void vwa0133() => CorpusAssert.Parses(@"CREATE VIEW vwa_double_check AS SELECT id FROM s.t WITH LOCAL CHECK OPTION WITH CASCADED CHECK OPTION", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void vwa0134() => CorpusAssert.Parses(@"CREATE VIEW vwa_check_union AS SELECT id FROM s.t UNION SELECT id FROM s.t2 WITH CHECK OPTION", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task vwa0124() => CorpusAssert.MatchesPostgres(@"CREATE VIEW vwa_bad_option WITH (bad_option = true) AS SELECT 1", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task vwa0125() => CorpusAssert.MatchesPostgres(@"CREATE VIEW vwa_bad_co WITH (check_option = invalid_value) AS SELECT 1", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task vwa0126() => CorpusAssert.MatchesPostgres(@"CREATE RECURSIVE VIEW vwa_rec_nocollist AS VALUES(1) UNION ALL SELECT n+1 FROM vwa_rec_nocollist WHERE n < 3", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task vwa0127() => CorpusAssert.MatchesPostgres(@"CREATE VIEW vwa_check_on_group AS SELECT status, count(*) AS cnt FROM s.t GROUP BY status WITH CHECK OPTION", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task vwa0128() => CorpusAssert.MatchesPostgres(@"CREATE VIEW vwa_bad_sb WITH (security_barrier = 42) AS SELECT 1", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task vwa0129() => CorpusAssert.MatchesPostgres(@"CREATE VIEW vwa_emptylist () AS SELECT 1", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task vwa0130() => CorpusAssert.MatchesPostgres(@"CREATE VIEW vwa_extra_comma (a, b,) AS SELECT 1, 2", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task vwa0131() => CorpusAssert.MatchesPostgres(@"CREATE VIEW vwa_temp_temp TEMP TEMPORARY AS SELECT 1", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task vwa0132() => CorpusAssert.MatchesPostgres(@"CREATE TEMP RECURSIVE VIEW vwa_temp_rec_no_col AS VALUES(1) UNION ALL SELECT n+1 FROM vwa_temp_rec_no_col WHERE n < 3", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task vwa0133() => CorpusAssert.MatchesPostgres(@"CREATE VIEW vwa_double_check AS SELECT id FROM s.t WITH LOCAL CHECK OPTION WITH CASCADED CHECK OPTION", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task vwa0134() => CorpusAssert.MatchesPostgres(@"CREATE VIEW vwa_check_union AS SELECT id FROM s.t UNION SELECT id FROM s.t2 WITH CHECK OPTION", "error", false);
     [Fact]
     public void vwa0135() => CorpusAssert.Parses(@"CREATE VIEW vwa_or_as SELECT 1", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void vwa0136() => CorpusAssert.Parses(@"CREATE OR VIEW vwa_bad AS SELECT 1", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void vwa0137() => CorpusAssert.Parses(@"CREATE REPLACE VIEW vwa_bad AS SELECT 1", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void vwa0138() => CorpusAssert.Parses(@"CREATE VIEW vwa_badkw REPLACE AS SELECT 1", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task vwa0136() => CorpusAssert.MatchesPostgres(@"CREATE OR VIEW vwa_bad AS SELECT 1", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task vwa0137() => CorpusAssert.MatchesPostgres(@"CREATE REPLACE VIEW vwa_bad AS SELECT 1", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task vwa0138() => CorpusAssert.MatchesPostgres(@"CREATE VIEW vwa_badkw REPLACE AS SELECT 1", "error", false);
     [Fact]
     public void vwa0139() => CorpusAssert.Parses(@"CREATE VIEW vwa_rec_no_collist_2 (n) AS SELECT 1", "ok");
     [Fact]
@@ -324,16 +324,16 @@ WHERE qty > 0", "ok");
     public void vwa0156() => CorpusAssert.Parses(@"ALTER VIEW IF EXISTS s.v SET (security_barrier = false)", "ok");
     [Fact]
     public void vwa0157() => CorpusAssert.Parses(@"ALTER VIEW IF EXISTS vwa_nonexistent SET (security_barrier = false)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void vwa0158() => CorpusAssert.Parses(@"ALTER VIEW vwa_nonexistent2 SET (security_barrier = false)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void vwa0159() => CorpusAssert.Parses(@"ALTER VIEW s.v SET (bad_option = true)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task vwa0158() => CorpusAssert.MatchesPostgres(@"ALTER VIEW vwa_nonexistent2 SET (security_barrier = false)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task vwa0159() => CorpusAssert.MatchesPostgres(@"ALTER VIEW s.v SET (bad_option = true)", "error", false);
     [Fact]
     public void vwa0160() => CorpusAssert.Parses(@"ALTER VIEW s.v RESET (bad_option)", "ok");
     [Fact]
     public void vwa0161() => CorpusAssert.Parses(@"ALTER VIEW s.v RENAME TO", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void vwa0162() => CorpusAssert.Parses(@"DROP VIEW vwa_nonexistent_drop", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task vwa0162() => CorpusAssert.MatchesPostgres(@"DROP VIEW vwa_nonexistent_drop", "error", false);
     [Fact]
     public void vwa0163() => CorpusAssert.Parses(@"DROP VIEW IF EXISTS vwa_nonexistent_drop", "ok");
     [Fact]
@@ -342,8 +342,8 @@ WHERE qty > 0", "ok");
     public void vwa0165() => CorpusAssert.Parses(@"CREATE VIEW vwa_todrop2 AS SELECT 1; DROP VIEW vwa_todrop2 CASCADE", "ok");
     [Fact]
     public void vwa0166() => CorpusAssert.Parses(@"CREATE VIEW vwa_todrop3 AS SELECT 1; DROP VIEW vwa_todrop3 RESTRICT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void vwa0167() => CorpusAssert.Parses(@"CREATE VIEW vwa_dep1 AS SELECT id FROM s.t; CREATE VIEW vwa_dep2 AS SELECT id FROM vwa_dep1; DROP VIEW vwa_dep1 RESTRICT", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task vwa0167() => CorpusAssert.MatchesPostgres(@"CREATE VIEW vwa_dep1 AS SELECT id FROM s.t; CREATE VIEW vwa_dep2 AS SELECT id FROM vwa_dep1; DROP VIEW vwa_dep1 RESTRICT", "error", false);
     [Fact]
     public void vwa0168() => CorpusAssert.Parses(@"CREATE VIEW vwa_dep3 AS SELECT id FROM s.t; CREATE VIEW vwa_dep4 AS SELECT id FROM vwa_dep3; DROP VIEW vwa_dep3 CASCADE", "ok");
     [Fact]
@@ -448,18 +448,18 @@ ALTER VIEW IF EXISTS s.v2 SET (security_invoker = true)", "ok");
     public void vwb0042() => CorpusAssert.Parses(@"CREATE VIEW s.v2 SELECT id FROM s.t", "error");
     [Fact]
     public void vwb0043() => CorpusAssert.Parses(@"CREATE VIEW s.v2 AS", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void vwb0044() => CorpusAssert.Parses(@"CREATE VIEW s.v2 WITH (bad_option = true) AS SELECT id FROM s.t", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void vwb0045() => CorpusAssert.Parses(@"CREATE VIEW s.v2 WITH (security_barrier = maybe) AS SELECT id FROM s.t", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void vwb0046() => CorpusAssert.Parses(@"CREATE RECURSIVE VIEW s.v2 AS SELECT 1", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void vwb0047() => CorpusAssert.Parses(@"CREATE VIEW s.v2 (a, b) AS SELECT id FROM s.t", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void vwb0048() => CorpusAssert.Parses(@"CREATE TEMP VIEW s.v2 AS SELECT id FROM s.t", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task vwb0044() => CorpusAssert.MatchesPostgres(@"CREATE VIEW s.v2 WITH (bad_option = true) AS SELECT id FROM s.t", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task vwb0045() => CorpusAssert.MatchesPostgres(@"CREATE VIEW s.v2 WITH (security_barrier = maybe) AS SELECT id FROM s.t", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task vwb0046() => CorpusAssert.MatchesPostgres(@"CREATE RECURSIVE VIEW s.v2 AS SELECT 1", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task vwb0047() => CorpusAssert.MatchesPostgres(@"CREATE VIEW s.v2 (a, b) AS SELECT id FROM s.t", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task vwb0048() => CorpusAssert.MatchesPostgres(@"CREATE TEMP VIEW s.v2 AS SELECT id FROM s.t", "error", false);
     [Fact]
     public void vwb0049() => CorpusAssert.Parses(@"CREATE VIEW AS SELECT 1", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void vwb0050() => CorpusAssert.Parses(@"CREATE VIEW s.v2 AS SELECT id FROM s.t WITH CASCADED LOCAL CHECK OPTION", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task vwb0050() => CorpusAssert.MatchesPostgres(@"CREATE VIEW s.v2 AS SELECT id FROM s.t WITH CASCADED LOCAL CHECK OPTION", "error", false);
 }

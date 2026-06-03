@@ -323,14 +323,14 @@ public class Corpus_DatetimeOps
     public void dta0158() => CorpusAssert.Parses(@"SELECT TIMESTAMP '2024-01-01' BETWEEN TIMESTAMP '2023-01-01' AND TIMESTAMP '2025-01-01'", "ok");
     [Fact]
     public void dta0159() => CorpusAssert.Parses(@"SELECT INTERVAL '1 day' < INTERVAL '2 days'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void dta0160() => CorpusAssert.Parses(@"SELECT INTERVAL '1-6' MONTH TO YEAR", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task dta0160() => CorpusAssert.MatchesPostgres(@"SELECT INTERVAL '1-6' MONTH TO YEAR", "error", false);
     [Fact]
     public void dta0161() => CorpusAssert.Parses(@"SELECT EXTRACT(YEAR, DATE '2024-01-01')", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void dta0162() => CorpusAssert.Parses(@"SELECT date_trunc(TIMESTAMP '2024-06-15 10:30:00', 'year')", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void dta0163() => CorpusAssert.Parses(@"SELECT INTERVAL 'xyz'", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task dta0162() => CorpusAssert.MatchesPostgres(@"SELECT date_trunc(TIMESTAMP '2024-06-15 10:30:00', 'year')", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task dta0163() => CorpusAssert.MatchesPostgres(@"SELECT INTERVAL 'xyz'", "error", false);
     [Fact]
     public void dta0164() => CorpusAssert.Parses(@"SELECT make_date(2024, 13, 1)", "error");
     [Fact]
@@ -339,10 +339,10 @@ public class Corpus_DatetimeOps
     public void dta0166() => CorpusAssert.Parses(@"SELECT make_time(25, 0, 0.0)", "error");
     [Fact]
     public void dta0167() => CorpusAssert.Parses(@"SELECT age()", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void dta0168() => CorpusAssert.Parses(@"SELECT DATE '2024-13-01'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void dta0169() => CorpusAssert.Parses(@"SELECT TIME '25:00:00'", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task dta0168() => CorpusAssert.MatchesPostgres(@"SELECT DATE '2024-13-01'", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task dta0169() => CorpusAssert.MatchesPostgres(@"SELECT TIME '25:00:00'", "error", false);
     [Fact]
     public void dta0170() => CorpusAssert.Parses(@"SELECT INTERVAL '1' DAY TO HOUR", "ok");
     [Fact]
@@ -575,8 +575,8 @@ public class Corpus_DatetimeOps
     public void dtb0114() => CorpusAssert.Parses(@"SELECT make_interval(weeks => 2)", "ok");
     [Fact]
     public void dtb0115() => CorpusAssert.Parses(@"SELECT make_interval(years => 1)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void dtb0116() => CorpusAssert.Parses(@"SELECT make_date(2024, 2, 30)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task dtb0116() => CorpusAssert.MatchesPostgres(@"SELECT make_date(2024, 2, 30)", "error", false);
     [Fact]
     public void dtb0117() => CorpusAssert.Parses(@"SELECT make_time(25, 0, 0)", "error");
     [Fact]
@@ -667,18 +667,18 @@ public class Corpus_DatetimeOps
     public void dtb0160() => CorpusAssert.Parses(@"SELECT date_trunc('month', s.t.created_at) FROM s.t", "ok");
     [Fact]
     public void dtb0161() => CorpusAssert.Parses(@"SELECT age(s.t.created_at, TIMESTAMPTZ '2020-01-01 00:00:00+00') FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void dtb0162() => CorpusAssert.Parses(@"SELECT INTERVAL '1' MONTH TO SECOND", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task dtb0162() => CorpusAssert.MatchesPostgres(@"SELECT INTERVAL '1' MONTH TO SECOND", "error", false);
     [Fact]
     public void dtb0163() => CorpusAssert.Parses(@"SELECT EXTRACT(SECOND FROM)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void dtb0164() => CorpusAssert.Parses(@"SELECT TIMESTAMP '2024-13-01'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void dtb0165() => CorpusAssert.Parses(@"SELECT TIME '25:00:00'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void dtb0166() => CorpusAssert.Parses(@"SELECT DATE '2024-02-30'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void dtb0167() => CorpusAssert.Parses(@"SELECT INTERVAL '1 year' YEAR TO MONTH TO DAY", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task dtb0164() => CorpusAssert.MatchesPostgres(@"SELECT TIMESTAMP '2024-13-01'", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task dtb0165() => CorpusAssert.MatchesPostgres(@"SELECT TIME '25:00:00'", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task dtb0166() => CorpusAssert.MatchesPostgres(@"SELECT DATE '2024-02-30'", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task dtb0167() => CorpusAssert.MatchesPostgres(@"SELECT INTERVAL '1 year' YEAR TO MONTH TO DAY", "error", false);
     [Fact]
     public void dtb0168() => CorpusAssert.Parses(@"SELECT to_char(TIMESTAMP '2024-03-15 14:30:45', 'IYYY-IW-ID')", "ok");
     [Fact]
@@ -731,8 +731,8 @@ public class Corpus_DatetimeOps
     public void dtc0022() => CorpusAssert.Parses(@"SELECT isfinite(DATE '2024-06-15'), isfinite(TIMESTAMP '2024-06-15 00:00:00'), isfinite(INTERVAL '1 day')", "ok");
     [Fact]
     public void dtc0023() => CorpusAssert.Parses(@"SELECT EXTRACT(BADFIELD FROM DATE '2024-01-01')", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void dtc0024() => CorpusAssert.Parses(@"SELECT INTERVAL '1' TO SECOND", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task dtc0024() => CorpusAssert.MatchesPostgres(@"SELECT INTERVAL '1' TO SECOND", "error", false);
     [Fact]
     public void dtc0025() => CorpusAssert.Parses(@"SELECT EXTRACT(YEAR, DATE '2024-01-01')", "error");
 }

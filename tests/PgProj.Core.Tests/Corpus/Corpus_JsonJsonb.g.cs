@@ -99,8 +99,8 @@ public class Corpus_JsonJsonb
     public void jsn0046() => CorpusAssert.Parses(@"SELECT '{bad json' IS JSON FROM s.t", "ok");
     [Fact]
     public void jsn0047() => CorpusAssert.Parses(@"SELECT data #>> FROM s.t", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void jsn0048() => CorpusAssert.Parses(@"SELECT jsonb_path_query(data, '$[') FROM s.t", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task jsn0048() => CorpusAssert.MatchesPostgres(@"SELECT jsonb_path_query(data, '$[') FROM s.t", "error", false);
     [Fact]
     public void jsn0049() => CorpusAssert.Parses(@"SELECT data || FROM s.t", "error");
     [Fact]

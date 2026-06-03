@@ -152,8 +152,8 @@ END $$;", "ok");
     public void doca0067() => CorpusAssert.Parses(@"DO $$ DECLARE b boolean; BEGIN b := FOUND; END $$;", "ok");
     [Fact]
     public void doca0068() => CorpusAssert.Parses(@"DO $$ BEGIN PERFORM nextval('s.seq'); END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void doca0069() => CorpusAssert.Parses(@"DO $$ BEGIN FOREACH x SLICE 0 IN ARRAY ARRAY[1,2,3] LOOP PERFORM x; END LOOP; END $$;", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task doca0069() => CorpusAssert.MatchesPostgres(@"DO $$ BEGIN FOREACH x SLICE 0 IN ARRAY ARRAY[1,2,3] LOOP PERFORM x; END LOOP; END $$;", "error", false);
     [Fact]
     public void doca0070() => CorpusAssert.Parses(@"DO $$ DECLARE x integer; BEGIN FOREACH x IN ARRAY ARRAY[1,2,3] LOOP PERFORM x; END LOOP; END $$;", "ok");
     [Fact]
@@ -168,24 +168,24 @@ END $$;", "ok");
     public void doca0075() => CorpusAssert.Parses(@"DO $$ BEGIN RAISE LOG 'log msg'; END $$;", "ok");
     [Fact]
     public void doca0076() => CorpusAssert.Parses(@"DO $$ BEGIN RAISE NOTICE 'val: %', 42; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void doca0077() => CorpusAssert.Parses(@"DO $$ BEGIN RAISE EXCEPTION 'error' USING ERRCODE = 'P0001'; END $$;", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task doca0077() => CorpusAssert.MatchesPostgres(@"DO $$ BEGIN RAISE EXCEPTION 'error' USING ERRCODE = 'P0001'; END $$;", "error", false);
     [Fact]
     public void doca0078() => CorpusAssert.Parses(@"DO $$ BEGIN RAISE EXCEPTION 'boom' USING HINT = 'try again'; EXCEPTION WHEN OTHERS THEN NULL; END $$;", "ok");
     [Fact]
     public void doca0079() => CorpusAssert.Parses(@"DO $$ DECLARE x integer; BEGIN x := (SELECT val FROM s.t LIMIT 1); END $$;", "ok");
     [Fact]
     public void doca0080() => CorpusAssert.Parses(@"DO $$ BEGIN PERFORM (SELECT 1); END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void doca0081() => CorpusAssert.Parses(@"DO LANGUAGE sql $$ SELECT 1 $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void doca0082() => CorpusAssert.Parses(@"DO LANGUAGE nonexistent_lang $$ BEGIN END $$;", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task doca0081() => CorpusAssert.MatchesPostgres(@"DO LANGUAGE sql $$ SELECT 1 $$;", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task doca0082() => CorpusAssert.MatchesPostgres(@"DO LANGUAGE nonexistent_lang $$ BEGIN END $$;", "error", false);
     [Fact]
     public void doca0083() => CorpusAssert.Parses(@"DO LANGUAGE 'plpgsql' $$ BEGIN END $$;", "ok");
     [Fact]
     public void doca0084() => CorpusAssert.Parses(@"DO $$ BEGIN END $$", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void doca0085() => CorpusAssert.Parses(@"DO 'BEGIN';", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task doca0085() => CorpusAssert.MatchesPostgres(@"DO 'BEGIN';", "error", false);
     [Fact]
     public void doca0086() => CorpusAssert.Parses(@"DO 42;", "error");
     [Fact]
@@ -252,26 +252,26 @@ END $$;", "ok");
     public void doca0113() => CorpusAssert.Parses(@"CALL s.p(NULL);", "ok");
     [Fact]
     public void doca0114() => CorpusAssert.Parses(@"CALL s.p(n => NULL);", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void doca0115() => CorpusAssert.Parses(@"CALL s.p((SELECT 2));", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void doca0116() => CorpusAssert.Parses(@"CALL s.p(1, 2);", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void doca0117() => CorpusAssert.Parses(@"CALL s.p();", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void doca0118() => CorpusAssert.Parses(@"CALL s.f(1);", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void doca0119() => CorpusAssert.Parses(@"CALL s.t(1);", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void doca0120() => CorpusAssert.Parses(@"CALL nonexistent_proc(1);", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task doca0115() => CorpusAssert.MatchesPostgres(@"CALL s.p((SELECT 2));", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task doca0116() => CorpusAssert.MatchesPostgres(@"CALL s.p(1, 2);", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task doca0117() => CorpusAssert.MatchesPostgres(@"CALL s.p();", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task doca0118() => CorpusAssert.MatchesPostgres(@"CALL s.f(1);", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task doca0119() => CorpusAssert.MatchesPostgres(@"CALL s.t(1);", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task doca0120() => CorpusAssert.MatchesPostgres(@"CALL nonexistent_proc(1);", "error", false);
     [Fact]
     public void doca0121() => CorpusAssert.Parses(@"CALL;", "error");
     [Fact]
     public void doca0122() => CorpusAssert.Parses(@"CALL s.p 1;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void doca0123() => CorpusAssert.Parses(@"CALL s.p(n => 1, n => 2);", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void doca0124() => CorpusAssert.Parses(@"CALL s.p(nosuchparam => 1);", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task doca0123() => CorpusAssert.MatchesPostgres(@"CALL s.p(n => 1, n => 2);", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task doca0124() => CorpusAssert.MatchesPostgres(@"CALL s.p(nosuchparam => 1);", "error", false);
     [Fact]
     public void doca0125() => CorpusAssert.Parses(@"DO $$ DECLARE p text; BEGIN p := 'test'; EXECUTE 'CALL s.p($1)' USING 1; END $$;", "ok");
     [Fact]
@@ -334,8 +334,8 @@ DROP PROCEDURE s.pnamed2(integer, integer);", "ok");
     public void doca0146() => CorpusAssert.Parses(@"DO $$ DECLARE x uuid := 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'; BEGIN PERFORM x; END $$;", "ok");
     [Fact]
     public void doca0147() => CorpusAssert.Parses(@"DO $$ DECLARE x jsonb := '{""key"": ""value""}'; BEGIN PERFORM x; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void doca0148() => CorpusAssert.Parses(@"CALL s.p(n => 1, n => 1);", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task doca0148() => CorpusAssert.MatchesPostgres(@"CALL s.p(n => 1, n => 1);", "error", false);
     [Fact]
     public void doca0149() => CorpusAssert.Parses(@"DO $$ AS $inner$ BEGIN END $inner$ $$;", "error");
     [Fact]

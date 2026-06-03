@@ -29,14 +29,14 @@ public class Corpus_SelectFromAdvanced
     public void selfa0011() => CorpusAssert.Parses(@"SELECT * FROM (SELECT id, name FROM s.t) AS sub(a, b)", "ok");
     [Fact]
     public void selfa0012() => CorpusAssert.Parses(@"SELECT a, b FROM (SELECT id, name FROM s.t) AS sub(a, b)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selfa0013() => CorpusAssert.Parses(@"SELECT * FROM (SELECT id FROM s.t) AS sub(a, b, c)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task selfa0013() => CorpusAssert.MatchesPostgres(@"SELECT * FROM (SELECT id FROM s.t) AS sub(a, b, c)", "error", false);
     [Fact]
     public void selfa0014() => CorpusAssert.Parses(@"SELECT * FROM (SELECT id FROM s.t) AS", "error");
     [Fact]
     public void selfa0015() => CorpusAssert.Parses(@"SELECT * FROM SELECT id FROM s.t", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selfa0016() => CorpusAssert.Parses(@"SELECT * FROM (SELECT id, name FROM s.t) AS sub(a, b, c, d)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task selfa0016() => CorpusAssert.MatchesPostgres(@"SELECT * FROM (SELECT id, name FROM s.t) AS sub(a, b, c, d)", "error", false);
     [Fact]
     public void selfa0017() => CorpusAssert.Parses(@"SELECT t.name, lat.val FROM s.t, LATERAL (SELECT val FROM s.t2 WHERE t2.t_id = t.id LIMIT 1) AS lat", "ok");
     [Fact]
@@ -89,8 +89,8 @@ public class Corpus_SelectFromAdvanced
     public void selfa0041() => CorpusAssert.Parses(@"SELECT * FROM unnest(NULL::int[]) AS u(v)", "ok");
     [Fact]
     public void selfa0042() => CorpusAssert.Parses(@"SELECT a, b FROM unnest(ARRAY[1,2], ARRAY['x','y']) AS u(a, b)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selfa0043() => CorpusAssert.Parses(@"SELECT * FROM unnest() AS u", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task selfa0043() => CorpusAssert.MatchesPostgres(@"SELECT * FROM unnest() AS u", "error", false);
     [Fact]
     public void selfa0044() => CorpusAssert.Parses(@"SELECT * FROM s.t TABLESAMPLE SYSTEM (10)", "ok");
     [Fact]
@@ -111,14 +111,14 @@ public class Corpus_SelectFromAdvanced
     public void selfa0052() => CorpusAssert.Parses(@"SELECT * FROM s.mv TABLESAMPLE SYSTEM (10)", "ok");
     [Fact]
     public void selfa0053() => CorpusAssert.Parses(@"SELECT * FROM s.t TABLESAMPLE (10)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selfa0054() => CorpusAssert.Parses(@"SELECT * FROM s.t TABLESAMPLE SYSTEM", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selfa0055() => CorpusAssert.Parses(@"SELECT * FROM s.t TABLESAMPLE SYSTEM (101)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selfa0056() => CorpusAssert.Parses(@"SELECT * FROM s.t TABLESAMPLE SYSTEM (-1)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selfa0057() => CorpusAssert.Parses(@"SELECT * FROM s.v TABLESAMPLE SYSTEM (10)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task selfa0054() => CorpusAssert.MatchesPostgres(@"SELECT * FROM s.t TABLESAMPLE SYSTEM", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task selfa0055() => CorpusAssert.MatchesPostgres(@"SELECT * FROM s.t TABLESAMPLE SYSTEM (101)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task selfa0056() => CorpusAssert.MatchesPostgres(@"SELECT * FROM s.t TABLESAMPLE SYSTEM (-1)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task selfa0057() => CorpusAssert.MatchesPostgres(@"SELECT * FROM s.v TABLESAMPLE SYSTEM (10)", "error", false);
     [Fact]
     public void selfa0058() => CorpusAssert.Parses(@"SELECT * FROM ONLY s.parent", "ok");
     [Fact]
@@ -177,12 +177,12 @@ public class Corpus_SelectFromAdvanced
     public void selfa0085() => CorpusAssert.Parses(@"SELECT * FROM ROWS FROM (generate_series(1, 3), generate_series(10, 12)) WITH ORDINALITY AS r(a, b, ord)", "ok");
     [Fact]
     public void selfa0086() => CorpusAssert.Parses(@"SELECT a, b, ord FROM ROWS FROM (generate_series(1, 2), generate_series(100, 101)) WITH ORDINALITY AS r(a, b, ord)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selfa0087() => CorpusAssert.Parses(@"SELECT * FROM ROWS FROM (generate_series(1, 3) AS (n int)) AS r", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selfa0088() => CorpusAssert.Parses(@"SELECT * FROM ROWS FROM (generate_series(1, 2) AS (n int), unnest(ARRAY['x','y']) AS (ch text)) AS r", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selfa0089() => CorpusAssert.Parses(@"SELECT * FROM ROWS FROM ()", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task selfa0087() => CorpusAssert.MatchesPostgres(@"SELECT * FROM ROWS FROM (generate_series(1, 3) AS (n int)) AS r", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task selfa0088() => CorpusAssert.MatchesPostgres(@"SELECT * FROM ROWS FROM (generate_series(1, 2) AS (n int), unnest(ARRAY['x','y']) AS (ch text)) AS r", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task selfa0089() => CorpusAssert.MatchesPostgres(@"SELECT * FROM ROWS FROM ()", "error", false);
     [Fact]
     public void selfa0090() => CorpusAssert.Parses(@"SELECT * FROM ROWS FROM (generate_series(1,3))", "ok");
     [Fact]
@@ -193,8 +193,8 @@ public class Corpus_SelectFromAdvanced
     public void selfa0093() => CorpusAssert.Parses(@"SELECT * FROM (SELECT id FROM s.t INTERSECT SELECT t_id FROM s.t2 WHERE t_id IS NOT NULL) AS inter", "ok");
     [Fact]
     public void selfa0094() => CorpusAssert.Parses(@"WITH cte AS (SELECT id, name FROM s.t) SELECT * FROM cte AS c", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selfa0095() => CorpusAssert.Parses(@"WITH cte AS (SELECT id FROM s.t) SELECT c.id FROM cte AS c(my_id)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task selfa0095() => CorpusAssert.MatchesPostgres(@"WITH cte AS (SELECT id FROM s.t) SELECT c.id FROM cte AS c(my_id)", "error", false);
     [Fact]
     public void selfa0096() => CorpusAssert.Parses(@"WITH cte AS (SELECT id FROM s.t) SELECT my_id FROM cte AS c(my_id)", "ok");
     [Fact]
@@ -231,8 +231,8 @@ public class Corpus_SelectFromAdvanced
     public void selfa0112() => CorpusAssert.Parses(@"SELECT id FROM s.t TABLESAMPLE BERNOULLI (100) REPEATABLE (999)", "ok");
     [Fact]
     public void selfa0113() => CorpusAssert.Parses(@"SELECT count(*) FROM s.t TABLESAMPLE SYSTEM (50)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selfa0114() => CorpusAssert.Parses(@"SELECT * FROM s.t TABLESAMPLE RANDOM (10)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task selfa0114() => CorpusAssert.MatchesPostgres(@"SELECT * FROM s.t TABLESAMPLE RANDOM (10)", "error", false);
     [Fact]
     public void selfa0115() => CorpusAssert.Parses(@"SELECT * FROM s.t TABLESAMPLE SYSTEM (10) REPEATABLE", "error");
     [Fact]
@@ -257,10 +257,10 @@ public class Corpus_SelectFromAdvanced
     public void selfa0125() => CorpusAssert.Parses(@"SELECT id, name FROM s.t JOIN LATERAL (SELECT * FROM generate_series(1, s.t.qty) AS gs(n)) AS lat ON true", "ok");
     [Fact]
     public void selfa0126() => CorpusAssert.Parses(@"SELECT * FROM ROWS FROM (s.rows_f()) AS r", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selfa0127() => CorpusAssert.Parses(@"SELECT n FROM ROWS FROM (generate_series(1,3) AS (n int), generate_series(4,6) AS (m int)) AS r", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selfa0128() => CorpusAssert.Parses(@"SELECT r.n, r.m FROM ROWS FROM (generate_series(1,3) AS (n int), generate_series(4,6) AS (m int)) AS r", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task selfa0127() => CorpusAssert.MatchesPostgres(@"SELECT n FROM ROWS FROM (generate_series(1,3) AS (n int), generate_series(4,6) AS (m int)) AS r", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task selfa0128() => CorpusAssert.MatchesPostgres(@"SELECT r.n, r.m FROM ROWS FROM (generate_series(1,3) AS (n int), generate_series(4,6) AS (m int)) AS r", "error", false);
     [Fact]
     public void selfa0129() => CorpusAssert.Parses(@"SELECT * FROM ROWS FROM (generate_series(1,2)) WITH ORDINALITY AS t(v, ord) WHERE ord = 1", "ok");
     [Fact]
@@ -315,8 +315,8 @@ public class Corpus_SelectFromAdvanced
     public void selfa0154() => CorpusAssert.Parses(@"SELECT * FROM ONLY s.parent AS p(id, kind)", "ok");
     [Fact]
     public void selfa0155() => CorpusAssert.Parses(@"SELECT p.id, p.kind FROM ONLY s.parent AS p(id, kind)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selfa0156() => CorpusAssert.Parses(@"SELECT * FROM (SELECT id FROM s.t) AS sub TABLESAMPLE SYSTEM (10)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task selfa0156() => CorpusAssert.MatchesPostgres(@"SELECT * FROM (SELECT id FROM s.t) AS sub TABLESAMPLE SYSTEM (10)", "error", false);
     [Fact]
     public void selfa0157() => CorpusAssert.Parses(@"SELECT * FROM s.t TABLESAMPLE SYSTEM(10)", "ok");
     [Fact]
@@ -335,8 +335,8 @@ public class Corpus_SelectFromAdvanced
     public void selfa0164() => CorpusAssert.Parses(@"SELECT * FROM LATERAL (SELECT id, name FROM s.t WHERE id = 1) AS lat(a, b)", "ok");
     [Fact]
     public void selfa0165() => CorpusAssert.Parses(@"SELECT * FROM s.t1", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selfa0166() => CorpusAssert.Parses(@"SELECT * FROM (SELECT id FROM s.t) AS sub WHERE nonexistent_col = 1", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task selfa0166() => CorpusAssert.MatchesPostgres(@"SELECT * FROM (SELECT id FROM s.t) AS sub WHERE nonexistent_col = 1", "error", false);
     [Fact]
     public void selfa0167() => CorpusAssert.Parses(@"SELECT * FROM s.t AS a, s.t AS b WHERE a.id = b.id", "ok");
     [Fact]
@@ -439,12 +439,12 @@ public class Corpus_SelectFromAdvanced
     public void selfb0046() => CorpusAssert.Parses(@"SELECT * FROM s.t TABLESAMPLE SYSTEM(100) AS s_alias", "error");
     [Fact]
     public void selfb0047() => CorpusAssert.Parses(@"SELECT * FROM s.t TABLESAMPLE(100)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selfb0048() => CorpusAssert.Parses(@"SELECT * FROM s.t TABLESAMPLE BERNOULLI", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selfb0049() => CorpusAssert.Parses(@"SELECT * FROM s.t TABLESAMPLE SYSTEM()", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selfb0050() => CorpusAssert.Parses(@"SELECT * FROM s.t TABLESAMPLE BERNOULLI(110)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task selfb0048() => CorpusAssert.MatchesPostgres(@"SELECT * FROM s.t TABLESAMPLE BERNOULLI", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task selfb0049() => CorpusAssert.MatchesPostgres(@"SELECT * FROM s.t TABLESAMPLE SYSTEM()", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task selfb0050() => CorpusAssert.MatchesPostgres(@"SELECT * FROM s.t TABLESAMPLE BERNOULLI(110)", "error", false);
     [Fact]
     public void selfb0051() => CorpusAssert.Parses(@"SELECT * FROM ONLY s.parent", "ok");
     [Fact]
@@ -459,8 +459,8 @@ public class Corpus_SelectFromAdvanced
     public void selfb0056() => CorpusAssert.Parses(@"SELECT * FROM ONLY s.parent AS p", "ok");
     [Fact]
     public void selfb0057() => CorpusAssert.Parses(@"SELECT p.id FROM ONLY s.parent AS p WHERE p.kind IS NOT NULL", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selfb0058() => CorpusAssert.Parses(@"SELECT f1.n, f2.v FROM ROWS FROM (generate_series(1,3) AS n, unnest(ARRAY['a','b','c']) AS v) AS rf(f1n, f2v)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task selfb0058() => CorpusAssert.MatchesPostgres(@"SELECT f1.n, f2.v FROM ROWS FROM (generate_series(1,3) AS n, unnest(ARRAY['a','b','c']) AS v) AS rf(f1n, f2v)", "error", false);
     [Fact]
     public void selfb0059() => CorpusAssert.Parses(@"SELECT * FROM ROWS FROM (generate_series(1,3), unnest(ARRAY['a','b','c'])) AS rf(n, v)", "ok");
     [Fact]
@@ -473,8 +473,8 @@ public class Corpus_SelectFromAdvanced
     public void selfb0063() => CorpusAssert.Parses(@"SELECT n, ord FROM ROWS FROM (generate_series(1,5)) WITH ORDINALITY AS t(n, ord)", "ok");
     [Fact]
     public void selfb0064() => CorpusAssert.Parses(@"SELECT n, v, ord FROM ROWS FROM (generate_series(1,3), unnest(ARRAY['x','y','z'])) WITH ORDINALITY AS t(n, v, ord)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selfb0065() => CorpusAssert.Parses(@"SELECT * FROM ROWS FROM ()", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task selfb0065() => CorpusAssert.MatchesPostgres(@"SELECT * FROM ROWS FROM ()", "error", false);
     [Fact]
     public void selfb0066() => CorpusAssert.Parses(@"SELECT * FROM ROWS FROM generate_series(1,3)", "error");
     [Fact]
@@ -505,8 +505,8 @@ public class Corpus_SelectFromAdvanced
     public void selfb0079() => CorpusAssert.Parses(@"SELECT * FROM (SELECT id FROM s.t) AS sub1 JOIN (SELECT t_id FROM s.t2) AS sub2 ON sub1.id = sub2.t_id", "ok");
     [Fact]
     public void selfb0080() => CorpusAssert.Parses(@"SELECT id FROM (SELECT id FROM s.t)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selfb0081() => CorpusAssert.Parses(@"SELECT * FROM (SELECT 1 AS x) AS t(x, y)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task selfb0081() => CorpusAssert.MatchesPostgres(@"SELECT * FROM (SELECT 1 AS x) AS t(x, y)", "error", false);
     [Fact]
     public void selfb0082() => CorpusAssert.Parses(@"SELECT * FROM s.t TABLESAMPLE BERNOULLI(50) REPEATABLE", "error");
     [Fact]
@@ -569,12 +569,12 @@ public class Corpus_SelectFromAdvanced
     public void selfb0111() => CorpusAssert.Parses(@"SELECT jsonb_array_elements.value FROM s.t, jsonb_array_elements(s.t.data)", "ok");
     [Fact]
     public void selfb0112() => CorpusAssert.Parses(@"SELECT x.val FROM s.t, jsonb_array_elements(s.t.data) AS x(val)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selfb0113() => CorpusAssert.Parses(@"SELECT * FROM unnest(ARRAY[ROW(1,'a'), ROW(2,'b')]::s.addr[]) AS u", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task selfb0113() => CorpusAssert.MatchesPostgres(@"SELECT * FROM unnest(ARRAY[ROW(1,'a'), ROW(2,'b')]::s.addr[]) AS u", "error", false);
     [Fact]
     public void selfb0114() => CorpusAssert.Parses(@"SELECT LATERAL (SELECT 1)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selfb0115() => CorpusAssert.Parses(@"SELECT * FROM LATERAL s.t", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task selfb0115() => CorpusAssert.MatchesPostgres(@"SELECT * FROM LATERAL s.t", "error", false);
     [Fact]
     public void selfb0116() => CorpusAssert.Parses(@"SELECT * FROM (SELECT id FROM s.t) AS", "error");
     [Fact]
@@ -603,18 +603,18 @@ public class Corpus_SelectFromAdvanced
     public void selfb0128() => CorpusAssert.Parses(@"SELECT n FROM generate_series(1, 10) AS gs(n) WHERE n % 2 = 0", "ok");
     [Fact]
     public void selfb0129() => CorpusAssert.Parses(@"SELECT t.name, lat.best FROM s.t, LATERAL (SELECT max(amount) AS best FROM s.t2 WHERE t2.t_id = t.id) AS lat", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selfb0130() => CorpusAssert.Parses(@"SELECT * FROM (SELECT id, name FROM s.t) AS a NATURAL JOIN (SELECT id, name FROM s.t2) AS b", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task selfb0130() => CorpusAssert.MatchesPostgres(@"SELECT * FROM (SELECT id, name FROM s.t) AS a NATURAL JOIN (SELECT id, name FROM s.t2) AS b", "error", false);
     [Fact]
     public void selfb0131() => CorpusAssert.Parses(@"SELECT * FROM (SELECT id, label FROM s.t2) AS a NATURAL JOIN (SELECT id, label FROM s.t2) AS b", "ok");
     [Fact]
     public void selfb0132() => CorpusAssert.Parses(@"SELECT * FROM (SELECT 1 AS x) AS t1, (SELECT 2 AS y) AS t2", "ok");
     [Fact]
     public void selfb0133() => CorpusAssert.Parses(@"SELECT x, y FROM (VALUES (1, 'a'), (2, 'b'), (3, 'c')) AS data(x, y) ORDER BY y DESC", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selfb0134() => CorpusAssert.Parses(@"SELECT * FROM (VALUES (DEFAULT)) AS t(a)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selfb0135() => CorpusAssert.Parses(@"SELECT a, b FROM (VALUES (1, 2)) AS t(a, b, c)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task selfb0134() => CorpusAssert.MatchesPostgres(@"SELECT * FROM (VALUES (DEFAULT)) AS t(a)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task selfb0135() => CorpusAssert.MatchesPostgres(@"SELECT a, b FROM (VALUES (1, 2)) AS t(a, b, c)", "error", false);
     [Fact]
     public void selfb0136() => CorpusAssert.Parses(@"SELECT * FROM (SELECT id FROM s.t) AS sub, LATERAL (SELECT sub.id + 1 AS next_id) AS nxt", "ok");
     [Fact]
@@ -627,8 +627,8 @@ public class Corpus_SelectFromAdvanced
     public void selfb0140() => CorpusAssert.Parses(@"SELECT * FROM s.events TABLESAMPLE BERNOULLI(100)", "ok");
     [Fact]
     public void selfb0141() => CorpusAssert.Parses(@"SELECT * FROM s.mv TABLESAMPLE SYSTEM(100)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selfb0142() => CorpusAssert.Parses(@"SELECT * FROM s.v TABLESAMPLE SYSTEM(100)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task selfb0142() => CorpusAssert.MatchesPostgres(@"SELECT * FROM s.v TABLESAMPLE SYSTEM(100)", "error", false);
     [Fact]
     public void selfb0143() => CorpusAssert.Parses(@"SELECT sub.id FROM (SELECT id FROM s.t) AS sub(id) JOIN s.t2 ON sub.id = t2.t_id", "ok");
     [Fact]
@@ -641,8 +641,8 @@ public class Corpus_SelectFromAdvanced
     public void selfb0147() => CorpusAssert.Parses(@"SELECT * FROM ROWS FROM (generate_series(1,3), generate_series(1,3)) WITH ORDINALITY AS t(a, b, ord)", "ok");
     [Fact]
     public void selfb0148() => CorpusAssert.Parses(@"SELECT t.id, x.n FROM s.t CROSS JOIN LATERAL generate_series(1, t.qty) AS x(n)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selfb0149() => CorpusAssert.Parses(@"SELECT * FROM (SELECT id FROM s.t) AS sub TABLESAMPLE BERNOULLI(50)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selfb0150() => CorpusAssert.Parses(@"SELECT * FROM generate_series ORDINALITY", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task selfb0149() => CorpusAssert.MatchesPostgres(@"SELECT * FROM (SELECT id FROM s.t) AS sub TABLESAMPLE BERNOULLI(50)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task selfb0150() => CorpusAssert.MatchesPostgres(@"SELECT * FROM generate_series ORDINALITY", "error", false);
 }

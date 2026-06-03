@@ -329,66 +329,66 @@ public class Corpus_SetShowReset
     public void ssra0161() => CorpusAssert.Parses(@"RESET", "error");
     [Fact]
     public void ssra0162() => CorpusAssert.Parses(@"RESET work_mem = DEFAULT", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ssra0163() => CorpusAssert.Parses(@"SET TIME ZONE", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ssra0164() => CorpusAssert.Parses(@"SET TIME ZONE TO 'UTC'", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ssra0163() => CorpusAssert.MatchesPostgres(@"SET TIME ZONE", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ssra0164() => CorpusAssert.MatchesPostgres(@"SET TIME ZONE TO 'UTC'", "error", false);
     [Fact]
     public void ssra0165() => CorpusAssert.Parses(@"SET TIMEZONE TO 'UTC'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ssra0166() => CorpusAssert.Parses(@"SET TIME TO '12:00'", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ssra0166() => CorpusAssert.MatchesPostgres(@"SET TIME TO '12:00'", "error", false);
     [Fact]
     public void ssra0167() => CorpusAssert.Parses(@"SET = '64MB'", "error");
     [Fact]
     public void ssra0168() => CorpusAssert.Parses(@"SET TO '64MB'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ssra0169() => CorpusAssert.Parses(@"SET work_mem TO '64MB', '128MB'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ssra0170() => CorpusAssert.Parses(@"SET server_version TO '18.0'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ssra0171() => CorpusAssert.Parses(@"SET NAMES TO 'UTF8'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ssra0172() => CorpusAssert.Parses(@"SET SCHEMA TO 'public'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ssra0173() => CorpusAssert.Parses(@"SET search_path TO s public", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ssra0174() => CorpusAssert.Parses(@"SET work_mem TO ON", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ssra0169() => CorpusAssert.MatchesPostgres(@"SET work_mem TO '64MB', '128MB'", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ssra0170() => CorpusAssert.MatchesPostgres(@"SET server_version TO '18.0'", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ssra0171() => CorpusAssert.MatchesPostgres(@"SET NAMES TO 'UTF8'", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ssra0172() => CorpusAssert.MatchesPostgres(@"SET SCHEMA TO 'public'", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ssra0173() => CorpusAssert.MatchesPostgres(@"SET search_path TO s public", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ssra0174() => CorpusAssert.MatchesPostgres(@"SET work_mem TO ON", "error", false);
     [Fact]
     public void ssra0175() => CorpusAssert.Parses(@"SET LOCAL SESSION work_mem TO '64MB'", "error");
     [Fact]
     public void ssra0176() => CorpusAssert.Parses(@"RESET TIME ZONE", "ok");
     [Fact]
     public void ssra0177() => CorpusAssert.Parses(@"SET work_mem DEFAULT", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ssra0178() => CorpusAssert.Parses(@"SET datestyle TO 'INVALID_STYLE'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ssra0179() => CorpusAssert.Parses(@"SET work_mem TO '64MB' '128MB'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ssra0180() => CorpusAssert.Parses(@"SET nonexistent_guc_param TO 'value'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ssra0181() => CorpusAssert.Parses(@"SET intervalstyle TO 'invalid_style'", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ssra0178() => CorpusAssert.MatchesPostgres(@"SET datestyle TO 'INVALID_STYLE'", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ssra0179() => CorpusAssert.MatchesPostgres(@"SET work_mem TO '64MB' '128MB'", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ssra0180() => CorpusAssert.MatchesPostgres(@"SET nonexistent_guc_param TO 'value'", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ssra0181() => CorpusAssert.MatchesPostgres(@"SET intervalstyle TO 'invalid_style'", "error", false);
     [Fact]
     public void ssra0182() => CorpusAssert.Parses(@"SHOW ALL ALL", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ssra0183() => CorpusAssert.Parses(@"SET work_mem TO 'not_a_memory_size'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ssra0184() => CorpusAssert.Parses(@"SET TIME ZONE INTERVAL", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ssra0185() => CorpusAssert.Parses(@"SET TIME ZONE 'bad/timezone/name'", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ssra0183() => CorpusAssert.MatchesPostgres(@"SET work_mem TO 'not_a_memory_size'", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ssra0184() => CorpusAssert.MatchesPostgres(@"SET TIME ZONE INTERVAL", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ssra0185() => CorpusAssert.MatchesPostgres(@"SET TIME ZONE 'bad/timezone/name'", "error", false);
     [Fact]
     public void ssra0186() => CorpusAssert.Parses(@"RESET LOCAL work_mem", "error");
     [Fact]
     public void ssra0187() => CorpusAssert.Parses(@"RESET SESSION work_mem", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ssra0188() => CorpusAssert.Parses(@"SET seed TO 2.0", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ssra0189() => CorpusAssert.Parses(@"SET seed TO -2.0", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ssra0190() => CorpusAssert.Parses(@"SET max_connections TO 200", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ssra0191() => CorpusAssert.Parses(@"SET client_encoding TO 'NOSUCHENCODING'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ssra0192() => CorpusAssert.Parses(@"SET transaction_isolation TO 'dirty read'", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ssra0188() => CorpusAssert.MatchesPostgres(@"SET seed TO 2.0", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ssra0189() => CorpusAssert.MatchesPostgres(@"SET seed TO -2.0", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ssra0190() => CorpusAssert.MatchesPostgres(@"SET max_connections TO 200", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ssra0191() => CorpusAssert.MatchesPostgres(@"SET client_encoding TO 'NOSUCHENCODING'", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ssra0192() => CorpusAssert.MatchesPostgres(@"SET transaction_isolation TO 'dirty read'", "error", false);
     [Fact]
     public void ssra0193() => CorpusAssert.Parses(@"SET enable_seqscan TO yes", "ok");
     [Fact]
@@ -397,14 +397,14 @@ public class Corpus_SetShowReset
     public void ssra0195() => CorpusAssert.Parses(@"SET enable_seqscan TO 1", "ok");
     [Fact]
     public void ssra0196() => CorpusAssert.Parses(@"SET enable_seqscan TO 0", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ssra0197() => CorpusAssert.Parses(@"SET xmlbinary TO 'invalid'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ssra0198() => CorpusAssert.Parses(@"SET lc_messages TO 'not_a_real_locale'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ssra0199() => CorpusAssert.Parses(@"SET geqo_threshold TO -1", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ssra0200() => CorpusAssert.Parses(@"SET SESSION AUTHORIZATION 'invalid_user_that_does_not_exist'", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ssra0197() => CorpusAssert.MatchesPostgres(@"SET xmlbinary TO 'invalid'", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ssra0198() => CorpusAssert.MatchesPostgres(@"SET lc_messages TO 'not_a_real_locale'", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ssra0199() => CorpusAssert.MatchesPostgres(@"SET geqo_threshold TO -1", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ssra0200() => CorpusAssert.MatchesPostgres(@"SET SESSION AUTHORIZATION 'invalid_user_that_does_not_exist'", "error", false);
     [Fact]
     public void ssra0201() => CorpusAssert.Parses(@"SET ROLE 'invalid_role_xyz'", "error");
     [Fact]
@@ -413,8 +413,8 @@ public class Corpus_SetShowReset
     public void ssra0203() => CorpusAssert.Parses(@"SET transaction_deferrable TO on", "ok");
     [Fact]
     public void ssra0204() => CorpusAssert.Parses(@"SET LOCAL SESSION AUTHORIZATION DEFAULT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ssra0205() => CorpusAssert.Parses(@"SET xmloption TO 'invalid_xmloption'", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ssra0205() => CorpusAssert.MatchesPostgres(@"SET xmloption TO 'invalid_xmloption'", "error", false);
     [Fact]
     public void ssrb0001() => CorpusAssert.Parses(@"SET work_mem = '4MB'", "ok");
     [Fact]
@@ -481,8 +481,8 @@ public class Corpus_SetShowReset
     public void ssrb0032() => CorpusAssert.Parses(@"SET LOCAL LOCAL work_mem TO '4MB'", "error");
     [Fact]
     public void ssrb0033() => CorpusAssert.Parses(@"RESET", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ssrb0034() => CorpusAssert.Parses(@"SET TIME ZONE", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ssrb0035() => CorpusAssert.Parses(@"SET work_mem TO '4MB', '8MB'", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ssrb0034() => CorpusAssert.MatchesPostgres(@"SET TIME ZONE", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ssrb0035() => CorpusAssert.MatchesPostgres(@"SET work_mem TO '4MB', '8MB'", "error", false);
 }

@@ -285,8 +285,8 @@ public class Corpus_NumericFuncs
     public void numfa0139() => CorpusAssert.Parses(@"SELECT width_bucket(10, ARRAY[1,2,3,4,5])", "ok");
     [Fact]
     public void numfa0140() => CorpusAssert.Parses(@"SELECT width_bucket()", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void numfa0141() => CorpusAssert.Parses(@"SELECT width_bucket(5.0, 0.0, 10.0)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task numfa0141() => CorpusAssert.MatchesPostgres(@"SELECT width_bucket(5.0, 0.0, 10.0)", "error", false);
     [Fact]
     public void numfa0142() => CorpusAssert.Parses(@"SELECT random()", "ok");
     [Fact]
@@ -371,12 +371,12 @@ public class Corpus_NumericFuncs
     public void numfa0182() => CorpusAssert.Parses(@"SELECT asinh(1.0)", "ok");
     [Fact]
     public void numfa0183() => CorpusAssert.Parses(@"SELECT acosh(1.0)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void numfa0184() => CorpusAssert.Parses(@"SELECT acosh(0.5)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task numfa0184() => CorpusAssert.MatchesPostgres(@"SELECT acosh(0.5)", "error", false);
     [Fact]
     public void numfa0185() => CorpusAssert.Parses(@"SELECT atanh(0.5)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void numfa0186() => CorpusAssert.Parses(@"SELECT atanh(1.5)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task numfa0186() => CorpusAssert.MatchesPostgres(@"SELECT atanh(1.5)", "error", false);
     [Fact]
     public void numfa0187() => CorpusAssert.Parses(@"SELECT sinh()", "error");
     [Fact]
@@ -403,10 +403,10 @@ public class Corpus_NumericFuncs
     public void numfa0198() => CorpusAssert.Parses(@"SELECT to_number('1234', '9999')", "ok");
     [Fact]
     public void numfa0199() => CorpusAssert.Parses(@"SELECT to_number('1.234,56', '9G999D99')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void numfa0200() => CorpusAssert.Parses(@"SELECT to_number()", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void numfa0201() => CorpusAssert.Parses(@"SELECT to_number('3.14')", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task numfa0200() => CorpusAssert.MatchesPostgres(@"SELECT to_number()", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task numfa0201() => CorpusAssert.MatchesPostgres(@"SELECT to_number('3.14')", "error", false);
     [Fact]
     public void numfa0202() => CorpusAssert.Parses(@"SELECT abs(val) FROM s.t", "ok");
     [Fact]
@@ -481,12 +481,12 @@ public class Corpus_NumericFuncs
     public void numfa0237() => CorpusAssert.Parses(@"SELECT 1 / 0", "error");
     [Fact]
     public void numfa0238() => CorpusAssert.Parses(@"SELECT 1.0 / 0.0", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void numfa0239() => CorpusAssert.Parses(@"SELECT power(-1.0, 0.5)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void numfa0240() => CorpusAssert.Parses(@"SELECT width_bucket(5.0, 0.0, 10.0, 0)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void numfa0241() => CorpusAssert.Parses(@"SELECT width_bucket(5.0, 10.0, 10.0, 5)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task numfa0239() => CorpusAssert.MatchesPostgres(@"SELECT power(-1.0, 0.5)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task numfa0240() => CorpusAssert.MatchesPostgres(@"SELECT width_bucket(5.0, 0.0, 10.0, 0)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task numfa0241() => CorpusAssert.MatchesPostgres(@"SELECT width_bucket(5.0, 10.0, 10.0, 5)", "error", false);
     [Fact]
     public void numfa0242() => CorpusAssert.Parses(@"SELECT abs(1 2)", "error");
     [Fact]
@@ -563,8 +563,8 @@ public class Corpus_NumericFuncs
     public void numfb0028() => CorpusAssert.Parses(@"SELECT sqrt(9.0)", "ok");
     [Fact]
     public void numfb0029() => CorpusAssert.Parses(@"SELECT sqrt(2.0::double precision)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void numfb0030() => CorpusAssert.Parses(@"SELECT sqrt(-1.0::double precision)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task numfb0030() => CorpusAssert.MatchesPostgres(@"SELECT sqrt(-1.0::double precision)", "error", false);
     [Fact]
     public void numfb0031() => CorpusAssert.Parses(@"SELECT cbrt(27.0::double precision)", "ok");
     [Fact]
@@ -641,8 +641,8 @@ public class Corpus_NumericFuncs
     public void numfb0067() => CorpusAssert.Parses(@"SELECT width_bucket(3.0::numeric, ARRAY[1.0, 2.0, 3.0, 4.0]::numeric[])", "ok");
     [Fact]
     public void numfb0068() => CorpusAssert.Parses(@"SELECT width_bucket(2, ARRAY[1, 3, 5, 7])", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void numfb0069() => CorpusAssert.Parses(@"SELECT width_bucket(5.0, 0.0, 10.0)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task numfb0069() => CorpusAssert.MatchesPostgres(@"SELECT width_bucket(5.0, 0.0, 10.0)", "error", false);
     [Fact]
     public void numfb0070() => CorpusAssert.Parses(@"SELECT random()", "ok");
     [Fact]
@@ -703,24 +703,24 @@ public class Corpus_NumericFuncs
     public void numfb0098() => CorpusAssert.Parses(@"SELECT to_number('12,454.8-', '99G999D9S')", "ok");
     [Fact]
     public void numfb0099() => CorpusAssert.Parses(@"SELECT to_number('3.14', '9.99')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void numfb0100() => CorpusAssert.Parses(@"SELECT to_number()", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task numfb0100() => CorpusAssert.MatchesPostgres(@"SELECT to_number()", "error", false);
     [Fact]
     public void numfb0101() => CorpusAssert.Parses(@"SELECT abs(val) FROM s.t", "ok");
     [Fact]
     public void numfb0102() => CorpusAssert.Parses(@"SELECT round(val, 1) FROM s.t", "ok");
     [Fact]
     public void numfb0103() => CorpusAssert.Parses(@"SELECT mod(qty, 3) FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void numfb0104() => CorpusAssert.Parses(@"SELECT sqrt(-4.0::numeric)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void numfb0105() => CorpusAssert.Parses(@"SELECT ln(0.0::double precision)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void numfb0106() => CorpusAssert.Parses(@"SELECT log(0.0::numeric)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void numfb0107() => CorpusAssert.Parses(@"SELECT ln(-1.0::numeric)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void numfb0108() => CorpusAssert.Parses(@"SELECT div(4::numeric, 0::numeric)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task numfb0104() => CorpusAssert.MatchesPostgres(@"SELECT sqrt(-4.0::numeric)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task numfb0105() => CorpusAssert.MatchesPostgres(@"SELECT ln(0.0::double precision)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task numfb0106() => CorpusAssert.MatchesPostgres(@"SELECT log(0.0::numeric)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task numfb0107() => CorpusAssert.MatchesPostgres(@"SELECT ln(-1.0::numeric)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task numfb0108() => CorpusAssert.MatchesPostgres(@"SELECT div(4::numeric, 0::numeric)", "error", false);
     [Fact]
     public void numfb0109() => CorpusAssert.Parses(@"SELECT mod(5, 0)", "error");
     [Fact]
@@ -731,12 +731,12 @@ public class Corpus_NumericFuncs
     public void numfb0112() => CorpusAssert.Parses(@"SELECT acos(-2.0)", "error");
     [Fact]
     public void numfb0113() => CorpusAssert.Parses(@"SELECT atanh(1.0)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void numfb0114() => CorpusAssert.Parses(@"SELECT acosh(0.5)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void numfb0115() => CorpusAssert.Parses(@"SELECT width_bucket(5.0, 0.0, 10.0, 0)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void numfb0116() => CorpusAssert.Parses(@"SELECT width_bucket(5.0, 0.0, 10.0, -1)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task numfb0114() => CorpusAssert.MatchesPostgres(@"SELECT acosh(0.5)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task numfb0115() => CorpusAssert.MatchesPostgres(@"SELECT width_bucket(5.0, 0.0, 10.0, 0)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task numfb0116() => CorpusAssert.MatchesPostgres(@"SELECT width_bucket(5.0, 0.0, 10.0, -1)", "error", false);
     [Fact]
     public void numfb0117() => CorpusAssert.Parses(@"SELECT setseed(2.0)", "error");
     [Fact]

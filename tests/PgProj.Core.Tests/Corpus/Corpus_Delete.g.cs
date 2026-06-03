@@ -147,8 +147,8 @@ public class Corpus_Delete
     public void dela0070() => CorpusAssert.Parses(@"DELETE FROM s.t WHERE qty < 0", "ok");
     [Fact]
     public void dela0071() => CorpusAssert.Parses(@"DELETE FROM ONLY s.t AS a WHERE a.val > 100", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void dela0072() => CorpusAssert.Parses(@"DELETE FROM ONLY s.parent * WHERE kind = 'x'", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task dela0072() => CorpusAssert.MatchesPostgres(@"DELETE FROM ONLY s.parent * WHERE kind = 'x'", "error", false);
     [Fact]
     public void dela0073() => CorpusAssert.Parses(@"DELETE s.t WHERE id = 1", "error");
     [Fact]
@@ -165,24 +165,24 @@ public class Corpus_Delete
     public void dela0079() => CorpusAssert.Parses(@"DELETE FROM s.t USING s.t2 USING s.mv WHERE id = 1", "error");
     [Fact]
     public void dela0080() => CorpusAssert.Parses(@"DELETE FROM s.nonexistent WHERE id = 1", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void dela0081() => CorpusAssert.Parses(@"DELETE FROM s.t WHERE nosuchcol = 1", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task dela0081() => CorpusAssert.MatchesPostgres(@"DELETE FROM s.t WHERE nosuchcol = 1", "error", false);
     [Fact]
     public void dela0082() => CorpusAssert.Parses(@"DELETE FROM s.v WHERE id = 1", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void dela0083() => CorpusAssert.Parses(@"DELETE FROM s.t WHERE id = 1 RETURNING nosuchcol", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void dela0084() => CorpusAssert.Parses(@"FROM s.t DELETE WHERE id = 1", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task dela0083() => CorpusAssert.MatchesPostgres(@"DELETE FROM s.t WHERE id = 1 RETURNING nosuchcol", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task dela0084() => CorpusAssert.MatchesPostgres(@"FROM s.t DELETE WHERE id = 1", "error", false);
     [Fact]
     public void dela0085() => CorpusAssert.Parses(@"DELETE FROM s.t WHERE id = 1 AND", "error");
     [Fact]
     public void dela0086() => CorpusAssert.Parses(@"DELETE FROM s.t WHERE id IN ()", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void dela0087() => CorpusAssert.Parses(@"DELETE FROM s.t ONLY WHERE id = 1", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task dela0087() => CorpusAssert.MatchesPostgres(@"DELETE FROM s.t ONLY WHERE id = 1", "error", false);
     [Fact]
     public void dela0088() => CorpusAssert.Parses(@"DELETE FROM s.t WHERE id = 1 RETURNING * AS x", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void dela0089() => CorpusAssert.Parses(@"DELETE FROM s.t WHERE CURRENT OF no_such_cursor", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task dela0089() => CorpusAssert.MatchesPostgres(@"DELETE FROM s.t WHERE CURRENT OF no_such_cursor", "error", false);
     [Fact]
     public void dela0090() => CorpusAssert.Parses(@"DELETE FROM s.t WHERE CURRENT OF", "error");
     [Fact]
@@ -229,8 +229,8 @@ public class Corpus_Delete
     public void dela0111() => CorpusAssert.Parses(@"TRUNCATE TABLE ONLY s.parent RESTART IDENTITY CASCADE", "ok");
     [Fact]
     public void dela0112() => CorpusAssert.Parses(@"TRUNCATE s.t2 CASCADE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void dela0113() => CorpusAssert.Parses(@"TRUNCATE nonexistent_table", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task dela0113() => CorpusAssert.MatchesPostgres(@"TRUNCATE nonexistent_table", "error", false);
     [Fact]
     public void dela0114() => CorpusAssert.Parses(@"TRUNCATE s.t WHERE id = 1", "error");
     [Fact]
@@ -317,8 +317,8 @@ DELETE FROM s.t WHERE id = 1", "ok");
     public void dela0154() => CorpusAssert.Parses(@"DELETE FROM s.t WHERE val::text LIKE '1%'", "ok");
     [Fact]
     public void dela0155() => CorpusAssert.Parses(@"DELETE FROM s.t WHERE id = 1 RETURNING id::text AS id_text", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void dela0156() => CorpusAssert.Parses(@"DELETE FROM s.t WHERE id BETWEEN 1 AND 10 RETURNING count(*) OVER () AS total", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task dela0156() => CorpusAssert.MatchesPostgres(@"DELETE FROM s.t WHERE id BETWEEN 1 AND 10 RETURNING count(*) OVER () AS total", "error", false);
     [Fact]
     public void dela0157() => CorpusAssert.Parses(@"DELETE FROM s.t WHERE id = 1 AND val IS NOT NULL AND qty >= 0 AND flag = false AND status <> 'sad'", "ok");
     [Fact]
@@ -337,12 +337,12 @@ DELETE FROM s.t WHERE id = 1", "ok");
     public void dela0164() => CorpusAssert.Parses(@"TRUNCATE s.events CASCADE", "ok");
     [Fact]
     public void dela0165() => CorpusAssert.Parses(@"TRUNCATE s.events RESTART IDENTITY CASCADE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void dela0166() => CorpusAssert.Parses(@"DELETE FROM s.t WHERE id = 1 RETURNING WITH () id", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void dela0167() => CorpusAssert.Parses(@"DELETE FROM s.t WHERE id = 1 RETURNING WITH (OLD) id", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void dela0168() => CorpusAssert.Parses(@"DELETE FROM s.t WHERE id = 1 RETURNING WITH (OLD AS) id", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task dela0166() => CorpusAssert.MatchesPostgres(@"DELETE FROM s.t WHERE id = 1 RETURNING WITH () id", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task dela0167() => CorpusAssert.MatchesPostgres(@"DELETE FROM s.t WHERE id = 1 RETURNING WITH (OLD) id", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task dela0168() => CorpusAssert.MatchesPostgres(@"DELETE FROM s.t WHERE id = 1 RETURNING WITH (OLD AS) id", "error", false);
     [Fact]
     public void dela0169() => CorpusAssert.Parses(@"DELETE FROM s.t WHERE true", "ok");
     [Fact]
@@ -489,18 +489,18 @@ DELETE FROM s.t WHERE id = 1", "ok");
     public void delb0070() => CorpusAssert.Parses(@"DELETE FROM s.t WHERE id = 1 USING s.t2", "error");
     [Fact]
     public void delb0071() => CorpusAssert.Parses(@"DELETE FROM s.nosuchschema.t", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void delb0072() => CorpusAssert.Parses(@"DELETE FROM s.t WHERE id = 'not_a_number'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void delb0073() => CorpusAssert.Parses(@"DELETE FROM s.mv WHERE status = 'ok'", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task delb0072() => CorpusAssert.MatchesPostgres(@"DELETE FROM s.t WHERE id = 'not_a_number'", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task delb0073() => CorpusAssert.MatchesPostgres(@"DELETE FROM s.mv WHERE status = 'ok'", "error", false);
     [Fact]
     public void delb0074() => CorpusAssert.Parses(@"TRUNCATE s.t WHERE id = 1", "error");
     [Fact]
     public void delb0075() => CorpusAssert.Parses(@"TRUNCATE s.t RETURNING *", "error");
     [Fact]
     public void delb0076() => CorpusAssert.Parses(@"TRUNCATE RESTART IDENTITY", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void delb0077() => CorpusAssert.Parses(@"DELETE FROM ONLY s.t ONLY", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task delb0077() => CorpusAssert.MatchesPostgres(@"DELETE FROM ONLY s.t ONLY", "error", false);
     [Fact]
     public void delb0078() => CorpusAssert.Parses(@"DELETE FROM s.t WHERE id = 1 RETURNING WITH ()", "error");
     [Fact]

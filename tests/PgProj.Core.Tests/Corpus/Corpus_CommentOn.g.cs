@@ -21,14 +21,14 @@ public class Corpus_CommentOn
     public void cmta0007() => CorpusAssert.Parses(@"COMMENT ON TABLE s.t IS NULL", "ok");
     [Fact]
     public void cmta0008() => CorpusAssert.Parses(@"COMMENT ON TABLE s.t IS ''", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cmta0009() => CorpusAssert.Parses(@"COMMENT ON TABLE no_such_table IS 'x'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cmta0010() => CorpusAssert.Parses(@"COMMENT ON TABLE s.t", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cmta0011() => CorpusAssert.Parses(@"COMMENT ON TABLE s.t IS", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cmta0012() => CorpusAssert.Parses(@"COMMENT ON TABLE s.t 'no is keyword'", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task cmta0009() => CorpusAssert.MatchesPostgres(@"COMMENT ON TABLE no_such_table IS 'x'", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task cmta0010() => CorpusAssert.MatchesPostgres(@"COMMENT ON TABLE s.t", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task cmta0011() => CorpusAssert.MatchesPostgres(@"COMMENT ON TABLE s.t IS", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task cmta0012() => CorpusAssert.MatchesPostgres(@"COMMENT ON TABLE s.t 'no is keyword'", "error", false);
     [Fact]
     public void cmta0013() => CorpusAssert.Parses(@"COMMENT ON COLUMN s.t.name IS 'the name column'", "ok");
     [Fact]
@@ -47,12 +47,12 @@ public class Corpus_CommentOn
     public void cmta0020() => CorpusAssert.Parses(@"COMMENT ON COLUMN s.t.status IS 'mood enum'", "ok");
     [Fact]
     public void cmta0021() => CorpusAssert.Parses(@"COMMENT ON COLUMN s.t.created_at IS NULL", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cmta0022() => CorpusAssert.Parses(@"COMMENT ON COLUMN s.t.no_such_col IS 'x'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cmta0023() => CorpusAssert.Parses(@"COMMENT ON COLUMN s.t IS 'missing column name'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cmta0024() => CorpusAssert.Parses(@"COMMENT ON COLUMN s.t.name.extra IS 'too many parts'", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task cmta0022() => CorpusAssert.MatchesPostgres(@"COMMENT ON COLUMN s.t.no_such_col IS 'x'", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task cmta0023() => CorpusAssert.MatchesPostgres(@"COMMENT ON COLUMN s.t IS 'missing column name'", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task cmta0024() => CorpusAssert.MatchesPostgres(@"COMMENT ON COLUMN s.t.name.extra IS 'too many parts'", "error", false);
     [Fact]
     public void cmta0025() => CorpusAssert.Parses(@"COMMENT ON COLUMN s.t2.label IS 'label column'", "ok");
     [Fact]
@@ -61,26 +61,26 @@ public class Corpus_CommentOn
     public void cmta0027() => CorpusAssert.Parses(@"COMMENT ON VIEW s.v IS 'simple view'", "ok");
     [Fact]
     public void cmta0028() => CorpusAssert.Parses(@"COMMENT ON VIEW s.v IS NULL", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cmta0029() => CorpusAssert.Parses(@"COMMENT ON VIEW no_such_view IS 'x'", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task cmta0029() => CorpusAssert.MatchesPostgres(@"COMMENT ON VIEW no_such_view IS 'x'", "error", false);
     [Fact]
     public void cmta0030() => CorpusAssert.Parses(@"COMMENT ON MATERIALIZED VIEW s.mv IS 'status count matview'", "ok");
     [Fact]
     public void cmta0031() => CorpusAssert.Parses(@"COMMENT ON MATERIALIZED VIEW s.mv IS NULL", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cmta0032() => CorpusAssert.Parses(@"COMMENT ON MATERIALIZED VIEW no_such_mv IS 'x'", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task cmta0032() => CorpusAssert.MatchesPostgres(@"COMMENT ON MATERIALIZED VIEW no_such_mv IS 'x'", "error", false);
     [Fact]
     public void cmta0033() => CorpusAssert.Parses(@"COMMENT ON INDEX s.t_name_idx IS 'name index'", "ok");
     [Fact]
     public void cmta0034() => CorpusAssert.Parses(@"COMMENT ON INDEX s.t_name_idx IS NULL", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cmta0035() => CorpusAssert.Parses(@"COMMENT ON INDEX no_such_idx IS 'x'", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task cmta0035() => CorpusAssert.MatchesPostgres(@"COMMENT ON INDEX no_such_idx IS 'x'", "error", false);
     [Fact]
     public void cmta0036() => CorpusAssert.Parses(@"COMMENT ON SEQUENCE s.seq IS 'the sequence'", "ok");
     [Fact]
     public void cmta0037() => CorpusAssert.Parses(@"COMMENT ON SEQUENCE s.seq IS NULL", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cmta0038() => CorpusAssert.Parses(@"COMMENT ON SEQUENCE no_such_seq IS 'x'", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task cmta0038() => CorpusAssert.MatchesPostgres(@"COMMENT ON SEQUENCE no_such_seq IS 'x'", "error", false);
     [Fact]
     public void cmta0039() => CorpusAssert.Parses(@"COMMENT ON FUNCTION s.f(integer) IS 'add one'", "ok");
     [Fact]
@@ -91,8 +91,8 @@ public class Corpus_CommentOn
     public void cmta0042() => CorpusAssert.Parses(@"COMMENT ON FUNCTION s.f IS 'no parens'", "ok");
     [Fact]
     public void cmta0043() => CorpusAssert.Parses(@"COMMENT ON FUNCTION s.f(integer) IS NULL", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cmta0044() => CorpusAssert.Parses(@"COMMENT ON FUNCTION no_such_func(integer) IS 'x'", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task cmta0044() => CorpusAssert.MatchesPostgres(@"COMMENT ON FUNCTION no_such_func(integer) IS 'x'", "error", false);
     [Fact]
     public void cmta0045() => CorpusAssert.Parses(@"COMMENT ON FUNCTION s.g(IN a integer, IN b integer) IS 'with argmode'", "ok");
     [Fact]
@@ -105,8 +105,8 @@ public class Corpus_CommentOn
     public void cmta0049() => CorpusAssert.Parses(@"COMMENT ON PROCEDURE s.p(IN n integer) IS 'named IN arg'", "ok");
     [Fact]
     public void cmta0050() => CorpusAssert.Parses(@"COMMENT ON PROCEDURE s.p(integer) IS NULL", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cmta0051() => CorpusAssert.Parses(@"COMMENT ON PROCEDURE no_such_proc(integer) IS 'x'", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task cmta0051() => CorpusAssert.MatchesPostgres(@"COMMENT ON PROCEDURE no_such_proc(integer) IS 'x'", "error", false);
     [Fact]
     public void cmta0052() => CorpusAssert.Parses(@"COMMENT ON ROUTINE s.f(integer) IS 'routine comment on function'", "ok");
     [Fact]
@@ -119,30 +119,30 @@ public class Corpus_CommentOn
     public void cmta0056() => CorpusAssert.Parses(@"COMMENT ON TYPE s.addr IS 'composite type'", "ok");
     [Fact]
     public void cmta0057() => CorpusAssert.Parses(@"COMMENT ON TYPE s.mood IS NULL", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cmta0058() => CorpusAssert.Parses(@"COMMENT ON TYPE no_such_type IS 'x'", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task cmta0058() => CorpusAssert.MatchesPostgres(@"COMMENT ON TYPE no_such_type IS 'x'", "error", false);
     [Fact]
     public void cmta0059() => CorpusAssert.Parses(@"COMMENT ON DOMAIN s.pos_int IS 'positive integer domain'", "ok");
     [Fact]
     public void cmta0060() => CorpusAssert.Parses(@"COMMENT ON DOMAIN s.pos_int IS NULL", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cmta0061() => CorpusAssert.Parses(@"COMMENT ON DOMAIN no_such_domain IS 'x'", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task cmta0061() => CorpusAssert.MatchesPostgres(@"COMMENT ON DOMAIN no_such_domain IS 'x'", "error", false);
     [Fact]
     public void cmta0062() => CorpusAssert.Parses(@"COMMENT ON SCHEMA s IS 'the s schema'", "ok");
     [Fact]
     public void cmta0063() => CorpusAssert.Parses(@"COMMENT ON SCHEMA s IS NULL", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cmta0064() => CorpusAssert.Parses(@"COMMENT ON SCHEMA no_such_schema IS 'x'", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task cmta0064() => CorpusAssert.MatchesPostgres(@"COMMENT ON SCHEMA no_such_schema IS 'x'", "error", false);
     [Fact]
     public void cmta0065() => CorpusAssert.Parses(@"COMMENT ON TRIGGER t_touch ON s.t IS 'the trigger'", "ok");
     [Fact]
     public void cmta0066() => CorpusAssert.Parses(@"COMMENT ON TRIGGER t_touch ON s.t IS NULL", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cmta0067() => CorpusAssert.Parses(@"COMMENT ON TRIGGER no_such_trg ON s.t IS 'x'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cmta0068() => CorpusAssert.Parses(@"COMMENT ON TRIGGER t_touch ON no_such_table IS 'x'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cmta0069() => CorpusAssert.Parses(@"COMMENT ON TRIGGER t_touch IS 'missing ON'", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task cmta0067() => CorpusAssert.MatchesPostgres(@"COMMENT ON TRIGGER no_such_trg ON s.t IS 'x'", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task cmta0068() => CorpusAssert.MatchesPostgres(@"COMMENT ON TRIGGER t_touch ON no_such_table IS 'x'", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task cmta0069() => CorpusAssert.MatchesPostgres(@"COMMENT ON TRIGGER t_touch IS 'missing ON'", "error", false);
     [Fact]
     public void cmta0070() => CorpusAssert.Parses(@"COMMENT ON COLUMN s.events.occurred IS 'partition key column'", "ok");
     [Fact]
@@ -168,28 +168,28 @@ comment text'", "ok");
     public void cmta0080() => CorpusAssert.Parses(@"CREATE TABLE s.tmp_cmta (x int); COMMENT ON TABLE s.tmp_cmta IS 'temp table comment'", "ok");
     [Fact]
     public void cmta0081() => CorpusAssert.Parses(@"CREATE TABLE s.tmp_cmta2 (x int, y text); COMMENT ON COLUMN s.tmp_cmta2.y IS 'y column'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cmta0082() => CorpusAssert.Parses(@"COMMENT TABLE s.t IS 'missing ON'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cmta0083() => CorpusAssert.Parses(@"COMMENT ON s.t IS 'missing object type'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cmta0084() => CorpusAssert.Parses(@"COMMENT ON TABLE IS 'missing object name'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cmta0085() => CorpusAssert.Parses(@"COMMENT ON COLUMN s.t.name IS 42", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cmta0086() => CorpusAssert.Parses(@"COMMENT ON COLUMN s.t.name IS TRUE", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cmta0087() => CorpusAssert.Parses(@"COMMENT ON CONSTRAINT my_constraint ON s.t IS 'a constraint'", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task cmta0082() => CorpusAssert.MatchesPostgres(@"COMMENT TABLE s.t IS 'missing ON'", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task cmta0083() => CorpusAssert.MatchesPostgres(@"COMMENT ON s.t IS 'missing object type'", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task cmta0084() => CorpusAssert.MatchesPostgres(@"COMMENT ON TABLE IS 'missing object name'", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task cmta0085() => CorpusAssert.MatchesPostgres(@"COMMENT ON COLUMN s.t.name IS 42", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task cmta0086() => CorpusAssert.MatchesPostgres(@"COMMENT ON COLUMN s.t.name IS TRUE", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task cmta0087() => CorpusAssert.MatchesPostgres(@"COMMENT ON CONSTRAINT my_constraint ON s.t IS 'a constraint'", "error", false);
     [Fact]
     public void cmta0088() => CorpusAssert.Parses(@"ALTER TABLE s.t2 ADD CONSTRAINT fk_t2_t_cmta FOREIGN KEY (t_id) REFERENCES s.t(id); COMMENT ON CONSTRAINT fk_t2_t_cmta ON s.t2 IS 'foreign key'", "ok");
     [Fact]
     public void cmta0089() => CorpusAssert.Parses(@"COMMENT ON CONSTRAINT pos_int_check ON DOMAIN s.pos_int IS 'domain constraint'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cmta0090() => CorpusAssert.Parses(@"COMMENT ON RULE my_rule ON s.v IS 'x'", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task cmta0090() => CorpusAssert.MatchesPostgres(@"COMMENT ON RULE my_rule ON s.v IS 'x'", "error", false);
     [Fact]
     public void cmta0091() => CorpusAssert.Parses(@"CREATE RULE my_rule AS ON INSERT TO s.v DO INSTEAD NOTHING; COMMENT ON RULE my_rule ON s.v IS 'insert rule'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cmta0092() => CorpusAssert.Parses(@"COMMENT ON RULE no_rule ON s.t IS 'x'", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task cmta0092() => CorpusAssert.MatchesPostgres(@"COMMENT ON RULE no_rule ON s.t IS 'x'", "error", false);
     [Fact]
     public void cmta0093() => CorpusAssert.Parses(@"CREATE TABLE s.ruleable (id int); CREATE RULE my_cmta_rule AS ON INSERT TO s.ruleable DO INSTEAD NOTHING; COMMENT ON RULE my_cmta_rule ON s.ruleable IS 'insert rule on table'", "ok");
     [Fact]
@@ -200,60 +200,60 @@ comment text'", "ok");
     public void cmta0096() => CorpusAssert.Parses(@"COMMENT ON DATABASE no_such_db IS 'x'", "ok");
     [Fact]
     public void cmta0097() => CorpusAssert.Parses(@"COMMENT ON ROLE postgres IS 'superuser role'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cmta0098() => CorpusAssert.Parses(@"COMMENT ON ROLE no_such_role IS 'x'", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task cmta0098() => CorpusAssert.MatchesPostgres(@"COMMENT ON ROLE no_such_role IS 'x'", "error", false);
     [Fact]
     public void cmta0099() => CorpusAssert.Parses(@"COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL language'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cmta0100() => CorpusAssert.Parses(@"COMMENT ON EXTENSION no_such_ext IS 'x'", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task cmta0100() => CorpusAssert.MatchesPostgres(@"COMMENT ON EXTENSION no_such_ext IS 'x'", "error", false);
     [Fact]
     public void cmta0101() => CorpusAssert.Parses(@"COMMENT ON LANGUAGE plpgsql IS 'PL/pgSQL procedural language'", "ok");
     [Fact]
     public void cmta0102() => CorpusAssert.Parses(@"COMMENT ON PROCEDURAL LANGUAGE plpgsql IS 'with PROCEDURAL keyword'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cmta0103() => CorpusAssert.Parses(@"COMMENT ON LANGUAGE no_such_lang IS 'x'", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task cmta0103() => CorpusAssert.MatchesPostgres(@"COMMENT ON LANGUAGE no_such_lang IS 'x'", "error", false);
     [Fact]
     public void cmta0104() => CorpusAssert.Parses(@"COMMENT ON TABLESPACE pg_default IS 'default tablespace'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cmta0105() => CorpusAssert.Parses(@"COMMENT ON TABLESPACE no_such_ts IS 'x'", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task cmta0105() => CorpusAssert.MatchesPostgres(@"COMMENT ON TABLESPACE no_such_ts IS 'x'", "error", false);
     [Fact]
     public void cmta0106() => CorpusAssert.Parses(@"COMMENT ON COLLATION pg_catalog.""default"" IS 'default collation'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cmta0107() => CorpusAssert.Parses(@"COMMENT ON COLLATION no_such_coll IS 'x'", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task cmta0107() => CorpusAssert.MatchesPostgres(@"COMMENT ON COLLATION no_such_coll IS 'x'", "error", false);
     [Fact]
     public void cmta0108() => CorpusAssert.Parses(@"COMMENT ON CAST (integer AS bigint) IS 'int to bigint cast'", "ok");
     [Fact]
     public void cmta0109() => CorpusAssert.Parses(@"COMMENT ON CAST (integer AS bigint) IS NULL", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cmta0110() => CorpusAssert.Parses(@"COMMENT ON CAST (no_type AS bigint) IS 'x'", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task cmta0110() => CorpusAssert.MatchesPostgres(@"COMMENT ON CAST (no_type AS bigint) IS 'x'", "error", false);
     [Fact]
     public void cmta0111() => CorpusAssert.Parses(@"COMMENT ON CONVERSION pg_catalog.iso_8859_1_to_utf8 IS 'encoding conversion'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cmta0112() => CorpusAssert.Parses(@"COMMENT ON CONVERSION no_such_conv IS 'x'", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task cmta0112() => CorpusAssert.MatchesPostgres(@"COMMENT ON CONVERSION no_such_conv IS 'x'", "error", false);
     [Fact]
     public void cmta0113() => CorpusAssert.Parses(@"COMMENT ON TEXT SEARCH CONFIGURATION pg_catalog.english IS 'english FTS config'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cmta0114() => CorpusAssert.Parses(@"COMMENT ON TEXT SEARCH CONFIGURATION no_such_tsc IS 'x'", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task cmta0114() => CorpusAssert.MatchesPostgres(@"COMMENT ON TEXT SEARCH CONFIGURATION no_such_tsc IS 'x'", "error", false);
     [Fact]
     public void cmta0115() => CorpusAssert.Parses(@"COMMENT ON TEXT SEARCH DICTIONARY pg_catalog.english_stem IS 'english stemmer'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cmta0116() => CorpusAssert.Parses(@"COMMENT ON TEXT SEARCH DICTIONARY no_such_dict IS 'x'", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task cmta0116() => CorpusAssert.MatchesPostgres(@"COMMENT ON TEXT SEARCH DICTIONARY no_such_dict IS 'x'", "error", false);
     [Fact]
     public void cmta0117() => CorpusAssert.Parses(@"COMMENT ON TEXT SEARCH PARSER pg_catalog.default IS 'default FTS parser'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cmta0118() => CorpusAssert.Parses(@"COMMENT ON TEXT SEARCH PARSER no_such_parser IS 'x'", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task cmta0118() => CorpusAssert.MatchesPostgres(@"COMMENT ON TEXT SEARCH PARSER no_such_parser IS 'x'", "error", false);
     [Fact]
     public void cmta0119() => CorpusAssert.Parses(@"COMMENT ON TEXT SEARCH TEMPLATE pg_catalog.simple IS 'simple FTS template'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cmta0120() => CorpusAssert.Parses(@"COMMENT ON TEXT SEARCH TEMPLATE no_such_tmpl IS 'x'", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task cmta0120() => CorpusAssert.MatchesPostgres(@"COMMENT ON TEXT SEARCH TEMPLATE no_such_tmpl IS 'x'", "error", false);
     [Fact]
     public void cmta0121() => CorpusAssert.Parses(@"COMMENT ON AGGREGATE count(*) IS 'count all rows'", "ok");
     [Fact]
     public void cmta0122() => CorpusAssert.Parses(@"COMMENT ON AGGREGATE pg_catalog.count(""any"") IS 'count non-null values'", "ok");
     [Fact]
     public void cmta0123() => CorpusAssert.Parses(@"COMMENT ON AGGREGATE sum(integer) IS 'sum of integers'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cmta0124() => CorpusAssert.Parses(@"COMMENT ON AGGREGATE no_such_agg(*) IS 'x'", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task cmta0124() => CorpusAssert.MatchesPostgres(@"COMMENT ON AGGREGATE no_such_agg(*) IS 'x'", "error", false);
     [Fact]
     public void cmta0125() => CorpusAssert.Parses(@"COMMENT ON AGGREGATE count(*) IS NULL", "ok");
     [Fact]
@@ -264,52 +264,52 @@ comment text'", "ok");
     public void cmta0128() => CorpusAssert.Parses(@"COMMENT ON OPERATOR -(NONE, integer) IS 'integer negation'", "ok");
     [Fact]
     public void cmta0129() => CorpusAssert.Parses(@"COMMENT ON OPERATOR +(integer, integer) IS NULL", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cmta0130() => CorpusAssert.Parses(@"COMMENT ON OPERATOR no_op(integer, integer) IS 'x'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cmta0131() => CorpusAssert.Parses(@"COMMENT ON OPERATOR CLASS btree_integer_ops USING btree IS 'btree int ops'", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task cmta0130() => CorpusAssert.MatchesPostgres(@"COMMENT ON OPERATOR no_op(integer, integer) IS 'x'", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task cmta0131() => CorpusAssert.MatchesPostgres(@"COMMENT ON OPERATOR CLASS btree_integer_ops USING btree IS 'btree int ops'", "error", false);
     [Fact]
     public void cmta0132() => CorpusAssert.Parses(@"COMMENT ON OPERATOR CLASS pg_catalog.int4_ops USING btree IS 'int4 btree ops'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cmta0133() => CorpusAssert.Parses(@"COMMENT ON OPERATOR FAMILY truly_no_such_opfam USING btree IS 'x'", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task cmta0133() => CorpusAssert.MatchesPostgres(@"COMMENT ON OPERATOR FAMILY truly_no_such_opfam USING btree IS 'x'", "error", false);
     [Fact]
     public void cmta0134() => CorpusAssert.Parses(@"COMMENT ON OPERATOR FAMILY pg_catalog.integer_ops USING btree IS 'integer btree family'", "ok");
     [Fact]
     public void cmta0135() => CorpusAssert.Parses(@"COMMENT ON ACCESS METHOD btree IS 'btree index method'", "ok");
     [Fact]
     public void cmta0136() => CorpusAssert.Parses(@"COMMENT ON ACCESS METHOD hash IS 'hash index method'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cmta0137() => CorpusAssert.Parses(@"COMMENT ON ACCESS METHOD no_such_am IS 'x'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cmta0138() => CorpusAssert.Parses(@"COMMENT ON FOREIGN DATA WRAPPER no_such_fdw IS 'x'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cmta0139() => CorpusAssert.Parses(@"COMMENT ON SERVER no_such_server IS 'x'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cmta0140() => CorpusAssert.Parses(@"COMMENT ON STATISTICS no_such_stats IS 'x'", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task cmta0137() => CorpusAssert.MatchesPostgres(@"COMMENT ON ACCESS METHOD no_such_am IS 'x'", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task cmta0138() => CorpusAssert.MatchesPostgres(@"COMMENT ON FOREIGN DATA WRAPPER no_such_fdw IS 'x'", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task cmta0139() => CorpusAssert.MatchesPostgres(@"COMMENT ON SERVER no_such_server IS 'x'", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task cmta0140() => CorpusAssert.MatchesPostgres(@"COMMENT ON STATISTICS no_such_stats IS 'x'", "error", false);
     [Fact]
     public void cmta0141() => CorpusAssert.Parses(@"CREATE STATISTICS s.cmta_stats ON name, val FROM s.t; COMMENT ON STATISTICS s.cmta_stats IS 'multi-column stats'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cmta0142() => CorpusAssert.Parses(@"COMMENT ON FOREIGN TABLE no_such_ft IS 'x'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cmta0143() => CorpusAssert.Parses(@"COMMENT ON EVENT TRIGGER no_such_et IS 'x'", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task cmta0142() => CorpusAssert.MatchesPostgres(@"COMMENT ON FOREIGN TABLE no_such_ft IS 'x'", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task cmta0143() => CorpusAssert.MatchesPostgres(@"COMMENT ON EVENT TRIGGER no_such_et IS 'x'", "error", false);
     [Fact]
     public void cmta0144() => CorpusAssert.Parses(@"CREATE FUNCTION s.et_fn() RETURNS event_trigger LANGUAGE plpgsql AS $$ BEGIN END $$; CREATE EVENT TRIGGER cmta_et ON ddl_command_start EXECUTE FUNCTION s.et_fn(); COMMENT ON EVENT TRIGGER cmta_et IS 'ddl event trigger'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cmta0145() => CorpusAssert.Parses(@"COMMENT ON PUBLICATION no_such_pub IS 'x'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cmta0146() => CorpusAssert.Parses(@"COMMENT ON SUBSCRIPTION no_such_sub IS 'x'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cmta0147() => CorpusAssert.Parses(@"COMMENT ON LARGE OBJECT 0 IS 'large object'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cmta0148() => CorpusAssert.Parses(@"COMMENT ON TABLE s.t IS 42", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cmta0149() => CorpusAssert.Parses(@"COMMENT ON TABLE s.t IS 'x' CASCADE", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cmta0150() => CorpusAssert.Parses(@"COMMENT ON TABLE s.t IS 'x' RESTRICT", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cmta0151() => CorpusAssert.Parses(@"COMMENT ON FUNCTION s.f(OUT x integer) IS 'out param'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cmta0152() => CorpusAssert.Parses(@"COMMENT ON FUNCTION s.g(integer, OUT integer) IS 'mixed modes'", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task cmta0145() => CorpusAssert.MatchesPostgres(@"COMMENT ON PUBLICATION no_such_pub IS 'x'", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task cmta0146() => CorpusAssert.MatchesPostgres(@"COMMENT ON SUBSCRIPTION no_such_sub IS 'x'", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task cmta0147() => CorpusAssert.MatchesPostgres(@"COMMENT ON LARGE OBJECT 0 IS 'large object'", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task cmta0148() => CorpusAssert.MatchesPostgres(@"COMMENT ON TABLE s.t IS 42", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task cmta0149() => CorpusAssert.MatchesPostgres(@"COMMENT ON TABLE s.t IS 'x' CASCADE", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task cmta0150() => CorpusAssert.MatchesPostgres(@"COMMENT ON TABLE s.t IS 'x' RESTRICT", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task cmta0151() => CorpusAssert.MatchesPostgres(@"COMMENT ON FUNCTION s.f(OUT x integer) IS 'out param'", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task cmta0152() => CorpusAssert.MatchesPostgres(@"COMMENT ON FUNCTION s.g(integer, OUT integer) IS 'mixed modes'", "error", false);
     [Fact]
     public void cmta0153() => CorpusAssert.Parses(@"COMMENT ON TYPE integer IS 'built-in integer type'", "ok");
     [Fact]

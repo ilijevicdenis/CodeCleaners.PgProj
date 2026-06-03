@@ -43,16 +43,16 @@ public class Corpus_PlpgsqlDynamic
     public void ppdya0018() => CorpusAssert.Parses(@"DO $$ DECLARE cmd text; r integer; BEGIN cmd := 'SELECT 42'; EXECUTE cmd INTO r; END $$;", "ok");
     [Fact]
     public void ppdya0019() => CorpusAssert.Parses(@"DO $$ DECLARE r integer; BEGIN EXECUTE format('SELECT %s', '123') INTO r; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppdya0020() => CorpusAssert.Parses(@"DO $$ DECLARE r bigint; BEGIN EXECUTE format('SELECT count(*) FROM %I', 't') INTO r; END $$;", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ppdya0020() => CorpusAssert.MatchesPostgres(@"DO $$ DECLARE r bigint; BEGIN EXECUTE format('SELECT count(*) FROM %I', 't') INTO r; END $$;", "error", false);
     [Fact]
     public void ppdya0021() => CorpusAssert.Parses(@"DO $$ DECLARE r bigint; BEGIN EXECUTE format('SELECT count(*) FROM s.%I', 't') INTO r; END $$;", "ok");
     [Fact]
     public void ppdya0022() => CorpusAssert.Parses(@"DO $$ DECLARE r text; BEGIN EXECUTE format('SELECT %L', 'hello world') INTO r; END $$;", "ok");
     [Fact]
     public void ppdya0023() => CorpusAssert.Parses(@"DO $$ DECLARE r text; BEGIN EXECUTE format('SELECT %L', NULL) INTO r; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppdya0024() => CorpusAssert.Parses(@"DO $$ DECLARE r text; BEGIN EXECUTE format('SELECT %I', 'my_col') INTO r; END $$;", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ppdya0024() => CorpusAssert.MatchesPostgres(@"DO $$ DECLARE r text; BEGIN EXECUTE format('SELECT %I', 'my_col') INTO r; END $$;", "error", false);
     [Fact]
     public void ppdya0025() => CorpusAssert.Parses(@"DO $$ DECLARE r text; BEGIN EXECUTE format('SELECT %s::text', quote_literal('abc')) INTO r; END $$;", "ok");
     [Fact]
@@ -125,10 +125,10 @@ public class Corpus_PlpgsqlDynamic
     public void ppdya0059() => CorpusAssert.Parses(@"DO $$ DECLARE r integer; BEGIN EXECUTE 'SELECT 1' USING 42 INTO r; END $$;", "ok");
     [Fact]
     public void ppdya0060() => CorpusAssert.Parses(@"DO $$ DECLARE r integer; BEGIN EXECUTE INTO STRICT r 'SELECT 1'; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppdya0061() => CorpusAssert.Parses(@"DO $$ DECLARE r integer; BEGIN EXECUTE 'NOT VALID SQL @@##' INTO r; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppdya0062() => CorpusAssert.Parses(@"DO $$ DECLARE r integer; BEGIN EXECUTE 'SELECT no_such_column_xyz FROM s.t' INTO r; END $$;", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ppdya0061() => CorpusAssert.MatchesPostgres(@"DO $$ DECLARE r integer; BEGIN EXECUTE 'NOT VALID SQL @@##' INTO r; END $$;", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ppdya0062() => CorpusAssert.MatchesPostgres(@"DO $$ DECLARE r integer; BEGIN EXECUTE 'SELECT no_such_column_xyz FROM s.t' INTO r; END $$;", "error", false);
     [Fact]
     public void ppdya0063() => CorpusAssert.Parses(@"DO $$ DECLARE r integer; BEGIN EXECUTE 'SELECT 1' INTO STRICT r; EXECUTE 'SELECT 1' INTO STRICT r; END $$;", "ok");
     [Fact]
@@ -137,10 +137,10 @@ public class Corpus_PlpgsqlDynamic
     public void ppdya0065() => CorpusAssert.Parses(@"DO $$ DECLARE r1 integer; r2 text; BEGIN EXECUTE 'SELECT $1, $2' INTO r1, r2 USING 7, 'world'; END $$;", "ok");
     [Fact]
     public void ppdya0066() => CorpusAssert.Parses(@"DO $$ DECLARE r integer; BEGIN EXECUTE 'SELECT id FROM s.t WHERE name = $1 LIMIT 1' INTO r USING 'nonexistent'; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppdya0067() => CorpusAssert.Parses(@"DO $$ DECLARE r integer; BEGIN EXECUTE 'SELECT id FROM s.t WHERE name = $1' INTO STRICT r USING 'definitely_not_there_xyz'; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppdya0068() => CorpusAssert.Parses(@"DO $$ DECLARE r integer; BEGIN EXECUTE 'SELECT 1 UNION SELECT 2' INTO STRICT r; END $$;", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ppdya0067() => CorpusAssert.MatchesPostgres(@"DO $$ DECLARE r integer; BEGIN EXECUTE 'SELECT id FROM s.t WHERE name = $1' INTO STRICT r USING 'definitely_not_there_xyz'; END $$;", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ppdya0068() => CorpusAssert.MatchesPostgres(@"DO $$ DECLARE r integer; BEGIN EXECUTE 'SELECT 1 UNION SELECT 2' INTO STRICT r; END $$;", "error", false);
     [Fact]
     public void ppdya0069() => CorpusAssert.Parses(@"DO $$ BEGIN EXECUTE 'CREATE TEMP TABLE exec_ddl (a int, b text)'; END $$;", "ok");
     [Fact]
@@ -173,34 +173,34 @@ public class Corpus_PlpgsqlDynamic
     public void ppdya0083() => CorpusAssert.Parses(@"DO $$ DECLARE r text; BEGIN r := format('%s', NULL); END $$;", "ok");
     [Fact]
     public void ppdya0084() => CorpusAssert.Parses(@"DO $$ DECLARE r text; BEGIN r := format('%L', NULL); END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppdya0085() => CorpusAssert.Parses(@"DO $$ DECLARE r text; BEGIN r := format('%I', NULL); END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppdya0086() => CorpusAssert.Parses(@"DO $$ DECLARE r text; BEGIN r := format('%X', 'test'); END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppdya0087() => CorpusAssert.Parses(@"DO $$ DECLARE r text; BEGIN r := format('%s %s', 'only_one'); END $$;", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ppdya0085() => CorpusAssert.MatchesPostgres(@"DO $$ DECLARE r text; BEGIN r := format('%I', NULL); END $$;", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ppdya0086() => CorpusAssert.MatchesPostgres(@"DO $$ DECLARE r text; BEGIN r := format('%X', 'test'); END $$;", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ppdya0087() => CorpusAssert.MatchesPostgres(@"DO $$ DECLARE r text; BEGIN r := format('%s %s', 'only_one'); END $$;", "error", false);
     [Fact]
     public void ppdya0088() => CorpusAssert.Parses(@"DO $$ DECLARE r text; BEGIN r := format('no specifiers', 'extra', 'args'); END $$;", "ok");
     [Fact]
     public void ppdya0089() => CorpusAssert.Parses(@"DO $$ DECLARE r text; BEGIN EXECUTE format('SELECT %I FROM s.t LIMIT 1', 'name') INTO r USING 'unused'; END $$;", "ok");
     [Fact]
     public void ppdya0090() => CorpusAssert.Parses(@"DO $$ DECLARE r text; BEGIN EXECUTE format('SELECT $1 FROM s.t LIMIT 1') INTO r USING 'hello'; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppdya0091() => CorpusAssert.Parses(@"DO $$ DECLARE r integer; BEGIN EXECUTE 'SELECT ''not_a_number'' || ''x''' INTO r; END $$;", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ppdya0091() => CorpusAssert.MatchesPostgres(@"DO $$ DECLARE r integer; BEGIN EXECUTE 'SELECT ''not_a_number'' || ''x''' INTO r; END $$;", "error", false);
     [Fact]
     public void ppdya0092() => CorpusAssert.Parses(@"DO $$ DECLARE rec record; BEGIN EXECUTE 'SELECT 1 AS id, ''alice'' AS name' INTO STRICT rec; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppdya0093() => CorpusAssert.Parses(@"DO $$ DECLARE r integer; BEGIN EXECUTE 'SELECT id FROM s.t' INTO STRICT r; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppdya0094() => CorpusAssert.Parses(@"DO $$ DECLARE r integer; BEGIN EXECUTE 'BEGIN'; END $$;", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ppdya0093() => CorpusAssert.MatchesPostgres(@"DO $$ DECLARE r integer; BEGIN EXECUTE 'SELECT id FROM s.t' INTO STRICT r; END $$;", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ppdya0094() => CorpusAssert.MatchesPostgres(@"DO $$ DECLARE r integer; BEGIN EXECUTE 'BEGIN'; END $$;", "error", false);
     [Fact]
     public void ppdya0095() => CorpusAssert.Parses(@"DO $$ DECLARE r text; col text := 'name'; BEGIN EXECUTE 'SELECT ' || quote_ident(col) || ' FROM s.t LIMIT 1' INTO r; END $$;", "ok");
     [Fact]
     public void ppdya0096() => CorpusAssert.Parses(@"DO $$ DECLARE r text; v text := 'O''Brien'; BEGIN EXECUTE 'SELECT ' || quote_literal(v) INTO r; END $$;", "ok");
     [Fact]
     public void ppdya0097() => CorpusAssert.Parses(@"DO $$ DECLARE r text; v text := NULL; BEGIN EXECUTE 'SELECT ' || coalesce(quote_nullable(v), 'NULL') INTO r; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppdya0098() => CorpusAssert.Parses(@"DO $$ DECLARE r text; BEGIN EXECUTE format('SELECT %I || %L', 'name', '_suffix') INTO r; END $$;", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ppdya0098() => CorpusAssert.MatchesPostgres(@"DO $$ DECLARE r text; BEGIN EXECUTE format('SELECT %I || %L', 'name', '_suffix') INTO r; END $$;", "error", false);
     [Fact]
     public void ppdya0099() => CorpusAssert.Parses(@"DO $$ DECLARE r text; BEGIN EXECUTE format('SELECT %I || %L FROM s.t LIMIT 1', 'name', '_suffix') INTO r; END $$;", "ok");
     [Fact]
@@ -233,8 +233,8 @@ public class Corpus_PlpgsqlDynamic
     public void ppdya0113() => CorpusAssert.Parses(@"DO $$ DECLARE r bigint; BEGIN EXECUTE 'SELECT count(*) FROM s.t WHERE flag = $1' INTO r USING false; END $$;", "ok");
     [Fact]
     public void ppdya0114() => CorpusAssert.Parses(@"DO $$ DECLARE rec record; r text; BEGIN EXECUTE 'SELECT name, qty FROM s.t LIMIT 1' INTO rec; r := rec.name; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppdya0115() => CorpusAssert.Parses(@"DO $$ DECLARE cmd text; BEGIN cmd := NULL; EXECUTE cmd; END $$;", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ppdya0115() => CorpusAssert.MatchesPostgres(@"DO $$ DECLARE cmd text; BEGIN cmd := NULL; EXECUTE cmd; END $$;", "error", false);
     [Fact]
     public void ppdya0116() => CorpusAssert.Parses(@"DO $$ DECLARE r integer; BEGIN EXECUTE 'SELECT $1 + $2 + $3' INTO r USING 1, 2, 3; END $$;", "ok");
     [Fact]
@@ -307,16 +307,16 @@ public class Corpus_PlpgsqlDynamic
     public void ppdya0150() => CorpusAssert.Parses(@"DO $$ DECLARE r text; BEGIN EXECUTE 'SELECT data->>$1 FROM s.t LIMIT 1' INTO r USING 'key'; END $$;", "ok");
     [Fact]
     public void ppdya0151() => CorpusAssert.Parses(@"DO $$ BEGIN EXECUTE 'CREATE TEMP TABLE trunc_tgt (x int)'; EXECUTE 'TRUNCATE TABLE trunc_tgt'; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppdya0152() => CorpusAssert.Parses(@"DO $$ DECLARE r integer; BEGIN EXECUTE 'SELECT $0' INTO r USING 1; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppdya0153() => CorpusAssert.Parses(@"DO $$ DECLARE r integer; BEGIN EXECUTE 'SELECT $5' INTO r USING 1, 2; END $$;", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ppdya0152() => CorpusAssert.MatchesPostgres(@"DO $$ DECLARE r integer; BEGIN EXECUTE 'SELECT $0' INTO r USING 1; END $$;", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ppdya0153() => CorpusAssert.MatchesPostgres(@"DO $$ DECLARE r integer; BEGIN EXECUTE 'SELECT $5' INTO r USING 1, 2; END $$;", "error", false);
     [Fact]
     public void ppdya0154() => CorpusAssert.Parses(@"DO $$ DECLARE r text; BEGIN EXECUTE format('SELECT %I FROM s.t WHERE %I = $1 LIMIT 1', 'name', 'name') INTO r USING 'test'; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppdya0155() => CorpusAssert.Parses(@"DO $$ DECLARE r integer; BEGIN EXECUTE 'SELECT FROM' INTO r; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppdya0156() => CorpusAssert.Parses(@"DO $$ DECLARE r integer; BEGIN EXECUTE '' INTO r; END $$;", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ppdya0155() => CorpusAssert.MatchesPostgres(@"DO $$ DECLARE r integer; BEGIN EXECUTE 'SELECT FROM' INTO r; END $$;", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ppdya0156() => CorpusAssert.MatchesPostgres(@"DO $$ DECLARE r integer; BEGIN EXECUTE '' INTO r; END $$;", "error", false);
     [Fact]
     public void ppdya0157() => CorpusAssert.Parses(@"DO $$ DECLARE r text; BEGIN r := format('Hello %s!', 'world'); END $$;", "ok");
     [Fact]
@@ -353,8 +353,8 @@ public class Corpus_PlpgsqlDynamic
     public void ppdyb0003() => CorpusAssert.Parses(@"DO $$ DECLARE r text; BEGIN EXECUTE 'SELECT name FROM s.t WHERE id = $1' INTO r USING 1; END $$;", "ok");
     [Fact]
     public void ppdyb0004() => CorpusAssert.Parses(@"DO $$ DECLARE r text; BEGIN EXECUTE 'SELECT name FROM s.t WHERE id = $1 AND val > $2' INTO r USING 1, 0.0; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppdyb0005() => CorpusAssert.Parses(@"DO $$ DECLARE r text; BEGIN EXECUTE 'SELECT name FROM s.t WHERE id = $1' INTO STRICT r USING 999; END $$;", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ppdyb0005() => CorpusAssert.MatchesPostgres(@"DO $$ DECLARE r text; BEGIN EXECUTE 'SELECT name FROM s.t WHERE id = $1' INTO STRICT r USING 999; END $$;", "error", false);
     [Fact]
     public void ppdyb0006() => CorpusAssert.Parses(@"DO $$ DECLARE v integer; BEGIN EXECUTE 'SELECT $1 + $2' INTO v USING 3, 4; END $$;", "ok");
     [Fact]
@@ -399,8 +399,8 @@ public class Corpus_PlpgsqlDynamic
     public void ppdyb0026() => CorpusAssert.Parses(@"CREATE OR REPLACE FUNCTION s.dyn_return() RETURNS SETOF text LANGUAGE plpgsql AS $$ BEGIN RETURN QUERY EXECUTE 'SELECT name FROM s.t'; END $$; SELECT s.dyn_return();", "ok");
     [Fact]
     public void ppdyb0027() => CorpusAssert.Parses(@"CREATE OR REPLACE FUNCTION s.dyn_return2(lim integer) RETURNS SETOF text LANGUAGE plpgsql AS $$ BEGIN RETURN QUERY EXECUTE 'SELECT name FROM s.t LIMIT $1' USING lim; END $$; SELECT s.dyn_return2(5);", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppdyb0028() => CorpusAssert.Parses(@"DO $$ DECLARE v text; BEGIN EXECUTE 'SELECT name FROM s.t LIMIT 1' INTO STRICT v; END $$;", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ppdyb0028() => CorpusAssert.MatchesPostgres(@"DO $$ DECLARE v text; BEGIN EXECUTE 'SELECT name FROM s.t LIMIT 1' INTO STRICT v; END $$;", "error", false);
     [Fact]
     public void ppdyb0029() => CorpusAssert.Parses(@"DO $$ DECLARE v text; BEGIN EXECUTE 'SELECT $1' INTO v USING 'hello'; END $$;", "ok");
     [Fact]
@@ -413,16 +413,16 @@ public class Corpus_PlpgsqlDynamic
     public void ppdyb0033() => CorpusAssert.Parses(@"DO $$ DECLARE v text; BEGIN EXECUTE 'SELECT name FROM s.t WHERE id = $1' USING 1 INTO v; END $$;", "ok");
     [Fact]
     public void ppdyb0034() => CorpusAssert.Parses(@"DO $$ DECLARE a text; b numeric; BEGIN EXECUTE 'SELECT name, val FROM s.t LIMIT 1' INTO a, b; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppdyb0035() => CorpusAssert.Parses(@"DO $$ DECLARE a text; b numeric; c integer; BEGIN EXECUTE 'SELECT name, val, qty FROM s.t LIMIT 1' INTO STRICT a, b, c; END $$;", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ppdyb0035() => CorpusAssert.MatchesPostgres(@"DO $$ DECLARE a text; b numeric; c integer; BEGIN EXECUTE 'SELECT name, val, qty FROM s.t LIMIT 1' INTO STRICT a, b, c; END $$;", "error", false);
     [Fact]
     public void ppdyb0036() => CorpusAssert.Parses(@"DO $$ BEGIN EXECUTE 'SELECT 1' USING; END $$;", "error");
     [Fact]
     public void ppdyb0037() => CorpusAssert.Parses(@"DO $$ BEGIN EXECUTE; END $$;", "error");
     [Fact]
     public void ppdyb0038() => CorpusAssert.Parses(@"DO $$ BEGIN EXECUTE 'INSERT INTO s.t(name) VALUES($1)' USING; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppdyb0039() => CorpusAssert.Parses(@"DO $$ DECLARE v text; BEGIN EXECUTE 'NOT VALID SQL !!!@#$%' INTO v; END $$;", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ppdyb0039() => CorpusAssert.MatchesPostgres(@"DO $$ DECLARE v text; BEGIN EXECUTE 'NOT VALID SQL !!!@#$%' INTO v; END $$;", "error", false);
     [Fact]
     public void ppdyb0040() => CorpusAssert.Parses(@"DO $$ DECLARE v text; BEGIN v := quote_ident('hello world'); END $$;", "ok");
     [Fact]
@@ -443,16 +443,16 @@ public class Corpus_PlpgsqlDynamic
     public void ppdyb0048() => CorpusAssert.Parses(@"DO $$ DECLARE v text; BEGIN v := format('%1$s %1$s %2$s', 'foo', 'bar'); END $$;", "ok");
     [Fact]
     public void ppdyb0049() => CorpusAssert.Parses(@"DO $$ DECLARE v text; BEGIN v := format(NULL); END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppdyb0050() => CorpusAssert.Parses(@"DO $$ DECLARE v text; BEGIN v := format('%I', NULL); END $$;", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ppdyb0050() => CorpusAssert.MatchesPostgres(@"DO $$ DECLARE v text; BEGIN v := format('%I', NULL); END $$;", "error", false);
     [Fact]
     public void ppdyb0051() => CorpusAssert.Parses(@"DO $$ DECLARE tblname text := 't'; n integer; BEGIN EXECUTE 'SELECT count(*) FROM s.' || quote_ident(tblname) INTO n; END $$;", "ok");
     [Fact]
     public void ppdyb0052() => CorpusAssert.Parses(@"DO $$ DECLARE colname text := 'qty'; n integer; BEGIN EXECUTE format('SELECT sum(%I) FROM s.t', colname) INTO n; END $$;", "ok");
     [Fact]
     public void ppdyb0053() => CorpusAssert.Parses(@"DO $$ DECLARE rec record; tbl text := 's.t2'; BEGIN FOR rec IN EXECUTE 'SELECT id, label FROM ' || tbl LOOP NULL; END LOOP; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppdyb0054() => CorpusAssert.Parses(@"DO $$ DECLARE cmd text; BEGIN cmd := 'CREATE INDEX CONCURRENTLY'; EXECUTE cmd || ' dyn_idx ON s.t(name)'; END $$;", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ppdyb0054() => CorpusAssert.MatchesPostgres(@"DO $$ DECLARE cmd text; BEGIN cmd := 'CREATE INDEX CONCURRENTLY'; EXECUTE cmd || ' dyn_idx ON s.t(name)'; END $$;", "error", false);
     [Fact]
     public void ppdyb0055() => CorpusAssert.Parses(@"DO $$ BEGIN EXECUTE 'CREATE TEMP TABLE dyn_tbl (id int, val text)'; EXECUTE 'INSERT INTO dyn_tbl VALUES(1, ''hello'')'; EXECUTE 'SELECT * FROM dyn_tbl'; END $$;", "ok");
     [Fact]
@@ -463,10 +463,10 @@ public class Corpus_PlpgsqlDynamic
     public void ppdyb0058() => CorpusAssert.Parses(@"DO $$ DECLARE v integer; BEGIN EXECUTE 'SELECT $1 + $2 + $3' INTO v USING 1, 2, 3; END $$;", "ok");
     [Fact]
     public void ppdyb0059() => CorpusAssert.Parses(@"DO $$ DECLARE v text; BEGIN EXECUTE 'SELECT name FROM s.t WHERE id = $2' USING 99, 1 INTO v; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppdyb0060() => CorpusAssert.Parses(@"DO $$ DECLARE v text; BEGIN EXECUTE 'SELECT name FROM s.t WHERE id = $3' USING 1, 2 INTO v; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppdyb0061() => CorpusAssert.Parses(@"DO $$ DECLARE v text; BEGIN EXECUTE 'SELECT 1 INTO v'; END $$;", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ppdyb0060() => CorpusAssert.MatchesPostgres(@"DO $$ DECLARE v text; BEGIN EXECUTE 'SELECT name FROM s.t WHERE id = $3' USING 1, 2 INTO v; END $$;", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ppdyb0061() => CorpusAssert.MatchesPostgres(@"DO $$ DECLARE v text; BEGIN EXECUTE 'SELECT 1 INTO v'; END $$;", "error", false);
     [Fact]
     public void ppdyb0062() => CorpusAssert.Parses(@"DO $$ DECLARE v integer; BEGIN EXECUTE 'SELECT count(*) FROM s.t GROUP BY status LIMIT 1' INTO v; END $$;", "ok");
     [Fact]
@@ -503,6 +503,6 @@ public class Corpus_PlpgsqlDynamic
     public void ppdyb0078() => CorpusAssert.Parses(@"DO $$ DECLARE tbl text := 's.t'; col text := 'name'; v text; BEGIN EXECUTE format('SELECT %s FROM %s LIMIT 1', quote_ident(col), tbl) INTO v; END $$;", "ok");
     [Fact]
     public void ppdyb0079() => CorpusAssert.Parses(@"DO $$ DECLARE v text; BEGIN EXECUTE format('SELECT %I FROM %I.%I LIMIT 1', 'name', 's', 't') INTO v; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppdyb0080() => CorpusAssert.Parses(@"DO $$ DECLARE v integer; BEGIN EXECUTE 'SELECT val FROM s.t WHERE id = $1' INTO STRICT v USING 1; END $$;", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ppdyb0080() => CorpusAssert.MatchesPostgres(@"DO $$ DECLARE v integer; BEGIN EXECUTE 'SELECT val FROM s.t WHERE id = $1' INTO STRICT v USING 1; END $$;", "error", false);
 }

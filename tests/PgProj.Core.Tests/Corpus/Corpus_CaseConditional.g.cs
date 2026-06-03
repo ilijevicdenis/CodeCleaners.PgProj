@@ -83,8 +83,8 @@ public class Corpus_CaseConditional
     public void csea0038() => CorpusAssert.Parses(@"SELECT COALESCE(null, null, null, null, null, 99)", "ok");
     [Fact]
     public void csea0039() => CorpusAssert.Parses(@"SELECT COALESCE(1)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void csea0040() => CorpusAssert.Parses(@"SELECT COALESCE()", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task csea0040() => CorpusAssert.MatchesPostgres(@"SELECT COALESCE()", "error", false);
     [Fact]
     public void csea0041() => CorpusAssert.Parses(@"SELECT NULLIF(1, 1)", "ok");
     [Fact]
@@ -103,12 +103,12 @@ public class Corpus_CaseConditional
     public void csea0048() => CorpusAssert.Parses(@"SELECT NULLIF(val, 0) FROM s.t", "ok");
     [Fact]
     public void csea0049() => CorpusAssert.Parses(@"SELECT NULLIF(qty, qty) FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void csea0050() => CorpusAssert.Parses(@"SELECT NULLIF(1, 2, 3)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void csea0051() => CorpusAssert.Parses(@"SELECT NULLIF(1)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void csea0052() => CorpusAssert.Parses(@"SELECT NULLIF()", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task csea0050() => CorpusAssert.MatchesPostgres(@"SELECT NULLIF(1, 2, 3)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task csea0051() => CorpusAssert.MatchesPostgres(@"SELECT NULLIF(1)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task csea0052() => CorpusAssert.MatchesPostgres(@"SELECT NULLIF()", "error", false);
     [Fact]
     public void csea0053() => CorpusAssert.Parses(@"SELECT GREATEST(1, 2, 3)", "ok");
     [Fact]
@@ -125,8 +125,8 @@ public class Corpus_CaseConditional
     public void csea0059() => CorpusAssert.Parses(@"SELECT GREATEST(1.5, 2.5, 0.5)", "ok");
     [Fact]
     public void csea0060() => CorpusAssert.Parses(@"SELECT GREATEST(qty, val) FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void csea0061() => CorpusAssert.Parses(@"SELECT GREATEST()", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task csea0061() => CorpusAssert.MatchesPostgres(@"SELECT GREATEST()", "error", false);
     [Fact]
     public void csea0062() => CorpusAssert.Parses(@"SELECT LEAST(1, 2, 3)", "ok");
     [Fact]
@@ -143,8 +143,8 @@ public class Corpus_CaseConditional
     public void csea0068() => CorpusAssert.Parses(@"SELECT LEAST(1.0, 2.0, 0.5)", "ok");
     [Fact]
     public void csea0069() => CorpusAssert.Parses(@"SELECT LEAST(qty, 0) FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void csea0070() => CorpusAssert.Parses(@"SELECT LEAST()", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task csea0070() => CorpusAssert.MatchesPostgres(@"SELECT LEAST()", "error", false);
     [Fact]
     public void csea0071() => CorpusAssert.Parses(@"SELECT CASE WHEN 1=1 THEN", "error");
     [Fact]
@@ -229,14 +229,14 @@ public class Corpus_CaseConditional
     public void csea0111() => CorpusAssert.Parses(@"SELECT CASE WHEN 1=1 THEN '{""a"":1}'::jsonb ELSE '{}'::jsonb END", "ok");
     [Fact]
     public void csea0112() => CorpusAssert.Parses(@"SELECT CASE WHEN 1=1 THEN now() ELSE '2000-01-01'::timestamptz END", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void csea0113() => CorpusAssert.Parses(@"SELECT CASE WHEN 1=1 THEN 1 ELSE 'text' END", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void csea0114() => CorpusAssert.Parses(@"SELECT COALESCE(1, 'text')", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void csea0115() => CorpusAssert.Parses(@"SELECT GREATEST(1, 'text')", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void csea0116() => CorpusAssert.Parses(@"SELECT LEAST(1, 'text')", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task csea0113() => CorpusAssert.MatchesPostgres(@"SELECT CASE WHEN 1=1 THEN 1 ELSE 'text' END", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task csea0114() => CorpusAssert.MatchesPostgres(@"SELECT COALESCE(1, 'text')", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task csea0115() => CorpusAssert.MatchesPostgres(@"SELECT GREATEST(1, 'text')", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task csea0116() => CorpusAssert.MatchesPostgres(@"SELECT LEAST(1, 'text')", "error", false);
     [Fact]
     public void csea0117() => CorpusAssert.Parses(@"UPDATE s.t SET qty = CASE WHEN qty < 0 THEN 0 ELSE qty END", "ok");
     [Fact]
@@ -415,16 +415,16 @@ public class Corpus_CaseConditional
     public void cseb0033() => CorpusAssert.Parses(@"SELECT CASE 1 WHEN THEN 'x' END", "error");
     [Fact]
     public void cseb0034() => CorpusAssert.Parses(@"SELECT CASE ELSE 'x' END", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cseb0035() => CorpusAssert.Parses(@"SELECT COALESCE()", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cseb0036() => CorpusAssert.Parses(@"SELECT NULLIF(1, 2, 3)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cseb0037() => CorpusAssert.Parses(@"SELECT GREATEST()", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task cseb0035() => CorpusAssert.MatchesPostgres(@"SELECT COALESCE()", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task cseb0036() => CorpusAssert.MatchesPostgres(@"SELECT NULLIF(1, 2, 3)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task cseb0037() => CorpusAssert.MatchesPostgres(@"SELECT GREATEST()", "error", false);
     [Fact]
     public void cseb0038() => CorpusAssert.Parses(@"SELECT CASE WHEN 1=1 THEN 'a' WHEN END", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cseb0039() => CorpusAssert.Parses(@"SELECT LEAST()", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cseb0040() => CorpusAssert.Parses(@"SELECT CASE val WHEN 'text' THEN 1 END FROM s.t", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task cseb0039() => CorpusAssert.MatchesPostgres(@"SELECT LEAST()", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task cseb0040() => CorpusAssert.MatchesPostgres(@"SELECT CASE val WHEN 'text' THEN 1 END FROM s.t", "error", false);
 }

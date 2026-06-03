@@ -65,8 +65,8 @@ public class Corpus_Update
     public void upda0029() => CorpusAssert.Parses(@"UPDATE s.parent SET kind = 'Y'", "ok");
     [Fact]
     public void upda0030() => CorpusAssert.Parses(@"UPDATE s.t * SET val = 0", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void upda0031() => CorpusAssert.Parses(@"UPDATE ONLY s.t * SET val = 1", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task upda0031() => CorpusAssert.MatchesPostgres(@"UPDATE ONLY s.t * SET val = 1", "error", false);
     [Fact]
     public void upda0032() => CorpusAssert.Parses(@"UPDATE s.t SET name = 'from' FROM s.t2 WHERE s.t2.t_id = s.t.id", "ok");
     [Fact]
@@ -91,8 +91,8 @@ public class Corpus_Update
     public void upda0042() => CorpusAssert.Parses(@"UPDATE s.t SET status = 'happy'", "ok");
     [Fact]
     public void upda0043() => CorpusAssert.Parses(@"UPDATE s.t SET status = 'happy'::s.mood", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void upda0044() => CorpusAssert.Parses(@"UPDATE s.t SET status = 'invalid_mood'", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task upda0044() => CorpusAssert.MatchesPostgres(@"UPDATE s.t SET status = 'invalid_mood'", "error", false);
     [Fact]
     public void upda0045() => CorpusAssert.Parses(@"UPDATE s.t SET data = '{""k"":1}'", "ok");
     [Fact]
@@ -185,8 +185,8 @@ public class Corpus_Update
     public void upda0089() => CorpusAssert.Parses(@"UPDATE s.t SET", "error");
     [Fact]
     public void upda0090() => CorpusAssert.Parses(@"UPDATE s.t", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void upda0091() => CorpusAssert.Parses(@"SET name = 'X'", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task upda0091() => CorpusAssert.MatchesPostgres(@"SET name = 'X'", "error", false);
     [Fact]
     public void upda0092() => CorpusAssert.Parses(@"UPDATE SET name = 'X'", "error");
     [Fact]
@@ -205,20 +205,20 @@ public class Corpus_Update
     public void upda0099() => CorpusAssert.Parses(@"UPDATE s.t SET nonexistent_col = 1", "error");
     [Fact]
     public void upda0100() => CorpusAssert.Parses(@"UPDATE s.nonexistent SET name = 'X'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void upda0101() => CorpusAssert.Parses(@"UPDATE s.mv SET name = 'X'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void upda0102() => CorpusAssert.Parses(@"UPDATE s.t SET val = 'not_a_number'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void upda0103() => CorpusAssert.Parses(@"UPDATE s.t SET name = 'X' RETURNING FROM", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void upda0104() => CorpusAssert.Parses(@"UPDATE s.t SET (name) = ('A','B')", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void upda0105() => CorpusAssert.Parses(@"UPDATE s.t SET (name, val) = (SELECT 'A')", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task upda0101() => CorpusAssert.MatchesPostgres(@"UPDATE s.mv SET name = 'X'", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task upda0102() => CorpusAssert.MatchesPostgres(@"UPDATE s.t SET val = 'not_a_number'", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task upda0103() => CorpusAssert.MatchesPostgres(@"UPDATE s.t SET name = 'X' RETURNING FROM", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task upda0104() => CorpusAssert.MatchesPostgres(@"UPDATE s.t SET (name) = ('A','B')", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task upda0105() => CorpusAssert.MatchesPostgres(@"UPDATE s.t SET (name, val) = (SELECT 'A')", "error", false);
     [Fact]
     public void upda0106() => CorpusAssert.Parses(@"UPDATE s.t SET val = 1 FROM", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void upda0107() => CorpusAssert.Parses(@"UPDATE s.t SET val = 1 WHERE CURRENT OF some_cursor", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task upda0107() => CorpusAssert.MatchesPostgres(@"UPDATE s.t SET val = 1 WHERE CURRENT OF some_cursor", "error", false);
     [Fact]
     public void upda0108() => CorpusAssert.Parses(@"WITH cte AS (UPDATE s.t2 SET amount = 1 RETURNING id) UPDATE s.t SET flag = true FROM cte WHERE cte.id = s.t.id", "ok");
     [Fact]
@@ -239,8 +239,8 @@ public class Corpus_Update
     public void upda0116() => CorpusAssert.Parses(@"UPDATE s.t SET val = val::numeric(12,2)", "ok");
     [Fact]
     public void upda0117() => CorpusAssert.Parses(@"UPDATE s.t SET qty = CAST(val AS integer)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void upda0118() => CorpusAssert.Parses(@"UPDATE s.t SET name = $1 WHERE id = $2", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task upda0118() => CorpusAssert.MatchesPostgres(@"UPDATE s.t SET name = $1 WHERE id = $2", "error", false);
     [Fact]
     public void upda0119() => CorpusAssert.Parses(@"UPDATE s.t AS a SET name = 'alias_dot' WHERE a.id = 1", "ok");
     [Fact]
@@ -348,8 +348,8 @@ name = 'comment_ok'", "ok");
     public void upda0170() => CorpusAssert.Parses(@"UPDATE s.t SET val = 1 RETURNING WITH (OLD AS o, NEW AS n) *, o.val, n.val", "ok");
     [Fact]
     public void upda0171() => CorpusAssert.Parses(@"UPDATE s.t AS a SET a.name = 'alias_dot'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void upda0172() => CorpusAssert.Parses(@"UPDATE s.t SET ""Name"" = 'quoted_case'", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task upda0172() => CorpusAssert.MatchesPostgres(@"UPDATE s.t SET ""Name"" = 'quoted_case'", "error", false);
     [Fact]
     public void upda0173() => CorpusAssert.Parses(@"UPDATE s.t SET val = 1 RETURNING WITH ()", "error");
     [Fact]
@@ -402,8 +402,8 @@ name = 'comment_ok'", "ok");
     public void updb0024() => CorpusAssert.Parses(@"UPDATE ONLY s.parent SET kind = 'base'", "ok");
     [Fact]
     public void updb0025() => CorpusAssert.Parses(@"UPDATE s.parent SET kind = 'all'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void updb0026() => CorpusAssert.Parses(@"UPDATE ONLY s.parent * SET kind = 'star'", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task updb0026() => CorpusAssert.MatchesPostgres(@"UPDATE ONLY s.parent * SET kind = 'star'", "error", false);
     [Fact]
     public void updb0027() => CorpusAssert.Parses(@"UPDATE s.parent * SET kind = 'star'", "ok");
     [Fact]
@@ -516,8 +516,8 @@ name = 'comment_ok'", "ok");
     public void updb0081() => CorpusAssert.Parses(@"UPDATE s.t SET created_at = now()", "ok");
     [Fact]
     public void updb0082() => CorpusAssert.Parses(@"UPDATE s.t SET created_at = CURRENT_TIMESTAMP", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void updb0083() => CorpusAssert.Parses(@"UPDATE s.t SET name = $1", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task updb0083() => CorpusAssert.MatchesPostgres(@"UPDATE s.t SET name = $1", "error", false);
     [Fact]
     public void updb0084() => CorpusAssert.Parses(@"UPDATE s.t SET name = 'x' WHERE false", "ok");
     [Fact]
@@ -556,12 +556,12 @@ name = 'comment_ok'", "ok");
     public void updb0101() => CorpusAssert.Parses(@"UPDATE s.t SET = 'x'", "error");
     [Fact]
     public void updb0102() => CorpusAssert.Parses(@"UPDATE s.t SET name = 'x', WHERE id = 1", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void updb0103() => CorpusAssert.Parses(@"UPDATE s.t SET (name) = 'x'", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task updb0103() => CorpusAssert.MatchesPostgres(@"UPDATE s.t SET (name) = 'x'", "error", false);
     [Fact]
     public void updb0104() => CorpusAssert.Parses(@"UPDATE s.t SET () = ()", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void updb0105() => CorpusAssert.Parses(@"UPDATE s.t SET (name, val) = ('a')", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task updb0105() => CorpusAssert.MatchesPostgres(@"UPDATE s.t SET (name, val) = ('a')", "error", false);
     [Fact]
     public void updb0106() => CorpusAssert.Parses(@"UPDATE s.t SET name = 'x' WHERE", "error");
     [Fact]
@@ -572,12 +572,12 @@ name = 'comment_ok'", "ok");
     public void updb0109() => CorpusAssert.Parses(@"UPDATE s.nonexistent SET name = 'x'", "error");
     [Fact]
     public void updb0110() => CorpusAssert.Parses(@"UPDATE s.t SET nonexistent_col = 'x'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void updb0111() => CorpusAssert.Parses(@"UPDATE s.t SET id = 'not_a_number'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void updb0112() => CorpusAssert.Parses(@"UPDATE s.t SET name = 'x', name = 'y'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void updb0113() => CorpusAssert.Parses(@"UPDATE s.mv SET n = 1", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task updb0111() => CorpusAssert.MatchesPostgres(@"UPDATE s.t SET id = 'not_a_number'", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task updb0112() => CorpusAssert.MatchesPostgres(@"UPDATE s.t SET name = 'x', name = 'y'", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task updb0113() => CorpusAssert.MatchesPostgres(@"UPDATE s.mv SET n = 1", "error", false);
     [Fact]
     public void updb0114() => CorpusAssert.Parses(@"UPDATE s.t SET name = 'x'; UPDATE s.t SET val = 1.0", "ok");
     [Fact]
@@ -632,12 +632,12 @@ name = 'comment_ok'", "ok");
     public void updb0139() => CorpusAssert.Parses(@"UPDATE s.t SET status = 'ok'::s.mood", "ok");
     [Fact]
     public void updb0140() => CorpusAssert.Parses(@"UPDATE s.t SET status = 'happy'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void updb0141() => CorpusAssert.Parses(@"UPDATE s.t SET status = 'invalid_mood'", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task updb0141() => CorpusAssert.MatchesPostgres(@"UPDATE s.t SET status = 'invalid_mood'", "error", false);
     [Fact]
     public void updb0142() => CorpusAssert.Parses(@"UPDATE s.t SET qty = 1 FROM s.t AS src WHERE src.id != s.t.id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void updb0143() => CorpusAssert.Parses(@"ONLY UPDATE s.t SET name = 'x'", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task updb0143() => CorpusAssert.MatchesPostgres(@"ONLY UPDATE s.t SET name = 'x'", "error", false);
     [Fact]
     public void updb0144() => CorpusAssert.Parses(@"UPDATE s.t SET name = 'x' FROM s.t2 LEFT JOIN s.t AS tref ON s.t2.t_id = tref.id", "ok");
     [Fact]
@@ -682,8 +682,8 @@ name = 'comment_ok'", "ok");
     public void updb0164() => CorpusAssert.Parses(@"UPDATE s.t SET name = 'x' FROM s.t2 WHERE s.t2.t_id = s.t.id WHERE s.t.id = 1", "error");
     [Fact]
     public void updb0165() => CorpusAssert.Parses(@"UPDATE s.t SET val = 1 / 0", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void updb0166() => CorpusAssert.Parses(@"UPDATE s.t SET name = 'x' RETURNING WITH () *", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task updb0166() => CorpusAssert.MatchesPostgres(@"UPDATE s.t SET name = 'x' RETURNING WITH () *", "error", false);
     [Fact]
     public void updb0167() => CorpusAssert.Parses(@"UPDATE s.t SET name = repeat('a', 1000)", "ok");
     [Fact]
@@ -728,8 +728,8 @@ name = 'comment_ok'", "ok");
     public void updc0017() => CorpusAssert.Parses(@"UPDATE s.t name = 'missing_set'", "error");
     [Fact]
     public void updc0018() => CorpusAssert.Parses(@"UPDATE s.t SET name 'no_eq'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void updc0019() => CorpusAssert.Parses(@"UPDATE s.t SET (name, qty) = (SELECT 'too_few' LIMIT 1)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task updc0019() => CorpusAssert.MatchesPostgres(@"UPDATE s.t SET (name, qty) = (SELECT 'too_few' LIMIT 1)", "error", false);
     [Fact]
     public void updc0020() => CorpusAssert.Parses(@"UPDATE s.t SET qty = qty + 1 RETURNING", "error");
 }

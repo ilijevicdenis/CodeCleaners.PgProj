@@ -113,16 +113,16 @@ public class Corpus_SelectGroupHaving
     public void selga0053() => CorpusAssert.Parses(@"SELECT name FROM s.t WHERE val > 0 GROUP BY name", "ok");
     [Fact]
     public void selga0054() => CorpusAssert.Parses(@"SELECT name, count(*) FROM s.t WHERE qty > 0 GROUP BY name HAVING count(*) > 0", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selga0055() => CorpusAssert.Parses(@"SELECT name FROM s.t WHERE count(*) > 0", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selga0056() => CorpusAssert.Parses(@"SELECT name FROM s.t WHERE sum(val) > 100 GROUP BY name", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selga0057() => CorpusAssert.Parses(@"SELECT name, qty FROM s.t GROUP BY name", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task selga0055() => CorpusAssert.MatchesPostgres(@"SELECT name FROM s.t WHERE count(*) > 0", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task selga0056() => CorpusAssert.MatchesPostgres(@"SELECT name FROM s.t WHERE sum(val) > 100 GROUP BY name", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task selga0057() => CorpusAssert.MatchesPostgres(@"SELECT name, qty FROM s.t GROUP BY name", "error", false);
     [Fact]
     public void selga0058() => CorpusAssert.Parses(@"SELECT name, val FROM s.t GROUP BY name, val", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selga0059() => CorpusAssert.Parses(@"SELECT name FROM s.t GROUP BY name HAVING qty > 0", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task selga0059() => CorpusAssert.MatchesPostgres(@"SELECT name FROM s.t GROUP BY name HAVING qty > 0", "error", false);
     [Fact]
     public void selga0060() => CorpusAssert.Parses(@"SELECT count(*) FROM s.t GROUP BY ()", "ok");
     [Fact]
@@ -137,8 +137,8 @@ public class Corpus_SelectGroupHaving
     public void selga0065() => CorpusAssert.Parses(@"SELECT name, count(*) FROM s.t GROUP BY ROLLUP (name, (status, flag))", "ok");
     [Fact]
     public void selga0066() => CorpusAssert.Parses(@"SELECT name, status, flag, count(*) FROM s.t GROUP BY CUBE ((name, status), flag)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selga0067() => CorpusAssert.Parses(@"SELECT name FROM s.t GROUP BY lower(name)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task selga0067() => CorpusAssert.MatchesPostgres(@"SELECT name FROM s.t GROUP BY lower(name)", "error", false);
     [Fact]
     public void selga0068() => CorpusAssert.Parses(@"SELECT lower(name) FROM s.t GROUP BY lower(name)", "ok");
     [Fact]
@@ -209,14 +209,14 @@ public class Corpus_SelectGroupHaving
     public void selga0101() => CorpusAssert.Parses(@"SELECT name, count(*) FROM s.t GROUP BY name HAVING count(*) > 0 ORDER BY count(*) DESC LIMIT 3 OFFSET 0", "ok");
     [Fact]
     public void selga0102() => CorpusAssert.Parses(@"SELECT name FROM s.t GROUP BY name ORDER BY 1", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selga0103() => CorpusAssert.Parses(@"SELECT name, count(*) FROM s.t GROUP BY 0", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selga0104() => CorpusAssert.Parses(@"SELECT name FROM s.t GROUP BY 2", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selga0105() => CorpusAssert.Parses(@"SELECT name FROM s.t GROUP BY -1", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selga0106() => CorpusAssert.Parses(@"SELECT name, count(*) FROM s.t GROUP BY name ORDER BY 3", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task selga0103() => CorpusAssert.MatchesPostgres(@"SELECT name, count(*) FROM s.t GROUP BY 0", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task selga0104() => CorpusAssert.MatchesPostgres(@"SELECT name FROM s.t GROUP BY 2", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task selga0105() => CorpusAssert.MatchesPostgres(@"SELECT name FROM s.t GROUP BY -1", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task selga0106() => CorpusAssert.MatchesPostgres(@"SELECT name, count(*) FROM s.t GROUP BY name ORDER BY 3", "error", false);
     [Fact]
     public void selga0107() => CorpusAssert.Parses(@"SELECT name, count(*) FROM s.t GROUP BY name HAVING", "error");
     [Fact]
@@ -249,8 +249,8 @@ public class Corpus_SelectGroupHaving
     public void selga0121() => CorpusAssert.Parses(@"SELECT name, count(*) FROM s.t GROUP BY name HAVING sum(val) FILTER (WHERE qty > 0) IS NOT NULL", "ok");
     [Fact]
     public void selga0122() => CorpusAssert.Parses(@"SELECT name, count(*) FROM s.t GROUP BY name HAVING count(*) FILTER (WHERE flag) > 0", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selga0123() => CorpusAssert.Parses(@"SELECT name, count(*) FROM s.t GROUP BY name HAVING ROLLUP (name)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task selga0123() => CorpusAssert.MatchesPostgres(@"SELECT name, count(*) FROM s.t GROUP BY name HAVING ROLLUP (name)", "error", false);
     [Fact]
     public void selga0124() => CorpusAssert.Parses(@"SELECT name, status, flag, count(*) FROM s.t GROUP BY name, status, flag", "ok");
     [Fact]
@@ -317,8 +317,8 @@ public class Corpus_SelectGroupHaving
     public void selga0155() => CorpusAssert.Parses(@"SELECT name, count(*) FROM s.t GROUP BY GROUPING SETS (name, status)", "ok");
     [Fact]
     public void selga0156() => CorpusAssert.Parses(@"SELECT name, status, count(*) FROM s.t GROUP BY CUBE (name, status) HAVING grouping(name) = 1", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selga0157() => CorpusAssert.Parses(@"SELECT name, count(*) FROM s.t GROUP BY name HAVING count(*) > 0 FOR UPDATE", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task selga0157() => CorpusAssert.MatchesPostgres(@"SELECT name, count(*) FROM s.t GROUP BY name HAVING count(*) > 0 FOR UPDATE", "error", false);
     [Fact]
     public void selga0158() => CorpusAssert.Parses(@"SELECT name FROM s.t GROUP BY ROLLUP (name) ORDER BY grouping(name), name", "ok");
     [Fact]
@@ -430,18 +430,18 @@ HAVING -- comment
     public void selgb0038() => CorpusAssert.Parses(@"SELECT name, sum(val) FROM s.t GROUP BY name LIMIT 5", "ok");
     [Fact]
     public void selgb0039() => CorpusAssert.Parses(@"SELECT name, sum(val) FROM s.t GROUP BY name LIMIT 5 OFFSET 2", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selgb0040() => CorpusAssert.Parses(@"SELECT name, sum(val) FROM s.t WHERE sum(val) > 0 GROUP BY name", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task selgb0040() => CorpusAssert.MatchesPostgres(@"SELECT name, sum(val) FROM s.t WHERE sum(val) > 0 GROUP BY name", "error", false);
     [Fact]
     public void selgb0041() => CorpusAssert.Parses(@"SELECT name FROM s.t GROUP BY", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selgb0042() => CorpusAssert.Parses(@"SELECT name FROM s.t HAVING name = 'x'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selgb0043() => CorpusAssert.Parses(@"SELECT name, val FROM s.t GROUP BY name", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task selgb0042() => CorpusAssert.MatchesPostgres(@"SELECT name FROM s.t HAVING name = 'x'", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task selgb0043() => CorpusAssert.MatchesPostgres(@"SELECT name, val FROM s.t GROUP BY name", "error", false);
     [Fact]
     public void selgb0044() => CorpusAssert.Parses(@"SELECT name, count(*) AS c FROM s.t GROUP BY name ORDER BY c", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selgb0045() => CorpusAssert.Parses(@"SELECT name, count(*) AS c FROM s.t GROUP BY name HAVING c > 0", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task selgb0045() => CorpusAssert.MatchesPostgres(@"SELECT name, count(*) AS c FROM s.t GROUP BY name HAVING c > 0", "error", false);
     [Fact]
     public void selgb0046() => CorpusAssert.Parses(@"SELECT name, sum(val) FILTER (WHERE val > 0) FROM s.t GROUP BY name", "ok");
     [Fact]
@@ -486,12 +486,12 @@ HAVING -- comment
     public void selgb0066() => CorpusAssert.Parses(@"SELECT val::int, count(*) FROM s.t GROUP BY val::int", "ok");
     [Fact]
     public void selgb0067() => CorpusAssert.Parses(@"SELECT CASE WHEN qty > 0 THEN 'pos' ELSE 'zero' END, count(*) FROM s.t GROUP BY CASE WHEN qty > 0 THEN 'pos' ELSE 'zero' END", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selgb0068() => CorpusAssert.Parses(@"SELECT name FROM s.t GROUP BY 0", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selgb0069() => CorpusAssert.Parses(@"SELECT name FROM s.t GROUP BY 2", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selgb0070() => CorpusAssert.Parses(@"SELECT name, sum(val) FROM s.t GROUP BY GROUPING SETS ()", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task selgb0068() => CorpusAssert.MatchesPostgres(@"SELECT name FROM s.t GROUP BY 0", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task selgb0069() => CorpusAssert.MatchesPostgres(@"SELECT name FROM s.t GROUP BY 2", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task selgb0070() => CorpusAssert.MatchesPostgres(@"SELECT name, sum(val) FROM s.t GROUP BY GROUPING SETS ()", "error", false);
     [Fact]
     public void selgb0071() => CorpusAssert.Parses(@"SELECT name, qty, sum(val) FROM s.t GROUP BY GROUPING SETS ((name), (qty), (name, qty), ())", "ok");
     [Fact]

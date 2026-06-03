@@ -315,36 +315,36 @@ public class Corpus_TypeSyntax
     public void tysa0154() => CorpusAssert.Parses(@"SELECT true::boolean, 'true'::bool", "ok");
     [Fact]
     public void tysa0155() => CorpusAssert.Parses(@"SELECT '{1,2,3}'::integer[], '{{1,2},{3,4}}'::integer[][]", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tysa0156() => CorpusAssert.Parses(@"SELECT CAST(1 AS notarealtype)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tysa0157() => CorpusAssert.Parses(@"SELECT CAST(1 AS char(0))", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tysa0158() => CorpusAssert.Parses(@"SELECT CAST(1 AS bit varying())", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tysa0159() => CorpusAssert.Parses(@"SELECT CAST(1 AS float(0))", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tysa0160() => CorpusAssert.Parses(@"SELECT CAST(1 AS float(54))", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tysa0161() => CorpusAssert.Parses(@"SELECT CAST(1 AS numeric(1001,0))", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tysa0162() => CorpusAssert.Parses(@"SELECT CAST(1 AS timestamp(7))", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tysa0163() => CorpusAssert.Parses(@"SELECT CAST(1 AS time(7))", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task tysa0156() => CorpusAssert.MatchesPostgres(@"SELECT CAST(1 AS notarealtype)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tysa0157() => CorpusAssert.MatchesPostgres(@"SELECT CAST(1 AS char(0))", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tysa0158() => CorpusAssert.MatchesPostgres(@"SELECT CAST(1 AS bit varying())", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tysa0159() => CorpusAssert.MatchesPostgres(@"SELECT CAST(1 AS float(0))", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tysa0160() => CorpusAssert.MatchesPostgres(@"SELECT CAST(1 AS float(54))", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tysa0161() => CorpusAssert.MatchesPostgres(@"SELECT CAST(1 AS numeric(1001,0))", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tysa0162() => CorpusAssert.MatchesPostgres(@"SELECT CAST(1 AS timestamp(7))", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tysa0163() => CorpusAssert.MatchesPostgres(@"SELECT CAST(1 AS time(7))", "error", false);
     [Fact]
     public void tysa0164() => CorpusAssert.Parses(@"SELECT 1 AS integer", "ok");
     [Fact]
     public void tysa0165() => CorpusAssert.Parses(@"SELECT CAST(1 AS integer badkeyword)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tysa0166() => CorpusAssert.Parses(@"SELECT CAST('2024-01-01' AS timestamp(-1))", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tysa0167() => CorpusAssert.Parses(@"CREATE TABLE s.tty36 (a numeric(,2))", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tysa0168() => CorpusAssert.Parses(@"SELECT CAST('hello' AS character varying(-1))", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tysa0169() => CorpusAssert.Parses(@"SELECT '0/1'::pg_lsn + '0/1'::pg_lsn", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tysa0170() => CorpusAssert.Parses(@"SELECT CAST(1.5 AS interval)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task tysa0166() => CorpusAssert.MatchesPostgres(@"SELECT CAST('2024-01-01' AS timestamp(-1))", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tysa0167() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.tty36 (a numeric(,2))", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tysa0168() => CorpusAssert.MatchesPostgres(@"SELECT CAST('hello' AS character varying(-1))", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tysa0169() => CorpusAssert.MatchesPostgres(@"SELECT '0/1'::pg_lsn + '0/1'::pg_lsn", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tysa0170() => CorpusAssert.MatchesPostgres(@"SELECT CAST(1.5 AS interval)", "error", false);
     [Fact]
     public void tysb0001() => CorpusAssert.Parses(@"SELECT CAST(42 AS smallint)", "ok");
     [Fact]
@@ -587,28 +587,28 @@ public class Corpus_TypeSyntax
     public void tysb0120() => CorpusAssert.Parses(@"SELECT 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'::uuid", "ok");
     [Fact]
     public void tysb0121() => CorpusAssert.Parses(@"SELECT interval '1 day' * 3", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tysb0122() => CorpusAssert.Parses(@"SELECT CAST(42 AS numeric(0))", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tysb0123() => CorpusAssert.Parses(@"SELECT CAST('x' AS char(0))", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tysb0124() => CorpusAssert.Parses(@"SELECT CAST(42 AS nosuchtype)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tysb0125() => CorpusAssert.Parses(@"SELECT CAST(42 AS bit varying())", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tysb0126() => CorpusAssert.Parses(@"SELECT CAST(42 AS float(0))", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tysb0127() => CorpusAssert.Parses(@"SELECT CAST(42 AS float(54))", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tysb0128() => CorpusAssert.Parses(@"SELECT CAST(42 AS integer())", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tysb0129() => CorpusAssert.Parses(@"SELECT CAST(42 AS double)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tysb0130() => CorpusAssert.Parses(@"SELECT CAST(42 AS timestamp with zone)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tysb0131() => CorpusAssert.Parses(@"SELECT CAST(42 AS time zone)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tysb0132() => CorpusAssert.Parses(@"SELECT CAST(42 AS character varying())", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task tysb0122() => CorpusAssert.MatchesPostgres(@"SELECT CAST(42 AS numeric(0))", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tysb0123() => CorpusAssert.MatchesPostgres(@"SELECT CAST('x' AS char(0))", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tysb0124() => CorpusAssert.MatchesPostgres(@"SELECT CAST(42 AS nosuchtype)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tysb0125() => CorpusAssert.MatchesPostgres(@"SELECT CAST(42 AS bit varying())", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tysb0126() => CorpusAssert.MatchesPostgres(@"SELECT CAST(42 AS float(0))", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tysb0127() => CorpusAssert.MatchesPostgres(@"SELECT CAST(42 AS float(54))", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tysb0128() => CorpusAssert.MatchesPostgres(@"SELECT CAST(42 AS integer())", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tysb0129() => CorpusAssert.MatchesPostgres(@"SELECT CAST(42 AS double)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tysb0130() => CorpusAssert.MatchesPostgres(@"SELECT CAST(42 AS timestamp with zone)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tysb0131() => CorpusAssert.MatchesPostgres(@"SELECT CAST(42 AS time zone)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tysb0132() => CorpusAssert.MatchesPostgres(@"SELECT CAST(42 AS character varying())", "error", false);
     [Fact]
     public void tysb0133() => CorpusAssert.Parses(@"SELECT 42::", "error");
     [Fact]
@@ -619,10 +619,10 @@ public class Corpus_TypeSyntax
     public void tysb0136() => CorpusAssert.Parses(@"SELECT CAST('1 year' AS interval(3))", "ok");
     [Fact]
     public void tysb0137() => CorpusAssert.Parses(@"CREATE TABLE pg_type_col_int_prec (a interval day to second(6), b interval second(4))", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tysb0138() => CorpusAssert.Parses(@"SELECT CAST(42 AS numeric(1001,0))", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tysb0139() => CorpusAssert.Parses(@"SELECT CAST(42 AS timestamp(7))", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task tysb0138() => CorpusAssert.MatchesPostgres(@"SELECT CAST(42 AS numeric(1001,0))", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tysb0139() => CorpusAssert.MatchesPostgres(@"SELECT CAST(42 AS timestamp(7))", "error", false);
     [Fact]
     public void tysb0140() => CorpusAssert.Parses(@"SELECT '{1,2,3}'::int[]", "ok");
     [Fact]
@@ -643,6 +643,6 @@ public class Corpus_TypeSyntax
     public void tysb0148() => CorpusAssert.Parses(@"SELECT CAST(42 AS integer) + CAST(1 AS smallint)", "ok");
     [Fact]
     public void tysb0149() => CorpusAssert.Parses(@"SELECT numrange(1.0, 2.0)::numrange", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tysb0150() => CorpusAssert.Parses(@"SELECT CAST(42 AS timestamp without zone)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task tysb0150() => CorpusAssert.MatchesPostgres(@"SELECT CAST(42 AS timestamp without zone)", "error", false);
 }

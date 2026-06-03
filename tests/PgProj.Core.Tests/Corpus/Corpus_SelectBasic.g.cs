@@ -363,22 +363,22 @@ public class Corpus_SelectBasic
     public void selba0178() => CorpusAssert.Parses(@"SELECT DISTINCT ON id FROM s.t ORDER BY id", "error");
     [Fact]
     public void selba0179() => CorpusAssert.Parses(@"SELECT id FROM s.t GROUP BY", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selba0180() => CorpusAssert.Parses(@"SELECT id WHERE id = 1", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task selba0180() => CorpusAssert.MatchesPostgres(@"SELECT id WHERE id = 1", "error", false);
     [Fact]
     public void selba0181() => CorpusAssert.Parses(@"SELECT *, FROM s.t", "error");
     [Fact]
     public void selba0182() => CorpusAssert.Parses(@"SELECT id FROM s.t JOIN s.t2", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selba0183() => CorpusAssert.Parses(@"SELECT id FROM s.t HAVING COUNT(*) > 0", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selba0184() => CorpusAssert.Parses(@"SELECT ALL DISTINCT id FROM s.t", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task selba0183() => CorpusAssert.MatchesPostgres(@"SELECT id FROM s.t HAVING COUNT(*) > 0", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task selba0184() => CorpusAssert.MatchesPostgres(@"SELECT ALL DISTINCT id FROM s.t", "error", false);
     [Fact]
     public void selba0185() => CorpusAssert.Parses(@"SELECT id FROM s.t FETCH FIRST ROWS ONLY", "ok");
     [Fact]
     public void selba0186() => CorpusAssert.Parses(@"SELECT id name extra FROM s.t", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selba0187() => CorpusAssert.Parses(@"SELECT 1 + * FROM s.t", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task selba0187() => CorpusAssert.MatchesPostgres(@"SELECT 1 + * FROM s.t", "error", false);
     [Fact]
     public void selba0188() => CorpusAssert.Parses(@"SELECT id FROM s.t WHERE id =", "error");
     [Fact]
@@ -387,8 +387,8 @@ public class Corpus_SelectBasic
     public void selba0190() => CorpusAssert.Parses(@"SELECT id FROM s.t OFFSET -1", "error");
     [Fact]
     public void selba0191() => CorpusAssert.Parses(@"SELECT id FROM s.nonexistent_table", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selba0192() => CorpusAssert.Parses(@"SELECT no_col FROM s.t", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task selba0192() => CorpusAssert.MatchesPostgres(@"SELECT no_col FROM s.t", "error", false);
     [Fact]
     public void selba0193() => CorpusAssert.Parses(@"SELECT id FROM s.t ORDER BY id LIMIT 5 FOR UPDATE", "ok");
     [Fact]
@@ -555,8 +555,8 @@ public class Corpus_SelectBasic
     public void selbb0074() => CorpusAssert.Parses(@"SELECT id FROM s.t FETCH FIRST 1 ROW ONLY", "ok");
     [Fact]
     public void selbb0075() => CorpusAssert.Parses(@"SELECT id FROM s.t OFFSET 0 ROWS FETCH NEXT 5 ROWS ONLY", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selbb0076() => CorpusAssert.Parses(@"SELECT id FROM s.t FETCH FIRST 5 ROWS WITH TIES", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task selbb0076() => CorpusAssert.MatchesPostgres(@"SELECT id FROM s.t FETCH FIRST 5 ROWS WITH TIES", "error", false);
     [Fact]
     public void selbb0077() => CorpusAssert.Parses(@"SELECT id FROM s.t ORDER BY id FETCH FIRST 5 ROWS WITH TIES", "ok");
     [Fact]
@@ -627,14 +627,14 @@ public class Corpus_SelectBasic
     public void selbb0110() => CorpusAssert.Parses(@"SELECT tags[1] FROM s.t", "ok");
     [Fact]
     public void selbb0111() => CorpusAssert.Parses(@"SELECT (home).city FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selbb0112() => CorpusAssert.Parses(@"SELECT home.city FROM s.t", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task selbb0112() => CorpusAssert.MatchesPostgres(@"SELECT home.city FROM s.t", "error", false);
     [Fact]
     public void selbb0113() => CorpusAssert.Parses(@"SELECT id::text FROM s.t", "ok");
     [Fact]
     public void selbb0114() => CorpusAssert.Parses(@"SELECT CAST(id AS text) FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selbb0115() => CorpusAssert.Parses(@"SELECT id FROM s.t WHERE id = $1", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task selbb0115() => CorpusAssert.MatchesPostgres(@"SELECT id FROM s.t WHERE id = $1", "error", false);
     [Fact]
     public void selbb0116() => CorpusAssert.Parses(@"SELECT 1, 2, 3", "ok");
     [Fact]
@@ -691,22 +691,22 @@ public class Corpus_SelectBasic
     public void selbb0142() => CorpusAssert.Parses(@"SELECT id FROM s.t LIMIT", "error");
     [Fact]
     public void selbb0143() => CorpusAssert.Parses(@"SELECT id FROM s.t OFFSET", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selbb0144() => CorpusAssert.Parses(@"DISTINCT SELECT id FROM s.t", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task selbb0144() => CorpusAssert.MatchesPostgres(@"DISTINCT SELECT id FROM s.t", "error", false);
     [Fact]
     public void selbb0145() => CorpusAssert.Parses(@"SELECT id FROM s.t GROUP", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selbb0146() => CorpusAssert.Parses(@"SELECT id FROM s.t HAVING count(*) > 0", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selbb0147() => CorpusAssert.Parses(@"SELECT id FROM s.t ORDER BY nonexistent_column", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selbb0148() => CorpusAssert.Parses(@"SELECT no_such_col FROM s.t", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task selbb0146() => CorpusAssert.MatchesPostgres(@"SELECT id FROM s.t HAVING count(*) > 0", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task selbb0147() => CorpusAssert.MatchesPostgres(@"SELECT id FROM s.t ORDER BY nonexistent_column", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task selbb0148() => CorpusAssert.MatchesPostgres(@"SELECT no_such_col FROM s.t", "error", false);
     [Fact]
     public void selbb0149() => CorpusAssert.Parses(@"SELECT id FROM s.no_such_table", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selbb0150() => CorpusAssert.Parses(@"SELECT id FROM s.t WHERE id = 'not_a_number'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selbb0151() => CorpusAssert.Parses(@"SELECT (SELECT id, name FROM s.t LIMIT 1)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task selbb0150() => CorpusAssert.MatchesPostgres(@"SELECT id FROM s.t WHERE id = 'not_a_number'", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task selbb0151() => CorpusAssert.MatchesPostgres(@"SELECT (SELECT id, name FROM s.t LIMIT 1)", "error", false);
     [Fact]
     public void selbb0152() => CorpusAssert.Parses(@"SELECT id FROM s.t AS t2 WHERE t2.id > 0", "ok");
     [Fact]
@@ -725,6 +725,6 @@ public class Corpus_SelectBasic
     public void selbb0159() => CorpusAssert.Parses(@"SELECT sum(val), avg(val), min(val), max(val) FROM s.t", "ok");
     [Fact]
     public void selbb0160() => CorpusAssert.Parses(@"SELECT id FROM s.t WHERE id = (SELECT max(id) FROM s.t)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selbb0161() => CorpusAssert.Parses(@"SELECT FROM WHERE true", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task selbb0161() => CorpusAssert.MatchesPostgres(@"SELECT FROM WHERE true", "error", false);
 }

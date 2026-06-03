@@ -77,8 +77,8 @@ public class Corpus_DropStatements
     public void drpa0035() => CorpusAssert.Parses(@"DROP INDEX IF EXISTS s.t_name_idx", "ok");
     [Fact]
     public void drpa0036() => CorpusAssert.Parses(@"DROP INDEX IF EXISTS s.no_such_idx", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void drpa0037() => CorpusAssert.Parses(@"DROP INDEX s.no_such_idx", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task drpa0037() => CorpusAssert.MatchesPostgres(@"DROP INDEX s.no_such_idx", "error", false);
     [Fact]
     public void drpa0038() => CorpusAssert.Parses(@"DROP INDEX s.t_name_idx CASCADE", "ok");
     [Fact]
@@ -119,10 +119,10 @@ public class Corpus_DropStatements
     public void drpa0056() => CorpusAssert.Parses(@"DROP SCHEMA IF EXISTS s CASCADE", "ok");
     [Fact]
     public void drpa0057() => CorpusAssert.Parses(@"DROP SCHEMA IF EXISTS no_such_schema", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void drpa0058() => CorpusAssert.Parses(@"DROP SCHEMA no_such_schema", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void drpa0059() => CorpusAssert.Parses(@"DROP SCHEMA s RESTRICT", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task drpa0058() => CorpusAssert.MatchesPostgres(@"DROP SCHEMA no_such_schema", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task drpa0059() => CorpusAssert.MatchesPostgres(@"DROP SCHEMA s RESTRICT", "error", false);
     [Fact]
     public void drpa0060() => CorpusAssert.Parses(@"DROP SCHEMA", "error");
     [Fact]
@@ -133,8 +133,8 @@ public class Corpus_DropStatements
     public void drpa0063() => CorpusAssert.Parses(@"DROP FUNCTION IF EXISTS s.f(integer)", "ok");
     [Fact]
     public void drpa0064() => CorpusAssert.Parses(@"DROP FUNCTION IF EXISTS s.no_such_fn(integer)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void drpa0065() => CorpusAssert.Parses(@"DROP FUNCTION s.no_such_fn(integer)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task drpa0065() => CorpusAssert.MatchesPostgres(@"DROP FUNCTION s.no_such_fn(integer)", "error", false);
     [Fact]
     public void drpa0066() => CorpusAssert.Parses(@"DROP FUNCTION s.f(integer) CASCADE", "ok");
     [Fact]
@@ -149,8 +149,8 @@ public class Corpus_DropStatements
     public void drpa0071() => CorpusAssert.Parses(@"DROP FUNCTION IF EXISTS s.f", "ok");
     [Fact]
     public void drpa0072() => CorpusAssert.Parses(@"DROP FUNCTION s.rows_f()", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void drpa0073() => CorpusAssert.Parses(@"DROP FUNCTION", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task drpa0073() => CorpusAssert.MatchesPostgres(@"DROP FUNCTION", "error", false);
     [Fact]
     public void drpa0074() => CorpusAssert.Parses(@"DROP FUNCTION s.f(integer) CASCADE RESTRICT", "error");
     [Fact]
@@ -161,16 +161,16 @@ public class Corpus_DropStatements
     public void drpa0077() => CorpusAssert.Parses(@"DROP PROCEDURE IF EXISTS s.p(integer)", "ok");
     [Fact]
     public void drpa0078() => CorpusAssert.Parses(@"DROP PROCEDURE IF EXISTS s.no_such_proc(integer)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void drpa0079() => CorpusAssert.Parses(@"DROP PROCEDURE s.no_such_proc(integer)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task drpa0079() => CorpusAssert.MatchesPostgres(@"DROP PROCEDURE s.no_such_proc(integer)", "error", false);
     [Fact]
     public void drpa0080() => CorpusAssert.Parses(@"DROP PROCEDURE s.p(integer) CASCADE", "ok");
     [Fact]
     public void drpa0081() => CorpusAssert.Parses(@"DROP PROCEDURE s.p(integer) RESTRICT", "ok");
     [Fact]
     public void drpa0082() => CorpusAssert.Parses(@"DROP PROCEDURE s.p", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void drpa0083() => CorpusAssert.Parses(@"DROP PROCEDURE", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task drpa0083() => CorpusAssert.MatchesPostgres(@"DROP PROCEDURE", "error", false);
     [Fact]
     public void drpa0084() => CorpusAssert.Parses(@"DROP PROCEDURE s.p(IN integer)", "ok");
     [Fact]
@@ -181,14 +181,14 @@ public class Corpus_DropStatements
     public void drpa0087() => CorpusAssert.Parses(@"CREATE TYPE s.drop_mood2 AS ENUM ('x','y'); DROP TYPE IF EXISTS s.drop_mood2", "ok");
     [Fact]
     public void drpa0088() => CorpusAssert.Parses(@"DROP TYPE IF EXISTS s.no_such_type", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void drpa0089() => CorpusAssert.Parses(@"DROP TYPE s.no_such_type", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task drpa0089() => CorpusAssert.MatchesPostgres(@"DROP TYPE s.no_such_type", "error", false);
     [Fact]
     public void drpa0090() => CorpusAssert.Parses(@"DROP TYPE s.mood CASCADE", "ok");
     [Fact]
     public void drpa0091() => CorpusAssert.Parses(@"DROP TYPE s.addr CASCADE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void drpa0092() => CorpusAssert.Parses(@"DROP TYPE s.addr RESTRICT", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task drpa0092() => CorpusAssert.MatchesPostgres(@"DROP TYPE s.addr RESTRICT", "error", false);
     [Fact]
     public void drpa0093() => CorpusAssert.Parses(@"CREATE TYPE s.drop_type_e AS ENUM ('a','b'); DROP TYPE s.drop_type_e", "ok");
     [Fact]
@@ -201,8 +201,8 @@ public class Corpus_DropStatements
     public void drpa0097() => CorpusAssert.Parses(@"DROP DOMAIN IF EXISTS s.pos_int", "ok");
     [Fact]
     public void drpa0098() => CorpusAssert.Parses(@"DROP DOMAIN IF EXISTS s.no_such_domain", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void drpa0099() => CorpusAssert.Parses(@"DROP DOMAIN s.no_such_domain", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task drpa0099() => CorpusAssert.MatchesPostgres(@"DROP DOMAIN s.no_such_domain", "error", false);
     [Fact]
     public void drpa0100() => CorpusAssert.Parses(@"DROP DOMAIN s.pos_int CASCADE", "ok");
     [Fact]
@@ -217,8 +217,8 @@ public class Corpus_DropStatements
     public void drpa0105() => CorpusAssert.Parses(@"DROP TRIGGER IF EXISTS t_touch ON s.t", "ok");
     [Fact]
     public void drpa0106() => CorpusAssert.Parses(@"DROP TRIGGER IF EXISTS no_such_trig ON s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void drpa0107() => CorpusAssert.Parses(@"DROP TRIGGER no_such_trig ON s.t", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task drpa0107() => CorpusAssert.MatchesPostgres(@"DROP TRIGGER no_such_trig ON s.t", "error", false);
     [Fact]
     public void drpa0108() => CorpusAssert.Parses(@"DROP TRIGGER t_touch ON s.t CASCADE", "ok");
     [Fact]
@@ -235,8 +235,8 @@ public class Corpus_DropStatements
     public void drpa0114() => CorpusAssert.Parses(@"CREATE TABLE s.rl_tbl2 (a int); CREATE RULE my_rule2 AS ON INSERT TO s.rl_tbl2 DO NOTHING; DROP RULE IF EXISTS my_rule2 ON s.rl_tbl2", "ok");
     [Fact]
     public void drpa0115() => CorpusAssert.Parses(@"CREATE TABLE s.rl_tbl3 (a int); DROP RULE IF EXISTS no_such_rule ON s.rl_tbl3", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void drpa0116() => CorpusAssert.Parses(@"CREATE TABLE s.rl_tbl4 (a int); DROP RULE no_such_rule ON s.rl_tbl4", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task drpa0116() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.rl_tbl4 (a int); DROP RULE no_such_rule ON s.rl_tbl4", "error", false);
     [Fact]
     public void drpa0117() => CorpusAssert.Parses(@"CREATE TABLE s.rl_tbl5 (a int); CREATE RULE my_rule5 AS ON INSERT TO s.rl_tbl5 DO NOTHING; DROP RULE my_rule5 ON s.rl_tbl5 CASCADE", "ok");
     [Fact]
@@ -251,8 +251,8 @@ public class Corpus_DropStatements
     public void drpa0122() => CorpusAssert.Parses(@"CREATE TABLE s.pol_tbl2 (owner text); ALTER TABLE s.pol_tbl2 ENABLE ROW LEVEL SECURITY; CREATE POLICY my_pol2 ON s.pol_tbl2 USING (owner = current_user); DROP POLICY IF EXISTS my_pol2 ON s.pol_tbl2", "ok");
     [Fact]
     public void drpa0123() => CorpusAssert.Parses(@"CREATE TABLE s.pol_tbl3 (owner text); DROP POLICY IF EXISTS no_such_pol ON s.pol_tbl3", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void drpa0124() => CorpusAssert.Parses(@"CREATE TABLE s.pol_tbl4 (owner text); DROP POLICY no_such_pol ON s.pol_tbl4", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task drpa0124() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.pol_tbl4 (owner text); DROP POLICY no_such_pol ON s.pol_tbl4", "error", false);
     [Fact]
     public void drpa0125() => CorpusAssert.Parses(@"CREATE TABLE s.pol_tbl5 (owner text); ALTER TABLE s.pol_tbl5 ENABLE ROW LEVEL SECURITY; CREATE POLICY my_pol5 ON s.pol_tbl5 USING (owner = current_user); DROP POLICY my_pol5 ON s.pol_tbl5 CASCADE", "ok");
     [Fact]
@@ -267,8 +267,8 @@ public class Corpus_DropStatements
     public void drpa0130() => CorpusAssert.Parses(@"CREATE EXTENSION IF NOT EXISTS ""uuid-ossp""; DROP EXTENSION IF EXISTS ""uuid-ossp""", "ok");
     [Fact]
     public void drpa0131() => CorpusAssert.Parses(@"DROP EXTENSION IF EXISTS no_such_extension", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void drpa0132() => CorpusAssert.Parses(@"DROP EXTENSION no_such_extension", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task drpa0132() => CorpusAssert.MatchesPostgres(@"DROP EXTENSION no_such_extension", "error", false);
     [Fact]
     public void drpa0133() => CorpusAssert.Parses(@"CREATE EXTENSION IF NOT EXISTS ""uuid-ossp""; DROP EXTENSION ""uuid-ossp"" CASCADE", "ok");
     [Fact]
@@ -281,16 +281,16 @@ public class Corpus_DropStatements
     public void drpa0137() => CorpusAssert.Parses(@"CREATE AGGREGATE s.agg_sum2(integer) (SFUNC = int4pl, STYPE = integer, INITCOND = '0'); DROP AGGREGATE IF EXISTS s.agg_sum2(integer)", "ok");
     [Fact]
     public void drpa0138() => CorpusAssert.Parses(@"DROP AGGREGATE IF EXISTS s.no_such_agg(integer)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void drpa0139() => CorpusAssert.Parses(@"DROP AGGREGATE s.no_such_agg(integer)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task drpa0139() => CorpusAssert.MatchesPostgres(@"DROP AGGREGATE s.no_such_agg(integer)", "error", false);
     [Fact]
     public void drpa0140() => CorpusAssert.Parses(@"CREATE AGGREGATE s.agg_sum3(integer) (SFUNC = int4pl, STYPE = integer, INITCOND = '0'); DROP AGGREGATE s.agg_sum3(integer) CASCADE", "ok");
     [Fact]
     public void drpa0141() => CorpusAssert.Parses(@"CREATE AGGREGATE s.agg_sum4(integer) (SFUNC = int4pl, STYPE = integer, INITCOND = '0'); DROP AGGREGATE s.agg_sum4(integer) RESTRICT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void drpa0142() => CorpusAssert.Parses(@"DROP AGGREGATE", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void drpa0143() => CorpusAssert.Parses(@"DROP AGGREGATE s.f", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task drpa0142() => CorpusAssert.MatchesPostgres(@"DROP AGGREGATE", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task drpa0143() => CorpusAssert.MatchesPostgres(@"DROP AGGREGATE s.f", "error", false);
     [Fact]
     public void drpa0144() => CorpusAssert.Parses(@"CREATE AGGREGATE s.agg_cnt(*) (SFUNC = int8inc, STYPE = bigint, INITCOND = '0'); DROP AGGREGATE s.agg_cnt(*)", "ok");
     [Fact]
@@ -301,8 +301,8 @@ public class Corpus_DropStatements
     public void drpa0147() => CorpusAssert.Parses(@"CREATE TEXT SEARCH CONFIGURATION s.mycfg2 (COPY = pg_catalog.english); DROP TEXT SEARCH CONFIGURATION IF EXISTS s.mycfg2", "ok");
     [Fact]
     public void drpa0148() => CorpusAssert.Parses(@"DROP TEXT SEARCH CONFIGURATION IF EXISTS s.no_such_cfg", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void drpa0149() => CorpusAssert.Parses(@"DROP TEXT SEARCH CONFIGURATION s.no_such_cfg", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task drpa0149() => CorpusAssert.MatchesPostgres(@"DROP TEXT SEARCH CONFIGURATION s.no_such_cfg", "error", false);
     [Fact]
     public void drpa0150() => CorpusAssert.Parses(@"CREATE TEXT SEARCH CONFIGURATION s.mycfg3 (COPY = pg_catalog.english); DROP TEXT SEARCH CONFIGURATION s.mycfg3 CASCADE", "ok");
     [Fact]
@@ -311,30 +311,30 @@ public class Corpus_DropStatements
     public void drpa0152() => CorpusAssert.Parses(@"CREATE TEXT SEARCH DICTIONARY s.mydict2 (TEMPLATE = pg_catalog.simple); DROP TEXT SEARCH DICTIONARY IF EXISTS s.mydict2", "ok");
     [Fact]
     public void drpa0153() => CorpusAssert.Parses(@"DROP TEXT SEARCH DICTIONARY IF EXISTS s.no_such_dict", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void drpa0154() => CorpusAssert.Parses(@"DROP TEXT SEARCH DICTIONARY s.no_such_dict", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task drpa0154() => CorpusAssert.MatchesPostgres(@"DROP TEXT SEARCH DICTIONARY s.no_such_dict", "error", false);
     [Fact]
     public void drpa0155() => CorpusAssert.Parses(@"CREATE TEXT SEARCH TEMPLATE s.mytmpl (LEXIZE = dsimple_lexize); DROP TEXT SEARCH TEMPLATE s.mytmpl", "ok");
     [Fact]
     public void drpa0156() => CorpusAssert.Parses(@"CREATE TEXT SEARCH TEMPLATE s.mytmpl2 (LEXIZE = dsimple_lexize); DROP TEXT SEARCH TEMPLATE IF EXISTS s.mytmpl2", "ok");
     [Fact]
     public void drpa0157() => CorpusAssert.Parses(@"DROP TEXT SEARCH TEMPLATE IF EXISTS s.no_such_tmpl", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void drpa0158() => CorpusAssert.Parses(@"DROP TEXT SEARCH TEMPLATE s.no_such_tmpl", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task drpa0158() => CorpusAssert.MatchesPostgres(@"DROP TEXT SEARCH TEMPLATE s.no_such_tmpl", "error", false);
     [Fact]
     public void drpa0159() => CorpusAssert.Parses(@"CREATE TEXT SEARCH PARSER s.myparser (START = prsd_start, GETTOKEN = prsd_nexttoken, END = prsd_end, LEXTYPES = prsd_lextype); DROP TEXT SEARCH PARSER s.myparser", "ok");
     [Fact]
     public void drpa0160() => CorpusAssert.Parses(@"DROP TEXT SEARCH PARSER IF EXISTS s.no_such_parser", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void drpa0161() => CorpusAssert.Parses(@"DROP TEXT SEARCH PARSER s.no_such_parser", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task drpa0161() => CorpusAssert.MatchesPostgres(@"DROP TEXT SEARCH PARSER s.no_such_parser", "error", false);
     [Fact]
     public void drpa0162() => CorpusAssert.Parses(@"CREATE COLLATION s.mycollation (LOCALE = 'C'); DROP COLLATION s.mycollation", "ok");
     [Fact]
     public void drpa0163() => CorpusAssert.Parses(@"CREATE COLLATION s.mycollation2 (LOCALE = 'C'); DROP COLLATION IF EXISTS s.mycollation2", "ok");
     [Fact]
     public void drpa0164() => CorpusAssert.Parses(@"DROP COLLATION IF EXISTS s.no_such_collation", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void drpa0165() => CorpusAssert.Parses(@"DROP COLLATION s.no_such_collation", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task drpa0165() => CorpusAssert.MatchesPostgres(@"DROP COLLATION s.no_such_collation", "error", false);
     [Fact]
     public void drpa0166() => CorpusAssert.Parses(@"CREATE COLLATION s.mycollation3 (LOCALE = 'C'); DROP COLLATION s.mycollation3 CASCADE", "ok");
     [Fact]
@@ -343,8 +343,8 @@ public class Corpus_DropStatements
     public void drpa0168() => CorpusAssert.Parses(@"CREATE CONVERSION s.myconv2 FOR 'LATIN1' TO 'UTF8' FROM iso8859_1_to_utf8; DROP CONVERSION IF EXISTS s.myconv2", "ok");
     [Fact]
     public void drpa0169() => CorpusAssert.Parses(@"DROP CONVERSION IF EXISTS s.no_such_conv", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void drpa0170() => CorpusAssert.Parses(@"DROP CONVERSION s.no_such_conv", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task drpa0170() => CorpusAssert.MatchesPostgres(@"DROP CONVERSION s.no_such_conv", "error", false);
     [Fact]
     public void drpb0001() => CorpusAssert.Parses(@"DROP TABLE IF EXISTS s.t_nodrop_x", "ok");
     [Fact]
@@ -367,8 +367,8 @@ public class Corpus_DropStatements
     public void drpb0010() => CorpusAssert.Parses(@"DROP TABLE s.t CASCADE RESTRICT", "error");
     [Fact]
     public void drpb0011() => CorpusAssert.Parses(@"DROP TABLE s.no_such_table", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void drpb0012() => CorpusAssert.Parses(@"CREATE TABLE s.drop_parent (id int); CREATE TABLE s.drop_child (x int REFERENCES s.drop_parent(id)); DROP TABLE s.drop_parent RESTRICT", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task drpb0012() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.drop_parent (id int); CREATE TABLE s.drop_child (x int REFERENCES s.drop_parent(id)); DROP TABLE s.drop_parent RESTRICT", "error", false);
     [Fact]
     public void drpb0013() => CorpusAssert.Parses(@"CREATE TABLE s.drop_parent2 (id int PRIMARY KEY); CREATE TABLE s.drop_child2 (x int REFERENCES s.drop_parent2(id)); DROP TABLE s.drop_parent2 CASCADE", "ok");
     [Fact]
@@ -417,8 +417,8 @@ public class Corpus_DropStatements
     public void drpb0035() => CorpusAssert.Parses(@"CREATE INDEX s_drop_idx4 ON s.t (val); DROP INDEX s.s_drop_idx4 RESTRICT", "ok");
     [Fact]
     public void drpb0036() => CorpusAssert.Parses(@"DROP INDEX", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void drpb0037() => CorpusAssert.Parses(@"DROP INDEX s.no_such_index", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task drpb0037() => CorpusAssert.MatchesPostgres(@"DROP INDEX s.no_such_index", "error", false);
     [Fact]
     public void drpb0038() => CorpusAssert.Parses(@"CREATE INDEX s_drop_idxa ON s.t (val); CREATE INDEX s_drop_idxb ON s.t (qty); DROP INDEX s.s_drop_idxa, s.s_drop_idxb", "ok");
     [Fact]
@@ -451,14 +451,14 @@ public class Corpus_DropStatements
     public void drpb0052() => CorpusAssert.Parses(@"CREATE SCHEMA drop_schema_y; DROP SCHEMA drop_schema_y CASCADE", "ok");
     [Fact]
     public void drpb0053() => CorpusAssert.Parses(@"CREATE SCHEMA drop_schema_z; DROP SCHEMA drop_schema_z RESTRICT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void drpb0054() => CorpusAssert.Parses(@"CREATE SCHEMA drop_schema_ne; CREATE TABLE drop_schema_ne.t1 (a int); DROP SCHEMA drop_schema_ne RESTRICT", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task drpb0054() => CorpusAssert.MatchesPostgres(@"CREATE SCHEMA drop_schema_ne; CREATE TABLE drop_schema_ne.t1 (a int); DROP SCHEMA drop_schema_ne RESTRICT", "error", false);
     [Fact]
     public void drpb0055() => CorpusAssert.Parses(@"CREATE SCHEMA drop_schema_cas; CREATE TABLE drop_schema_cas.t1 (a int); DROP SCHEMA drop_schema_cas CASCADE", "ok");
     [Fact]
     public void drpb0056() => CorpusAssert.Parses(@"DROP SCHEMA", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void drpb0057() => CorpusAssert.Parses(@"DROP SCHEMA s_no_exist", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task drpb0057() => CorpusAssert.MatchesPostgres(@"DROP SCHEMA s_no_exist", "error", false);
     [Fact]
     public void drpb0058() => CorpusAssert.Parses(@"CREATE SCHEMA drop_sch1; CREATE SCHEMA drop_sch2; DROP SCHEMA drop_sch1, drop_sch2", "ok");
     [Fact]
@@ -479,16 +479,16 @@ public class Corpus_DropStatements
     public void drpb0066() => CorpusAssert.Parses(@"CREATE FUNCTION s.drop_fn7() RETURNS void LANGUAGE sql AS $$ SELECT 1 $$; DROP FUNCTION s.drop_fn7()", "ok");
     [Fact]
     public void drpb0067() => CorpusAssert.Parses(@"DROP FUNCTION IF EXISTS s.f_no_such", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void drpb0068() => CorpusAssert.Parses(@"DROP FUNCTION", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void drpb0069() => CorpusAssert.Parses(@"DROP FUNCTION s.no_such_fn(int)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task drpb0068() => CorpusAssert.MatchesPostgres(@"DROP FUNCTION", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task drpb0069() => CorpusAssert.MatchesPostgres(@"DROP FUNCTION s.no_such_fn(int)", "error", false);
     [Fact]
     public void drpb0070() => CorpusAssert.Parses(@"CREATE FUNCTION s.drop_fna(x int) RETURNS int LANGUAGE sql AS $$ SELECT x $$; CREATE FUNCTION s.drop_fnb(y text) RETURNS text LANGUAGE sql AS $$ SELECT y $$; DROP FUNCTION s.drop_fna(int), s.drop_fnb(text)", "ok");
     [Fact]
     public void drpb0071() => CorpusAssert.Parses(@"CREATE FUNCTION s.drop_fn_oe(x int) RETURNS int LANGUAGE sql AS $$ SELECT x $$; CREATE FUNCTION s.drop_fn_oe(x int, y int) RETURNS int LANGUAGE sql AS $$ SELECT x+y $$; DROP FUNCTION s.drop_fn_oe(int)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void drpb0072() => CorpusAssert.Parses(@"CREATE FUNCTION s.drop_fn_oe2(x int) RETURNS int LANGUAGE sql AS $$ SELECT x $$; CREATE FUNCTION s.drop_fn_oe2(x int, y int) RETURNS int LANGUAGE sql AS $$ SELECT x+y $$; DROP FUNCTION s.drop_fn_oe2", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task drpb0072() => CorpusAssert.MatchesPostgres(@"CREATE FUNCTION s.drop_fn_oe2(x int) RETURNS int LANGUAGE sql AS $$ SELECT x $$; CREATE FUNCTION s.drop_fn_oe2(x int, y int) RETURNS int LANGUAGE sql AS $$ SELECT x+y $$; DROP FUNCTION s.drop_fn_oe2", "error", false);
     [Fact]
     public void drpb0073() => CorpusAssert.Parses(@"DROP PROCEDURE IF EXISTS s.p_no_such(int)", "ok");
     [Fact]
@@ -499,10 +499,10 @@ public class Corpus_DropStatements
     public void drpb0076() => CorpusAssert.Parses(@"CREATE PROCEDURE s.drop_proc3(IN n int) LANGUAGE plpgsql AS $$ BEGIN NULL; END $$; DROP PROCEDURE s.drop_proc3(int) CASCADE", "ok");
     [Fact]
     public void drpb0077() => CorpusAssert.Parses(@"CREATE PROCEDURE s.drop_proc4(IN n int) LANGUAGE plpgsql AS $$ BEGIN NULL; END $$; DROP PROCEDURE s.drop_proc4(int) RESTRICT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void drpb0078() => CorpusAssert.Parses(@"DROP PROCEDURE", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void drpb0079() => CorpusAssert.Parses(@"DROP PROCEDURE s.no_such_proc(int)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task drpb0078() => CorpusAssert.MatchesPostgres(@"DROP PROCEDURE", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task drpb0079() => CorpusAssert.MatchesPostgres(@"DROP PROCEDURE s.no_such_proc(int)", "error", false);
     [Fact]
     public void drpb0080() => CorpusAssert.Parses(@"CREATE PROCEDURE s.drop_proc5(IN a int, IN b text) LANGUAGE plpgsql AS $$ BEGIN NULL; END $$; DROP PROCEDURE s.drop_proc5(int, text)", "ok");
     [Fact]
@@ -517,10 +517,10 @@ public class Corpus_DropStatements
     public void drpb0085() => CorpusAssert.Parses(@"CREATE AGGREGATE s.drop_agg2(int) (sfunc = int4pl, stype = int); DROP AGGREGATE s.drop_agg2(int) CASCADE", "ok");
     [Fact]
     public void drpb0086() => CorpusAssert.Parses(@"CREATE AGGREGATE s.drop_agg3(int) (sfunc = int4pl, stype = int); DROP AGGREGATE s.drop_agg3(int) RESTRICT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void drpb0087() => CorpusAssert.Parses(@"DROP AGGREGATE", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void drpb0088() => CorpusAssert.Parses(@"DROP AGGREGATE s.no_agg(int)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task drpb0087() => CorpusAssert.MatchesPostgres(@"DROP AGGREGATE", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task drpb0088() => CorpusAssert.MatchesPostgres(@"DROP AGGREGATE s.no_agg(int)", "error", false);
     [Fact]
     public void drpb0089() => CorpusAssert.Parses(@"CREATE AGGREGATE s.drop_agg4(int) (sfunc = int4pl, stype = int); DROP AGGREGATE IF EXISTS s.drop_agg4(int)", "ok");
     [Fact]
@@ -537,8 +537,8 @@ public class Corpus_DropStatements
     public void drpb0095() => CorpusAssert.Parses(@"CREATE TYPE s.drop_type3 AS (x int); DROP TYPE s.drop_type3 CASCADE", "ok");
     [Fact]
     public void drpb0096() => CorpusAssert.Parses(@"CREATE TYPE s.drop_type4 AS (x int); DROP TYPE s.drop_type4 RESTRICT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void drpb0097() => CorpusAssert.Parses(@"DROP TYPE s.no_such_type", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task drpb0097() => CorpusAssert.MatchesPostgres(@"DROP TYPE s.no_such_type", "error", false);
     [Fact]
     public void drpb0098() => CorpusAssert.Parses(@"DROP TYPE", "error");
     [Fact]
@@ -553,8 +553,8 @@ public class Corpus_DropStatements
     public void drpb0103() => CorpusAssert.Parses(@"CREATE DOMAIN s.drop_dom2 AS text; DROP DOMAIN s.drop_dom2 CASCADE", "ok");
     [Fact]
     public void drpb0104() => CorpusAssert.Parses(@"CREATE DOMAIN s.drop_dom3 AS text; DROP DOMAIN s.drop_dom3 RESTRICT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void drpb0105() => CorpusAssert.Parses(@"DROP DOMAIN s.no_such_domain", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task drpb0105() => CorpusAssert.MatchesPostgres(@"DROP DOMAIN s.no_such_domain", "error", false);
     [Fact]
     public void drpb0106() => CorpusAssert.Parses(@"DROP DOMAIN", "error");
     [Fact]
@@ -571,10 +571,10 @@ public class Corpus_DropStatements
     public void drpb0112() => CorpusAssert.Parses(@"CREATE TRIGGER drop_trg3 BEFORE INSERT ON s.t FOR EACH ROW EXECUTE FUNCTION s.trg(); DROP TRIGGER drop_trg3 ON s.t RESTRICT", "ok");
     [Fact]
     public void drpb0113() => CorpusAssert.Parses(@"DROP TRIGGER", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void drpb0114() => CorpusAssert.Parses(@"DROP TRIGGER no_trg ON s.no_such_table", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void drpb0115() => CorpusAssert.Parses(@"DROP TRIGGER no_such_trigger ON s.t", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task drpb0114() => CorpusAssert.MatchesPostgres(@"DROP TRIGGER no_trg ON s.no_such_table", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task drpb0115() => CorpusAssert.MatchesPostgres(@"DROP TRIGGER no_such_trigger ON s.t", "error", false);
     [Fact]
     public void drpb0116() => CorpusAssert.Parses(@"DROP TRIGGER IF EXISTS t_touch ON s.t CASCADE", "ok");
     [Fact]
@@ -587,10 +587,10 @@ public class Corpus_DropStatements
     public void drpb0120() => CorpusAssert.Parses(@"CREATE RULE drop_rule3 AS ON INSERT TO s.t DO ALSO NOTHING; DROP RULE drop_rule3 ON s.t RESTRICT", "ok");
     [Fact]
     public void drpb0121() => CorpusAssert.Parses(@"DROP RULE", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void drpb0122() => CorpusAssert.Parses(@"DROP RULE no_such_rule ON s.t", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void drpb0123() => CorpusAssert.Parses(@"DROP RULE no_rule ON s.no_such_table", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task drpb0122() => CorpusAssert.MatchesPostgres(@"DROP RULE no_such_rule ON s.t", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task drpb0123() => CorpusAssert.MatchesPostgres(@"DROP RULE no_rule ON s.no_such_table", "error", false);
     [Fact]
     public void drpb0124() => CorpusAssert.Parses(@"CREATE POLICY drop_pol ON s.t USING (true); DROP POLICY drop_pol ON s.t", "ok");
     [Fact]
@@ -601,10 +601,10 @@ public class Corpus_DropStatements
     public void drpb0127() => CorpusAssert.Parses(@"CREATE POLICY drop_pol3 ON s.t USING (true); DROP POLICY drop_pol3 ON s.t RESTRICT", "ok");
     [Fact]
     public void drpb0128() => CorpusAssert.Parses(@"DROP POLICY", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void drpb0129() => CorpusAssert.Parses(@"DROP POLICY no_such_pol ON s.t", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void drpb0130() => CorpusAssert.Parses(@"DROP POLICY no_pol ON s.no_such_table", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task drpb0129() => CorpusAssert.MatchesPostgres(@"DROP POLICY no_such_pol ON s.t", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task drpb0130() => CorpusAssert.MatchesPostgres(@"DROP POLICY no_pol ON s.no_such_table", "error", false);
     [Fact]
     public void drpb0131() => CorpusAssert.Parses(@"DROP EXTENSION IF EXISTS no_such_ext", "ok");
     [Fact]
@@ -615,8 +615,8 @@ public class Corpus_DropStatements
     public void drpb0134() => CorpusAssert.Parses(@"CREATE EXTENSION IF NOT EXISTS pg_trgm; DROP EXTENSION pg_trgm RESTRICT", "ok");
     [Fact]
     public void drpb0135() => CorpusAssert.Parses(@"DROP EXTENSION", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void drpb0136() => CorpusAssert.Parses(@"DROP EXTENSION no_such_extension", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task drpb0136() => CorpusAssert.MatchesPostgres(@"DROP EXTENSION no_such_extension", "error", false);
     [Fact]
     public void drpb0137() => CorpusAssert.Parses(@"CREATE EXTENSION IF NOT EXISTS pg_trgm; DROP EXTENSION IF EXISTS pg_trgm", "ok");
     [Fact]
@@ -657,8 +657,8 @@ public class Corpus_DropStatements
     public void drpb0155() => CorpusAssert.Parses(@"CREATE TABLE s.drp_restrict_ok (a int); DROP TABLE IF EXISTS s.drp_restrict_ok RESTRICT", "ok");
     [Fact]
     public void drpb0156() => CorpusAssert.Parses(@"CREATE FUNCTION s.drop_fnx(x int) RETURNS int LANGUAGE sql AS $$ SELECT x $$; DROP FUNCTION s.drop_fnx", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void drpb0157() => CorpusAssert.Parses(@"CREATE FUNCTION s.drop_fn_schema(x int) RETURNS int LANGUAGE sql AS $$ SELECT x $$; DROP FUNCTION s.drop_fn_schema(s.pos_int)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task drpb0157() => CorpusAssert.MatchesPostgres(@"CREATE FUNCTION s.drop_fn_schema(x int) RETURNS int LANGUAGE sql AS $$ SELECT x $$; DROP FUNCTION s.drop_fn_schema(s.pos_int)", "error", false);
     [Fact]
     public void drpb0158() => CorpusAssert.Parses(@"CREATE FUNCTION s.drop_fn_pint(x s.pos_int) RETURNS int LANGUAGE sql AS $$ SELECT x::int $$; DROP FUNCTION s.drop_fn_pint(s.pos_int)", "ok");
     [Fact]
@@ -683,16 +683,16 @@ public class Corpus_DropStatements
     public void drpb0168() => CorpusAssert.Parses(@"CREATE TABLE s.drp_inh (x int) INHERITS (s.parent); DROP TABLE s.drp_inh", "ok");
     [Fact]
     public void drpb0169() => CorpusAssert.Parses(@"DROP TABLE s.child CASCADE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void drpb0170() => CorpusAssert.Parses(@"DROP TABLE RESTRICT", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task drpb0170() => CorpusAssert.MatchesPostgres(@"DROP TABLE RESTRICT", "error", false);
     [Fact]
     public void drpc0001() => CorpusAssert.Parses(@"CREATE TABLE drop_t1 (a int); DROP TABLE drop_t1;", "ok");
     [Fact]
     public void drpc0002() => CorpusAssert.Parses(@"CREATE TABLE drop_t2 (a int); DROP TABLE IF EXISTS drop_t2;", "ok");
     [Fact]
     public void drpc0003() => CorpusAssert.Parses(@"DROP TABLE IF EXISTS no_such_table_xyz;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void drpc0004() => CorpusAssert.Parses(@"DROP TABLE no_such_table_xyz;", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task drpc0004() => CorpusAssert.MatchesPostgres(@"DROP TABLE no_such_table_xyz;", "error", false);
     [Fact]
     public void drpc0005() => CorpusAssert.Parses(@"CREATE TABLE drop_t5 (a int); DROP TABLE drop_t5 RESTRICT;", "ok");
     [Fact]
@@ -719,8 +719,8 @@ public class Corpus_DropStatements
     public void drpc0016() => CorpusAssert.Parses(@"DROP VIEW IF EXISTS s.v;", "ok");
     [Fact]
     public void drpc0017() => CorpusAssert.Parses(@"DROP VIEW IF EXISTS no_such_view_xyz;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void drpc0018() => CorpusAssert.Parses(@"DROP VIEW no_such_view_xyz;", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task drpc0018() => CorpusAssert.MatchesPostgres(@"DROP VIEW no_such_view_xyz;", "error", false);
     [Fact]
     public void drpc0019() => CorpusAssert.Parses(@"CREATE VIEW drop_v2 AS SELECT 1 AS x; DROP VIEW drop_v2 CASCADE;", "ok");
     [Fact]
@@ -779,8 +779,8 @@ public class Corpus_DropStatements
     public void drpc0046() => CorpusAssert.Parses(@"DROP FUNCTION s.f(integer) RESTRICT;", "ok");
     [Fact]
     public void drpc0047() => CorpusAssert.Parses(@"CREATE FUNCTION drop_fn1(x int) RETURNS int LANGUAGE sql AS $$ SELECT x $$; CREATE FUNCTION drop_fn1(x text) RETURNS text LANGUAGE sql AS $$ SELECT x $$; DROP FUNCTION drop_fn1(int), drop_fn1(text);", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void drpc0048() => CorpusAssert.Parses(@"DROP FUNCTION;", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task drpc0048() => CorpusAssert.MatchesPostgres(@"DROP FUNCTION;", "error", false);
     [Fact]
     public void drpc0049() => CorpusAssert.Parses(@"DROP PROCEDURE s.p(integer);", "ok");
     [Fact]

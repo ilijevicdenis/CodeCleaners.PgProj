@@ -139,12 +139,12 @@ public class Corpus_SelectWindow
     public void selwa0066() => CorpusAssert.Parses(@"SELECT id, row_number() OVER (ORDER BY id) AS rn FROM s.t", "ok");
     [Fact]
     public void selwa0067() => CorpusAssert.Parses(@"SELECT id, sum(val) OVER (ORDER BY id) AS running_sum FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selwa0068() => CorpusAssert.Parses(@"SELECT count(DISTINCT status) OVER () FROM s.t", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task selwa0068() => CorpusAssert.MatchesPostgres(@"SELECT count(DISTINCT status) OVER () FROM s.t", "error", false);
     [Fact]
     public void selwa0069() => CorpusAssert.Parses(@"SELECT row_number() OVER (ORDER BY id) FROM s.t WHERE val > 0", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selwa0070() => CorpusAssert.Parses(@"SELECT status, sum(qty) OVER (PARTITION BY status) FROM s.t GROUP BY status", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task selwa0070() => CorpusAssert.MatchesPostgres(@"SELECT status, sum(qty) OVER (PARTITION BY status) FROM s.t GROUP BY status", "error", false);
     [Fact]
     public void selwa0071() => CorpusAssert.Parses(@"SELECT status, sum(sum(qty)) OVER (ORDER BY status) FROM s.t GROUP BY status", "ok");
     [Fact]
@@ -173,26 +173,26 @@ public class Corpus_SelectWindow
     public void selwa0083() => CorpusAssert.Parses(@"SELECT row_number() OVER (ORDER BY) FROM s.t", "error");
     [Fact]
     public void selwa0084() => CorpusAssert.Parses(@"SELECT row_number() OVER (PARTITION BY) FROM s.t", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selwa0085() => CorpusAssert.Parses(@"SELECT sum(qty) OVER (ROWS BETWEEN UNBOUNDED FOLLOWING AND CURRENT ROW) FROM s.t", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selwa0086() => CorpusAssert.Parses(@"SELECT sum(qty) OVER (ROWS BETWEEN CURRENT ROW AND UNBOUNDED PRECEDING) FROM s.t", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selwa0087() => CorpusAssert.Parses(@"SELECT sum(qty) OVER (ROWS BETWEEN 1 FOLLOWING AND CURRENT ROW) FROM s.t", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selwa0088() => CorpusAssert.Parses(@"SELECT sum(qty) OVER (ROWS BETWEEN CURRENT ROW AND 1 PRECEDING) FROM s.t", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task selwa0085() => CorpusAssert.MatchesPostgres(@"SELECT sum(qty) OVER (ROWS BETWEEN UNBOUNDED FOLLOWING AND CURRENT ROW) FROM s.t", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task selwa0086() => CorpusAssert.MatchesPostgres(@"SELECT sum(qty) OVER (ROWS BETWEEN CURRENT ROW AND UNBOUNDED PRECEDING) FROM s.t", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task selwa0087() => CorpusAssert.MatchesPostgres(@"SELECT sum(qty) OVER (ROWS BETWEEN 1 FOLLOWING AND CURRENT ROW) FROM s.t", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task selwa0088() => CorpusAssert.MatchesPostgres(@"SELECT sum(qty) OVER (ROWS BETWEEN CURRENT ROW AND 1 PRECEDING) FROM s.t", "error", false);
     [Fact]
     public void selwa0089() => CorpusAssert.Parses(@"SELECT row_number() OVER (PARTITION BY status ORDER BY id ORDER BY val) FROM s.t", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selwa0090() => CorpusAssert.Parses(@"SELECT row_number() FROM s.t", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selwa0091() => CorpusAssert.Parses(@"SELECT row_number() OVER (RANGE BETWEEN 5 PRECEDING AND 5 FOLLOWING) FROM s.t", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task selwa0090() => CorpusAssert.MatchesPostgres(@"SELECT row_number() FROM s.t", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task selwa0091() => CorpusAssert.MatchesPostgres(@"SELECT row_number() OVER (RANGE BETWEEN 5 PRECEDING AND 5 FOLLOWING) FROM s.t", "error", false);
     [Fact]
     public void selwa0092() => CorpusAssert.Parses(@"SELECT groups BETWEEN 1 PRECEDING AND CURRENT ROW FROM s.t", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selwa0093() => CorpusAssert.Parses(@"SELECT row_number() OVER nonexistent FROM s.t", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selwa0094() => CorpusAssert.Parses(@"SELECT sum(qty) OVER (GROUPS BETWEEN 1 PRECEDING AND 1 FOLLOWING) FROM s.t", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task selwa0093() => CorpusAssert.MatchesPostgres(@"SELECT row_number() OVER nonexistent FROM s.t", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task selwa0094() => CorpusAssert.MatchesPostgres(@"SELECT sum(qty) OVER (GROUPS BETWEEN 1 PRECEDING AND 1 FOLLOWING) FROM s.t", "error", false);
     [Fact]
     public void selwa0095() => CorpusAssert.Parses(@"SELECT row_number() OVER (ORDER BY id) FROM s.t WINDOW w AS (ORDER BY id)", "ok");
     [Fact]
@@ -271,14 +271,14 @@ public class Corpus_SelectWindow
     public void selwa0132() => CorpusAssert.Parses(@"SELECT row_number() OVER (PARTITION BY status ORDER BY id RANGE BETWEEN CURRENT ROW AND CURRENT ROW EXCLUDE CURRENT ROW) FROM s.t", "ok");
     [Fact]
     public void selwa0133() => CorpusAssert.Parses(@"SELECT sum(qty) OVER (ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING EXCLUDE CURRENT ROW) FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selwa0134() => CorpusAssert.Parses(@"INSERT INTO s.t(name,qty) VALUES('x',1); SELECT ntile(0) OVER (ORDER BY id) FROM s.t", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task selwa0134() => CorpusAssert.MatchesPostgres(@"INSERT INTO s.t(name,qty) VALUES('x',1); SELECT ntile(0) OVER (ORDER BY id) FROM s.t", "error", false);
     [Fact]
     public void selwa0135() => CorpusAssert.Parses(@"SELECT lag(val, 1) OVER (PARTITION BY status ORDER BY id) FROM s.t", "ok");
     [Fact]
     public void selwa0136() => CorpusAssert.Parses(@"SELECT lead(val, 1) OVER (PARTITION BY status ORDER BY id) FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selwa0137() => CorpusAssert.Parses(@"INSERT INTO s.t(name) VALUES('x'); SELECT nth_value(val, 0) OVER (ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) FROM s.t", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task selwa0137() => CorpusAssert.MatchesPostgres(@"INSERT INTO s.t(name) VALUES('x'); SELECT nth_value(val, 0) OVER (ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) FROM s.t", "error", false);
     [Fact]
     public void selwa0138() => CorpusAssert.Parses(@"SELECT row_number() OVER (ORDER BY id ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW), sum(val) OVER (PARTITION BY status ORDER BY id) FROM s.t", "ok");
     [Fact]
@@ -307,18 +307,18 @@ public class Corpus_SelectWindow
     public void selwa0150() => CorpusAssert.Parses(@"SELECT row_number() OVER () WINDOW w AS ()", "ok");
     [Fact]
     public void selwa0151() => CorpusAssert.Parses(@"SELECT sum(val) OVER (PARTITION BY status ORDER BY id RANGE BETWEEN 0 PRECEDING AND 0 FOLLOWING) FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selwa0152() => CorpusAssert.Parses(@"SELECT row_number() OVER (w PARTITION BY flag) FROM s.t WINDOW w AS (PARTITION BY status)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selwa0153() => CorpusAssert.Parses(@"SELECT row_number() OVER (w ROWS BETWEEN 1 PRECEDING AND 1 FOLLOWING) FROM s.t WINDOW w AS (ORDER BY id ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task selwa0152() => CorpusAssert.MatchesPostgres(@"SELECT row_number() OVER (w PARTITION BY flag) FROM s.t WINDOW w AS (PARTITION BY status)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task selwa0153() => CorpusAssert.MatchesPostgres(@"SELECT row_number() OVER (w ROWS BETWEEN 1 PRECEDING AND 1 FOLLOWING) FROM s.t WINDOW w AS (ORDER BY id ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)", "error", false);
     [Fact]
     public void selwa0154() => CorpusAssert.Parses(@"SELECT sum(qty) OVER (ORDER BY id ROWS BETWEEN 2 PRECEDING AND 1 PRECEDING) FROM s.t", "ok");
     [Fact]
     public void selwa0155() => CorpusAssert.Parses(@"SELECT sum(qty) OVER (ORDER BY id ROWS BETWEEN 1 FOLLOWING AND 2 FOLLOWING) FROM s.t", "ok");
     [Fact]
     public void selwa0156() => CorpusAssert.Parses(@"SELECT row_number() OVER (ORDER BY id ROWS BETWEEN 2 FOLLOWING AND 1 FOLLOWING) FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selwa0157() => CorpusAssert.Parses(@"SELECT sum(qty) OVER (ORDER BY id ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING EXCLUDE CURRENT ROW EXCLUDE TIES) FROM s.t", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task selwa0157() => CorpusAssert.MatchesPostgres(@"SELECT sum(qty) OVER (ORDER BY id ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING EXCLUDE CURRENT ROW EXCLUDE TIES) FROM s.t", "error", false);
     [Fact]
     public void selwa0158() => CorpusAssert.Parses(@"SELECT bool_and(flag) OVER (PARTITION BY status) FROM s.t", "ok");
     [Fact]
@@ -333,8 +333,8 @@ public class Corpus_SelectWindow
     public void selwa0163() => CorpusAssert.Parses(@"SELECT variance(val) OVER (PARTITION BY status) FROM s.t", "ok");
     [Fact]
     public void selwa0164() => CorpusAssert.Parses(@"SELECT corr(val, qty) OVER (PARTITION BY status) FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selwa0165() => CorpusAssert.Parses(@"SELECT row_number() OVER w FROM s.t WINDOW w AS (w2), w2 AS (ORDER BY id)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task selwa0165() => CorpusAssert.MatchesPostgres(@"SELECT row_number() OVER w FROM s.t WINDOW w AS (w2), w2 AS (ORDER BY id)", "error", false);
     [Fact]
     public void selwa0166() => CorpusAssert.Parses(@"SELECT row_number() OVER (ORDER BY id) FROM s.t LIMIT 5", "ok");
     [Fact]
@@ -343,8 +343,8 @@ public class Corpus_SelectWindow
     public void selwa0168() => CorpusAssert.Parses(@"SELECT rank() OVER (ORDER BY val), dense_rank() OVER (ORDER BY val), percent_rank() OVER (ORDER BY val), cume_dist() OVER (ORDER BY val) FROM s.t", "ok");
     [Fact]
     public void selwa0169() => CorpusAssert.Parses(@"SELECT row_number() OVER (ORDER BY id), lag(val) OVER (ORDER BY id), lead(val) OVER (ORDER BY id), first_value(val) OVER (ORDER BY id ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING), last_value(val) OVER (ORDER BY id ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selwa0170() => CorpusAssert.Parses(@"SELECT sum(qty) OVER (ORDER BY id RANGE BETWEEN '1 day' PRECEDING AND '1 day' FOLLOWING) FROM s.t", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task selwa0170() => CorpusAssert.MatchesPostgres(@"SELECT sum(qty) OVER (ORDER BY id RANGE BETWEEN '1 day' PRECEDING AND '1 day' FOLLOWING) FROM s.t", "error", false);
     [Fact]
     public void selwb0001() => CorpusAssert.Parses(@"SELECT row_number() OVER () FROM s.t", "ok");
     [Fact]
@@ -561,16 +561,16 @@ public class Corpus_SelectWindow
     public void selwb0107() => CorpusAssert.Parses(@"SELECT * FROM (SELECT id, row_number() OVER (ORDER BY id) AS rn FROM s.t) sub WHERE rn <= 3", "ok");
     [Fact]
     public void selwb0108() => CorpusAssert.Parses(@"SELECT id, val, sum(val) OVER (ORDER BY id RANGE BETWEEN 1 PRECEDING AND 1 FOLLOWING) FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selwb0109() => CorpusAssert.Parses(@"SELECT sum(val) OVER (GROUPS BETWEEN 1 PRECEDING AND 1 FOLLOWING) FROM s.t", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selwb0110() => CorpusAssert.Parses(@"SELECT row_number() OVER (ORDER BY id ROWS BETWEEN CURRENT ROW AND 1 PRECEDING) FROM s.t", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task selwb0109() => CorpusAssert.MatchesPostgres(@"SELECT sum(val) OVER (GROUPS BETWEEN 1 PRECEDING AND 1 FOLLOWING) FROM s.t", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task selwb0110() => CorpusAssert.MatchesPostgres(@"SELECT row_number() OVER (ORDER BY id ROWS BETWEEN CURRENT ROW AND 1 PRECEDING) FROM s.t", "error", false);
     [Fact]
     public void selwb0111() => CorpusAssert.Parses(@"SELECT sum(val) OVER (ORDER BY id ROWS BETWEEN 5 PRECEDING AND 3 PRECEDING) FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selwb0112() => CorpusAssert.Parses(@"SELECT row_number() OVER (ORDER BY id ROWS BETWEEN UNBOUNDED FOLLOWING AND CURRENT ROW) FROM s.t", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selwb0113() => CorpusAssert.Parses(@"SELECT sum(val) OVER (ORDER BY id ROWS BETWEEN CURRENT ROW AND UNBOUNDED PRECEDING) FROM s.t", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task selwb0112() => CorpusAssert.MatchesPostgres(@"SELECT row_number() OVER (ORDER BY id ROWS BETWEEN UNBOUNDED FOLLOWING AND CURRENT ROW) FROM s.t", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task selwb0113() => CorpusAssert.MatchesPostgres(@"SELECT sum(val) OVER (ORDER BY id ROWS BETWEEN CURRENT ROW AND UNBOUNDED PRECEDING) FROM s.t", "error", false);
     [Fact]
     public void selwb0114() => CorpusAssert.Parses(@"SELECT row_number() OVER", "error");
     [Fact]
@@ -583,16 +583,16 @@ public class Corpus_SelectWindow
     public void selwb0118() => CorpusAssert.Parses(@"SELECT ntile(2) OVER (PARTITION BY flag ORDER BY id) FROM s.t", "ok");
     [Fact]
     public void selwb0119() => CorpusAssert.Parses(@"SELECT ntile(10) OVER (ORDER BY val NULLS LAST) FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selwb0120() => CorpusAssert.Parses(@"SELECT row_number() OVER (w) FROM s.t", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selwb0121() => CorpusAssert.Parses(@"SELECT sum(val) OVER (ORDER BY id ROWS BETWEEN -1 PRECEDING AND CURRENT ROW) FROM s.t", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task selwb0120() => CorpusAssert.MatchesPostgres(@"SELECT row_number() OVER (w) FROM s.t", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task selwb0121() => CorpusAssert.MatchesPostgres(@"SELECT sum(val) OVER (ORDER BY id ROWS BETWEEN -1 PRECEDING AND CURRENT ROW) FROM s.t", "error", false);
     [Fact]
     public void selwb0122() => CorpusAssert.Parses(@"SELECT rank() OVER (PARTITION BY status ORDER BY id) FROM s.t WINDOW w AS (ORDER BY id)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selwb0123() => CorpusAssert.Parses(@"SELECT row_number() OVER (w PARTITION BY status) FROM s.t WINDOW w AS (ORDER BY id)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selwb0124() => CorpusAssert.Parses(@"SELECT sum(val) OVER (w ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) FROM s.t WINDOW w AS (ORDER BY id ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task selwb0123() => CorpusAssert.MatchesPostgres(@"SELECT row_number() OVER (w PARTITION BY status) FROM s.t WINDOW w AS (ORDER BY id)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task selwb0124() => CorpusAssert.MatchesPostgres(@"SELECT sum(val) OVER (w ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) FROM s.t WINDOW w AS (ORDER BY id ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)", "error", false);
     [Fact]
     public void selwb0125() => CorpusAssert.Parses(@"SELECT row_number() OVER (ORDER BY id) FROM s.t UNION ALL SELECT row_number() OVER (ORDER BY id) FROM s.t2", "ok");
     [Fact]
@@ -631,10 +631,10 @@ public class Corpus_SelectWindow
     public void selwb0142() => CorpusAssert.Parses(@"SELECT sum(val) FILTER (WHERE val > 0) OVER (PARTITION BY status ORDER BY id) FROM s.t", "ok");
     [Fact]
     public void selwb0143() => CorpusAssert.Parses(@"SELECT count(*) FILTER (WHERE flag) OVER (PARTITION BY status) FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selwb0144() => CorpusAssert.Parses(@"SELECT row_number() FILTER (WHERE flag) OVER (ORDER BY id) FROM s.t", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selwb0145() => CorpusAssert.Parses(@"SELECT sum(val) OVER (ORDER BY id RANGE BETWEEN '1 day'::interval PRECEDING AND '1 day'::interval FOLLOWING) FROM s.t", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task selwb0144() => CorpusAssert.MatchesPostgres(@"SELECT row_number() FILTER (WHERE flag) OVER (ORDER BY id) FROM s.t", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task selwb0145() => CorpusAssert.MatchesPostgres(@"SELECT sum(val) OVER (ORDER BY id RANGE BETWEEN '1 day'::interval PRECEDING AND '1 day'::interval FOLLOWING) FROM s.t", "error", false);
     [Fact]
     public void selwb0146() => CorpusAssert.Parses(@"SELECT sum(qty) OVER (ORDER BY created_at RANGE BETWEEN '1 hour'::interval PRECEDING AND '1 hour'::interval FOLLOWING) FROM s.t", "ok");
     [Fact]
@@ -643,12 +643,12 @@ public class Corpus_SelectWindow
     public void selwb0148() => CorpusAssert.Parses(@"SELECT t.id, sum(t2.amount) OVER (PARTITION BY t.status ORDER BY t.id) FROM s.t JOIN s.t2 ON s.t.id = s.t2.t_id", "ok");
     [Fact]
     public void selwb0149() => CorpusAssert.Parses(@"SELECT row_number() OVER (ORDER BY id) FROM s.v", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selwb0150() => CorpusAssert.Parses(@"SELECT id, row_number() OVER (ORDER BY id) FROM s.t HAVING row_number() OVER (ORDER BY id) > 1", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selwb0151() => CorpusAssert.Parses(@"SELECT id FROM s.t WHERE row_number() OVER (ORDER BY id) > 1", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selwb0152() => CorpusAssert.Parses(@"SELECT id FROM s.t GROUP BY id, row_number() OVER (ORDER BY id)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task selwb0150() => CorpusAssert.MatchesPostgres(@"SELECT id, row_number() OVER (ORDER BY id) FROM s.t HAVING row_number() OVER (ORDER BY id) > 1", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task selwb0151() => CorpusAssert.MatchesPostgres(@"SELECT id FROM s.t WHERE row_number() OVER (ORDER BY id) > 1", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task selwb0152() => CorpusAssert.MatchesPostgres(@"SELECT id FROM s.t GROUP BY id, row_number() OVER (ORDER BY id)", "error", false);
     [Fact]
     public void selwb0153() => CorpusAssert.Parses(@"SELECT sum(val) OVER (ORDER BY id ROWS BETWEEN UNBOUNDED PRECEDING AND 0 FOLLOWING) FROM s.t", "ok");
     [Fact]
@@ -659,12 +659,12 @@ public class Corpus_SelectWindow
     public void selwb0156() => CorpusAssert.Parses(@"SELECT row_number() OVER (ORDER BY id) FROM s.t WINDOW", "error");
     [Fact]
     public void selwb0157() => CorpusAssert.Parses(@"SELECT sum(val) OVER w FROM s.t WINDOW w AS (PARTITION BY status ORDER BY id ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW EXCLUDE TIES)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selwb0158() => CorpusAssert.Parses(@"SELECT array_agg(name ORDER BY id) OVER (PARTITION BY status) FROM s.t", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selwb0159() => CorpusAssert.Parses(@"SELECT string_agg(name, ',' ORDER BY id) OVER (PARTITION BY status) FROM s.t", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selwb0160() => CorpusAssert.Parses(@"SELECT sum(DISTINCT val) OVER (ORDER BY id) FROM s.t", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task selwb0158() => CorpusAssert.MatchesPostgres(@"SELECT array_agg(name ORDER BY id) OVER (PARTITION BY status) FROM s.t", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task selwb0159() => CorpusAssert.MatchesPostgres(@"SELECT string_agg(name, ',' ORDER BY id) OVER (PARTITION BY status) FROM s.t", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task selwb0160() => CorpusAssert.MatchesPostgres(@"SELECT sum(DISTINCT val) OVER (ORDER BY id) FROM s.t", "error", false);
     [Fact]
     public void selwb0161() => CorpusAssert.Parses(@"SELECT row_number() OVER (ORDER BY id) FROM s.t WHERE id IN (SELECT id FROM s.t2)", "ok");
     [Fact]
@@ -707,8 +707,8 @@ public class Corpus_SelectWindow
     public void selwc0010() => CorpusAssert.Parses(@"SELECT id, val, row_number() OVER w2 FROM s.t WINDOW w1 AS (PARTITION BY flag), w2 AS (w1 ORDER BY val)", "ok");
     [Fact]
     public void selwc0011() => CorpusAssert.Parses(@"SELECT id, val, sum(val) OVER (ORDER BY id ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW EXCLUDE GROUP), count(*) OVER (ORDER BY id ROWS BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING EXCLUDE TIES), min(val) OVER (ORDER BY id ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING EXCLUDE NO OTHERS) FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selwc0012() => CorpusAssert.Parses(@"SELECT row_number() OVER (ORDER BY id ROWS BETWEEN UNBOUNDED FOLLOWING AND CURRENT ROW) FROM s.t", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selwc0013() => CorpusAssert.Parses(@"SELECT row_number() OVER (ORDER BY id ROWS BETWEEN CURRENT ROW AND UNBOUNDED PRECEDING) FROM s.t", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task selwc0012() => CorpusAssert.MatchesPostgres(@"SELECT row_number() OVER (ORDER BY id ROWS BETWEEN UNBOUNDED FOLLOWING AND CURRENT ROW) FROM s.t", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task selwc0013() => CorpusAssert.MatchesPostgres(@"SELECT row_number() OVER (ORDER BY id ROWS BETWEEN CURRENT ROW AND UNBOUNDED PRECEDING) FROM s.t", "error", false);
 }

@@ -108,8 +108,8 @@ CREATE OR REPLACE FUNCTION s.trg_or_replace() RETURNS trigger LANGUAGE plpgsql A
     public void pptba0050() => CorpusAssert.Parses(@"CREATE FUNCTION s.trg_perform_call() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN PERFORM s.f(1); RETURN NEW; END $$;", "ok");
     [Fact]
     public void pptba0051() => CorpusAssert.Parses(@"CREATE FUNCTION s.trg_no_args_decl() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN RETURN NEW; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void pptba0052() => CorpusAssert.Parses(@"CREATE FUNCTION s.trg_with_param(x integer) RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN RETURN NEW; END $$;", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task pptba0052() => CorpusAssert.MatchesPostgres(@"CREATE FUNCTION s.trg_with_param(x integer) RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN RETURN NEW; END $$;", "error", false);
     [Fact]
     public void pptba0053() => CorpusAssert.Parses(@"CREATE FUNCTION s.trg_bad_return() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN RETURN 42; END $$;", "ok");
     [Fact]
@@ -124,8 +124,8 @@ CREATE OR REPLACE FUNCTION s.trg_or_replace() RETURNS trigger LANGUAGE plpgsql A
     public void pptba0058() => CorpusAssert.Parses(@"CREATE FUNCTION s.trg_return_int_var() RETURNS trigger LANGUAGE plpgsql AS $$ DECLARE v integer := 5; BEGIN RETURN v; END $$;", "ok");
     [Fact]
     public void pptba0059() => CorpusAssert.Parses(@"CREATE FUNCTION s.trg_return_text() RETURNS trigger LANGUAGE plpgsql AS $$ DECLARE v text := 'hi'; BEGIN RETURN v; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void pptba0060() => CorpusAssert.Parses(@"CREATE FUNCTION s.trg_bad_lang() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN RETURN NEW END $$;", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task pptba0060() => CorpusAssert.MatchesPostgres(@"CREATE FUNCTION s.trg_bad_lang() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN RETURN NEW END $$;", "error", false);
     [Fact]
     public void pptba0061() => CorpusAssert.Parses(@"CREATE FUNCTION s.trg_exception_handler() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN IF NEW.qty < 0 THEN RAISE EXCEPTION 'qty must be non-negative, got %', NEW.qty; END IF; RETURN NEW; END $$;", "ok");
     [Fact]
@@ -168,9 +168,9 @@ CREATE OR REPLACE FUNCTION s.trg_or_replace() RETURNS trigger LANGUAGE plpgsql A
     public void pptba0080() => CorpusAssert.Parses(@"CREATE FUNCTION s.trg_tg_when_after() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN IF TG_WHEN = 'AFTER' THEN RETURN NULL; END IF; RETURN NEW; END $$;", "ok");
     [Fact]
     public void pptba0081() => CorpusAssert.Parses(@"CREATE FUNCTION s.trg_tg_when_instead() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN IF TG_WHEN = 'INSTEAD OF' THEN RETURN NEW; END IF; RETURN NULL; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void pptba0082() => CorpusAssert.Parses(@"CREATE FUNCTION s.trg_returns_void2() RETURNS void LANGUAGE plpgsql AS $$ BEGIN RETURN; END $$;
-CREATE TRIGGER t_bad BEFORE INSERT ON s.t FOR EACH ROW EXECUTE FUNCTION s.trg_returns_void2();", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task pptba0082() => CorpusAssert.MatchesPostgres(@"CREATE FUNCTION s.trg_returns_void2() RETURNS void LANGUAGE plpgsql AS $$ BEGIN RETURN; END $$;
+CREATE TRIGGER t_bad BEFORE INSERT ON s.t FOR EACH ROW EXECUTE FUNCTION s.trg_returns_void2();", "error", false);
     [Fact]
     public void pptba0083() => CorpusAssert.Parses(@"CREATE FUNCTION s.trg_argv_loop2() RETURNS trigger LANGUAGE plpgsql AS $$ DECLARE i int; v text; BEGIN FOR i IN 0..TG_NARGS-1 LOOP v := TG_ARGV[i]; END LOOP; RETURN NEW; END $$;", "ok");
     [Fact]
@@ -247,12 +247,12 @@ CREATE TRIGGER t_bad BEFORE INSERT ON s.t FOR EACH ROW EXECUTE FUNCTION s.trg_re
     public void pptba0119() => CorpusAssert.Parses(@"CREATE FUNCTION s.trg_current_timestamp() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN NEW.created_at := current_timestamp; RETURN NEW; END $$;", "ok");
     [Fact]
     public void pptba0120() => CorpusAssert.Parses(@"CREATE FUNCTION s.trg_clock_timestamp() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN NEW.created_at := clock_timestamp(); RETURN NEW; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void pptba0121() => CorpusAssert.Parses(@"CREATE FUNCTION s.trg_setof_returns() RETURNS SETOF s.t LANGUAGE plpgsql AS $$ BEGIN RETURN; END $$;
-CREATE TRIGGER t_bad2 BEFORE INSERT ON s.t FOR EACH ROW EXECUTE FUNCTION s.trg_setof_returns();", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void pptba0122() => CorpusAssert.Parses(@"CREATE FUNCTION s.trg_int_returns() RETURNS integer LANGUAGE plpgsql AS $$ BEGIN RETURN 1; END $$;
-CREATE TRIGGER t_bad3 BEFORE INSERT ON s.t FOR EACH ROW EXECUTE FUNCTION s.trg_int_returns();", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task pptba0121() => CorpusAssert.MatchesPostgres(@"CREATE FUNCTION s.trg_setof_returns() RETURNS SETOF s.t LANGUAGE plpgsql AS $$ BEGIN RETURN; END $$;
+CREATE TRIGGER t_bad2 BEFORE INSERT ON s.t FOR EACH ROW EXECUTE FUNCTION s.trg_setof_returns();", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task pptba0122() => CorpusAssert.MatchesPostgres(@"CREATE FUNCTION s.trg_int_returns() RETURNS integer LANGUAGE plpgsql AS $$ BEGIN RETURN 1; END $$;
+CREATE TRIGGER t_bad3 BEFORE INSERT ON s.t FOR EACH ROW EXECUTE FUNCTION s.trg_int_returns();", "error", false);
     [Fact]
     public void pptba0123() => CorpusAssert.Parses(@"CREATE FUNCTION s.trg_tg_argv_nargs_zero() RETURNS trigger LANGUAGE plpgsql AS $$ DECLARE a text; BEGIN IF TG_NARGS = 0 THEN a := NULL; ELSE a := TG_ARGV[0]; END IF; RETURN NEW; END $$;", "ok");
     [Fact]
@@ -405,10 +405,10 @@ CREATE TRIGGER t_stmt_trg AFTER INSERT ON s.t FOR EACH STATEMENT EXECUTE FUNCTIO
     public void pptbb0026() => CorpusAssert.Parses(@"CREATE FUNCTION s.trg_bad_syntax_declare() RETURNS trigger LANGUAGE plpgsql AS $$ DECLARE x RETURN NEW; END $$;", "error");
     [Fact]
     public void pptbb0027() => CorpusAssert.Parses(@"CREATE FUNCTION bad_trg_syntax_if() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN IF TG_OP = 'INSERT' RETURN NEW; END IF; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void pptbb0028() => CorpusAssert.Parses(@"CREATE FUNCTION bad_trg_syntax() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN RETURN NEW END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void pptbb0029() => CorpusAssert.Parses(@"CREATE FUNCTION bad_trg_begin_only() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void pptbb0030() => CorpusAssert.Parses(@"CREATE FUNCTION bad_trg_no_lang() RETURNS trigger AS $$ BEGIN RETURN NEW; END $$;", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task pptbb0028() => CorpusAssert.MatchesPostgres(@"CREATE FUNCTION bad_trg_syntax() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN RETURN NEW END $$;", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task pptbb0029() => CorpusAssert.MatchesPostgres(@"CREATE FUNCTION bad_trg_begin_only() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN $$;", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task pptbb0030() => CorpusAssert.MatchesPostgres(@"CREATE FUNCTION bad_trg_no_lang() RETURNS trigger AS $$ BEGIN RETURN NEW; END $$;", "error", false);
 }

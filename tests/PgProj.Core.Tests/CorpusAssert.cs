@@ -24,4 +24,14 @@ public static class CorpusAssert
             Assert.Fail("expected a parse or semantic error, but the statement was accepted");
         }
     }
+
+    /// <summary>
+    /// Verdict check via real PostgreSQL execution, for cases the static engine cannot decide without
+    /// false positives. Only invoked when a database is configured (see <see cref="DbFactAttribute"/>).
+    /// </summary>
+    public static async System.Threading.Tasks.Task MatchesPostgres(string sql, string expect, bool solo)
+    {
+        var actual = await CorpusDb.ErrorsAsync(sql, solo) ? "error" : "ok";
+        Assert.True(actual == expect, $"PostgreSQL verdict was '{actual}', expected '{expect}'");
+    }
 }

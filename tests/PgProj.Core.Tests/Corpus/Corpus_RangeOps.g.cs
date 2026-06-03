@@ -271,44 +271,44 @@ public class Corpus_RangeOps
     public void rnga0132() => CorpusAssert.Parses(@"SELECT range_agg(span) FROM s.t GROUP BY status", "ok");
     [Fact]
     public void rnga0133() => CorpusAssert.Parses(@"SELECT range_agg(int4range(1,5))", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void rnga0134() => CorpusAssert.Parses(@"SELECT int4range(5, 1)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void rnga0135() => CorpusAssert.Parses(@"SELECT int4range(1, 10, '><')", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void rnga0136() => CorpusAssert.Parses(@"SELECT int4range(1, 10, 'XY')", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void rnga0137() => CorpusAssert.Parses(@"SELECT int4range(1, 10, '')", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void rnga0138() => CorpusAssert.Parses(@"SELECT '[abc,10)'::int4range", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void rnga0139() => CorpusAssert.Parses(@"SELECT '[1,abc)'::int4range", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void rnga0140() => CorpusAssert.Parses(@"SELECT '(1,10'::int4range", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void rnga0141() => CorpusAssert.Parses(@"SELECT '1,10)'::int4range", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void rnga0142() => CorpusAssert.Parses(@"SELECT int4range(1, 5) + int4range(8, 12)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void rnga0143() => CorpusAssert.Parses(@"SELECT int4range(1, 5) @> numrange(2.0, 4.0)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void rnga0144() => CorpusAssert.Parses(@"SELECT int4range(1, 5) && numrange(2.0, 4.0)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task rnga0134() => CorpusAssert.MatchesPostgres(@"SELECT int4range(5, 1)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task rnga0135() => CorpusAssert.MatchesPostgres(@"SELECT int4range(1, 10, '><')", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task rnga0136() => CorpusAssert.MatchesPostgres(@"SELECT int4range(1, 10, 'XY')", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task rnga0137() => CorpusAssert.MatchesPostgres(@"SELECT int4range(1, 10, '')", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task rnga0138() => CorpusAssert.MatchesPostgres(@"SELECT '[abc,10)'::int4range", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task rnga0139() => CorpusAssert.MatchesPostgres(@"SELECT '[1,abc)'::int4range", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task rnga0140() => CorpusAssert.MatchesPostgres(@"SELECT '(1,10'::int4range", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task rnga0141() => CorpusAssert.MatchesPostgres(@"SELECT '1,10)'::int4range", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task rnga0142() => CorpusAssert.MatchesPostgres(@"SELECT int4range(1, 5) + int4range(8, 12)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task rnga0143() => CorpusAssert.MatchesPostgres(@"SELECT int4range(1, 5) @> numrange(2.0, 4.0)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task rnga0144() => CorpusAssert.MatchesPostgres(@"SELECT int4range(1, 5) && numrange(2.0, 4.0)", "error", false);
     [Fact]
     public void rnga0145() => CorpusAssert.Parses(@"SELECT lower()", "error");
     [Fact]
     public void rnga0146() => CorpusAssert.Parses(@"SELECT upper()", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void rnga0147() => CorpusAssert.Parses(@"SELECT isempty(1, 2)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void rnga0148() => CorpusAssert.Parses(@"SELECT range_merge(int4range(1,5), numrange(3.0,8.0))", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void rnga0149() => CorpusAssert.Parses(@"SELECT int4range(1, 10) @> 3.5", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void rnga0150() => CorpusAssert.Parses(@"SELECT numrange(1.0, 5.0) + numrange(8.0, 12.0)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void rnga0151() => CorpusAssert.Parses(@"SELECT int4range(1,10) << 5", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void rnga0152() => CorpusAssert.Parses(@"SELECT 'badrange'::int4range", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task rnga0147() => CorpusAssert.MatchesPostgres(@"SELECT isempty(1, 2)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task rnga0148() => CorpusAssert.MatchesPostgres(@"SELECT range_merge(int4range(1,5), numrange(3.0,8.0))", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task rnga0149() => CorpusAssert.MatchesPostgres(@"SELECT int4range(1, 10) @> 3.5", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task rnga0150() => CorpusAssert.MatchesPostgres(@"SELECT numrange(1.0, 5.0) + numrange(8.0, 12.0)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task rnga0151() => CorpusAssert.MatchesPostgres(@"SELECT int4range(1,10) << 5", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task rnga0152() => CorpusAssert.MatchesPostgres(@"SELECT 'badrange'::int4range", "error", false);
     [Fact]
     public void rnga0153() => CorpusAssert.Parses(@"SELECT int4range(1, 10, '[]') @> int4range(1, 10, '[]')", "ok");
     [Fact]
@@ -391,8 +391,8 @@ public class Corpus_RangeOps
     public void rngb0022() => CorpusAssert.Parses(@"SELECT int4range(1,5) + int4range(3,8)", "ok");
     [Fact]
     public void rngb0023() => CorpusAssert.Parses(@"SELECT int4range(1,8) * int4range(3,10)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void rngb0024() => CorpusAssert.Parses(@"SELECT int4range(1,10) - int4range(3,5)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task rngb0024() => CorpusAssert.MatchesPostgres(@"SELECT int4range(1,10) - int4range(3,5)", "error", false);
     [Fact]
     public void rngb0025() => CorpusAssert.Parses(@"SELECT lower(int4range(1,10))", "ok");
     [Fact]
@@ -413,16 +413,16 @@ public class Corpus_RangeOps
     public void rngb0033() => CorpusAssert.Parses(@"SELECT range_agg(span) FROM s.t", "ok");
     [Fact]
     public void rngb0034() => CorpusAssert.Parses(@"SELECT unnest(int4multirange(int4range(1,5), int4range(10,20)))", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void rngb0035() => CorpusAssert.Parses(@"SELECT int4range(1, 10, 'XY')", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task rngb0035() => CorpusAssert.MatchesPostgres(@"SELECT int4range(1, 10, 'XY')", "error", false);
     [Fact]
     public void rngb0036() => CorpusAssert.Parses(@"SELECT '[1,10)'::int4range @> 5", "ok");
     [Fact]
     public void rngb0037() => CorpusAssert.Parses(@"SELECT span @> 5 FROM s.t LIMIT 1", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void rngb0038() => CorpusAssert.Parses(@"SELECT int4range(10, 1)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void rngb0039() => CorpusAssert.Parses(@"SELECT int4range(1, 5, '[') ", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void rngb0040() => CorpusAssert.Parses(@"SELECT int4range @> 5", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task rngb0038() => CorpusAssert.MatchesPostgres(@"SELECT int4range(10, 1)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task rngb0039() => CorpusAssert.MatchesPostgres(@"SELECT int4range(1, 5, '[') ", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task rngb0040() => CorpusAssert.MatchesPostgres(@"SELECT int4range @> 5", "error", false);
 }

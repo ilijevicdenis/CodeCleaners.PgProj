@@ -67,40 +67,40 @@ CREATE OPERATOR ##~<> (FUNCTION = int4ne, LEFTARG = integer, RIGHTARG = integer,
     public void opra0029() => CorpusAssert.Parses(@"CREATE OPERATOR ##~= (FUNCTION = int4eq, LEFTARG = integer, RIGHTARG = integer, COMMUTATOR = OPERATOR(##~=))", "ok");
     [Fact]
     public void opra0030() => CorpusAssert.Parses(@"CREATE OPERATOR s.##~ (FUNCTION = int4eq, LEFTARG = integer, RIGHTARG = integer, COMMUTATOR = OPERATOR(s.##~))", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void opra0031() => CorpusAssert.Parses(@"CREATE OPERATOR ##~= (FUNCTION = s.f, LEFTARG = integer, RIGHTARG = integer)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void opra0032() => CorpusAssert.Parses(@"CREATE OPERATOR ##~= (FUNCTION = s.f, LEFTARG = integer)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task opra0031() => CorpusAssert.MatchesPostgres(@"CREATE OPERATOR ##~= (FUNCTION = s.f, LEFTARG = integer, RIGHTARG = integer)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task opra0032() => CorpusAssert.MatchesPostgres(@"CREATE OPERATOR ##~= (FUNCTION = s.f, LEFTARG = integer)", "error", false);
     [Fact]
     public void opra0033() => CorpusAssert.Parses(@"CREATE OPERATOR ##~= (FUNCTION = s.f, RIGHTARG = integer)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void opra0034() => CorpusAssert.Parses(@"CREATE OPERATOR ##~= (FUNCTION = int4eq, LEFTARG = integer, RIGHTARG = integer, RESTRICT = OPERATOR(eqsel))", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void opra0035() => CorpusAssert.Parses(@"CREATE OPERATOR (FUNCTION = int4pl, LEFTARG = integer, RIGHTARG = integer)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void opra0036() => CorpusAssert.Parses(@"CREATE OPERATOR ##~= ()", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void opra0037() => CorpusAssert.Parses(@"CREATE OPERATOR ##~= (LEFTARG = integer, RIGHTARG = integer)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void opra0038() => CorpusAssert.Parses(@"CREATE OPERATOR ##~= (FUNCTION = int4eq)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void opra0039() => CorpusAssert.Parses(@"CREATE OPERATOR ##~= FUNCTION = int4pl, LEFTARG = integer, RIGHTARG = integer", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void opra0040() => CorpusAssert.Parses(@"CREATE OPERATOR ##~= (FUNCTION = int4pl, LEFTARG = integer, RIGHTARG = integer,)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task opra0034() => CorpusAssert.MatchesPostgres(@"CREATE OPERATOR ##~= (FUNCTION = int4eq, LEFTARG = integer, RIGHTARG = integer, RESTRICT = OPERATOR(eqsel))", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task opra0035() => CorpusAssert.MatchesPostgres(@"CREATE OPERATOR (FUNCTION = int4pl, LEFTARG = integer, RIGHTARG = integer)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task opra0036() => CorpusAssert.MatchesPostgres(@"CREATE OPERATOR ##~= ()", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task opra0037() => CorpusAssert.MatchesPostgres(@"CREATE OPERATOR ##~= (LEFTARG = integer, RIGHTARG = integer)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task opra0038() => CorpusAssert.MatchesPostgres(@"CREATE OPERATOR ##~= (FUNCTION = int4eq)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task opra0039() => CorpusAssert.MatchesPostgres(@"CREATE OPERATOR ##~= FUNCTION = int4pl, LEFTARG = integer, RIGHTARG = integer", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task opra0040() => CorpusAssert.MatchesPostgres(@"CREATE OPERATOR ##~= (FUNCTION = int4pl, LEFTARG = integer, RIGHTARG = integer,)", "error", false);
     [Fact]
     public void opra0041() => CorpusAssert.Parses(@"CREATE OPERATOR ##~= (FUNCTION = int4pl, LEFTARG = integer, RIGHTARG = integer, FUNCTION = int4pl)", "ok");
     [Fact]
     public void opra0042() => CorpusAssert.Parses(@"CREATE OPERATOR ##~= (FUNCTION = int4pl, LEFTARG = integer, RIGHTARG = integer, LEFTARG = integer)", "ok");
     [Fact]
     public void opra0043() => CorpusAssert.Parses(@"CREATE OPERATOR ##~= (FUNCTION = int4pl, LEFTARG = integer, RIGHTARG = integer, RIGHTARG = integer)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void opra0044() => CorpusAssert.Parses(@"CREATE OPERATOR ##~= (FUNCTION = nonexistent_fn, LEFTARG = integer, RIGHTARG = integer)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void opra0045() => CorpusAssert.Parses(@"CREATE OPERATOR and (FUNCTION = int4pl, LEFTARG = integer, RIGHTARG = integer)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void opra0046() => CorpusAssert.Parses(@"CREATE OPERATOR ##~= (FUNCTION = int4pl, LEFTARG = integer, RIGHTARG = badtype)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void opra0047() => CorpusAssert.Parses(@"CREATE OPERATOR ##~= (FUNCTION = int4pl, LEFTARG = badtype, RIGHTARG = integer)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task opra0044() => CorpusAssert.MatchesPostgres(@"CREATE OPERATOR ##~= (FUNCTION = nonexistent_fn, LEFTARG = integer, RIGHTARG = integer)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task opra0045() => CorpusAssert.MatchesPostgres(@"CREATE OPERATOR and (FUNCTION = int4pl, LEFTARG = integer, RIGHTARG = integer)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task opra0046() => CorpusAssert.MatchesPostgres(@"CREATE OPERATOR ##~= (FUNCTION = int4pl, LEFTARG = integer, RIGHTARG = badtype)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task opra0047() => CorpusAssert.MatchesPostgres(@"CREATE OPERATOR ##~= (FUNCTION = int4pl, LEFTARG = badtype, RIGHTARG = integer)", "error", false);
     [Fact]
     public void opra0048() => CorpusAssert.Parses(@"CREATE OPERATOR ##~= (PROCEDURE = int4pl, FUNCTION = int4pl, LEFTARG = integer, RIGHTARG = integer)", "ok");
     [Fact]
@@ -159,22 +159,22 @@ DROP OPERATOR ##?? (integer, integer) CASCADE", "ok");
     [Fact]
     public void opra0074() => CorpusAssert.Parses(@"CREATE OPERATOR ##?? (FUNCTION = int4pl, LEFTARG = integer, RIGHTARG = integer);
 DROP OPERATOR ##?? (integer, integer) RESTRICT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void opra0075() => CorpusAssert.Parses(@"DROP OPERATOR ##!? (integer, integer)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task opra0075() => CorpusAssert.MatchesPostgres(@"DROP OPERATOR ##!? (integer, integer)", "error", false);
     [Fact]
     public void opra0076() => CorpusAssert.Parses(@"DROP OPERATOR IF EXISTS ##?? (integer, integer), ##?? (NONE, integer)", "ok");
     [Fact]
     public void opra0077() => CorpusAssert.Parses(@"CREATE OPERATOR ##?? (FUNCTION = int4pl, LEFTARG = integer, RIGHTARG = integer);
 CREATE OPERATOR ##?? (FUNCTION = int8pl, LEFTARG = bigint, RIGHTARG = bigint);
 DROP OPERATOR ##?? (integer, integer), ##?? (bigint, bigint)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void opra0078() => CorpusAssert.Parses(@"DROP OPERATOR ## (integer, integer)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void opra0079() => CorpusAssert.Parses(@"DROP OPERATOR integer (integer, integer)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void opra0080() => CorpusAssert.Parses(@"DROP OPERATOR ##?? (integer)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void opra0081() => CorpusAssert.Parses(@"DROP OPERATOR ##?? (NONE, NONE)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task opra0078() => CorpusAssert.MatchesPostgres(@"DROP OPERATOR ## (integer, integer)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task opra0079() => CorpusAssert.MatchesPostgres(@"DROP OPERATOR integer (integer, integer)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task opra0080() => CorpusAssert.MatchesPostgres(@"DROP OPERATOR ##?? (integer)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task opra0081() => CorpusAssert.MatchesPostgres(@"DROP OPERATOR ##?? (NONE, NONE)", "error", false);
     [Fact]
     public void opra0082() => CorpusAssert.Parses(@"CREATE OPERATOR ##?? (FUNCTION = int4eq, LEFTARG = integer, RIGHTARG = integer);
 ALTER OPERATOR ##?? (integer, integer) SET (RESTRICT = eqsel)", "ok");
@@ -193,12 +193,12 @@ ALTER OPERATOR ##?? (integer, integer) SET (JOIN = NONE)", "ok");
     [Fact]
     public void opra0087() => CorpusAssert.Parses(@"CREATE OPERATOR ##?? (FUNCTION = int4pl, LEFTARG = integer, RIGHTARG = integer);
 ALTER OPERATOR ##?? (integer, integer) SET (COMMUTATOR = ##??)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void opra0088() => CorpusAssert.Parses(@"CREATE OPERATOR ##?? (FUNCTION = int4um, RIGHTARG = integer);
-ALTER OPERATOR ##?? (NONE, integer) SET (RESTRICT = eqsel)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void opra0089() => CorpusAssert.Parses(@"CREATE OPERATOR ##?? (FUNCTION = int4um, RIGHTARG = integer);
-ALTER OPERATOR ##?? (NONE, integer) SET (JOIN = eqjoinsel)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task opra0088() => CorpusAssert.MatchesPostgres(@"CREATE OPERATOR ##?? (FUNCTION = int4um, RIGHTARG = integer);
+ALTER OPERATOR ##?? (NONE, integer) SET (RESTRICT = eqsel)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task opra0089() => CorpusAssert.MatchesPostgres(@"CREATE OPERATOR ##?? (FUNCTION = int4um, RIGHTARG = integer);
+ALTER OPERATOR ##?? (NONE, integer) SET (JOIN = eqjoinsel)", "error", false);
     [Fact]
     public void opra0090() => CorpusAssert.Parses(@"CREATE OPERATOR ##?? (FUNCTION = int4eq, LEFTARG = integer, RIGHTARG = integer);
 ALTER OPERATOR ##?? (integer, integer) SET (HASHES)", "ok");
@@ -211,16 +211,16 @@ ALTER OPERATOR ##?? (integer, integer) SET (HASHES, MERGES)", "ok");
     [Fact]
     public void opra0093() => CorpusAssert.Parses(@"CREATE OPERATOR ##?? (FUNCTION = int4eq, LEFTARG = integer, RIGHTARG = integer);
 ALTER OPERATOR ##?? (integer, integer) SET (RESTRICT = eqsel, JOIN = eqjoinsel, HASHES, MERGES)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void opra0094() => CorpusAssert.Parses(@"ALTER OPERATOR ##!? (integer, integer) SET (RESTRICT = eqsel)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void opra0095() => CorpusAssert.Parses(@"CREATE OPERATOR ##?? (FUNCTION = int4pl, LEFTARG = integer, RIGHTARG = integer);
-ALTER OPERATOR ##?? (integer, integer) SET ()", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void opra0096() => CorpusAssert.Parses(@"ALTER OPERATOR ##?? (integer) SET (RESTRICT = eqsel)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void opra0097() => CorpusAssert.Parses(@"CREATE OPERATOR ##?? (FUNCTION = int4eq, LEFTARG = integer, RIGHTARG = integer);
-ALTER OPERATOR ##?? (integer, integer) SET (RESTRICT = nonexistent_fn)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task opra0094() => CorpusAssert.MatchesPostgres(@"ALTER OPERATOR ##!? (integer, integer) SET (RESTRICT = eqsel)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task opra0095() => CorpusAssert.MatchesPostgres(@"CREATE OPERATOR ##?? (FUNCTION = int4pl, LEFTARG = integer, RIGHTARG = integer);
+ALTER OPERATOR ##?? (integer, integer) SET ()", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task opra0096() => CorpusAssert.MatchesPostgres(@"ALTER OPERATOR ##?? (integer) SET (RESTRICT = eqsel)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task opra0097() => CorpusAssert.MatchesPostgres(@"CREATE OPERATOR ##?? (FUNCTION = int4eq, LEFTARG = integer, RIGHTARG = integer);
+ALTER OPERATOR ##?? (integer, integer) SET (RESTRICT = nonexistent_fn)", "error", false);
     [Fact]
     public void opra0098() => CorpusAssert.Parses(@"CREATE OPERATOR ##?? (FUNCTION = int4pl, LEFTARG = integer, RIGHTARG = integer);
 ALTER OPERATOR ##?? (integer, integer) OWNER TO CURRENT_USER", "ok");
@@ -245,24 +245,24 @@ DROP OPERATOR ##~< (integer, integer)", "ok");
     public void opra0104() => CorpusAssert.Parses(@"CREATE OPERATOR ##|| (FUNCTION = textcat, LEFTARG = text, RIGHTARG = text)", "ok");
     [Fact]
     public void opra0105() => CorpusAssert.Parses(@"CREATE OPERATOR ##!! (FUNCTION = numeric_uminus, RIGHTARG = numeric)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void opra0106() => CorpusAssert.Parses(@"CREATE OPERATOR ##~= (FUNCTION = int4eq, LEFTARG = integer, RIGHTARG = integer, COMMUTATOR = OPERATOR(pg_catalog.=))", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void opra0107() => CorpusAssert.Parses(@"CREATE OPERATOR ##~= (FUNCTION = int4lt, LEFTARG = integer, RIGHTARG = integer, NEGATOR = OPERATOR(pg_catalog.>=))", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void opra0108() => CorpusAssert.Parses(@"CREATE OPERATOR ##~= (FUNCTION = int4eq, LEFTARG = integer, RIGHTARG = integer, RESTRICT = OPERATOR(eqsel))", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task opra0106() => CorpusAssert.MatchesPostgres(@"CREATE OPERATOR ##~= (FUNCTION = int4eq, LEFTARG = integer, RIGHTARG = integer, COMMUTATOR = OPERATOR(pg_catalog.=))", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task opra0107() => CorpusAssert.MatchesPostgres(@"CREATE OPERATOR ##~= (FUNCTION = int4lt, LEFTARG = integer, RIGHTARG = integer, NEGATOR = OPERATOR(pg_catalog.>=))", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task opra0108() => CorpusAssert.MatchesPostgres(@"CREATE OPERATOR ##~= (FUNCTION = int4eq, LEFTARG = integer, RIGHTARG = integer, RESTRICT = OPERATOR(eqsel))", "error", false);
     [Fact]
     public void opra0109() => CorpusAssert.Parses(@"CREATE OPERATOR + (FUNCTION = int4pl, LEFTARG = integer, RIGHTARG = integer)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void opra0110() => CorpusAssert.Parses(@"CREATE OPERATOR ##~= (FUNCTION = int4pl, LEFTARG = integer, RIGHTARG = integer, JOIN = OPERATOR(eqjoinsel))", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task opra0110() => CorpusAssert.MatchesPostgres(@"CREATE OPERATOR ##~= (FUNCTION = int4pl, LEFTARG = integer, RIGHTARG = integer, JOIN = OPERATOR(eqjoinsel))", "error", false);
     [Fact]
     public void opra0111() => CorpusAssert.Parses(@"CREATE OPERATOR ##?< (FUNCTION = int4lt, LEFTARG = integer, RIGHTARG = integer, RESTRICT = scalarltsel, MERGES)", "ok");
     [Fact]
     public void opra0112() => CorpusAssert.Parses(@"CREATE OPERATOR ##?> (FUNCTION = int4gt, LEFTARG = integer, RIGHTARG = integer, RESTRICT = scalargtsel, MERGES, COMMUTATOR = ##?<);
 CREATE OPERATOR ##?< (FUNCTION = int4lt, LEFTARG = integer, RIGHTARG = integer, RESTRICT = scalarltsel, MERGES, COMMUTATOR = ##?>)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void opra0113() => CorpusAssert.Parses(@"CREATE OPERATOR ##?? (FUNCTION = int4eq, LEFTARG = integer, RIGHTARG = integer);
-ALTER OPERATOR ##?? (integer, integer) SET (NEGATOR = ##??)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task opra0113() => CorpusAssert.MatchesPostgres(@"CREATE OPERATOR ##?? (FUNCTION = int4eq, LEFTARG = integer, RIGHTARG = integer);
+ALTER OPERATOR ##?? (integer, integer) SET (NEGATOR = ##??)", "error", false);
     [Fact]
     public void opra0114() => CorpusAssert.Parses(@"CREATE OPERATOR ##?? (FUNCTION = int4eq, LEFTARG = integer, RIGHTARG = integer);
 ALTER OPERATOR ##?? (integer, integer) SET (COMMUTATOR = ##??, RESTRICT = eqsel, JOIN = eqjoinsel, HASHES, MERGES)", "ok");
@@ -278,10 +278,10 @@ ALTER OPERATOR ##?? (integer, integer) SET (COMMUTATOR = ##??, RESTRICT = eqsel,
     public void opra0117() => CorpusAssert.Parses(@"CREATE OPERATOR ##~= (FUNCTION = int4eq, LEFTARG = INTEGER, RIGHTARG = INTEGER)", "ok");
     [Fact]
     public void opra0118() => CorpusAssert.Parses(@"CREATE OPERATOR ##~= (FUNCTION = int4eq, LEFTARG = pg_catalog.int4, RIGHTARG = pg_catalog.int4)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void opra0119() => CorpusAssert.Parses(@"CREATE OPERATOR ##~= (FUNCTION = int4eq, LEFTARG = integer, RIGHTARG = integer, COMMUTATOR = OPERATOR(pg_catalog.=), RESTRICT = eqsel, JOIN = eqjoinsel, HASHES, MERGES)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void opra0120() => CorpusAssert.Parses(@"CREATE OPERATOR ##~= (FUNCTION = int4eq, LEFTARG = integer, RIGHTARG = integer, NEGATOR = OPERATOR(pg_catalog.<>))", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task opra0119() => CorpusAssert.MatchesPostgres(@"CREATE OPERATOR ##~= (FUNCTION = int4eq, LEFTARG = integer, RIGHTARG = integer, COMMUTATOR = OPERATOR(pg_catalog.=), RESTRICT = eqsel, JOIN = eqjoinsel, HASHES, MERGES)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task opra0120() => CorpusAssert.MatchesPostgres(@"CREATE OPERATOR ##~= (FUNCTION = int4eq, LEFTARG = integer, RIGHTARG = integer, NEGATOR = OPERATOR(pg_catalog.<>))", "error", false);
     [Fact]
     public void opra0121() => CorpusAssert.Parses(@"CREATE OPERATOR ##~= (FUNCTION = int4pl, LEFTARG = integer, RIGHTARG = integer);
 ALTER OPERATOR ##~= (integer, integer) OWNER TO CURRENT_USER;
@@ -304,8 +304,8 @@ DROP OPERATOR IF EXISTS ##!? (NONE, integer)", "ok");
     [Fact]
     public void opra0126() => CorpusAssert.Parses(@"CREATE OPERATOR ##?? (FUNCTION = int4eq, LEFTARG = integer, RIGHTARG = integer, COMMUTATOR = ##??);
 ALTER OPERATOR ##?? (integer, integer) SET (RESTRICT = eqsel, JOIN = eqjoinsel)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void opra0127() => CorpusAssert.Parses(@"CREATE OPERATOR ##?a (FUNCTION = int4pl, LEFTARG = integer, RIGHTARG = integer)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task opra0127() => CorpusAssert.MatchesPostgres(@"CREATE OPERATOR ##?a (FUNCTION = int4pl, LEFTARG = integer, RIGHTARG = integer)", "error", false);
     [Fact]
     public void opra0128() => CorpusAssert.Parses(@"CREATE OPERATOR ## (FUNCTION = int4pl, LEFTARG = integer, RIGHTARG = integer)", "ok");
     [Fact]
@@ -321,8 +321,8 @@ ALTER OPERATOR ##?? (integer, integer) SET SCHEMA s", "ok");
     [Fact]
     public void opra0132() => CorpusAssert.Parses(@"CREATE OPERATOR ##?? (FUNCTION = int4um, RIGHTARG = integer);
 ALTER OPERATOR ##?? (NONE, integer) OWNER TO SESSION_USER", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void opra0133() => CorpusAssert.Parses(@"ALTER OPERATOR ##!? (NONE, integer) SET (COMMUTATOR = ##!?)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task opra0133() => CorpusAssert.MatchesPostgres(@"ALTER OPERATOR ##!? (NONE, integer) SET (COMMUTATOR = ##!?)", "error", false);
     [Fact]
     public void opra0134() => CorpusAssert.Parses(@"CREATE OPERATOR ##?? (FUNCTION = int4pl, LEFTARG = integer, RIGHTARG = integer);
 ALTER OPERATOR ##?? (integer, integer)", "error");
@@ -338,8 +338,8 @@ DROP OPERATOR ##~= (integer, integer)", "ok");
     public void opra0137() => CorpusAssert.Parses(@"CREATE SCHEMA op_schema;
 CREATE OPERATOR op_schema.##~= (FUNCTION = int4pl, LEFTARG = integer, RIGHTARG = integer);
 DROP OPERATOR op_schema.##~= (integer, integer)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void opra0138() => CorpusAssert.Parses(@"DROP OPERATOR (integer, integer)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task opra0138() => CorpusAssert.MatchesPostgres(@"DROP OPERATOR (integer, integer)", "error", false);
     [Fact]
     public void opra0139() => CorpusAssert.Parses(@"CREATE OPERATOR ##~= (FUNCTION = int4eq, LEFTARG = integer, RIGHTARG = integer, RESTRICT = eqsel, JOIN = eqjoinsel);
 ALTER OPERATOR ##~= (integer, integer) SET (RESTRICT = neqsel, JOIN = neqjoinsel)", "ok");
@@ -385,9 +385,9 @@ SELECT '1'::integer ##~= '1'::integer", "ok");
     [Fact]
     public void opra0152() => CorpusAssert.Parses(@"CREATE OPERATOR ##< (FUNCTION = int4lt, LEFTARG = integer, RIGHTARG = integer, MERGES);
 SELECT * FROM s.t WHERE s.t.qty ##< 5", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void opra0153() => CorpusAssert.Parses(@"CREATE OPERATOR ##~= (FUNCTION = int4eq, LEFTARG = integer, RIGHTARG = integer, HASHES);
-SELECT s.t.id FROM s.t INNER JOIN s.t2 ON s.t.id::integer ##~= s.t2.t_id::integer", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task opra0153() => CorpusAssert.MatchesPostgres(@"CREATE OPERATOR ##~= (FUNCTION = int4eq, LEFTARG = integer, RIGHTARG = integer, HASHES);
+SELECT s.t.id FROM s.t INNER JOIN s.t2 ON s.t.id::integer ##~= s.t2.t_id::integer", "error", false);
     [Fact]
     public void opra0154() => CorpusAssert.Parses(@"CREATE OPERATOR ##?? (
   FUNCTION = int4eq,
@@ -491,6 +491,6 @@ ALTER OPERATOR @=^(integer, integer) SET (RESTRICT = NONE, JOIN = NONE)", "ok");
     public void oprb0009() => CorpusAssert.Parses(@"CREATE FUNCTION oprb0009_fn(integer, integer) RETURNS boolean LANGUAGE sql AS $$ SELECT $1 < $2 $$;
 CREATE OPERATOR @<^ (FUNCTION = oprb0009_fn, LEFTARG = integer, RIGHTARG = integer);
 DROP OPERATOR @<^(integer, integer) CASCADE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void oprb0010() => CorpusAssert.Parses(@"CREATE OPERATOR @##@ (LEFTARG = integer, RIGHTARG = integer)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task oprb0010() => CorpusAssert.MatchesPostgres(@"CREATE OPERATOR @##@ (LEFTARG = integer, RIGHTARG = integer)", "error", false);
 }

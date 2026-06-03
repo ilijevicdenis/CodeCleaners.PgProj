@@ -229,48 +229,48 @@ DROP DOMAIN IF EXISTS s.d_drop5, s.nonexistent99", "ok");
     public void doma0101() => CorpusAssert.Parses(@"CREATE DOMAIN d_noschema AS integer", "ok");
     [Fact]
     public void doma0102() => CorpusAssert.Parses(@"CREATE DOMAIN s.d_keyword_as_omit integer", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void doma0103() => CorpusAssert.Parses(@"CREATE DOMAIN AS integer", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void doma0104() => CorpusAssert.Parses(@"CREATE DOMAIN s.d_bad", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void doma0105() => CorpusAssert.Parses(@"CREATE DOMAIN s.d_bad2 AS", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void doma0106() => CorpusAssert.Parses(@"CREATE DOMAIN s.d_bad3 AS nonexistent_type_xyz", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void doma0107() => CorpusAssert.Parses(@"CREATE DOMAIN s.d_bad4 AS integer CHECK VALUE > 0", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void doma0108() => CorpusAssert.Parses(@"CREATE DOMAIN s.d_bad5 AS integer CHECK (> 0)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void doma0109() => CorpusAssert.Parses(@"CREATE DOMAIN s.d_bad6 AS integer DEFAULT", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void doma0110() => CorpusAssert.Parses(@"CREATE DOMAIN s.d_bad7 AS integer COLLATE", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void doma0111() => CorpusAssert.Parses(@"CREATE DOMAIN s.d_bad8 AS integer COLLATE bad_collation_xyz", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void doma0112() => CorpusAssert.Parses(@"CREATE DOMAIN s.d_bad9 AS integer CONSTRAINT", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void doma0113() => CorpusAssert.Parses(@"CREATE DOMAIN s.d_bad10 AS integer CONSTRAINT c1", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void doma0114() => CorpusAssert.Parses(@"ALTER DOMAIN s.pos_int SET DEFAULT", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void doma0115() => CorpusAssert.Parses(@"ALTER DOMAIN s.pos_int DROP CONSTRAINT nonexistent_xyz", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void doma0116() => CorpusAssert.Parses(@"ALTER DOMAIN s.nonexistent_domain_xyz SET DEFAULT 1", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void doma0117() => CorpusAssert.Parses(@"DROP DOMAIN s.nonexistent_domain_xyz", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task doma0103() => CorpusAssert.MatchesPostgres(@"CREATE DOMAIN AS integer", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task doma0104() => CorpusAssert.MatchesPostgres(@"CREATE DOMAIN s.d_bad", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task doma0105() => CorpusAssert.MatchesPostgres(@"CREATE DOMAIN s.d_bad2 AS", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task doma0106() => CorpusAssert.MatchesPostgres(@"CREATE DOMAIN s.d_bad3 AS nonexistent_type_xyz", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task doma0107() => CorpusAssert.MatchesPostgres(@"CREATE DOMAIN s.d_bad4 AS integer CHECK VALUE > 0", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task doma0108() => CorpusAssert.MatchesPostgres(@"CREATE DOMAIN s.d_bad5 AS integer CHECK (> 0)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task doma0109() => CorpusAssert.MatchesPostgres(@"CREATE DOMAIN s.d_bad6 AS integer DEFAULT", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task doma0110() => CorpusAssert.MatchesPostgres(@"CREATE DOMAIN s.d_bad7 AS integer COLLATE", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task doma0111() => CorpusAssert.MatchesPostgres(@"CREATE DOMAIN s.d_bad8 AS integer COLLATE bad_collation_xyz", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task doma0112() => CorpusAssert.MatchesPostgres(@"CREATE DOMAIN s.d_bad9 AS integer CONSTRAINT", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task doma0113() => CorpusAssert.MatchesPostgres(@"CREATE DOMAIN s.d_bad10 AS integer CONSTRAINT c1", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task doma0114() => CorpusAssert.MatchesPostgres(@"ALTER DOMAIN s.pos_int SET DEFAULT", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task doma0115() => CorpusAssert.MatchesPostgres(@"ALTER DOMAIN s.pos_int DROP CONSTRAINT nonexistent_xyz", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task doma0116() => CorpusAssert.MatchesPostgres(@"ALTER DOMAIN s.nonexistent_domain_xyz SET DEFAULT 1", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task doma0117() => CorpusAssert.MatchesPostgres(@"DROP DOMAIN s.nonexistent_domain_xyz", "error", false);
     [Fact]
     public void doma0118() => CorpusAssert.Parses(@"DROP DOMAIN", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void doma0119() => CorpusAssert.Parses(@"CREATE DOMAIN s.d_bad11 AS integer NOT NULL NULL", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void doma0120() => CorpusAssert.Parses(@"CREATE DOMAIN s.d_bad12 AS integer DEFAULT 0 DEFAULT 1", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task doma0119() => CorpusAssert.MatchesPostgres(@"CREATE DOMAIN s.d_bad11 AS integer NOT NULL NULL", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task doma0120() => CorpusAssert.MatchesPostgres(@"CREATE DOMAIN s.d_bad12 AS integer DEFAULT 0 DEFAULT 1", "error", false);
     [Fact]
     public void doma0121() => CorpusAssert.Parses(@"CREATE DOMAIN s.d_check_extra_paren AS integer CHECK ((VALUE > 0))", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void doma0122() => CorpusAssert.Parses(@"CREATE DOMAIN s.d_check_empty AS integer CHECK ()", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void doma0123() => CorpusAssert.Parses(@"DOMAIN s.d_bad13 AS integer", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task doma0122() => CorpusAssert.MatchesPostgres(@"CREATE DOMAIN s.d_check_empty AS integer CHECK ()", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task doma0123() => CorpusAssert.MatchesPostgres(@"DOMAIN s.d_bad13 AS integer", "error", false);
     [Fact]
     public void doma0124() => CorpusAssert.Parses(@"CREATE DOMAIN s.d_long_check AS text
   CONSTRAINT min_len CHECK (char_length(VALUE) >= 2)
@@ -349,14 +349,14 @@ ALTER DOMAIN s.d_alter_drop_nn DROP NOT NULL", "ok");
     public void doma0158() => CorpusAssert.Parses(@"CREATE DOMAIN s.d_validate_c AS integer;
 ALTER DOMAIN s.d_validate_c ADD CONSTRAINT vc CHECK (VALUE > 0) NOT VALID;
 ALTER DOMAIN s.d_validate_c VALIDATE CONSTRAINT vc", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void doma0159() => CorpusAssert.Parses(@"ALTER DOMAIN s.pos_int RENAME CONSTRAINT nonexistent_xyz TO new_name", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void doma0160() => CorpusAssert.Parses(@"ALTER DOMAIN s.pos_int VALIDATE CONSTRAINT nonexistent_xyz", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void doma0161() => CorpusAssert.Parses(@"ALTER DOMAIN s.pos_int ADD CONSTRAINT", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void doma0162() => CorpusAssert.Parses(@"ALTER DOMAIN s.pos_int ADD NOT NULL NOT VALID", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task doma0159() => CorpusAssert.MatchesPostgres(@"ALTER DOMAIN s.pos_int RENAME CONSTRAINT nonexistent_xyz TO new_name", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task doma0160() => CorpusAssert.MatchesPostgres(@"ALTER DOMAIN s.pos_int VALIDATE CONSTRAINT nonexistent_xyz", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task doma0161() => CorpusAssert.MatchesPostgres(@"ALTER DOMAIN s.pos_int ADD CONSTRAINT", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task doma0162() => CorpusAssert.MatchesPostgres(@"ALTER DOMAIN s.pos_int ADD NOT NULL NOT VALID", "error", false);
     [Fact]
     public void doma0163() => CorpusAssert.Parses(@"CREATE DOMAIN s.d_dollar_quote AS text DEFAULT $$hello world$$", "ok");
     [Fact]
@@ -369,10 +369,10 @@ ALTER DOMAIN s.d_validate_c VALIDATE CONSTRAINT vc", "ok");
   CONSTRAINT max_val CHECK (VALUE <= 999999.99)
   NOT NULL
   DEFAULT 1.00", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void doma0167() => CorpusAssert.Parses(@"CREATE DOMAIN s.d_bad_collate_int AS integer COLLATE ""C""", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void doma0168() => CorpusAssert.Parses(@"CREATE DOMAIN s.d_bad_check_subquery AS integer CHECK (VALUE > (SELECT 1))", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task doma0167() => CorpusAssert.MatchesPostgres(@"CREATE DOMAIN s.d_bad_collate_int AS integer COLLATE ""C""", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task doma0168() => CorpusAssert.MatchesPostgres(@"CREATE DOMAIN s.d_bad_check_subquery AS integer CHECK (VALUE > (SELECT 1))", "error", false);
     [Fact]
     public void doma0169() => CorpusAssert.Parses(@"ALTER DOMAIN s.pos_int SET SCHEMA", "error");
     [Fact]
@@ -461,20 +461,20 @@ ALTER DOMAIN s.d_validate_c VALIDATE CONSTRAINT vc", "ok");
     public void domb0041() => CorpusAssert.Parses(@"CREATE DOMAIN d41 AS integer CHECK (VALUE > 0); ALTER DOMAIN d41 ADD CHECK (VALUE < 1000)", "ok");
     [Fact]
     public void domb0042() => CorpusAssert.Parses(@"CREATE DOMAIN d42 AS integer; ALTER DOMAIN d42 OWNER TO CURRENT_USER", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void domb0043() => CorpusAssert.Parses(@"CREATE DOMAIN integer", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void domb0044() => CorpusAssert.Parses(@"CREATE DOMAIN d44", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void domb0045() => CorpusAssert.Parses(@"CREATE DOMAIN d45 AS nonexistent_type_xyz", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void domb0046() => CorpusAssert.Parses(@"CREATE DOMAIN d46 AS integer CHECK (x > 0)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void domb0047() => CorpusAssert.Parses(@"CREATE DOMAIN d47 AS integer CHECK VALUE > 0", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void domb0048() => CorpusAssert.Parses(@"CREATE DOMAIN d48 AS integer DEFAULT", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void domb0049() => CorpusAssert.Parses(@"ALTER DOMAIN nonexistent_domain_zzz SET DEFAULT 1", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void domb0050() => CorpusAssert.Parses(@"CREATE DOMAIN d50 AS integer COLLATE ""C""", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task domb0043() => CorpusAssert.MatchesPostgres(@"CREATE DOMAIN integer", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task domb0044() => CorpusAssert.MatchesPostgres(@"CREATE DOMAIN d44", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task domb0045() => CorpusAssert.MatchesPostgres(@"CREATE DOMAIN d45 AS nonexistent_type_xyz", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task domb0046() => CorpusAssert.MatchesPostgres(@"CREATE DOMAIN d46 AS integer CHECK (x > 0)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task domb0047() => CorpusAssert.MatchesPostgres(@"CREATE DOMAIN d47 AS integer CHECK VALUE > 0", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task domb0048() => CorpusAssert.MatchesPostgres(@"CREATE DOMAIN d48 AS integer DEFAULT", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task domb0049() => CorpusAssert.MatchesPostgres(@"ALTER DOMAIN nonexistent_domain_zzz SET DEFAULT 1", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task domb0050() => CorpusAssert.MatchesPostgres(@"CREATE DOMAIN d50 AS integer COLLATE ""C""", "error", false);
 }

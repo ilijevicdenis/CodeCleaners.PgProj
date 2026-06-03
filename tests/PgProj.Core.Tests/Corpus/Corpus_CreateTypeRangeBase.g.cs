@@ -37,10 +37,10 @@ public class Corpus_CreateTypeRangeBase
     public void tyrba0015() => CorpusAssert.Parses(@"CREATE TYPE myrange12 AS RANGE (SUBTYPE = text, SUBTYPE_OPCLASS = text_ops);", "ok");
     [Fact]
     public void tyrba0016() => CorpusAssert.Parses(@"CREATE TYPE myrange13 AS RANGE (SUBTYPE = float8, SUBTYPE_DIFF = float8mi);", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyrba0017() => CorpusAssert.Parses(@"CREATE TYPE myrange14 AS RANGE (SUBTYPE = int4, SUBTYPE_DIFF = int4mi);", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyrba0018() => CorpusAssert.Parses(@"CREATE TYPE myrange15 AS RANGE (SUBTYPE = date, SUBTYPE_DIFF = date_mi);", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task tyrba0017() => CorpusAssert.MatchesPostgres(@"CREATE TYPE myrange14 AS RANGE (SUBTYPE = int4, SUBTYPE_DIFF = int4mi);", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tyrba0018() => CorpusAssert.MatchesPostgres(@"CREATE TYPE myrange15 AS RANGE (SUBTYPE = date, SUBTYPE_DIFF = date_mi);", "error", false);
     [Fact]
     public void tyrba0019() => CorpusAssert.Parses(@"CREATE TYPE myrange16 AS RANGE (SUBTYPE = text, COLLATION = ""default"");", "ok");
     [Fact]
@@ -59,8 +59,8 @@ public class Corpus_CreateTypeRangeBase
     public void tyrba0026() => CorpusAssert.Parses(@"CREATE TYPE myrange23 AS RANGE (SUBTYPE = float8, SUBTYPE_DIFF = float8mi, MULTIRANGE_TYPE_NAME = myfloatrange_multi);", "ok");
     [Fact]
     public void tyrba0027() => CorpusAssert.Parses(@"CREATE TYPE myrange24 AS RANGE (SUBTYPE = text, COLLATION = ""C"", SUBTYPE_OPCLASS = text_ops, MULTIRANGE_TYPE_NAME = mytextrange_multi);", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyrba0028() => CorpusAssert.Parses(@"CREATE TYPE myrange25 AS RANGE (SUBTYPE = int4, SUBTYPE_OPCLASS = int4_ops, SUBTYPE_DIFF = int4mi, MULTIRANGE_TYPE_NAME = myintrange_multi);", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task tyrba0028() => CorpusAssert.MatchesPostgres(@"CREATE TYPE myrange25 AS RANGE (SUBTYPE = int4, SUBTYPE_OPCLASS = int4_ops, SUBTYPE_DIFF = int4mi, MULTIRANGE_TYPE_NAME = myintrange_multi);", "error", false);
     [Fact]
     public void tyrba0029() => CorpusAssert.Parses(@"CREATE TYPE s.myrange26 AS RANGE (SUBTYPE = int4);", "ok");
     [Fact]
@@ -106,8 +106,8 @@ public class Corpus_CreateTypeRangeBase
     public void tyrba0048() => CorpusAssert.Parses(@"CREATE TYPE myrange43 AS RANGE (SUBTYPE_DIFF = float8mi, SUBTYPE = float8);", "ok");
     [Fact]
     public void tyrba0049() => CorpusAssert.Parses(@"CREATE TYPE myrange44 AS RANGE (COLLATION = ""C"", SUBTYPE = text);", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyrba0050() => CorpusAssert.Parses(@"CREATE TYPE myshellx AS RANGE (SUBTYPE = int4, CANONICAL = myshellx_canonical);", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task tyrba0050() => CorpusAssert.MatchesPostgres(@"CREATE TYPE myshellx AS RANGE (SUBTYPE = int4, CANONICAL = myshellx_canonical);", "error", false);
     [Fact]
     public void tyrba0051() => CorpusAssert.Parses(@"CREATE TYPE AS RANGE (SUBTYPE = int4);", "error");
     [Fact]
@@ -128,18 +128,18 @@ public class Corpus_CreateTypeRangeBase
     public void tyrba0059() => CorpusAssert.Parses(@"CREATE TYPE mybadr8 AS RANGE (SUBTYPE int4);", "error");
     [Fact]
     public void tyrba0060() => CorpusAssert.Parses(@"CREATE TYPE mybadr9 RANGE (SUBTYPE = int4);", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyrba0061() => CorpusAssert.Parses(@"CREATE TYPE mybadr10 AS RANGE (SUBTYPE = nonexistent_type_xyz);", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task tyrba0061() => CorpusAssert.MatchesPostgres(@"CREATE TYPE mybadr10 AS RANGE (SUBTYPE = nonexistent_type_xyz);", "error", false);
     [Fact]
     public void tyrba0062() => CorpusAssert.Parses(@"CREATE TYPE mybadr11 AS RANGE (SUBTYPE = int4, UNKNOWN_OPT = foo);", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyrba0063() => CorpusAssert.Parses(@"CREATE TYPE mybadr12 AS RANGE (SUBTYPE = int4, SUBTYPE_DIFF = nonexistent_fn_xyz);", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyrba0064() => CorpusAssert.Parses(@"CREATE TYPE mybadr13 AS RANGE (SUBTYPE = int4, COLLATION = nonexistent_collation_xyz);", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task tyrba0063() => CorpusAssert.MatchesPostgres(@"CREATE TYPE mybadr12 AS RANGE (SUBTYPE = int4, SUBTYPE_DIFF = nonexistent_fn_xyz);", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tyrba0064() => CorpusAssert.MatchesPostgres(@"CREATE TYPE mybadr13 AS RANGE (SUBTYPE = int4, COLLATION = nonexistent_collation_xyz);", "error", false);
     [Fact]
     public void tyrba0065() => CorpusAssert.Parses(@"CREATE TYPE mybadr14 AS RANGE (SUBTYPE = int4, MULTIRANGE_TYPE_NAME = mybadr14_multi, MULTIRANGE_TYPE_NAME = mybadr14_multi2);", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyrba0066() => CorpusAssert.Parses(@"CREATE TYPE mybadr15 AS RANGE (SUBTYPE = int4, COLLATION = ""C"");", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task tyrba0066() => CorpusAssert.MatchesPostgres(@"CREATE TYPE mybadr15 AS RANGE (SUBTYPE = int4, COLLATION = ""C"");", "error", false);
     [Fact]
     public void tyrba0067() => CorpusAssert.Parses(@"CREATE TYPE mybadr16 AS (SUBTYPE = int4);", "error");
     [Fact]
@@ -148,8 +148,8 @@ public class Corpus_CreateTypeRangeBase
     public void tyrba0069() => CorpusAssert.Parses(@"CREATE TYPE myrange46 AS RANGE (SUBTYPE = s.pos_int);", "ok");
     [Fact]
     public void tyrba0070() => CorpusAssert.Parses(@"CREATE TYPE mymultirange_explicit AS RANGE (SUBTYPE = int4, MULTIRANGE_TYPE_NAME = mymultirange_explicit_mrange);", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyrba0071() => CorpusAssert.Parses(@"CREATE TYPE s.myrange47 AS RANGE (SUBTYPE = numeric, SUBTYPE_DIFF = numeric_sub);", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task tyrba0071() => CorpusAssert.MatchesPostgres(@"CREATE TYPE s.myrange47 AS RANGE (SUBTYPE = numeric, SUBTYPE_DIFF = numeric_sub);", "error", false);
     [Fact]
     public void tyrba0072() => CorpusAssert.Parses(@"CREATE TYPE myrange48 AS RANGE (SUBTYPE = int4);
 CREATE TYPE myrange48_use AS RANGE (SUBTYPE = int4);", "ok");
@@ -158,10 +158,10 @@ CREATE TYPE myrange48_use AS RANGE (SUBTYPE = int4);", "ok");
 CREATE TYPE myrange49 AS RANGE (SUBTYPE = int4);", "ok");
     [Fact]
     public void tyrba0074() => CorpusAssert.Parses(@"CREATE TYPE mybadr17 AS RANGE (SUBTYPE = int4,);", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyrba0075() => CorpusAssert.Parses(@"CREATE TYPE mybadr18 AS RANGE (SUBTYPE = int4, SUBTYPE_OPCLASS = int4_ops SUBTYPE_DIFF = float8mi);", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyrba0076() => CorpusAssert.Parses(@"CREATE TYPE myrange50 AS RANGE (SUBTYPE = int4, SUBTYPE_OPCLASS = int4_ops, SUBTYPE_DIFF = int4mi, COLLATION = ""C"", MULTIRANGE_TYPE_NAME = myrange50_multi);", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task tyrba0075() => CorpusAssert.MatchesPostgres(@"CREATE TYPE mybadr18 AS RANGE (SUBTYPE = int4, SUBTYPE_OPCLASS = int4_ops SUBTYPE_DIFF = float8mi);", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tyrba0076() => CorpusAssert.MatchesPostgres(@"CREATE TYPE myrange50 AS RANGE (SUBTYPE = int4, SUBTYPE_OPCLASS = int4_ops, SUBTYPE_DIFF = int4mi, COLLATION = ""C"", MULTIRANGE_TYPE_NAME = myrange50_multi);", "error", false);
     [Fact]
     public void tyrba0077() => CorpusAssert.Parses(@"CREATE TYPE myrange51 AS RANGE (SUBTYPE = varchar);", "ok");
     [Fact]
@@ -172,96 +172,96 @@ CREATE TYPE myrange49 AS RANGE (SUBTYPE = int4);", "ok");
     public void tyrba0080() => CorpusAssert.Parses(@"CREATE TYPE myrange54 AS RANGE (SUBTYPE = char);", "ok");
     [Fact]
     public void tyrba0081() => CorpusAssert.Parses(@"CREATE TYPE myrange55 AS RANGE (SUBTYPE = int4, SUBTYPE_OPCLASS = int4_ops, MULTIRANGE_TYPE_NAME = myrange55_multi);", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyrba0082() => CorpusAssert.Parses(@"CREATE TYPE mybadb1 (INPUT = myinput, OUTPUT = myoutput);", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyrba0083() => CorpusAssert.Parses(@"CREATE TYPE mybadb2 (INPUT = myinput);", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyrba0084() => CorpusAssert.Parses(@"CREATE TYPE mybadb3 (OUTPUT = myoutput);", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task tyrba0082() => CorpusAssert.MatchesPostgres(@"CREATE TYPE mybadb1 (INPUT = myinput, OUTPUT = myoutput);", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tyrba0083() => CorpusAssert.MatchesPostgres(@"CREATE TYPE mybadb2 (INPUT = myinput);", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tyrba0084() => CorpusAssert.MatchesPostgres(@"CREATE TYPE mybadb3 (OUTPUT = myoutput);", "error", false);
     [Fact]
     public void tyrba0085() => CorpusAssert.Parses(@"CREATE TYPE (INPUT = myinput, OUTPUT = myoutput);", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyrba0086() => CorpusAssert.Parses(@"CREATE TYPE mybadb4 (INPUT = myinput, OUTPUT = myoutput, INTERNALLENGTH = 4);", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyrba0087() => CorpusAssert.Parses(@"CREATE TYPE mybadb5 (INPUT = myinput, OUTPUT = myoutput, INTERNALLENGTH = VARIABLE);", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task tyrba0086() => CorpusAssert.MatchesPostgres(@"CREATE TYPE mybadb4 (INPUT = myinput, OUTPUT = myoutput, INTERNALLENGTH = 4);", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tyrba0087() => CorpusAssert.MatchesPostgres(@"CREATE TYPE mybadb5 (INPUT = myinput, OUTPUT = myoutput, INTERNALLENGTH = VARIABLE);", "error", false);
     [Fact]
     public void tyrba0088() => CorpusAssert.Parses(@"CREATE TYPE mybadb6 (INPUT = myinput, OUTPUT = myoutput, PASSEDBYVALUE);", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyrba0089() => CorpusAssert.Parses(@"CREATE TYPE mybadb7 (INPUT = myinput, OUTPUT = myoutput, ALIGNMENT = char);", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyrba0090() => CorpusAssert.Parses(@"CREATE TYPE mybadb8 (INPUT = myinput, OUTPUT = myoutput, ALIGNMENT = int2);", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyrba0091() => CorpusAssert.Parses(@"CREATE TYPE mybadb9 (INPUT = myinput, OUTPUT = myoutput, ALIGNMENT = int4);", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyrba0092() => CorpusAssert.Parses(@"CREATE TYPE mybadb10 (INPUT = myinput, OUTPUT = myoutput, ALIGNMENT = double);", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyrba0093() => CorpusAssert.Parses(@"CREATE TYPE mybadb11 (INPUT = myinput, OUTPUT = myoutput, STORAGE = plain);", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyrba0094() => CorpusAssert.Parses(@"CREATE TYPE mybadb12 (INPUT = myinput, OUTPUT = myoutput, STORAGE = extended);", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyrba0095() => CorpusAssert.Parses(@"CREATE TYPE mybadb13 (INPUT = myinput, OUTPUT = myoutput, STORAGE = external);", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyrba0096() => CorpusAssert.Parses(@"CREATE TYPE mybadb14 (INPUT = myinput, OUTPUT = myoutput, STORAGE = main);", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyrba0097() => CorpusAssert.Parses(@"CREATE TYPE mybadb15 (INPUT = myinput, OUTPUT = myoutput, LIKE = int4);", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyrba0098() => CorpusAssert.Parses(@"CREATE TYPE mybadb16 (INPUT = myinput, OUTPUT = myoutput, CATEGORY = 'N');", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyrba0099() => CorpusAssert.Parses(@"CREATE TYPE mybadb17 (INPUT = myinput, OUTPUT = myoutput, PREFERRED = true);", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyrba0100() => CorpusAssert.Parses(@"CREATE TYPE mybadb18 (INPUT = myinput, OUTPUT = myoutput, PREFERRED = false);", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyrba0101() => CorpusAssert.Parses(@"CREATE TYPE mybadb19 (INPUT = myinput, OUTPUT = myoutput, DEFAULT = '0');", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyrba0102() => CorpusAssert.Parses(@"CREATE TYPE mybadb20 (INPUT = myinput, OUTPUT = myoutput, ELEMENT = float4);", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyrba0103() => CorpusAssert.Parses(@"CREATE TYPE mybadb21 (INPUT = myinput, OUTPUT = myoutput, DELIMITER = ',');", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyrba0104() => CorpusAssert.Parses(@"CREATE TYPE mybadb22 (INPUT = myinput, OUTPUT = myoutput, DELIMITER = '|');", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyrba0105() => CorpusAssert.Parses(@"CREATE TYPE mybadb23 (INPUT = myinput, OUTPUT = myoutput, COLLATABLE = true);", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyrba0106() => CorpusAssert.Parses(@"CREATE TYPE mybadb24 (INPUT = myinput, OUTPUT = myoutput, COLLATABLE = false);", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyrba0107() => CorpusAssert.Parses(@"CREATE TYPE mybadb25 (INPUT = myinput, OUTPUT = myoutput, RECEIVE = myrecv);", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyrba0108() => CorpusAssert.Parses(@"CREATE TYPE mybadb26 (INPUT = myinput, OUTPUT = myoutput, SEND = mysend);", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyrba0109() => CorpusAssert.Parses(@"CREATE TYPE mybadb27 (INPUT = myinput, OUTPUT = myoutput, TYPMOD_IN = mytypmod_in);", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyrba0110() => CorpusAssert.Parses(@"CREATE TYPE mybadb28 (INPUT = myinput, OUTPUT = myoutput, TYPMOD_OUT = mytypmod_out);", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyrba0111() => CorpusAssert.Parses(@"CREATE TYPE mybadb29 (INPUT = myinput, OUTPUT = myoutput, ANALYZE = myanalyze);", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyrba0112() => CorpusAssert.Parses(@"CREATE TYPE mybadb30 (INPUT = myinput, OUTPUT = myoutput, SUBSCRIPT = mysubscript);", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task tyrba0089() => CorpusAssert.MatchesPostgres(@"CREATE TYPE mybadb7 (INPUT = myinput, OUTPUT = myoutput, ALIGNMENT = char);", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tyrba0090() => CorpusAssert.MatchesPostgres(@"CREATE TYPE mybadb8 (INPUT = myinput, OUTPUT = myoutput, ALIGNMENT = int2);", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tyrba0091() => CorpusAssert.MatchesPostgres(@"CREATE TYPE mybadb9 (INPUT = myinput, OUTPUT = myoutput, ALIGNMENT = int4);", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tyrba0092() => CorpusAssert.MatchesPostgres(@"CREATE TYPE mybadb10 (INPUT = myinput, OUTPUT = myoutput, ALIGNMENT = double);", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tyrba0093() => CorpusAssert.MatchesPostgres(@"CREATE TYPE mybadb11 (INPUT = myinput, OUTPUT = myoutput, STORAGE = plain);", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tyrba0094() => CorpusAssert.MatchesPostgres(@"CREATE TYPE mybadb12 (INPUT = myinput, OUTPUT = myoutput, STORAGE = extended);", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tyrba0095() => CorpusAssert.MatchesPostgres(@"CREATE TYPE mybadb13 (INPUT = myinput, OUTPUT = myoutput, STORAGE = external);", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tyrba0096() => CorpusAssert.MatchesPostgres(@"CREATE TYPE mybadb14 (INPUT = myinput, OUTPUT = myoutput, STORAGE = main);", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tyrba0097() => CorpusAssert.MatchesPostgres(@"CREATE TYPE mybadb15 (INPUT = myinput, OUTPUT = myoutput, LIKE = int4);", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tyrba0098() => CorpusAssert.MatchesPostgres(@"CREATE TYPE mybadb16 (INPUT = myinput, OUTPUT = myoutput, CATEGORY = 'N');", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tyrba0099() => CorpusAssert.MatchesPostgres(@"CREATE TYPE mybadb17 (INPUT = myinput, OUTPUT = myoutput, PREFERRED = true);", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tyrba0100() => CorpusAssert.MatchesPostgres(@"CREATE TYPE mybadb18 (INPUT = myinput, OUTPUT = myoutput, PREFERRED = false);", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tyrba0101() => CorpusAssert.MatchesPostgres(@"CREATE TYPE mybadb19 (INPUT = myinput, OUTPUT = myoutput, DEFAULT = '0');", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tyrba0102() => CorpusAssert.MatchesPostgres(@"CREATE TYPE mybadb20 (INPUT = myinput, OUTPUT = myoutput, ELEMENT = float4);", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tyrba0103() => CorpusAssert.MatchesPostgres(@"CREATE TYPE mybadb21 (INPUT = myinput, OUTPUT = myoutput, DELIMITER = ',');", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tyrba0104() => CorpusAssert.MatchesPostgres(@"CREATE TYPE mybadb22 (INPUT = myinput, OUTPUT = myoutput, DELIMITER = '|');", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tyrba0105() => CorpusAssert.MatchesPostgres(@"CREATE TYPE mybadb23 (INPUT = myinput, OUTPUT = myoutput, COLLATABLE = true);", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tyrba0106() => CorpusAssert.MatchesPostgres(@"CREATE TYPE mybadb24 (INPUT = myinput, OUTPUT = myoutput, COLLATABLE = false);", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tyrba0107() => CorpusAssert.MatchesPostgres(@"CREATE TYPE mybadb25 (INPUT = myinput, OUTPUT = myoutput, RECEIVE = myrecv);", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tyrba0108() => CorpusAssert.MatchesPostgres(@"CREATE TYPE mybadb26 (INPUT = myinput, OUTPUT = myoutput, SEND = mysend);", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tyrba0109() => CorpusAssert.MatchesPostgres(@"CREATE TYPE mybadb27 (INPUT = myinput, OUTPUT = myoutput, TYPMOD_IN = mytypmod_in);", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tyrba0110() => CorpusAssert.MatchesPostgres(@"CREATE TYPE mybadb28 (INPUT = myinput, OUTPUT = myoutput, TYPMOD_OUT = mytypmod_out);", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tyrba0111() => CorpusAssert.MatchesPostgres(@"CREATE TYPE mybadb29 (INPUT = myinput, OUTPUT = myoutput, ANALYZE = myanalyze);", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tyrba0112() => CorpusAssert.MatchesPostgres(@"CREATE TYPE mybadb30 (INPUT = myinput, OUTPUT = myoutput, SUBSCRIPT = mysubscript);", "error", false);
     [Fact]
     public void tyrba0113() => CorpusAssert.Parses(@"CREATE TYPE mybadbsyn1 INPUT = myinput, OUTPUT = myoutput;", "error");
     [Fact]
     public void tyrba0114() => CorpusAssert.Parses(@"CREATE TYPE mybadbsyn2 (INPUT myinput, OUTPUT myoutput);", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyrba0115() => CorpusAssert.Parses(@"CREATE TYPE mybadbsyn3 (INPUT = myinput, OUTPUT = myoutput, ALIGNMENT = bigint);", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyrba0116() => CorpusAssert.Parses(@"CREATE TYPE mybadbsyn4 (INPUT = myinput, OUTPUT = myoutput, STORAGE = compressed);", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyrba0117() => CorpusAssert.Parses(@"CREATE TYPE mybadbsyn5 (INPUT = myinput, OUTPUT = myoutput, INTERNALLENGTH = -1);", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyrba0118() => CorpusAssert.Parses(@"CREATE TYPE mybadbsyn6 (INPUT = myinput, OUTPUT = myoutput, STORAGE = default);", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyrba0119() => CorpusAssert.Parses(@"CREATE TYPE mybadbsyn7 (INPUT = myinput, OUTPUT = myoutput, CATEGORY = 'ABC');", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyrba0120() => CorpusAssert.Parses(@"CREATE TYPE mybadbsyn8 (INPUT = myinput, OUTPUT = myoutput, PREFERRED = yes);", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyrba0121() => CorpusAssert.Parses(@"CREATE TYPE mybadbsyn9 (INPUT = myinput, OUTPUT = myoutput, COLLATABLE = 1);", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyrba0122() => CorpusAssert.Parses(@"CREATE TYPE mybadbsyn10 (INPUT = myinput, OUTPUT = myoutput, INTERNALLENGTH = 'four');", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyrba0123() => CorpusAssert.Parses(@"CREATE TYPE mybadr19 AS RANGE (SUBTYPE = int4, CANONICAL = s.f);", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyrba0124() => CorpusAssert.Parses(@"CREATE TYPE myrange56 AS RANGE (SUBTYPE = int4, SUBTYPE_OPCLASS = nonexistent_opclass_xyz);", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyrba0125() => CorpusAssert.Parses(@"CREATE TYPE myrange57 AS RANGE (SUBTYPE = int4, SUBTYPE_DIFF = s.f);", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyrba0126() => CorpusAssert.Parses(@"CREATE TYPE mybadr20 AS RANGE (SUBTYPE = int4, CANONICAL = s.f, SUBTYPE_DIFF = float8mi);", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task tyrba0115() => CorpusAssert.MatchesPostgres(@"CREATE TYPE mybadbsyn3 (INPUT = myinput, OUTPUT = myoutput, ALIGNMENT = bigint);", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tyrba0116() => CorpusAssert.MatchesPostgres(@"CREATE TYPE mybadbsyn4 (INPUT = myinput, OUTPUT = myoutput, STORAGE = compressed);", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tyrba0117() => CorpusAssert.MatchesPostgres(@"CREATE TYPE mybadbsyn5 (INPUT = myinput, OUTPUT = myoutput, INTERNALLENGTH = -1);", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tyrba0118() => CorpusAssert.MatchesPostgres(@"CREATE TYPE mybadbsyn6 (INPUT = myinput, OUTPUT = myoutput, STORAGE = default);", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tyrba0119() => CorpusAssert.MatchesPostgres(@"CREATE TYPE mybadbsyn7 (INPUT = myinput, OUTPUT = myoutput, CATEGORY = 'ABC');", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tyrba0120() => CorpusAssert.MatchesPostgres(@"CREATE TYPE mybadbsyn8 (INPUT = myinput, OUTPUT = myoutput, PREFERRED = yes);", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tyrba0121() => CorpusAssert.MatchesPostgres(@"CREATE TYPE mybadbsyn9 (INPUT = myinput, OUTPUT = myoutput, COLLATABLE = 1);", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tyrba0122() => CorpusAssert.MatchesPostgres(@"CREATE TYPE mybadbsyn10 (INPUT = myinput, OUTPUT = myoutput, INTERNALLENGTH = 'four');", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tyrba0123() => CorpusAssert.MatchesPostgres(@"CREATE TYPE mybadr19 AS RANGE (SUBTYPE = int4, CANONICAL = s.f);", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tyrba0124() => CorpusAssert.MatchesPostgres(@"CREATE TYPE myrange56 AS RANGE (SUBTYPE = int4, SUBTYPE_OPCLASS = nonexistent_opclass_xyz);", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tyrba0125() => CorpusAssert.MatchesPostgres(@"CREATE TYPE myrange57 AS RANGE (SUBTYPE = int4, SUBTYPE_DIFF = s.f);", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tyrba0126() => CorpusAssert.MatchesPostgres(@"CREATE TYPE mybadr20 AS RANGE (SUBTYPE = int4, CANONICAL = s.f, SUBTYPE_DIFF = float8mi);", "error", false);
     [Fact]
     public void tyrba0127() => CorpusAssert.Parses(@"CREATE TYPE myshell4;", "ok");
     [Fact]
@@ -282,29 +282,29 @@ CREATE TYPE myrange49 AS RANGE (SUBTYPE = int4);", "ok");
     public void tyrba0135() => CorpusAssert.Parses(@"CREATE TYPE myrange64 AS RANGE (SUBTYPE = bytea);", "ok");
     [Fact]
     public void tyrba0136() => CorpusAssert.Parses(@"CREATE TYPE myrange65 AS RANGE (SUBTYPE = macaddr);", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyrba0137() => CorpusAssert.Parses(@"CREATE TYPE myrange66 AS RANGE (SUBTYPE = int4, SUBTYPE_OPCLASS = int4_ops, SUBTYPE_DIFF = int4mi);", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyrba0138() => CorpusAssert.Parses(@"CREATE TYPE myrange67 AS RANGE (SUBTYPE = float4, SUBTYPE_DIFF = float4mi);", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyrba0139() => CorpusAssert.Parses(@"CREATE TYPE myrange68 AS RANGE (SUBTYPE = int8, SUBTYPE_DIFF = int8mi);", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyrba0140() => CorpusAssert.Parses(@"CREATE TYPE myrange69 AS RANGE (SUBTYPE = timestamp, SUBTYPE_DIFF = timestamp_mi_interval);", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyrba0141() => CorpusAssert.Parses(@"CREATE TYPE mybadr21 AS RANGE (SUBTYPE = int4, SUBTYPE_DIFF = int4mi, COLLATION = ""default"");", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyrba0142() => CorpusAssert.Parses(@"CREATE TYPE mybadr22 AS RANGE (SUBTYPE = int4
-SUBTYPE_DIFF = int4mi);", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyrba0143() => CorpusAssert.Parses(@"CREATE TYPE myrange70 AS RANGE (SUBTYPE = timestamptz, SUBTYPE_DIFF = timestamptz_mi);", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyrba0144() => CorpusAssert.Parses(@"CREATE TYPE mybadbsyn11 (INPUT = myinput, OUTPUT = myoutput, ALIGNMENT = 4);", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyrba0145() => CorpusAssert.Parses(@"CREATE TYPE mybadbsyn12 (INPUT = myinput, OUTPUT = myoutput, STORAGE = 'plain');", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task tyrba0137() => CorpusAssert.MatchesPostgres(@"CREATE TYPE myrange66 AS RANGE (SUBTYPE = int4, SUBTYPE_OPCLASS = int4_ops, SUBTYPE_DIFF = int4mi);", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tyrba0138() => CorpusAssert.MatchesPostgres(@"CREATE TYPE myrange67 AS RANGE (SUBTYPE = float4, SUBTYPE_DIFF = float4mi);", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tyrba0139() => CorpusAssert.MatchesPostgres(@"CREATE TYPE myrange68 AS RANGE (SUBTYPE = int8, SUBTYPE_DIFF = int8mi);", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tyrba0140() => CorpusAssert.MatchesPostgres(@"CREATE TYPE myrange69 AS RANGE (SUBTYPE = timestamp, SUBTYPE_DIFF = timestamp_mi_interval);", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tyrba0141() => CorpusAssert.MatchesPostgres(@"CREATE TYPE mybadr21 AS RANGE (SUBTYPE = int4, SUBTYPE_DIFF = int4mi, COLLATION = ""default"");", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tyrba0142() => CorpusAssert.MatchesPostgres(@"CREATE TYPE mybadr22 AS RANGE (SUBTYPE = int4
+SUBTYPE_DIFF = int4mi);", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tyrba0143() => CorpusAssert.MatchesPostgres(@"CREATE TYPE myrange70 AS RANGE (SUBTYPE = timestamptz, SUBTYPE_DIFF = timestamptz_mi);", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tyrba0144() => CorpusAssert.MatchesPostgres(@"CREATE TYPE mybadbsyn11 (INPUT = myinput, OUTPUT = myoutput, ALIGNMENT = 4);", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tyrba0145() => CorpusAssert.MatchesPostgres(@"CREATE TYPE mybadbsyn12 (INPUT = myinput, OUTPUT = myoutput, STORAGE = 'plain');", "error", false);
     [Fact]
     public void tyrba0146() => CorpusAssert.Parses(@"CREATE TYPE mybadbsyn13 AS RANGE (SUBTYPE = int4) WITH (fillfactor = 70);", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyrba0147() => CorpusAssert.Parses(@"CREATE OR REPLACE TYPE myrange71 AS RANGE (SUBTYPE = int4);", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task tyrba0147() => CorpusAssert.MatchesPostgres(@"CREATE OR REPLACE TYPE myrange71 AS RANGE (SUBTYPE = int4);", "error", false);
     [Fact]
     public void tyrba0148() => CorpusAssert.Parses(@"CREATE TYPE IF NOT EXISTS myrange72 AS RANGE (SUBTYPE = int4);", "error");
     [Fact]
@@ -367,15 +367,15 @@ INSERT INTO mrtest VALUES ('{[1,5],[10,20]}'::myrange89_multi);", "ok");
     public void tyrba0167() => CorpusAssert.Parses(@"CREATE TYPE myrange90 AS RANGE (SUBTYPE = varchar, COLLATION = ""default"");
 CREATE TABLE vtest (v myrange90);
 INSERT INTO vtest VALUES (myrange90('abc', 'xyz'));", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyrba0168() => CorpusAssert.Parses(@"CREATE TYPE mybadr23 AS RANGE (SUBTYPE = int4, CANONICAL = mybadr23, SUBTYPE_DIFF = int4mi);", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task tyrba0168() => CorpusAssert.MatchesPostgres(@"CREATE TYPE mybadr23 AS RANGE (SUBTYPE = int4, CANONICAL = mybadr23, SUBTYPE_DIFF = int4mi);", "error", false);
     [Fact]
     public void tyrba0169() => CorpusAssert.Parses(@"CREATE TYPE myrange91 AS RANGE (SUBTYPE = int4, SUBTYPE_OPCLASS = int4_ops, MULTIRANGE_TYPE_NAME = myrange91_multi);
 CREATE TABLE t91 (id serial, r myrange91, mr myrange91_multi);
 INSERT INTO t91(r, mr) VALUES (myrange91(1,100), '{[1,10],[50,60]}'::myrange91_multi);", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyrba0170() => CorpusAssert.Parses(@"CREATE TYPE mybadr24 AS RANGE (SUBTYPE = int4);
-CREATE TYPE mybadr24 AS RANGE (SUBTYPE = int4);", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task tyrba0170() => CorpusAssert.MatchesPostgres(@"CREATE TYPE mybadr24 AS RANGE (SUBTYPE = int4);
+CREATE TYPE mybadr24 AS RANGE (SUBTYPE = int4);", "error", false);
     [Fact]
     public void tyrbb0001() => CorpusAssert.Parses(@"CREATE TYPE s.shell_a", "ok");
     [Fact]
@@ -404,8 +404,8 @@ CREATE TYPE mybadr24 AS RANGE (SUBTYPE = int4);", "error");
     public void tyrbb0013() => CorpusAssert.Parses(@"CREATE TYPE s.r10 AS RANGE (SUBTYPE = text, COLLATION = ""POSIX"")", "ok");
     [Fact]
     public void tyrbb0014() => CorpusAssert.Parses(@"CREATE TYPE s.r11 AS RANGE (SUBTYPE = int4, MULTIRANGE_TYPE_NAME = s.r11_multi)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyrbb0015() => CorpusAssert.Parses(@"CREATE TYPE s.r12 AS RANGE (SUBTYPE = float4, SUBTYPE_DIFF = float4mi)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task tyrbb0015() => CorpusAssert.MatchesPostgres(@"CREATE TYPE s.r12 AS RANGE (SUBTYPE = float4, SUBTYPE_DIFF = float4mi)", "error", false);
     [Fact]
     public void tyrbb0016() => CorpusAssert.Parses(@"CREATE TYPE s.r13 AS RANGE (SUBTYPE = float8, SUBTYPE_DIFF = float8mi)", "ok");
     [Fact]
@@ -416,13 +416,13 @@ CREATE TYPE mybadr24 AS RANGE (SUBTYPE = int4);", "error");
     public void tyrbb0019() => CorpusAssert.Parses(@"CREATE TYPE s.r16 AS RANGE (subtype = int4)", "ok");
     [Fact]
     public void tyrbb0020() => CorpusAssert.Parses(@"CREATE TYPE s.r17 AS RANGE (SUBTYPE = int4, subtype_opclass = int4_ops)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyrbb0021() => CorpusAssert.Parses(@"CREATE TYPE s.r18 AS RANGE (
+    [DbFact]
+    public System.Threading.Tasks.Task tyrbb0021() => CorpusAssert.MatchesPostgres(@"CREATE TYPE s.r18 AS RANGE (
   SUBTYPE = numeric,
   SUBTYPE_DIFF = numeric_sub
-)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyrbb0022() => CorpusAssert.Parses(@"CREATE TYPE s.r19 AS RANGE (SUBTYPE = int4, CANONICAL = mycanon)", "error");
+)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tyrbb0022() => CorpusAssert.MatchesPostgres(@"CREATE TYPE s.r19 AS RANGE (SUBTYPE = int4, CANONICAL = mycanon)", "error", false);
     [Fact]
     public void tyrbb0023() => CorpusAssert.Parses(@"CREATE TYPE s.r20 AS RANGE ()", "error");
     [Fact]
@@ -439,21 +439,21 @@ CREATE TYPE mybadr24 AS RANGE (SUBTYPE = int4);", "error");
     public void tyrbb0029() => CorpusAssert.Parses(@"CREATE TYPE s.r25 AS RANGE (SUBTYPE = int4,)", "error");
     [Fact]
     public void tyrbb0030() => CorpusAssert.Parses(@"CREATE TYPE s.r26 AS RANGE (SUBTYPE = )", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyrbb0031() => CorpusAssert.Parses(@"CREATE TYPE s.r27 AS RANGE (SUBTYPE = int4 SUBTYPE_OPCLASS = int4_ops)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyrbb0032() => CorpusAssert.Parses(@"CREATE TYPE s.r28 AS RANGE (SUBTYPE = nonexistent_type_xyz)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task tyrbb0031() => CorpusAssert.MatchesPostgres(@"CREATE TYPE s.r27 AS RANGE (SUBTYPE = int4 SUBTYPE_OPCLASS = int4_ops)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tyrbb0032() => CorpusAssert.MatchesPostgres(@"CREATE TYPE s.r28 AS RANGE (SUBTYPE = nonexistent_type_xyz)", "error", false);
     [Fact]
     public void tyrbb0033() => CorpusAssert.Parses(@"CREATE TYPE s.r29 AS RANGE (SUBTYPE = s.mood)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyrbb0034() => CorpusAssert.Parses(@"CREATE TYPE s.r30 AS RANGE (SUBTYPE = int4, COLLATION = ""C"")", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task tyrbb0034() => CorpusAssert.MatchesPostgres(@"CREATE TYPE s.r30 AS RANGE (SUBTYPE = int4, COLLATION = ""C"")", "error", false);
     [Fact]
     public void tyrbb0035() => CorpusAssert.Parses(@"CREATE TYPE s.r31 AS RANGE (SUBTYPE = int4, SUBTYPE = float8)", "error");
     [Fact]
     public void tyrbb0036() => CorpusAssert.Parses(@"CREATE TYPE s.r32 AS RANGE (SUBTYPE = int4, MULTIRANGE_TYPE_NAME = s.r32_multi, MULTIRANGE_TYPE_NAME = s.r32_other)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyrbb0037() => CorpusAssert.Parses(@"CREATE TYPE s.r33 AS RANGE (SUBTYPE = int4);
-CREATE TYPE s.r33 AS RANGE (SUBTYPE = int4)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task tyrbb0037() => CorpusAssert.MatchesPostgres(@"CREATE TYPE s.r33 AS RANGE (SUBTYPE = int4);
+CREATE TYPE s.r33 AS RANGE (SUBTYPE = int4)", "error", false);
     [Fact]
     public void tyrbb0038() => CorpusAssert.Parses(@"CREATE TYPE s.r34 AS RANGE (SUBTYPE = timestamp)", "ok");
     [Fact]
@@ -464,8 +464,8 @@ CREATE TYPE s.r33 AS RANGE (SUBTYPE = int4)", "error");
     public void tyrbb0041() => CorpusAssert.Parses(@"CREATE TYPE s.r37 AS RANGE (SUBTYPE = ""char"")", "ok");
     [Fact]
     public void tyrbb0042() => CorpusAssert.Parses(@"CREATE TYPE s.r38 AS RANGE (SUBTYPE = oid)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyrbb0043() => CorpusAssert.Parses(@"CREATE TYPE s.r39 AS RANGE (SUBTYPE = int4, SUBTYPE_OPCLASS = int4_ops, SUBTYPE_DIFF = int4mi, MULTIRANGE_TYPE_NAME = s.r39_multi)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task tyrbb0043() => CorpusAssert.MatchesPostgres(@"CREATE TYPE s.r39 AS RANGE (SUBTYPE = int4, SUBTYPE_OPCLASS = int4_ops, SUBTYPE_DIFF = int4mi, MULTIRANGE_TYPE_NAME = s.r39_multi)", "error", false);
     [Fact]
     public void tyrbb0044() => CorpusAssert.Parses(@"CREATE TYPE s.r40 AS RANGE (SUBTYPE = float8, SUBTYPE_OPCLASS = float8_ops, SUBTYPE_DIFF = float8mi)", "ok");
     [Fact]
@@ -476,15 +476,15 @@ CREATE TYPE s.r33 AS RANGE (SUBTYPE = int4)", "error");
     public void tyrbb0047() => CorpusAssert.Parses(@"CREATE TYPE s.r43 AS RANGE (SUBTYPE = varchar)", "ok");
     [Fact]
     public void tyrbb0048() => CorpusAssert.Parses(@"CREATE TYPE s.r44 AS RANGE (SUBTYPE = bytea)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyrbb0049() => CorpusAssert.Parses(@"CREATE TYPE s.r45 AS RANGE (SUBTYPE = int4, SUBTYPE_DIFF = int4mi, SUBTYPE_OPCLASS = int4_ops)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task tyrbb0049() => CorpusAssert.MatchesPostgres(@"CREATE TYPE s.r45 AS RANGE (SUBTYPE = int4, SUBTYPE_DIFF = int4mi, SUBTYPE_OPCLASS = int4_ops)", "error", false);
     [Fact]
     public void tyrbb0050() => CorpusAssert.Parses(@"CREATE TYPE s.r46 AS RANGE (SUBTYPE = text, COLLATION = pg_catalog.""default"")", "ok");
     [Fact]
     public void tyrbb0051() => CorpusAssert.Parses(@"CREATE TYPE s.r47 AS RANGE (SUBTYPE = int4, SUBTYPE_OPCLASS = pg_catalog.int4_ops)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyrbb0052() => CorpusAssert.Parses(@"CREATE TYPE s.shell_b;
-CREATE TYPE s.r48 AS RANGE (SUBTYPE = int4, CANONICAL = some_canon)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task tyrbb0052() => CorpusAssert.MatchesPostgres(@"CREATE TYPE s.shell_b;
+CREATE TYPE s.r48 AS RANGE (SUBTYPE = int4, CANONICAL = some_canon)", "error", false);
     [Fact]
     public void tyrbb0053() => CorpusAssert.Parses(@"CREATE TYPE myrange AS RANGE (SUBTYPE = int4)", "ok");
     [Fact]
@@ -498,50 +498,50 @@ SELECT lower('(1,5)'::s.r50), upper('(1,5)'::s.r50)", "ok");
 SELECT isempty('empty'::s.r51)", "ok");
     [Fact]
     public void tyrbb0057() => CorpusAssert.Parses(@"CREATE TYPE (INPUT = myin, OUTPUT = myout)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyrbb0058() => CorpusAssert.Parses(@"CREATE TYPE s.bt1 (INPUT = int4in, OUTPUT = int4out)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyrbb0059() => CorpusAssert.Parses(@"CREATE TYPE s.bt2 (OUTPUT = int4out)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyrbb0060() => CorpusAssert.Parses(@"CREATE TYPE s.bt3 (INPUT = fakein)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyrbb0061() => CorpusAssert.Parses(@"CREATE TYPE s.bt4 (INPUT = int4in, OUTPUT = int4out, INTERNALLENGTH = 4)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyrbb0062() => CorpusAssert.Parses(@"CREATE TYPE s.bt5 (INPUT = int4in, OUTPUT = int4out, INTERNALLENGTH = VARIABLE)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task tyrbb0058() => CorpusAssert.MatchesPostgres(@"CREATE TYPE s.bt1 (INPUT = int4in, OUTPUT = int4out)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tyrbb0059() => CorpusAssert.MatchesPostgres(@"CREATE TYPE s.bt2 (OUTPUT = int4out)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tyrbb0060() => CorpusAssert.MatchesPostgres(@"CREATE TYPE s.bt3 (INPUT = fakein)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tyrbb0061() => CorpusAssert.MatchesPostgres(@"CREATE TYPE s.bt4 (INPUT = int4in, OUTPUT = int4out, INTERNALLENGTH = 4)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tyrbb0062() => CorpusAssert.MatchesPostgres(@"CREATE TYPE s.bt5 (INPUT = int4in, OUTPUT = int4out, INTERNALLENGTH = VARIABLE)", "error", false);
     [Fact]
     public void tyrbb0063() => CorpusAssert.Parses(@"CREATE TYPE s.bt6 (INPUT = int4in, OUTPUT = int4out, PASSEDBYVALUE)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyrbb0064() => CorpusAssert.Parses(@"CREATE TYPE s.bt7 (INPUT = int4in, OUTPUT = int4out, ALIGNMENT = int4)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyrbb0065() => CorpusAssert.Parses(@"CREATE TYPE s.bt8 (INPUT = int4in, OUTPUT = int4out, ALIGNMENT = char)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyrbb0066() => CorpusAssert.Parses(@"CREATE TYPE s.bt9 (INPUT = int4in, OUTPUT = int4out, ALIGNMENT = int2)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyrbb0067() => CorpusAssert.Parses(@"CREATE TYPE s.bt10 (INPUT = int4in, OUTPUT = int4out, ALIGNMENT = double)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyrbb0068() => CorpusAssert.Parses(@"CREATE TYPE s.bt11 (INPUT = int4in, OUTPUT = int4out, STORAGE = plain)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyrbb0069() => CorpusAssert.Parses(@"CREATE TYPE s.bt12 (INPUT = int4in, OUTPUT = int4out, STORAGE = external)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyrbb0070() => CorpusAssert.Parses(@"CREATE TYPE s.bt13 (INPUT = int4in, OUTPUT = int4out, STORAGE = extended)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyrbb0071() => CorpusAssert.Parses(@"CREATE TYPE s.bt14 (INPUT = int4in, OUTPUT = int4out, STORAGE = main)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyrbb0072() => CorpusAssert.Parses(@"CREATE TYPE s.bt15 (INPUT = int4in, OUTPUT = int4out, LIKE = int4)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyrbb0073() => CorpusAssert.Parses(@"CREATE TYPE s.bt16 (INPUT = int4in, OUTPUT = int4out, CATEGORY = 'N')", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyrbb0074() => CorpusAssert.Parses(@"CREATE TYPE s.bt17 (INPUT = int4in, OUTPUT = int4out, PREFERRED = true)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyrbb0075() => CorpusAssert.Parses(@"CREATE TYPE s.bt18 (INPUT = int4in, OUTPUT = int4out, PREFERRED = false)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyrbb0076() => CorpusAssert.Parses(@"CREATE TYPE s.bt19 (INPUT = int4in, OUTPUT = int4out, DEFAULT = '0')", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyrbb0077() => CorpusAssert.Parses(@"CREATE TYPE s.bt20 (INPUT = int4in, OUTPUT = int4out, ELEMENT = int4)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyrbb0078() => CorpusAssert.Parses(@"CREATE TYPE s.bt21 (INPUT = int4in, OUTPUT = int4out, DELIMITER = ',')", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyrbb0079() => CorpusAssert.Parses(@"CREATE TYPE s.bt22 (INPUT = int4in, OUTPUT = int4out, COLLATABLE = true)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyrbb0080() => CorpusAssert.Parses(@"CREATE TYPE s.bt23 (INPUT = int4in, OUTPUT = int4out, COLLATABLE = false)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task tyrbb0064() => CorpusAssert.MatchesPostgres(@"CREATE TYPE s.bt7 (INPUT = int4in, OUTPUT = int4out, ALIGNMENT = int4)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tyrbb0065() => CorpusAssert.MatchesPostgres(@"CREATE TYPE s.bt8 (INPUT = int4in, OUTPUT = int4out, ALIGNMENT = char)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tyrbb0066() => CorpusAssert.MatchesPostgres(@"CREATE TYPE s.bt9 (INPUT = int4in, OUTPUT = int4out, ALIGNMENT = int2)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tyrbb0067() => CorpusAssert.MatchesPostgres(@"CREATE TYPE s.bt10 (INPUT = int4in, OUTPUT = int4out, ALIGNMENT = double)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tyrbb0068() => CorpusAssert.MatchesPostgres(@"CREATE TYPE s.bt11 (INPUT = int4in, OUTPUT = int4out, STORAGE = plain)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tyrbb0069() => CorpusAssert.MatchesPostgres(@"CREATE TYPE s.bt12 (INPUT = int4in, OUTPUT = int4out, STORAGE = external)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tyrbb0070() => CorpusAssert.MatchesPostgres(@"CREATE TYPE s.bt13 (INPUT = int4in, OUTPUT = int4out, STORAGE = extended)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tyrbb0071() => CorpusAssert.MatchesPostgres(@"CREATE TYPE s.bt14 (INPUT = int4in, OUTPUT = int4out, STORAGE = main)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tyrbb0072() => CorpusAssert.MatchesPostgres(@"CREATE TYPE s.bt15 (INPUT = int4in, OUTPUT = int4out, LIKE = int4)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tyrbb0073() => CorpusAssert.MatchesPostgres(@"CREATE TYPE s.bt16 (INPUT = int4in, OUTPUT = int4out, CATEGORY = 'N')", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tyrbb0074() => CorpusAssert.MatchesPostgres(@"CREATE TYPE s.bt17 (INPUT = int4in, OUTPUT = int4out, PREFERRED = true)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tyrbb0075() => CorpusAssert.MatchesPostgres(@"CREATE TYPE s.bt18 (INPUT = int4in, OUTPUT = int4out, PREFERRED = false)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tyrbb0076() => CorpusAssert.MatchesPostgres(@"CREATE TYPE s.bt19 (INPUT = int4in, OUTPUT = int4out, DEFAULT = '0')", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tyrbb0077() => CorpusAssert.MatchesPostgres(@"CREATE TYPE s.bt20 (INPUT = int4in, OUTPUT = int4out, ELEMENT = int4)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tyrbb0078() => CorpusAssert.MatchesPostgres(@"CREATE TYPE s.bt21 (INPUT = int4in, OUTPUT = int4out, DELIMITER = ',')", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tyrbb0079() => CorpusAssert.MatchesPostgres(@"CREATE TYPE s.bt22 (INPUT = int4in, OUTPUT = int4out, COLLATABLE = true)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tyrbb0080() => CorpusAssert.MatchesPostgres(@"CREATE TYPE s.bt23 (INPUT = int4in, OUTPUT = int4out, COLLATABLE = false)", "error", false);
 }

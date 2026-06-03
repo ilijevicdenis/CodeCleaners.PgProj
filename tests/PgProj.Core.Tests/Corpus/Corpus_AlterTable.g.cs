@@ -25,8 +25,8 @@ public class Corpus_AlterTable
     public void alta0009() => CorpusAssert.Parses(@"ALTER TABLE s.t ADD COLUMN extra text COLLATE ""C""", "ok");
     [Fact]
     public void alta0010() => CorpusAssert.Parses(@"ALTER TABLE s.t ADD COLUMN IF NOT EXISTS", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void alta0011() => CorpusAssert.Parses(@"ALTER TABLE s.t ADD COLUMN IF extra text", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task alta0011() => CorpusAssert.MatchesPostgres(@"ALTER TABLE s.t ADD COLUMN IF extra text", "error", false);
     [Fact]
     public void alta0012() => CorpusAssert.Parses(@"ALTER TABLE s.t2 DROP COLUMN label", "ok");
     [Fact]
@@ -39,8 +39,8 @@ public class Corpus_AlterTable
     public void alta0016() => CorpusAssert.Parses(@"ALTER TABLE s.t2 DROP COLUMN label RESTRICT", "ok");
     [Fact]
     public void alta0017() => CorpusAssert.Parses(@"ALTER TABLE s.t2 DROP COLUMN label CASCADE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void alta0018() => CorpusAssert.Parses(@"ALTER TABLE s.t DROP COLUMN nonexistent_col", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task alta0018() => CorpusAssert.MatchesPostgres(@"ALTER TABLE s.t DROP COLUMN nonexistent_col", "error", false);
     [Fact]
     public void alta0019() => CorpusAssert.Parses(@"ALTER TABLE s.t DROP COLUMN qty RESTRICT CASCADE", "error");
     [Fact]
@@ -83,15 +83,15 @@ public class Corpus_AlterTable
     public void alta0038() => CorpusAssert.Parses(@"ALTER TABLE s.t ADD CONSTRAINT check_qty CHECK (qty >= 0) NOT VALID", "ok");
     [Fact]
     public void alta0039() => CorpusAssert.Parses(@"ALTER TABLE s.t ADD CHECK (val > -1000)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void alta0040() => CorpusAssert.Parses(@"ALTER TABLE s.t ADD PRIMARY KEY (id)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void alta0041() => CorpusAssert.Parses(@"ALTER TABLE s.t VALIDATE CONSTRAINT nonexistent_check_xyz", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task alta0040() => CorpusAssert.MatchesPostgres(@"ALTER TABLE s.t ADD PRIMARY KEY (id)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task alta0041() => CorpusAssert.MatchesPostgres(@"ALTER TABLE s.t VALIDATE CONSTRAINT nonexistent_check_xyz", "error", false);
     [Fact]
     public void alta0042() => CorpusAssert.Parses(@"CREATE TABLE s.alta_vc (id int, val int, CONSTRAINT chk_val CHECK (val > 0) NOT VALID);
 ALTER TABLE s.alta_vc VALIDATE CONSTRAINT chk_val", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void alta0043() => CorpusAssert.Parses(@"ALTER TABLE s.t DROP CONSTRAINT t_pkey", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task alta0043() => CorpusAssert.MatchesPostgres(@"ALTER TABLE s.t DROP CONSTRAINT t_pkey", "error", false);
     [Fact]
     public void alta0044() => CorpusAssert.Parses(@"ALTER TABLE s.t DROP CONSTRAINT IF EXISTS nonexistent_constraint", "ok");
     [Fact]
@@ -114,14 +114,14 @@ ALTER TABLE s.alta_dc3 ALTER CONSTRAINT fk_self3 DEFERRABLE INITIALLY DEFERRED",
     [Fact]
     public void alta0051() => CorpusAssert.Parses(@"CREATE TABLE s.alta_dc4 (a int PRIMARY KEY, b int, CONSTRAINT fk_self4 FOREIGN KEY (b) REFERENCES s.alta_dc4(a));
 ALTER TABLE s.alta_dc4 ALTER CONSTRAINT fk_self4 INITIALLY IMMEDIATE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void alta0052() => CorpusAssert.Parses(@"ALTER TABLE s.t ALTER CONSTRAINT nonexistent DEFERRABLE", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task alta0052() => CorpusAssert.MatchesPostgres(@"ALTER TABLE s.t ALTER CONSTRAINT nonexistent DEFERRABLE", "error", false);
     [Fact]
     public void alta0053() => CorpusAssert.Parses(@"ALTER TABLE s.t ALTER COLUMN id DROP IDENTITY", "ok");
     [Fact]
     public void alta0054() => CorpusAssert.Parses(@"ALTER TABLE s.t ALTER COLUMN val DROP IDENTITY IF EXISTS", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void alta0055() => CorpusAssert.Parses(@"ALTER TABLE s.t ALTER COLUMN val DROP IDENTITY", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task alta0055() => CorpusAssert.MatchesPostgres(@"ALTER TABLE s.t ALTER COLUMN val DROP IDENTITY", "error", false);
     [Fact]
     public void alta0056() => CorpusAssert.Parses(@"CREATE TABLE s.alta_gi (id int NOT NULL);
 ALTER TABLE s.alta_gi ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY", "ok");
@@ -183,8 +183,8 @@ ALTER TABLE s.alta_gi3 ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY (START W
     public void alta0083() => CorpusAssert.Parses(@"ALTER TABLE s.t FORCE ROW LEVEL SECURITY", "ok");
     [Fact]
     public void alta0084() => CorpusAssert.Parses(@"ALTER TABLE s.t NO FORCE ROW LEVEL SECURITY", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void alta0085() => CorpusAssert.Parses(@"ALTER TABLE s.t ENABLE ROW SECURITY", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task alta0085() => CorpusAssert.MatchesPostgres(@"ALTER TABLE s.t ENABLE ROW SECURITY", "error", false);
     [Fact]
     public void alta0086() => CorpusAssert.Parses(@"ALTER TABLE s.t DISABLE TRIGGER t_touch", "ok");
     [Fact]
@@ -205,8 +205,8 @@ ALTER TABLE s.alta_gi3 ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY (START W
     public void alta0094() => CorpusAssert.Parses(@"ALTER TABLE s.t CLUSTER ON t_name_idx", "ok");
     [Fact]
     public void alta0095() => CorpusAssert.Parses(@"ALTER TABLE s.t SET WITHOUT CLUSTER", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void alta0096() => CorpusAssert.Parses(@"ALTER TABLE s.t CLUSTER ON nonexistent_idx", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task alta0096() => CorpusAssert.MatchesPostgres(@"ALTER TABLE s.t CLUSTER ON nonexistent_idx", "error", false);
     [Fact]
     public void alta0097() => CorpusAssert.Parses(@"ALTER TABLE s.t SET (fillfactor = 80)", "ok");
     [Fact]
@@ -227,10 +227,10 @@ ALTER TABLE s.alta_unlog SET UNLOGGED", "ok");
 ALTER TABLE s.child INHERIT s.parent", "ok");
     [Fact]
     public void alta0105() => CorpusAssert.Parses(@"ALTER TABLE s.child NO INHERIT s.parent", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void alta0106() => CorpusAssert.Parses(@"ALTER TABLE s.t INHERIT s.parent", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void alta0107() => CorpusAssert.Parses(@"ALTER TABLE s.t OF s.addr", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task alta0106() => CorpusAssert.MatchesPostgres(@"ALTER TABLE s.t INHERIT s.parent", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task alta0107() => CorpusAssert.MatchesPostgres(@"ALTER TABLE s.t OF s.addr", "error", false);
     [Fact]
     public void alta0108() => CorpusAssert.Parses(@"CREATE TABLE s.alta_typed (street text, city text, zip text);
 ALTER TABLE s.alta_typed OF s.addr", "ok");
@@ -244,16 +244,16 @@ ALTER TABLE s.alta_typed2 NOT OF", "ok");
     public void alta0111() => CorpusAssert.Parses(@"ALTER TABLE s.t OWNER TO CURRENT_ROLE", "ok");
     [Fact]
     public void alta0112() => CorpusAssert.Parses(@"ALTER TABLE s.t OWNER TO SESSION_USER", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void alta0113() => CorpusAssert.Parses(@"ALTER TABLE s.t OWNER TO nonexistent_role_xyz", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task alta0113() => CorpusAssert.MatchesPostgres(@"ALTER TABLE s.t OWNER TO nonexistent_role_xyz", "error", false);
     [Fact]
     public void alta0114() => CorpusAssert.Parses(@"ALTER TABLE s.t REPLICA IDENTITY FULL", "ok");
     [Fact]
     public void alta0115() => CorpusAssert.Parses(@"ALTER TABLE s.t REPLICA IDENTITY DEFAULT", "ok");
     [Fact]
     public void alta0116() => CorpusAssert.Parses(@"ALTER TABLE s.t REPLICA IDENTITY NOTHING", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void alta0117() => CorpusAssert.Parses(@"ALTER TABLE s.t REPLICA IDENTITY USING INDEX t_name_idx", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task alta0117() => CorpusAssert.MatchesPostgres(@"ALTER TABLE s.t REPLICA IDENTITY USING INDEX t_name_idx", "error", false);
     [Fact]
     public void alta0118() => CorpusAssert.Parses(@"ALTER TABLE s.t SET SCHEMA public", "ok");
     [Fact]
@@ -262,24 +262,24 @@ ALTER TABLE s.alta_typed2 NOT OF", "ok");
     public void alta0120() => CorpusAssert.Parses(@"ALTER TABLE s.t RENAME COLUMN val TO value_col", "ok");
     [Fact]
     public void alta0121() => CorpusAssert.Parses(@"ALTER TABLE s.t RENAME val TO value_col", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void alta0122() => CorpusAssert.Parses(@"ALTER TABLE s.t RENAME COLUMN nonexistent_col TO something", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task alta0122() => CorpusAssert.MatchesPostgres(@"ALTER TABLE s.t RENAME COLUMN nonexistent_col TO something", "error", false);
     [Fact]
     public void alta0123() => CorpusAssert.Parses(@"CREATE TABLE s.alta_rnc (id int, CONSTRAINT chk_id CHECK (id > 0));
 ALTER TABLE s.alta_rnc RENAME CONSTRAINT chk_id TO chk_id_new", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void alta0124() => CorpusAssert.Parses(@"ALTER TABLE s.t RENAME CONSTRAINT nonexistent_constraint TO something", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void alta0125() => CorpusAssert.Parses(@"ALTER TABLE s.events ATTACH PARTITION s.events_2024 FOR VALUES FROM ('2024-01-01') TO ('2025-01-01')", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task alta0124() => CorpusAssert.MatchesPostgres(@"ALTER TABLE s.t RENAME CONSTRAINT nonexistent_constraint TO something", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task alta0125() => CorpusAssert.MatchesPostgres(@"ALTER TABLE s.events ATTACH PARTITION s.events_2024 FOR VALUES FROM ('2024-01-01') TO ('2025-01-01')", "error", false);
     [Fact]
     public void alta0126() => CorpusAssert.Parses(@"CREATE TABLE s.alta_part_new (id bigint NOT NULL, occurred date NOT NULL, payload jsonb);
 ALTER TABLE s.events ATTACH PARTITION s.alta_part_new FOR VALUES FROM ('2025-01-01') TO ('2026-01-01')", "ok");
     [Fact]
     public void alta0127() => CorpusAssert.Parses(@"ALTER TABLE s.events DETACH PARTITION s.events_2024", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void alta0128() => CorpusAssert.Parses(@"ALTER TABLE s.events DETACH PARTITION s.events_2024 CONCURRENTLY", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void alta0129() => CorpusAssert.Parses(@"ALTER TABLE s.events DETACH PARTITION nonexistent_part", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task alta0128() => CorpusAssert.MatchesPostgres(@"ALTER TABLE s.events DETACH PARTITION s.events_2024 CONCURRENTLY", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task alta0129() => CorpusAssert.MatchesPostgres(@"ALTER TABLE s.events DETACH PARTITION nonexistent_part", "error", false);
     [Fact]
     public void alta0130() => CorpusAssert.Parses(@"ALTER TABLE s.t ADD COLUMN c1 text, ADD COLUMN c2 integer", "ok");
     [Fact]
@@ -290,24 +290,24 @@ ALTER TABLE s.events ATTACH PARTITION s.alta_part_new FOR VALUES FROM ('2025-01-
     public void alta0133() => CorpusAssert.Parses(@"ALTER TABLE s.t ADD COLUMN c1 text, ADD COLUMN c2 integer, ALTER COLUMN qty SET DEFAULT 5", "ok");
     [Fact]
     public void alta0134() => CorpusAssert.Parses(@"ALTER TABLE ONLY s.t ADD COLUMN extra text", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void alta0135() => CorpusAssert.Parses(@"ALTER TABLE ONLY s.parent ADD COLUMN extra_col text", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task alta0135() => CorpusAssert.MatchesPostgres(@"ALTER TABLE ONLY s.parent ADD COLUMN extra_col text", "error", false);
     [Fact]
     public void alta0136() => CorpusAssert.Parses(@"ALTER TABLE IF EXISTS s.t ADD COLUMN extra text", "ok");
     [Fact]
     public void alta0137() => CorpusAssert.Parses(@"ALTER TABLE IF EXISTS s.nonexistent_table ADD COLUMN extra text", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void alta0138() => CorpusAssert.Parses(@"ALTER TABLE s.nonexistent_table ADD COLUMN extra text", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task alta0138() => CorpusAssert.MatchesPostgres(@"ALTER TABLE s.nonexistent_table ADD COLUMN extra text", "error", false);
     [Fact]
     public void alta0139() => CorpusAssert.Parses(@"ALTER TABLE s.t SET WITHOUT OIDS", "ok");
     [Fact]
     public void alta0140() => CorpusAssert.Parses(@"ALTER TABLE s.t SET ACCESS METHOD heap", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void alta0141() => CorpusAssert.Parses(@"ALTER TABLE s.t SET ACCESS METHOD columnar", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task alta0141() => CorpusAssert.MatchesPostgres(@"ALTER TABLE s.t SET ACCESS METHOD columnar", "error", false);
     [Fact]
     public void alta0142() => CorpusAssert.Parses(@"ALTER TABLE s.t SET TABLESPACE pg_default", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void alta0143() => CorpusAssert.Parses(@"ALTER TABLE s.t SET TABLESPACE nonexistent_ts", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task alta0143() => CorpusAssert.MatchesPostgres(@"ALTER TABLE s.t SET TABLESPACE nonexistent_ts", "error", false);
     [Fact]
     public void alta0144() => CorpusAssert.Parses(@"ALTER TABLE ALL IN TABLESPACE pg_default SET TABLESPACE pg_default", "ok");
     [Fact]
@@ -342,19 +342,19 @@ CREATE UNIQUE INDEX alta_idx_uid ON s.alta_idx(id);
 ALTER TABLE s.alta_idx ADD CONSTRAINT uq_idx UNIQUE USING INDEX alta_idx_uid", "ok");
     [Fact]
     public void alta0159() => CorpusAssert.Parses(@"ALTER TABLE s.t ADD COLUMN generated_col integer GENERATED ALWAYS AS (qty + 1) STORED", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void alta0160() => CorpusAssert.Parses(@"ALTER TABLE s.t ALTER COLUMN qty SET EXPRESSION AS (id::integer + 1)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task alta0160() => CorpusAssert.MatchesPostgres(@"ALTER TABLE s.t ALTER COLUMN qty SET EXPRESSION AS (id::integer + 1)", "error", false);
     [Fact]
     public void alta0161() => CorpusAssert.Parses(@"CREATE TABLE s.alta_gen (id int, x int, y int GENERATED ALWAYS AS (x + 1) STORED);
 ALTER TABLE s.alta_gen ALTER COLUMN y DROP EXPRESSION", "ok");
     [Fact]
     public void alta0162() => CorpusAssert.Parses(@"ALTER TABLE s.t ALTER COLUMN val DROP EXPRESSION IF EXISTS", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void alta0163() => CorpusAssert.Parses(@"ALTER TABLE s.t ALTER COLUMN val DROP EXPRESSION", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task alta0163() => CorpusAssert.MatchesPostgres(@"ALTER TABLE s.t ALTER COLUMN val DROP EXPRESSION", "error", false);
     [Fact]
     public void alta0164() => CorpusAssert.Parses(@"ALTER TABLE s.t * ADD COLUMN extra text", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void alta0165() => CorpusAssert.Parses(@"ALTER TABLE s.t ENABLE DISABLE TRIGGER ALL", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task alta0165() => CorpusAssert.MatchesPostgres(@"ALTER TABLE s.t ENABLE DISABLE TRIGGER ALL", "error", false);
     [Fact]
     public void alta0166() => CorpusAssert.Parses(@"ALTER TABLE s.t ADD CONSTRAINT chk_flag CHECK (flag IN (true, false)) NOT VALID", "ok");
     [Fact]
@@ -391,8 +391,8 @@ ALTER TABLE s.alta_gen ALTER COLUMN y DROP EXPRESSION", "ok");
     public void altb0012() => CorpusAssert.Parses(@"ALTER TABLE s.t DROP COLUMN IF EXISTS span", "ok");
     [Fact]
     public void altb0013() => CorpusAssert.Parses(@"ALTER TABLE s.t DROP COLUMN IF EXISTS nonexistent", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void altb0014() => CorpusAssert.Parses(@"ALTER TABLE s.t DROP COLUMN nonexistent", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task altb0014() => CorpusAssert.MatchesPostgres(@"ALTER TABLE s.t DROP COLUMN nonexistent", "error", false);
     [Fact]
     public void altb0015() => CorpusAssert.Parses(@"ALTER TABLE s.t DROP COLUMN span RESTRICT", "ok");
     [Fact]
@@ -411,8 +411,8 @@ ALTER TABLE s.alta_gen ALTER COLUMN y DROP EXPRESSION", "ok");
     public void altb0022() => CorpusAssert.Parses(@"CREATE TABLE s.tmp_at (a numeric(12,2), b text); ALTER TABLE s.tmp_at ALTER COLUMN b TYPE text COLLATE ""C""", "ok");
     [Fact]
     public void altb0023() => CorpusAssert.Parses(@"CREATE TABLE s.tmp_at (a numeric(12,2), b text); ALTER TABLE s.tmp_at ALTER COLUMN a TYPE text USING a::text COLLATE ""POSIX""", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void altb0024() => CorpusAssert.Parses(@"ALTER TABLE s.t ALTER COLUMN nonexistent TYPE text", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task altb0024() => CorpusAssert.MatchesPostgres(@"ALTER TABLE s.t ALTER COLUMN nonexistent TYPE text", "error", false);
     [Fact]
     public void altb0025() => CorpusAssert.Parses(@"ALTER TABLE s.t ALTER COLUMN val TYPE", "error");
     [Fact]
@@ -473,8 +473,8 @@ ALTER TABLE s.alta_gen ALTER COLUMN y DROP EXPRESSION", "ok");
     public void altb0053() => CorpusAssert.Parses(@"ALTER TABLE s.t2 ADD CONSTRAINT fk_t FOREIGN KEY (t_id) REFERENCES s.t(id) ON UPDATE CASCADE ON DELETE RESTRICT", "ok");
     [Fact]
     public void altb0054() => CorpusAssert.Parses(@"ALTER TABLE s.t2 ADD CONSTRAINT fk_t FOREIGN KEY (t_id) REFERENCES s.t(id) NOT VALID", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void altb0055() => CorpusAssert.Parses(@"ALTER TABLE s.t ADD CONSTRAINT pk2 PRIMARY KEY (id)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task altb0055() => CorpusAssert.MatchesPostgres(@"ALTER TABLE s.t ADD CONSTRAINT pk2 PRIMARY KEY (id)", "error", false);
     [Fact]
     public void altb0056() => CorpusAssert.Parses(@"ALTER TABLE s.t ADD CONSTRAINT chk_val CHECK (val IS NOT NULL)", "ok");
     [Fact]
@@ -487,14 +487,14 @@ ALTER TABLE s.alta_gen ALTER COLUMN y DROP EXPRESSION", "ok");
     public void altb0060() => CorpusAssert.Parses(@"ALTER TABLE s.t ADD CONSTRAINT chk_qty CHECK (qty >= 0); ALTER TABLE s.t DROP CONSTRAINT chk_qty CASCADE", "ok");
     [Fact]
     public void altb0061() => CorpusAssert.Parses(@"ALTER TABLE s.t ADD CONSTRAINT chk_qty CHECK (qty >= 0); ALTER TABLE s.t DROP CONSTRAINT chk_qty RESTRICT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void altb0062() => CorpusAssert.Parses(@"ALTER TABLE s.t DROP CONSTRAINT nonexistent", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task altb0062() => CorpusAssert.MatchesPostgres(@"ALTER TABLE s.t DROP CONSTRAINT nonexistent", "error", false);
     [Fact]
     public void altb0063() => CorpusAssert.Parses(@"ALTER TABLE s.t2 ADD CONSTRAINT fk_t FOREIGN KEY (t_id) REFERENCES s.t(id) NOT VALID; ALTER TABLE s.t2 VALIDATE CONSTRAINT fk_t", "ok");
     [Fact]
     public void altb0064() => CorpusAssert.Parses(@"ALTER TABLE s.t ADD CONSTRAINT chk_qty CHECK (qty >= 0) NOT VALID; ALTER TABLE s.t VALIDATE CONSTRAINT chk_qty", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void altb0065() => CorpusAssert.Parses(@"ALTER TABLE s.t VALIDATE CONSTRAINT nonexistent", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task altb0065() => CorpusAssert.MatchesPostgres(@"ALTER TABLE s.t VALIDATE CONSTRAINT nonexistent", "error", false);
     [Fact]
     public void altb0066() => CorpusAssert.Parses(@"ALTER TABLE s.t2 ADD CONSTRAINT fk_t FOREIGN KEY (t_id) REFERENCES s.t(id) DEFERRABLE INITIALLY DEFERRED", "ok");
     [Fact]
@@ -505,16 +505,16 @@ ALTER TABLE s.alta_gen ALTER COLUMN y DROP EXPRESSION", "ok");
     public void altb0069() => CorpusAssert.Parses(@"ALTER TABLE s.t2 ADD CONSTRAINT fk_t FOREIGN KEY (t_id) REFERENCES s.t(id) DEFERRABLE INITIALLY DEFERRED; ALTER TABLE s.t2 ALTER CONSTRAINT fk_t DEFERRABLE INITIALLY IMMEDIATE", "ok");
     [Fact]
     public void altb0070() => CorpusAssert.Parses(@"ALTER TABLE s.t2 ADD CONSTRAINT fk_t FOREIGN KEY (t_id) REFERENCES s.t(id) DEFERRABLE; ALTER TABLE s.t2 ALTER CONSTRAINT fk_t NOT DEFERRABLE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void altb0071() => CorpusAssert.Parses(@"ALTER TABLE s.t ALTER CONSTRAINT nonexistent NOT DEFERRABLE", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task altb0071() => CorpusAssert.MatchesPostgres(@"ALTER TABLE s.t ALTER CONSTRAINT nonexistent NOT DEFERRABLE", "error", false);
     [Fact]
     public void altb0072() => CorpusAssert.Parses(@"ALTER TABLE s.t ALTER COLUMN id DROP IDENTITY", "ok");
     [Fact]
     public void altb0073() => CorpusAssert.Parses(@"ALTER TABLE s.t ALTER COLUMN id DROP IDENTITY IF EXISTS", "ok");
     [Fact]
     public void altb0074() => CorpusAssert.Parses(@"ALTER TABLE s.t ALTER COLUMN val DROP IDENTITY IF EXISTS", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void altb0075() => CorpusAssert.Parses(@"ALTER TABLE s.t ALTER COLUMN val DROP IDENTITY", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task altb0075() => CorpusAssert.MatchesPostgres(@"ALTER TABLE s.t ALTER COLUMN val DROP IDENTITY", "error", false);
     [Fact]
     public void altb0076() => CorpusAssert.Parses(@"ALTER TABLE s.t ALTER COLUMN id SET GENERATED ALWAYS", "ok");
     [Fact]
@@ -559,8 +559,8 @@ ALTER TABLE s.alta_gen ALTER COLUMN y DROP EXPRESSION", "ok");
     public void altb0096() => CorpusAssert.Parses(@"ALTER TABLE s.t CLUSTER ON t_name_idx", "ok");
     [Fact]
     public void altb0097() => CorpusAssert.Parses(@"ALTER TABLE s.t SET WITHOUT CLUSTER", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void altb0098() => CorpusAssert.Parses(@"ALTER TABLE s.t CLUSTER ON nonexistent_idx", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task altb0098() => CorpusAssert.MatchesPostgres(@"ALTER TABLE s.t CLUSTER ON nonexistent_idx", "error", false);
     [Fact]
     public void altb0099() => CorpusAssert.Parses(@"ALTER TABLE s.t SET (fillfactor = 80)", "ok");
     [Fact]
@@ -573,58 +573,58 @@ ALTER TABLE s.alta_gen ALTER COLUMN y DROP EXPRESSION", "ok");
     public void altb0103() => CorpusAssert.Parses(@"ALTER TABLE s.t RESET (fillfactor, autovacuum_enabled)", "ok");
     [Fact]
     public void altb0104() => CorpusAssert.Parses(@"ALTER TABLE s.t SET ()", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void altb0105() => CorpusAssert.Parses(@"ALTER TABLE s.child INHERIT s.parent", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task altb0105() => CorpusAssert.MatchesPostgres(@"ALTER TABLE s.child INHERIT s.parent", "error", false);
     [Fact]
     public void altb0106() => CorpusAssert.Parses(@"ALTER TABLE s.child NO INHERIT s.parent", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void altb0107() => CorpusAssert.Parses(@"ALTER TABLE s.t NO INHERIT s.parent", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task altb0107() => CorpusAssert.MatchesPostgres(@"ALTER TABLE s.t NO INHERIT s.parent", "error", false);
     [Fact]
     public void altb0108() => CorpusAssert.Parses(@"CREATE TYPE s.tmp_type AS (x int); CREATE TABLE s.tmp_of (x int); ALTER TABLE s.tmp_of OF s.tmp_type", "ok");
     [Fact]
     public void altb0109() => CorpusAssert.Parses(@"CREATE TYPE s.tmp_type AS (x int); CREATE TABLE s.tmp_of OF s.tmp_type; ALTER TABLE s.tmp_of NOT OF", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void altb0110() => CorpusAssert.Parses(@"ALTER TABLE s.t NOT OF", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void altb0111() => CorpusAssert.Parses(@"ALTER TABLE s.events ATTACH PARTITION s.events_2024 FOR VALUES FROM ('2024-01-01') TO ('2025-01-01')", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task altb0110() => CorpusAssert.MatchesPostgres(@"ALTER TABLE s.t NOT OF", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task altb0111() => CorpusAssert.MatchesPostgres(@"ALTER TABLE s.events ATTACH PARTITION s.events_2024 FOR VALUES FROM ('2024-01-01') TO ('2025-01-01')", "error", false);
     [Fact]
     public void altb0112() => CorpusAssert.Parses(@"CREATE TABLE s.ev2025 (id bigint, occurred date NOT NULL, payload jsonb, PRIMARY KEY (id, occurred)); ALTER TABLE s.events ATTACH PARTITION s.ev2025 FOR VALUES FROM ('2025-01-01') TO ('2026-01-01')", "ok");
     [Fact]
     public void altb0113() => CorpusAssert.Parses(@"ALTER TABLE s.events DETACH PARTITION s.events_2024", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void altb0114() => CorpusAssert.Parses(@"ALTER TABLE s.events DETACH PARTITION s.events_2024 CONCURRENTLY", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void altb0115() => CorpusAssert.Parses(@"ALTER TABLE s.events DETACH PARTITION s.events_2024 FINALIZE", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void altb0116() => CorpusAssert.Parses(@"ALTER TABLE s.events DETACH PARTITION nonexistent", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task altb0114() => CorpusAssert.MatchesPostgres(@"ALTER TABLE s.events DETACH PARTITION s.events_2024 CONCURRENTLY", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task altb0115() => CorpusAssert.MatchesPostgres(@"ALTER TABLE s.events DETACH PARTITION s.events_2024 FINALIZE", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task altb0116() => CorpusAssert.MatchesPostgres(@"ALTER TABLE s.events DETACH PARTITION nonexistent", "error", false);
     [Fact]
     public void altb0117() => CorpusAssert.Parses(@"ALTER TABLE s.t OWNER TO CURRENT_USER", "ok");
     [Fact]
     public void altb0118() => CorpusAssert.Parses(@"ALTER TABLE s.t OWNER TO SESSION_USER", "ok");
     [Fact]
     public void altb0119() => CorpusAssert.Parses(@"ALTER TABLE s.t OWNER TO CURRENT_ROLE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void altb0120() => CorpusAssert.Parses(@"ALTER TABLE s.t OWNER TO nonexistent_role", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task altb0120() => CorpusAssert.MatchesPostgres(@"ALTER TABLE s.t OWNER TO nonexistent_role", "error", false);
     [Fact]
     public void altb0121() => CorpusAssert.Parses(@"CREATE SCHEMA s2; ALTER TABLE s.t SET SCHEMA s2", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void altb0122() => CorpusAssert.Parses(@"ALTER TABLE s.t SET SCHEMA nonexistent_schema", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task altb0122() => CorpusAssert.MatchesPostgres(@"ALTER TABLE s.t SET SCHEMA nonexistent_schema", "error", false);
     [Fact]
     public void altb0123() => CorpusAssert.Parses(@"ALTER TABLE s.t RENAME TO t_renamed", "ok");
     [Fact]
     public void altb0124() => CorpusAssert.Parses(@"ALTER TABLE s.t RENAME COLUMN name TO full_name", "ok");
     [Fact]
     public void altb0125() => CorpusAssert.Parses(@"ALTER TABLE s.t RENAME COLUMN IF EXISTS nonexistent TO something", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void altb0126() => CorpusAssert.Parses(@"ALTER TABLE s.t RENAME COLUMN nonexistent TO something", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task altb0126() => CorpusAssert.MatchesPostgres(@"ALTER TABLE s.t RENAME COLUMN nonexistent TO something", "error", false);
     [Fact]
     public void altb0127() => CorpusAssert.Parses(@"ALTER TABLE s.t ADD CONSTRAINT chk_qty CHECK (qty >= 0); ALTER TABLE s.t RENAME CONSTRAINT chk_qty TO chk_qty_new", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void altb0128() => CorpusAssert.Parses(@"ALTER TABLE s.t RENAME CONSTRAINT nonexistent TO something", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task altb0128() => CorpusAssert.MatchesPostgres(@"ALTER TABLE s.t RENAME CONSTRAINT nonexistent TO something", "error", false);
     [Fact]
     public void altb0129() => CorpusAssert.Parses(@"ALTER TABLE s.t SET TABLESPACE pg_default", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void altb0130() => CorpusAssert.Parses(@"ALTER TABLE s.t SET TABLESPACE nonexistent_tblspc", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task altb0130() => CorpusAssert.MatchesPostgres(@"ALTER TABLE s.t SET TABLESPACE nonexistent_tblspc", "error", false);
     [Fact]
     public void altb0131() => CorpusAssert.Parses(@"CREATE TABLE s.tmp_logged (a int); ALTER TABLE s.tmp_logged SET UNLOGGED", "ok");
     [Fact]
@@ -639,16 +639,16 @@ ALTER TABLE s.alta_gen ALTER COLUMN y DROP EXPRESSION", "ok");
     public void altb0136() => CorpusAssert.Parses(@"ALTER TABLE s.t ALTER COLUMN qty SET DEFAULT 10, ALTER COLUMN flag SET DEFAULT true, ALTER COLUMN name SET DEFAULT 'anon'", "ok");
     [Fact]
     public void altb0137() => CorpusAssert.Parses(@"ALTER TABLE ONLY s.t ADD COLUMN extra text", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void altb0138() => CorpusAssert.Parses(@"ALTER TABLE ONLY s.parent ADD COLUMN extra text", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task altb0138() => CorpusAssert.MatchesPostgres(@"ALTER TABLE ONLY s.parent ADD COLUMN extra text", "error", false);
     [Fact]
     public void altb0139() => CorpusAssert.Parses(@"ALTER TABLE s.parent ADD COLUMN extra text", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void altb0140() => CorpusAssert.Parses(@"ALTER TABLE s.t ADD COLUMN extra text, DROP COLUMN extra", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task altb0140() => CorpusAssert.MatchesPostgres(@"ALTER TABLE s.t ADD COLUMN extra text, DROP COLUMN extra", "error", false);
     [Fact]
     public void altb0141() => CorpusAssert.Parses(@"ALTER TABLE s.t ADD CONSTRAINT chk_val CHECK (val > 0), ADD CONSTRAINT uq_name UNIQUE (name)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void altb0142() => CorpusAssert.Parses(@"ALTER TABLE nonexistent ADD COLUMN a int", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task altb0142() => CorpusAssert.MatchesPostgres(@"ALTER TABLE nonexistent ADD COLUMN a int", "error", false);
     [Fact]
     public void altb0143() => CorpusAssert.Parses(@"ALTER TABLE IF EXISTS nonexistent ADD COLUMN a int", "ok");
     [Fact]
@@ -665,8 +665,8 @@ ALTER TABLE s.alta_gen ALTER COLUMN y DROP EXPRESSION", "ok");
     public void altb0149() => CorpusAssert.Parses(@"ALTER TABLE s.t ALTER COLUMN qty SET STATISTICS 10001", "ok");
     [Fact]
     public void altb0150() => CorpusAssert.Parses(@"ALTER TABLE s.t ADD CONSTRAINT excl_val EXCLUDE (val WITH =)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void altb0151() => CorpusAssert.Parses(@"ALTER TABLE s.t ADD CONSTRAINT excl_val EXCLUDE USING gist (val WITH =)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task altb0151() => CorpusAssert.MatchesPostgres(@"ALTER TABLE s.t ADD CONSTRAINT excl_val EXCLUDE USING gist (val WITH =)", "error", false);
     [Fact]
     public void altb0152() => CorpusAssert.Parses(@"ALTER TABLE s.t ALTER COLUMN val SET DEFAULT NULL", "ok");
     [Fact]
@@ -681,8 +681,8 @@ ALTER TABLE s.alta_gen ALTER COLUMN y DROP EXPRESSION", "ok");
     public void altb0157() => CorpusAssert.Parses(@"ALTER TABLE s.t ALTER COLUMN id SET GENERATED ALWAYS SET CACHE 10", "ok");
     [Fact]
     public void altb0158() => CorpusAssert.Parses(@"ALTER TABLE s.t2 ADD CONSTRAINT fk_t FOREIGN KEY (t_id) REFERENCES s.t(id) MATCH FULL", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void altb0159() => CorpusAssert.Parses(@"ALTER TABLE s.t2 ADD CONSTRAINT fk_t FOREIGN KEY (t_id) REFERENCES s.t(id) MATCH PARTIAL", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task altb0159() => CorpusAssert.MatchesPostgres(@"ALTER TABLE s.t2 ADD CONSTRAINT fk_t FOREIGN KEY (t_id) REFERENCES s.t(id) MATCH PARTIAL", "error", false);
     [Fact]
     public void altb0160() => CorpusAssert.Parses(@"ALTER TABLE s.t2 ADD CONSTRAINT fk_t FOREIGN KEY (t_id) REFERENCES s.t(id) MATCH SIMPLE", "ok");
     [Fact]
@@ -693,10 +693,10 @@ ALTER TABLE s.alta_gen ALTER COLUMN y DROP EXPRESSION", "ok");
     public void altb0163() => CorpusAssert.Parses(@"ALTER TABLE s.t2 ADD CONSTRAINT fk_t FOREIGN KEY (t_id) REFERENCES s.t(id) ON DELETE SET DEFAULT", "ok");
     [Fact]
     public void altb0164() => CorpusAssert.Parses(@"ALTER TABLE s.t2 ADD CONSTRAINT fk_t FOREIGN KEY (t_id) REFERENCES s.t(id) ON UPDATE SET NULL ON DELETE SET DEFAULT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void altb0165() => CorpusAssert.Parses(@"ALTER TABLE s.t ENABLE RULE _RETURN", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void altb0166() => CorpusAssert.Parses(@"ALTER TABLE s.t DISABLE RULE _RETURN", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task altb0165() => CorpusAssert.MatchesPostgres(@"ALTER TABLE s.t ENABLE RULE _RETURN", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task altb0166() => CorpusAssert.MatchesPostgres(@"ALTER TABLE s.t DISABLE RULE _RETURN", "error", false);
     [Fact]
     public void altb0167() => CorpusAssert.Parses(@"ALTER TABLE s.t ADD CONSTRAINT chk_multi CHECK (qty >= 0 AND val IS NOT NULL AND name <> '')", "ok");
     [Fact]
@@ -747,8 +747,8 @@ ALTER TABLE s.alta_gen ALTER COLUMN y DROP EXPRESSION", "ok");
     public void altc0020() => CorpusAssert.Parses(@"ALTER TABLE s.t DROP COLUMN IF EXISTS tags CASCADE", "ok");
     [Fact]
     public void altc0021() => CorpusAssert.Parses(@"ALTER TABLE s.t DROP COLUMN", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void altc0022() => CorpusAssert.Parses(@"ALTER TABLE s.t DROP COLUMN nonexistent_col", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task altc0022() => CorpusAssert.MatchesPostgres(@"ALTER TABLE s.t DROP COLUMN nonexistent_col", "error", false);
     [Fact]
     public void altc0023() => CorpusAssert.Parses(@"CREATE TABLE s.t_tmp (a numeric(12,2)); ALTER TABLE s.t_tmp ALTER COLUMN a TYPE numeric(15,4)", "ok");
     [Fact]
@@ -787,8 +787,8 @@ ALTER TABLE s.alta_gen ALTER COLUMN y DROP EXPRESSION", "ok");
     public void altc0040() => CorpusAssert.Parses(@"ALTER TABLE s.t ADD CONSTRAINT chk_qty CHECK (qty >= 0)", "ok");
     [Fact]
     public void altc0041() => CorpusAssert.Parses(@"ALTER TABLE s.t ADD CONSTRAINT uniq_name UNIQUE (name)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void altc0042() => CorpusAssert.Parses(@"ALTER TABLE s.t ADD CONSTRAINT t_pk2 PRIMARY KEY (id)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task altc0042() => CorpusAssert.MatchesPostgres(@"ALTER TABLE s.t ADD CONSTRAINT t_pk2 PRIMARY KEY (id)", "error", false);
     [Fact]
     public void altc0043() => CorpusAssert.Parses(@"ALTER TABLE s.t2 ADD CONSTRAINT fk_t2_t FOREIGN KEY (t_id) REFERENCES s.t(id)", "ok");
     [Fact]
@@ -797,8 +797,8 @@ ALTER TABLE s.alta_gen ALTER COLUMN y DROP EXPRESSION", "ok");
     public void altc0045() => CorpusAssert.Parses(@"ALTER TABLE s.t ADD CONSTRAINT chk_val CHECK (val > 0) NOT VALID", "ok");
     [Fact]
     public void altc0046() => CorpusAssert.Parses(@"ALTER TABLE s.t ADD CONSTRAINT chk_val2 CHECK (val > 0) NOT VALID; ALTER TABLE s.t VALIDATE CONSTRAINT chk_val2", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void altc0047() => CorpusAssert.Parses(@"ALTER TABLE s.t DROP CONSTRAINT nonexistent_constraint", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task altc0047() => CorpusAssert.MatchesPostgres(@"ALTER TABLE s.t DROP CONSTRAINT nonexistent_constraint", "error", false);
     [Fact]
     public void altc0048() => CorpusAssert.Parses(@"ALTER TABLE s.t ADD CONSTRAINT chk_qty2 CHECK (qty >= 0); ALTER TABLE s.t DROP CONSTRAINT chk_qty2", "ok");
     [Fact]
@@ -807,16 +807,16 @@ ALTER TABLE s.alta_gen ALTER COLUMN y DROP EXPRESSION", "ok");
     public void altc0050() => CorpusAssert.Parses(@"ALTER TABLE s.t ADD CONSTRAINT chk_qty3 CHECK (qty >= 0); ALTER TABLE s.t DROP CONSTRAINT IF EXISTS chk_qty3 CASCADE", "ok");
     [Fact]
     public void altc0051() => CorpusAssert.Parses(@"ALTER TABLE s.t ADD CONSTRAINT chk_qty4 CHECK (qty >= 0); ALTER TABLE s.t DROP CONSTRAINT chk_qty4 RESTRICT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void altc0052() => CorpusAssert.Parses(@"ALTER TABLE s.t VALIDATE CONSTRAINT nonexistent_con", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task altc0052() => CorpusAssert.MatchesPostgres(@"ALTER TABLE s.t VALIDATE CONSTRAINT nonexistent_con", "error", false);
     [Fact]
     public void altc0053() => CorpusAssert.Parses(@"ALTER TABLE s.t2 ADD CONSTRAINT fk_t2_defer FOREIGN KEY (t_id) REFERENCES s.t(id) DEFERRABLE INITIALLY DEFERRED", "ok");
     [Fact]
     public void altc0054() => CorpusAssert.Parses(@"ALTER TABLE s.t2 ADD CONSTRAINT fk_t2_nodefer FOREIGN KEY (t_id) REFERENCES s.t(id) NOT DEFERRABLE", "ok");
     [Fact]
     public void altc0055() => CorpusAssert.Parses(@"ALTER TABLE s.t2 ADD CONSTRAINT fk_alt FOREIGN KEY (t_id) REFERENCES s.t(id) DEFERRABLE INITIALLY IMMEDIATE; ALTER TABLE s.t2 ALTER CONSTRAINT fk_alt DEFERRABLE INITIALLY DEFERRED", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void altc0056() => CorpusAssert.Parses(@"ALTER TABLE s.t2 ALTER CONSTRAINT nonexistent_fk DEFERRABLE", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task altc0056() => CorpusAssert.MatchesPostgres(@"ALTER TABLE s.t2 ALTER CONSTRAINT nonexistent_fk DEFERRABLE", "error", false);
     [Fact]
     public void altc0057() => CorpusAssert.Parses(@"ALTER TABLE s.t ALTER COLUMN id SET GENERATED ALWAYS", "ok");
     [Fact]
@@ -827,10 +827,10 @@ ALTER TABLE s.alta_gen ALTER COLUMN y DROP EXPRESSION", "ok");
     public void altc0060() => CorpusAssert.Parses(@"ALTER TABLE s.t ALTER COLUMN id DROP IDENTITY IF EXISTS", "ok");
     [Fact]
     public void altc0061() => CorpusAssert.Parses(@"ALTER TABLE s.t ALTER COLUMN val DROP IDENTITY IF EXISTS", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void altc0062() => CorpusAssert.Parses(@"ALTER TABLE s.t ALTER COLUMN val DROP IDENTITY", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void altc0063() => CorpusAssert.Parses(@"ALTER TABLE s.t ALTER COLUMN id SET GENERATED ALWAYS; ALTER TABLE s.t ALTER COLUMN id ADD GENERATED BY DEFAULT AS IDENTITY", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task altc0062() => CorpusAssert.MatchesPostgres(@"ALTER TABLE s.t ALTER COLUMN val DROP IDENTITY", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task altc0063() => CorpusAssert.MatchesPostgres(@"ALTER TABLE s.t ALTER COLUMN id SET GENERATED ALWAYS; ALTER TABLE s.t ALTER COLUMN id ADD GENERATED BY DEFAULT AS IDENTITY", "error", false);
     [Fact]
     public void altc0064() => CorpusAssert.Parses(@"ALTER TABLE s.t ALTER COLUMN qty DROP DEFAULT; ALTER TABLE s.t ALTER COLUMN qty ADD GENERATED ALWAYS AS IDENTITY", "ok");
     [Fact]
@@ -869,8 +869,8 @@ ALTER TABLE s.alta_gen ALTER COLUMN y DROP EXPRESSION", "ok");
     public void altc0081() => CorpusAssert.Parses(@"ALTER TABLE s.t FORCE ROW LEVEL SECURITY", "ok");
     [Fact]
     public void altc0082() => CorpusAssert.Parses(@"ALTER TABLE s.t NO FORCE ROW LEVEL SECURITY", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void altc0083() => CorpusAssert.Parses(@"ALTER TABLE s.t ENABLE ROW SECURITY", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task altc0083() => CorpusAssert.MatchesPostgres(@"ALTER TABLE s.t ENABLE ROW SECURITY", "error", false);
     [Fact]
     public void altc0084() => CorpusAssert.Parses(@"ALTER TABLE s.t ENABLE TRIGGER t_touch", "ok");
     [Fact]
@@ -887,8 +887,8 @@ ALTER TABLE s.alta_gen ALTER COLUMN y DROP EXPRESSION", "ok");
     public void altc0090() => CorpusAssert.Parses(@"ALTER TABLE s.t ENABLE ALWAYS TRIGGER t_touch", "ok");
     [Fact]
     public void altc0091() => CorpusAssert.Parses(@"ALTER TABLE s.t ENABLE REPLICA TRIGGER t_touch", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void altc0092() => CorpusAssert.Parses(@"ALTER TABLE s.t ENABLE RULE nonexistent_rule", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task altc0092() => CorpusAssert.MatchesPostgres(@"ALTER TABLE s.t ENABLE RULE nonexistent_rule", "error", false);
     [Fact]
     public void altc0093() => CorpusAssert.Parses(@"CREATE RULE r1 AS ON INSERT TO s.t DO ALSO NOTHING; ALTER TABLE s.t ENABLE RULE r1", "ok");
     [Fact]
@@ -901,8 +901,8 @@ ALTER TABLE s.alta_gen ALTER COLUMN y DROP EXPRESSION", "ok");
     public void altc0097() => CorpusAssert.Parses(@"ALTER TABLE s.t CLUSTER ON t_name_idx", "ok");
     [Fact]
     public void altc0098() => CorpusAssert.Parses(@"ALTER TABLE s.t SET WITHOUT CLUSTER", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void altc0099() => CorpusAssert.Parses(@"ALTER TABLE s.t CLUSTER ON nonexistent_idx", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task altc0099() => CorpusAssert.MatchesPostgres(@"ALTER TABLE s.t CLUSTER ON nonexistent_idx", "error", false);
     [Fact]
     public void altc0100() => CorpusAssert.Parses(@"ALTER TABLE s.t SET (fillfactor = 80)", "ok");
     [Fact]
@@ -913,58 +913,58 @@ ALTER TABLE s.alta_gen ALTER COLUMN y DROP EXPRESSION", "ok");
     public void altc0103() => CorpusAssert.Parses(@"ALTER TABLE s.t RESET (fillfactor)", "ok");
     [Fact]
     public void altc0104() => CorpusAssert.Parses(@"ALTER TABLE s.t RESET (fillfactor, autovacuum_enabled)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void altc0105() => CorpusAssert.Parses(@"ALTER TABLE s.t SET (invalid_param_xyz = 1)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void altc0106() => CorpusAssert.Parses(@"ALTER TABLE s.child INHERIT s.parent", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task altc0105() => CorpusAssert.MatchesPostgres(@"ALTER TABLE s.t SET (invalid_param_xyz = 1)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task altc0106() => CorpusAssert.MatchesPostgres(@"ALTER TABLE s.child INHERIT s.parent", "error", false);
     [Fact]
     public void altc0107() => CorpusAssert.Parses(@"ALTER TABLE s.child NO INHERIT s.parent", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void altc0108() => CorpusAssert.Parses(@"ALTER TABLE s.t INHERIT s.parent", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task altc0108() => CorpusAssert.MatchesPostgres(@"ALTER TABLE s.t INHERIT s.parent", "error", false);
     [Fact]
     public void altc0109() => CorpusAssert.Parses(@"CREATE TABLE s.typed_tbl OF s.addr; ALTER TABLE s.typed_tbl NOT OF", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void altc0110() => CorpusAssert.Parses(@"ALTER TABLE s.t NOT OF", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task altc0110() => CorpusAssert.MatchesPostgres(@"ALTER TABLE s.t NOT OF", "error", false);
     [Fact]
     public void altc0111() => CorpusAssert.Parses(@"CREATE TABLE s.part_test (id int, occurred date NOT NULL) PARTITION BY RANGE (occurred); CREATE TABLE s.part_test_2024 (LIKE s.part_test); ALTER TABLE s.part_test ATTACH PARTITION s.part_test_2024 FOR VALUES FROM ('2024-01-01') TO ('2025-01-01')", "ok");
     [Fact]
     public void altc0112() => CorpusAssert.Parses(@"ALTER TABLE s.events DETACH PARTITION s.events_2024", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void altc0113() => CorpusAssert.Parses(@"ALTER TABLE s.events DETACH PARTITION s.events_2024 CONCURRENTLY", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void altc0114() => CorpusAssert.Parses(@"ALTER TABLE s.events DETACH PARTITION s.events_2024 FINALIZE", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void altc0115() => CorpusAssert.Parses(@"ALTER TABLE s.events DETACH PARTITION nonexistent_partition", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void altc0116() => CorpusAssert.Parses(@"ALTER TABLE s.events ATTACH PARTITION s.events_2024 FOR VALUES FROM ('2024-01-01') TO ('2025-01-01')", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task altc0113() => CorpusAssert.MatchesPostgres(@"ALTER TABLE s.events DETACH PARTITION s.events_2024 CONCURRENTLY", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task altc0114() => CorpusAssert.MatchesPostgres(@"ALTER TABLE s.events DETACH PARTITION s.events_2024 FINALIZE", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task altc0115() => CorpusAssert.MatchesPostgres(@"ALTER TABLE s.events DETACH PARTITION nonexistent_partition", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task altc0116() => CorpusAssert.MatchesPostgres(@"ALTER TABLE s.events ATTACH PARTITION s.events_2024 FOR VALUES FROM ('2024-01-01') TO ('2025-01-01')", "error", false);
     [Fact]
     public void altc0117() => CorpusAssert.Parses(@"ALTER TABLE s.t OWNER TO CURRENT_USER", "ok");
     [Fact]
     public void altc0118() => CorpusAssert.Parses(@"ALTER TABLE s.t OWNER TO SESSION_USER", "ok");
     [Fact]
     public void altc0119() => CorpusAssert.Parses(@"ALTER TABLE s.t OWNER TO CURRENT_ROLE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void altc0120() => CorpusAssert.Parses(@"ALTER TABLE s.t OWNER TO nonexistent_user", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task altc0120() => CorpusAssert.MatchesPostgres(@"ALTER TABLE s.t OWNER TO nonexistent_user", "error", false);
     [Fact]
     public void altc0121() => CorpusAssert.Parses(@"ALTER TABLE s.t SET SCHEMA public", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void altc0122() => CorpusAssert.Parses(@"ALTER TABLE s.t SET SCHEMA nonexistent_schema", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task altc0122() => CorpusAssert.MatchesPostgres(@"ALTER TABLE s.t SET SCHEMA nonexistent_schema", "error", false);
     [Fact]
     public void altc0123() => CorpusAssert.Parses(@"ALTER TABLE s.t RENAME TO t_renamed; ALTER TABLE s.t_renamed RENAME TO t", "ok");
     [Fact]
     public void altc0124() => CorpusAssert.Parses(@"ALTER TABLE s.t RENAME COLUMN name TO full_name; ALTER TABLE s.t RENAME COLUMN full_name TO name", "ok");
     [Fact]
     public void altc0125() => CorpusAssert.Parses(@"ALTER TABLE s.t RENAME COLUMN IF EXISTS nonexistent_col TO new_name", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void altc0126() => CorpusAssert.Parses(@"ALTER TABLE s.t RENAME COLUMN nonexistent_col TO new_name", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task altc0126() => CorpusAssert.MatchesPostgres(@"ALTER TABLE s.t RENAME COLUMN nonexistent_col TO new_name", "error", false);
     [Fact]
     public void altc0127() => CorpusAssert.Parses(@"ALTER TABLE s.t ADD CONSTRAINT ck_name CHECK (name IS NOT NULL); ALTER TABLE s.t RENAME CONSTRAINT ck_name TO ck_name_new; ALTER TABLE s.t DROP CONSTRAINT ck_name_new", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void altc0128() => CorpusAssert.Parses(@"ALTER TABLE s.t RENAME CONSTRAINT nonexistent_con TO new_con", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task altc0128() => CorpusAssert.MatchesPostgres(@"ALTER TABLE s.t RENAME CONSTRAINT nonexistent_con TO new_con", "error", false);
     [Fact]
     public void altc0129() => CorpusAssert.Parses(@"ALTER TABLE s.t SET TABLESPACE pg_default", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void altc0130() => CorpusAssert.Parses(@"ALTER TABLE s.t SET TABLESPACE nonexistent_ts", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task altc0130() => CorpusAssert.MatchesPostgres(@"ALTER TABLE s.t SET TABLESPACE nonexistent_ts", "error", false);
     [Fact]
     public void altc0131() => CorpusAssert.Parses(@"ALTER TABLE s.t SET LOGGED", "ok");
     [Fact]
@@ -985,8 +985,8 @@ ALTER TABLE s.alta_gen ALTER COLUMN y DROP EXPRESSION", "ok");
     public void altc0139() => CorpusAssert.Parses(@"ALTER TABLE ONLY s.t ADD COLUMN only_col text", "ok");
     [Fact]
     public void altc0140() => CorpusAssert.Parses(@"ALTER TABLE ONLY s.t DROP COLUMN tags", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void altc0141() => CorpusAssert.Parses(@"ALTER TABLE ONLY s.parent ADD COLUMN parent_only_col text", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task altc0141() => CorpusAssert.MatchesPostgres(@"ALTER TABLE ONLY s.parent ADD COLUMN parent_only_col text", "error", false);
     [Fact]
     public void altc0142() => CorpusAssert.Parses(@"ALTER TABLE s.t* ADD COLUMN star_col text", "ok");
     [Fact]
@@ -995,16 +995,16 @@ ALTER TABLE s.alta_gen ALTER COLUMN y DROP EXPRESSION", "ok");
     public void altc0144() => CorpusAssert.Parses(@"ALTER TABLE s.t", "error");
     [Fact]
     public void altc0145() => CorpusAssert.Parses(@"ALTER TABLE s.t UNKNOWN_ACTION", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void altc0146() => CorpusAssert.Parses(@"ALTER TABLE s.nonexistent_table ADD COLUMN col text", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task altc0146() => CorpusAssert.MatchesPostgres(@"ALTER TABLE s.nonexistent_table ADD COLUMN col text", "error", false);
     [Fact]
     public void altc0147() => CorpusAssert.Parses(@"ALTER TABLE IF EXISTS s.nonexistent_table ADD COLUMN col text", "ok");
     [Fact]
     public void altc0148() => CorpusAssert.Parses(@"ALTER TABLE IF EXISTS s.t ADD COLUMN if_exists_col text", "ok");
     [Fact]
     public void altc0149() => CorpusAssert.Parses(@"ALTER TABLE s.t ALTER COLUMN id SET GENERATED ALWAYS RESTART WITH 1", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void altc0150() => CorpusAssert.Parses(@"ALTER TABLE s.t ALTER COLUMN id SET GENERATED ALWAYS (START WITH 1000)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task altc0150() => CorpusAssert.MatchesPostgres(@"ALTER TABLE s.t ALTER COLUMN id SET GENERATED ALWAYS (START WITH 1000)", "error", false);
     [Fact]
     public void altc0151() => CorpusAssert.Parses(@"ALTER TABLE s.t ADD COLUMN new_gen int GENERATED ALWAYS AS (qty * 2) STORED", "ok");
     [Fact]
@@ -1029,8 +1029,8 @@ ALTER TABLE s.alta_gen ALTER COLUMN y DROP EXPRESSION", "ok");
     public void altc0161() => CorpusAssert.Parses(@"ALTER TABLE s.t ADD CONSTRAINT chk_multi CHECK (qty >= 0 AND val IS NOT NULL)", "ok");
     [Fact]
     public void altc0162() => CorpusAssert.Parses(@"ALTER TABLE s.t ALTER COLUMN status SET DEFAULT 'happy'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void altc0163() => CorpusAssert.Parses(@"ALTER TABLE s.t ALTER COLUMN status SET DEFAULT 'nonexistent_enum_val'", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task altc0163() => CorpusAssert.MatchesPostgres(@"ALTER TABLE s.t ALTER COLUMN status SET DEFAULT 'nonexistent_enum_val'", "error", false);
     [Fact]
     public void altc0164() => CorpusAssert.Parses(@"ALTER TABLE s.t ADD COLUMN arr_col integer[] DEFAULT '{}'", "ok");
     [Fact]
@@ -1041,8 +1041,8 @@ ALTER TABLE s.alta_gen ALTER COLUMN y DROP EXPRESSION", "ok");
     public void altc0167() => CorpusAssert.Parses(@"ALTER TABLE s.t ADD COLUMN ts_col timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP", "ok");
     [Fact]
     public void altc0168() => CorpusAssert.Parses(@"ALTER TABLE s.t ADD COLUMN ts_col2 timestamptz NOT NULL DEFAULT now()", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void altc0169() => CorpusAssert.Parses(@"ALTER TABLE s.t2 ADD CONSTRAINT fk_no_col FOREIGN KEY (nonexistent_col) REFERENCES s.t(id)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task altc0169() => CorpusAssert.MatchesPostgres(@"ALTER TABLE s.t2 ADD CONSTRAINT fk_no_col FOREIGN KEY (nonexistent_col) REFERENCES s.t(id)", "error", false);
     [Fact]
     public void altc0170() => CorpusAssert.Parses(@"ALTER TABLE s.t ALTER COLUMN name SET STORAGE PLAIN; ALTER TABLE s.t ALTER COLUMN name SET STORAGE EXTENDED", "ok");
     [Fact]
@@ -1116,8 +1116,8 @@ ALTER TABLE s.t ALTER COLUMN descr TYPE text COLLATE ""C""", "ok");
     public void altd0034() => CorpusAssert.Parses(@"ALTER TABLE s.t ADD CONSTRAINT t_val_pos CHECK (val > 0) NOT VALID", "ok");
     [Fact]
     public void altd0035() => CorpusAssert.Parses(@"ALTER TABLE s.t ADD CONSTRAINT t_name_uq UNIQUE (name)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void altd0036() => CorpusAssert.Parses(@"ALTER TABLE s.t ADD CONSTRAINT t_pk2 PRIMARY KEY (id)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task altd0036() => CorpusAssert.MatchesPostgres(@"ALTER TABLE s.t ADD CONSTRAINT t_pk2 PRIMARY KEY (id)", "error", false);
     [Fact]
     public void altd0037() => CorpusAssert.Parses(@"ALTER TABLE s.t2 ADD CONSTRAINT t2_fk FOREIGN KEY (t_id) REFERENCES s.t(id)", "ok");
     [Fact]
@@ -1207,8 +1207,8 @@ ALTER TABLE s.newchild INHERIT s.parent", "ok");
 ALTER TABLE s.typed_tbl NOT OF", "ok");
     [Fact]
     public void altd0075() => CorpusAssert.Parses(@"ALTER TABLE s.events DETACH PARTITION s.events_2024", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void altd0076() => CorpusAssert.Parses(@"ALTER TABLE s.events DETACH PARTITION s.events_2024 CONCURRENTLY", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task altd0076() => CorpusAssert.MatchesPostgres(@"ALTER TABLE s.events DETACH PARTITION s.events_2024 CONCURRENTLY", "error", false);
     [Fact]
     public void altd0077() => CorpusAssert.Parses(@"ALTER TABLE s.events DETACH PARTITION s.events_2024 CONCURRENTLY", "ok");
     [Fact]
@@ -1262,6 +1262,6 @@ ALTER TABLE s.standalone SET UNLOGGED", "ok");
     public void altd0100() => CorpusAssert.Parses(@"ALTER TABLE s.t ALTER COLUMN name SET ( n_distinct = 10 )", "ok");
     [Fact]
     public void altd0101() => CorpusAssert.Parses(@"ALTER TABLE s.t ALTER COLUMN name RESET ( n_distinct )", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void altd0102() => CorpusAssert.Parses(@"ALTER TABLE s.nonexistent ADD COLUMN c text", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task altd0102() => CorpusAssert.MatchesPostgres(@"ALTER TABLE s.nonexistent ADD COLUMN c text", "error", false);
 }

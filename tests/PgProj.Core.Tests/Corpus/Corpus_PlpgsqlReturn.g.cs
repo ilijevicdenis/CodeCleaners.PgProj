@@ -185,18 +185,18 @@ public class Corpus_PlpgsqlReturn
     public void ppra0089() => CorpusAssert.Parses(@"CREATE FUNCTION ppra_out_setof2(OUT a integer, OUT b text) RETURNS SETOF record LANGUAGE plpgsql AS $$ BEGIN a := 1; b := 'x'; RETURN NEXT; a := 2; b := 'y'; RETURN NEXT; END $$;", "ok");
     [Fact]
     public void ppra0090() => CorpusAssert.Parses(@"CREATE FUNCTION ppra_rq_joinfix() RETURNS SETOF text LANGUAGE plpgsql AS $$ BEGIN RETURN QUERY SELECT t.name FROM s.t AS t JOIN s.t2 AS t2 ON t.id = t2.t_id; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppra0091() => CorpusAssert.Parses(@"CREATE FUNCTION ppra_rq_nocolon() RETURNS SETOF integer LANGUAGE plpgsql AS $$ BEGIN RETURN QUERY EXECUTE 'SELECT $1' USING 1, ; END $$;", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ppra0091() => CorpusAssert.MatchesPostgres(@"CREATE FUNCTION ppra_rq_nocolon() RETURNS SETOF integer LANGUAGE plpgsql AS $$ BEGIN RETURN QUERY EXECUTE 'SELECT $1' USING 1, ; END $$;", "error", false);
     [Fact]
     public void ppra0092() => CorpusAssert.Parses(@"DO $$ BEGIN RETURN 1; END $$;", "error");
     [Fact]
     public void ppra0093() => CorpusAssert.Parses(@"CREATE FUNCTION ppra_proc_ret() RETURNS void LANGUAGE plpgsql AS $$ BEGIN RETURN 42; END $$;", "error");
     [Fact]
     public void ppra0094() => CorpusAssert.Parses(@"CREATE PROCEDURE ppra_proc1(n integer) LANGUAGE plpgsql AS $$ BEGIN RETURN 1; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppra0095() => CorpusAssert.Parses(@"CREATE FUNCTION ppra_seterr1() RETURNS SETOF integer LANGUAGE plpgsql AS $$ BEGIN RETURN NEXT; RETURN; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppra0096() => CorpusAssert.Parses(@"CREATE FUNCTION ppra_err_syntax1() RETURNS integer LANGUAGE plpgsql AS $$ BEGIN RETURN; END $$;", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ppra0095() => CorpusAssert.MatchesPostgres(@"CREATE FUNCTION ppra_seterr1() RETURNS SETOF integer LANGUAGE plpgsql AS $$ BEGIN RETURN NEXT; RETURN; END $$;", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ppra0096() => CorpusAssert.MatchesPostgres(@"CREATE FUNCTION ppra_err_syntax1() RETURNS integer LANGUAGE plpgsql AS $$ BEGIN RETURN; END $$;", "error", false);
     [Fact]
     public void ppra0097() => CorpusAssert.Parses(@"CREATE FUNCTION ppra_err_retnext_scalar() RETURNS integer LANGUAGE plpgsql AS $$ BEGIN RETURN NEXT 1; RETURN; END $$;", "error");
     [Fact]
@@ -205,20 +205,20 @@ public class Corpus_PlpgsqlReturn
     public void ppra0099() => CorpusAssert.Parses(@"CREATE FUNCTION ppra_err_syntax2() RETURNS integer LANGUAGE plpgsql AS $$ BEGIN RETURN QUERY; END $$;", "error");
     [Fact]
     public void ppra0100() => CorpusAssert.Parses(@"CREATE FUNCTION ppra_err_syntax3() RETURNS integer LANGUAGE plpgsql AS $$ BEGIN RETURN NEXT; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppra0101() => CorpusAssert.Parses(@"CREATE FUNCTION ppra_err_badkw() RETURNS integer LANGUAGE plpgsql AS $$ BEGIN RETRUN 1; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppra0102() => CorpusAssert.Parses(@"CREATE FUNCTION ppra_err_missing_semi() RETURNS integer LANGUAGE plpgsql AS $$ BEGIN RETURN 1 END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppra0103() => CorpusAssert.Parses(@"CREATE FUNCTION ppra_err_rqe_noquote() RETURNS SETOF integer LANGUAGE plpgsql AS $$ BEGIN RETURN QUERY EXECUTE SELECT 1; END $$;", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ppra0101() => CorpusAssert.MatchesPostgres(@"CREATE FUNCTION ppra_err_badkw() RETURNS integer LANGUAGE plpgsql AS $$ BEGIN RETRUN 1; END $$;", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ppra0102() => CorpusAssert.MatchesPostgres(@"CREATE FUNCTION ppra_err_missing_semi() RETURNS integer LANGUAGE plpgsql AS $$ BEGIN RETURN 1 END $$;", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ppra0103() => CorpusAssert.MatchesPostgres(@"CREATE FUNCTION ppra_err_rqe_noquote() RETURNS SETOF integer LANGUAGE plpgsql AS $$ BEGIN RETURN QUERY EXECUTE SELECT 1; END $$;", "error", false);
     [Fact]
     public void ppra0104() => CorpusAssert.Parses(@"CREATE FUNCTION ppra_err_trg_new_nontrg() RETURNS integer LANGUAGE plpgsql AS $$ BEGIN RETURN NEW; END $$;", "ok");
     [Fact]
     public void ppra0105() => CorpusAssert.Parses(@"CREATE FUNCTION ppra_err_trg_old_nontrg() RETURNS integer LANGUAGE plpgsql AS $$ BEGIN RETURN OLD; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppra0106() => CorpusAssert.Parses(@"CREATE FUNCTION ppra_err_rqe_using_bare() RETURNS SETOF integer LANGUAGE plpgsql AS $$ BEGIN RETURN QUERY EXECUTE 'SELECT $1' USING; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppra0107() => CorpusAssert.Parses(@"CREATE FUNCTION ppra_err_double_ret() RETURNS integer LANGUAGE plpgsql AS $$ BEGIN RETURN RETURN 1; END $$;", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ppra0106() => CorpusAssert.MatchesPostgres(@"CREATE FUNCTION ppra_err_rqe_using_bare() RETURNS SETOF integer LANGUAGE plpgsql AS $$ BEGIN RETURN QUERY EXECUTE 'SELECT $1' USING; END $$;", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ppra0107() => CorpusAssert.MatchesPostgres(@"CREATE FUNCTION ppra_err_double_ret() RETURNS integer LANGUAGE plpgsql AS $$ BEGIN RETURN RETURN 1; END $$;", "error", false);
     [Fact]
     public void ppra0108() => CorpusAssert.Parses(@"CREATE FUNCTION ppra_dollar1() RETURNS integer LANGUAGE plpgsql AS $body$ BEGIN RETURN 7; END $body$;", "ok");
     [Fact]
@@ -325,8 +325,8 @@ public class Corpus_PlpgsqlReturn
     public void ppra0159() => CorpusAssert.Parses(@"CREATE FUNCTION ppra_parallel_safe() RETURNS integer LANGUAGE plpgsql PARALLEL SAFE AS $$ BEGIN RETURN 1; END $$;", "ok");
     [Fact]
     public void ppra0160() => CorpusAssert.Parses(@"CREATE FUNCTION ppra_parallel_unsafe() RETURNS SETOF integer LANGUAGE plpgsql PARALLEL UNSAFE AS $$ BEGIN RETURN QUERY SELECT generate_series(1,3); END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppra0161() => CorpusAssert.Parses(@"CREATE FUNCTION ppra_err_proc_void_val() LANGUAGE plpgsql AS $$ BEGIN RETURN 5; END $$;", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ppra0161() => CorpusAssert.MatchesPostgres(@"CREATE FUNCTION ppra_err_proc_void_val() LANGUAGE plpgsql AS $$ BEGIN RETURN 5; END $$;", "error", false);
     [Fact]
     public void ppra0162() => CorpusAssert.Parses(@"CREATE FUNCTION ppra_rq_cte_multi() RETURNS SETOF integer LANGUAGE plpgsql AS $$ BEGIN RETURN QUERY WITH a AS (SELECT 1 AS n), b AS (SELECT 2 AS n) SELECT n FROM a UNION ALL SELECT n FROM b; END $$;", "ok");
     [Fact]
@@ -466,28 +466,28 @@ END $$;", "ok");
     public void pprb0049() => CorpusAssert.Parses(@"CREATE FUNCTION s.pprb_expr4() RETURNS text LANGUAGE plpgsql AS $$ BEGIN RETURN 'abc' || 'def'; END $$;", "ok");
     [Fact]
     public void pprb0050() => CorpusAssert.Parses(@"CREATE FUNCTION s.pprb_expr5() RETURNS integer LANGUAGE plpgsql AS $$ BEGIN RETURN CASE WHEN 1=1 THEN 42 ELSE 0 END; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void pprb0051() => CorpusAssert.Parses(@"CREATE FUNCTION s.pprb_setnext_noexpr() RETURNS SETOF integer LANGUAGE plpgsql AS $$ BEGIN RETURN NEXT; RETURN; END $$;", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task pprb0051() => CorpusAssert.MatchesPostgres(@"CREATE FUNCTION s.pprb_setnext_noexpr() RETURNS SETOF integer LANGUAGE plpgsql AS $$ BEGIN RETURN NEXT; RETURN; END $$;", "error", false);
     [Fact]
     public void pprb0052() => CorpusAssert.Parses(@"CREATE PROCEDURE s.pprb_proc_val(n integer) LANGUAGE plpgsql AS $$ BEGIN RETURN n; END $$;", "error");
     [Fact]
     public void pprb0053() => CorpusAssert.Parses(@"CREATE FUNCTION s.pprb_void_val() RETURNS void LANGUAGE plpgsql AS $$ BEGIN RETURN 1; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void pprb0054() => CorpusAssert.Parses(@"CREATE FUNCTION s.pprb_scalar_noexpr() RETURNS integer LANGUAGE plpgsql AS $$ BEGIN RETURN; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void pprb0055() => CorpusAssert.Parses(@"CREATE FUNCTION s.pprb_bad_syntax1() RETURNS integer LANGUAGE plpgsql AS $$ BEGIN RETURN END; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void pprb0056() => CorpusAssert.Parses(@"CREATE FUNCTION s.pprb_bad_syntax2() RETURNS integer LANGUAGE plpgsql AS $$ BEGIN RETURN; RETURN 1; END $$;", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task pprb0054() => CorpusAssert.MatchesPostgres(@"CREATE FUNCTION s.pprb_scalar_noexpr() RETURNS integer LANGUAGE plpgsql AS $$ BEGIN RETURN; END $$;", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task pprb0055() => CorpusAssert.MatchesPostgres(@"CREATE FUNCTION s.pprb_bad_syntax1() RETURNS integer LANGUAGE plpgsql AS $$ BEGIN RETURN END; END $$;", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task pprb0056() => CorpusAssert.MatchesPostgres(@"CREATE FUNCTION s.pprb_bad_syntax2() RETURNS integer LANGUAGE plpgsql AS $$ BEGIN RETURN; RETURN 1; END $$;", "error", false);
     [Fact]
     public void pprb0057() => CorpusAssert.Parses(@"DO $$ BEGIN RETURN NEXT 1; END $$;", "error");
     [Fact]
     public void pprb0058() => CorpusAssert.Parses(@"DO $$ BEGIN RETURN QUERY SELECT 1; END $$;", "error");
     [Fact]
     public void pprb0059() => CorpusAssert.Parses(@"CREATE FUNCTION s.pprb_rq_noqry() RETURNS SETOF integer LANGUAGE plpgsql AS $$ BEGIN RETURN QUERY; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void pprb0060() => CorpusAssert.Parses(@"CREATE FUNCTION s.pprb_rqe_nostr() RETURNS SETOF integer LANGUAGE plpgsql AS $$ BEGIN RETURN QUERY EXECUTE; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void pprb0061() => CorpusAssert.Parses(@"CREATE FUNCTION s.pprb_bad_syntax3() RETURNS integer LANGUAGE plpgsql AS $$ BEGIN RETURN,; END $$;", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task pprb0060() => CorpusAssert.MatchesPostgres(@"CREATE FUNCTION s.pprb_rqe_nostr() RETURNS SETOF integer LANGUAGE plpgsql AS $$ BEGIN RETURN QUERY EXECUTE; END $$;", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task pprb0061() => CorpusAssert.MatchesPostgres(@"CREATE FUNCTION s.pprb_bad_syntax3() RETURNS integer LANGUAGE plpgsql AS $$ BEGIN RETURN,; END $$;", "error", false);
     [Fact]
     public void pprb0062() => CorpusAssert.Parses(@"CREATE FUNCTION s.pprb_setqry6() RETURNS SETOF integer LANGUAGE plpgsql AS $$ BEGIN RETURN QUERY SELECT generate_series(1,3); RETURN; END $$;", "ok");
     [Fact]

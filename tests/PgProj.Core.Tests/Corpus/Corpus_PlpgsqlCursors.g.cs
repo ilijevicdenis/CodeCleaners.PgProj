@@ -164,12 +164,12 @@ DO $$ DECLARE c CURSOR FOR SELECT id FROM s.t2; BEGIN OPEN c; CLOSE c; END $$;",
     public void ppca0077() => CorpusAssert.Parses(@"DO $$ DECLARE c1 refcursor; c2 refcursor; v bigint; BEGIN OPEN c1 FOR SELECT id FROM s.t; OPEN c2 FOR SELECT id FROM s.t2; FETCH c1 INTO v; FETCH c2 INTO v; CLOSE c1; CLOSE c2; END $$;", "ok");
     [Fact]
     public void ppca0078() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR FOR SELECT id FROM s.t; v bigint; found_val boolean; BEGIN OPEN c; FETCH c INTO v; found_val := FOUND; CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppca0079() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR FOR SELECT id FROM s.t; BEGIN OPEN c; CLOSE c; CLOSE c; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppca0080() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR FOR SELECT id FROM s.t; v bigint; BEGIN FETCH c INTO v; CLOSE c; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppca0081() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR FOR SELECT id FROM s.t; BEGIN OPEN c; OPEN c; CLOSE c; END $$;", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ppca0079() => CorpusAssert.MatchesPostgres(@"DO $$ DECLARE c CURSOR FOR SELECT id FROM s.t; BEGIN OPEN c; CLOSE c; CLOSE c; END $$;", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ppca0080() => CorpusAssert.MatchesPostgres(@"DO $$ DECLARE c CURSOR FOR SELECT id FROM s.t; v bigint; BEGIN FETCH c INTO v; CLOSE c; END $$;", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ppca0081() => CorpusAssert.MatchesPostgres(@"DO $$ DECLARE c CURSOR FOR SELECT id FROM s.t; BEGIN OPEN c; OPEN c; CLOSE c; END $$;", "error", false);
     [Fact]
     public void ppca0082() => CorpusAssert.Parses(@"DO $$ BEGIN DECLARE c CURSOR FOR SELECT 1; END $$;", "error");
     [Fact]
@@ -188,22 +188,22 @@ DO $$ DECLARE c CURSOR FOR SELECT id FROM s.t2; BEGIN OPEN c; CLOSE c; END $$;",
     public void ppca0089() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR FOR SELECT id FROM s.t; v bigint; BEGIN OPEN c; FETCH ABSOLUTE FROM c INTO v; CLOSE c; END $$;", "error");
     [Fact]
     public void ppca0090() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR FOR SELECT id FROM s.t; v bigint; BEGIN OPEN c; FETCH RELATIVE FROM c INTO v; CLOSE c; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppca0091() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR (k integer) FOR SELECT id FROM s.t WHERE id = k; BEGIN FOR r IN c LOOP NULL; END LOOP; END $$;", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ppca0091() => CorpusAssert.MatchesPostgres(@"DO $$ DECLARE c CURSOR (k integer) FOR SELECT id FROM s.t WHERE id = k; BEGIN FOR r IN c LOOP NULL; END LOOP; END $$;", "error", false);
     [Fact]
     public void ppca0092() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR FOR SELECT id FROM s.t; BEGIN OPEN c; CLOSE; END $$;", "error");
     [Fact]
     public void ppca0093() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR FOR SELECT id FROM s.t; v bigint; BEGIN OPEN c; FETCH NEXT NEXT FROM c INTO v; CLOSE c; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppca0094() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR FOR SELECT id FROM s.nonexistent; BEGIN OPEN c; CLOSE c; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppca0095() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR FOR SELECT id FROM s.t; v bigint; BEGIN OPEN c; FETCH FORWARD -1 FROM c INTO v; CLOSE c; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppca0096() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR FOR SELECT id FROM s.t; BEGIN OPEN c FOR SELECT id FROM s.t; CLOSE c; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppca0097() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR FOR SELECT id FROM s.t; BEGIN CLOSE c; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppca0098() => CorpusAssert.Parses(@"DO $$ DECLARE c refcursor; v bigint; BEGIN FETCH c INTO v; END $$;", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ppca0094() => CorpusAssert.MatchesPostgres(@"DO $$ DECLARE c CURSOR FOR SELECT id FROM s.nonexistent; BEGIN OPEN c; CLOSE c; END $$;", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ppca0095() => CorpusAssert.MatchesPostgres(@"DO $$ DECLARE c CURSOR FOR SELECT id FROM s.t; v bigint; BEGIN OPEN c; FETCH FORWARD -1 FROM c INTO v; CLOSE c; END $$;", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ppca0096() => CorpusAssert.MatchesPostgres(@"DO $$ DECLARE c CURSOR FOR SELECT id FROM s.t; BEGIN OPEN c FOR SELECT id FROM s.t; CLOSE c; END $$;", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ppca0097() => CorpusAssert.MatchesPostgres(@"DO $$ DECLARE c CURSOR FOR SELECT id FROM s.t; BEGIN CLOSE c; END $$;", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ppca0098() => CorpusAssert.MatchesPostgres(@"DO $$ DECLARE c refcursor; v bigint; BEGIN FETCH c INTO v; END $$;", "error", false);
     [Fact]
     public void ppca0099() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR FOR SELECT id FROM s.t; v bigint; BEGIN OPEN c; FETCH ABSOLUTE 1 FROM c INTO v; CLOSE c; END $$;", "ok");
     [Fact]
@@ -233,8 +233,8 @@ SELECT s.multi_cur('ca', 'cb');", "ok");
     public void ppca0111() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR (nm text) FOR SELECT id FROM s.t WHERE name = nm; v bigint; BEGIN OPEN c(nm := 'Alice'); FETCH c INTO v; CLOSE c; END $$;", "ok");
     [Fact]
     public void ppca0112() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR (a integer, b text) FOR SELECT id FROM s.t WHERE id = a AND name = b; v bigint; BEGIN OPEN c(1, 'Alice'); FETCH c INTO v; CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppca0113() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR FOR SELECT id FROM s.t; BEGIN OPEN c; MOVE FORWARD ALL FROM c; FETCH NEXT FROM c INTO (SELECT 1); CLOSE c; END $$;", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ppca0113() => CorpusAssert.MatchesPostgres(@"DO $$ DECLARE c CURSOR FOR SELECT id FROM s.t; BEGIN OPEN c; MOVE FORWARD ALL FROM c; FETCH NEXT FROM c INTO (SELECT 1); CLOSE c; END $$;", "error", false);
     [Fact]
     public void ppca0114() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR FOR SELECT id FROM s.t; v bigint; BEGIN OPEN c; FETCH c INTO v; RAISE NOTICE 'val: %', v; CLOSE c; END $$;", "ok");
     [Fact]
@@ -331,16 +331,16 @@ SELECT s.f_named_cur();", "ok");
     public void ppca0159() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR FOR SELECT id FROM s.t; id_val bigint; BEGIN OPEN c; FETCH c INTO id_val; CLOSE c; END $$;", "ok");
     [Fact]
     public void ppca0160() => CorpusAssert.Parses(@"DO $$ DECLARE c NO SCROLL CURSOR FOR SELECT id FROM s.t; v bigint; BEGIN OPEN c; FETCH NEXT FROM c INTO v; CLOSE c; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppca0161() => CorpusAssert.Parses(@"DO $$ DECLARE c NO SCROLL CURSOR FOR SELECT id FROM s.t; v bigint; BEGIN OPEN c; FETCH PRIOR FROM c INTO v; CLOSE c; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppca0162() => CorpusAssert.Parses(@"DO $$ DECLARE c NO SCROLL CURSOR FOR SELECT id FROM s.t; v bigint; BEGIN OPEN c; FETCH LAST FROM c INTO v; CLOSE c; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppca0163() => CorpusAssert.Parses(@"DO $$ DECLARE c NO SCROLL CURSOR FOR SELECT id FROM s.t; v bigint; BEGIN OPEN c; FETCH ABSOLUTE -1 FROM c INTO v; CLOSE c; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppca0164() => CorpusAssert.Parses(@"DO $$ DECLARE c NO SCROLL CURSOR FOR SELECT id FROM s.t; BEGIN OPEN c; MOVE BACKWARD FROM c; CLOSE c; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppca0165() => CorpusAssert.Parses(@"DO $$ DECLARE c refcursor; v bigint; BEGIN OPEN c NO SCROLL FOR SELECT id FROM s.t; FETCH PRIOR FROM c INTO v; CLOSE c; END $$;", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ppca0161() => CorpusAssert.MatchesPostgres(@"DO $$ DECLARE c NO SCROLL CURSOR FOR SELECT id FROM s.t; v bigint; BEGIN OPEN c; FETCH PRIOR FROM c INTO v; CLOSE c; END $$;", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ppca0162() => CorpusAssert.MatchesPostgres(@"DO $$ DECLARE c NO SCROLL CURSOR FOR SELECT id FROM s.t; v bigint; BEGIN OPEN c; FETCH LAST FROM c INTO v; CLOSE c; END $$;", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ppca0163() => CorpusAssert.MatchesPostgres(@"DO $$ DECLARE c NO SCROLL CURSOR FOR SELECT id FROM s.t; v bigint; BEGIN OPEN c; FETCH ABSOLUTE -1 FROM c INTO v; CLOSE c; END $$;", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ppca0164() => CorpusAssert.MatchesPostgres(@"DO $$ DECLARE c NO SCROLL CURSOR FOR SELECT id FROM s.t; BEGIN OPEN c; MOVE BACKWARD FROM c; CLOSE c; END $$;", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ppca0165() => CorpusAssert.MatchesPostgres(@"DO $$ DECLARE c refcursor; v bigint; BEGIN OPEN c NO SCROLL FOR SELECT id FROM s.t; FETCH PRIOR FROM c INTO v; CLOSE c; END $$;", "error", false);
     [Fact]
     public void ppca0166() => CorpusAssert.Parses(@"DO $$ DECLARE c CURSOR FOR SELECT id, name, val FROM s.t; v_id bigint; v_name text; v_val numeric; BEGIN OPEN c; FETCH c INTO v_id, v_name, v_val; CLOSE c; END $$;", "ok");
     [Fact]
@@ -427,8 +427,8 @@ SELECT s.f_named_cur();", "ok");
     public void ppcb0037() => CorpusAssert.Parses(@"DO $$ DECLARE curs2 SCROLL CURSOR FOR SELECT id FROM s.t; BEGIN OPEN curs2; MOVE curs2; CLOSE curs2; END $$;", "ok");
     [Fact]
     public void ppcb0038() => CorpusAssert.Parses(@"DO $$ DECLARE curs2 SCROLL CURSOR FOR SELECT id FROM s.t; BEGIN OPEN curs2; MOVE NEXT FROM curs2; CLOSE curs2; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppcb0039() => CorpusAssert.Parses(@"DO $$ DECLARE curs2 SCROLL CURSOR FOR SELECT id FROM s.t; BEGIN OPEN curs2; FETCH FIRST FROM curs2 INTO i; MOVE PRIOR FROM curs2; CLOSE curs2; END $$;", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ppcb0039() => CorpusAssert.MatchesPostgres(@"DO $$ DECLARE curs2 SCROLL CURSOR FOR SELECT id FROM s.t; BEGIN OPEN curs2; FETCH FIRST FROM curs2 INTO i; MOVE PRIOR FROM curs2; CLOSE curs2; END $$;", "error", false);
     [Fact]
     public void ppcb0040() => CorpusAssert.Parses(@"DO $$ DECLARE curs2 SCROLL CURSOR FOR SELECT id FROM s.t; i bigint; BEGIN OPEN curs2; FETCH FIRST FROM curs2 INTO i; MOVE PRIOR FROM curs2; CLOSE curs2; END $$;", "ok");
     [Fact]
@@ -471,8 +471,8 @@ SELECT s.f_named_cur();", "ok");
     public void ppcb0059() => CorpusAssert.Parses(@"CREATE FUNCTION s.ret_named_cursor(c refcursor) RETURNS refcursor LANGUAGE plpgsql AS $$ BEGIN OPEN c FOR SELECT id FROM s.t; RETURN c; END $$;", "ok");
     [Fact]
     public void ppcb0060() => CorpusAssert.Parses(@"CREATE FUNCTION s.ret_two_cursors(c1 refcursor, c2 refcursor) RETURNS SETOF refcursor LANGUAGE plpgsql AS $$ BEGIN OPEN c1 FOR SELECT id FROM s.t; RETURN NEXT c1; OPEN c2 FOR SELECT name FROM s.t; RETURN NEXT c2; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppcb0061() => CorpusAssert.Parses(@"DO $$ DECLARE curs2 CURSOR FOR SELECT id FROM s.t; i bigint; BEGIN OPEN curs2; FETCH FORWARD 0 FROM curs2 INTO i; CLOSE curs2; END $$;", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ppcb0061() => CorpusAssert.MatchesPostgres(@"DO $$ DECLARE curs2 CURSOR FOR SELECT id FROM s.t; i bigint; BEGIN OPEN curs2; FETCH FORWARD 0 FROM curs2 INTO i; CLOSE curs2; END $$;", "error", false);
     [Fact]
     public void ppcb0062() => CorpusAssert.Parses(@"DO $$ DECLARE curs2 CURSOR FOR SELECT id FROM s.t; i bigint; BEGIN OPEN curs2; FETCH ABSOLUTE 0 FROM curs2 INTO i; CLOSE curs2; END $$;", "ok");
     [Fact]
@@ -499,10 +499,10 @@ SELECT s.f_named_cur();", "ok");
     public void ppcb0073() => CorpusAssert.Parses(@"DO $$ DECLARE curs1 refcursor; i bigint; v integer := 1; BEGIN OPEN curs1 FOR EXECUTE 'SELECT id FROM s.t WHERE id >= $1' USING v; FETCH curs1 INTO i; CLOSE curs1; END $$;", "ok");
     [Fact]
     public void ppcb0074() => CorpusAssert.Parses(@"DO $$ DECLARE curs1 refcursor; i bigint; BEGIN OPEN curs1 FOR EXECUTE 'SELECT id FROM s.t WHERE id >= $1' USING 1 + 1; FETCH curs1 INTO i; CLOSE curs1; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppcb0075() => CorpusAssert.Parses(@"DO $$ DECLARE curs2 CURSOR FOR SELECT id FROM s.t; i bigint; BEGIN OPEN curs2; FETCH NEXT curs2 INTO i; CLOSE curs2; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppcb0076() => CorpusAssert.Parses(@"DO $$ DECLARE curs2 CURSOR FOR SELECT id FROM s.t; i bigint; BEGIN OPEN curs2; FETCH FORWARD 1 FROM curs2 INTO i; CLOSE curs2; END $$;", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ppcb0075() => CorpusAssert.MatchesPostgres(@"DO $$ DECLARE curs2 CURSOR FOR SELECT id FROM s.t; i bigint; BEGIN OPEN curs2; FETCH NEXT curs2 INTO i; CLOSE curs2; END $$;", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ppcb0076() => CorpusAssert.MatchesPostgres(@"DO $$ DECLARE curs2 CURSOR FOR SELECT id FROM s.t; i bigint; BEGIN OPEN curs2; FETCH FORWARD 1 FROM curs2 INTO i; CLOSE curs2; END $$;", "error", false);
     [Fact]
     public void ppcb0077() => CorpusAssert.Parses(@"DO $$ DECLARE curs2 CURSOR FOR SELECT id FROM s.t; i bigint; BEGIN OPEN curs2; FETCH RELATIVE 0 FROM curs2 INTO i; CLOSE curs2; END $$;", "ok");
     [Fact]
@@ -533,16 +533,16 @@ DO $$ DECLARE curs2 CURSOR FOR SELECT id FROM s.t FOR UPDATE; i bigint; BEGIN OP
     public void ppcb0089() => CorpusAssert.Parses(@"DO $$ DECLARE curs1 refcursor; r record; BEGIN OPEN curs1 FOR SELECT id FROM s.t UNION SELECT id FROM s.t2; FETCH curs1 INTO r; CLOSE curs1; END $$;", "ok");
     [Fact]
     public void ppcb0090() => CorpusAssert.Parses(@"DO $$ DECLARE curs2 CURSOR FOR SELECT id, name, val, qty FROM s.t; i bigint; n text; v numeric; q integer; BEGIN OPEN curs2; FETCH curs2 INTO i, n, v, q; CLOSE curs2; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppcb0091() => CorpusAssert.Parses(@"DO $$ DECLARE curs2 CURSOR FOR SELECT id FROM s.t; BEGIN OPEN curs2; FETCH curs2 INTO i; CLOSE curs2; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppcb0092() => CorpusAssert.Parses(@"DO $$ BEGIN OPEN curs1 FOR SELECT 1; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppcb0093() => CorpusAssert.Parses(@"DO $$ DECLARE curs2 CURSOR FOR SELECT id FROM s.t; i bigint; BEGIN FETCH curs2 INTO i; END $$;", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ppcb0091() => CorpusAssert.MatchesPostgres(@"DO $$ DECLARE curs2 CURSOR FOR SELECT id FROM s.t; BEGIN OPEN curs2; FETCH curs2 INTO i; CLOSE curs2; END $$;", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ppcb0092() => CorpusAssert.MatchesPostgres(@"DO $$ BEGIN OPEN curs1 FOR SELECT 1; END $$;", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ppcb0093() => CorpusAssert.MatchesPostgres(@"DO $$ DECLARE curs2 CURSOR FOR SELECT id FROM s.t; i bigint; BEGIN FETCH curs2 INTO i; END $$;", "error", false);
     [Fact]
     public void ppcb0094() => CorpusAssert.Parses(@"DO $$ DECLARE curs2 CURSOR FOR SELECT id FROM s.t; i bigint; BEGIN OPEN curs2; FETCH BADDIR FROM curs2 INTO i; CLOSE curs2; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppcb0095() => CorpusAssert.Parses(@"DO $$ DECLARE curs1 refcursor; BEGIN OPEN curs1 FOR; END $$;", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ppcb0095() => CorpusAssert.MatchesPostgres(@"DO $$ DECLARE curs1 refcursor; BEGIN OPEN curs1 FOR; END $$;", "error", false);
     [Fact]
     public void ppcb0096() => CorpusAssert.Parses(@"DO $$ DECLARE curs2 CURSOR FOR SELECT id FROM s.t; i bigint; BEGIN OPEN curs2; FETCH FROM curs2; CLOSE curs2; END $$;", "error");
     [Fact]
@@ -555,22 +555,22 @@ DO $$ DECLARE curs2 CURSOR FOR SELECT id FROM s.t FOR UPDATE; i bigint; BEGIN OP
     public void ppcb0100() => CorpusAssert.Parses(@"DO $$ DECLARE r record; BEGIN FOR r IN SELECT id FROM s.t LOOP NULL; END LOOP; END $$;", "ok");
     [Fact]
     public void ppcb0101() => CorpusAssert.Parses(@"DO $$ DECLARE curs1 refcursor; i bigint; BEGIN OPEN curs1 FOR SELECT id FROM s.t; MOVE FORWARD ALL FROM curs1; FETCH LAST FROM curs1 INTO i; CLOSE curs1; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppcb0102() => CorpusAssert.Parses(@"DO $$ DECLARE curs1 SCROLL refcursor; BEGIN END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppcb0103() => CorpusAssert.Parses(@"DO $$ DECLARE curs2 CURSOR (k integer) FOR SELECT * FROM s.t WHERE id = k; r record; BEGIN OPEN curs2(k := 99); FOR r IN curs2(99) LOOP NULL; END LOOP; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppcb0104() => CorpusAssert.Parses(@"DO $$ DECLARE curs2 CURSOR FOR SELECT id FROM s.t; i bigint; BEGIN OPEN curs2; OPEN curs2; FETCH curs2 INTO i; CLOSE curs2; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppcb0105() => CorpusAssert.Parses(@"DO $$ DECLARE curs2 CURSOR FOR SELECT id FROM s.t; BEGIN CLOSE curs2; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppcb0106() => CorpusAssert.Parses(@"DO $$ DECLARE curs1 refcursor; i bigint; BEGIN OPEN curs1 FOR SELECT id FROM s.t; FETCH BACKWARD ALL FROM curs1 INTO i; CLOSE curs1; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppcb0107() => CorpusAssert.Parses(@"DO $$ DECLARE curs1 refcursor; i bigint; BEGIN OPEN curs1 SCROLL FOR SELECT id FROM s.t; FETCH BACKWARD ALL FROM curs1 INTO i; CLOSE curs1; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppcb0108() => CorpusAssert.Parses(@"DO $$ DECLARE curs2 CURSOR FOR SELECT id FROM s.t; i bigint; BEGIN OPEN curs2; FETCH ALL FROM curs2 INTO i; CLOSE curs2; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppcb0109() => CorpusAssert.Parses(@"DO $$ DECLARE curs3 CURSOR (k integer) FOR SELECT id FROM s.t WHERE id = k; r record; BEGIN FOR r IN curs3(key := 1) LOOP NULL; END LOOP; END $$;", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ppcb0102() => CorpusAssert.MatchesPostgres(@"DO $$ DECLARE curs1 SCROLL refcursor; BEGIN END $$;", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ppcb0103() => CorpusAssert.MatchesPostgres(@"DO $$ DECLARE curs2 CURSOR (k integer) FOR SELECT * FROM s.t WHERE id = k; r record; BEGIN OPEN curs2(k := 99); FOR r IN curs2(99) LOOP NULL; END LOOP; END $$;", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ppcb0104() => CorpusAssert.MatchesPostgres(@"DO $$ DECLARE curs2 CURSOR FOR SELECT id FROM s.t; i bigint; BEGIN OPEN curs2; OPEN curs2; FETCH curs2 INTO i; CLOSE curs2; END $$;", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ppcb0105() => CorpusAssert.MatchesPostgres(@"DO $$ DECLARE curs2 CURSOR FOR SELECT id FROM s.t; BEGIN CLOSE curs2; END $$;", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ppcb0106() => CorpusAssert.MatchesPostgres(@"DO $$ DECLARE curs1 refcursor; i bigint; BEGIN OPEN curs1 FOR SELECT id FROM s.t; FETCH BACKWARD ALL FROM curs1 INTO i; CLOSE curs1; END $$;", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ppcb0107() => CorpusAssert.MatchesPostgres(@"DO $$ DECLARE curs1 refcursor; i bigint; BEGIN OPEN curs1 SCROLL FOR SELECT id FROM s.t; FETCH BACKWARD ALL FROM curs1 INTO i; CLOSE curs1; END $$;", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ppcb0108() => CorpusAssert.MatchesPostgres(@"DO $$ DECLARE curs2 CURSOR FOR SELECT id FROM s.t; i bigint; BEGIN OPEN curs2; FETCH ALL FROM curs2 INTO i; CLOSE curs2; END $$;", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ppcb0109() => CorpusAssert.MatchesPostgres(@"DO $$ DECLARE curs3 CURSOR (k integer) FOR SELECT id FROM s.t WHERE id = k; r record; BEGIN FOR r IN curs3(key := 1) LOOP NULL; END LOOP; END $$;", "error", false);
     [Fact]
     public void ppcb0110() => CorpusAssert.Parses(@"DO $$ DECLARE curs2 CURSOR FOR SELECT id FROM s.t; BEGIN OPEN curs2; MOVE FORWARD ALL FROM curs2; CLOSE curs2; END $$;", "ok");
     [Fact]
@@ -579,18 +579,18 @@ DO $$ DECLARE curs2 CURSOR FOR SELECT id FROM s.t FOR UPDATE; i bigint; BEGIN OP
     public void ppcb0112() => CorpusAssert.Parses(@"DO $$ DECLARE curs2 CURSOR FOR SELECT id FROM s.t; i bigint; BEGIN OPEN curs2; MOVE FORWARD ALL FROM curs2; FETCH ABSOLUTE 1 FROM curs2 INTO i; CLOSE curs2; END $$;", "ok");
     [Fact]
     public void ppcb0113() => CorpusAssert.Parses(@"DO $$ DECLARE c1 refcursor; c2 refcursor; r1 record; r2 record; BEGIN OPEN c1 FOR SELECT id FROM s.t; OPEN c2 FOR SELECT name FROM s.t; FETCH c1 INTO r1; FETCH c2 INTO r2; CLOSE c1; CLOSE c2; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppcb0114() => CorpusAssert.Parses(@"DO $$ DECLARE curs2 CURSOR FOR SELECT id FROM s.t; i bigint; BEGIN OPEN curs2; FETCH FORWARD 100 FROM curs2 INTO i; CLOSE curs2; END $$;", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ppcb0114() => CorpusAssert.MatchesPostgres(@"DO $$ DECLARE curs2 CURSOR FOR SELECT id FROM s.t; i bigint; BEGIN OPEN curs2; FETCH FORWARD 100 FROM curs2 INTO i; CLOSE curs2; END $$;", "error", false);
     [Fact]
     public void ppcb0115() => CorpusAssert.Parses(@"DO $$ DECLARE curs1 refcursor; r record; BEGIN OPEN curs1 FOR SELECT id FROM s.t WHERE 1=0; FETCH curs1 INTO r; IF NOT FOUND THEN NULL; END IF; CLOSE curs1; END $$;", "ok");
     [Fact]
     public void ppcb0116() => CorpusAssert.Parses(@"DO $$ DECLARE curs2 CURSOR FOR SELECT id FROM s.t FOR UPDATE; i bigint; BEGIN OPEN curs2; FETCH curs2 INTO i; CLOSE curs2; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppcb0117() => CorpusAssert.Parses(@"DO $$ DECLARE curs2 SCROLL CURSOR FOR SELECT id FROM s.t FOR UPDATE; i bigint; BEGIN OPEN curs2; FETCH curs2 INTO i; CLOSE curs2; END $$;", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ppcb0117() => CorpusAssert.MatchesPostgres(@"DO $$ DECLARE curs2 SCROLL CURSOR FOR SELECT id FROM s.t FOR UPDATE; i bigint; BEGIN OPEN curs2; FETCH curs2 INTO i; CLOSE curs2; END $$;", "error", false);
     [Fact]
     public void ppcb0118() => CorpusAssert.Parses(@"DO $$ DECLARE curs1 refcursor; i bigint; BEGIN OPEN curs1 FOR SELECT id FROM s.t FOR UPDATE; FETCH curs1 INTO i; CLOSE curs1; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppcb0119() => CorpusAssert.Parses(@"DO $$ DECLARE curs1 refcursor; i bigint; BEGIN OPEN curs1 SCROLL FOR SELECT id FROM s.t FOR UPDATE; FETCH curs1 INTO i; CLOSE curs1; END $$;", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ppcb0119() => CorpusAssert.MatchesPostgres(@"DO $$ DECLARE curs1 refcursor; i bigint; BEGIN OPEN curs1 SCROLL FOR SELECT id FROM s.t FOR UPDATE; FETCH curs1 INTO i; CLOSE curs1; END $$;", "error", false);
     [Fact]
     public void ppcb0120() => CorpusAssert.Parses(@"DO $$ DECLARE curs1 refcursor; r record; BEGIN OPEN curs1 FOR SELECT id FROM s.v; FETCH curs1 INTO r; CLOSE curs1; END $$;", "ok");
     [Fact]
@@ -607,10 +607,10 @@ DO $$ DECLARE curs2 CURSOR FOR SELECT id FROM s.t FOR UPDATE; i bigint; BEGIN OP
     public void ppcb0126() => CorpusAssert.Parses(@"DO $$ DECLARE curs1 refcursor; r record; BEGIN OPEN curs1 FOR SELECT * FROM s.rows_f(); FETCH curs1 INTO r; CLOSE curs1; END $$;", "ok");
     [Fact]
     public void ppcb0127() => CorpusAssert.Parses(@"DO $$ DECLARE curs2 CURSOR FOR SELECT id FROM s.t; i bigint; BEGIN OPEN curs2; FETCH NEXT FROM curs2 INTO i, i; CLOSE curs2; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppcb0128() => CorpusAssert.Parses(@"DO $$ DECLARE curs2 NO SCROLL CURSOR FOR SELECT id FROM s.t; i bigint; BEGIN OPEN curs2; FETCH PRIOR FROM curs2 INTO i; CLOSE curs2; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppcb0129() => CorpusAssert.Parses(@"DO $$ DECLARE curs2 CURSOR FOR SELECT id FROM s.t; i bigint; BEGIN OPEN curs2; FETCH 1 FROM curs2 INTO i; CLOSE curs2; END $$;", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ppcb0128() => CorpusAssert.MatchesPostgres(@"DO $$ DECLARE curs2 NO SCROLL CURSOR FOR SELECT id FROM s.t; i bigint; BEGIN OPEN curs2; FETCH PRIOR FROM curs2 INTO i; CLOSE curs2; END $$;", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ppcb0129() => CorpusAssert.MatchesPostgres(@"DO $$ DECLARE curs2 CURSOR FOR SELECT id FROM s.t; i bigint; BEGIN OPEN curs2; FETCH 1 FROM curs2 INTO i; CLOSE curs2; END $$;", "error", false);
     [Fact]
     public void ppcb0130() => CorpusAssert.Parses(@"DO $$ DECLARE curs2 CURSOR FOR SELECT id FROM s.t; i bigint; BEGIN OPEN curs2; FETCH ABSOLUTE FROM curs2 INTO i; CLOSE curs2; END $$;", "error");
 }

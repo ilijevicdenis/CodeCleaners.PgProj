@@ -309,40 +309,40 @@ public class Corpus_GrantRevoke
     public void grva0151() => CorpusAssert.Parses(@"GRANT SELECT ON TABLE", "error");
     [Fact]
     public void grva0152() => CorpusAssert.Parses(@"GRANT ON TABLE s.t TO PUBLIC", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void grva0153() => CorpusAssert.Parses(@"GRANT SELECT TABLE s.t TO PUBLIC", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task grva0153() => CorpusAssert.MatchesPostgres(@"GRANT SELECT TABLE s.t TO PUBLIC", "error", false);
     [Fact]
     public void grva0154() => CorpusAssert.Parses(@"GRANT SELECT ON TABLE s.t", "error");
     [Fact]
     public void grva0155() => CorpusAssert.Parses(@"GRANT SELECT ON TABLE s.t TO", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void grva0156() => CorpusAssert.Parses(@"GRANT SELECT ON s.no_such_table TO PUBLIC", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void grva0157() => CorpusAssert.Parses(@"GRANT BOGUSPRIVILEGE ON TABLE s.t TO PUBLIC", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void grva0158() => CorpusAssert.Parses(@"GRANT DELETE(name) ON TABLE s.t TO PUBLIC", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void grva0159() => CorpusAssert.Parses(@"GRANT SELECT ON SEQUENCE s.no_such_seq TO PUBLIC", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void grva0160() => CorpusAssert.Parses(@"GRANT EXECUTE ON FUNCTION s.f(integer) TO PUBLIC WITH ADMIN OPTION", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task grva0156() => CorpusAssert.MatchesPostgres(@"GRANT SELECT ON s.no_such_table TO PUBLIC", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task grva0157() => CorpusAssert.MatchesPostgres(@"GRANT BOGUSPRIVILEGE ON TABLE s.t TO PUBLIC", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task grva0158() => CorpusAssert.MatchesPostgres(@"GRANT DELETE(name) ON TABLE s.t TO PUBLIC", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task grva0159() => CorpusAssert.MatchesPostgres(@"GRANT SELECT ON SEQUENCE s.no_such_seq TO PUBLIC", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task grva0160() => CorpusAssert.MatchesPostgres(@"GRANT EXECUTE ON FUNCTION s.f(integer) TO PUBLIC WITH ADMIN OPTION", "error", false);
     [Fact]
     public void grva0161() => CorpusAssert.Parses(@"REVOKE SELECT ON TABLE s.t FROM", "error");
     [Fact]
     public void grva0162() => CorpusAssert.Parses(@"REVOKE SELECT ON TABLE s.t", "error");
     [Fact]
     public void grva0163() => CorpusAssert.Parses(@"REVOKE ON TABLE s.t FROM PUBLIC", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void grva0164() => CorpusAssert.Parses(@"GRANT SELECT ON SCHEMA s TO PUBLIC WITH ADMIN OPTION", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void grva0165() => CorpusAssert.Parses(@"ALTER DEFAULT PRIVILEGES GRANT SELECT ON TABLE s.t TO PUBLIC", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void grva0166() => CorpusAssert.Parses(@"ALTER DEFAULT PRIVILEGES GRANT ON TABLES TO PUBLIC", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void grva0167() => CorpusAssert.Parses(@"GRANT USAGE ON FOREIGN DATA WRAPPER postgres_fdw TO PUBLIC", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void grva0168() => CorpusAssert.Parses(@"GRANT USAGE, CREATE ON SEQUENCE s.seq TO PUBLIC", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void grva0169() => CorpusAssert.Parses(@"GRANT CONNECT ON TABLE s.t TO PUBLIC", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task grva0164() => CorpusAssert.MatchesPostgres(@"GRANT SELECT ON SCHEMA s TO PUBLIC WITH ADMIN OPTION", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task grva0165() => CorpusAssert.MatchesPostgres(@"ALTER DEFAULT PRIVILEGES GRANT SELECT ON TABLE s.t TO PUBLIC", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task grva0166() => CorpusAssert.MatchesPostgres(@"ALTER DEFAULT PRIVILEGES GRANT ON TABLES TO PUBLIC", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task grva0167() => CorpusAssert.MatchesPostgres(@"GRANT USAGE ON FOREIGN DATA WRAPPER postgres_fdw TO PUBLIC", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task grva0168() => CorpusAssert.MatchesPostgres(@"GRANT USAGE, CREATE ON SEQUENCE s.seq TO PUBLIC", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task grva0169() => CorpusAssert.MatchesPostgres(@"GRANT CONNECT ON TABLE s.t TO PUBLIC", "error", false);
     [Fact]
     public void grva0170() => CorpusAssert.Parses(@"REVOKE GRANT OPTION FOR SELECT ON TABLE s.t FROM", "error");
     [Fact]
@@ -493,9 +493,9 @@ GRANT SELECT ON s.t TO grvb_r4, grvb_r5", "ok");
     [Fact]
     public void grvb0070() => CorpusAssert.Parses(@"CREATE ROLE grvb_r6;
 GRANT SELECT ON s.t TO PUBLIC, grvb_r6", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void grvb0071() => CorpusAssert.Parses(@"CREATE ROLE grvb_r7;
-GRANT grvb_r7 TO PUBLIC", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task grvb0071() => CorpusAssert.MatchesPostgres(@"CREATE ROLE grvb_r7;
+GRANT grvb_r7 TO PUBLIC", "error", false);
     [Fact]
     public void grvb0072() => CorpusAssert.Parses(@"CREATE ROLE grvb_r8;
 CREATE ROLE grvb_r9;
@@ -620,18 +620,18 @@ REVOKE ADMIN OPTION FOR grvb_rn FROM grvb_ro", "ok");
     public void grvb0122() => CorpusAssert.Parses(@"ALTER DEFAULT PRIVILEGES IN SCHEMA s REVOKE SELECT ON TABLES FROM PUBLIC", "ok");
     [Fact]
     public void grvb0123() => CorpusAssert.Parses(@"ALTER DEFAULT PRIVILEGES REVOKE GRANT OPTION FOR SELECT ON TABLES FROM PUBLIC", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void grvb0124() => CorpusAssert.Parses(@"GRANT BOGUSPRIVILEGE ON s.t TO PUBLIC", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task grvb0124() => CorpusAssert.MatchesPostgres(@"GRANT BOGUSPRIVILEGE ON s.t TO PUBLIC", "error", false);
     [Fact]
     public void grvb0125() => CorpusAssert.Parses(@"GRANT SELECT ON s.t", "error");
     [Fact]
     public void grvb0126() => CorpusAssert.Parses(@"GRANT ON s.t TO PUBLIC", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void grvb0127() => CorpusAssert.Parses(@"GRANT SELECT s.t TO PUBLIC", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task grvb0127() => CorpusAssert.MatchesPostgres(@"GRANT SELECT s.t TO PUBLIC", "error", false);
     [Fact]
     public void grvb0128() => CorpusAssert.Parses(@"REVOKE SELECT ON s.t", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void grvb0129() => CorpusAssert.Parses(@"GRANT SELECT ON NONEXISTENT_TABLE TO PUBLIC", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void grvb0130() => CorpusAssert.Parses(@"REVOKE SELECT ON NONEXISTENT_TABLE FROM PUBLIC", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task grvb0129() => CorpusAssert.MatchesPostgres(@"GRANT SELECT ON NONEXISTENT_TABLE TO PUBLIC", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task grvb0130() => CorpusAssert.MatchesPostgres(@"REVOKE SELECT ON NONEXISTENT_TABLE FROM PUBLIC", "error", false);
 }

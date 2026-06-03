@@ -182,29 +182,29 @@ ALTER TYPE s.c26 ALTER ATTRIBUTE x TYPE text COLLATE ""C""", "ok");
     public void tyeca0068() => CorpusAssert.Parses(@"CREATE TYPE s.bad_comp2 AS (integer)", "error");
     [Fact]
     public void tyeca0069() => CorpusAssert.Parses(@"CREATE TYPE s.bad_comp3 (x integer)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyeca0070() => CorpusAssert.Parses(@"ALTER TYPE s.nonexistent_type ADD VALUE 'x'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyeca0071() => CorpusAssert.Parses(@"CREATE TYPE s.e12 AS ENUM ('a', 'b');
-ALTER TYPE s.e12 ADD VALUE 'a'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyeca0072() => CorpusAssert.Parses(@"CREATE TYPE s.e13 AS ENUM ('a', 'b');
-ALTER TYPE s.e13 ADD VALUE 'c' BEFORE 'z'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyeca0073() => CorpusAssert.Parses(@"CREATE TYPE s.e14 AS ENUM ('a', 'b');
-ALTER TYPE s.e14 ADD VALUE 'c' AFTER 'z'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyeca0074() => CorpusAssert.Parses(@"CREATE TYPE s.e15 AS ENUM ('a', 'b');
-ALTER TYPE s.e15 RENAME VALUE 'x' TO 'y'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyeca0075() => CorpusAssert.Parses(@"CREATE TYPE s.e16 AS ENUM ('a', 'b');
-ALTER TYPE s.e16 RENAME VALUE 'a' TO 'b'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyeca0076() => CorpusAssert.Parses(@"CREATE TYPE s.c27 AS (x integer);
-ALTER TYPE s.c27 DROP ATTRIBUTE nonexistent", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyeca0077() => CorpusAssert.Parses(@"CREATE TYPE s.c28 AS (x integer);
-ALTER TYPE s.c28 ADD ATTRIBUTE x text", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task tyeca0070() => CorpusAssert.MatchesPostgres(@"ALTER TYPE s.nonexistent_type ADD VALUE 'x'", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tyeca0071() => CorpusAssert.MatchesPostgres(@"CREATE TYPE s.e12 AS ENUM ('a', 'b');
+ALTER TYPE s.e12 ADD VALUE 'a'", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tyeca0072() => CorpusAssert.MatchesPostgres(@"CREATE TYPE s.e13 AS ENUM ('a', 'b');
+ALTER TYPE s.e13 ADD VALUE 'c' BEFORE 'z'", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tyeca0073() => CorpusAssert.MatchesPostgres(@"CREATE TYPE s.e14 AS ENUM ('a', 'b');
+ALTER TYPE s.e14 ADD VALUE 'c' AFTER 'z'", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tyeca0074() => CorpusAssert.MatchesPostgres(@"CREATE TYPE s.e15 AS ENUM ('a', 'b');
+ALTER TYPE s.e15 RENAME VALUE 'x' TO 'y'", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tyeca0075() => CorpusAssert.MatchesPostgres(@"CREATE TYPE s.e16 AS ENUM ('a', 'b');
+ALTER TYPE s.e16 RENAME VALUE 'a' TO 'b'", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tyeca0076() => CorpusAssert.MatchesPostgres(@"CREATE TYPE s.c27 AS (x integer);
+ALTER TYPE s.c27 DROP ATTRIBUTE nonexistent", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tyeca0077() => CorpusAssert.MatchesPostgres(@"CREATE TYPE s.c28 AS (x integer);
+ALTER TYPE s.c28 ADD ATTRIBUTE x text", "error", false);
     [Fact]
     public void tyeca0078() => CorpusAssert.Parses(@"ALTER TYPE s.mood ADD VALUE 'ecstatic'", "ok");
     [Fact]
@@ -358,18 +358,18 @@ ALTER TYPE s.e29 ADD VALUE '' AFTER 'a'", "ok");
     [Fact]
     public void tyeca0133() => CorpusAssert.Parses(@"CREATE TYPE s.e30 AS ENUM ('a');
 ALTER TYPE s.e30 ADD VALUE 'b' BEFORE 'a' AFTER 'a'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyeca0134() => CorpusAssert.Parses(@"CREATE TYPE s.c49 AS (x integer);
-ALTER TYPE s.c49 ALTER ATTRIBUTE x TYPE nonexistent_type_xyz", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task tyeca0134() => CorpusAssert.MatchesPostgres(@"CREATE TYPE s.c49 AS (x integer);
+ALTER TYPE s.c49 ALTER ATTRIBUTE x TYPE nonexistent_type_xyz", "error", false);
     [Fact]
     public void tyeca0135() => CorpusAssert.Parses(@"CREATE TYPE s.e31 AS ENUM ('a', 'b');
 ALTER TYPE s.e31 ADD VALUE 'c' BEFORE", "error");
     [Fact]
     public void tyeca0136() => CorpusAssert.Parses(@"CREATE TYPE s.e32 AS ENUM ('a', 'b');
 ALTER TYPE s.e32 ADD VALUE 'c' AFTER", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyeca0137() => CorpusAssert.Parses(@"CREATE TYPE s.c50 AS (x integer);
-ALTER TYPE s.c50 SET SCHEMA nonexistent_schema_xyz", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task tyeca0137() => CorpusAssert.MatchesPostgres(@"CREATE TYPE s.c50 AS (x integer);
+ALTER TYPE s.c50 SET SCHEMA nonexistent_schema_xyz", "error", false);
     [Fact]
     public void tyeca0138() => CorpusAssert.Parses(@"CREATE TYPE s.schcomp AS (x integer);
 ALTER TYPE s.schcomp SET SCHEMA s", "ok");
@@ -377,12 +377,12 @@ ALTER TYPE s.schcomp SET SCHEMA s", "ok");
     public void tyeca0139() => CorpusAssert.Parses(@"CREATE TYPE s.e33 AS ENUM ('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j')", "ok");
     [Fact]
     public void tyeca0140() => CorpusAssert.Parses(@"CREATE TYPE s.big_comp AS (f1 integer, f2 text, f3 boolean, f4 float8, f5 numeric(10,2), f6 date, f7 timestamptz, f8 jsonb, f9 uuid, f10 text[])", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyeca0141() => CorpusAssert.Parses(@"CREATE TYPE s.e34 AS ENUM ('a');
-ALTER TYPE s.e34 RENAME VALUE 'a' TO 'a'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyeca0142() => CorpusAssert.Parses(@"CREATE TYPE s.c51 AS (x integer);
-ALTER TYPE s.c51 RENAME ATTRIBUTE x TO x", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task tyeca0141() => CorpusAssert.MatchesPostgres(@"CREATE TYPE s.e34 AS ENUM ('a');
+ALTER TYPE s.e34 RENAME VALUE 'a' TO 'a'", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tyeca0142() => CorpusAssert.MatchesPostgres(@"CREATE TYPE s.c51 AS (x integer);
+ALTER TYPE s.c51 RENAME ATTRIBUTE x TO x", "error", false);
     [Fact]
     public void tyeca0143() => CorpusAssert.Parses(@"CREATE TYPE s.e35 AS ENUM ('a', 'b');
 ALTER TYPE s.e35 ADD VALUE IF NOT EXISTS 'a' BEFORE 'b'", "ok");
@@ -444,10 +444,10 @@ ALTER TYPE s.c59 RENAME ATTRIBUTE x TO a, RENAME ATTRIBUTE y TO b", "error");
 ALTER TYPE s.c60 OWNER TO SESSION_USER;
 ALTER TYPE s.c60 RENAME TO c60_new;
 ALTER TYPE s.c60_new SET SCHEMA public", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyeca0161() => CorpusAssert.Parses(@"CREATE TYPE s.e43 AS ENUM ('low', 'high');
+    [DbFact]
+    public System.Threading.Tasks.Task tyeca0161() => CorpusAssert.MatchesPostgres(@"CREATE TYPE s.e43 AS ENUM ('low', 'high');
 ALTER TYPE s.e43 RENAME VALUE 'low' TO 'LOW';
-ALTER TYPE s.e43 ADD VALUE 'medium' BEFORE 'HIGH'", "error");
+ALTER TYPE s.e43 ADD VALUE 'medium' BEFORE 'HIGH'", "error", false);
     [Fact]
     public void tyeca0162() => CorpusAssert.Parses(@"CREATE TYPE s.c61 AS (x integer);
 ALTER TYPE s.c61 DROP ATTRIBUTE IF EXISTS x;
@@ -625,12 +625,12 @@ ALTER TYPE mycomp17 ALTER ATTRIBUTE x TYPE bigint RESTRICT", "ok");
     public void tyecb0055() => CorpusAssert.Parses(@"CREATE TYPE mycomp_bad AS (a integer, b)", "error");
     [Fact]
     public void tyecb0056() => CorpusAssert.Parses(@"CREATE TYPE mycomp_bad2 AS (integer)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyecb0057() => CorpusAssert.Parses(@"CREATE TYPE s.mood AS ENUM ('x')", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyecb0058() => CorpusAssert.Parses(@"CREATE TYPE s.addr AS (x int)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyecb0059() => CorpusAssert.Parses(@"ALTER TYPE nonexistent_type999 ADD VALUE 'x'", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task tyecb0057() => CorpusAssert.MatchesPostgres(@"CREATE TYPE s.mood AS ENUM ('x')", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tyecb0058() => CorpusAssert.MatchesPostgres(@"CREATE TYPE s.addr AS (x int)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tyecb0059() => CorpusAssert.MatchesPostgres(@"ALTER TYPE nonexistent_type999 ADD VALUE 'x'", "error", false);
     [Fact]
     public void tyecb0060() => CorpusAssert.Parses(@"ALTER TYPE s.mood ADD VALUE 'excited'", "ok");
     [Fact]
@@ -652,30 +652,30 @@ ALTER TYPE alterable_comp ALTER ATTRIBUTE city TYPE varchar(200)", "ok");
     public void tyecb0068() => CorpusAssert.Parses(@"ALTER TYPE s.mood ADD VALUE", "error");
     [Fact]
     public void tyecb0069() => CorpusAssert.Parses(@"ALTER TYPE s.mood RENAME VALUE 'sad' TO", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyecb0070() => CorpusAssert.Parses(@"ALTER TYPE s.mood DROP ATTRIBUTE street", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyecb0071() => CorpusAssert.Parses(@"ALTER TYPE s.addr ADD VALUE 'new_val'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyecb0072() => CorpusAssert.Parses(@"ALTER TYPE s.mood RENAME VALUE 'nonexistent' TO 'other'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyecb0073() => CorpusAssert.Parses(@"CREATE TYPE myenum10 AS ENUM ('a');
-ALTER TYPE myenum10 ADD VALUE 'a';", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyecb0074() => CorpusAssert.Parses(@"CREATE TYPE myenum11 AS ENUM ('a', 'b');
-ALTER TYPE myenum11 RENAME VALUE 'z' TO 'x';", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyecb0075() => CorpusAssert.Parses(@"CREATE TYPE mycomp18 AS (x integer);
-ALTER TYPE mycomp18 DROP ATTRIBUTE nonexistent", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyecb0076() => CorpusAssert.Parses(@"CREATE TYPE mycomp19 AS (x integer);
-ALTER TYPE mycomp19 RENAME ATTRIBUTE nonexistent TO newname", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyecb0077() => CorpusAssert.Parses(@"CREATE TYPE myenum_before AS ENUM ('a', 'b');
-ALTER TYPE myenum_before ADD VALUE 'c' BEFORE 'nonexistent';", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tyecb0078() => CorpusAssert.Parses(@"CREATE TYPE myenum_after AS ENUM ('a', 'b');
-ALTER TYPE myenum_after ADD VALUE 'c' AFTER 'nonexistent';", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task tyecb0070() => CorpusAssert.MatchesPostgres(@"ALTER TYPE s.mood DROP ATTRIBUTE street", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tyecb0071() => CorpusAssert.MatchesPostgres(@"ALTER TYPE s.addr ADD VALUE 'new_val'", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tyecb0072() => CorpusAssert.MatchesPostgres(@"ALTER TYPE s.mood RENAME VALUE 'nonexistent' TO 'other'", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tyecb0073() => CorpusAssert.MatchesPostgres(@"CREATE TYPE myenum10 AS ENUM ('a');
+ALTER TYPE myenum10 ADD VALUE 'a';", "error", true);
+    [DbFact]
+    public System.Threading.Tasks.Task tyecb0074() => CorpusAssert.MatchesPostgres(@"CREATE TYPE myenum11 AS ENUM ('a', 'b');
+ALTER TYPE myenum11 RENAME VALUE 'z' TO 'x';", "error", true);
+    [DbFact]
+    public System.Threading.Tasks.Task tyecb0075() => CorpusAssert.MatchesPostgres(@"CREATE TYPE mycomp18 AS (x integer);
+ALTER TYPE mycomp18 DROP ATTRIBUTE nonexistent", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tyecb0076() => CorpusAssert.MatchesPostgres(@"CREATE TYPE mycomp19 AS (x integer);
+ALTER TYPE mycomp19 RENAME ATTRIBUTE nonexistent TO newname", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tyecb0077() => CorpusAssert.MatchesPostgres(@"CREATE TYPE myenum_before AS ENUM ('a', 'b');
+ALTER TYPE myenum_before ADD VALUE 'c' BEFORE 'nonexistent';", "error", true);
+    [DbFact]
+    public System.Threading.Tasks.Task tyecb0078() => CorpusAssert.MatchesPostgres(@"CREATE TYPE myenum_after AS ENUM ('a', 'b');
+ALTER TYPE myenum_after ADD VALUE 'c' AFTER 'nonexistent';", "error", true);
     [Fact]
     public void tyecb0079() => CorpusAssert.Parses(@"CREATE TYPE comp_quoted AS (""First Name"" text, ""Last Name"" text)", "ok");
     [Fact]

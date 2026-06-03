@@ -71,30 +71,30 @@ public class Corpus_Merge
     public void mrga0032() => CorpusAssert.Parses(@"MERGE s.t USING s.t2 ON s.t.id = s.t2.t_id WHEN MATCHED THEN DELETE", "error");
     [Fact]
     public void mrga0033() => CorpusAssert.Parses(@"MERGE INTO s.t USING s.t2 WHEN MATCHED THEN DELETE", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void mrga0034() => CorpusAssert.Parses(@"MERGE INTO s.t AS tgt USING s.t2 AS src ON tgt.id = src.t_id WHEN MATCHED THEN INSERT (name) VALUES ('x')", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task mrga0034() => CorpusAssert.MatchesPostgres(@"MERGE INTO s.t AS tgt USING s.t2 AS src ON tgt.id = src.t_id WHEN MATCHED THEN INSERT (name) VALUES ('x')", "error", false);
     [Fact]
     public void mrga0035() => CorpusAssert.Parses(@"MERGE INTO s.t AS tgt USING s.t2 AS src ON tgt.id = src.t_id WHEN THEN UPDATE SET name = 'x'", "error");
     [Fact]
     public void mrga0036() => CorpusAssert.Parses(@"MERGE INTO s.t AS tgt USING s.t2 AS src ON tgt.id = src.t_id WHEN MATCHED UPDATE SET name = 'x'", "error");
     [Fact]
     public void mrga0037() => CorpusAssert.Parses(@"MERGE INTO s.t AS tgt USING s.t2 AS src ON tgt.id = src.t_id WHEN MATCHED THEN UPDATE name = 'x'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void mrga0038() => CorpusAssert.Parses(@"MERGE INTO s.t AS tgt USING s.t2 AS src ON tgt.id = src.t_id WHEN NOT MATCHED THEN UPDATE SET name = 'x'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void mrga0039() => CorpusAssert.Parses(@"MERGE INTO s.t AS tgt USING s.t2 AS src ON tgt.id = src.t_id WHEN NOT MATCHED THEN DELETE", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void mrga0040() => CorpusAssert.Parses(@"MERGE INTO s.t AS tgt USING s.t2 AS src ON tgt.id = src.t_id WHEN NOT MATCHED BY TARGET THEN UPDATE SET name = 'x'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void mrga0041() => CorpusAssert.Parses(@"MERGE INTO s.t AS tgt USING s.t2 AS src ON tgt.id = src.t_id WHEN NOT MATCHED BY TARGET THEN DELETE", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void mrga0042() => CorpusAssert.Parses(@"MERGE INTO s.t AS tgt USING s.t2 AS src ON tgt.id = src.t_id WHEN NOT MATCHED BY SOURCE THEN INSERT (name) VALUES ('x')", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void mrga0043() => CorpusAssert.Parses(@"MERGE INTO s.t AS tgt USING s.t2 AS src ON tgt.id = src.t_id WHEN MATCHED THEN UPDATE SET name = src.label WHEN MATCHED THEN DELETE", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void mrga0044() => CorpusAssert.Parses(@"MERGE INTO s.t AS tgt USING s.t2 AS src ON tgt.id = src.t_id WHEN NOT MATCHED THEN INSERT (name) VALUES (src.label) WHEN NOT MATCHED THEN DO NOTHING", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void mrga0045() => CorpusAssert.Parses(@"MERGE INTO s.t AS tgt USING s.t2 AS src ON tgt.id = src.t_id WHEN NOT MATCHED BY SOURCE THEN DELETE WHEN NOT MATCHED BY SOURCE THEN DO NOTHING", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task mrga0038() => CorpusAssert.MatchesPostgres(@"MERGE INTO s.t AS tgt USING s.t2 AS src ON tgt.id = src.t_id WHEN NOT MATCHED THEN UPDATE SET name = 'x'", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task mrga0039() => CorpusAssert.MatchesPostgres(@"MERGE INTO s.t AS tgt USING s.t2 AS src ON tgt.id = src.t_id WHEN NOT MATCHED THEN DELETE", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task mrga0040() => CorpusAssert.MatchesPostgres(@"MERGE INTO s.t AS tgt USING s.t2 AS src ON tgt.id = src.t_id WHEN NOT MATCHED BY TARGET THEN UPDATE SET name = 'x'", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task mrga0041() => CorpusAssert.MatchesPostgres(@"MERGE INTO s.t AS tgt USING s.t2 AS src ON tgt.id = src.t_id WHEN NOT MATCHED BY TARGET THEN DELETE", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task mrga0042() => CorpusAssert.MatchesPostgres(@"MERGE INTO s.t AS tgt USING s.t2 AS src ON tgt.id = src.t_id WHEN NOT MATCHED BY SOURCE THEN INSERT (name) VALUES ('x')", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task mrga0043() => CorpusAssert.MatchesPostgres(@"MERGE INTO s.t AS tgt USING s.t2 AS src ON tgt.id = src.t_id WHEN MATCHED THEN UPDATE SET name = src.label WHEN MATCHED THEN DELETE", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task mrga0044() => CorpusAssert.MatchesPostgres(@"MERGE INTO s.t AS tgt USING s.t2 AS src ON tgt.id = src.t_id WHEN NOT MATCHED THEN INSERT (name) VALUES (src.label) WHEN NOT MATCHED THEN DO NOTHING", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task mrga0045() => CorpusAssert.MatchesPostgres(@"MERGE INTO s.t AS tgt USING s.t2 AS src ON tgt.id = src.t_id WHEN NOT MATCHED BY SOURCE THEN DELETE WHEN NOT MATCHED BY SOURCE THEN DO NOTHING", "error", false);
     [Fact]
     public void mrga0046() => CorpusAssert.Parses(@"MERGE INTO s.t AS tgt USING s.t2 AS src ON tgt.id = src.t_id WHEN MATCHED THEN UPDATE SET name = src.label ORDER BY tgt.id", "error");
     [Fact]
@@ -103,8 +103,8 @@ public class Corpus_Merge
     public void mrga0048() => CorpusAssert.Parses(@"MERGE INTO s.t AS tgt USING s.t2 AS src ON tgt.id = src.t_id WHEN MATCHED THEN UPDATE SET name = src.label WHERE tgt.qty > 0", "error");
     [Fact]
     public void mrga0049() => CorpusAssert.Parses(@"MERGE INTO s.t AS tgt USING s.t2 AS src ON tgt.id = src.t_id WHEN MATCHED THEN UPDATE s.t SET name = src.label", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void mrga0050() => CorpusAssert.Parses(@"MERGE INTO s.mv AS tgt USING s.t2 AS src ON tgt.id = src.t_id WHEN MATCHED THEN UPDATE SET status = 'ok'", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task mrga0050() => CorpusAssert.MatchesPostgres(@"MERGE INTO s.mv AS tgt USING s.t2 AS src ON tgt.id = src.t_id WHEN MATCHED THEN UPDATE SET status = 'ok'", "error", false);
     [Fact]
     public void mrga0051() => CorpusAssert.Parses(@"MERGE INTO s.t AS tgt USING s.t2 AS src ON tgt.id = src.t_id WHEN MATCHED THEN UPDATE SET name = src.label RETURNING WITH (OLD AS o, NEW AS n) *", "ok");
     [Fact]
@@ -185,26 +185,26 @@ public class Corpus_Merge
     public void mrga0089() => CorpusAssert.Parses(@"MERGE INTO s.t AS tgt USING s.t2 AS src ON tgt.id = src.t_id WHEN MATCHED THEN UPDATE SET val = CASE WHEN src.amount > 0 THEN src.amount ELSE 0 END", "ok");
     [Fact]
     public void mrga0090() => CorpusAssert.Parses(@"MERGE INTO s.t AS tgt USING s.t2 AS src ON tgt.id = src.t_id WHEN NOT MATCHED THEN INSERT (name, val) VALUES (COALESCE(src.label, 'unknown'), src.amount)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void mrga0091() => CorpusAssert.Parses(@"MERGE INTO s.t AS tgt USING s.t2 AS src ON tgt.id = src.t_id WHEN MATCHED THEN UPDATE SET name = src.label WHEN MATCHED AND tgt.qty = 0 THEN DELETE", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void mrga0092() => CorpusAssert.Parses(@"MERGE INTO s.t AS tgt USING s.t2 AS src ON tgt.id = src.t_id WHEN NOT MATCHED THEN DO NOTHING WHEN NOT MATCHED THEN INSERT (name) VALUES (src.label)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void mrga0093() => CorpusAssert.Parses(@"MERGE INTO s.t AS tgt USING s.t2 AS src ON tgt.id = src.t_id WHEN NOT MATCHED BY SOURCE THEN DO NOTHING WHEN NOT MATCHED BY SOURCE THEN DELETE", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task mrga0091() => CorpusAssert.MatchesPostgres(@"MERGE INTO s.t AS tgt USING s.t2 AS src ON tgt.id = src.t_id WHEN MATCHED THEN UPDATE SET name = src.label WHEN MATCHED AND tgt.qty = 0 THEN DELETE", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task mrga0092() => CorpusAssert.MatchesPostgres(@"MERGE INTO s.t AS tgt USING s.t2 AS src ON tgt.id = src.t_id WHEN NOT MATCHED THEN DO NOTHING WHEN NOT MATCHED THEN INSERT (name) VALUES (src.label)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task mrga0093() => CorpusAssert.MatchesPostgres(@"MERGE INTO s.t AS tgt USING s.t2 AS src ON tgt.id = src.t_id WHEN NOT MATCHED BY SOURCE THEN DO NOTHING WHEN NOT MATCHED BY SOURCE THEN DELETE", "error", false);
     [Fact]
     public void mrga0094() => CorpusAssert.Parses(@"MERGE INTO s.t AS tgt USING s.t2 AS src ON tgt.id = src.t_id WHEN MATCHED THEN UPDATE SET name = 'x' WHEN NOT MATCHED THEN INSERT WHEN NOT MATCHED THEN DO NOTHING", "error");
     [Fact]
     public void mrga0095() => CorpusAssert.Parses(@"MERGE INTO s.t AS tgt USING s.t2 AS src ON tgt.id = src.t_id WHEN NOT MATCHED THEN INSERT (name, val) VALUES (src.label, src.amount), ('other', 1.0)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void mrga0096() => CorpusAssert.Parses(@"MERGE INTO s.t AS tgt USING s.t2 AS src ON tgt.id = src.t_id WHEN MATCHED THEN UPDATE SET name = src.label RETURNING WITH (BOTH AS b) b.name", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task mrga0096() => CorpusAssert.MatchesPostgres(@"MERGE INTO s.t AS tgt USING s.t2 AS src ON tgt.id = src.t_id WHEN MATCHED THEN UPDATE SET name = src.label RETURNING WITH (BOTH AS b) b.name", "error", false);
     [Fact]
     public void mrga0097() => CorpusAssert.Parses(@"MERGE INTO s.t AS tgt USING s.t2 AS src ON tgt.id = src.t_id WHEN MATCHED THEN UPDATE SET name = src.label RETURNING OLD.name", "ok");
     [Fact]
     public void mrga0098() => CorpusAssert.Parses(@"MERGE INTO s.t AS tgt USING s.t2 AS src ON tgt.id = src.t_id WHEN MATCHED THEN UPDATE SET name = src.label RETURNING NEW.name", "ok");
     [Fact]
     public void mrga0099() => CorpusAssert.Parses(@"MERGE INTO s.t AS tgt USING s.t2 AS src ON tgt.id = src.t_id WHEN MATCHED THEN UPDATE SET name = src.label RETURNING OLD.*, NEW.*", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void mrga0100() => CorpusAssert.Parses(@"WITH RECURSIVE r AS (SELECT * FROM s.t2) MERGE INTO s.t AS tgt USING r AS src ON tgt.id = src.t_id WHEN MATCHED THEN DELETE", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task mrga0100() => CorpusAssert.MatchesPostgres(@"WITH RECURSIVE r AS (SELECT * FROM s.t2) MERGE INTO s.t AS tgt USING r AS src ON tgt.id = src.t_id WHEN MATCHED THEN DELETE", "error", false);
     [Fact]
     public void mrga0101() => CorpusAssert.Parses(@"MERGE INTO s.t AS tgt USING s.t2 AS src ON tgt.id = src.t_id WHEN NOT MATCHED THEN INSERT (id, name) OVERRIDING SYSTEM VALUE VALUES (999, src.label)", "ok");
     [Fact]
@@ -243,16 +243,16 @@ public class Corpus_Merge
     public void mrga0118() => CorpusAssert.Parses(@"MERGE INTO s.t AS tgt USING s.t2 AS src ON tgt.id = src.t_id WHEN MATCHED THEN UPDATE SET name = src.label RETURNING *; SELECT 1", "ok");
     [Fact]
     public void mrga0119() => CorpusAssert.Parses(@"MERGE INTO s.t AS tgt USING s.t2 AS src ON tgt.id = src.t_id WHEN MATCHED THEN UPDATE SET id = src.t_id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void mrga0120() => CorpusAssert.Parses(@"MERGE INTO s.t AS tgt USING s.t2 AS src ON tgt.id = src.t_id WHEN MATCHED THEN UPDATE SET name = src.label, name = src.label", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void mrga0121() => CorpusAssert.Parses(@"MERGE INTO s.t AS tgt USING s.t2 AS src ON tgt.id = src.t_id WHEN NOT MATCHED THEN INSERT (name, name) VALUES ('a', 'b')", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void mrga0122() => CorpusAssert.Parses(@"MERGE INTO s.t AS tgt USING s.t2 AS src ON tgt.id = src.t_id WHEN MATCHED THEN UPDATE SET nonexistent_col = 'x'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void mrga0123() => CorpusAssert.Parses(@"MERGE INTO s.t AS tgt USING s.t2 AS src ON tgt.id = src.t_id WHEN NOT MATCHED THEN INSERT (nonexistent_col) VALUES ('x')", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void mrga0124() => CorpusAssert.Parses(@"MERGE INTO s.t AS tgt USING s.t2 AS src ON tgt.id = src.t_id WHEN MATCHED THEN UPDATE SET name = src.nonexistent", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task mrga0120() => CorpusAssert.MatchesPostgres(@"MERGE INTO s.t AS tgt USING s.t2 AS src ON tgt.id = src.t_id WHEN MATCHED THEN UPDATE SET name = src.label, name = src.label", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task mrga0121() => CorpusAssert.MatchesPostgres(@"MERGE INTO s.t AS tgt USING s.t2 AS src ON tgt.id = src.t_id WHEN NOT MATCHED THEN INSERT (name, name) VALUES ('a', 'b')", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task mrga0122() => CorpusAssert.MatchesPostgres(@"MERGE INTO s.t AS tgt USING s.t2 AS src ON tgt.id = src.t_id WHEN MATCHED THEN UPDATE SET nonexistent_col = 'x'", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task mrga0123() => CorpusAssert.MatchesPostgres(@"MERGE INTO s.t AS tgt USING s.t2 AS src ON tgt.id = src.t_id WHEN NOT MATCHED THEN INSERT (nonexistent_col) VALUES ('x')", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task mrga0124() => CorpusAssert.MatchesPostgres(@"MERGE INTO s.t AS tgt USING s.t2 AS src ON tgt.id = src.t_id WHEN MATCHED THEN UPDATE SET name = src.nonexistent", "error", false);
     [Fact]
     public void mrga0125() => CorpusAssert.Parses(@"MERGE INTO s.t AS tgt USING s.t2 AS src ON tgt.id = src.t_id WHEN MATCHED THEN UPDATE SET name = src.label WHEN NOT MATCHED THEN INSERT (name, val) VALUES (src.label, src.amount) WHEN NOT MATCHED BY SOURCE THEN DELETE RETURNING WITH (OLD AS o, NEW AS n) merge_action() AS action, o.name AS removed, n.name AS upserted", "ok");
     [Fact]
@@ -307,10 +307,10 @@ public class Corpus_Merge
     public void mrga0150() => CorpusAssert.Parses(@"MERGE INTO s.t AS tgt USING s.t2 AS src ON tgt.id = src.t_id WHEN MATCHED THEN UPDATE SET name = src.label WHEN NOT MATCHED AND src.amount > 0 THEN INSERT (name, val) VALUES (src.label, src.amount) WHEN NOT MATCHED AND src.amount <= 0 THEN DO NOTHING WHEN NOT MATCHED BY SOURCE THEN DELETE RETURNING merge_action(), tgt.id", "ok");
     [Fact]
     public void mrga0151() => CorpusAssert.Parses(@"INSERT INTO s.t (name) VALUES ('x'); MERGE INTO s.t AS tgt USING (SELECT max(id) AS t_id, 'merged' AS label FROM s.t) AS src ON tgt.id = src.t_id WHEN MATCHED THEN UPDATE SET name = src.label", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void mrga0152() => CorpusAssert.Parses(@"MERGE INTO s.t AS tgt USING s.t2 AS src ON tgt.id = src.t_id WHEN MATCHED THEN UPDATE SET name = src.label RETURNING WITH () *", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void mrga0153() => CorpusAssert.Parses(@"MERGE INTO s.t AS tgt USING s.t2 AS src ON tgt.id = src.t_id WHEN MATCHED THEN UPDATE SET name = src.label RETURNING WITH (OLD) *", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task mrga0152() => CorpusAssert.MatchesPostgres(@"MERGE INTO s.t AS tgt USING s.t2 AS src ON tgt.id = src.t_id WHEN MATCHED THEN UPDATE SET name = src.label RETURNING WITH () *", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task mrga0153() => CorpusAssert.MatchesPostgres(@"MERGE INTO s.t AS tgt USING s.t2 AS src ON tgt.id = src.t_id WHEN MATCHED THEN UPDATE SET name = src.label RETURNING WITH (OLD) *", "error", false);
     [Fact]
     public void mrga0154() => CorpusAssert.Parses(@"MERGE INTO s.t AS tgt USING s.t2 AS src ON tgt.id = src.t_id WHEN MATCHED THEN UPDATE SET name = src.label RETURNING WITH (OLD AS o) o.*", "ok");
     [Fact]
@@ -339,8 +339,8 @@ public class Corpus_Merge
     public void mrga0166() => CorpusAssert.Parses(@"MERGE INTO s.t AS tgt USING s.t2 AS src ON tgt.id = src.t_id WHEN MATCHED THEN UPDATE SET name = src.label RETURNING length(OLD.name) AS old_len, length(NEW.name) AS new_len", "ok");
     [Fact]
     public void mrga0167() => CorpusAssert.Parses(@"MERGE INTO s.t AS tgt USING s.t2 AS src ON tgt.id = src.t_id WHEN MATCHED THEN UPDATE SET name = src.label WHEN NOT MATCHED THEN INSERT (name) VALUES (src.label) WHEN NOT MATCHED BY SOURCE THEN DO NOTHING RETURNING merge_action() AS action, tgt.id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void mrga0168() => CorpusAssert.Parses(@"MERGE INTO s.t AS tgt USING s.t2 AS src ON tgt.id = src.t_id WHEN MATCHED THEN UPDATE SET name = src.label; SELECT merge_action()", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task mrga0168() => CorpusAssert.MatchesPostgres(@"MERGE INTO s.t AS tgt USING s.t2 AS src ON tgt.id = src.t_id WHEN MATCHED THEN UPDATE SET name = src.label; SELECT merge_action()", "error", false);
     [Fact]
     public void mrga0169() => CorpusAssert.Parses(@"MERGE INTO s.t AS tgt USING s.t2 AS src ON tgt.id = src.t_id WHEN MATCHED THEN UPDATE SET name = src.label WHEN NOT MATCHED THEN INSERT (name) VALUES (src.label) RETURNING WITH (OLD AS o, NEW AS n) o.id, n.id, o.name, n.name, o.val, n.val", "ok");
     [Fact]
@@ -531,12 +531,12 @@ public class Corpus_Merge
     public void mrgb0092() => CorpusAssert.Parses(@"MERGE INTO s.t AS tgt USING s.t2 AS src ON tgt.id = src.t_id WHEN MATCHED UPDATE SET name = src.label", "error");
     [Fact]
     public void mrgb0093() => CorpusAssert.Parses(@"MERGE INTO s.t AS tgt USING s.t2 AS src ON tgt.id = src.t_id WHEN MATCHED THEN", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void mrgb0094() => CorpusAssert.Parses(@"MERGE INTO s.t AS tgt USING s.t2 AS src ON tgt.id = src.t_id WHEN MATCHED THEN INSERT (name) VALUES ('x')", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void mrgb0095() => CorpusAssert.Parses(@"MERGE INTO s.t AS tgt USING s.t2 AS src ON tgt.id = src.t_id WHEN NOT MATCHED THEN UPDATE SET name = src.label", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void mrgb0096() => CorpusAssert.Parses(@"MERGE INTO s.t AS tgt USING s.t2 AS src ON tgt.id = src.t_id WHEN NOT MATCHED THEN DELETE", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task mrgb0094() => CorpusAssert.MatchesPostgres(@"MERGE INTO s.t AS tgt USING s.t2 AS src ON tgt.id = src.t_id WHEN MATCHED THEN INSERT (name) VALUES ('x')", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task mrgb0095() => CorpusAssert.MatchesPostgres(@"MERGE INTO s.t AS tgt USING s.t2 AS src ON tgt.id = src.t_id WHEN NOT MATCHED THEN UPDATE SET name = src.label", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task mrgb0096() => CorpusAssert.MatchesPostgres(@"MERGE INTO s.t AS tgt USING s.t2 AS src ON tgt.id = src.t_id WHEN NOT MATCHED THEN DELETE", "error", false);
     [Fact]
     public void mrgb0097() => CorpusAssert.Parses(@"MERGE INTO s.t AS tgt USING s.t2 AS src ON tgt.id = src.t_id WHEN MATCHED THEN UPDATE SET", "error");
     [Fact]
@@ -553,24 +553,24 @@ public class Corpus_Merge
     public void mrgb0103() => CorpusAssert.Parses(@"MERGE INTO s.t AS tgt s.t2 AS src ON tgt.id = src.t_id WHEN MATCHED THEN UPDATE SET name = src.label", "error");
     [Fact]
     public void mrgb0104() => CorpusAssert.Parses(@"MERGE INTO s.t AS tgt USING ON tgt.id = 1 WHEN MATCHED THEN DELETE", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void mrgb0105() => CorpusAssert.Parses(@"MERGE INTO s.t AS tgt USING s.t2 AS src ON tgt.id = src.t_id WHEN MATCHED THEN UPDATE SET name = src.label, name = src.label", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void mrgb0106() => CorpusAssert.Parses(@"MERGE INTO s.mv AS tgt USING s.t2 AS src ON tgt.status = 'ok' WHEN MATCHED THEN UPDATE SET status = 'happy'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void mrgb0107() => CorpusAssert.Parses(@"MERGE INTO s.t AS tgt USING s.t2 AS src ON tgt.id = src.t_id WHEN MATCHED THEN UPDATE SET nonexistent_col = 'x'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void mrgb0108() => CorpusAssert.Parses(@"MERGE INTO s.t AS tgt USING s.t2 AS src ON tgt.id = src.t_id WHEN NOT MATCHED THEN INSERT (nonexistent_col) VALUES ('x')", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void mrgb0109() => CorpusAssert.Parses(@"MERGE INTO s.t AS tgt USING s.t2 AS src ON tgt.id = src.t_id WHEN MATCHED THEN UPDATE SET name = src.label RETURNING WITH () tgt.id", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task mrgb0105() => CorpusAssert.MatchesPostgres(@"MERGE INTO s.t AS tgt USING s.t2 AS src ON tgt.id = src.t_id WHEN MATCHED THEN UPDATE SET name = src.label, name = src.label", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task mrgb0106() => CorpusAssert.MatchesPostgres(@"MERGE INTO s.mv AS tgt USING s.t2 AS src ON tgt.status = 'ok' WHEN MATCHED THEN UPDATE SET status = 'happy'", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task mrgb0107() => CorpusAssert.MatchesPostgres(@"MERGE INTO s.t AS tgt USING s.t2 AS src ON tgt.id = src.t_id WHEN MATCHED THEN UPDATE SET nonexistent_col = 'x'", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task mrgb0108() => CorpusAssert.MatchesPostgres(@"MERGE INTO s.t AS tgt USING s.t2 AS src ON tgt.id = src.t_id WHEN NOT MATCHED THEN INSERT (nonexistent_col) VALUES ('x')", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task mrgb0109() => CorpusAssert.MatchesPostgres(@"MERGE INTO s.t AS tgt USING s.t2 AS src ON tgt.id = src.t_id WHEN MATCHED THEN UPDATE SET name = src.label RETURNING WITH () tgt.id", "error", false);
     [Fact]
     public void mrgb0110() => CorpusAssert.Parses(@"MERGE INTO s.t AS tgt USING s.t2 AS src ON tgt.id = src.t_id WHEN MATCHED THEN DO", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void mrgb0111() => CorpusAssert.Parses(@"MERGE INTO s.t AS tgt USING s.t2 AS src ON tgt.id = src.t_id WHEN MATCHED THEN DO NOTHING WHEN MATCHED THEN UPDATE SET name = src.label", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void mrgb0112() => CorpusAssert.Parses(@"MERGE INTO s.t AS tgt USING s.t2 AS src ON tgt.id = src.t_id WHEN NOT MATCHED THEN DO NOTHING WHEN NOT MATCHED THEN INSERT (name) VALUES (src.label)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void mrgb0113() => CorpusAssert.Parses(@"MERGE INTO s.t AS tgt USING s.t2 AS src ON tgt.id = src.t_id WHEN NOT MATCHED BY SOURCE THEN DO NOTHING WHEN NOT MATCHED BY SOURCE AND tgt.qty > 0 THEN DELETE", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task mrgb0111() => CorpusAssert.MatchesPostgres(@"MERGE INTO s.t AS tgt USING s.t2 AS src ON tgt.id = src.t_id WHEN MATCHED THEN DO NOTHING WHEN MATCHED THEN UPDATE SET name = src.label", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task mrgb0112() => CorpusAssert.MatchesPostgres(@"MERGE INTO s.t AS tgt USING s.t2 AS src ON tgt.id = src.t_id WHEN NOT MATCHED THEN DO NOTHING WHEN NOT MATCHED THEN INSERT (name) VALUES (src.label)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task mrgb0113() => CorpusAssert.MatchesPostgres(@"MERGE INTO s.t AS tgt USING s.t2 AS src ON tgt.id = src.t_id WHEN NOT MATCHED BY SOURCE THEN DO NOTHING WHEN NOT MATCHED BY SOURCE AND tgt.qty > 0 THEN DELETE", "error", false);
     [Fact]
     public void mrgb0114() => CorpusAssert.Parses(@"MERGE INTO s.t AS tgt USING s.t2 AS src ON tgt.id = src.t_id WHEN MATCHED THEN UPDATE SET name = src.label WHERE src.amount > 0", "error");
     [Fact]
@@ -579,12 +579,12 @@ public class Corpus_Merge
     public void mrgb0116() => CorpusAssert.Parses(@"MERGE INTO s.t AS tgt USING s.t2 AS src ON tgt.id = src.t_id WHEN MATCHED THEN DELETE FROM s.t", "error");
     [Fact]
     public void mrgb0117() => CorpusAssert.Parses(@"MERGE INTO s.t AS tgt USING s.t2 AS src ON tgt.id = src.t_id MATCHED THEN UPDATE SET name = src.label", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void mrgb0118() => CorpusAssert.Parses(@"MERGE INTO s.t AS tgt USING s.t2 AS src ON tgt.id = src.t_id WHEN MATCHED THEN UPDATE SET name = src.label RETURNING WITH (BOTH AS ab) ab.id", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task mrgb0118() => CorpusAssert.MatchesPostgres(@"MERGE INTO s.t AS tgt USING s.t2 AS src ON tgt.id = src.t_id WHEN MATCHED THEN UPDATE SET name = src.label RETURNING WITH (BOTH AS ab) ab.id", "error", false);
     [Fact]
     public void mrgb0119() => CorpusAssert.Parses(@"MERGE INTO s.t AS tgt USING s.t2 AS src ON tgt.id = src.t_id WHEN NOT MATCHED THEN INSERT (name) DEFAULT VALUES (src.label)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void mrgb0120() => CorpusAssert.Parses(@"MERGE INTO s.t AS tgt USING s.t2 AS src ON tgt.id = src.t_id WHEN NOT MATCHED BY SOURCE THEN INSERT (name) VALUES (tgt.name)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task mrgb0120() => CorpusAssert.MatchesPostgres(@"MERGE INTO s.t AS tgt USING s.t2 AS src ON tgt.id = src.t_id WHEN NOT MATCHED BY SOURCE THEN INSERT (name) VALUES (tgt.name)", "error", false);
     [Fact]
     public void mrgb0121() => CorpusAssert.Parses(@"MERGE INTO s.t AS tgt USING s.t2 AS src ON tgt.id = src.t_id WHEN MATCHED THEN UPDATE SET name = src.label RETURNING USING tgt.id", "error");
     [Fact]

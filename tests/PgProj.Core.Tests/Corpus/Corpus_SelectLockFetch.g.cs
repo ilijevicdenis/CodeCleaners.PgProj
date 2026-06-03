@@ -153,10 +153,10 @@ public class Corpus_SelectLockFetch
     public void sellfa0073() => CorpusAssert.Parses(@"SELECT id FROM s.t ORDER BY id FETCH FIRST ROW WITH TIES", "ok");
     [Fact]
     public void sellfa0074() => CorpusAssert.Parses(@"SELECT id FROM s.t ORDER BY id FETCH NEXT ROW WITH TIES", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void sellfa0075() => CorpusAssert.Parses(@"SELECT id FROM s.t FETCH FIRST 5 ROWS WITH TIES", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void sellfa0076() => CorpusAssert.Parses(@"SELECT id FROM s.t FETCH NEXT 5 ROWS WITH TIES", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task sellfa0075() => CorpusAssert.MatchesPostgres(@"SELECT id FROM s.t FETCH FIRST 5 ROWS WITH TIES", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task sellfa0076() => CorpusAssert.MatchesPostgres(@"SELECT id FROM s.t FETCH NEXT 5 ROWS WITH TIES", "error", false);
     [Fact]
     public void sellfa0077() => CorpusAssert.Parses(@"SELECT id FROM s.t OFFSET 5 ROWS FETCH FIRST 10 ROWS ONLY", "ok");
     [Fact]
@@ -177,12 +177,12 @@ public class Corpus_SelectLockFetch
     public void sellfa0085() => CorpusAssert.Parses(@"SELECT id FROM s.t OFFSET -1", "error");
     [Fact]
     public void sellfa0086() => CorpusAssert.Parses(@"SELECT id FROM s.t FETCH FIRST -1 ROWS ONLY", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void sellfa0087() => CorpusAssert.Parses(@"SELECT id FROM s.t FETCH FIRST 5 ROWS", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void sellfa0088() => CorpusAssert.Parses(@"SELECT id FROM s.t FETCH FIRST 5", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void sellfa0089() => CorpusAssert.Parses(@"SELECT id FROM s.t FETCH 5 ROWS ONLY", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task sellfa0087() => CorpusAssert.MatchesPostgres(@"SELECT id FROM s.t FETCH FIRST 5 ROWS", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task sellfa0088() => CorpusAssert.MatchesPostgres(@"SELECT id FROM s.t FETCH FIRST 5", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task sellfa0089() => CorpusAssert.MatchesPostgres(@"SELECT id FROM s.t FETCH 5 ROWS ONLY", "error", false);
     [Fact]
     public void sellfa0090() => CorpusAssert.Parses(@"SELECT id FROM s.t FOR", "error");
     [Fact]
@@ -193,22 +193,22 @@ public class Corpus_SelectLockFetch
     public void sellfa0093() => CorpusAssert.Parses(@"SELECT id FROM s.t FOR NO UPDATE", "error");
     [Fact]
     public void sellfa0094() => CorpusAssert.Parses(@"SELECT id FROM s.t FOR KEY UPDATE", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void sellfa0095() => CorpusAssert.Parses(@"SELECT name, count(*) FROM s.t GROUP BY name FOR UPDATE", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void sellfa0096() => CorpusAssert.Parses(@"SELECT DISTINCT id FROM s.t FOR UPDATE", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void sellfa0097() => CorpusAssert.Parses(@"SELECT id FROM s.t UNION SELECT id FROM s.t2 FOR UPDATE", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void sellfa0098() => CorpusAssert.Parses(@"SELECT id FROM s.t FOR UPDATE OF nonexistent_table", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void sellfa0099() => CorpusAssert.Parses(@"SELECT id FROM s.t ORDER BY id FETCH FIRST 5 ROWS WITH TIES FOR UPDATE SKIP LOCKED", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void sellfa0100() => CorpusAssert.Parses(@"SELECT id FROM s.t LIMIT 5 LIMIT 10", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void sellfa0101() => CorpusAssert.Parses(@"SELECT id FROM s.t OFFSET 5 OFFSET 10", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void sellfa0102() => CorpusAssert.Parses(@"SELECT id FROM s.t LIMIT ALL FETCH FIRST 5 ROWS ONLY", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task sellfa0095() => CorpusAssert.MatchesPostgres(@"SELECT name, count(*) FROM s.t GROUP BY name FOR UPDATE", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task sellfa0096() => CorpusAssert.MatchesPostgres(@"SELECT DISTINCT id FROM s.t FOR UPDATE", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task sellfa0097() => CorpusAssert.MatchesPostgres(@"SELECT id FROM s.t UNION SELECT id FROM s.t2 FOR UPDATE", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task sellfa0098() => CorpusAssert.MatchesPostgres(@"SELECT id FROM s.t FOR UPDATE OF nonexistent_table", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task sellfa0099() => CorpusAssert.MatchesPostgres(@"SELECT id FROM s.t ORDER BY id FETCH FIRST 5 ROWS WITH TIES FOR UPDATE SKIP LOCKED", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task sellfa0100() => CorpusAssert.MatchesPostgres(@"SELECT id FROM s.t LIMIT 5 LIMIT 10", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task sellfa0101() => CorpusAssert.MatchesPostgres(@"SELECT id FROM s.t OFFSET 5 OFFSET 10", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task sellfa0102() => CorpusAssert.MatchesPostgres(@"SELECT id FROM s.t LIMIT ALL FETCH FIRST 5 ROWS ONLY", "error", false);
     [Fact]
     public void sellfa0103() => CorpusAssert.Parses(@"SELECT id FROM s.t WHERE id = 1 FOR UPDATE", "ok");
     [Fact]
@@ -291,18 +291,18 @@ public class Corpus_SelectLockFetch
     public void sellfa0142() => CorpusAssert.Parses(@"SELECT id FROM s.t LIMIT 10 FOR NO KEY UPDATE NOWAIT", "ok");
     [Fact]
     public void sellfa0143() => CorpusAssert.Parses(@"SELECT count(*) FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void sellfa0144() => CorpusAssert.Parses(@"SELECT count(*) FROM s.t FOR UPDATE", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void sellfa0145() => CorpusAssert.Parses(@"SELECT id FROM s.t HAVING id > 0 FOR UPDATE", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void sellfa0146() => CorpusAssert.Parses(@"SELECT id FROM s.t FETCH FIRST 5 ROWS ONLY FETCH NEXT 3 ROWS ONLY", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task sellfa0144() => CorpusAssert.MatchesPostgres(@"SELECT count(*) FROM s.t FOR UPDATE", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task sellfa0145() => CorpusAssert.MatchesPostgres(@"SELECT id FROM s.t HAVING id > 0 FOR UPDATE", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task sellfa0146() => CorpusAssert.MatchesPostgres(@"SELECT id FROM s.t FETCH FIRST 5 ROWS ONLY FETCH NEXT 3 ROWS ONLY", "error", false);
     [Fact]
     public void sellfa0147() => CorpusAssert.Parses(@"SELECT id FROM s.t LIMIT", "error");
     [Fact]
     public void sellfa0148() => CorpusAssert.Parses(@"SELECT id FROM s.t OFFSET", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void sellfa0149() => CorpusAssert.Parses(@"SELECT id FROM s.t FETCH ONLY", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task sellfa0149() => CorpusAssert.MatchesPostgres(@"SELECT id FROM s.t FETCH ONLY", "error", false);
     [Fact]
     public void sellfa0150() => CorpusAssert.Parses(@"SELECT id FROM s.t FOR LOCK", "error");
     [Fact]
@@ -441,12 +441,12 @@ public class Corpus_SelectLockFetch
     public void sellfb0047() => CorpusAssert.Parses(@"SELECT s.t2.id FROM s.t2 JOIN s.t ON s.t2.t_id = s.t.id FOR UPDATE OF t FOR SHARE OF t2", "ok");
     [Fact]
     public void sellfb0048() => CorpusAssert.Parses(@"SELECT id FROM s.t FOR UPDATE NOWAIT SKIP LOCKED", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void sellfb0049() => CorpusAssert.Parses(@"SELECT id FROM s.t FETCH FIRST 5 ROWS", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void sellfb0050() => CorpusAssert.Parses(@"SELECT id FROM s.t FETCH 5 ROWS ONLY", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void sellfb0051() => CorpusAssert.Parses(@"SELECT id FROM s.t FETCH FIRST 5 ONLY", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task sellfb0049() => CorpusAssert.MatchesPostgres(@"SELECT id FROM s.t FETCH FIRST 5 ROWS", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task sellfb0050() => CorpusAssert.MatchesPostgres(@"SELECT id FROM s.t FETCH 5 ROWS ONLY", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task sellfb0051() => CorpusAssert.MatchesPostgres(@"SELECT id FROM s.t FETCH FIRST 5 ONLY", "error", false);
     [Fact]
     public void sellfb0052() => CorpusAssert.Parses(@"SELECT id FROM s.t FOR ROWS ONLY", "error");
     [Fact]
@@ -455,18 +455,18 @@ public class Corpus_SelectLockFetch
     public void sellfb0054() => CorpusAssert.Parses(@"SELECT id FROM s.t OFFSET -1", "error");
     [Fact]
     public void sellfb0055() => CorpusAssert.Parses(@"SELECT id FROM s.t FETCH FIRST -1 ROWS ONLY", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void sellfb0056() => CorpusAssert.Parses(@"SELECT id FROM s.t FOR UPDATE OF nonexistent", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void sellfb0057() => CorpusAssert.Parses(@"SELECT id FROM s.t LIMIT 10 LIMIT 5", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void sellfb0058() => CorpusAssert.Parses(@"SELECT id FROM s.t OFFSET 5 OFFSET 3", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void sellfb0059() => CorpusAssert.Parses(@"SELECT id FROM s.t FETCH FIRST 5 ROWS ONLY FETCH NEXT 3 ROWS ONLY", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task sellfb0056() => CorpusAssert.MatchesPostgres(@"SELECT id FROM s.t FOR UPDATE OF nonexistent", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task sellfb0057() => CorpusAssert.MatchesPostgres(@"SELECT id FROM s.t LIMIT 10 LIMIT 5", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task sellfb0058() => CorpusAssert.MatchesPostgres(@"SELECT id FROM s.t OFFSET 5 OFFSET 3", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task sellfb0059() => CorpusAssert.MatchesPostgres(@"SELECT id FROM s.t FETCH FIRST 5 ROWS ONLY FETCH NEXT 3 ROWS ONLY", "error", false);
     [Fact]
     public void sellfb0060() => CorpusAssert.Parses(@"SELECT id FROM s.t WITH TIES", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void sellfb0061() => CorpusAssert.Parses(@"SELECT id FROM s.t FETCH FIRST 5 ROWS WITH TIES", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task sellfb0061() => CorpusAssert.MatchesPostgres(@"SELECT id FROM s.t FETCH FIRST 5 ROWS WITH TIES", "error", false);
     [Fact]
     public void sellfb0062() => CorpusAssert.Parses(@"SELECT id FROM s.t FOR UPDATE OF", "error");
     [Fact]
@@ -493,8 +493,8 @@ public class Corpus_SelectLockFetch
     public void sellfb0073() => CorpusAssert.Parses(@"SELECT id FROM s.t FOR UPDATE LOCK IN SHARE MODE", "error");
     [Fact]
     public void sellfb0074() => CorpusAssert.Parses(@"SELECT id FROM s.t FOR UPDATE OF s.t", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void sellfb0075() => CorpusAssert.Parses(@"SELECT id FROM s.mv FOR UPDATE", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task sellfb0075() => CorpusAssert.MatchesPostgres(@"SELECT id FROM s.mv FOR UPDATE", "error", false);
     [Fact]
     public void sellfb0076() => CorpusAssert.Parses(@"SELECT id FROM s.t OFFSET 2 ROW FETCH NEXT 5 ROWS ONLY", "ok");
     [Fact]

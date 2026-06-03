@@ -7,8 +7,8 @@ public class Corpus_CreateOpclassFamily
 {
     [Fact]
     public void opca0001() => CorpusAssert.Parses(@"CREATE OPERATOR CLASS opca0001_ops FOR TYPE integer USING btree AS OPERATOR 1 <, OPERATOR 2 <=, OPERATOR 3 =, OPERATOR 4 >=, OPERATOR 5 >", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void opca0002() => CorpusAssert.Parses(@"CREATE OPERATOR CLASS opca0002_ops DEFAULT FOR TYPE integer USING btree AS OPERATOR 1 <, OPERATOR 2 <=, OPERATOR 3 =, OPERATOR 4 >=, OPERATOR 5 >", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task opca0002() => CorpusAssert.MatchesPostgres(@"CREATE OPERATOR CLASS opca0002_ops DEFAULT FOR TYPE integer USING btree AS OPERATOR 1 <, OPERATOR 2 <=, OPERATOR 3 =, OPERATOR 4 >=, OPERATOR 5 >", "error", false);
     [Fact]
     public void opca0003() => CorpusAssert.Parses(@"CREATE OPERATOR CLASS opca0003_ops FOR TYPE text USING hash AS OPERATOR 1 =", "ok");
     [Fact]
@@ -26,20 +26,20 @@ CREATE OPERATOR CLASS opca0007_ops FOR TYPE integer USING btree FAMILY opca0007_
     public void opca0009() => CorpusAssert.Parses(@"CREATE OPERATOR CLASS opca0009_ops FOR TYPE integer USING btree AS FUNCTION 1 (integer, integer) btint4cmp(int4, int4)", "ok");
     [Fact]
     public void opca0010() => CorpusAssert.Parses(@"CREATE OPERATOR CLASS opca0010_ops FOR TYPE integer USING btree AS OPERATOR 1 <(integer, integer), OPERATOR 2 <=(integer, integer), OPERATOR 3 =(integer, integer), OPERATOR 4 >=(integer, integer), OPERATOR 5 >(integer, integer), FUNCTION 1 btint4cmp(int4, int4)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void opca0011() => CorpusAssert.Parses(@"CREATE OPERATOR CLASS opca0011_ops FOR TYPE int4 USING btree", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void opca0012() => CorpusAssert.Parses(@"CREATE OPERATOR CLASS opca0012_ops FOR TYPE int4 AS OPERATOR 1 <", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void opca0013() => CorpusAssert.Parses(@"CREATE OPERATOR CLASS FOR TYPE int4 USING btree AS OPERATOR 1 <", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void opca0014() => CorpusAssert.Parses(@"CREATE OPERATOR CLASS opca0014_ops USING btree AS OPERATOR 1 <", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void opca0015() => CorpusAssert.Parses(@"CREATE OPERATOR CLASS opca0015_ops FOR TYPE int4 USING btree AS OPERATOR <", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void opca0016() => CorpusAssert.Parses(@"CREATE OPERATOR CLASS opca0016_ops FOR TYPE int4 USING btree AS FUNCTION btint4cmp(int4, int4)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void opca0017() => CorpusAssert.Parses(@"CREATE OPERATOR CLASS opca0017_ops FOR TYPE int4 USING btree AS 1 <", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task opca0011() => CorpusAssert.MatchesPostgres(@"CREATE OPERATOR CLASS opca0011_ops FOR TYPE int4 USING btree", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task opca0012() => CorpusAssert.MatchesPostgres(@"CREATE OPERATOR CLASS opca0012_ops FOR TYPE int4 AS OPERATOR 1 <", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task opca0013() => CorpusAssert.MatchesPostgres(@"CREATE OPERATOR CLASS FOR TYPE int4 USING btree AS OPERATOR 1 <", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task opca0014() => CorpusAssert.MatchesPostgres(@"CREATE OPERATOR CLASS opca0014_ops USING btree AS OPERATOR 1 <", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task opca0015() => CorpusAssert.MatchesPostgres(@"CREATE OPERATOR CLASS opca0015_ops FOR TYPE int4 USING btree AS OPERATOR <", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task opca0016() => CorpusAssert.MatchesPostgres(@"CREATE OPERATOR CLASS opca0016_ops FOR TYPE int4 USING btree AS FUNCTION btint4cmp(int4, int4)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task opca0017() => CorpusAssert.MatchesPostgres(@"CREATE OPERATOR CLASS opca0017_ops FOR TYPE int4 USING btree AS 1 <", "error", false);
     [Fact]
     public void opca0018() => CorpusAssert.Parses(@"CREATE OPERATOR CLASS s.opca0018_ops FOR TYPE integer USING btree AS OPERATOR 1 <, OPERATOR 2 <=, OPERATOR 3 =, OPERATOR 4 >=, OPERATOR 5 >", "ok");
     [Fact]
@@ -62,8 +62,8 @@ CREATE OPERATOR CLASS opca0007_ops FOR TYPE integer USING btree FAMILY opca0007_
     public void opca0027() => CorpusAssert.Parses(@"CREATE OPERATOR CLASS opca0027_ops FOR TYPE integer USING hash AS OPERATOR 1 =(integer, integer), FUNCTION 1 hashint4(integer), FUNCTION 2 hashint4extended(integer, bigint)", "ok");
     [Fact]
     public void opca0028() => CorpusAssert.Parses(@"CREATE OPERATOR CLASS opca0028_ops FOR TYPE integer USING brin AS OPERATOR 1 <, OPERATOR 2 <=, OPERATOR 3 =, OPERATOR 4 >=, OPERATOR 5 >", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void opca0029() => CorpusAssert.Parses(@"CREATE OPERATOR CLASS opca0029_ops FOR TYPE integer USING gin AS OPERATOR 7 @>", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task opca0029() => CorpusAssert.MatchesPostgres(@"CREATE OPERATOR CLASS opca0029_ops FOR TYPE integer USING gin AS OPERATOR 7 @>", "error", false);
     [Fact]
     public void opca0030() => CorpusAssert.Parses(@"CREATE OPERATOR CLASS opca0030_ops FOR TYPE int4 USING btree AS OPERATOR 1 <, OPERATOR 2 <=, OPERATOR 3 =, OPERATOR 4 >=, OPERATOR 5 >, FUNCTION 1 btint4cmp(int4, int4), FUNCTION 2 btint4sortsupport(internal)", "ok");
     [Fact]
@@ -72,8 +72,8 @@ CREATE OPERATOR CLASS opca0031_ops FOR TYPE int4 USING btree FAMILY opca0031_fam
     [Fact]
     public void opca0032() => CorpusAssert.Parses(@"CREATE OPERATOR FAMILY s.opca0032_fam USING btree;
 CREATE OPERATOR CLASS opca0032_ops FOR TYPE int4 USING btree FAMILY s.opca0032_fam AS OPERATOR 1 <, FUNCTION 1 btint4cmp(int4, int4)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void opca0033() => CorpusAssert.Parses(@"CREATE OPERATOR CLASS opca0033_ops FOR TYPE int4 USING btree FAMILY nonexistent_fam AS OPERATOR 1 <", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task opca0033() => CorpusAssert.MatchesPostgres(@"CREATE OPERATOR CLASS opca0033_ops FOR TYPE int4 USING btree FAMILY nonexistent_fam AS OPERATOR 1 <", "error", false);
     [Fact]
     public void opca0034() => CorpusAssert.Parses(@"CREATE OPERATOR CLASS opca0034_ops FOR TYPE int4 USING btree AS OPERATOR 1 <, OPERATOR 2 <=", "ok");
     [Fact]
@@ -82,8 +82,8 @@ CREATE OPERATOR CLASS opca0032_ops FOR TYPE int4 USING btree FAMILY s.opca0032_f
     public void opca0036() => CorpusAssert.Parses(@"CREATE OPERATOR CLASS opca0036_ops FOR TYPE int4 USING btree AS OPERATOR 1 <( int4 , int4 )", "ok");
     [Fact]
     public void opca0037() => CorpusAssert.Parses(@"CREATE OPERATOR CLASS opca0037_ops FOR TYPE int4 USING spgist AS OPERATOR 1 =", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void opca0038() => CorpusAssert.Parses(@"CREATE OPERATOR CLASS opca0038_ops FOR TYPE int4 USING btree AS STORAGE int8", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task opca0038() => CorpusAssert.MatchesPostgres(@"CREATE OPERATOR CLASS opca0038_ops FOR TYPE int4 USING btree AS STORAGE int8", "error", false);
     [Fact]
     public void opca0039() => CorpusAssert.Parses(@"CREATE OPERATOR CLASS opca0039_ops FOR TYPE anyarray USING gin AS OPERATOR 1 &&(anyarray, anyarray), OPERATOR 2 @>(anyarray, anyarray), OPERATOR 3 <@(anyarray, anyarray), OPERATOR 4 =(anyarray, anyarray)", "ok");
     [Fact]
@@ -106,32 +106,32 @@ CREATE OPERATOR CLASS opca0032_ops FOR TYPE int4 USING btree FAMILY s.opca0032_f
     public void opca0045() => CorpusAssert.Parses(@"CREATE OPERATOR CLASS opca0045_ops FOR TYPE integer USING btree AS OPERATOR 1 pg_catalog.<", "ok");
     [Fact]
     public void opca0046() => CorpusAssert.Parses(@"CREATE OPERATOR CLASS opca0046_ops FOR TYPE integer USING btree AS OPERATOR 1 pg_catalog.<(integer, integer)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void opca0047() => CorpusAssert.Parses(@"CREATE OPERATOR CLASS opca0047_ops FOR TYPE int4 USING btree AS OPERATOR 1 <, OPERATOR 1 <=", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void opca0048() => CorpusAssert.Parses(@"CREATE OPERATOR CLASS opca0048_ops FOR TYPE int4 USING btree AS FUNCTION 1 btint4cmp(int4, int4), FUNCTION 1 btint4cmp(int4, int4)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void opca0049() => CorpusAssert.Parses(@"CREATE OPERATOR CLASS opca0049_ops FOR TYPE int4 USING btree AS OPERATOR 0 <", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void opca0050() => CorpusAssert.Parses(@"CREATE OPERATOR CLASS opca0050_ops FOR TYPE int4 USING btree AS OPERATOR -1 <", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void opca0051() => CorpusAssert.Parses(@"CREATE OPERATOR CLASS opca0051_ops FOR TYPE integer USING btree AS OPERATOR 1 <(integer) ", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void opca0052() => CorpusAssert.Parses(@"CREATE OPERATOR CLASS opca0052_ops FOR TYPE int4 USING btree AS OPERATOR 1 nonexistent_op", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void opca0053() => CorpusAssert.Parses(@"CREATE OPERATOR CLASS opca0053_ops FOR TYPE int4 USING btree AS FUNCTION 1 nonexistent_func(int4, int4)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void opca0054() => CorpusAssert.Parses(@"CREATE OPERATOR CLASS opca0054_ops FOR TYPE nonexistent_type USING btree AS OPERATOR 1 <", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void opca0055() => CorpusAssert.Parses(@"CREATE OPERATOR CLASS opca0055_ops FOR TYPE int4 USING nonexistent_method AS OPERATOR 1 <", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task opca0047() => CorpusAssert.MatchesPostgres(@"CREATE OPERATOR CLASS opca0047_ops FOR TYPE int4 USING btree AS OPERATOR 1 <, OPERATOR 1 <=", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task opca0048() => CorpusAssert.MatchesPostgres(@"CREATE OPERATOR CLASS opca0048_ops FOR TYPE int4 USING btree AS FUNCTION 1 btint4cmp(int4, int4), FUNCTION 1 btint4cmp(int4, int4)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task opca0049() => CorpusAssert.MatchesPostgres(@"CREATE OPERATOR CLASS opca0049_ops FOR TYPE int4 USING btree AS OPERATOR 0 <", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task opca0050() => CorpusAssert.MatchesPostgres(@"CREATE OPERATOR CLASS opca0050_ops FOR TYPE int4 USING btree AS OPERATOR -1 <", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task opca0051() => CorpusAssert.MatchesPostgres(@"CREATE OPERATOR CLASS opca0051_ops FOR TYPE integer USING btree AS OPERATOR 1 <(integer) ", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task opca0052() => CorpusAssert.MatchesPostgres(@"CREATE OPERATOR CLASS opca0052_ops FOR TYPE int4 USING btree AS OPERATOR 1 nonexistent_op", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task opca0053() => CorpusAssert.MatchesPostgres(@"CREATE OPERATOR CLASS opca0053_ops FOR TYPE int4 USING btree AS FUNCTION 1 nonexistent_func(int4, int4)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task opca0054() => CorpusAssert.MatchesPostgres(@"CREATE OPERATOR CLASS opca0054_ops FOR TYPE nonexistent_type USING btree AS OPERATOR 1 <", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task opca0055() => CorpusAssert.MatchesPostgres(@"CREATE OPERATOR CLASS opca0055_ops FOR TYPE int4 USING nonexistent_method AS OPERATOR 1 <", "error", false);
     [Fact]
     public void opca0056() => CorpusAssert.Parses(@"CREATE OPERATOR CLASS opca0056_ops FOR TYPE int4 USING BTREE AS OPERATOR 1 <", "ok");
     [Fact]
     public void opca0057() => CorpusAssert.Parses(@"CREATE OPERATOR CLASS opca0057_ops FOR TYPE integer USING btree AS OPERATOR 1 <(int4, int4) FOR SEARCH", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void opca0058() => CorpusAssert.Parses(@"CREATE OPERATOR CLASS opca0058_ops FOR TYPE integer USING btree AS OPERATOR 11 <(integer, integer) FOR ORDER BY float_ops", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void opca0059() => CorpusAssert.Parses(@"CREATE OPERATOR CLASS opca0059_ops FOR TYPE integer USING btree AS OPERATOR 1 <(integer, integer) FOR ORDER BY integer_ops", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task opca0058() => CorpusAssert.MatchesPostgres(@"CREATE OPERATOR CLASS opca0058_ops FOR TYPE integer USING btree AS OPERATOR 11 <(integer, integer) FOR ORDER BY float_ops", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task opca0059() => CorpusAssert.MatchesPostgres(@"CREATE OPERATOR CLASS opca0059_ops FOR TYPE integer USING btree AS OPERATOR 1 <(integer, integer) FOR ORDER BY integer_ops", "error", false);
     [Fact]
     public void opca0060() => CorpusAssert.Parses(@"CREATE OPERATOR CLASS opca0060_ops FOR TYPE int4 USING btree AS OPERATOR 1 <, OPERATOR 2 <=, OPERATOR 3 =, OPERATOR 4 >=, OPERATOR 5 >, FUNCTION 1 btint4cmp(int4, int4), FUNCTION 2 btint4sortsupport(internal), FUNCTION 4 btequalimage(oid)", "ok");
     [Fact]
@@ -150,16 +150,16 @@ CREATE OPERATOR CLASS opca0032_ops FOR TYPE int4 USING btree FAMILY s.opca0032_f
     public void opca0067() => CorpusAssert.Parses(@"CREATE OPERATOR FAMILY s.opca0067_fam USING btree", "ok");
     [Fact]
     public void opca0068() => CorpusAssert.Parses(@"create operator family opca0068_fam using btree", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void opca0069() => CorpusAssert.Parses(@"CREATE OPERATOR FAMILY opca0069_fam USING btree; CREATE OPERATOR FAMILY opca0069_fam USING btree", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task opca0069() => CorpusAssert.MatchesPostgres(@"CREATE OPERATOR FAMILY opca0069_fam USING btree; CREATE OPERATOR FAMILY opca0069_fam USING btree", "error", false);
     [Fact]
     public void opca0070() => CorpusAssert.Parses(@"CREATE OPERATOR FAMILY opca0070_fam USING btree; CREATE OPERATOR FAMILY opca0070_fam USING hash", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void opca0071() => CorpusAssert.Parses(@"CREATE OPERATOR FAMILY opca0071_fam", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void opca0072() => CorpusAssert.Parses(@"CREATE OPERATOR FAMILY USING btree", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void opca0073() => CorpusAssert.Parses(@"CREATE OPERATOR FAMILY opca0073_fam USING nonexistent_method", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task opca0071() => CorpusAssert.MatchesPostgres(@"CREATE OPERATOR FAMILY opca0071_fam", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task opca0072() => CorpusAssert.MatchesPostgres(@"CREATE OPERATOR FAMILY USING btree", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task opca0073() => CorpusAssert.MatchesPostgres(@"CREATE OPERATOR FAMILY opca0073_fam USING nonexistent_method", "error", false);
     [Fact]
     public void opca0074() => CorpusAssert.Parses(@"CREATE OPERATOR FAMILY opca0074_fam USING btree;
 ALTER OPERATOR FAMILY opca0074_fam USING btree ADD OPERATOR 1 <(integer, integer)", "ok");
@@ -187,9 +187,9 @@ ALTER OPERATOR FAMILY opca0080_fam USING btree DROP OPERATOR 1 (integer, integer
     [Fact]
     public void opca0081() => CorpusAssert.Parses(@"CREATE OPERATOR FAMILY opca0081_fam USING btree;
 ALTER OPERATOR FAMILY opca0081_fam USING btree ADD OPERATOR 1 <(integer, integer) FOR SEARCH", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void opca0082() => CorpusAssert.Parses(@"CREATE OPERATOR FAMILY opca0082_fam USING btree;
-ALTER OPERATOR FAMILY opca0082_fam USING btree ADD OPERATOR 1 <(integer, integer) FOR ORDER BY integer_ops", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task opca0082() => CorpusAssert.MatchesPostgres(@"CREATE OPERATOR FAMILY opca0082_fam USING btree;
+ALTER OPERATOR FAMILY opca0082_fam USING btree ADD OPERATOR 1 <(integer, integer) FOR ORDER BY integer_ops", "error", false);
     [Fact]
     public void opca0083() => CorpusAssert.Parses(@"CREATE OPERATOR FAMILY opca0083_fam USING btree;
 ALTER OPERATOR FAMILY opca0083_fam USING btree RENAME TO opca0083_fam_new", "ok");
@@ -205,40 +205,40 @@ ALTER OPERATOR FAMILY opca0086_fam USING btree OWNER TO SESSION_USER", "ok");
     [Fact]
     public void opca0087() => CorpusAssert.Parses(@"CREATE OPERATOR FAMILY opca0087_fam USING btree;
 ALTER OPERATOR FAMILY opca0087_fam USING btree SET SCHEMA s", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void opca0088() => CorpusAssert.Parses(@"ALTER OPERATOR FAMILY nonexistent_fam USING btree ADD OPERATOR 1 <(integer, integer)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void opca0089() => CorpusAssert.Parses(@"CREATE OPERATOR FAMILY opca0089_fam USING btree;
-ALTER OPERATOR FAMILY opca0089_fam USING btree ADD OPERATOR 1 nonexistent_op(integer, integer)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void opca0090() => CorpusAssert.Parses(@"CREATE OPERATOR FAMILY opca0090_fam USING btree;
-ALTER OPERATOR FAMILY opca0090_fam USING btree ADD FUNCTION 1 nonexistent_func(int4, int4)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void opca0091() => CorpusAssert.Parses(@"CREATE OPERATOR FAMILY opca0091_fam USING btree;
-ALTER OPERATOR FAMILY opca0091_fam USING btree ADD <(integer, integer)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void opca0092() => CorpusAssert.Parses(@"CREATE OPERATOR FAMILY opca0092_fam USING btree;
-ALTER OPERATOR FAMILY opca0092_fam USING btree DROP OPERATOR 1 (integer, integer)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void opca0093() => CorpusAssert.Parses(@"CREATE OPERATOR FAMILY opca0093_fam USING btree;
-ALTER OPERATOR FAMILY opca0093_fam USING btree DROP OPERATOR (integer, integer)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task opca0088() => CorpusAssert.MatchesPostgres(@"ALTER OPERATOR FAMILY nonexistent_fam USING btree ADD OPERATOR 1 <(integer, integer)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task opca0089() => CorpusAssert.MatchesPostgres(@"CREATE OPERATOR FAMILY opca0089_fam USING btree;
+ALTER OPERATOR FAMILY opca0089_fam USING btree ADD OPERATOR 1 nonexistent_op(integer, integer)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task opca0090() => CorpusAssert.MatchesPostgres(@"CREATE OPERATOR FAMILY opca0090_fam USING btree;
+ALTER OPERATOR FAMILY opca0090_fam USING btree ADD FUNCTION 1 nonexistent_func(int4, int4)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task opca0091() => CorpusAssert.MatchesPostgres(@"CREATE OPERATOR FAMILY opca0091_fam USING btree;
+ALTER OPERATOR FAMILY opca0091_fam USING btree ADD <(integer, integer)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task opca0092() => CorpusAssert.MatchesPostgres(@"CREATE OPERATOR FAMILY opca0092_fam USING btree;
+ALTER OPERATOR FAMILY opca0092_fam USING btree DROP OPERATOR 1 (integer, integer)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task opca0093() => CorpusAssert.MatchesPostgres(@"CREATE OPERATOR FAMILY opca0093_fam USING btree;
+ALTER OPERATOR FAMILY opca0093_fam USING btree DROP OPERATOR (integer, integer)", "error", false);
     [Fact]
     public void opca0094() => CorpusAssert.Parses(@"CREATE OPERATOR FAMILY opca0094_fam USING btree;
 ALTER OPERATOR FAMILY opca0094_fam USING btree ADD FUNCTION 1 btint4cmp(int4, int4)", "ok");
     [Fact]
     public void opca0095() => CorpusAssert.Parses(@"CREATE OPERATOR FAMILY opca0095_fam USING btree;
 ALTER OPERATOR FAMILY opca0095_fam USING btree ADD FUNCTION 1 (integer) btint4cmp(int4, int4)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void opca0096() => CorpusAssert.Parses(@"CREATE OPERATOR FAMILY opca0096_fam USING btree;
-ALTER OPERATOR FAMILY s.opca0096_fam USING btree ADD OPERATOR 1 <(integer, integer)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task opca0096() => CorpusAssert.MatchesPostgres(@"CREATE OPERATOR FAMILY opca0096_fam USING btree;
+ALTER OPERATOR FAMILY s.opca0096_fam USING btree ADD OPERATOR 1 <(integer, integer)", "error", false);
     [Fact]
     public void opca0097() => CorpusAssert.Parses(@"CREATE OPERATOR FAMILY s.opca0097_fam USING btree;
 ALTER OPERATOR FAMILY s.opca0097_fam USING btree ADD OPERATOR 1 <(integer, integer)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void opca0098() => CorpusAssert.Parses(@"CREATE OPERATOR FAMILY opca0098_fam USING btree;
-ALTER OPERATOR FAMILY opca0098_fam USING hash ADD OPERATOR 1 <(integer, integer)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void opca0099() => CorpusAssert.Parses(@"DROP OPERATOR CLASS opca0099_ops USING btree", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task opca0098() => CorpusAssert.MatchesPostgres(@"CREATE OPERATOR FAMILY opca0098_fam USING btree;
+ALTER OPERATOR FAMILY opca0098_fam USING hash ADD OPERATOR 1 <(integer, integer)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task opca0099() => CorpusAssert.MatchesPostgres(@"DROP OPERATOR CLASS opca0099_ops USING btree", "error", false);
     [Fact]
     public void opca0100() => CorpusAssert.Parses(@"DROP OPERATOR CLASS IF EXISTS opca0100_ops USING btree", "ok");
     [Fact]
@@ -253,15 +253,15 @@ DROP OPERATOR CLASS opca0103_ops USING btree RESTRICT", "ok");
     [Fact]
     public void opca0104() => CorpusAssert.Parses(@"CREATE OPERATOR CLASS opca0104_ops FOR TYPE integer USING btree AS OPERATOR 1 <;
 DROP OPERATOR CLASS IF EXISTS opca0104_ops USING btree", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void opca0105() => CorpusAssert.Parses(@"DROP OPERATOR CLASS opca0105_ops", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task opca0105() => CorpusAssert.MatchesPostgres(@"DROP OPERATOR CLASS opca0105_ops", "error", false);
     [Fact]
     public void opca0106() => CorpusAssert.Parses(@"DROP OPERATOR CLASS IF EXISTS USING btree", "error");
     [Fact]
     public void opca0107() => CorpusAssert.Parses(@"CREATE OPERATOR CLASS s.opca0107_ops FOR TYPE integer USING btree AS OPERATOR 1 <;
 DROP OPERATOR CLASS s.opca0107_ops USING btree", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void opca0108() => CorpusAssert.Parses(@"DROP OPERATOR FAMILY opca0108_fam USING btree", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task opca0108() => CorpusAssert.MatchesPostgres(@"DROP OPERATOR FAMILY opca0108_fam USING btree", "error", false);
     [Fact]
     public void opca0109() => CorpusAssert.Parses(@"DROP OPERATOR FAMILY IF EXISTS opca0109_fam USING btree", "ok");
     [Fact]
@@ -276,8 +276,8 @@ DROP OPERATOR FAMILY opca0112_fam USING btree RESTRICT", "ok");
     [Fact]
     public void opca0113() => CorpusAssert.Parses(@"CREATE OPERATOR FAMILY opca0113_fam USING btree;
 DROP OPERATOR FAMILY IF EXISTS opca0113_fam USING btree", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void opca0114() => CorpusAssert.Parses(@"DROP OPERATOR FAMILY opca0114_fam", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task opca0114() => CorpusAssert.MatchesPostgres(@"DROP OPERATOR FAMILY opca0114_fam", "error", false);
     [Fact]
     public void opca0115() => CorpusAssert.Parses(@"DROP OPERATOR FAMILY IF EXISTS USING btree", "error");
     [Fact]
@@ -298,14 +298,14 @@ ALTER OPERATOR CLASS opca0120_ops USING btree OWNER TO SESSION_USER", "ok");
     [Fact]
     public void opca0121() => CorpusAssert.Parses(@"CREATE OPERATOR CLASS opca0121_ops FOR TYPE integer USING btree AS OPERATOR 1 <;
 ALTER OPERATOR CLASS opca0121_ops USING btree SET SCHEMA s", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void opca0122() => CorpusAssert.Parses(@"ALTER OPERATOR CLASS nonexistent_ops USING btree RENAME TO something_else", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void opca0123() => CorpusAssert.Parses(@"CREATE OPERATOR CLASS opca0123_ops FOR TYPE integer USING btree AS OPERATOR 1 <;
-ALTER OPERATOR CLASS opca0123_ops USING hash RENAME TO opca0123_ops_new", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void opca0124() => CorpusAssert.Parses(@"CREATE OPERATOR CLASS opca0124_ops FOR TYPE integer USING btree AS OPERATOR 1 <;
-ALTER OPERATOR CLASS opca0124_ops USING btree", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task opca0122() => CorpusAssert.MatchesPostgres(@"ALTER OPERATOR CLASS nonexistent_ops USING btree RENAME TO something_else", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task opca0123() => CorpusAssert.MatchesPostgres(@"CREATE OPERATOR CLASS opca0123_ops FOR TYPE integer USING btree AS OPERATOR 1 <;
+ALTER OPERATOR CLASS opca0123_ops USING hash RENAME TO opca0123_ops_new", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task opca0124() => CorpusAssert.MatchesPostgres(@"CREATE OPERATOR CLASS opca0124_ops FOR TYPE integer USING btree AS OPERATOR 1 <;
+ALTER OPERATOR CLASS opca0124_ops USING btree", "error", false);
     [Fact]
     public void opca0125() => CorpusAssert.Parses(@"CREATE OPERATOR CLASS s.opca0125_ops FOR TYPE integer USING btree AS OPERATOR 1 <;
 ALTER OPERATOR CLASS s.opca0125_ops USING btree RENAME TO opca0125_ops_new", "ok");
@@ -348,15 +348,15 @@ ALTER OPERATOR FAMILY opca0138_fam USING hash ADD OPERATOR 1 =(integer, integer)
     [Fact]
     public void opca0139() => CorpusAssert.Parses(@"CREATE OPERATOR FAMILY opca0139_fam USING btree;
 ALTER OPERATOR FAMILY opca0139_fam USING btree ADD OPERATOR 1 <(integer, integer) FOR SEARCH, FUNCTION 1 (integer, integer) btint4cmp(int4, int4)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void opca0140() => CorpusAssert.Parses(@"CREATE OPERATOR FAMILY opca0140_fam USING btree;
-ALTER OPERATOR FAMILY opca0140_fam USING btree DROP FUNCTION 1 (integer, integer)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task opca0140() => CorpusAssert.MatchesPostgres(@"CREATE OPERATOR FAMILY opca0140_fam USING btree;
+ALTER OPERATOR FAMILY opca0140_fam USING btree DROP FUNCTION 1 (integer, integer)", "error", false);
     [Fact]
     public void opca0141() => CorpusAssert.Parses(@"CREATE OPERATOR CLASS opca0141_ops FOR TYPE integer USING btree AS OPERATOR 1 <, OPERATOR 2 <=, OPERATOR 3 =, OPERATOR 4 >=, OPERATOR 5 >, FUNCTION 1 btint4cmp(int4, int4);
 ALTER OPERATOR CLASS opca0141_ops USING btree SET SCHEMA public", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void opca0142() => CorpusAssert.Parses(@"CREATE OPERATOR CLASS opca0142_ops FOR TYPE integer USING btree AS OPERATOR 1 <;
-ALTER OPERATOR CLASS opca0142_ops USING btree OWNER TO nonexistent_role", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task opca0142() => CorpusAssert.MatchesPostgres(@"CREATE OPERATOR CLASS opca0142_ops FOR TYPE integer USING btree AS OPERATOR 1 <;
+ALTER OPERATOR CLASS opca0142_ops USING btree OWNER TO nonexistent_role", "error", false);
     [Fact]
     public void opca0143() => CorpusAssert.Parses(@"CREATE OPERATOR FAMILY opca0143_fam USING btree;
 ALTER OPERATOR FAMILY opca0143_fam USING btree RENAME TO opca0143_renamed;
@@ -371,8 +371,8 @@ ALTER OPERATOR CLASS opca0145_ops USING btree SET SCHEMA s;
 DROP OPERATOR CLASS s.opca0145_ops USING btree", "ok");
     [Fact]
     public void opca0146() => CorpusAssert.Parses(@"CREATE OPERATOR CLASS opca0146_ops FOR TYPE int4 USING btree AS OPERATOR 1 <(int4, int4) FOR SEARCH, OPERATOR 2 <=(int4, int4) FOR SEARCH, OPERATOR 3 =(int4, int4) FOR SEARCH, OPERATOR 4 >=(int4, int4) FOR SEARCH, OPERATOR 5 >(int4, int4) FOR SEARCH", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void opca0147() => CorpusAssert.Parses(@"CREATE OPERATOR CLASS opca0147_ops FOR TYPE integer USING btree AS OPERATOR 1 <(integer, integer), OPERATOR 2 <=(integer, integer), OPERATOR 3 =(integer, integer), OPERATOR 4 >=(integer, integer), OPERATOR 5 >(integer, integer), OPERATOR 1 <(integer, integer) FOR ORDER BY integer_ops", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task opca0147() => CorpusAssert.MatchesPostgres(@"CREATE OPERATOR CLASS opca0147_ops FOR TYPE integer USING btree AS OPERATOR 1 <(integer, integer), OPERATOR 2 <=(integer, integer), OPERATOR 3 =(integer, integer), OPERATOR 4 >=(integer, integer), OPERATOR 5 >(integer, integer), OPERATOR 1 <(integer, integer) FOR ORDER BY integer_ops", "error", false);
     [Fact]
     public void opca0148() => CorpusAssert.Parses(@"CREATE OPERATOR CLASS opca0148_ops FOR TYPE int4 USING btree AS FUNCTION 1 (int4, int4) btint4cmp(int4, int4), FUNCTION 2 (int4, int4) btint4sortsupport(internal)", "ok");
     [Fact]
@@ -405,18 +405,18 @@ DROP OPERATOR FAMILY opca0155_fam_v2 USING btree", "ok");
     public void opca0156() => CorpusAssert.Parses(@"CREATE OPERATOR CLASS opca0156_ops FOR TYPE int4 USING btree AS OPERATOR 1 <(int4, int4), OPERATOR 2 <=(int4, int4), OPERATOR 3 =(int4, int4), OPERATOR 4 >=(int4, int4), OPERATOR 5 >(int4, int4), FUNCTION 1 btint4cmp(int4, int4); DROP OPERATOR FAMILY opca0156_ops USING btree CASCADE", "ok");
     [Fact]
     public void opca0157() => CorpusAssert.Parses(@"CREATE OPERATOR CLASS opca0157_ops FOR TYPE integer USING btree AS OPERATOR 1 < ,OPERATOR 2 <= ,OPERATOR 3 =", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void opca0158() => CorpusAssert.Parses(@"CREATE OPERATOR CLASS opca0158_ops FOR TYPE integer USING btree AS OPERATOR 1 <, OPERATOR 2 <=,", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void opca0159() => CorpusAssert.Parses(@"CREATE OPERATOR CLASS opca0159_ops FOR TYPE integer USING btree AS (OPERATOR 1 <)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void opca0160() => CorpusAssert.Parses(@"CREATE OPERATOR FAMILY opca0160a_fam USING btree; CREATE OPERATOR FAMILY opca0160b_fam USING btree; ALTER OPERATOR FAMILY opca0160a_fam USING btree RENAME TO opca0160b_fam", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task opca0158() => CorpusAssert.MatchesPostgres(@"CREATE OPERATOR CLASS opca0158_ops FOR TYPE integer USING btree AS OPERATOR 1 <, OPERATOR 2 <=,", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task opca0159() => CorpusAssert.MatchesPostgres(@"CREATE OPERATOR CLASS opca0159_ops FOR TYPE integer USING btree AS (OPERATOR 1 <)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task opca0160() => CorpusAssert.MatchesPostgres(@"CREATE OPERATOR FAMILY opca0160a_fam USING btree; CREATE OPERATOR FAMILY opca0160b_fam USING btree; ALTER OPERATOR FAMILY opca0160a_fam USING btree RENAME TO opca0160b_fam", "error", false);
     [Fact]
     public void opca0161() => CorpusAssert.Parses(@"CREATE OPERATOR CLASS opca0161_ops FOR TYPE integer USING btree AS OPERATOR 1 <;
 ALTER OPERATOR CLASS opca0161_ops USING btree RENAME TO opca0161_ops_renamed", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void opca0162() => CorpusAssert.Parses(@"CREATE OPERATOR FAMILY opca0162_fam USING btree;
-ALTER OPERATOR FAMILY opca0162_fam USING btree OWNER TO CURRENT_USER, RENAME TO opca0162_fam_new", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task opca0162() => CorpusAssert.MatchesPostgres(@"CREATE OPERATOR FAMILY opca0162_fam USING btree;
+ALTER OPERATOR FAMILY opca0162_fam USING btree OWNER TO CURRENT_USER, RENAME TO opca0162_fam_new", "error", false);
     [Fact]
     public void opca0163() => CorpusAssert.Parses(@"CREATE OPERATOR FAMILY opca0163_fam USING btree;
 ALTER OPERATOR FAMILY opca0163_fam USING btree ADD OPERATOR 1 <(integer, integer) FOR SEARCH, OPERATOR 3 =(integer, integer) FOR SEARCH, FUNCTION 1 (integer, integer) btint4cmp(int4, int4), FUNCTION 2 (integer, integer) btint4sortsupport(internal)", "ok");
@@ -443,8 +443,8 @@ ALTER OPERATOR FAMILY opca0168_fam USING btree ADD FUNCTION 2 (integer, integer)
     public void opca0170() => CorpusAssert.Parses(@"CREATE OPERATOR CLASS opca0170_ops FOR TYPE integer USING btree AS OPERATOR 1 pg_catalog.<(integer, integer), OPERATOR 2 pg_catalog.<=(integer, integer), OPERATOR 3 pg_catalog.=(integer, integer), OPERATOR 4 pg_catalog.>=(integer, integer), OPERATOR 5 pg_catalog.>(integer, integer), FUNCTION 1 pg_catalog.btint4cmp(int4, int4)", "ok");
     [Fact]
     public void opcb0001() => CorpusAssert.Parses(@"CREATE OPERATOR CLASS opcb0001_abs_ops FOR TYPE integer USING btree AS OPERATOR 1 <, OPERATOR 2 <=, OPERATOR 3 =, OPERATOR 4 >=, OPERATOR 5 >, FUNCTION 1 btint4cmp(integer, integer)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void opcb0002() => CorpusAssert.Parses(@"CREATE OPERATOR CLASS opcb0002_int_ops DEFAULT FOR TYPE integer USING hash AS OPERATOR 1 =, FUNCTION 1 hashint4(integer)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task opcb0002() => CorpusAssert.MatchesPostgres(@"CREATE OPERATOR CLASS opcb0002_int_ops DEFAULT FOR TYPE integer USING hash AS OPERATOR 1 =, FUNCTION 1 hashint4(integer)", "error", false);
     [Fact]
     public void opcb0003() => CorpusAssert.Parses(@"CREATE OPERATOR FAMILY opcb0003_fam USING btree", "ok");
     [Fact]
@@ -459,8 +459,8 @@ ALTER OPERATOR FAMILY opcb0007_fam USING btree RENAME TO opcb0007_fam_renamed", 
     [Fact]
     public void opcb0008() => CorpusAssert.Parses(@"CREATE OPERATOR FAMILY opcb0008_fam USING btree;
 ALTER OPERATOR FAMILY opcb0008_fam USING btree SET SCHEMA s", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void opcb0009() => CorpusAssert.Parses(@"CREATE OPERATOR CLASS opcb0009_int_ops FOR TYPE integer USING btree FAMILY opcb0009_fam AS OPERATOR 1 <, OPERATOR 2 <=, OPERATOR 3 =, OPERATOR 4 >=, OPERATOR 5 >, FUNCTION 1 btint4cmp(integer, integer)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task opcb0009() => CorpusAssert.MatchesPostgres(@"CREATE OPERATOR CLASS opcb0009_int_ops FOR TYPE integer USING btree FAMILY opcb0009_fam AS OPERATOR 1 <, OPERATOR 2 <=, OPERATOR 3 =, OPERATOR 4 >=, OPERATOR 5 >, FUNCTION 1 btint4cmp(integer, integer)", "error", false);
     [Fact]
     public void opcb0010() => CorpusAssert.Parses(@"CREATE OPERATOR FAMILY opcb0010_fam USING btree;
 CREATE OPERATOR CLASS opcb0010_int_ops FOR TYPE integer USING btree FAMILY opcb0010_fam AS OPERATOR 1 <, OPERATOR 2 <=, OPERATOR 3 =, OPERATOR 4 >=, OPERATOR 5 >, FUNCTION 1 btint4cmp(integer, integer)", "ok");
@@ -506,12 +506,12 @@ DROP OPERATOR FAMILY opcb0023_fam USING btree", "ok");
     [Fact]
     public void opcb0026() => CorpusAssert.Parses(@"CREATE OPERATOR CLASS opcb0026_int_ops FOR TYPE integer USING btree AS OPERATOR 1 <, OPERATOR 2 <=, OPERATOR 3 =, OPERATOR 4 >=, OPERATOR 5 >, FUNCTION 1 btint4cmp(integer, integer);
 DROP OPERATOR CLASS opcb0026_int_ops USING btree CASCADE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void opcb0027() => CorpusAssert.Parses(@"CREATE OPERATOR CLASS FOR TYPE integer USING btree AS OPERATOR 1 <", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void opcb0028() => CorpusAssert.Parses(@"CREATE OPERATOR CLASS opcb0028_bad FOR TYPE integer AS OPERATOR 1 <", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void opcb0029() => CorpusAssert.Parses(@"CREATE OPERATOR FAMILY USING btree", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task opcb0027() => CorpusAssert.MatchesPostgres(@"CREATE OPERATOR CLASS FOR TYPE integer USING btree AS OPERATOR 1 <", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task opcb0028() => CorpusAssert.MatchesPostgres(@"CREATE OPERATOR CLASS opcb0028_bad FOR TYPE integer AS OPERATOR 1 <", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task opcb0029() => CorpusAssert.MatchesPostgres(@"CREATE OPERATOR FAMILY USING btree", "error", false);
     [Fact]
     public void opcb0030() => CorpusAssert.Parses(@"CREATE OPERATOR CLASS opcb0030_int_ops FOR TYPE integer USING btree AS STORAGE integer, OPERATOR 1 <, FUNCTION 1 btint4cmp(integer, integer)", "ok");
 }

@@ -292,24 +292,24 @@ FETCH FORWARD 5 FROM c104", "ok");
     [Fact]
     public void cursa0105() => CorpusAssert.Parses(@"DECLARE c105 NO SCROLL CURSOR FOR SELECT id FROM s.t;
 FETCH FORWARD ALL FROM c105", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cursa0106() => CorpusAssert.Parses(@"DECLARE c106 NO SCROLL CURSOR FOR SELECT id FROM s.t;
-FETCH PRIOR FROM c106", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cursa0107() => CorpusAssert.Parses(@"DECLARE c107 NO SCROLL CURSOR FOR SELECT id FROM s.t;
-FETCH LAST FROM c107", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cursa0108() => CorpusAssert.Parses(@"DECLARE c108 NO SCROLL CURSOR FOR SELECT id FROM s.t;
-FETCH BACKWARD FROM c108", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cursa0109() => CorpusAssert.Parses(@"DECLARE c109 NO SCROLL CURSOR FOR SELECT id FROM s.t;
-FETCH RELATIVE -1 FROM c109", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cursa0110() => CorpusAssert.Parses(@"DECLARE c110 NO SCROLL CURSOR FOR SELECT id FROM s.t;
-FETCH BACKWARD 1 FROM c110", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cursa0111() => CorpusAssert.Parses(@"DECLARE c111 NO SCROLL CURSOR FOR SELECT id FROM s.t;
-FETCH BACKWARD ALL FROM c111", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task cursa0106() => CorpusAssert.MatchesPostgres(@"DECLARE c106 NO SCROLL CURSOR FOR SELECT id FROM s.t;
+FETCH PRIOR FROM c106", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task cursa0107() => CorpusAssert.MatchesPostgres(@"DECLARE c107 NO SCROLL CURSOR FOR SELECT id FROM s.t;
+FETCH LAST FROM c107", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task cursa0108() => CorpusAssert.MatchesPostgres(@"DECLARE c108 NO SCROLL CURSOR FOR SELECT id FROM s.t;
+FETCH BACKWARD FROM c108", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task cursa0109() => CorpusAssert.MatchesPostgres(@"DECLARE c109 NO SCROLL CURSOR FOR SELECT id FROM s.t;
+FETCH RELATIVE -1 FROM c109", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task cursa0110() => CorpusAssert.MatchesPostgres(@"DECLARE c110 NO SCROLL CURSOR FOR SELECT id FROM s.t;
+FETCH BACKWARD 1 FROM c110", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task cursa0111() => CorpusAssert.MatchesPostgres(@"DECLARE c111 NO SCROLL CURSOR FOR SELECT id FROM s.t;
+FETCH BACKWARD ALL FROM c111", "error", false);
     [Fact]
     public void cursa0112() => CorpusAssert.Parses(@"DECLARE c112 FOR SELECT id FROM s.t", "error");
     [Fact]
@@ -318,28 +318,28 @@ FETCH BACKWARD ALL FROM c111", "error");
     public void cursa0114() => CorpusAssert.Parses(@"DECLARE CURSOR FOR SELECT id FROM s.t", "error");
     [Fact]
     public void cursa0115() => CorpusAssert.Parses(@"DECLARE c115 CURSOR FOR", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cursa0116() => CorpusAssert.Parses(@"FETCH FROM nonexistent_cursor", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cursa0117() => CorpusAssert.Parses(@"CLOSE nonexistent_cursor", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task cursa0116() => CorpusAssert.MatchesPostgres(@"FETCH FROM nonexistent_cursor", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task cursa0117() => CorpusAssert.MatchesPostgres(@"CLOSE nonexistent_cursor", "error", false);
     [Fact]
     public void cursa0118() => CorpusAssert.Parses(@"FETCH BADDIR FROM c", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cursa0119() => CorpusAssert.Parses(@"DECLARE c119 INSENSITIVE ASENSITIVE CURSOR FOR SELECT id FROM s.t", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task cursa0119() => CorpusAssert.MatchesPostgres(@"DECLARE c119 INSENSITIVE ASENSITIVE CURSOR FOR SELECT id FROM s.t", "error", false);
     [Fact]
     public void cursa0120() => CorpusAssert.Parses(@"DECLARE c120 SCROLL NO SCROLL CURSOR FOR SELECT id FROM s.t", "error");
     [Fact]
     public void cursa0121() => CorpusAssert.Parses(@"DECLARE c121 CURSOR FOR UPDATE s.t SET val = 1", "error");
     [Fact]
     public void cursa0122() => CorpusAssert.Parses(@"DECLARE c122 CURSOR FOR INSERT INTO s.t(name) VALUES ('x')", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cursa0123() => CorpusAssert.Parses(@"MOVE FROM nonexistent_cursor", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cursa0124() => CorpusAssert.Parses(@"DECLARE c124 CURSOR FOR SELECT id FROM s.t;
+    [DbFact]
+    public System.Threading.Tasks.Task cursa0123() => CorpusAssert.MatchesPostgres(@"MOVE FROM nonexistent_cursor", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task cursa0124() => CorpusAssert.MatchesPostgres(@"DECLARE c124 CURSOR FOR SELECT id FROM s.t;
 FETCH NEXT FROM c124;
 FETCH NEXT FROM c124;
 CLOSE c124;
-FETCH NEXT FROM c124", "error");
+FETCH NEXT FROM c124", "error", false);
     [Fact]
     public void cursa0125() => CorpusAssert.Parses(@"DECLARE c125 SCROLL CURSOR FOR SELECT id FROM s.t ORDER BY id;
 MOVE ABSOLUTE 1 FROM c125;
@@ -421,9 +421,9 @@ FETCH ALL FROM c148", "ok");
     public void cursa0150() => CorpusAssert.Parses(@"DECLARE c150 SCROLL CURSOR FOR SELECT id FROM s.t ORDER BY id DESC;
 FETCH FIRST FROM c150;
 FETCH LAST FROM c150", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cursa0151() => CorpusAssert.Parses(@"DECLARE c151 CURSOR FOR SELECT id FROM s.t;
-DECLARE c151 CURSOR FOR SELECT name FROM s.t", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task cursa0151() => CorpusAssert.MatchesPostgres(@"DECLARE c151 CURSOR FOR SELECT id FROM s.t;
+DECLARE c151 CURSOR FOR SELECT name FROM s.t", "error", false);
     [Fact]
     public void cursa0152() => CorpusAssert.Parses(@"DECLARE c152 CURSOR FOR SELECT id, name FROM s.t WHERE id > 0 ORDER BY name LIMIT 5", "ok");
     [Fact]
@@ -468,8 +468,8 @@ FETCH NEXT FROM c166;
 CLOSE c166;
 DECLARE c166 CURSOR FOR SELECT name FROM s.t;
 FETCH NEXT FROM c166", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cursa0167() => CorpusAssert.Parses(@"FETCH ABSOLUTE 1 FROM c", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task cursa0167() => CorpusAssert.MatchesPostgres(@"FETCH ABSOLUTE 1 FROM c", "error", false);
     [Fact]
     public void cursa0168() => CorpusAssert.Parses(@"DECLARE c168 CURSOR FOR SELECT id FROM s.t;
 FETCH NEXT FROM c168;
@@ -626,21 +626,21 @@ MOVE PRIOR FROM cur46", "ok");
     [Fact]
     public void cursb0051() => CorpusAssert.Parses(@"DECLARE cur51 CURSOR FOR SELECT id FROM s.t;
 FETCH SIDEWAYS FROM cur51", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cursb0052() => CorpusAssert.Parses(@"FETCH NEXT FROM nonexistent_cursor", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cursb0053() => CorpusAssert.Parses(@"CLOSE nonexistent_cursor", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cursb0054() => CorpusAssert.Parses(@"DECLARE cur54 CURSOR FOR SELECT id FROM s.t;
-FETCH ABSOLUTE FROM cur54", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cursb0055() => CorpusAssert.Parses(@"DECLARE cur55 CURSOR FOR SELECT id FROM s.t;
-FETCH RELATIVE FROM cur55", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cursb0056() => CorpusAssert.Parses(@"DECLARE cur56 CURSOR FOR SELECT id FROM s.t;
-MOVE ABSOLUTE FROM cur56", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cursb0057() => CorpusAssert.Parses(@"DECLARE cur57 CURSOR FOR SELECT id FROM s.nonexistent", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task cursb0052() => CorpusAssert.MatchesPostgres(@"FETCH NEXT FROM nonexistent_cursor", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task cursb0053() => CorpusAssert.MatchesPostgres(@"CLOSE nonexistent_cursor", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task cursb0054() => CorpusAssert.MatchesPostgres(@"DECLARE cur54 CURSOR FOR SELECT id FROM s.t;
+FETCH ABSOLUTE FROM cur54", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task cursb0055() => CorpusAssert.MatchesPostgres(@"DECLARE cur55 CURSOR FOR SELECT id FROM s.t;
+FETCH RELATIVE FROM cur55", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task cursb0056() => CorpusAssert.MatchesPostgres(@"DECLARE cur56 CURSOR FOR SELECT id FROM s.t;
+MOVE ABSOLUTE FROM cur56", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task cursb0057() => CorpusAssert.MatchesPostgres(@"DECLARE cur57 CURSOR FOR SELECT id FROM s.nonexistent", "error", false);
     [Fact]
     public void cursb0058() => CorpusAssert.Parses(@"DECLARE cur58 BINARY CURSOR WITH HOLD WITHOUT HOLD FOR SELECT id FROM s.t", "error");
     [Fact]

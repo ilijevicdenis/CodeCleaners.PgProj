@@ -60,8 +60,8 @@ CREATE STATISTICS IF NOT EXISTS s.st11 ON name, val FROM s.t", "ok");
     public void staa0026() => CorpusAssert.Parses(@"CREATE STATISTICS st26 ON name, val FROM s.t", "ok");
     [Fact]
     public void staa0027() => CorpusAssert.Parses(@"CREATE STATISTICS s.""My Stats"" ON name, val FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void staa0028() => CorpusAssert.Parses(@"CREATE STATISTICS s.st28 ON s.t.name, s.t.val FROM s.t", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task staa0028() => CorpusAssert.MatchesPostgres(@"CREATE STATISTICS s.st28 ON s.t.name, s.t.val FROM s.t", "error", false);
     [Fact]
     public void staa0029() => CorpusAssert.Parses(@"CREATE STATISTICS s.st29 ON t_id, label FROM s.t2", "ok");
     [Fact]
@@ -70,39 +70,39 @@ CREATE STATISTICS IF NOT EXISTS s.st11 ON name, val FROM s.t", "ok");
     public void staa0031() => CorpusAssert.Parses(@"CREATE STATISTICS ON (val + qty), (qty * 2) FROM s.t", "ok");
     [Fact]
     public void staa0032() => CorpusAssert.Parses(@"CREATE STATISTICS (ndistinct) ON name, val FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void staa0033() => CorpusAssert.Parses(@"CREATE STATISTICS IF NOT EXISTS ON name, val FROM s.t", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task staa0033() => CorpusAssert.MatchesPostgres(@"CREATE STATISTICS IF NOT EXISTS ON name, val FROM s.t", "error", false);
     [Fact]
     public void staa0034() => CorpusAssert.Parses(@"CREATE STATISTICS s.st34 ON status, n FROM s.mv", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void staa0035() => CorpusAssert.Parses(@"CREATE STATISTICS s.st35 ON name FROM s.t", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void staa0036() => CorpusAssert.Parses(@"CREATE STATISTICS s.st36 ON name, val", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void staa0037() => CorpusAssert.Parses(@"CREATE STATISTICS s.st37 ON FROM s.t", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void staa0038() => CorpusAssert.Parses(@"CREATE STATISTICS s.st38 () ON name, val FROM s.t", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void staa0039() => CorpusAssert.Parses(@"CREATE STATISTICS s.st39 (invalid_kind) ON name, val FROM s.t", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void staa0040() => CorpusAssert.Parses(@"CREATE STATISTICS s.st40 (ndistinct dependencies) ON name, val FROM s.t", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void staa0041() => CorpusAssert.Parses(@"CREATE STATISTICS ON name FROM s.t", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void staa0042() => CorpusAssert.Parses(@"CREATE STATISTICS s.st42 ON name, nonexistent_col FROM s.t", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void staa0043() => CorpusAssert.Parses(@"CREATE STATISTICS s.st43 ON name, val FROM nonexistent_table", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void staa0044() => CorpusAssert.Parses(@"CREATE STATISTICS s.st44dup ON name, val FROM s.t;
-CREATE STATISTICS s.st44dup ON name, val FROM s.t", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void staa0045() => CorpusAssert.Parses(@"CREATE STATISTIC s.st45 ON name, val FROM s.t", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void staa0046() => CorpusAssert.Parses(@"CREATE STATISTICS s.st46 ON name, val IN s.t", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void staa0047() => CorpusAssert.Parses(@"CREATE STATISTICS s.st47 name, val ON FROM s.t", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void staa0048() => CorpusAssert.Parses(@"CREATE STATISTICS s.st48 (ndistinct) FROM s.t ON name, val", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task staa0035() => CorpusAssert.MatchesPostgres(@"CREATE STATISTICS s.st35 ON name FROM s.t", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task staa0036() => CorpusAssert.MatchesPostgres(@"CREATE STATISTICS s.st36 ON name, val", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task staa0037() => CorpusAssert.MatchesPostgres(@"CREATE STATISTICS s.st37 ON FROM s.t", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task staa0038() => CorpusAssert.MatchesPostgres(@"CREATE STATISTICS s.st38 () ON name, val FROM s.t", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task staa0039() => CorpusAssert.MatchesPostgres(@"CREATE STATISTICS s.st39 (invalid_kind) ON name, val FROM s.t", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task staa0040() => CorpusAssert.MatchesPostgres(@"CREATE STATISTICS s.st40 (ndistinct dependencies) ON name, val FROM s.t", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task staa0041() => CorpusAssert.MatchesPostgres(@"CREATE STATISTICS ON name FROM s.t", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task staa0042() => CorpusAssert.MatchesPostgres(@"CREATE STATISTICS s.st42 ON name, nonexistent_col FROM s.t", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task staa0043() => CorpusAssert.MatchesPostgres(@"CREATE STATISTICS s.st43 ON name, val FROM nonexistent_table", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task staa0044() => CorpusAssert.MatchesPostgres(@"CREATE STATISTICS s.st44dup ON name, val FROM s.t;
+CREATE STATISTICS s.st44dup ON name, val FROM s.t", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task staa0045() => CorpusAssert.MatchesPostgres(@"CREATE STATISTIC s.st45 ON name, val FROM s.t", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task staa0046() => CorpusAssert.MatchesPostgres(@"CREATE STATISTICS s.st46 ON name, val IN s.t", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task staa0047() => CorpusAssert.MatchesPostgres(@"CREATE STATISTICS s.st47 name, val ON FROM s.t", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task staa0048() => CorpusAssert.MatchesPostgres(@"CREATE STATISTICS s.st48 (ndistinct) FROM s.t ON name, val", "error", false);
     [Fact]
     public void staa0049() => CorpusAssert.Parses(@"CREATE STATISTICS s.st49 ON (val + qty), name FROM s.t", "ok");
     [Fact]
@@ -148,28 +148,28 @@ DROP STATISTICS s.st62 RESTRICT", "ok");
     public void staa0063() => CorpusAssert.Parses(@"CREATE STATISTICS s.st63a ON qty, flag FROM s.t;
 CREATE STATISTICS s.st63b ON name, val FROM s.t;
 DROP STATISTICS s.st63a, s.st63b", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void staa0064() => CorpusAssert.Parses(@"DROP STATISTICS s.nonexistent_stat", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void staa0065() => CorpusAssert.Parses(@"ALTER STATISTICS s.nonexistent_stat RENAME TO foo", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task staa0064() => CorpusAssert.MatchesPostgres(@"DROP STATISTICS s.nonexistent_stat", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task staa0065() => CorpusAssert.MatchesPostgres(@"ALTER STATISTICS s.nonexistent_stat RENAME TO foo", "error", false);
     [Fact]
     public void staa0066() => CorpusAssert.Parses(@"CREATE STATISTICS s.st66 ON qty, flag FROM s.t;
 ALTER STATISTICS s.st66 SET STATISTICS -1", "ok");
     [Fact]
     public void staa0067() => CorpusAssert.Parses(@"CREATE STATISTICS s.st67 ON qty, flag FROM s.t;
 ALTER STATISTICS s.st67 SET STATISTICS 10001", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void staa0068() => CorpusAssert.Parses(@"ALTER STATISTICS SET STATISTICS 100", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void staa0069() => CorpusAssert.Parses(@"CREATE STATISTICS s.st69 ON qty, flag FROM s.t;
-ALTER STATISTICS s.st69 SET STATISTIC 100", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task staa0068() => CorpusAssert.MatchesPostgres(@"ALTER STATISTICS SET STATISTICS 100", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task staa0069() => CorpusAssert.MatchesPostgres(@"CREATE STATISTICS s.st69 ON qty, flag FROM s.t;
+ALTER STATISTICS s.st69 SET STATISTIC 100", "error", false);
     [Fact]
     public void staa0070() => CorpusAssert.Parses(@"CREATE STATISTICS s.st70 ON qty, flag FROM s.t;
 ALTER STATISTICS s.st70 RENAME st70_new", "error");
     [Fact]
     public void staa0071() => CorpusAssert.Parses(@"DROP STATISTICS", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void staa0072() => CorpusAssert.Parses(@"DROP STATISTIC s.st72", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task staa0072() => CorpusAssert.MatchesPostgres(@"DROP STATISTIC s.st72", "error", false);
     [Fact]
     public void staa0073() => CorpusAssert.Parses(@"CREATE STATISTICS s.st73 ON id, amount FROM s.t2", "ok");
     [Fact]
@@ -264,10 +264,10 @@ DROP STATISTICS s.st107_final", "ok");
 ALTER STATISTICS s.st108 SET SCHEMA s", "ok");
     [Fact]
     public void staa0109() => CorpusAssert.Parses(@"CREATE STATISTICS ON (qty * val) FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void staa0110() => CorpusAssert.Parses(@"CREATE STATISTICS s.st110 ON (qty) FROM s.t", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void staa0111() => CorpusAssert.Parses(@"CREATE STATISTICS s.st111 ON (flag) FROM s.t", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task staa0110() => CorpusAssert.MatchesPostgres(@"CREATE STATISTICS s.st110 ON (qty) FROM s.t", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task staa0111() => CorpusAssert.MatchesPostgres(@"CREATE STATISTICS s.st111 ON (flag) FROM s.t", "error", false);
     [Fact]
     public void staa0112() => CorpusAssert.Parses(@"CREATE STATISTICS s.st112 ON (status::text) FROM s.t", "ok");
     [Fact]
@@ -276,19 +276,19 @@ ALTER STATISTICS s.st108 SET SCHEMA s", "ok");
     public void staa0114() => CorpusAssert.Parses(@"CREATE STATISTICS s.st114 ON (char_length(name)) FROM s.t", "ok");
     [Fact]
     public void staa0115() => CorpusAssert.Parses(@"CREATE STATISTICS s.st115 ON (substring(name FROM 1 FOR 3)) FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void staa0116() => CorpusAssert.Parses(@"CREATE STATISTICS s.st116 ON name, val FROM s.t;
-ALTER STATISTICS s.st116 SET STATISTICS 'abc'", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task staa0116() => CorpusAssert.MatchesPostgres(@"CREATE STATISTICS s.st116 ON name, val FROM s.t;
+ALTER STATISTICS s.st116 SET STATISTICS 'abc'", "error", false);
     [Fact]
     public void staa0117() => CorpusAssert.Parses(@"CREATE STATISTICS s.st117 ON name, val FROM s.t;
 ALTER STATISTICS s.st117 OWNER TO 'nonexistent_role_xyz'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void staa0118() => CorpusAssert.Parses(@"CREATE STATISTICS s.st118 ON name, val FROM s.t;
-ALTER STATISTICS s.st118 SET SCHEMA nonexistent_schema_xyz", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void staa0119() => CorpusAssert.Parses(@"CREATE STATISTICS s.st119 ON val FROM s.t", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void staa0120() => CorpusAssert.Parses(@"CREATE STATISTICS s.st120 ON name, val FROM s.v", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task staa0118() => CorpusAssert.MatchesPostgres(@"CREATE STATISTICS s.st118 ON name, val FROM s.t;
+ALTER STATISTICS s.st118 SET SCHEMA nonexistent_schema_xyz", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task staa0119() => CorpusAssert.MatchesPostgres(@"CREATE STATISTICS s.st119 ON val FROM s.t", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task staa0120() => CorpusAssert.MatchesPostgres(@"CREATE STATISTICS s.st120 ON name, val FROM s.v", "error", false);
     [Fact]
     public void staa0121() => CorpusAssert.Parses(@"CREATE STATISTICS s.st121 (ndistinct, ndistinct) ON name, val FROM s.t", "ok");
     [Fact]

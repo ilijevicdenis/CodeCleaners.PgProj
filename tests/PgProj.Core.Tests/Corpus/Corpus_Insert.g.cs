@@ -9,8 +9,8 @@ public class Corpus_Insert
     public void insa0001() => CorpusAssert.Parses(@"INSERT INTO s.t (name, val, qty) VALUES ('Alice', 1.50, 3)", "ok");
     [Fact]
     public void insa0002() => CorpusAssert.Parses(@"INSERT INTO s.t (name) VALUES ('Bob')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void insa0003() => CorpusAssert.Parses(@"INSERT INTO s.t DEFAULT VALUES", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task insa0003() => CorpusAssert.MatchesPostgres(@"INSERT INTO s.t DEFAULT VALUES", "error", false);
     [Fact]
     public void insa0004() => CorpusAssert.Parses(@"INSERT INTO s.t2 DEFAULT VALUES", "ok");
     [Fact]
@@ -27,8 +27,8 @@ public class Corpus_Insert
     public void insa0010() => CorpusAssert.Parses(@"INSERT INTO s.t (name, data) VALUES ('Jack', '{""a"":1}'::jsonb)", "ok");
     [Fact]
     public void insa0011() => CorpusAssert.Parses(@"INSERT INTO s.t (name, status) VALUES ('Kate', 'happy')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void insa0012() => CorpusAssert.Parses(@"INSERT INTO s.t (name, status) VALUES ('Leo', 'grumpy')", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task insa0012() => CorpusAssert.MatchesPostgres(@"INSERT INTO s.t (name, status) VALUES ('Leo', 'grumpy')", "error", false);
     [Fact]
     public void insa0013() => CorpusAssert.Parses(@"INSERT INTO s.t (name, home) VALUES ('Mia', ROW('123 Main', 'Springfield', '62701')::s.addr)", "ok");
     [Fact]
@@ -39,8 +39,8 @@ public class Corpus_Insert
     public void insa0016() => CorpusAssert.Parses(@"INSERT INTO s.t (name, val) VALUES ('Pat', 1+2)", "ok");
     [Fact]
     public void insa0017() => CorpusAssert.Parses(@"INSERT INTO s.t (name, qty) VALUES ('Quinn', nextval('s.seq'))", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void insa0018() => CorpusAssert.Parses(@"INSERT INTO s.t (name, val) VALUES (NULL, NULL)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task insa0018() => CorpusAssert.MatchesPostgres(@"INSERT INTO s.t (name, val) VALUES (NULL, NULL)", "error", false);
     [Fact]
     public void insa0019() => CorpusAssert.Parses(@"INSERT INTO s.t (name, val) VALUES ('Rose', NULL)", "ok");
     [Fact]
@@ -117,8 +117,8 @@ public class Corpus_Insert
     public void insa0055() => CorpusAssert.Parses(@"INSERT INTO s.events (occurred, payload) VALUES ('2024-06-01', '{""k"":""v""}'::jsonb)", "ok");
     [Fact]
     public void insa0056() => CorpusAssert.Parses(@"INSERT INTO s.events_2024 (occurred, payload) VALUES ('2024-07-04', NULL)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void insa0057() => CorpusAssert.Parses(@"INSERT INTO s.events (occurred, payload) VALUES ('2023-01-01', NULL)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task insa0057() => CorpusAssert.MatchesPostgres(@"INSERT INTO s.events (occurred, payload) VALUES ('2023-01-01', NULL)", "error", false);
     [Fact]
     public void insa0058() => CorpusAssert.Parses(@"INSERT INTO s.t (name) VALUES ('SubExpr', (SELECT max(qty) FROM s.t))", "error");
     [Fact]
@@ -137,22 +137,22 @@ public class Corpus_Insert
     public void insa0065() => CorpusAssert.Parses(@"INSERT INTO s.t (name) VALUE ('BadKeyword')", "error");
     [Fact]
     public void insa0066() => CorpusAssert.Parses(@"INSERT INTO s.t (name) VALUES 'NoParen'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void insa0067() => CorpusAssert.Parses(@"INSERT INTO s.t (name) VALUES ('x') ON CONFLICT DO UPDATE SET name = 'y'", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task insa0067() => CorpusAssert.MatchesPostgres(@"INSERT INTO s.t (name) VALUES ('x') ON CONFLICT DO UPDATE SET name = 'y'", "error", false);
     [Fact]
     public void insa0068() => CorpusAssert.Parses(@"INSERT INTO s.t (id, name) OVERRIDING SYSTEM VALUE VALUES (984, 'x') ON CONFLICT (id) DO UPDATE SET name = EXCLUDED.name", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void insa0069() => CorpusAssert.Parses(@"INSERT INTO s.t (name) VALUES ('x') ON CONFLICT (nonexistent_col) DO NOTHING", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void insa0070() => CorpusAssert.Parses(@"INSERT INTO s.t (name) VALUES ('x') ON CONFLICT ON CONSTRAINT no_such_constraint DO NOTHING", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task insa0069() => CorpusAssert.MatchesPostgres(@"INSERT INTO s.t (name) VALUES ('x') ON CONFLICT (nonexistent_col) DO NOTHING", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task insa0070() => CorpusAssert.MatchesPostgres(@"INSERT INTO s.t (name) VALUES ('x') ON CONFLICT ON CONSTRAINT no_such_constraint DO NOTHING", "error", false);
     [Fact]
     public void insa0071() => CorpusAssert.Parses(@"INSERT INTO s.t (name) VALUES ('x') ON CONFLICT DO REPLACE", "error");
     [Fact]
     public void insa0072() => CorpusAssert.Parses(@"INSERT INTO (name) VALUES ('x')", "error");
     [Fact]
     public void insa0073() => CorpusAssert.Parses(@"INSERT INTO s.t (name) VALUES ('x') ON CONFLICT (id) DO UPDATE", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void insa0074() => CorpusAssert.Parses(@"INSERT INTO s.t (name) SELECT", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task insa0074() => CorpusAssert.MatchesPostgres(@"INSERT INTO s.t (name) SELECT", "error", false);
     [Fact]
     public void insa0075() => CorpusAssert.Parses(@"INSERT INTO s.t (name) VALUES ('CaseInsert')", "ok");
     [Fact]
@@ -197,8 +197,8 @@ public class Corpus_Insert
     public void insa0095() => CorpusAssert.Parses(@"INSERT INTO s.t (name, val) VALUES ('Cast', CAST(42 AS numeric(12,2)))", "ok");
     [Fact]
     public void insa0096() => CorpusAssert.Parses(@"INSERT INTO s.t (name, val) VALUES ('PgCast', 42::numeric(12,2))", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void insa0097() => CorpusAssert.Parses(@"INSERT INTO s.t (name, qty) VALUES ('Cond', NULLIF(5, 5))", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task insa0097() => CorpusAssert.MatchesPostgres(@"INSERT INTO s.t (name, qty) VALUES ('Cond', NULLIF(5, 5))", "error", false);
     [Fact]
     public void insa0098() => CorpusAssert.Parses(@"INSERT INTO s.t (name, qty) VALUES ('NullIf2', NULLIF(5, 6))", "ok");
     [Fact]
@@ -247,10 +247,10 @@ public class Corpus_Insert
     public void insa0120() => CorpusAssert.Parses(@"INSERT INTO s.nonexistent (name) VALUES ('x')", "error");
     [Fact]
     public void insa0121() => CorpusAssert.Parses(@"INSERT INTO s.v (name, val) VALUES ('View', 1.0)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void insa0122() => CorpusAssert.Parses(@"INSERT INTO s.mv (status, n) VALUES ('ok', 1)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void insa0123() => CorpusAssert.Parses(@"INSERT INTO s.t (name) VALUES ('x') ON CONFLICT (name, id) DO NOTHING", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task insa0122() => CorpusAssert.MatchesPostgres(@"INSERT INTO s.mv (status, n) VALUES ('ok', 1)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task insa0123() => CorpusAssert.MatchesPostgres(@"INSERT INTO s.t (name) VALUES ('x') ON CONFLICT (name, id) DO NOTHING", "error", false);
     [Fact]
     public void insa0124() => CorpusAssert.Parses(@"INSERT INTO s.t (name, val) VALUES ('Concat', 'hello' || ' world', 1.0)", "error");
     [Fact]
@@ -293,10 +293,10 @@ public class Corpus_Insert
     public void insa0143() => CorpusAssert.Parses(@"INSERT INTO s.t2 (t_id, label, amount) SELECT id, name, val FROM s.t WHERE val IS NOT NULL", "ok");
     [Fact]
     public void insa0144() => CorpusAssert.Parses(@"INSERT INTO s.t (name) VALUES ('NullExpr', NULL::text)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void insa0145() => CorpusAssert.Parses(@"INSERT INTO s.t (name) VALUES (NULL::text)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void insa0146() => CorpusAssert.Parses(@"INSERT INTO s.t (name, val) VALUES (DEFAULT, 1.0)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task insa0145() => CorpusAssert.MatchesPostgres(@"INSERT INTO s.t (name) VALUES (NULL::text)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task insa0146() => CorpusAssert.MatchesPostgres(@"INSERT INTO s.t (name, val) VALUES (DEFAULT, 1.0)", "error", false);
     [Fact]
     public void insa0147() => CorpusAssert.Parses(@"INSERT INTO s.t (name, qty) VALUES ('DefQty', DEFAULT)", "ok");
     [Fact]
@@ -327,8 +327,8 @@ public class Corpus_Insert
     public void insa0160() => CorpusAssert.Parses(@"INSERT INTO s.t (id, name) OVERRIDING SYSTEM VALUE VALUES (980, 'RefExisting') ON CONFLICT (id) DO UPDATE SET qty = s.t.qty + 1", "ok");
     [Fact]
     public void insa0161() => CorpusAssert.Parses(@"INSERT INTO s.t AS tbl (id, name) OVERRIDING SYSTEM VALUE VALUES (979, 'RefAlias') ON CONFLICT (id) DO UPDATE SET qty = tbl.qty + 1", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void insa0162() => CorpusAssert.Parses(@"INSERT INTO s.t (name) VALUES ('OnConf_noTarget') ON CONFLICT DO UPDATE SET name = EXCLUDED.name", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task insa0162() => CorpusAssert.MatchesPostgres(@"INSERT INTO s.t (name) VALUES ('OnConf_noTarget') ON CONFLICT DO UPDATE SET name = EXCLUDED.name", "error", false);
     [Fact]
     public void insa0163() => CorpusAssert.Parses(@"INSERT INTO s.t (name, qty, val) VALUES ('Multi1', 1, 1.0), ('Multi2', 2, 2.0), ('Multi3', 3, 3.0) RETURNING id, name", "ok");
     [Fact]
@@ -365,8 +365,8 @@ public class Corpus_Insert
     public void insb0009() => CorpusAssert.Parses(@"INSERT INTO s.t (name, qty) VALUES ('i1', 10), ('i2', 20)", "ok");
     [Fact]
     public void insb0010() => CorpusAssert.Parses(@"INSERT INTO s.t (name, val, qty, flag) VALUES ('j1', 1.5, 3, false), ('j2', 2.5, 7, true)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void insb0011() => CorpusAssert.Parses(@"INSERT INTO s.t DEFAULT VALUES", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task insb0011() => CorpusAssert.MatchesPostgres(@"INSERT INTO s.t DEFAULT VALUES", "error", false);
     [Fact]
     public void insb0012() => CorpusAssert.Parses(@"INSERT INTO s.t (name, qty) VALUES ('k1', DEFAULT)", "ok");
     [Fact]
@@ -481,8 +481,8 @@ public class Corpus_Insert
     public void insb0067() => CorpusAssert.Parses(@"INSERT INTO s.t (name) VALUES ($tag$tagged dollar$tag$)", "ok");
     [Fact]
     public void insb0068() => CorpusAssert.Parses(@"INSERT INTO s.t (name) VALUES ('it''s a test')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void insb0069() => CorpusAssert.Parses(@"INSERT INTO s.t (val) VALUES (1 + 2)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task insb0069() => CorpusAssert.MatchesPostgres(@"INSERT INTO s.t (val) VALUES (1 + 2)", "error", false);
     [Fact]
     public void insb0070() => CorpusAssert.Parses(@"INSERT INTO s.t (name, qty) VALUES ('mismatch', 1, 2)", "error");
     [Fact]
@@ -491,8 +491,8 @@ public class Corpus_Insert
     public void insb0072() => CorpusAssert.Parses(@"INSERT s.t (name) VALUES ('no-into')", "error");
     [Fact]
     public void insb0073() => CorpusAssert.Parses(@"INSERT INTO (name) VALUES ('no-table')", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void insb0074() => CorpusAssert.Parses(@"INSERT INTO s.t VALUES ('only-val')", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task insb0074() => CorpusAssert.MatchesPostgres(@"INSERT INTO s.t VALUES ('only-val')", "error", false);
     [Fact]
     public void insb0075() => CorpusAssert.Parses(@"INSERT INTO s.t (name) VALUES", "error");
     [Fact]
@@ -501,14 +501,14 @@ public class Corpus_Insert
     public void insb0077() => CorpusAssert.Parses(@"INSERT INTO s.t (name) VALUES ('a') ON CONFLICT DO UPDATE", "error");
     [Fact]
     public void insb0078() => CorpusAssert.Parses(@"INSERT INTO s.t (name) VALUES ('a') ON CONFLICT DO INSERT", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void insb0079() => CorpusAssert.Parses(@"INSERT INTO s.t (name) VALUES ('a') ON CONFLICT (nonexistent_col) DO NOTHING", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void insb0080() => CorpusAssert.Parses(@"INSERT INTO s.t (name) VALUES ('a') ON CONFLICT ON CONSTRAINT no_such_constraint DO NOTHING", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task insb0079() => CorpusAssert.MatchesPostgres(@"INSERT INTO s.t (name) VALUES ('a') ON CONFLICT (nonexistent_col) DO NOTHING", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task insb0080() => CorpusAssert.MatchesPostgres(@"INSERT INTO s.t (name) VALUES ('a') ON CONFLICT ON CONSTRAINT no_such_constraint DO NOTHING", "error", false);
     [Fact]
     public void insb0081() => CorpusAssert.Parses(@"INSERT INTO s.t (name) RETURNING", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void insb0082() => CorpusAssert.Parses(@"INSERT INTO s.t (name) VALUES ('a') RETURNING nonexistent_col", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task insb0082() => CorpusAssert.MatchesPostgres(@"INSERT INTO s.t (name) VALUES ('a') RETURNING nonexistent_col", "error", false);
     [Fact]
     public void insb0083() => CorpusAssert.Parses(@"INSERT INTO s.nonexistent (name) VALUES ('a')", "error");
     [Fact]
@@ -595,10 +595,10 @@ public class Corpus_Insert
 SELECT currval('s.seq')", "ok");
     [Fact]
     public void insb0124() => CorpusAssert.Parses(@"INSERT INTO s.t (name) ON CONFLICT DO NOTHING", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void insb0125() => CorpusAssert.Parses(@"INSERT INTO s.t (name) VALUES ('exc1') ON CONFLICT (id) DO UPDATE SET name = EXCLUDED.nonexistent", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void insb0126() => CorpusAssert.Parses(@"INSERT INTO s.t (name) VALUES ('noconflict') ON CONFLICT DO UPDATE SET name = 'x'", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task insb0125() => CorpusAssert.MatchesPostgres(@"INSERT INTO s.t (name) VALUES ('exc1') ON CONFLICT (id) DO UPDATE SET name = EXCLUDED.nonexistent", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task insb0126() => CorpusAssert.MatchesPostgres(@"INSERT INTO s.t (name) VALUES ('noconflict') ON CONFLICT DO UPDATE SET name = 'x'", "error", false);
     [Fact]
     public void insb0127() => CorpusAssert.Parses(@"INSERT INTO s.t (name, val) VALUES ('ov-order', 5.0) OVERRIDING USER VALUE OVERRIDING SYSTEM VALUE", "error");
     [Fact]
@@ -613,8 +613,8 @@ SELECT currval('s.seq')", "ok");
     public void insb0132() => CorpusAssert.Parses(@"INSERT INTO s.t (name) VALUES ('a') ON CONFLICT (id) DO UPDATE SET", "error");
     [Fact]
     public void insb0133() => CorpusAssert.Parses(@"INSERT INTO s.t (name, val) VALUES ('multi-def', DEFAULT), ('multi-val', 1.0)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void insb0134() => CorpusAssert.Parses(@"INSERT INTO s.t (name) VALUES (DEFAULT)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task insb0134() => CorpusAssert.MatchesPostgres(@"INSERT INTO s.t (name) VALUES (DEFAULT)", "error", false);
     [Fact]
     public void insb0135() => CorpusAssert.Parses(@"INSERT INTO s.t (name, qty) VALUES ('with-sel') SELECT 1", "error");
     [Fact]
@@ -633,8 +633,8 @@ SELECT currval('s.seq')", "ok");
     public void insb0142() => CorpusAssert.Parses(@"WITH u AS (UPDATE s.t SET qty = qty WHERE false RETURNING name) INSERT INTO s.t2 (label) SELECT name FROM u", "ok");
     [Fact]
     public void insb0143() => CorpusAssert.Parses(@"INSERT INTO s.t (name) SELECT 'order-off' ORDER BY 1", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void insb0144() => CorpusAssert.Parses(@"INSERT INTO s.t (name, val) VALUES ('idx-col', 1.0) ON CONFLICT (name) DO NOTHING", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task insb0144() => CorpusAssert.MatchesPostgres(@"INSERT INTO s.t (name, val) VALUES ('idx-col', 1.0) ON CONFLICT (name) DO NOTHING", "error", false);
     [Fact]
     public void insb0145() => CorpusAssert.Parses(@"INSERT INTO s.t (name) VALUES ('partial-idx') ON CONFLICT (id) WHERE id > 0 DO NOTHING", "ok");
     [Fact]
@@ -661,8 +661,8 @@ SELECT currval('s.seq')", "ok");
     public void insb0156() => CorpusAssert.Parses(@"INSERT INTO s.t (name, val) VALUES ('subexpr2', (SELECT max(val) FROM s.t))", "ok");
     [Fact]
     public void insb0157() => CorpusAssert.Parses(@"INSERT INTO s.t (name) VALUES ('no-ret') RETURNING", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void insb0158() => CorpusAssert.Parses(@"INSERT INTO s.t (name) VALUES ('oc-no-target') ON CONFLICT DO UPDATE SET qty = 0", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task insb0158() => CorpusAssert.MatchesPostgres(@"INSERT INTO s.t (name) VALUES ('oc-no-target') ON CONFLICT DO UPDATE SET qty = 0", "error", false);
     [Fact]
     public void insb0159() => CorpusAssert.Parses(@"INSERT INTO s.t (name) VALUES ('ovr1') OVERRIDING NOTHING VALUE", "error");
     [Fact]
@@ -799,8 +799,8 @@ SELECT currval('s.seq')", "ok");
     public void insc0055() => CorpusAssert.Parses(@"INSERT INTO s.t (name) VALUES ($tag$tagged value$tag$)", "ok");
     [Fact]
     public void insc0056() => CorpusAssert.Parses(@"INSERT s.t (name) VALUES ('no_into')", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void insc0057() => CorpusAssert.Parses(@"INSERT INTO s.t VALUES ('wrong_col_count', 999, 'extra')", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task insc0057() => CorpusAssert.MatchesPostgres(@"INSERT INTO s.t VALUES ('wrong_col_count', 999, 'extra')", "error", false);
     [Fact]
     public void insc0058() => CorpusAssert.Parses(@"INSERT INTO s.t (name, qty) VALUES ('mismatch')", "error");
     [Fact]

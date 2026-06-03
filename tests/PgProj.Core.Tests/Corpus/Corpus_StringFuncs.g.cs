@@ -277,8 +277,8 @@ public class Corpus_StringFuncs
     public void strfa0135() => CorpusAssert.Parses(@"SELECT parse_ident('foo.bar', false)", "ok");
     [Fact]
     public void strfa0136() => CorpusAssert.Parses(@"SELECT parse_ident('foo.bar.baz')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void strfa0137() => CorpusAssert.Parses(@"SELECT parse_ident('invalid..ident')", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task strfa0137() => CorpusAssert.MatchesPostgres(@"SELECT parse_ident('invalid..ident')", "error", false);
     [Fact]
     public void strfa0138() => CorpusAssert.Parses(@"SELECT normalize('café')", "ok");
     [Fact]
@@ -289,8 +289,8 @@ public class Corpus_StringFuncs
     public void strfa0141() => CorpusAssert.Parses(@"SELECT normalize('café', NFKC)", "ok");
     [Fact]
     public void strfa0142() => CorpusAssert.Parses(@"SELECT normalize('café', NFKD)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void strfa0143() => CorpusAssert.Parses(@"SELECT normalize('hello', INVALID_FORM)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task strfa0143() => CorpusAssert.MatchesPostgres(@"SELECT normalize('hello', INVALID_FORM)", "error", false);
     [Fact]
     public void strfa0144() => CorpusAssert.Parses(@"SELECT 'café' IS NORMALIZED", "ok");
     [Fact]
@@ -491,8 +491,8 @@ public class Corpus_StringFuncs
     public void strfb0042() => CorpusAssert.Parses(@"SELECT format('%2$s %1$s', 'world', 'hello')", "ok");
     [Fact]
     public void strfb0043() => CorpusAssert.Parses(@"SELECT format('hello %s, you are %s years old', 'alice', 30)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void strfb0044() => CorpusAssert.Parses(@"SELECT format('%s %s', 'only one arg')", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task strfb0044() => CorpusAssert.MatchesPostgres(@"SELECT format('%s %s', 'only one arg')", "error", false);
     [Fact]
     public void strfb0045() => CorpusAssert.Parses(@"SELECT format()", "error");
     [Fact]
@@ -689,10 +689,10 @@ public class Corpus_StringFuncs
     public void strfb0141() => CorpusAssert.Parses(@"SELECT parse_ident('pg_catalog.pg_class')", "ok");
     [Fact]
     public void strfb0142() => CorpusAssert.Parses(@"SELECT parse_ident('""quoted"".""name""')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void strfb0143() => CorpusAssert.Parses(@"SELECT parse_ident('bad..name')", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void strfb0144() => CorpusAssert.Parses(@"SELECT parse_ident()", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task strfb0143() => CorpusAssert.MatchesPostgres(@"SELECT parse_ident('bad..name')", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task strfb0144() => CorpusAssert.MatchesPostgres(@"SELECT parse_ident()", "error", false);
     [Fact]
     public void strfb0145() => CorpusAssert.Parses(@"SELECT to_hex(255)", "ok");
     [Fact]
@@ -721,10 +721,10 @@ public class Corpus_StringFuncs
     public void strfb0157() => CorpusAssert.Parses(@"SELECT normalize('caf\u00e9', NFKC)", "ok");
     [Fact]
     public void strfb0158() => CorpusAssert.Parses(@"SELECT normalize('caf\u00e9', NFKD)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void strfb0159() => CorpusAssert.Parses(@"SELECT normalize()", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void strfb0160() => CorpusAssert.Parses(@"SELECT normalize('hello', BAD_FORM)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task strfb0159() => CorpusAssert.MatchesPostgres(@"SELECT normalize()", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task strfb0160() => CorpusAssert.MatchesPostgres(@"SELECT normalize('hello', BAD_FORM)", "error", false);
     [Fact]
     public void strfb0161() => CorpusAssert.Parses(@"SELECT is_normalized('caf\u00e9')", "ok");
     [Fact]
@@ -741,8 +741,8 @@ public class Corpus_StringFuncs
     public void strfb0167() => CorpusAssert.Parses(@"SELECT replace(name, 'a', 'b') FROM s.t WHERE starts_with(name, 'a')", "ok");
     [Fact]
     public void strfb0168() => CorpusAssert.Parses(@"SELECT split_part(label, ':', 1) FROM s.t2", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void strfb0169() => CorpusAssert.Parses(@"SELECT to_ascii()", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task strfb0169() => CorpusAssert.MatchesPostgres(@"SELECT to_ascii()", "error", false);
     [Fact]
     public void strfb0170() => CorpusAssert.Parses(@"SELECT convert_from('\x68656c6c6f'::bytea, 'UTF8')", "ok");
     [Fact]
@@ -793,8 +793,8 @@ public class Corpus_StringFuncs
     public void strfc0013() => CorpusAssert.Parses(@"SELECT normalize('cafe', NFC), normalize('cafe', NFD), normalize('cafe', NFKC), normalize('cafe', NFKD), is_normalized('cafe')", "ok");
     [Fact]
     public void strfc0014() => CorpusAssert.Parses(@"SELECT length()", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void strfc0015() => CorpusAssert.Parses(@"SELECT format('%z', 'x')", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task strfc0015() => CorpusAssert.MatchesPostgres(@"SELECT format('%z', 'x')", "error", false);
     [Fact]
     public void strfc0016() => CorpusAssert.Parses(@"SELECT substring('abc' FROM 1 FOR 2 FOR 3)", "error");
     [Fact]

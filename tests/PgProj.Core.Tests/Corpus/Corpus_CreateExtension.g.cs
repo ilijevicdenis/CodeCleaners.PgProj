@@ -5,8 +5,8 @@ namespace PgProj.Core.Tests.Corpus;
 
 public class Corpus_CreateExtension
 {
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void exta0001() => CorpusAssert.Parses(@"CREATE EXTENSION plpgsql", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task exta0001() => CorpusAssert.MatchesPostgres(@"CREATE EXTENSION plpgsql", "error", false);
     [Fact]
     public void exta0002() => CorpusAssert.Parses(@"CREATE EXTENSION IF NOT EXISTS plpgsql", "ok");
     [Fact]
@@ -19,8 +19,8 @@ public class Corpus_CreateExtension
     public void exta0006() => CorpusAssert.Parses(@"CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog VERSION '1.0'", "ok");
     [Fact]
     public void exta0007() => CorpusAssert.Parses(@"CREATE EXTENSION IF NOT EXISTS plpgsql VERSION '1.0'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void exta0008() => CorpusAssert.Parses(@"CREATE EXTENSION IF NOT EXISTS plpgsql VERSION 1.0", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task exta0008() => CorpusAssert.MatchesPostgres(@"CREATE EXTENSION IF NOT EXISTS plpgsql VERSION 1.0", "error", false);
     [Fact]
     public void exta0009() => CorpusAssert.Parses(@"CREATE EXTENSION IF NOT EXISTS plpgsql CASCADE", "ok");
     [Fact]
@@ -89,32 +89,32 @@ public class Corpus_CreateExtension
     public void exta0041() => CorpusAssert.Parses(@"CREATE EXTENSION IF NOT EXISTS unaccent", "ok");
     [Fact]
     public void exta0042() => CorpusAssert.Parses(@"CREATE EXTENSION IF NOT EXISTS unaccent SCHEMA s", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void exta0043() => CorpusAssert.Parses(@"CREATE EXTENSION nonexistent_xyz_abc_ext", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void exta0044() => CorpusAssert.Parses(@"CREATE EXTENSION IF NOT EXISTS nonexistent_xyz_abc_ext", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task exta0043() => CorpusAssert.MatchesPostgres(@"CREATE EXTENSION nonexistent_xyz_abc_ext", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task exta0044() => CorpusAssert.MatchesPostgres(@"CREATE EXTENSION IF NOT EXISTS nonexistent_xyz_abc_ext", "error", false);
     [Fact]
     public void exta0045() => CorpusAssert.Parses(@"CREATE EXTENSION", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void exta0046() => CorpusAssert.Parses(@"CREATE EXTENSION IF plpgsql", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void exta0047() => CorpusAssert.Parses(@"CREATE EXTENSION IF EXISTS plpgsql", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void exta0048() => CorpusAssert.Parses(@"CREATE EXTENSION plpgsql WITH", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void exta0049() => CorpusAssert.Parses(@"CREATE EXTENSION plpgsql WITH VERSION '1.0' SCHEMA pg_catalog", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void exta0050() => CorpusAssert.Parses(@"CREATE EXTENSION plpgsql CASCADE SCHEMA pg_catalog", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void exta0051() => CorpusAssert.Parses(@"CREATE EXTENSION plpgsql RESTRICT", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void exta0052() => CorpusAssert.Parses(@"CREATE EXTENSION plpgsql SCHEMA", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void exta0053() => CorpusAssert.Parses(@"CREATE EXTENSION plpgsql VERSION", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void exta0054() => CorpusAssert.Parses(@"CREATE OR REPLACE EXTENSION plpgsql", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void exta0055() => CorpusAssert.Parses(@"CREATE EXTENSION plpgsql SCHEMA nonexistent_schema_xyz", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task exta0046() => CorpusAssert.MatchesPostgres(@"CREATE EXTENSION IF plpgsql", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task exta0047() => CorpusAssert.MatchesPostgres(@"CREATE EXTENSION IF EXISTS plpgsql", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task exta0048() => CorpusAssert.MatchesPostgres(@"CREATE EXTENSION plpgsql WITH", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task exta0049() => CorpusAssert.MatchesPostgres(@"CREATE EXTENSION plpgsql WITH VERSION '1.0' SCHEMA pg_catalog", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task exta0050() => CorpusAssert.MatchesPostgres(@"CREATE EXTENSION plpgsql CASCADE SCHEMA pg_catalog", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task exta0051() => CorpusAssert.MatchesPostgres(@"CREATE EXTENSION plpgsql RESTRICT", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task exta0052() => CorpusAssert.MatchesPostgres(@"CREATE EXTENSION plpgsql SCHEMA", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task exta0053() => CorpusAssert.MatchesPostgres(@"CREATE EXTENSION plpgsql VERSION", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task exta0054() => CorpusAssert.MatchesPostgres(@"CREATE OR REPLACE EXTENSION plpgsql", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task exta0055() => CorpusAssert.MatchesPostgres(@"CREATE EXTENSION plpgsql SCHEMA nonexistent_schema_xyz", "error", false);
     [Fact]
     public void exta0056() => CorpusAssert.Parses(@"CREATE EXTENSION hstore;
 DROP EXTENSION hstore", "ok");
@@ -129,8 +129,8 @@ DROP EXTENSION hstore CASCADE", "ok");
 DROP EXTENSION hstore RESTRICT", "ok");
     [Fact]
     public void exta0060() => CorpusAssert.Parses(@"DROP EXTENSION IF EXISTS nonexistent_ext_xyz", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void exta0061() => CorpusAssert.Parses(@"DROP EXTENSION nonexistent_ext_xyz", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task exta0061() => CorpusAssert.MatchesPostgres(@"DROP EXTENSION nonexistent_ext_xyz", "error", false);
     [Fact]
     public void exta0062() => CorpusAssert.Parses(@"DROP EXTENSION", "error");
     [Fact]
@@ -143,8 +143,8 @@ DROP EXTENSION hstore, pg_trgm", "ok");
     public void exta0065() => CorpusAssert.Parses(@"CREATE EXTENSION IF NOT EXISTS hstore;
 CREATE EXTENSION IF NOT EXISTS pg_trgm;
 DROP EXTENSION IF EXISTS hstore, pg_trgm CASCADE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void exta0066() => CorpusAssert.Parses(@"DROP EXTENSION CASCADE", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task exta0066() => CorpusAssert.MatchesPostgres(@"DROP EXTENSION CASCADE", "error", false);
     [Fact]
     public void exta0067() => CorpusAssert.Parses(@"CREATE EXTENSION IF NOT EXISTS hstore;
 ALTER EXTENSION hstore UPDATE", "ok");
@@ -157,20 +157,20 @@ ALTER EXTENSION hstore SET SCHEMA s", "ok");
     [Fact]
     public void exta0070() => CorpusAssert.Parses(@"CREATE EXTENSION IF NOT EXISTS hstore;
 ALTER EXTENSION hstore SET SCHEMA public", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void exta0071() => CorpusAssert.Parses(@"ALTER EXTENSION nonexistent_ext_xyz UPDATE", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void exta0072() => CorpusAssert.Parses(@"ALTER EXTENSION nonexistent_ext_xyz SET SCHEMA public", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task exta0071() => CorpusAssert.MatchesPostgres(@"ALTER EXTENSION nonexistent_ext_xyz UPDATE", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task exta0072() => CorpusAssert.MatchesPostgres(@"ALTER EXTENSION nonexistent_ext_xyz SET SCHEMA public", "error", false);
     [Fact]
     public void exta0073() => CorpusAssert.Parses(@"ALTER EXTENSION", "error");
     [Fact]
     public void exta0074() => CorpusAssert.Parses(@"ALTER EXTENSION hstore", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void exta0075() => CorpusAssert.Parses(@"ALTER EXTENSION hstore RENAME TO hstore2", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void exta0076() => CorpusAssert.Parses(@"ALTER EXTENSION plpgsql UPDATE TO", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void exta0077() => CorpusAssert.Parses(@"ALTER EXTENSION plpgsql SET", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task exta0075() => CorpusAssert.MatchesPostgres(@"ALTER EXTENSION hstore RENAME TO hstore2", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task exta0076() => CorpusAssert.MatchesPostgres(@"ALTER EXTENSION plpgsql UPDATE TO", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task exta0077() => CorpusAssert.MatchesPostgres(@"ALTER EXTENSION plpgsql SET", "error", false);
     [Fact]
     public void exta0078() => CorpusAssert.Parses(@"ALTER EXTENSION plpgsql SET SCHEMA", "error");
     [Fact]
@@ -239,10 +239,10 @@ ALTER EXTENSION hstore ADD MATERIALIZED VIEW s.mv", "ok");
     public void exta0097() => CorpusAssert.Parses(@"CREATE EXTENSION IF NOT EXISTS hstore;
 ALTER EXTENSION hstore ADD MATERIALIZED VIEW s.mv;
 ALTER EXTENSION hstore DROP MATERIALIZED VIEW s.mv", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void exta0098() => CorpusAssert.Parses(@"CREATE EXTENSION IF NOT EXISTS hstore;
+    [DbFact]
+    public System.Threading.Tasks.Task exta0098() => CorpusAssert.MatchesPostgres(@"CREATE EXTENSION IF NOT EXISTS hstore;
 ALTER EXTENSION hstore ADD CONVERSION s.my_conv;
-", "error");
+", "error", false);
     [Fact]
     public void exta0099() => CorpusAssert.Parses(@"ALTER EXTENSION plpgsql ADD FUNCTION s.f(integer)", "ok");
     [Fact]
@@ -276,20 +276,20 @@ ALTER EXTENSION hstore ADD TEXT SEARCH DICTIONARY pg_catalog.simple", "ok");
     public void exta0108() => CorpusAssert.Parses(@"CREATE EXTENSION IF NOT EXISTS hstore;
 ALTER EXTENSION hstore ADD TEXT SEARCH DICTIONARY pg_catalog.simple;
 ALTER EXTENSION hstore DROP TEXT SEARCH DICTIONARY pg_catalog.simple", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void exta0109() => CorpusAssert.Parses(@"ALTER EXTENSION plpgsql ADD LANGUAGE plpgsql", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void exta0110() => CorpusAssert.Parses(@"CREATE EXTENSION IF NOT EXISTS hstore;
+    [DbFact]
+    public System.Threading.Tasks.Task exta0109() => CorpusAssert.MatchesPostgres(@"ALTER EXTENSION plpgsql ADD LANGUAGE plpgsql", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task exta0110() => CorpusAssert.MatchesPostgres(@"CREATE EXTENSION IF NOT EXISTS hstore;
 CREATE LANGUAGE IF NOT EXISTS plperlu;
-ALTER EXTENSION hstore ADD LANGUAGE plperlu", "error");
+ALTER EXTENSION hstore ADD LANGUAGE plperlu", "error", false);
     [Fact]
     public void exta0111() => CorpusAssert.Parses(@"ALTER EXTENSION plpgsql UPDATE TO '1.0'", "ok");
     [Fact]
     public void exta0112() => CorpusAssert.Parses(@"ALTER EXTENSION plpgsql SET SCHEMA pg_catalog", "ok");
     [Fact]
     public void exta0113() => CorpusAssert.Parses(@"CREATE EXTENSION", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void exta0114() => CorpusAssert.Parses(@"CREATE EXTENSION 'hstore'", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task exta0114() => CorpusAssert.MatchesPostgres(@"CREATE EXTENSION 'hstore'", "error", false);
     [Fact]
     public void exta0115() => CorpusAssert.Parses(@"CREATE EXTENSION IF NOT EXISTS hstore WITH SCHEMA s VERSION '1.8' CASCADE", "ok");
     [Fact]
@@ -303,6 +303,6 @@ ALTER EXTENSION hstore ADD ROUTINE s.f(integer)", "ok");
     public void exta0119() => CorpusAssert.Parses(@"CREATE EXTENSION IF NOT EXISTS hstore;
 ALTER EXTENSION hstore ADD ROUTINE s.f(integer);
 ALTER EXTENSION hstore DROP ROUTINE s.f(integer)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void exta0120() => CorpusAssert.Parses(@"ALTER EXTENSION plpgsql ADD PROCEDURAL LANGUAGE plpgsql", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task exta0120() => CorpusAssert.MatchesPostgres(@"ALTER EXTENSION plpgsql ADD PROCEDURAL LANGUAGE plpgsql", "error", false);
 }

@@ -304,67 +304,67 @@ USING (id > 0);", "ok");
 CREATE POLICY p_alter_rename2 ON s.t USING (true);
 ALTER POLICY p_alter_rename2 ON s.t RENAME TO p_renamed2;
 DROP POLICY p_renamed2 ON s.t;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void pola0094() => CorpusAssert.Parses(@"ALTER TABLE s.t ENABLE ROW LEVEL SECURITY;
-CREATE POLICY p_forcerl ON s.t FORCE ROW LEVEL SECURITY;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void pola0095() => CorpusAssert.Parses(@"CREATE POLICY ON s.t USING (true);", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void pola0096() => CorpusAssert.Parses(@"CREATE POLICY p_notbl USING (true);", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void pola0097() => CorpusAssert.Parses(@"CREATE POLICY p_badcmd ON s.t FOR TRUNCATE;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void pola0098() => CorpusAssert.Parses(@"CREATE POLICY p_badcmd2 ON s.t FOR COPY;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void pola0099() => CorpusAssert.Parses(@"CREATE POLICY p_badkw ON s.t AS INCLUSIVE;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void pola0100() => CorpusAssert.Parses(@"CREATE POLICY p_badkw2 ON s.t AS EXCLUSIVE;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void pola0101() => CorpusAssert.Parses(@"ALTER TABLE s.t ENABLE ROW LEVEL SECURITY;
-CREATE POLICY p_sel_wc_err ON s.t FOR SELECT WITH CHECK (true);", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void pola0102() => CorpusAssert.Parses(@"ALTER TABLE s.t ENABLE ROW LEVEL SECURITY;
-CREATE POLICY p_del_wc_err ON s.t FOR DELETE WITH CHECK (true);", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void pola0103() => CorpusAssert.Parses(@"ALTER TABLE s.t ENABLE ROW LEVEL SECURITY;
-CREATE POLICY p_ins_using_err ON s.t FOR INSERT USING (true);", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void pola0104() => CorpusAssert.Parses(@"CREATE POLICY p_noexpr ON s.t USING ();", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void pola0105() => CorpusAssert.Parses(@"CREATE POLICY p_nowc ON s.t WITH CHECK ();", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void pola0106() => CorpusAssert.Parses(@"CREATE POLICY p_noparen ON s.t USING id > 0;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void pola0107() => CorpusAssert.Parses(@"CREATE POLICY p_noparen2 ON s.t WITH CHECK id > 0;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void pola0108() => CorpusAssert.Parses(@"CREATE POLICY p_badorder ON s.t USING (true) FOR SELECT;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void pola0109() => CorpusAssert.Parses(@"CREATE POLICY p_badorder2 ON s.t WITH CHECK (true) USING (true);", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void pola0110() => CorpusAssert.Parses(@"CREATE POLICY p_dup_using ON s.t USING (true) USING (false);", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void pola0111() => CorpusAssert.Parses(@"CREATE POLICY p_dup_wc ON s.t WITH CHECK (true) WITH CHECK (false);", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void pola0112() => CorpusAssert.Parses(@"CREATE POLICY p_agg ON s.t USING (count(*) > 0);", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void pola0113() => CorpusAssert.Parses(@"CREATE POLICY p_win ON s.t USING (row_number() OVER () > 0);", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void pola0114() => CorpusAssert.Parses(@"ALTER TABLE s.t ENABLE ROW LEVEL SECURITY;
+    [DbFact]
+    public System.Threading.Tasks.Task pola0094() => CorpusAssert.MatchesPostgres(@"ALTER TABLE s.t ENABLE ROW LEVEL SECURITY;
+CREATE POLICY p_forcerl ON s.t FORCE ROW LEVEL SECURITY;", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task pola0095() => CorpusAssert.MatchesPostgres(@"CREATE POLICY ON s.t USING (true);", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task pola0096() => CorpusAssert.MatchesPostgres(@"CREATE POLICY p_notbl USING (true);", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task pola0097() => CorpusAssert.MatchesPostgres(@"CREATE POLICY p_badcmd ON s.t FOR TRUNCATE;", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task pola0098() => CorpusAssert.MatchesPostgres(@"CREATE POLICY p_badcmd2 ON s.t FOR COPY;", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task pola0099() => CorpusAssert.MatchesPostgres(@"CREATE POLICY p_badkw ON s.t AS INCLUSIVE;", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task pola0100() => CorpusAssert.MatchesPostgres(@"CREATE POLICY p_badkw2 ON s.t AS EXCLUSIVE;", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task pola0101() => CorpusAssert.MatchesPostgres(@"ALTER TABLE s.t ENABLE ROW LEVEL SECURITY;
+CREATE POLICY p_sel_wc_err ON s.t FOR SELECT WITH CHECK (true);", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task pola0102() => CorpusAssert.MatchesPostgres(@"ALTER TABLE s.t ENABLE ROW LEVEL SECURITY;
+CREATE POLICY p_del_wc_err ON s.t FOR DELETE WITH CHECK (true);", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task pola0103() => CorpusAssert.MatchesPostgres(@"ALTER TABLE s.t ENABLE ROW LEVEL SECURITY;
+CREATE POLICY p_ins_using_err ON s.t FOR INSERT USING (true);", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task pola0104() => CorpusAssert.MatchesPostgres(@"CREATE POLICY p_noexpr ON s.t USING ();", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task pola0105() => CorpusAssert.MatchesPostgres(@"CREATE POLICY p_nowc ON s.t WITH CHECK ();", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task pola0106() => CorpusAssert.MatchesPostgres(@"CREATE POLICY p_noparen ON s.t USING id > 0;", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task pola0107() => CorpusAssert.MatchesPostgres(@"CREATE POLICY p_noparen2 ON s.t WITH CHECK id > 0;", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task pola0108() => CorpusAssert.MatchesPostgres(@"CREATE POLICY p_badorder ON s.t USING (true) FOR SELECT;", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task pola0109() => CorpusAssert.MatchesPostgres(@"CREATE POLICY p_badorder2 ON s.t WITH CHECK (true) USING (true);", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task pola0110() => CorpusAssert.MatchesPostgres(@"CREATE POLICY p_dup_using ON s.t USING (true) USING (false);", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task pola0111() => CorpusAssert.MatchesPostgres(@"CREATE POLICY p_dup_wc ON s.t WITH CHECK (true) WITH CHECK (false);", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task pola0112() => CorpusAssert.MatchesPostgres(@"CREATE POLICY p_agg ON s.t USING (count(*) > 0);", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task pola0113() => CorpusAssert.MatchesPostgres(@"CREATE POLICY p_win ON s.t USING (row_number() OVER () > 0);", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task pola0114() => CorpusAssert.MatchesPostgres(@"ALTER TABLE s.t ENABLE ROW LEVEL SECURITY;
 CREATE POLICY p_nodrop ON s.t;
-DROP POLICY p_nonexist ON s.t;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void pola0115() => CorpusAssert.Parses(@"ALTER POLICY p_noexist ON s.t RENAME TO p_x;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void pola0116() => CorpusAssert.Parses(@"ALTER TABLE s.t ENABLE ROW LEVEL SECURITY;
+DROP POLICY p_nonexist ON s.t;", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task pola0115() => CorpusAssert.MatchesPostgres(@"ALTER POLICY p_noexist ON s.t RENAME TO p_x;", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task pola0116() => CorpusAssert.MatchesPostgres(@"ALTER TABLE s.t ENABLE ROW LEVEL SECURITY;
 CREATE POLICY p_rename_dup ON s.t;
-ALTER POLICY p_rename_dup ON s.t RENAME TO p_rename_dup;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void pola0117() => CorpusAssert.Parses(@"CREATE POLICY p_notab ON nonexistent_table_xyz USING (true);", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void pola0118() => CorpusAssert.Parses(@"DROP POLICY p_x ON nonexistent_table_xyz;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void pola0119() => CorpusAssert.Parses(@"ALTER TABLE s.t ENABLE ROW LEVEL SECURITY;
-CREATE POLICY p_view_err ON s.v USING (true);", "error");
+ALTER POLICY p_rename_dup ON s.t RENAME TO p_rename_dup;", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task pola0117() => CorpusAssert.MatchesPostgres(@"CREATE POLICY p_notab ON nonexistent_table_xyz USING (true);", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task pola0118() => CorpusAssert.MatchesPostgres(@"DROP POLICY p_x ON nonexistent_table_xyz;", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task pola0119() => CorpusAssert.MatchesPostgres(@"ALTER TABLE s.t ENABLE ROW LEVEL SECURITY;
+CREATE POLICY p_view_err ON s.v USING (true);", "error", false);
     [Fact]
     public void pola0120() => CorpusAssert.Parses(@"ALTER TABLE s.t ENABLE ROW LEVEL SECURITY;
 CREATE POLICY p_for_as ON s.t AS PERMISSIVE FOR SELECT TO PUBLIC USING (id > 0);", "ok");
@@ -471,20 +471,20 @@ ALTER POLICY p_alter_using_wc ON s.t USING (id > 1) WITH CHECK (qty >= 0);", "ok
     public void pola0151() => CorpusAssert.Parses(@"ALTER TABLE s.t ENABLE ROW LEVEL SECURITY;
 CREATE POLICY p_drop_cascade2 ON s.t USING (true);
 DROP POLICY IF EXISTS p_drop_cascade2 ON s.t CASCADE;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void pola0152() => CorpusAssert.Parses(@"CREATE POLICY p_no_on USING (true);", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void pola0153() => CorpusAssert.Parses(@"CREATE POLICY p_dup_for ON s.t FOR SELECT FOR INSERT;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void pola0154() => CorpusAssert.Parses(@"CREATE POLICY p_dup_as ON s.t AS PERMISSIVE AS RESTRICTIVE;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void pola0155() => CorpusAssert.Parses(@"CREATE POLICY p_dup_to ON s.t TO PUBLIC TO CURRENT_USER;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void pola0156() => CorpusAssert.Parses(@"ALTER TABLE s.t ENABLE ROW LEVEL SECURITY;
-CREATE POLICY p_matview_err ON s.mv USING (true);", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void pola0157() => CorpusAssert.Parses(@"ALTER TABLE s.t ENABLE ROW LEVEL SECURITY;
-CREATE POLICY p_seq_err ON s.seq USING (true);", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task pola0152() => CorpusAssert.MatchesPostgres(@"CREATE POLICY p_no_on USING (true);", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task pola0153() => CorpusAssert.MatchesPostgres(@"CREATE POLICY p_dup_for ON s.t FOR SELECT FOR INSERT;", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task pola0154() => CorpusAssert.MatchesPostgres(@"CREATE POLICY p_dup_as ON s.t AS PERMISSIVE AS RESTRICTIVE;", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task pola0155() => CorpusAssert.MatchesPostgres(@"CREATE POLICY p_dup_to ON s.t TO PUBLIC TO CURRENT_USER;", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task pola0156() => CorpusAssert.MatchesPostgres(@"ALTER TABLE s.t ENABLE ROW LEVEL SECURITY;
+CREATE POLICY p_matview_err ON s.mv USING (true);", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task pola0157() => CorpusAssert.MatchesPostgres(@"ALTER TABLE s.t ENABLE ROW LEVEL SECURITY;
+CREATE POLICY p_seq_err ON s.seq USING (true);", "error", false);
     [Fact]
     public void pola0158() => CorpusAssert.Parses(@"ALTER POLICY ON s.t RENAME TO p_x;", "error");
     [Fact]
@@ -509,10 +509,10 @@ CREATE POLICY p_pos_int ON s.t USING (qty::s.pos_int IS NOT NULL);", "ok");
     [Fact]
     public void pola0166() => CorpusAssert.Parses(@"ALTER TABLE s.t ENABLE ROW LEVEL SECURITY;
 CREATE POLICY p_col_schema ON s.t USING ((home).city IS NOT NULL);", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void pola0167() => CorpusAssert.Parses(@"ALTER TABLE s.t ENABLE ROW LEVEL SECURITY;
+    [DbFact]
+    public System.Threading.Tasks.Task pola0167() => CorpusAssert.MatchesPostgres(@"ALTER TABLE s.t ENABLE ROW LEVEL SECURITY;
 CREATE POLICY p_no_or_replace ON s.t USING (true);
-CREATE POLICY p_no_or_replace ON s.t USING (false);", "error");
+CREATE POLICY p_no_or_replace ON s.t USING (false);", "error", false);
     [Fact]
     public void pola0168() => CorpusAssert.Parses(@"ALTER TABLE s.t ENABLE ROW LEVEL SECURITY;
 CREATE POLICY p_alter_rename_schema ON s.t USING (true);
@@ -608,14 +608,14 @@ CREATE POLICY p_drop_restrict ON s.t USING (true);
 DROP POLICY p_drop_restrict ON s.t RESTRICT", "ok");
     [Fact]
     public void polb0026() => CorpusAssert.Parses(@"DROP POLICY IF EXISTS p_no_such ON s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void polb0027() => CorpusAssert.Parses(@"ALTER TABLE s.t ENABLE ROW LEVEL SECURITY;
-CREATE POLICY p_sel_check ON s.t FOR SELECT WITH CHECK (true)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void polb0028() => CorpusAssert.Parses(@"ALTER TABLE s.t ENABLE ROW LEVEL SECURITY;
-CREATE POLICY p_del_check ON s.t FOR DELETE WITH CHECK (true)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void polb0029() => CorpusAssert.Parses(@"CREATE POLICY ON s.t USING (true)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void polb0030() => CorpusAssert.Parses(@"CREATE POLICY p_bad FOR SELECT USING (true)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task polb0027() => CorpusAssert.MatchesPostgres(@"ALTER TABLE s.t ENABLE ROW LEVEL SECURITY;
+CREATE POLICY p_sel_check ON s.t FOR SELECT WITH CHECK (true)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task polb0028() => CorpusAssert.MatchesPostgres(@"ALTER TABLE s.t ENABLE ROW LEVEL SECURITY;
+CREATE POLICY p_del_check ON s.t FOR DELETE WITH CHECK (true)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task polb0029() => CorpusAssert.MatchesPostgres(@"CREATE POLICY ON s.t USING (true)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task polb0030() => CorpusAssert.MatchesPostgres(@"CREATE POLICY p_bad FOR SELECT USING (true)", "error", false);
 }

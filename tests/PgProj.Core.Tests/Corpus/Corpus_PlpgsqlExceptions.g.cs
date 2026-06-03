@@ -59,8 +59,8 @@ public class Corpus_PlpgsqlExceptions
     public void ppea0026() => CorpusAssert.Parses(@"DO $$ BEGIN RAISE LOG 'log message'; END $$;", "ok");
     [Fact]
     public void ppea0027() => CorpusAssert.Parses(@"DO $$ BEGIN RAISE DEBUG 'debug message'; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppea0028() => CorpusAssert.Parses(@"DO $$ BEGIN RAISE EXCEPTION 'fatal error'; END $$;", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ppea0028() => CorpusAssert.MatchesPostgres(@"DO $$ BEGIN RAISE EXCEPTION 'fatal error'; END $$;", "error", false);
     [Fact]
     public void ppea0029() => CorpusAssert.Parses(@"DO $$ BEGIN BEGIN RAISE EXCEPTION 'fatal'; EXCEPTION WHEN OTHERS THEN NULL; END; END $$;", "ok");
     [Fact]
@@ -69,8 +69,8 @@ public class Corpus_PlpgsqlExceptions
     public void ppea0031() => CorpusAssert.Parses(@"DO $$ BEGIN RAISE NOTICE 'a=% b=%', 1, 2; END $$;", "ok");
     [Fact]
     public void ppea0032() => CorpusAssert.Parses(@"DO $$ BEGIN RAISE NOTICE 'no args here'; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppea0033() => CorpusAssert.Parses(@"DO $$ BEGIN RAISE EXCEPTION 'error %', 'detail' USING HINT = 'try again'; END $$;", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ppea0033() => CorpusAssert.MatchesPostgres(@"DO $$ BEGIN RAISE EXCEPTION 'error %', 'detail' USING HINT = 'try again'; END $$;", "error", false);
     [Fact]
     public void ppea0034() => CorpusAssert.Parses(@"DO $$ BEGIN BEGIN RAISE EXCEPTION 'error' USING HINT = 'try again'; EXCEPTION WHEN OTHERS THEN NULL; END; END $$;", "ok");
     [Fact]
@@ -105,8 +105,8 @@ public class Corpus_PlpgsqlExceptions
     public void ppea0049() => CorpusAssert.Parses(@"DO $$ BEGIN BEGIN RAISE EXCEPTION 'error' USING ERRCODE = 'unique_violation', DETAIL = 'dup row'; EXCEPTION WHEN unique_violation THEN NULL; END; END $$;", "ok");
     [Fact]
     public void ppea0050() => CorpusAssert.Parses(@"DO $$ BEGIN BEGIN RAISE USING MESSAGE = 'custom error', ERRCODE = 'P0001'; EXCEPTION WHEN OTHERS THEN NULL; END; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppea0051() => CorpusAssert.Parses(@"DO $$ BEGIN BEGIN PERFORM 1/0; EXCEPTION WHEN division_by_zero THEN RAISE; END; END $$;", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ppea0051() => CorpusAssert.MatchesPostgres(@"DO $$ BEGIN BEGIN PERFORM 1/0; EXCEPTION WHEN division_by_zero THEN RAISE; END; END $$;", "error", false);
     [Fact]
     public void ppea0052() => CorpusAssert.Parses(@"DO $$ BEGIN BEGIN BEGIN PERFORM 1/0; EXCEPTION WHEN division_by_zero THEN RAISE; END; EXCEPTION WHEN division_by_zero THEN RAISE NOTICE 'caught re-raised'; END; END $$;", "ok");
     [Fact]
@@ -115,12 +115,12 @@ public class Corpus_PlpgsqlExceptions
     public void ppea0054() => CorpusAssert.Parses(@"DO $$ BEGIN ASSERT 1 = 1; END $$;", "ok");
     [Fact]
     public void ppea0055() => CorpusAssert.Parses(@"DO $$ BEGIN ASSERT 1 > 0, 'one is greater than zero'; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppea0056() => CorpusAssert.Parses(@"DO $$ BEGIN ASSERT false; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppea0057() => CorpusAssert.Parses(@"DO $$ BEGIN ASSERT false, 'assertion failed message'; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppea0058() => CorpusAssert.Parses(@"DO $$ BEGIN ASSERT null; END $$;", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ppea0056() => CorpusAssert.MatchesPostgres(@"DO $$ BEGIN ASSERT false; END $$;", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ppea0057() => CorpusAssert.MatchesPostgres(@"DO $$ BEGIN ASSERT false, 'assertion failed message'; END $$;", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ppea0058() => CorpusAssert.MatchesPostgres(@"DO $$ BEGIN ASSERT null; END $$;", "error", false);
     [Fact]
     public void ppea0059() => CorpusAssert.Parses(@"DO $$ BEGIN BEGIN ASSERT false; EXCEPTION WHEN assert_failure THEN RAISE NOTICE 'assert caught'; END; END $$;", "ok");
     [Fact]
@@ -147,28 +147,28 @@ public class Corpus_PlpgsqlExceptions
     public void ppea0070() => CorpusAssert.Parses(@"DO $$ DECLARE v text; BEGIN BEGIN PERFORM 1/0; EXCEPTION WHEN OTHERS THEN GET STACKED DIAGNOSTICS v = RETURNED_SQLSTATE; RAISE NOTICE 'sqlstate=%', v; END; END $$;", "ok");
     [Fact]
     public void ppea0071() => CorpusAssert.Parses(@"DO $$ DECLARE v text; BEGIN BEGIN PERFORM 1/0; EXCEPTION WHEN OTHERS THEN GET STACKED DIAGNOSTICS v := MESSAGE_TEXT; END; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppea0072() => CorpusAssert.Parses(@"DO $$ BEGIN RAISE EXCEPTION USING ERRCODE = 'division_by_zero'; END $$;", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ppea0072() => CorpusAssert.MatchesPostgres(@"DO $$ BEGIN RAISE EXCEPTION USING ERRCODE = 'division_by_zero'; END $$;", "error", false);
     [Fact]
     public void ppea0073() => CorpusAssert.Parses(@"DO $$ BEGIN BEGIN RAISE EXCEPTION USING ERRCODE = 'division_by_zero'; EXCEPTION WHEN division_by_zero THEN NULL; END; END $$;", "ok");
     [Fact]
     public void ppea0074() => CorpusAssert.Parses(@"DO $$ BEGIN BEGIN RAISE NOTICE 'test' USING HINT = 'a hint'; EXCEPTION WHEN OTHERS THEN NULL; END; END $$;", "ok");
     [Fact]
     public void ppea0075() => CorpusAssert.Parses(@"DO $$ BEGIN BEGIN RAISE WARNING 'warn' USING DETAIL = 'detail here'; EXCEPTION WHEN OTHERS THEN NULL; END; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppea0076() => CorpusAssert.Parses(@"DO $$ BEGIN RAISE EXCEPTION 'err % %', 1, 2 USING HINT = 'two args'; END $$;", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ppea0076() => CorpusAssert.MatchesPostgres(@"DO $$ BEGIN RAISE EXCEPTION 'err % %', 1, 2 USING HINT = 'two args'; END $$;", "error", false);
     [Fact]
     public void ppea0077() => CorpusAssert.Parses(@"DO $$ BEGIN BEGIN RAISE EXCEPTION 'err % %', 1, 2 USING HINT = 'two args'; EXCEPTION WHEN OTHERS THEN NULL; END; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppea0078() => CorpusAssert.Parses(@"DO $$ BEGIN RAISE; END $$;", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ppea0078() => CorpusAssert.MatchesPostgres(@"DO $$ BEGIN RAISE; END $$;", "error", false);
     [Fact]
     public void ppea0079() => CorpusAssert.Parses(@"DO $$ BEGIN BEGIN RAISE NOTICE 'hello'; END; END $$;", "ok");
     [Fact]
     public void ppea0080() => CorpusAssert.Parses(@"DO $$ DECLARE x integer; BEGIN BEGIN SELECT id INTO STRICT x FROM s.t WHERE false; EXCEPTION WHEN no_data_found THEN RAISE NOTICE 'no data'; END; END $$;", "ok");
     [Fact]
     public void ppea0081() => CorpusAssert.Parses(@"DO $$ BEGIN BEGIN PERFORM s.f(-1); EXCEPTION WHEN invalid_parameter_value THEN NULL; WHEN OTHERS THEN NULL; END; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppea0082() => CorpusAssert.Parses(@"DO $$ BEGIN BEGIN PERFORM 1/0; EXCEPTION WHEN division_by_zero THEN RAISE EXCEPTION 'converted error'; END; END $$;", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ppea0082() => CorpusAssert.MatchesPostgres(@"DO $$ BEGIN BEGIN PERFORM 1/0; EXCEPTION WHEN division_by_zero THEN RAISE EXCEPTION 'converted error'; END; END $$;", "error", false);
     [Fact]
     public void ppea0083() => CorpusAssert.Parses(@"DO $$ BEGIN BEGIN BEGIN PERFORM 1/0; EXCEPTION WHEN division_by_zero THEN RAISE EXCEPTION 'converted'; END; EXCEPTION WHEN OTHERS THEN RAISE NOTICE 'caught converted'; END; END $$;", "ok");
     [Fact]
@@ -199,24 +199,24 @@ public class Corpus_PlpgsqlExceptions
     public void ppea0096() => CorpusAssert.Parses(@"DO $$ BEGIN RAISE NOTICE 'too many %', 1, 2; END $$;", "error");
     [Fact]
     public void ppea0097() => CorpusAssert.Parses(@"DO $$ BEGIN RAISE NOTICE '% and %', 1; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppea0098() => CorpusAssert.Parses(@"DO $$ BEGIN ASSERT; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppea0099() => CorpusAssert.Parses(@"DO $$ BEGIN ASSERT 1 = 1,; END $$;", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ppea0098() => CorpusAssert.MatchesPostgres(@"DO $$ BEGIN ASSERT; END $$;", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ppea0099() => CorpusAssert.MatchesPostgres(@"DO $$ BEGIN ASSERT 1 = 1,; END $$;", "error", false);
     [Fact]
     public void ppea0100() => CorpusAssert.Parses(@"DO $$ BEGIN BEGIN PERFORM 1/0; EXCEPTION; END; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppea0101() => CorpusAssert.Parses(@"DO $$ BEGIN BEGIN PERFORM 1/0; END EXCEPTION WHEN division_by_zero THEN NULL; END; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppea0102() => CorpusAssert.Parses(@"DO $$ BEGIN BEGIN PERFORM 1/0; EXCEPTION WHEN not_valid_condition_name_xyz THEN NULL; END; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppea0103() => CorpusAssert.Parses(@"DO $$ BEGIN BEGIN PERFORM 1/0; EXCEPTION WHEN SQLSTATE '999' THEN NULL; END; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppea0104() => CorpusAssert.Parses(@"DO $$ BEGIN BEGIN PERFORM 1/0; EXCEPTION WHEN SQLSTATE 'ZZZZZ' THEN NULL; END; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppea0105() => CorpusAssert.Parses(@"DO $$ BEGIN BEGIN PERFORM 1/0; EXCEPTION WHEN SQLSTATE '' THEN NULL; END; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppea0106() => CorpusAssert.Parses(@"DO $$ BEGIN RAISE EXCEPTION 'msg' USING ERRCODE = ''; END $$;", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ppea0101() => CorpusAssert.MatchesPostgres(@"DO $$ BEGIN BEGIN PERFORM 1/0; END EXCEPTION WHEN division_by_zero THEN NULL; END; END $$;", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ppea0102() => CorpusAssert.MatchesPostgres(@"DO $$ BEGIN BEGIN PERFORM 1/0; EXCEPTION WHEN not_valid_condition_name_xyz THEN NULL; END; END $$;", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ppea0103() => CorpusAssert.MatchesPostgres(@"DO $$ BEGIN BEGIN PERFORM 1/0; EXCEPTION WHEN SQLSTATE '999' THEN NULL; END; END $$;", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ppea0104() => CorpusAssert.MatchesPostgres(@"DO $$ BEGIN BEGIN PERFORM 1/0; EXCEPTION WHEN SQLSTATE 'ZZZZZ' THEN NULL; END; END $$;", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ppea0105() => CorpusAssert.MatchesPostgres(@"DO $$ BEGIN BEGIN PERFORM 1/0; EXCEPTION WHEN SQLSTATE '' THEN NULL; END; END $$;", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ppea0106() => CorpusAssert.MatchesPostgres(@"DO $$ BEGIN RAISE EXCEPTION 'msg' USING ERRCODE = ''; END $$;", "error", false);
     [Fact]
     public void ppea0107() => CorpusAssert.Parses(@"DO $$ BEGIN BEGIN PERFORM 1/0; EXCEPTION WHEN SQLSTATE '22012' THEN RAISE NOTICE 'caught sqlstate'; END; END $$;", "ok");
     [Fact]
@@ -239,32 +239,32 @@ public class Corpus_PlpgsqlExceptions
     public void ppea0116() => CorpusAssert.Parses(@"DO $$ BEGIN <<outer>> BEGIN <<inner>> BEGIN PERFORM 1/0; EXCEPTION WHEN division_by_zero THEN RAISE NOTICE 'inner caught'; END inner; END outer; END $$;", "ok");
     [Fact]
     public void ppea0117() => CorpusAssert.Parses(@"DO $$ BEGIN BEGIN PERFORM 1/0; EXCEPTION WHEN division_by_zero THEN NULL; WHEN unique_violation THEN NULL; WHEN foreign_key_violation THEN NULL; WHEN not_null_violation THEN NULL; WHEN OTHERS THEN NULL; END; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppea0118() => CorpusAssert.Parses(@"DO $$ BEGIN RAISE EXCEPTION 'msg' USING ERRCODE = 'unique_violation', DETAIL = 'row dup', HINT = 'check key', COLUMN = 'id', CONSTRAINT = 'pk', TABLE = 't', SCHEMA = 's'; END $$;", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ppea0118() => CorpusAssert.MatchesPostgres(@"DO $$ BEGIN RAISE EXCEPTION 'msg' USING ERRCODE = 'unique_violation', DETAIL = 'row dup', HINT = 'check key', COLUMN = 'id', CONSTRAINT = 'pk', TABLE = 't', SCHEMA = 's'; END $$;", "error", false);
     [Fact]
     public void ppea0119() => CorpusAssert.Parses(@"DO $$ BEGIN BEGIN RAISE EXCEPTION 'msg' USING ERRCODE = 'unique_violation', DETAIL = 'row dup', HINT = 'check key', COLUMN = 'id', CONSTRAINT = 'pk', TABLE = 't', SCHEMA = 's'; EXCEPTION WHEN unique_violation THEN NULL; END; END $$;", "ok");
     [Fact]
     public void ppea0120() => CorpusAssert.Parses(@"DO $$ DECLARE v text; BEGIN BEGIN PERFORM 1/0; EXCEPTION WHEN OTHERS THEN GET STACKED DIAGNOSTICS v = MESSAGE_TEXT; RAISE NOTICE 'msg=%', v; END; END $$;", "ok");
     [Fact]
     public void ppea0121() => CorpusAssert.Parses(@"DO $$ DECLARE v text; BEGIN BEGIN PERFORM 1/0; EXCEPTION WHEN OTHERS THEN GET STACKED DIAGNOSTICS v = PG_EXCEPTION_CONTEXT; RAISE NOTICE 'ctx=%', v; END; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppea0122() => CorpusAssert.Parses(@"DO $$ BEGIN GET STACKED DIAGNOSTICS; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppea0123() => CorpusAssert.Parses(@"DO $$ BEGIN BEGIN PERFORM 1/0; EXCEPTION WHEN OTHERS THEN GET STACKED DIAGNOSTICS; END; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppea0124() => CorpusAssert.Parses(@"DO $$ DECLARE v text; BEGIN BEGIN PERFORM 1/0; EXCEPTION WHEN OTHERS THEN GET STACKED DIAGNOSTICS v = INVALID_ITEM_NAME; END; END $$;", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ppea0122() => CorpusAssert.MatchesPostgres(@"DO $$ BEGIN GET STACKED DIAGNOSTICS; END $$;", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ppea0123() => CorpusAssert.MatchesPostgres(@"DO $$ BEGIN BEGIN PERFORM 1/0; EXCEPTION WHEN OTHERS THEN GET STACKED DIAGNOSTICS; END; END $$;", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ppea0124() => CorpusAssert.MatchesPostgres(@"DO $$ DECLARE v text; BEGIN BEGIN PERFORM 1/0; EXCEPTION WHEN OTHERS THEN GET STACKED DIAGNOSTICS v = INVALID_ITEM_NAME; END; END $$;", "error", false);
     [Fact]
     public void ppea0125() => CorpusAssert.Parses(@"DO $$ BEGIN RAISE NOTICE '%%'; END $$;", "ok");
     [Fact]
     public void ppea0126() => CorpusAssert.Parses(@"DO $$ BEGIN RAISE NOTICE 'val: % %%', 42; END $$;", "ok");
     [Fact]
     public void ppea0127() => CorpusAssert.Parses(@"DO $$ BEGIN RAISE NOTICE ''; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppea0128() => CorpusAssert.Parses(@"DO $$ BEGIN RAISE EXCEPTION '' USING ERRCODE = '22012'; END $$;", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ppea0128() => CorpusAssert.MatchesPostgres(@"DO $$ BEGIN RAISE EXCEPTION '' USING ERRCODE = '22012'; END $$;", "error", false);
     [Fact]
     public void ppea0129() => CorpusAssert.Parses(@"DO $$ BEGIN BEGIN RAISE EXCEPTION '' USING ERRCODE = '22012'; EXCEPTION WHEN division_by_zero THEN NULL; END; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppea0130() => CorpusAssert.Parses(@"DO $$ BEGIN RAISE EXCEPTION 'err' USING ERRCODE = 'unique_violation', ERRCODE = '22012'; END $$;", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ppea0130() => CorpusAssert.MatchesPostgres(@"DO $$ BEGIN RAISE EXCEPTION 'err' USING ERRCODE = 'unique_violation', ERRCODE = '22012'; END $$;", "error", false);
     [Fact]
     public void ppea0131() => CorpusAssert.Parses(@"DO $$ BEGIN BEGIN PERFORM 1/0; EXCEPTION WHEN SQLSTATE '22012' OR SQLSTATE '23505' OR SQLSTATE 'P0002' THEN RAISE NOTICE 'caught one'; END; END $$;", "ok");
     [Fact]
@@ -277,18 +277,18 @@ public class Corpus_PlpgsqlExceptions
     public void ppea0135() => CorpusAssert.Parses(@"DO $$ DECLARE arr text[] := ARRAY['a','b']; BEGIN ASSERT array_length(arr, 1) = 2; END $$;", "ok");
     [Fact]
     public void ppea0136() => CorpusAssert.Parses(@"DO $$ BEGIN ASSERT true, 'msg ' || 'concatenated'; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppea0137() => CorpusAssert.Parses(@"DO $$ BEGIN BEGIN ASSERT false; EXCEPTION WHEN OTHERS THEN RAISE NOTICE 'others does not catch assert'; END; END $$;", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ppea0137() => CorpusAssert.MatchesPostgres(@"DO $$ BEGIN BEGIN ASSERT false; EXCEPTION WHEN OTHERS THEN RAISE NOTICE 'others does not catch assert'; END; END $$;", "error", false);
     [Fact]
     public void ppea0138() => CorpusAssert.Parses(@"DO $$ BEGIN BEGIN ASSERT false; EXCEPTION WHEN assert_failure THEN RAISE NOTICE 'assert_failure caught'; END; END $$;", "ok");
     [Fact]
     public void ppea0139() => CorpusAssert.Parses(@"DO $$ BEGIN BEGIN ASSERT false; EXCEPTION WHEN SQLSTATE 'P0004' THEN RAISE NOTICE 'caught by sqlstate'; END; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppea0140() => CorpusAssert.Parses(@"DO $$ BEGIN RAISE EXCEPTION USING HINT = 'h', DETAIL = 'd', ERRCODE = 'division_by_zero', MESSAGE = 'override msg'; END $$;", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ppea0140() => CorpusAssert.MatchesPostgres(@"DO $$ BEGIN RAISE EXCEPTION USING HINT = 'h', DETAIL = 'd', ERRCODE = 'division_by_zero', MESSAGE = 'override msg'; END $$;", "error", false);
     [Fact]
     public void ppea0141() => CorpusAssert.Parses(@"DO $$ BEGIN BEGIN RAISE EXCEPTION USING HINT = 'h', DETAIL = 'd', ERRCODE = 'division_by_zero', MESSAGE = 'override msg'; EXCEPTION WHEN division_by_zero THEN NULL; END; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppea0142() => CorpusAssert.Parses(@"DO $$ BEGIN RAISE unique_violation USING MESSAGE = 'dup', DETAIL = 'row already exists'; END $$;", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ppea0142() => CorpusAssert.MatchesPostgres(@"DO $$ BEGIN RAISE unique_violation USING MESSAGE = 'dup', DETAIL = 'row already exists'; END $$;", "error", false);
     [Fact]
     public void ppea0143() => CorpusAssert.Parses(@"DO $$ BEGIN BEGIN RAISE unique_violation USING MESSAGE = 'dup', DETAIL = 'row already exists'; EXCEPTION WHEN unique_violation THEN NULL; END; END $$;", "ok");
     [Fact]
@@ -303,8 +303,8 @@ public class Corpus_PlpgsqlExceptions
     public void ppea0148() => CorpusAssert.Parses(@"DO $$ BEGIN BEGIN BEGIN BEGIN PERFORM 1/0; EXCEPTION WHEN division_by_zero THEN NULL; END; END; END; END $$;", "ok");
     [Fact]
     public void ppea0149() => CorpusAssert.Parses(@"DO $$ BEGIN BEGIN PERFORM 1/0; EXCEPTION WHEN division_by_zero THEN NULL; WHEN unique_violation THEN NULL; WHEN no_data_found THEN NULL; WHEN too_many_rows THEN NULL; WHEN foreign_key_violation THEN NULL; WHEN not_null_violation THEN NULL; WHEN check_violation THEN NULL; WHEN OTHERS THEN NULL; END; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppea0150() => CorpusAssert.Parses(@"DO $$ BEGIN RAISE EXCEPTION 'err' USING ERRCODE = 'XXXXX'; END $$;", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ppea0150() => CorpusAssert.MatchesPostgres(@"DO $$ BEGIN RAISE EXCEPTION 'err' USING ERRCODE = 'XXXXX'; END $$;", "error", false);
     [Fact]
     public void ppea0151() => CorpusAssert.Parses(@"DO $$ BEGIN BEGIN RAISE EXCEPTION 'err' USING ERRCODE = 'XXXXX'; EXCEPTION WHEN OTHERS THEN NULL; END; END $$;", "ok");
     [Fact]
@@ -317,8 +317,8 @@ public class Corpus_PlpgsqlExceptions
     public void ppea0155() => CorpusAssert.Parses(@"DO $$ DECLARE v text; BEGIN BEGIN RAISE EXCEPTION 'test' USING ERRCODE='23505', COLUMN='my_col'; EXCEPTION WHEN OTHERS THEN GET STACKED DIAGNOSTICS v = COLUMN_NAME; RAISE NOTICE 'col=%', v; END; END $$;", "ok");
     [Fact]
     public void ppea0156() => CorpusAssert.Parses(@"DO $$ DECLARE v text; BEGIN BEGIN RAISE EXCEPTION 'test' USING ERRCODE='42P01', TABLE='mytbl', SCHEMA='mysch'; EXCEPTION WHEN OTHERS THEN GET STACKED DIAGNOSTICS v = TABLE_NAME; RAISE NOTICE 'table=%', v; END; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppea0157() => CorpusAssert.Parses(@"DO $$ BEGIN RAISE EXCEPTION 'msg' USING HINT = (SELECT 'dynamic hint'); END $$;", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ppea0157() => CorpusAssert.MatchesPostgres(@"DO $$ BEGIN RAISE EXCEPTION 'msg' USING HINT = (SELECT 'dynamic hint'); END $$;", "error", false);
     [Fact]
     public void ppea0158() => CorpusAssert.Parses(@"DO $$ BEGIN BEGIN RAISE EXCEPTION 'msg' USING HINT = (SELECT 'dynamic hint'); EXCEPTION WHEN OTHERS THEN NULL; END; END $$;", "ok");
     [Fact]
@@ -331,8 +331,8 @@ public class Corpus_PlpgsqlExceptions
     public void ppea0162() => CorpusAssert.Parses(@"DO $$ DECLARE v1 text; v2 text; v3 text; v4 text; v5 text; v6 text; BEGIN BEGIN PERFORM 1/0; EXCEPTION WHEN OTHERS THEN GET STACKED DIAGNOSTICS v1 = RETURNED_SQLSTATE, v2 = MESSAGE_TEXT, v3 = PG_EXCEPTION_DETAIL, v4 = PG_EXCEPTION_HINT, v5 = PG_EXCEPTION_CONTEXT, v6 = COLUMN_NAME; END; END $$;", "ok");
     [Fact]
     public void ppea0163() => CorpusAssert.Parses(@"DO $$ DECLARE v1 text; v2 text; BEGIN BEGIN PERFORM 1/0; EXCEPTION WHEN OTHERS THEN GET STACKED DIAGNOSTICS v1 = TABLE_NAME, v2 = SCHEMA_NAME; END; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppea0164() => CorpusAssert.Parses(@"DO $$ BEGIN RAISE EXCEPTION 'err' USING HINT = 'h' ERRCODE = '22012'; END $$;", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ppea0164() => CorpusAssert.MatchesPostgres(@"DO $$ BEGIN RAISE EXCEPTION 'err' USING HINT = 'h' ERRCODE = '22012'; END $$;", "error", false);
     [Fact]
     public void ppea0165() => CorpusAssert.Parses(@"DO $$ BEGIN BEGIN PERFORM 1/0; EXCEPTION WHEN 22012 THEN NULL; END; END $$;", "error");
     [Fact]
@@ -379,28 +379,28 @@ public class Corpus_PlpgsqlExceptions
     public void ppeb0016() => CorpusAssert.Parses(@"DO $$ BEGIN RAISE LOG 'log message'; END $$;", "ok");
     [Fact]
     public void ppeb0017() => CorpusAssert.Parses(@"DO $$ BEGIN RAISE DEBUG 'debug message'; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppeb0018() => CorpusAssert.Parses(@"DO $$ BEGIN RAISE EXCEPTION 'error occurred'; END $$;", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ppeb0018() => CorpusAssert.MatchesPostgres(@"DO $$ BEGIN RAISE EXCEPTION 'error occurred'; END $$;", "error", false);
     [Fact]
     public void ppeb0019() => CorpusAssert.Parses(@"DO $$ BEGIN RAISE NOTICE '% and %', 1, 2; END $$;", "ok");
     [Fact]
     public void ppeb0020() => CorpusAssert.Parses(@"DO $$ BEGIN RAISE NOTICE 'value: %', 'text'; END $$;", "ok");
     [Fact]
     public void ppeb0021() => CorpusAssert.Parses(@"DO $$ BEGIN RAISE NOTICE 'no args'; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppeb0022() => CorpusAssert.Parses(@"DO $$ BEGIN RAISE EXCEPTION 'err %', 'x' USING ERRCODE = 'P0001'; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppeb0023() => CorpusAssert.Parses(@"DO $$ BEGIN RAISE EXCEPTION 'bad input' USING MESSAGE = 'override message'; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppeb0024() => CorpusAssert.Parses(@"DO $$ BEGIN RAISE EXCEPTION 'fail' USING DETAIL = 'some detail'; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppeb0025() => CorpusAssert.Parses(@"DO $$ BEGIN RAISE EXCEPTION 'fail' USING HINT = 'try this instead'; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppeb0026() => CorpusAssert.Parses(@"DO $$ BEGIN RAISE EXCEPTION 'fail' USING COLUMN = 'col1'; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppeb0027() => CorpusAssert.Parses(@"DO $$ BEGIN RAISE EXCEPTION 'fail' USING CONSTRAINT = 'uq_name'; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppeb0028() => CorpusAssert.Parses(@"DO $$ BEGIN RAISE EXCEPTION 'fail' USING ERRCODE = 'P0001', DETAIL = 'details', HINT = 'hint'; END $$;", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ppeb0022() => CorpusAssert.MatchesPostgres(@"DO $$ BEGIN RAISE EXCEPTION 'err %', 'x' USING ERRCODE = 'P0001'; END $$;", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ppeb0023() => CorpusAssert.MatchesPostgres(@"DO $$ BEGIN RAISE EXCEPTION 'bad input' USING MESSAGE = 'override message'; END $$;", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ppeb0024() => CorpusAssert.MatchesPostgres(@"DO $$ BEGIN RAISE EXCEPTION 'fail' USING DETAIL = 'some detail'; END $$;", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ppeb0025() => CorpusAssert.MatchesPostgres(@"DO $$ BEGIN RAISE EXCEPTION 'fail' USING HINT = 'try this instead'; END $$;", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ppeb0026() => CorpusAssert.MatchesPostgres(@"DO $$ BEGIN RAISE EXCEPTION 'fail' USING COLUMN = 'col1'; END $$;", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ppeb0027() => CorpusAssert.MatchesPostgres(@"DO $$ BEGIN RAISE EXCEPTION 'fail' USING CONSTRAINT = 'uq_name'; END $$;", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ppeb0028() => CorpusAssert.MatchesPostgres(@"DO $$ BEGIN RAISE EXCEPTION 'fail' USING ERRCODE = 'P0001', DETAIL = 'details', HINT = 'hint'; END $$;", "error", false);
     [Fact]
     public void ppeb0029() => CorpusAssert.Parses(@"DO $$ BEGIN BEGIN RAISE EXCEPTION 'test'; EXCEPTION WHEN SQLSTATE 'P0001' THEN NULL; END; END $$;", "ok");
     [Fact]
@@ -419,18 +419,18 @@ public class Corpus_PlpgsqlExceptions
     public void ppeb0036() => CorpusAssert.Parses(@"DO $$ DECLARE s text; m text; d text; BEGIN BEGIN RAISE EXCEPTION 'inner'; EXCEPTION WHEN others THEN GET STACKED DIAGNOSTICS s = RETURNED_SQLSTATE, m = MESSAGE_TEXT, d = PG_EXCEPTION_DETAIL; END; END $$;", "ok");
     [Fact]
     public void ppeb0037() => CorpusAssert.Parses(@"DO $$ BEGIN BEGIN NULL; EXCEPTION WHEN others THEN RAISE; END; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppeb0038() => CorpusAssert.Parses(@"DO $$ BEGIN BEGIN RAISE EXCEPTION 'test'; EXCEPTION WHEN others THEN RAISE; END; END $$;", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ppeb0038() => CorpusAssert.MatchesPostgres(@"DO $$ BEGIN BEGIN RAISE EXCEPTION 'test'; EXCEPTION WHEN others THEN RAISE; END; END $$;", "error", false);
     [Fact]
     public void ppeb0039() => CorpusAssert.Parses(@"DO $$ BEGIN ASSERT true; END $$;", "ok");
     [Fact]
     public void ppeb0040() => CorpusAssert.Parses(@"DO $$ BEGIN ASSERT 1 = 1; END $$;", "ok");
     [Fact]
     public void ppeb0041() => CorpusAssert.Parses(@"DO $$ BEGIN ASSERT 1 = 1, 'should not fail'; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppeb0042() => CorpusAssert.Parses(@"DO $$ BEGIN ASSERT false, 'assertion failed'; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppeb0043() => CorpusAssert.Parses(@"DO $$ BEGIN ASSERT false; END $$;", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ppeb0042() => CorpusAssert.MatchesPostgres(@"DO $$ BEGIN ASSERT false, 'assertion failed'; END $$;", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ppeb0043() => CorpusAssert.MatchesPostgres(@"DO $$ BEGIN ASSERT false; END $$;", "error", false);
     [Fact]
     public void ppeb0044() => CorpusAssert.Parses(@"DO $$ BEGIN ASSERT 2 > 1, 'math is broken'; END $$;", "ok");
     [Fact]
@@ -481,8 +481,8 @@ public class Corpus_PlpgsqlExceptions
     public void ppeb0067() => CorpusAssert.Parses(@"DO $$ BEGIN RAISE NOTICE 'flag: %', true; END $$;", "ok");
     [Fact]
     public void ppeb0068() => CorpusAssert.Parses(@"DO $$ BEGIN RAISE NOTICE '%', now(); END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppeb0069() => CorpusAssert.Parses(@"DO $$ BEGIN RAISE EXCEPTION 'msg' USING ERRCODE = '22012'; END $$;", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ppeb0069() => CorpusAssert.MatchesPostgres(@"DO $$ BEGIN RAISE EXCEPTION 'msg' USING ERRCODE = '22012'; END $$;", "error", false);
     [Fact]
     public void ppeb0070() => CorpusAssert.Parses(@"DO $$ BEGIN BEGIN RAISE EXCEPTION 'test' USING ERRCODE='22012'; EXCEPTION WHEN division_by_zero THEN NULL; END; END $$;", "ok");
     [Fact]
@@ -525,8 +525,8 @@ public class Corpus_PlpgsqlExceptions
     public void ppeb0089() => CorpusAssert.Parses(@"DO $$ DECLARE tbl text; BEGIN BEGIN RAISE EXCEPTION 'tbl err' USING TABLE='t'; EXCEPTION WHEN others THEN GET STACKED DIAGNOSTICS tbl = TABLE_NAME; END; END $$;", "ok");
     [Fact]
     public void ppeb0090() => CorpusAssert.Parses(@"DO $$ DECLARE sch text; BEGIN BEGIN RAISE EXCEPTION 'sch err' USING SCHEMA='s'; EXCEPTION WHEN others THEN GET STACKED DIAGNOSTICS sch = SCHEMA_NAME; END; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppeb0091() => CorpusAssert.Parses(@"DO $$ BEGIN RAISE EXCEPTION 'err' USING TABLE = 's.t', COLUMN = 'name'; END $$;", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ppeb0091() => CorpusAssert.MatchesPostgres(@"DO $$ BEGIN RAISE EXCEPTION 'err' USING TABLE = 's.t', COLUMN = 'name'; END $$;", "error", false);
     [Fact]
     public void ppeb0092() => CorpusAssert.Parses(@"DO $$ BEGIN BEGIN RAISE EXCEPTION 'test'; EXCEPTION WHEN raise_exception THEN RAISE NOTICE 'caught raise_exception'; END; END $$;", "ok");
     [Fact]
@@ -539,8 +539,8 @@ public class Corpus_PlpgsqlExceptions
     public void ppeb0096() => CorpusAssert.Parses(@"DO $$ BEGIN RAISE NOTICE E'line1\nline2'; END $$;", "ok");
     [Fact]
     public void ppeb0097() => CorpusAssert.Parses(@"DO $body$ BEGIN RAISE NOTICE 'in body block'; END $body$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppeb0098() => CorpusAssert.Parses(@"DO $$ BEGIN RAISE EXCEPTION 'msg' USING ERRCODE = 'division_by_zero'; END $$;", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ppeb0098() => CorpusAssert.MatchesPostgres(@"DO $$ BEGIN RAISE EXCEPTION 'msg' USING ERRCODE = 'division_by_zero'; END $$;", "error", false);
     [Fact]
     public void ppeb0099() => CorpusAssert.Parses(@"DO $$ BEGIN BEGIN RAISE DIVISION_BY_ZERO; EXCEPTION WHEN division_by_zero THEN NULL; END; END $$;", "ok");
     [Fact]
@@ -573,8 +573,8 @@ public class Corpus_PlpgsqlExceptions
     public void ppeb0113() => CorpusAssert.Parses(@"DO $$ BEGIN BEGIN NULL; EXCEPTION WHEN config_file_error THEN NULL; END; END $$;", "ok");
     [Fact]
     public void ppeb0114() => CorpusAssert.Parses(@"DO $$ BEGIN BEGIN NULL; EXCEPTION WHEN duplicate_database THEN NULL; END; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppeb0115() => CorpusAssert.Parses(@"DO $$ BEGIN RAISE EXCEPTION USING MESSAGE='explicit msg', ERRCODE='P0001'; END $$;", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ppeb0115() => CorpusAssert.MatchesPostgres(@"DO $$ BEGIN RAISE EXCEPTION USING MESSAGE='explicit msg', ERRCODE='P0001'; END $$;", "error", false);
     [Fact]
     public void ppeb0116() => CorpusAssert.Parses(@"DO $$ BEGIN RAISE NOTICE 'val=%', s.f(2); END $$;", "ok");
     [Fact]
@@ -606,44 +606,44 @@ DO $$ BEGIN NULL; END $$;", "ok");
     public void ppeb0129() => CorpusAssert.Parses(@"DO $$ BEGIN BEGIN NULL; EXCEPTION WHEN SQLSTATE '2200C' THEN NULL; END; END $$;", "ok");
     [Fact]
     public void ppeb0130() => CorpusAssert.Parses(@"DO $$ BEGIN BEGIN NULL; EXCEPTION WHEN SQLSTATE '22019' THEN NULL; END; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppeb0131() => CorpusAssert.Parses(@"DO $$ BEGIN RAISE EXCEPTION 'msg' USING ERRCODE = 'P0001', ERRCODE = 'P0002'; END $$;", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ppeb0131() => CorpusAssert.MatchesPostgres(@"DO $$ BEGIN RAISE EXCEPTION 'msg' USING ERRCODE = 'P0001', ERRCODE = 'P0002'; END $$;", "error", false);
     [Fact]
     public void ppeb0132() => CorpusAssert.Parses(@"DO $$ BEGIN BEGIN NULL; EXCEPTION THEN NULL; END; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppeb0133() => CorpusAssert.Parses(@"DO $$ BEGIN BEGIN NULL; WHEN division_by_zero THEN NULL; END; END $$;", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ppeb0133() => CorpusAssert.MatchesPostgres(@"DO $$ BEGIN BEGIN NULL; WHEN division_by_zero THEN NULL; END; END $$;", "error", false);
     [Fact]
     public void ppeb0134() => CorpusAssert.Parses(@"DO $$ BEGIN RAISE BADLEVEL 'msg'; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppeb0135() => CorpusAssert.Parses(@"DO $$ BEGIN RAISE NOTICE; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppeb0136() => CorpusAssert.Parses(@"DO $$ BEGIN ASSERT; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppeb0137() => CorpusAssert.Parses(@"DO $$ BEGIN ASSERT 1=1 'missing comma'; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppeb0138() => CorpusAssert.Parses(@"DO $$ BEGIN BEGIN NULL; EXCEPTION WHEN SQLSTATE 'ZZZ' THEN NULL; END; END $$;", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ppeb0135() => CorpusAssert.MatchesPostgres(@"DO $$ BEGIN RAISE NOTICE; END $$;", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ppeb0136() => CorpusAssert.MatchesPostgres(@"DO $$ BEGIN ASSERT; END $$;", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ppeb0137() => CorpusAssert.MatchesPostgres(@"DO $$ BEGIN ASSERT 1=1 'missing comma'; END $$;", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ppeb0138() => CorpusAssert.MatchesPostgres(@"DO $$ BEGIN BEGIN NULL; EXCEPTION WHEN SQLSTATE 'ZZZ' THEN NULL; END; END $$;", "error", false);
     [Fact]
     public void ppeb0139() => CorpusAssert.Parses(@"DO $$ BEGIN BEGIN NULL; EXCEPTION WHEN 'division_by_zero' THEN NULL; END; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppeb0140() => CorpusAssert.Parses(@"DO $$ BEGIN BEGIN NULL; EXCEPTION WHEN SQLSTATE THEN NULL; END; END $$;", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ppeb0140() => CorpusAssert.MatchesPostgres(@"DO $$ BEGIN BEGIN NULL; EXCEPTION WHEN SQLSTATE THEN NULL; END; END $$;", "error", false);
     [Fact]
     public void ppeb0141() => CorpusAssert.Parses(@"DO $$ BEGIN BEGIN NULL; EXCEPTION WHEN others AND division_by_zero THEN NULL; END; END $$;", "error");
     [Fact]
     public void ppeb0142() => CorpusAssert.Parses(@"DO $$ BEGIN RAISE EXCEPTION 'msg' USING BAD_OPTION = 'v'; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppeb0143() => CorpusAssert.Parses(@"DO $$ BEGIN GET STACKED DIAGNOSTICS; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppeb0144() => CorpusAssert.Parses(@"DO $$ DECLARE v text; BEGIN GET STACKED DIAGNOSTICS v = MESSAGE_TEXT; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppeb0145() => CorpusAssert.Parses(@"DO $$ DECLARE v text; BEGIN GET STACKED DIAGNOSTICS v = UNKNOWN_FIELD; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppeb0146() => CorpusAssert.Parses(@"DO $$ BEGIN BEGIN NULL; EXCEPTION WHEN SQLSTATE '0' THEN NULL; END; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppeb0147() => CorpusAssert.Parses(@"DO $$ BEGIN BEGIN NULL; EXCEPTION WHEN SQLSTATE '' THEN NULL; END; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppeb0148() => CorpusAssert.Parses(@"DO $$ BEGIN RAISE EXCEPTION 'msg' USING ERRCODE = 42; END $$;", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ppeb0143() => CorpusAssert.MatchesPostgres(@"DO $$ BEGIN GET STACKED DIAGNOSTICS; END $$;", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ppeb0144() => CorpusAssert.MatchesPostgres(@"DO $$ DECLARE v text; BEGIN GET STACKED DIAGNOSTICS v = MESSAGE_TEXT; END $$;", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ppeb0145() => CorpusAssert.MatchesPostgres(@"DO $$ DECLARE v text; BEGIN GET STACKED DIAGNOSTICS v = UNKNOWN_FIELD; END $$;", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ppeb0146() => CorpusAssert.MatchesPostgres(@"DO $$ BEGIN BEGIN NULL; EXCEPTION WHEN SQLSTATE '0' THEN NULL; END; END $$;", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ppeb0147() => CorpusAssert.MatchesPostgres(@"DO $$ BEGIN BEGIN NULL; EXCEPTION WHEN SQLSTATE '' THEN NULL; END; END $$;", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ppeb0148() => CorpusAssert.MatchesPostgres(@"DO $$ BEGIN RAISE EXCEPTION 'msg' USING ERRCODE = 42; END $$;", "error", false);
     [Fact]
     public void ppeb0149() => CorpusAssert.Parses(@"DO $$ BEGIN RAISE EXCEPTION USING; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppeb0150() => CorpusAssert.Parses(@"DO $$ BEGIN BEGIN NULL; EXCEPTION WHEN nonexistent_condition_xyz THEN NULL; END; END $$;", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ppeb0150() => CorpusAssert.MatchesPostgres(@"DO $$ BEGIN BEGIN NULL; EXCEPTION WHEN nonexistent_condition_xyz THEN NULL; END; END $$;", "error", false);
 }

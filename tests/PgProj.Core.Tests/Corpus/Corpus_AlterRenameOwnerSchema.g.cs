@@ -9,8 +9,8 @@ public class Corpus_AlterRenameOwnerSchema
     public void aroa0001() => CorpusAssert.Parses(@"ALTER TABLE s.t RENAME TO t_renamed; ALTER TABLE s.t_renamed RENAME TO t", "ok");
     [Fact]
     public void aroa0002() => CorpusAssert.Parses(@"ALTER TABLE s.t2 RENAME TO t2_renamed; ALTER TABLE s.t2_renamed RENAME TO t2", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void aroa0003() => CorpusAssert.Parses(@"ALTER TABLE s.t RENAME TO t", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task aroa0003() => CorpusAssert.MatchesPostgres(@"ALTER TABLE s.t RENAME TO t", "error", false);
     [Fact]
     public void aroa0004() => CorpusAssert.Parses(@"ALTER TABLE IF EXISTS s.t RENAME TO t_ren; ALTER TABLE IF EXISTS s.t_ren RENAME TO t", "ok");
     [Fact]
@@ -27,8 +27,8 @@ public class Corpus_AlterRenameOwnerSchema
     public void aroa0010() => CorpusAssert.Parses(@"ALTER TABLE s.t OWNER TO SESSION_USER", "ok");
     [Fact]
     public void aroa0011() => CorpusAssert.Parses(@"ALTER TABLE s.t OWNER TO CURRENT_ROLE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void aroa0012() => CorpusAssert.Parses(@"ALTER TABLE s.t OWNER TO no_such_role_xyz", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task aroa0012() => CorpusAssert.MatchesPostgres(@"ALTER TABLE s.t OWNER TO no_such_role_xyz", "error", false);
     [Fact]
     public void aroa0013() => CorpusAssert.Parses(@"ALTER TABLE s.t OWNER", "error");
     [Fact]
@@ -41,8 +41,8 @@ public class Corpus_AlterRenameOwnerSchema
     public void aroa0017() => CorpusAssert.Parses(@"ALTER TABLE s.t RENAME COLUMN name TO full_name; ALTER TABLE s.t RENAME COLUMN full_name TO name", "ok");
     [Fact]
     public void aroa0018() => CorpusAssert.Parses(@"ALTER TABLE s.t RENAME name TO full_name; ALTER TABLE s.t RENAME full_name TO name", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void aroa0019() => CorpusAssert.Parses(@"ALTER TABLE s.t RENAME COLUMN no_such_col TO other", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task aroa0019() => CorpusAssert.MatchesPostgres(@"ALTER TABLE s.t RENAME COLUMN no_such_col TO other", "error", false);
     [Fact]
     public void aroa0020() => CorpusAssert.Parses(@"ALTER TABLE s.t RENAME CONSTRAINT t_pkey TO t_pk_renamed; ALTER TABLE s.t RENAME CONSTRAINT t_pk_renamed TO t_pkey", "ok");
     [Fact]
@@ -59,8 +59,8 @@ public class Corpus_AlterRenameOwnerSchema
     public void aroa0026() => CorpusAssert.Parses(@"ALTER VIEW s.v SET SCHEMA s", "ok");
     [Fact]
     public void aroa0027() => CorpusAssert.Parses(@"ALTER VIEW s.v RENAME TO", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void aroa0028() => CorpusAssert.Parses(@"ALTER VIEW s.v OWNER TO no_such_role_xyz", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task aroa0028() => CorpusAssert.MatchesPostgres(@"ALTER VIEW s.v OWNER TO no_such_role_xyz", "error", false);
     [Fact]
     public void aroa0029() => CorpusAssert.Parses(@"ALTER MATERIALIZED VIEW s.mv RENAME TO mv_renamed; ALTER MATERIALIZED VIEW s.mv_renamed RENAME TO mv", "ok");
     [Fact]
@@ -87,8 +87,8 @@ public class Corpus_AlterRenameOwnerSchema
     public void aroa0040() => CorpusAssert.Parses(@"ALTER SEQUENCE s.seq SET SCHEMA s", "ok");
     [Fact]
     public void aroa0041() => CorpusAssert.Parses(@"ALTER SEQUENCE s.seq RENAME TO", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void aroa0042() => CorpusAssert.Parses(@"ALTER SEQUENCE s.seq OWNER TO no_such_role_xyz", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task aroa0042() => CorpusAssert.MatchesPostgres(@"ALTER SEQUENCE s.seq OWNER TO no_such_role_xyz", "error", false);
     [Fact]
     public void aroa0043() => CorpusAssert.Parses(@"ALTER TYPE s.mood RENAME TO mood_renamed; ALTER TYPE s.mood_renamed RENAME TO mood", "ok");
     [Fact]
@@ -105,18 +105,18 @@ public class Corpus_AlterRenameOwnerSchema
     public void aroa0049() => CorpusAssert.Parses(@"ALTER TYPE s.addr SET SCHEMA s", "ok");
     [Fact]
     public void aroa0050() => CorpusAssert.Parses(@"ALTER TYPE s.mood RENAME TO", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void aroa0051() => CorpusAssert.Parses(@"ALTER TYPE s.mood OWNER TO no_such_role_xyz", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task aroa0051() => CorpusAssert.MatchesPostgres(@"ALTER TYPE s.mood OWNER TO no_such_role_xyz", "error", false);
     [Fact]
     public void aroa0052() => CorpusAssert.Parses(@"ALTER TYPE s.addr RENAME ATTRIBUTE street TO street_name CASCADE; ALTER TYPE s.addr RENAME ATTRIBUTE street_name TO street CASCADE", "ok");
     [Fact]
     public void aroa0053() => CorpusAssert.Parses(@"ALTER TYPE s.addr RENAME ATTRIBUTE street TO street_name RESTRICT; ALTER TYPE s.addr RENAME ATTRIBUTE street_name TO street RESTRICT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void aroa0054() => CorpusAssert.Parses(@"ALTER TYPE s.addr RENAME ATTRIBUTE no_such_attr TO other", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task aroa0054() => CorpusAssert.MatchesPostgres(@"ALTER TYPE s.addr RENAME ATTRIBUTE no_such_attr TO other", "error", false);
     [Fact]
     public void aroa0055() => CorpusAssert.Parses(@"ALTER TYPE s.mood RENAME VALUE 'sad' TO 'unhappy'; ALTER TYPE s.mood RENAME VALUE 'unhappy' TO 'sad'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void aroa0056() => CorpusAssert.Parses(@"ALTER TYPE s.mood RENAME VALUE 'nonexistent' TO 'something'", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task aroa0056() => CorpusAssert.MatchesPostgres(@"ALTER TYPE s.mood RENAME VALUE 'nonexistent' TO 'something'", "error", false);
     [Fact]
     public void aroa0057() => CorpusAssert.Parses(@"ALTER DOMAIN s.pos_int RENAME TO pos_int_ren; ALTER DOMAIN s.pos_int_ren RENAME TO pos_int", "ok");
     [Fact]
@@ -127,8 +127,8 @@ public class Corpus_AlterRenameOwnerSchema
     public void aroa0060() => CorpusAssert.Parses(@"ALTER DOMAIN s.pos_int SET SCHEMA s", "ok");
     [Fact]
     public void aroa0061() => CorpusAssert.Parses(@"ALTER DOMAIN s.pos_int RENAME TO", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void aroa0062() => CorpusAssert.Parses(@"ALTER DOMAIN s.pos_int OWNER TO no_such_role_xyz", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task aroa0062() => CorpusAssert.MatchesPostgres(@"ALTER DOMAIN s.pos_int OWNER TO no_such_role_xyz", "error", false);
     [Fact]
     public void aroa0063() => CorpusAssert.Parses(@"ALTER FUNCTION s.f(integer) RENAME TO f_renamed; ALTER FUNCTION s.f_renamed(integer) RENAME TO f", "ok");
     [Fact]
@@ -145,10 +145,10 @@ public class Corpus_AlterRenameOwnerSchema
     public void aroa0069() => CorpusAssert.Parses(@"ALTER FUNCTION s.f(integer) SET SCHEMA s", "ok");
     [Fact]
     public void aroa0070() => CorpusAssert.Parses(@"ALTER FUNCTION s.f(integer) RENAME TO", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void aroa0071() => CorpusAssert.Parses(@"ALTER FUNCTION s.f(integer) OWNER TO no_such_role_xyz", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void aroa0072() => CorpusAssert.Parses(@"ALTER FUNCTION s.no_such_fn(integer) RENAME TO whatever", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task aroa0071() => CorpusAssert.MatchesPostgres(@"ALTER FUNCTION s.f(integer) OWNER TO no_such_role_xyz", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task aroa0072() => CorpusAssert.MatchesPostgres(@"ALTER FUNCTION s.no_such_fn(integer) RENAME TO whatever", "error", false);
     [Fact]
     public void aroa0073() => CorpusAssert.Parses(@"ALTER PROCEDURE s.p(integer) RENAME TO p_renamed; ALTER PROCEDURE s.p_renamed(integer) RENAME TO p", "ok");
     [Fact]
@@ -159,12 +159,12 @@ public class Corpus_AlterRenameOwnerSchema
     public void aroa0076() => CorpusAssert.Parses(@"ALTER PROCEDURE s.p(integer) SET SCHEMA s", "ok");
     [Fact]
     public void aroa0077() => CorpusAssert.Parses(@"ALTER PROCEDURE s.p(integer) RENAME TO", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void aroa0078() => CorpusAssert.Parses(@"ALTER PROCEDURE s.p(integer) OWNER TO no_such_role_xyz", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task aroa0078() => CorpusAssert.MatchesPostgres(@"ALTER PROCEDURE s.p(integer) OWNER TO no_such_role_xyz", "error", false);
     [Fact]
     public void aroa0079() => CorpusAssert.Parses(@"ALTER SCHEMA s RENAME TO s2; ALTER SCHEMA s2 RENAME TO s", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void aroa0080() => CorpusAssert.Parses(@"ALTER SCHEMA s RENAME TO s", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task aroa0080() => CorpusAssert.MatchesPostgres(@"ALTER SCHEMA s RENAME TO s", "error", false);
     [Fact]
     public void aroa0081() => CorpusAssert.Parses(@"ALTER SCHEMA s OWNER TO CURRENT_USER", "ok");
     [Fact]
@@ -173,22 +173,22 @@ public class Corpus_AlterRenameOwnerSchema
     public void aroa0083() => CorpusAssert.Parses(@"ALTER SCHEMA s OWNER TO CURRENT_ROLE", "ok");
     [Fact]
     public void aroa0084() => CorpusAssert.Parses(@"ALTER SCHEMA s RENAME TO", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void aroa0085() => CorpusAssert.Parses(@"ALTER SCHEMA s OWNER TO no_such_role_xyz", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void aroa0086() => CorpusAssert.Parses(@"ALTER SCHEMA no_such_schema RENAME TO whatever", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task aroa0085() => CorpusAssert.MatchesPostgres(@"ALTER SCHEMA s OWNER TO no_such_role_xyz", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task aroa0086() => CorpusAssert.MatchesPostgres(@"ALTER SCHEMA no_such_schema RENAME TO whatever", "error", false);
     [Fact]
     public void aroa0087() => CorpusAssert.Parses(@"ALTER INDEX s.t_name_idx RENAME TO t_name_idx_ren; ALTER INDEX s.t_name_idx_ren RENAME TO t_name_idx", "ok");
     [Fact]
     public void aroa0088() => CorpusAssert.Parses(@"ALTER INDEX IF EXISTS s.t_name_idx RENAME TO t_name_idx_ren; ALTER INDEX s.t_name_idx_ren RENAME TO t_name_idx", "ok");
     [Fact]
     public void aroa0089() => CorpusAssert.Parses(@"ALTER INDEX IF EXISTS s.no_such_idx RENAME TO whatever", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void aroa0090() => CorpusAssert.Parses(@"ALTER INDEX s.t_name_idx SET SCHEMA s", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task aroa0090() => CorpusAssert.MatchesPostgres(@"ALTER INDEX s.t_name_idx SET SCHEMA s", "error", false);
     [Fact]
     public void aroa0091() => CorpusAssert.Parses(@"ALTER INDEX s.t_name_idx RENAME TO", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void aroa0092() => CorpusAssert.Parses(@"ALTER INDEX s.no_such_idx RENAME TO whatever", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task aroa0092() => CorpusAssert.MatchesPostgres(@"ALTER INDEX s.no_such_idx RENAME TO whatever", "error", false);
     [Fact]
     public void aroa0093() => CorpusAssert.Parses(@"CREATE AGGREGATE s.myagg(integer) (SFUNC = int4pl, STYPE = integer); ALTER AGGREGATE s.myagg(integer) RENAME TO myagg_ren; ALTER AGGREGATE s.myagg_ren(integer) RENAME TO myagg", "ok");
     [Fact]
@@ -197,8 +197,8 @@ public class Corpus_AlterRenameOwnerSchema
     public void aroa0095() => CorpusAssert.Parses(@"CREATE AGGREGATE s.myagg(integer) (SFUNC = int4pl, STYPE = integer); ALTER AGGREGATE s.myagg(integer) OWNER TO SESSION_USER", "ok");
     [Fact]
     public void aroa0096() => CorpusAssert.Parses(@"CREATE AGGREGATE s.myagg(integer) (SFUNC = int4pl, STYPE = integer); ALTER AGGREGATE s.myagg(integer) SET SCHEMA s", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void aroa0097() => CorpusAssert.Parses(@"ALTER AGGREGATE s.myagg(integer) RENAME TO whatever", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task aroa0097() => CorpusAssert.MatchesPostgres(@"ALTER AGGREGATE s.myagg(integer) RENAME TO whatever", "error", false);
     [Fact]
     public void aroa0098() => CorpusAssert.Parses(@"ALTER AGGREGATE s.f(integer) RENAME TO", "error");
     [Fact]
@@ -213,16 +213,16 @@ public class Corpus_AlterRenameOwnerSchema
     public void aroa0103() => CorpusAssert.Parses(@"CREATE SCHEMA s2; ALTER TYPE s.mood SET SCHEMA s2; ALTER TYPE s2.mood SET SCHEMA s", "ok");
     [Fact]
     public void aroa0104() => CorpusAssert.Parses(@"CREATE SCHEMA s2; ALTER FUNCTION s.f(integer) SET SCHEMA s2; ALTER FUNCTION s2.f(integer) SET SCHEMA s", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void aroa0105() => CorpusAssert.Parses(@"ALTER TABLE s.t SET SCHEMA no_such_schema", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void aroa0106() => CorpusAssert.Parses(@"ALTER VIEW s.v SET SCHEMA no_such_schema", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void aroa0107() => CorpusAssert.Parses(@"ALTER SEQUENCE s.seq SET SCHEMA no_such_schema", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void aroa0108() => CorpusAssert.Parses(@"ALTER TYPE s.mood SET SCHEMA no_such_schema", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void aroa0109() => CorpusAssert.Parses(@"ALTER FUNCTION s.f(integer) SET SCHEMA no_such_schema", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task aroa0105() => CorpusAssert.MatchesPostgres(@"ALTER TABLE s.t SET SCHEMA no_such_schema", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task aroa0106() => CorpusAssert.MatchesPostgres(@"ALTER VIEW s.v SET SCHEMA no_such_schema", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task aroa0107() => CorpusAssert.MatchesPostgres(@"ALTER SEQUENCE s.seq SET SCHEMA no_such_schema", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task aroa0108() => CorpusAssert.MatchesPostgres(@"ALTER TYPE s.mood SET SCHEMA no_such_schema", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task aroa0109() => CorpusAssert.MatchesPostgres(@"ALTER FUNCTION s.f(integer) SET SCHEMA no_such_schema", "error", false);
     [Fact]
     public void aroa0110() => CorpusAssert.Parses(@"ALTER TABLE s.t RENAME TO 123bad", "error");
     [Fact]
@@ -235,14 +235,14 @@ public class Corpus_AlterRenameOwnerSchema
     public void aroa0114() => CorpusAssert.Parses(@"ALTER TABLE s.t RENAME TO T_UPPER; ALTER TABLE s.t_upper RENAME TO t", "ok");
     [Fact]
     public void aroa0115() => CorpusAssert.Parses(@"ALTER TRIGGER t_touch ON s.t RENAME TO t_touch2; ALTER TRIGGER t_touch2 ON s.t RENAME TO t_touch", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void aroa0116() => CorpusAssert.Parses(@"ALTER TRIGGER no_such_trigger ON s.t RENAME TO whatever", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task aroa0116() => CorpusAssert.MatchesPostgres(@"ALTER TRIGGER no_such_trigger ON s.t RENAME TO whatever", "error", false);
     [Fact]
     public void aroa0117() => CorpusAssert.Parses(@"ALTER TRIGGER t_touch ON s.t RENAME TO", "error");
     [Fact]
     public void aroa0118() => CorpusAssert.Parses(@"CREATE RULE myrule AS ON INSERT TO s.t DO ALSO NOTHING; ALTER RULE myrule ON s.t RENAME TO myrule2; ALTER RULE myrule2 ON s.t RENAME TO myrule", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void aroa0119() => CorpusAssert.Parses(@"ALTER RULE no_such_rule ON s.t RENAME TO whatever", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task aroa0119() => CorpusAssert.MatchesPostgres(@"ALTER RULE no_such_rule ON s.t RENAME TO whatever", "error", false);
     [Fact]
     public void aroa0120() => CorpusAssert.Parses(@"ALTER RULE no_such_rule ON s.t RENAME TO", "error");
     [Fact]
@@ -251,34 +251,34 @@ public class Corpus_AlterRenameOwnerSchema
     public void aroa0122() => CorpusAssert.Parses(@"CREATE TEXT SEARCH CONFIGURATION s.mytsconf (COPY = pg_catalog.english); ALTER TEXT SEARCH CONFIGURATION s.mytsconf OWNER TO CURRENT_USER", "ok");
     [Fact]
     public void aroa0123() => CorpusAssert.Parses(@"CREATE TEXT SEARCH CONFIGURATION s.mytsconf (COPY = pg_catalog.english); ALTER TEXT SEARCH CONFIGURATION s.mytsconf SET SCHEMA s", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void aroa0124() => CorpusAssert.Parses(@"ALTER TEXT SEARCH CONFIGURATION s.no_such_tsconf RENAME TO whatever", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task aroa0124() => CorpusAssert.MatchesPostgres(@"ALTER TEXT SEARCH CONFIGURATION s.no_such_tsconf RENAME TO whatever", "error", false);
     [Fact]
     public void aroa0125() => CorpusAssert.Parses(@"CREATE TEXT SEARCH DICTIONARY s.mytsdict (TEMPLATE = pg_catalog.simple); ALTER TEXT SEARCH DICTIONARY s.mytsdict RENAME TO mytsdict2; ALTER TEXT SEARCH DICTIONARY s.mytsdict2 RENAME TO mytsdict", "ok");
     [Fact]
     public void aroa0126() => CorpusAssert.Parses(@"CREATE TEXT SEARCH DICTIONARY s.mytsdict (TEMPLATE = pg_catalog.simple); ALTER TEXT SEARCH DICTIONARY s.mytsdict OWNER TO CURRENT_USER", "ok");
     [Fact]
     public void aroa0127() => CorpusAssert.Parses(@"CREATE TEXT SEARCH DICTIONARY s.mytsdict (TEMPLATE = pg_catalog.simple); ALTER TEXT SEARCH DICTIONARY s.mytsdict SET SCHEMA s", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void aroa0128() => CorpusAssert.Parses(@"ALTER TEXT SEARCH DICTIONARY s.no_such_tsdict RENAME TO whatever", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task aroa0128() => CorpusAssert.MatchesPostgres(@"ALTER TEXT SEARCH DICTIONARY s.no_such_tsdict RENAME TO whatever", "error", false);
     [Fact]
     public void aroa0129() => CorpusAssert.Parses(@"CREATE COLLATION s.mycoll (LOCALE = 'C'); ALTER COLLATION s.mycoll RENAME TO mycoll2; ALTER COLLATION s.mycoll2 RENAME TO mycoll", "ok");
     [Fact]
     public void aroa0130() => CorpusAssert.Parses(@"CREATE COLLATION s.mycoll (LOCALE = 'C'); ALTER COLLATION s.mycoll OWNER TO CURRENT_USER", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void aroa0131() => CorpusAssert.Parses(@"ALTER COLLATION no_such_coll RENAME TO whatever", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task aroa0131() => CorpusAssert.MatchesPostgres(@"ALTER COLLATION no_such_coll RENAME TO whatever", "error", false);
     [Fact]
     public void aroa0132() => CorpusAssert.Parses(@"ALTER COLLATION s.no_such_coll RENAME TO", "error");
     [Fact]
     public void aroa0133() => CorpusAssert.Parses(@"CREATE CONVERSION s.myconv FOR 'LATIN1' TO 'UTF8' FROM iso8859_1_to_utf8; ALTER CONVERSION s.myconv RENAME TO myconv2; ALTER CONVERSION s.myconv2 RENAME TO myconv", "ok");
     [Fact]
     public void aroa0134() => CorpusAssert.Parses(@"CREATE CONVERSION s.myconv FOR 'LATIN1' TO 'UTF8' FROM iso8859_1_to_utf8; ALTER CONVERSION s.myconv OWNER TO CURRENT_USER", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void aroa0135() => CorpusAssert.Parses(@"ALTER CONVERSION s.no_such_conv RENAME TO whatever", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task aroa0135() => CorpusAssert.MatchesPostgres(@"ALTER CONVERSION s.no_such_conv RENAME TO whatever", "error", false);
     [Fact]
     public void aroa0136() => CorpusAssert.Parses(@"ALTER TABLE s.t SET SCHEMA", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void aroa0137() => CorpusAssert.Parses(@"ALTER TABLE s.t SET", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task aroa0137() => CorpusAssert.MatchesPostgres(@"ALTER TABLE s.t SET", "error", false);
     [Fact]
     public void aroa0138() => CorpusAssert.Parses(@"ALTER VIEW s.v SET SCHEMA", "error");
     [Fact]
@@ -329,22 +329,22 @@ public class Corpus_AlterRenameOwnerSchema
     public void aroa0161() => CorpusAssert.Parses(@"ALTER TABLE s.t RENAME COLUMN home TO home2; ALTER TABLE s.t RENAME COLUMN home2 TO home", "ok");
     [Fact]
     public void aroa0162() => CorpusAssert.Parses(@"ALTER TABLE s.t RENAME COLUMN status TO status2; ALTER TABLE s.t RENAME COLUMN status2 TO status", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void aroa0163() => CorpusAssert.Parses(@"ALTER INDEX s.t_name_idx RENAME TO t_name_idx", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task aroa0163() => CorpusAssert.MatchesPostgres(@"ALTER INDEX s.t_name_idx RENAME TO t_name_idx", "error", false);
     [Fact]
     public void aroa0164() => CorpusAssert.Parses(@"ALTER TRIGGER t_touch ON s.t RENAME TO t_touch", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void aroa0165() => CorpusAssert.Parses(@"ALTER FUNCTION s.f(integer) RENAME TO f", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void aroa0166() => CorpusAssert.Parses(@"ALTER SEQUENCE s.seq RENAME TO seq", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void aroa0167() => CorpusAssert.Parses(@"ALTER DOMAIN s.pos_int RENAME TO pos_int", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void aroa0168() => CorpusAssert.Parses(@"ALTER TYPE s.mood RENAME TO mood", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void aroa0169() => CorpusAssert.Parses(@"ALTER VIEW s.v RENAME TO v", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void aroa0170() => CorpusAssert.Parses(@"ALTER MATERIALIZED VIEW s.mv RENAME TO mv", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task aroa0165() => CorpusAssert.MatchesPostgres(@"ALTER FUNCTION s.f(integer) RENAME TO f", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task aroa0166() => CorpusAssert.MatchesPostgres(@"ALTER SEQUENCE s.seq RENAME TO seq", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task aroa0167() => CorpusAssert.MatchesPostgres(@"ALTER DOMAIN s.pos_int RENAME TO pos_int", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task aroa0168() => CorpusAssert.MatchesPostgres(@"ALTER TYPE s.mood RENAME TO mood", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task aroa0169() => CorpusAssert.MatchesPostgres(@"ALTER VIEW s.v RENAME TO v", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task aroa0170() => CorpusAssert.MatchesPostgres(@"ALTER MATERIALIZED VIEW s.mv RENAME TO mv", "error", false);
     [Fact]
     public void arob0001() => CorpusAssert.Parses(@"ALTER TABLE s.t RENAME TO t_renamed; ALTER TABLE s.t_renamed RENAME TO t", "ok");
     [Fact]
@@ -473,8 +473,8 @@ public class Corpus_AlterRenameOwnerSchema
     public void arob0063() => CorpusAssert.Parses(@"ALTER INDEX IF EXISTS s.t_name_idx RENAME TO idx2; ALTER INDEX IF EXISTS s.idx2 RENAME TO t_name_idx", "ok");
     [Fact]
     public void arob0064() => CorpusAssert.Parses(@"ALTER INDEX IF EXISTS s.no_such_index RENAME TO whatever", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void arob0065() => CorpusAssert.Parses(@"ALTER INDEX s.t_name_idx SET SCHEMA public", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task arob0065() => CorpusAssert.MatchesPostgres(@"ALTER INDEX s.t_name_idx SET SCHEMA public", "error", false);
     [Fact]
     public void arob0066() => CorpusAssert.Parses(@"ALTER INDEX s.t_name_idx RENAME", "error");
     [Fact]
@@ -511,16 +511,16 @@ public class Corpus_AlterRenameOwnerSchema
     public void arob0082() => CorpusAssert.Parses(@"CREATE AGGREGATE s.myagg2(integer) (SFUNC = int4pl, STYPE = integer); ALTER AGGREGATE s.myagg2(integer) OWNER TO CURRENT_USER", "ok");
     [Fact]
     public void arob0083() => CorpusAssert.Parses(@"CREATE AGGREGATE s.myagg3(integer) (SFUNC = int4pl, STYPE = integer); ALTER AGGREGATE s.myagg3(integer) SET SCHEMA public", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void arob0084() => CorpusAssert.Parses(@"ALTER AGGREGATE s.no_such_agg(integer) RENAME TO x", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void arob0085() => CorpusAssert.Parses(@"ALTER TABLE no_such_table RENAME TO x", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void arob0086() => CorpusAssert.Parses(@"ALTER VIEW no_such_view RENAME TO x", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void arob0087() => CorpusAssert.Parses(@"ALTER SEQUENCE no_such_seq RENAME TO x", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void arob0088() => CorpusAssert.Parses(@"ALTER INDEX no_such_index RENAME TO x", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task arob0084() => CorpusAssert.MatchesPostgres(@"ALTER AGGREGATE s.no_such_agg(integer) RENAME TO x", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task arob0085() => CorpusAssert.MatchesPostgres(@"ALTER TABLE no_such_table RENAME TO x", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task arob0086() => CorpusAssert.MatchesPostgres(@"ALTER VIEW no_such_view RENAME TO x", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task arob0087() => CorpusAssert.MatchesPostgres(@"ALTER SEQUENCE no_such_seq RENAME TO x", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task arob0088() => CorpusAssert.MatchesPostgres(@"ALTER INDEX no_such_index RENAME TO x", "error", false);
     [Fact]
     public void arob0089() => CorpusAssert.Parses(@"CREATE TABLE s.orig (a int); ALTER TABLE s.orig RENAME TO orig2; INSERT INTO s.orig2 DEFAULT VALUES; ALTER TABLE s.orig2 RENAME TO orig", "ok");
     [Fact]
@@ -561,8 +561,8 @@ public class Corpus_AlterRenameOwnerSchema
     public void arob0107() => CorpusAssert.Parses(@"ALTER s.t RENAME TO t2", "error");
     [Fact]
     public void arob0108() => CorpusAssert.Parses(@"ALTER TABLE s.t OWNER CURRENT_USER", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void arob0109() => CorpusAssert.Parses(@"ALTER FUNCTION s.f(integer) OWNER CURRENT_USER", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task arob0109() => CorpusAssert.MatchesPostgres(@"ALTER FUNCTION s.f(integer) OWNER CURRENT_USER", "error", false);
     [Fact]
     public void arob0110() => CorpusAssert.Parses(@"CREATE TABLE s.tbl_for_mv_schema (x int); ALTER MATERIALIZED VIEW s.mv SET SCHEMA public", "ok");
 }

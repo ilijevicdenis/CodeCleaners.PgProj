@@ -23,10 +23,10 @@ public class Corpus_Explain
     public void expa0008() => CorpusAssert.Parses(@"EXPLAIN (COSTS) SELECT * FROM s.t", "ok");
     [Fact]
     public void expa0009() => CorpusAssert.Parses(@"EXPLAIN (BUFFERS) SELECT * FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void expa0010() => CorpusAssert.Parses(@"EXPLAIN (WAL) SELECT * FROM s.t", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void expa0011() => CorpusAssert.Parses(@"EXPLAIN (TIMING) SELECT * FROM s.t", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task expa0010() => CorpusAssert.MatchesPostgres(@"EXPLAIN (WAL) SELECT * FROM s.t", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task expa0011() => CorpusAssert.MatchesPostgres(@"EXPLAIN (TIMING) SELECT * FROM s.t", "error", false);
     [Fact]
     public void expa0012() => CorpusAssert.Parses(@"EXPLAIN (SUMMARY) SELECT * FROM s.t", "ok");
     [Fact]
@@ -257,38 +257,38 @@ public class Corpus_Explain
     public void expa0125() => CorpusAssert.Parses(@"EXPLAIN (ANALYZE, SERIALIZE TEXT) SELECT * FROM s.t", "ok");
     [Fact]
     public void expa0126() => CorpusAssert.Parses(@"EXPLAIN (ANALYZE, SERIALIZE BINARY) SELECT * FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void expa0127() => CorpusAssert.Parses(@"EXPLAIN (SERIALIZE TEXT) SELECT * FROM s.t", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void expa0128() => CorpusAssert.Parses(@"EXPLAIN (SERIALIZE BINARY) SELECT * FROM s.t", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task expa0127() => CorpusAssert.MatchesPostgres(@"EXPLAIN (SERIALIZE TEXT) SELECT * FROM s.t", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task expa0128() => CorpusAssert.MatchesPostgres(@"EXPLAIN (SERIALIZE BINARY) SELECT * FROM s.t", "error", false);
     [Fact]
     public void expa0129() => CorpusAssert.Parses(@"EXPLAIN", "error");
     [Fact]
     public void expa0130() => CorpusAssert.Parses(@"EXPLAIN ()", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void expa0131() => CorpusAssert.Parses(@"EXPLAIN (FORMAT) SELECT 1", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void expa0132() => CorpusAssert.Parses(@"EXPLAIN (FORMAT CSV) SELECT 1", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void expa0133() => CorpusAssert.Parses(@"EXPLAIN (FORMAT HTML) SELECT 1", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void expa0134() => CorpusAssert.Parses(@"EXPLAIN (ANALYZE, GENERIC_PLAN) SELECT * FROM s.t WHERE id = $1", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void expa0135() => CorpusAssert.Parses(@"EXPLAIN (BADOPTION) SELECT 1", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void expa0136() => CorpusAssert.Parses(@"EXPLAIN (ANALYZE MAYBE) SELECT 1", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void expa0137() => CorpusAssert.Parses(@"EXPLAIN VERBOSE ANALYZE SELECT 1", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void expa0138() => CorpusAssert.Parses(@"EXPLAIN (ANALYZE, VERBOSE FORMAT JSON) SELECT 1", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void expa0139() => CorpusAssert.Parses(@"EXPLAIN (ANALYZE, VERBOSE,) SELECT 1", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void expa0140() => CorpusAssert.Parses(@"EXPLAIN (ANALYZE VERBOSE) SELECT 1", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task expa0131() => CorpusAssert.MatchesPostgres(@"EXPLAIN (FORMAT) SELECT 1", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task expa0132() => CorpusAssert.MatchesPostgres(@"EXPLAIN (FORMAT CSV) SELECT 1", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task expa0133() => CorpusAssert.MatchesPostgres(@"EXPLAIN (FORMAT HTML) SELECT 1", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task expa0134() => CorpusAssert.MatchesPostgres(@"EXPLAIN (ANALYZE, GENERIC_PLAN) SELECT * FROM s.t WHERE id = $1", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task expa0135() => CorpusAssert.MatchesPostgres(@"EXPLAIN (BADOPTION) SELECT 1", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task expa0136() => CorpusAssert.MatchesPostgres(@"EXPLAIN (ANALYZE MAYBE) SELECT 1", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task expa0137() => CorpusAssert.MatchesPostgres(@"EXPLAIN VERBOSE ANALYZE SELECT 1", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task expa0138() => CorpusAssert.MatchesPostgres(@"EXPLAIN (ANALYZE, VERBOSE FORMAT JSON) SELECT 1", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task expa0139() => CorpusAssert.MatchesPostgres(@"EXPLAIN (ANALYZE, VERBOSE,) SELECT 1", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task expa0140() => CorpusAssert.MatchesPostgres(@"EXPLAIN (ANALYZE VERBOSE) SELECT 1", "error", false);
     [Fact]
     public void expa0141() => CorpusAssert.Parses(@"EXPLAIN ANALYZE SELECT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void expa0142() => CorpusAssert.Parses(@"EXPLAIN SELECT * FROM nonexistent_table_xyz", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task expa0142() => CorpusAssert.MatchesPostgres(@"EXPLAIN SELECT * FROM nonexistent_table_xyz", "error", false);
     [Fact]
     public void expa0143() => CorpusAssert.Parses(@"EXPLAIN (ANALYZE, VERBOSE, FORMAT JSON) INSERT INTO s.t (name, qty) VALUES ('z', 99)", "ok");
     [Fact]

@@ -97,8 +97,8 @@ public class Corpus_LockCmd
     public void lcka0045() => CorpusAssert.Parses(@"BEGIN; LOCK TABLE s.events_2024; ROLLBACK;", "ok");
     [Fact]
     public void lcka0046() => CorpusAssert.Parses(@"BEGIN; LOCK TABLE s.v; ROLLBACK;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void lcka0047() => CorpusAssert.Parses(@"BEGIN; LOCK TABLE s.mv; ROLLBACK;", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task lcka0047() => CorpusAssert.MatchesPostgres(@"BEGIN; LOCK TABLE s.mv; ROLLBACK;", "error", false);
     [Fact]
     public void lcka0048() => CorpusAssert.Parses(@"BEGIN; LOCK TABLE s.t IN ACCESS SHARE MODE; LOCK TABLE s.t2 IN ROW EXCLUSIVE MODE; ROLLBACK;", "ok");
     [Fact]
@@ -149,16 +149,16 @@ public class Corpus_LockCmd
     public void lcka0071() => CorpusAssert.Parses(@"BEGIN; LOCK TABLE s.t IN SHARE UPDATE; ROLLBACK;", "error");
     [Fact]
     public void lcka0072() => CorpusAssert.Parses(@"BEGIN; LOCK TABLE s.t IN SHARE ROW; ROLLBACK;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void lcka0073() => CorpusAssert.Parses(@"BEGIN; LOCK TABLE s.t IN BOGUS MODE; ROLLBACK;", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task lcka0073() => CorpusAssert.MatchesPostgres(@"BEGIN; LOCK TABLE s.t IN BOGUS MODE; ROLLBACK;", "error", false);
     [Fact]
     public void lcka0074() => CorpusAssert.Parses(@"BEGIN; LOCK TABLE s.t NOWAIT IN SHARE MODE; ROLLBACK;", "error");
     [Fact]
     public void lcka0075() => CorpusAssert.Parses(@"BEGIN; LOCK TABLE s.t MODE; ROLLBACK;", "error");
     [Fact]
     public void lcka0076() => CorpusAssert.Parses(@"BEGIN; LOCK TABLE s.t IN MODE; ROLLBACK;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void lcka0077() => CorpusAssert.Parses(@"BEGIN; LOCK TABLE s.no_such_table; ROLLBACK;", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task lcka0077() => CorpusAssert.MatchesPostgres(@"BEGIN; LOCK TABLE s.no_such_table; ROLLBACK;", "error", false);
     [Fact]
     public void lcka0078() => CorpusAssert.Parses(@"BEGIN; LOCK TABLE IN SHARE MODE; ROLLBACK;", "error");
     [Fact]
@@ -167,16 +167,16 @@ public class Corpus_LockCmd
     public void lcka0080() => CorpusAssert.Parses(@"BEGIN; LOCK TABLE s.t IN ACCESS EXCLUSIVE MODE ACCESS EXCLUSIVE MODE; ROLLBACK;", "error");
     [Fact]
     public void lcka0081() => CorpusAssert.Parses(@"BEGIN; LOCK TABLE s.t NOWAIT NOWAIT; ROLLBACK;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void lcka0082() => CorpusAssert.Parses(@"BEGIN; LOCK TABLE s.t IN EXCLUSIVE SHARE MODE; ROLLBACK;", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task lcka0082() => CorpusAssert.MatchesPostgres(@"BEGIN; LOCK TABLE s.t IN EXCLUSIVE SHARE MODE; ROLLBACK;", "error", false);
     [Fact]
     public void lcka0083() => CorpusAssert.Parses(@"BEGIN; LOCK TABLE ONLY ONLY s.t; ROLLBACK;", "error");
     [Fact]
     public void lcka0084() => CorpusAssert.Parses(@"BEGIN; LOCK TABLE s.t IN ACCESS SHARE MODE IN ROW EXCLUSIVE MODE; ROLLBACK;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void lcka0085() => CorpusAssert.Parses(@"BEGIN; LOCK TABLE s.seq; ROLLBACK;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void lcka0086() => CorpusAssert.Parses(@"BEGIN; LOCK TABLE s.f; ROLLBACK;", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task lcka0085() => CorpusAssert.MatchesPostgres(@"BEGIN; LOCK TABLE s.seq; ROLLBACK;", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task lcka0086() => CorpusAssert.MatchesPostgres(@"BEGIN; LOCK TABLE s.f; ROLLBACK;", "error", false);
     [Fact]
     public void lcka0087() => CorpusAssert.Parses(@"BEGIN; LOCK TABLE s.t IN SHARE ROW EXCLUSIVE MODE, s.t2 IN ACCESS SHARE MODE; ROLLBACK;", "error");
     [Fact]

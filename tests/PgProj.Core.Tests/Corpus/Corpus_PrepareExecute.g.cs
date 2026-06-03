@@ -101,8 +101,8 @@ public class Corpus_PrepareExecute
     public void prxa0047() => CorpusAssert.Parses(@"PREPARE q47 (integer) AS SELECT * FROM s.t WHERE id = $1; EXECUTE q47 (42)", "ok");
     [Fact]
     public void prxa0048() => CorpusAssert.Parses(@"PREPARE q48 AS SELECT * FROM s.t; EXECUTE q48", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void prxa0049() => CorpusAssert.Parses(@"EXECUTE q49()", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task prxa0049() => CorpusAssert.MatchesPostgres(@"EXECUTE q49()", "error", false);
     [Fact]
     public void prxa0050() => CorpusAssert.Parses(@"PREPARE q50 (integer, text) AS SELECT * FROM s.t WHERE id = $1 AND name = $2; EXECUTE q50 (1, 'foo')", "ok");
     [Fact]
@@ -269,40 +269,40 @@ public class Corpus_PrepareExecute
     public void prxa0131() => CorpusAssert.Parses(@"PREPARE q131 (text) AS SELECT * FROM s.t WHERE to_tsvector('english', name) @@ plainto_tsquery('english', $1)", "ok");
     [Fact]
     public void prxa0132() => CorpusAssert.Parses(@"PREPARE q132 AS SELECT id, name, val FROM s.t WHERE id = $1 OR name = $2", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void prxa0133() => CorpusAssert.Parses(@"DEALLOCATE nonexistent_plan", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void prxa0134() => CorpusAssert.Parses(@"EXECUTE nonexistent_plan", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task prxa0133() => CorpusAssert.MatchesPostgres(@"DEALLOCATE nonexistent_plan", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task prxa0134() => CorpusAssert.MatchesPostgres(@"EXECUTE nonexistent_plan", "error", false);
     [Fact]
     public void prxa0135() => CorpusAssert.Parses(@"PREPARE AS SELECT 1", "error");
     [Fact]
     public void prxa0136() => CorpusAssert.Parses(@"PREPARE q136 SELECT 1", "error");
     [Fact]
     public void prxa0137() => CorpusAssert.Parses(@"PREPARE q137 AS", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void prxa0138() => CorpusAssert.Parses(@"PREPARE q138 AS CREATE TABLE foo (x int)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void prxa0139() => CorpusAssert.Parses(@"PREPARE q139 AS BEGIN", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void prxa0140() => CorpusAssert.Parses(@"PREPARE q140 (badtype) AS SELECT $1", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void prxa0141() => CorpusAssert.Parses(@"PREPARE q141 () AS SELECT 1", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task prxa0138() => CorpusAssert.MatchesPostgres(@"PREPARE q138 AS CREATE TABLE foo (x int)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task prxa0139() => CorpusAssert.MatchesPostgres(@"PREPARE q139 AS BEGIN", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task prxa0140() => CorpusAssert.MatchesPostgres(@"PREPARE q140 (badtype) AS SELECT $1", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task prxa0141() => CorpusAssert.MatchesPostgres(@"PREPARE q141 () AS SELECT 1", "error", false);
     [Fact]
     public void prxa0142() => CorpusAssert.Parses(@"PREPARE 123bad AS SELECT 1", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void prxa0143() => CorpusAssert.Parses(@"PREPARE q143 (integer,) AS SELECT $1", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void prxa0144() => CorpusAssert.Parses(@"PREPARE q144 AS SELECT * FROM nonexistent_table_xyz", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void prxa0145() => CorpusAssert.Parses(@"PREPARE q145 AS VACUUM s.t", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task prxa0143() => CorpusAssert.MatchesPostgres(@"PREPARE q143 (integer,) AS SELECT $1", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task prxa0144() => CorpusAssert.MatchesPostgres(@"PREPARE q144 AS SELECT * FROM nonexistent_table_xyz", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task prxa0145() => CorpusAssert.MatchesPostgres(@"PREPARE q145 AS VACUUM s.t", "error", false);
     [Fact]
     public void prxa0146() => CorpusAssert.Parses(@"DEALLOCATE", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void prxa0147() => CorpusAssert.Parses(@"PREPARE q147 (integer) AS SELECT * FROM s.t WHERE id = $1; EXECUTE q147(1, 2)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void prxa0148() => CorpusAssert.Parses(@"PREPARE q148 (integer, text) AS SELECT * FROM s.t WHERE id = $1 AND name = $2; EXECUTE q148(1)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void prxa0149() => CorpusAssert.Parses(@"PREPARE q149 AS CALL s.p(1)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void prxa0150() => CorpusAssert.Parses(@"PREPARE q150 AS SELECT * FROM s.t; PREPARE q150 AS SELECT 1", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task prxa0147() => CorpusAssert.MatchesPostgres(@"PREPARE q147 (integer) AS SELECT * FROM s.t WHERE id = $1; EXECUTE q147(1, 2)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task prxa0148() => CorpusAssert.MatchesPostgres(@"PREPARE q148 (integer, text) AS SELECT * FROM s.t WHERE id = $1 AND name = $2; EXECUTE q148(1)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task prxa0149() => CorpusAssert.MatchesPostgres(@"PREPARE q149 AS CALL s.p(1)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task prxa0150() => CorpusAssert.MatchesPostgres(@"PREPARE q150 AS SELECT * FROM s.t; PREPARE q150 AS SELECT 1", "error", false);
 }

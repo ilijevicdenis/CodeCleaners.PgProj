@@ -225,16 +225,16 @@ public class Corpus_SelectSetops
     public void selsa0109() => CorpusAssert.Parses(@"SELECT id FROM s.t UNION SELECT id FROM s.t2 LIMIT 5 OFFSET 2", "ok");
     [Fact]
     public void selsa0110() => CorpusAssert.Parses(@"SELECT 1 UNION SELECT 2 FETCH FIRST ROW ONLY", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selsa0111() => CorpusAssert.Parses(@"SELECT id FROM s.t UNION SELECT id FROM s.t2 FETCH NEXT 2 ROWS WITH TIES", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selsa0112() => CorpusAssert.Parses(@"SELECT 1 UNION SELECT 2, 3", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selsa0113() => CorpusAssert.Parses(@"SELECT 1, 2 UNION SELECT 3", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selsa0114() => CorpusAssert.Parses(@"SELECT 1 INTERSECT SELECT 2, 3", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selsa0115() => CorpusAssert.Parses(@"SELECT 1, 2 EXCEPT SELECT 3", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task selsa0111() => CorpusAssert.MatchesPostgres(@"SELECT id FROM s.t UNION SELECT id FROM s.t2 FETCH NEXT 2 ROWS WITH TIES", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task selsa0112() => CorpusAssert.MatchesPostgres(@"SELECT 1 UNION SELECT 2, 3", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task selsa0113() => CorpusAssert.MatchesPostgres(@"SELECT 1, 2 UNION SELECT 3", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task selsa0114() => CorpusAssert.MatchesPostgres(@"SELECT 1 INTERSECT SELECT 2, 3", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task selsa0115() => CorpusAssert.MatchesPostgres(@"SELECT 1, 2 EXCEPT SELECT 3", "error", false);
     [Fact]
     public void selsa0116() => CorpusAssert.Parses(@"SELECT 1 UNION SELECT 'not a number' WHERE", "error");
     [Fact]
@@ -247,8 +247,8 @@ public class Corpus_SelectSetops
     public void selsa0120() => CorpusAssert.Parses(@"SELECT 1 UNION UNION SELECT 2", "error");
     [Fact]
     public void selsa0121() => CorpusAssert.Parses(@"SELECT 1 UNION", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selsa0122() => CorpusAssert.Parses(@"UNION SELECT 1", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task selsa0122() => CorpusAssert.MatchesPostgres(@"UNION SELECT 1", "error", false);
     [Fact]
     public void selsa0123() => CorpusAssert.Parses(@"SELECT 1 INTERSECT", "error");
     [Fact]
@@ -263,34 +263,34 @@ public class Corpus_SelectSetops
     public void selsa0128() => CorpusAssert.Parses(@"SELECT 1 ORDER BY 1 UNION SELECT 2", "error");
     [Fact]
     public void selsa0129() => CorpusAssert.Parses(@"SELECT 1 UNION SELECT 2 ORDER BY 1 ORDER BY 1", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selsa0130() => CorpusAssert.Parses(@"SELECT 1 UNION SELECT 2 LIMIT 1 LIMIT 2", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task selsa0130() => CorpusAssert.MatchesPostgres(@"SELECT 1 UNION SELECT 2 LIMIT 1 LIMIT 2", "error", false);
     [Fact]
     public void selsa0131() => CorpusAssert.Parses(@"SELECT 1 CORRESPONDING SELECT 2", "error");
     [Fact]
     public void selsa0132() => CorpusAssert.Parses(@"SELECT 1 UNION CORRESPONDING BY (a) SELECT 2", "error");
     [Fact]
     public void selsa0133() => CorpusAssert.Parses(@"SELECT 1 UNION SELECT 2 HAVING count(*) > 0", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selsa0134() => CorpusAssert.Parses(@"SELECT id FROM s.t UNION SELECT name FROM s.t", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selsa0135() => CorpusAssert.Parses(@"SELECT true UNION SELECT 42", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task selsa0134() => CorpusAssert.MatchesPostgres(@"SELECT id FROM s.t UNION SELECT name FROM s.t", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task selsa0135() => CorpusAssert.MatchesPostgres(@"SELECT true UNION SELECT 42", "error", false);
     [Fact]
     public void selsa0136() => CorpusAssert.Parses(@"SELECT 1 UNION SELECT 2 GROUP BY 1", "ok");
     [Fact]
     public void selsa0137() => CorpusAssert.Parses(@"SELECT 1 UNION SELECT 2 WHERE true", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selsa0138() => CorpusAssert.Parses(@"SELECT 1 UNION SELECT", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selsa0139() => CorpusAssert.Parses(@"SELECT 1 EXCEPT SELECT", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selsa0140() => CorpusAssert.Parses(@"SELECT UNION SELECT 1", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selsa0141() => CorpusAssert.Parses(@"SELECT id FROM s.t UNION SELECT id FROM nonexistent_table", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selsa0142() => CorpusAssert.Parses(@"SELECT 1 AS n UNION SELECT 2 ORDER BY nonexistent_col", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selsa0143() => CorpusAssert.Parses(@"SELECT 1 UNION SELECT 2 ORDER BY 3", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task selsa0138() => CorpusAssert.MatchesPostgres(@"SELECT 1 UNION SELECT", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task selsa0139() => CorpusAssert.MatchesPostgres(@"SELECT 1 EXCEPT SELECT", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task selsa0140() => CorpusAssert.MatchesPostgres(@"SELECT UNION SELECT 1", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task selsa0141() => CorpusAssert.MatchesPostgres(@"SELECT id FROM s.t UNION SELECT id FROM nonexistent_table", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task selsa0142() => CorpusAssert.MatchesPostgres(@"SELECT 1 AS n UNION SELECT 2 ORDER BY nonexistent_col", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task selsa0143() => CorpusAssert.MatchesPostgres(@"SELECT 1 UNION SELECT 2 ORDER BY 3", "error", false);
     [Fact]
     public void selsa0144() => CorpusAssert.Parses(@"SELECT 1 UNION SELECT 2 LIMIT -1", "error");
     [Fact]
@@ -327,12 +327,12 @@ public class Corpus_SelectSetops
     public void selsa0160() => CorpusAssert.Parses(@"SELECT id FROM s.t UNION SELECT id FROM s.t ORDER BY id FETCH FIRST 5 ROWS ONLY", "ok");
     [Fact]
     public void selsa0161() => CorpusAssert.Parses(@"SELECT id FROM s.t UNION SELECT id FROM s.t ORDER BY 1 FETCH NEXT 5 ROWS WITH TIES", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selsa0162() => CorpusAssert.Parses(@"SELECT id FROM s.t UNION SELECT id FROM s.t2 FOR UPDATE", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selsa0163() => CorpusAssert.Parses(@"SELECT id FROM s.t UNION SELECT id FROM s.t2 FOR SHARE", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selsa0164() => CorpusAssert.Parses(@"SELECT id FROM s.t INTERSECT SELECT id FROM s.t2 FOR KEY SHARE", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task selsa0162() => CorpusAssert.MatchesPostgres(@"SELECT id FROM s.t UNION SELECT id FROM s.t2 FOR UPDATE", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task selsa0163() => CorpusAssert.MatchesPostgres(@"SELECT id FROM s.t UNION SELECT id FROM s.t2 FOR SHARE", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task selsa0164() => CorpusAssert.MatchesPostgres(@"SELECT id FROM s.t INTERSECT SELECT id FROM s.t2 FOR KEY SHARE", "error", false);
     [Fact]
     public void selsa0165() => CorpusAssert.Parses(@"SELECT 1 UNION SELECT 2 FROM s.nonexistent_xyz", "error");
     [Fact]
@@ -395,10 +395,10 @@ public class Corpus_SelectSetops
     public void selsb0024() => CorpusAssert.Parses(@"(SELECT 1 UNION SELECT 2) EXCEPT (SELECT 2 UNION SELECT 3)", "ok");
     [Fact]
     public void selsb0025() => CorpusAssert.Parses(@"SELECT val FROM s.t UNION SELECT amount FROM s.t2", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selsb0026() => CorpusAssert.Parses(@"SELECT 1 UNION SELECT 'a'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selsb0027() => CorpusAssert.Parses(@"SELECT 1, 2 UNION SELECT 3", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task selsb0026() => CorpusAssert.MatchesPostgres(@"SELECT 1 UNION SELECT 'a'", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task selsb0027() => CorpusAssert.MatchesPostgres(@"SELECT 1, 2 UNION SELECT 3", "error", false);
     [Fact]
     public void selsb0028() => CorpusAssert.Parses(@"SELECT 1 EXCEPTING SELECT 2", "error");
     [Fact]

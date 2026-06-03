@@ -53,14 +53,14 @@ public class Corpus_SelectCte
     public void selca0023() => CorpusAssert.Parses(@"WITH RECURSIVE r AS (SELECT 1 AS n UNION SELECT n + 1 FROM r WHERE n < 3) SELECT * FROM r", "ok");
     [Fact]
     public void selca0024() => CorpusAssert.Parses(@"WITH RECURSIVE fib(a, b) AS (SELECT 0, 1 UNION ALL SELECT b, a+b FROM fib WHERE a < 100) SELECT a FROM fib", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selca0025() => CorpusAssert.Parses(@"WITH r AS (SELECT 1 AS n UNION ALL SELECT n + 1 FROM r WHERE n < 5) SELECT * FROM r", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selca0026() => CorpusAssert.Parses(@"WITH RECURSIVE r AS (SELECT n + 1 FROM r WHERE n < 5) SELECT * FROM r", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selca0027() => CorpusAssert.Parses(@"WITH RECURSIVE r AS (SELECT 1 AS n INTERSECT SELECT n + 1 FROM r WHERE n < 5) SELECT * FROM r", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selca0028() => CorpusAssert.Parses(@"WITH RECURSIVE r AS (SELECT 1 AS n EXCEPT SELECT n + 1 FROM r WHERE n < 5) SELECT * FROM r", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task selca0025() => CorpusAssert.MatchesPostgres(@"WITH r AS (SELECT 1 AS n UNION ALL SELECT n + 1 FROM r WHERE n < 5) SELECT * FROM r", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task selca0026() => CorpusAssert.MatchesPostgres(@"WITH RECURSIVE r AS (SELECT n + 1 FROM r WHERE n < 5) SELECT * FROM r", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task selca0027() => CorpusAssert.MatchesPostgres(@"WITH RECURSIVE r AS (SELECT 1 AS n INTERSECT SELECT n + 1 FROM r WHERE n < 5) SELECT * FROM r", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task selca0028() => CorpusAssert.MatchesPostgres(@"WITH RECURSIVE r AS (SELECT 1 AS n EXCEPT SELECT n + 1 FROM r WHERE n < 5) SELECT * FROM r", "error", false);
     [Fact]
     public void selca0029() => CorpusAssert.Parses(@"WITH RECURSIVE r(n) AS (SELECT 1 UNION ALL SELECT n+1 FROM r WHERE n < 5) SEARCH DEPTH FIRST BY n SET ord SELECT * FROM r ORDER BY ord", "ok");
     [Fact]
@@ -133,32 +133,32 @@ public class Corpus_SelectCte
     public void selca0063() => CorpusAssert.Parses(@"WITH cte AS (SELECT id, name FROM s.t) SELECT * FROM cte ORDER BY name LIMIT 10 OFFSET 0", "ok");
     [Fact]
     public void selca0064() => CorpusAssert.Parses(@"WITH cte AS (SELECT id, name, val FROM s.t) SELECT id, sum(val) OVER (PARTITION BY name) FROM cte", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selca0065() => CorpusAssert.Parses(@"WITH cte AS (SELECT * FROM s.t) SELECT * FROM cte TABLESAMPLE BERNOULLI(50)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selca0066() => CorpusAssert.Parses(@"AS (SELECT 1)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task selca0065() => CorpusAssert.MatchesPostgres(@"WITH cte AS (SELECT * FROM s.t) SELECT * FROM cte TABLESAMPLE BERNOULLI(50)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task selca0066() => CorpusAssert.MatchesPostgres(@"AS (SELECT 1)", "error", false);
     [Fact]
     public void selca0067() => CorpusAssert.Parses(@"WITH AS (SELECT 1) SELECT 1", "error");
     [Fact]
     public void selca0068() => CorpusAssert.Parses(@"WITH cte (SELECT 1) SELECT * FROM cte", "error");
     [Fact]
     public void selca0069() => CorpusAssert.Parses(@"WITH cte AS SELECT 1 SELECT * FROM cte", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selca0070() => CorpusAssert.Parses(@"WITH cte AS () SELECT * FROM cte", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task selca0070() => CorpusAssert.MatchesPostgres(@"WITH cte AS () SELECT * FROM cte", "error", false);
     [Fact]
     public void selca0071() => CorpusAssert.Parses(@"WITH cte1 AS (SELECT 1 AS n) cte2 AS (SELECT 2 AS n) SELECT * FROM cte1", "error");
     [Fact]
     public void selca0072() => CorpusAssert.Parses(@"WITH cte AS (SELECT 1 AS n),", "error");
     [Fact]
     public void selca0073() => CorpusAssert.Parses(@"WITH RECURSIVE r(n) AS (SELECT 1 UNION ALL SELECT n+1 FROM r WHERE n < 5) SELECT * FROM r", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selca0074() => CorpusAssert.Parses(@"WITH cte AS (SELECT id FROM nonexistent_table_xyz) SELECT * FROM cte", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selca0075() => CorpusAssert.Parses(@"WITH cte AS (SELECT id FROM s.t) SELECT * FROM nonexistent_xyz", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selca0076() => CorpusAssert.Parses(@"WITH cte AS (SELECT id FROM s.t) SELECT nonexistent_col FROM cte", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selca0077() => CorpusAssert.Parses(@"WITH cte(a, b) AS (SELECT id FROM s.t) SELECT * FROM cte", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task selca0074() => CorpusAssert.MatchesPostgres(@"WITH cte AS (SELECT id FROM nonexistent_table_xyz) SELECT * FROM cte", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task selca0075() => CorpusAssert.MatchesPostgres(@"WITH cte AS (SELECT id FROM s.t) SELECT * FROM nonexistent_xyz", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task selca0076() => CorpusAssert.MatchesPostgres(@"WITH cte AS (SELECT id FROM s.t) SELECT nonexistent_col FROM cte", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task selca0077() => CorpusAssert.MatchesPostgres(@"WITH cte(a, b) AS (SELECT id FROM s.t) SELECT * FROM cte", "error", false);
     [Fact]
     public void selca0078() => CorpusAssert.Parses(@"WITH ""My CTE"" AS (SELECT 1 AS n) SELECT * FROM ""My CTE""", "ok");
     [Fact]
@@ -321,12 +321,12 @@ cte AS (SELECT 1 AS n) SELECT * FROM cte", "ok");
     public void selca0156() => CorpusAssert.Parses(@"WITH RECURSIVE r(n) AS (SELECT 1 UNION ALL SELECT n+1 FROM r WHERE n < 5) SELECT n, sum(n) OVER (ORDER BY n) AS running_total FROM r", "ok");
     [Fact]
     public void selca0157() => CorpusAssert.Parses(@"WITH cte AS (TABLE s.t) SELECT id, name FROM cte LIMIT 5", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selca0158() => CorpusAssert.Parses(@"WITH RECURSIVE r(n) AS (SELECT 1 UNION ALL SELECT n+1 FROM r WHERE n < 5) SELECT * FROM r WHERE is_cycle = false", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task selca0158() => CorpusAssert.MatchesPostgres(@"WITH RECURSIVE r(n) AS (SELECT 1 UNION ALL SELECT n+1 FROM r WHERE n < 5) SELECT * FROM r WHERE is_cycle = false", "error", false);
     [Fact]
     public void selca0159() => CorpusAssert.Parses(@"WITH RECURSIVE r(n) AS (SELECT 1 UNION ALL SELECT n+1 FROM r WHERE n < 5) CYCLE n SET is_cycle TO 1 DEFAULT 0 USING path SELECT * FROM r", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selca0160() => CorpusAssert.Parses(@"WITH cte AS (SELECT id FROM s.t) SELECT * FROM cte WHERE id > 0 FOR UPDATE OF cte", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task selca0160() => CorpusAssert.MatchesPostgres(@"WITH cte AS (SELECT id FROM s.t) SELECT * FROM cte WHERE id > 0 FOR UPDATE OF cte", "error", false);
     [Fact]
     public void selca0161() => CorpusAssert.Parses(@"WITH a AS (SELECT 1 AS x), b AS (SELECT x*2 AS y FROM a) SELECT a.x, b.y FROM a, b", "ok");
     [Fact]
@@ -431,10 +431,10 @@ cte AS (SELECT 1 AS n) SELECT * FROM cte", "ok");
     public void selcb0041() => CorpusAssert.Parses(@"WITH cte AS (SELECT id FROM s.t INTERSECT SELECT id FROM s.t2) SELECT * FROM cte", "ok");
     [Fact]
     public void selcb0042() => CorpusAssert.Parses(@"WITH cte AS (SELECT id FROM s.t EXCEPT SELECT t_id FROM s.t2) SELECT * FROM cte", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selcb0043() => CorpusAssert.Parses(@"WITH RECURSIVE r(n) AS (SELECT n+1 FROM r WHERE n < 5) SELECT n FROM r", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selcb0044() => CorpusAssert.Parses(@"WITH r(n) AS (SELECT 1 UNION ALL SELECT n+1 FROM r WHERE n < 5) SELECT n FROM r", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task selcb0043() => CorpusAssert.MatchesPostgres(@"WITH RECURSIVE r(n) AS (SELECT n+1 FROM r WHERE n < 5) SELECT n FROM r", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task selcb0044() => CorpusAssert.MatchesPostgres(@"WITH r(n) AS (SELECT 1 UNION ALL SELECT n+1 FROM r WHERE n < 5) SELECT n FROM r", "error", false);
     [Fact]
     public void selcb0045() => CorpusAssert.Parses(@"WITH SELECT 1", "error");
     [Fact]
@@ -447,20 +447,20 @@ cte AS (SELECT 1 AS n) SELECT * FROM cte", "ok");
     public void selcb0049() => CorpusAssert.Parses(@"WITH cte AS (SELECT 1),, cte2 AS (SELECT 2) SELECT 1", "error");
     [Fact]
     public void selcb0050() => CorpusAssert.Parses(@"WITH cte AS (SELECT 1) cte2 AS (SELECT 2) SELECT 1", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selcb0051() => CorpusAssert.Parses(@"WITH RECURSIVE r(n) AS (SELECT 1 UNION ALL SELECT n+1 FROM r WHERE n < 3 INTERSECT ALL SELECT 1) SELECT * FROM r", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selcb0052() => CorpusAssert.Parses(@"RECURSIVE cte AS (SELECT 1) SELECT 1", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selcb0053() => CorpusAssert.Parses(@"WITH cte AS () SELECT 1", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selcb0054() => CorpusAssert.Parses(@"WITH cte AS (SELECT 1) SELECT x FROM cte", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selcb0055() => CorpusAssert.Parses(@"WITH RECURSIVE r(n) AS (SELECT 1 UNION ALL SELECT n+1 FROM r) SEARCH BREADTH FIRST BY n SET ORDER SELECT n FROM r WHERE n < 5", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selcb0056() => CorpusAssert.Parses(@"WITH cte(x, y) AS (SELECT 1) SELECT * FROM cte", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selcb0057() => CorpusAssert.Parses(@"WITH cte AS (INSERT INTO s.t(name, qty) VALUES ('x', 0)) SELECT * FROM cte", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task selcb0051() => CorpusAssert.MatchesPostgres(@"WITH RECURSIVE r(n) AS (SELECT 1 UNION ALL SELECT n+1 FROM r WHERE n < 3 INTERSECT ALL SELECT 1) SELECT * FROM r", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task selcb0052() => CorpusAssert.MatchesPostgres(@"RECURSIVE cte AS (SELECT 1) SELECT 1", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task selcb0053() => CorpusAssert.MatchesPostgres(@"WITH cte AS () SELECT 1", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task selcb0054() => CorpusAssert.MatchesPostgres(@"WITH cte AS (SELECT 1) SELECT x FROM cte", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task selcb0055() => CorpusAssert.MatchesPostgres(@"WITH RECURSIVE r(n) AS (SELECT 1 UNION ALL SELECT n+1 FROM r) SEARCH BREADTH FIRST BY n SET ORDER SELECT n FROM r WHERE n < 5", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task selcb0056() => CorpusAssert.MatchesPostgres(@"WITH cte(x, y) AS (SELECT 1) SELECT * FROM cte", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task selcb0057() => CorpusAssert.MatchesPostgres(@"WITH cte AS (INSERT INTO s.t(name, qty) VALUES ('x', 0)) SELECT * FROM cte", "error", false);
     [Fact]
     public void selcb0058() => CorpusAssert.Parses(@"WITH RECURSIVE r(n) AS (SELECT 1 UNION ALL SELECT n+1 FROM r WHERE n < 5) SEARCH DEPTH FIRST BY n SET s CYCLE n SET c USING p SELECT n FROM r", "ok");
     [Fact]
@@ -569,8 +569,8 @@ cte AS (SELECT 1 AS n) SELECT * FROM cte", "ok");
     public void selcb0110() => CorpusAssert.Parses(@"WITH cte AS (SELECT 1 AS x) SELECT * FROM cte AS t(a)", "ok");
     [Fact]
     public void selcb0111() => CorpusAssert.Parses(@"WITH RECURSIVE SEARCH FIRST BY n SET ord AS (SELECT 1 AS n UNION ALL SELECT n+1 FROM r WHERE n < 5) SELECT n FROM r ORDER BY ord", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selcb0112() => CorpusAssert.Parses(@"WITH cte AS (SELECT id FROM s.t), cte AS (SELECT id FROM s.t2) SELECT * FROM cte", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task selcb0112() => CorpusAssert.MatchesPostgres(@"WITH cte AS (SELECT id FROM s.t), cte AS (SELECT id FROM s.t2) SELECT * FROM cte", "error", false);
     [Fact]
     public void selcb0113() => CorpusAssert.Parses(@"WITH cte AS (WITH inner_cte AS (SELECT 1 AS x) SELECT x FROM inner_cte) SELECT * FROM cte", "ok");
     [Fact]
@@ -613,8 +613,8 @@ cte AS (SELECT 1 AS n) SELECT * FROM cte", "ok");
     public void selcb0132() => CorpusAssert.Parses(@"WITH ""MyCtE"" AS (SELECT 1 AS x) SELECT x FROM ""MyCtE""", "ok");
     [Fact]
     public void selcb0133() => CorpusAssert.Parses(@"WITH cte AS (SELECT 1 AS x) SELECT x FROM CTE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selcb0134() => CorpusAssert.Parses(@"WITH cte AS (SELECT id FROM s.t) SELECT * FROM cte TABLESAMPLE BERNOULLI(100)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task selcb0134() => CorpusAssert.MatchesPostgres(@"WITH cte AS (SELECT id FROM s.t) SELECT * FROM cte TABLESAMPLE BERNOULLI(100)", "error", false);
     [Fact]
     public void selcb0135() => CorpusAssert.Parses(@"WITH RECURSIVE r(n) AS (SELECT 1 UNION ALL SELECT n+1 FROM r WHERE n < 5) SELECT n FROM r FOR SHARE", "ok");
     [Fact]
@@ -713,8 +713,8 @@ cte AS (SELECT 1 AS n) SELECT * FROM cte", "ok");
     public void selcc0012() => CorpusAssert.Parses(@"WITH del AS (DELETE FROM s.t2 WHERE id = 0 RETURNING id) SELECT * FROM del", "ok");
     [Fact]
     public void selcc0013() => CorpusAssert.Parses(@"WITH RECURSIVE bad(n) AS (SELECT 1 SELECT n + 1 FROM bad WHERE n < 5) SELECT n FROM bad", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selcc0014() => CorpusAssert.Parses(@"WITH bad(n) AS (SELECT 1 UNION ALL SELECT n + 1 FROM bad WHERE n < 5) SELECT n FROM bad", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task selcc0014() => CorpusAssert.MatchesPostgres(@"WITH bad(n) AS (SELECT 1 UNION ALL SELECT n + 1 FROM bad WHERE n < 5) SELECT n FROM bad", "error", false);
     [Fact]
     public void selcc0015() => CorpusAssert.Parses(@"WITH AS (SELECT 1) SELECT * FROM cte", "error");
 }

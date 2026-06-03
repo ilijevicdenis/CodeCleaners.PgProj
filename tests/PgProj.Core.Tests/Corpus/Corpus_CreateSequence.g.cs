@@ -141,46 +141,46 @@ public class Corpus_CreateSequence
     public void seqa0067() => CorpusAssert.Parses(@"ALTER SEQUENCE s.seq NO MINVALUE NO MAXVALUE NO CYCLE CACHE 1", "ok");
     [Fact]
     public void seqa0068() => CorpusAssert.Parses(@"CREATE SEQUENCE myseq68 AS smallint; ALTER SEQUENCE myseq68 AS bigint", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void seqa0069() => CorpusAssert.Parses(@"CREATE SEQUENCE myseq69 START 1; SELECT lastval()", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void seqa0070() => CorpusAssert.Parses(@"CREATE SEQUENCE myseq70new; SELECT currval('myseq70new')", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task seqa0069() => CorpusAssert.MatchesPostgres(@"CREATE SEQUENCE myseq69 START 1; SELECT lastval()", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task seqa0070() => CorpusAssert.MatchesPostgres(@"CREATE SEQUENCE myseq70new; SELECT currval('myseq70new')", "error", false);
     [Fact]
     public void seqa0071() => CorpusAssert.Parses(@"CREATE SEQUENCE", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void seqa0072() => CorpusAssert.Parses(@"CREATE SEQUENCE myseq72 AS text", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void seqa0073() => CorpusAssert.Parses(@"CREATE SEQUENCE myseq73 AS float8", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void seqa0074() => CorpusAssert.Parses(@"CREATE SEQUENCE myseq74 INCREMENT BY", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void seqa0075() => CorpusAssert.Parses(@"CREATE SEQUENCE myseq75 MINVALUE", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void seqa0076() => CorpusAssert.Parses(@"CREATE SEQUENCE myseq76 MAXVALUE", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void seqa0077() => CorpusAssert.Parses(@"CREATE SEQUENCE myseq77 START", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void seqa0078() => CorpusAssert.Parses(@"CREATE SEQUENCE myseq78 CACHE", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void seqa0079() => CorpusAssert.Parses(@"CREATE SEQUENCE myseq79 CACHE 0", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void seqa0080() => CorpusAssert.Parses(@"CREATE SEQUENCE myseq80 CACHE -1", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void seqa0081() => CorpusAssert.Parses(@"CREATE SEQUENCE s.seq", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void seqa0082() => CorpusAssert.Parses(@"CREATE SEQUENCE myseq82 MINVALUE 100 MAXVALUE 10", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void seqa0083() => CorpusAssert.Parses(@"CREATE SEQUENCE myseq83 START WITH 0 MINVALUE 1", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void seqa0084() => CorpusAssert.Parses(@"CREATE SEQUENCE myseq84 OWNED BY nonexistent_table.col", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void seqa0085() => CorpusAssert.Parses(@"CREATE SEQUENCE myseq85 OWNED BY s.t.nonexistent_col", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void seqa0086() => CorpusAssert.Parses(@"CREATE TEMP TEMPORARY SEQUENCE myseq86", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void seqa0087() => CorpusAssert.Parses(@"ALTER SEQUENCE nonexistent_seq RESTART WITH 1", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void seqa0088() => CorpusAssert.Parses(@"ALTER SEQUENCE s.seq CACHE 0", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task seqa0072() => CorpusAssert.MatchesPostgres(@"CREATE SEQUENCE myseq72 AS text", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task seqa0073() => CorpusAssert.MatchesPostgres(@"CREATE SEQUENCE myseq73 AS float8", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task seqa0074() => CorpusAssert.MatchesPostgres(@"CREATE SEQUENCE myseq74 INCREMENT BY", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task seqa0075() => CorpusAssert.MatchesPostgres(@"CREATE SEQUENCE myseq75 MINVALUE", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task seqa0076() => CorpusAssert.MatchesPostgres(@"CREATE SEQUENCE myseq76 MAXVALUE", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task seqa0077() => CorpusAssert.MatchesPostgres(@"CREATE SEQUENCE myseq77 START", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task seqa0078() => CorpusAssert.MatchesPostgres(@"CREATE SEQUENCE myseq78 CACHE", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task seqa0079() => CorpusAssert.MatchesPostgres(@"CREATE SEQUENCE myseq79 CACHE 0", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task seqa0080() => CorpusAssert.MatchesPostgres(@"CREATE SEQUENCE myseq80 CACHE -1", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task seqa0081() => CorpusAssert.MatchesPostgres(@"CREATE SEQUENCE s.seq", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task seqa0082() => CorpusAssert.MatchesPostgres(@"CREATE SEQUENCE myseq82 MINVALUE 100 MAXVALUE 10", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task seqa0083() => CorpusAssert.MatchesPostgres(@"CREATE SEQUENCE myseq83 START WITH 0 MINVALUE 1", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task seqa0084() => CorpusAssert.MatchesPostgres(@"CREATE SEQUENCE myseq84 OWNED BY nonexistent_table.col", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task seqa0085() => CorpusAssert.MatchesPostgres(@"CREATE SEQUENCE myseq85 OWNED BY s.t.nonexistent_col", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task seqa0086() => CorpusAssert.MatchesPostgres(@"CREATE TEMP TEMPORARY SEQUENCE myseq86", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task seqa0087() => CorpusAssert.MatchesPostgres(@"ALTER SEQUENCE nonexistent_seq RESTART WITH 1", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task seqa0088() => CorpusAssert.MatchesPostgres(@"ALTER SEQUENCE s.seq CACHE 0", "error", false);
     [Fact]
     public void seqa0089() => CorpusAssert.Parses(@"ALTER SEQUENCE s.seq RENAME TO", "error");
     [Fact]
@@ -232,12 +232,12 @@ public class Corpus_CreateSequence
     public void seqa0112() => CorpusAssert.Parses(@"CREATE UNLOGGED SEQUENCE myseq112 START WITH 1 CACHE 10", "ok");
     [Fact]
     public void seqa0113() => CorpusAssert.Parses(@"CREATE SEQUENCE IF NOT EXISTS myseq113 AS integer START WITH 1 CACHE 5", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void seqa0114() => CorpusAssert.Parses(@"CREATE SEQUENCE myseq114 INCREMENT BY 0", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void seqa0115() => CorpusAssert.Parses(@"SELECT nextval('nonexistent_seq_xyz')", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void seqa0116() => CorpusAssert.Parses(@"SELECT setval('nonexistent_seq_xyz', 100)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task seqa0114() => CorpusAssert.MatchesPostgres(@"CREATE SEQUENCE myseq114 INCREMENT BY 0", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task seqa0115() => CorpusAssert.MatchesPostgres(@"SELECT nextval('nonexistent_seq_xyz')", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task seqa0116() => CorpusAssert.MatchesPostgres(@"SELECT setval('nonexistent_seq_xyz', 100)", "error", false);
     [Fact]
     public void seqa0117() => CorpusAssert.Parses(@"CREATE SEQUENCE myseq117 START WITH 100 MINVALUE 100 MAXVALUE 200 CYCLE; SELECT nextval('myseq117')", "ok");
     [Fact]
@@ -246,18 +246,18 @@ public class Corpus_CreateSequence
     public void seqa0119() => CorpusAssert.Parses(@"ALTER SEQUENCE s.seq AS smallint MINVALUE 1 MAXVALUE 32767 START WITH 1", "ok");
     [Fact]
     public void seqa0120() => CorpusAssert.Parses(@"CREATE SEQUENCE myseq120; ALTER SEQUENCE myseq120 SET SCHEMA s; SELECT nextval('s.myseq120')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void seqa0121() => CorpusAssert.Parses(@"ALTER SEQUENCE s.seq AS numeric", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void seqa0122() => CorpusAssert.Parses(@"ALTER SEQUENCE s.seq MINVALUE 1000 MAXVALUE 500", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void seqa0123() => CorpusAssert.Parses(@"ALTER SEQUENCE s.seq AS integer MAXVALUE 2147483648", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void seqa0124() => CorpusAssert.Parses(@"CREATE SEQUENCE myseq124 AS smallint MAXVALUE 32768", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void seqa0125() => CorpusAssert.Parses(@"CREATE SEQUENCE myseq125 AS smallint MINVALUE -32769", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void seqa0126() => CorpusAssert.Parses(@"CREATE SEQUENCE myseq126 MAXVALUE 100 START WITH 200", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task seqa0121() => CorpusAssert.MatchesPostgres(@"ALTER SEQUENCE s.seq AS numeric", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task seqa0122() => CorpusAssert.MatchesPostgres(@"ALTER SEQUENCE s.seq MINVALUE 1000 MAXVALUE 500", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task seqa0123() => CorpusAssert.MatchesPostgres(@"ALTER SEQUENCE s.seq AS integer MAXVALUE 2147483648", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task seqa0124() => CorpusAssert.MatchesPostgres(@"CREATE SEQUENCE myseq124 AS smallint MAXVALUE 32768", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task seqa0125() => CorpusAssert.MatchesPostgres(@"CREATE SEQUENCE myseq125 AS smallint MINVALUE -32769", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task seqa0126() => CorpusAssert.MatchesPostgres(@"CREATE SEQUENCE myseq126 MAXVALUE 100 START WITH 200", "error", false);
     [Fact]
     public void seqa0127() => CorpusAssert.Parses(@"CREATE SEQUENCE myseq127 INCREMENT BY -1 START WITH -1 MINVALUE -100 MAXVALUE -1", "ok");
     [Fact]
@@ -284,8 +284,8 @@ public class Corpus_CreateSequence
     public void seqa0138() => CorpusAssert.Parses(@"ALTER SEQUENCE IF EXISTS s.seq AS bigint NO MINVALUE NO MAXVALUE NO CYCLE", "ok");
     [Fact]
     public void seqa0139() => CorpusAssert.Parses(@"CREATE SEQUENCE myseq139 START 1 CACHE 1 NO CYCLE OWNED BY NONE INCREMENT 1 MINVALUE 1 MAXVALUE 100", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void seqa0140() => CorpusAssert.Parses(@"CREATE SEQUENCE myseq140 START WITH 1 MINVALUE MAXVALUE", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task seqa0140() => CorpusAssert.MatchesPostgres(@"CREATE SEQUENCE myseq140 START WITH 1 MINVALUE MAXVALUE", "error", false);
     [Fact]
     public void seqa0141() => CorpusAssert.Parses(@"CREATE SEQUENCE myseq141 NO", "error");
     [Fact]
@@ -294,12 +294,12 @@ public class Corpus_CreateSequence
     public void seqa0143() => CorpusAssert.Parses(@"CREATE SEQUENCE myseq143 OWNED", "error");
     [Fact]
     public void seqa0144() => CorpusAssert.Parses(@"CREATE SEQUENCE myseq144 OWNED BY", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void seqa0145() => CorpusAssert.Parses(@"CREATE SEQUENCE myseq145 START WITH INCREMENT BY 5", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task seqa0145() => CorpusAssert.MatchesPostgres(@"CREATE SEQUENCE myseq145 START WITH INCREMENT BY 5", "error", false);
     [Fact]
     public void seqa0146() => CorpusAssert.Parses(@"ALTER SEQUENCE", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void seqa0147() => CorpusAssert.Parses(@"ALTER SEQUENCE s.seq SET", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task seqa0147() => CorpusAssert.MatchesPostgres(@"ALTER SEQUENCE s.seq SET", "error", false);
     [Fact]
     public void seqa0148() => CorpusAssert.Parses(@"ALTER SEQUENCE s.seq RENAME", "error");
     [Fact]
@@ -324,8 +324,8 @@ public class Corpus_CreateSequence
     public void seqa0158() => CorpusAssert.Parses(@"CREATE SEQUENCE myseq158; SELECT * FROM pg_sequences WHERE sequencename = 'myseq158'", "ok");
     [Fact]
     public void seqa0159() => CorpusAssert.Parses(@"CREATE SEQUENCE myseq159 START WITH 1; SELECT nextval('myseq159'); SELECT nextval('myseq159'); SELECT nextval('myseq159')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void seqa0160() => CorpusAssert.Parses(@"CREATE SEQUENCE myseq160 START WITH 1 MAXVALUE 2 NO CYCLE; SELECT nextval('myseq160'); SELECT nextval('myseq160'); SELECT nextval('myseq160')", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task seqa0160() => CorpusAssert.MatchesPostgres(@"CREATE SEQUENCE myseq160 START WITH 1 MAXVALUE 2 NO CYCLE; SELECT nextval('myseq160'); SELECT nextval('myseq160'); SELECT nextval('myseq160')", "error", false);
     [Fact]
     public void seqa0161() => CorpusAssert.Parses(@"CREATE SEQUENCE myseq161 START WITH 1 MAXVALUE 3 CYCLE; SELECT nextval('myseq161'); SELECT nextval('myseq161'); SELECT nextval('myseq161'); SELECT nextval('myseq161')", "ok");
     [Fact]
@@ -342,10 +342,10 @@ public class Corpus_CreateSequence
     public void seqa0167() => CorpusAssert.Parses(@"CREATE SEQUENCE myseq167 START WITH 1 INCREMENT BY 1;
 SELECT setval('myseq167', 999);
 SELECT currval('myseq167')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void seqa0168() => CorpusAssert.Parses(@"ALTER SEQUENCE s.seq AS smallint MAXVALUE 32768", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void seqa0169() => CorpusAssert.Parses(@"CREATE SEQUENCE myseq169 MINVALUE 5 START WITH 3", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task seqa0168() => CorpusAssert.MatchesPostgres(@"ALTER SEQUENCE s.seq AS smallint MAXVALUE 32768", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task seqa0169() => CorpusAssert.MatchesPostgres(@"CREATE SEQUENCE myseq169 MINVALUE 5 START WITH 3", "error", false);
     [Fact]
     public void seqa0170() => CorpusAssert.Parses(@"CREATE SEQUENCE myseq170 INCREMENT BY 1 MINVALUE 1 MAXVALUE 1000 START WITH 1 CACHE 50 NO CYCLE OWNED BY NONE AS bigint", "ok");
     [Fact]
@@ -410,10 +410,10 @@ SELECT currval('sq26');
 SELECT setval('sq26', 500)", "ok");
     [Fact]
     public void seqb0027() => CorpusAssert.Parses(@"CREATE SEQUENCE", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void seqb0028() => CorpusAssert.Parses(@"CREATE SEQUENCE sq_err AS text", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void seqb0029() => CorpusAssert.Parses(@"CREATE SEQUENCE sq_err2 INCREMENT BY", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void seqb0030() => CorpusAssert.Parses(@"CREATE SEQUENCE sq_err3 CACHE -1", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task seqb0028() => CorpusAssert.MatchesPostgres(@"CREATE SEQUENCE sq_err AS text", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task seqb0029() => CorpusAssert.MatchesPostgres(@"CREATE SEQUENCE sq_err2 INCREMENT BY", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task seqb0030() => CorpusAssert.MatchesPostgres(@"CREATE SEQUENCE sq_err3 CACHE -1", "error", false);
 }

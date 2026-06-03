@@ -284,67 +284,67 @@ CREATE CAST (csta_rng121 AS text) WITH INOUT", "ok");
     public void csta0122() => CorpusAssert.Parses(@"CREATE FUNCTION csta_fn122(integer) RETURNS text LANGUAGE sql AS $$ SELECT $1::text $$;
 CREATE CAST (integer AS text) WITH FUNCTION csta_fn122(integer);
 DROP CAST (integer AS text)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void csta0123() => CorpusAssert.Parses(@"CREATE CAST (text AS date) WITH INOUT;
-CREATE CAST (text AS date) WITH INOUT", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void csta0124() => CorpusAssert.Parses(@"DROP CAST (text AS date)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void csta0125() => CorpusAssert.Parses(@"DROP CAST (text AS integer)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void csta0126() => CorpusAssert.Parses(@"DROP CAST (bigint AS nonexistent_type)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void csta0127() => CorpusAssert.Parses(@"DROP CAST (nonexistent_type AS text)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void csta0128() => CorpusAssert.Parses(@"CREATE CAST bigint AS integer WITH INOUT", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void csta0129() => CorpusAssert.Parses(@"CREATE CAST (bigint integer) WITH INOUT", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void csta0130() => CorpusAssert.Parses(@"CREATE CAST (bigint AS) WITH INOUT", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void csta0131() => CorpusAssert.Parses(@"CREATE CAST (AS integer) WITH INOUT", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void csta0132() => CorpusAssert.Parses(@"CREATE CAST (integer AS text)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void csta0133() => CorpusAssert.Parses(@"CREATE CAST (integer AS text) WITH FUNCTION", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void csta0134() => CorpusAssert.Parses(@"CREATE CAST (integer AS text) WITH INOUT AS EXPLICIT", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void csta0135() => CorpusAssert.Parses(@"CREATE CAST (integer AS text) WITH INOUT AS ASSIGNMENT AS IMPLICIT", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void csta0136() => CorpusAssert.Parses(@"CREATE CAST (integer AS text) WITHOUT FUNCTION WITH INOUT", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void csta0137() => CorpusAssert.Parses(@"CREATE CAST (integer AS text) WITH FUNCTION csta_fn137(integer) WITHOUT FUNCTION", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task csta0123() => CorpusAssert.MatchesPostgres(@"CREATE CAST (text AS date) WITH INOUT;
+CREATE CAST (text AS date) WITH INOUT", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task csta0124() => CorpusAssert.MatchesPostgres(@"DROP CAST (text AS date)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task csta0125() => CorpusAssert.MatchesPostgres(@"DROP CAST (text AS integer)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task csta0126() => CorpusAssert.MatchesPostgres(@"DROP CAST (bigint AS nonexistent_type)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task csta0127() => CorpusAssert.MatchesPostgres(@"DROP CAST (nonexistent_type AS text)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task csta0128() => CorpusAssert.MatchesPostgres(@"CREATE CAST bigint AS integer WITH INOUT", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task csta0129() => CorpusAssert.MatchesPostgres(@"CREATE CAST (bigint integer) WITH INOUT", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task csta0130() => CorpusAssert.MatchesPostgres(@"CREATE CAST (bigint AS) WITH INOUT", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task csta0131() => CorpusAssert.MatchesPostgres(@"CREATE CAST (AS integer) WITH INOUT", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task csta0132() => CorpusAssert.MatchesPostgres(@"CREATE CAST (integer AS text)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task csta0133() => CorpusAssert.MatchesPostgres(@"CREATE CAST (integer AS text) WITH FUNCTION", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task csta0134() => CorpusAssert.MatchesPostgres(@"CREATE CAST (integer AS text) WITH INOUT AS EXPLICIT", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task csta0135() => CorpusAssert.MatchesPostgres(@"CREATE CAST (integer AS text) WITH INOUT AS ASSIGNMENT AS IMPLICIT", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task csta0136() => CorpusAssert.MatchesPostgres(@"CREATE CAST (integer AS text) WITHOUT FUNCTION WITH INOUT", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task csta0137() => CorpusAssert.MatchesPostgres(@"CREATE CAST (integer AS text) WITH FUNCTION csta_fn137(integer) WITHOUT FUNCTION", "error", false);
     [Fact]
     public void csta0138() => CorpusAssert.Parses(@"CREATE (integer AS text) WITH INOUT", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void csta0139() => CorpusAssert.Parses(@"CAST (integer AS text) WITH INOUT", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void csta0140() => CorpusAssert.Parses(@"CREATE CAST (integer AS text) INOUT", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void csta0141() => CorpusAssert.Parses(@"CREATE CAST (integer AS text) FUNCTION myfn(integer)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void csta0142() => CorpusAssert.Parses(@"CREATE CAST (integer text) WITH INOUT", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task csta0139() => CorpusAssert.MatchesPostgres(@"CAST (integer AS text) WITH INOUT", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task csta0140() => CorpusAssert.MatchesPostgres(@"CREATE CAST (integer AS text) INOUT", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task csta0141() => CorpusAssert.MatchesPostgres(@"CREATE CAST (integer AS text) FUNCTION myfn(integer)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task csta0142() => CorpusAssert.MatchesPostgres(@"CREATE CAST (integer text) WITH INOUT", "error", false);
     [Fact]
     public void csta0143() => CorpusAssert.Parses(@"DROP CAST (integer AS text) CASCADES", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void csta0144() => CorpusAssert.Parses(@"DROP CAST IF (integer AS text)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void csta0145() => CorpusAssert.Parses(@"DROP CAST integer AS text", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void csta0146() => CorpusAssert.Parses(@"CREATE CAST (integer AS text) WITH FUNCTION nonexistent_fn(integer)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void csta0147() => CorpusAssert.Parses(@"CREATE CAST (integer AS text) WITH FUNCTION nonexistent_schema.myfn(integer)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void csta0148() => CorpusAssert.Parses(@"CREATE CAST (integer AS text) WITH FUNCTION s.f(integer)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void csta0149() => CorpusAssert.Parses(@"CREATE CAST (integer AS text) WITH FUNCTION s.g(integer, integer)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void csta0150() => CorpusAssert.Parses(@"CREATE CAST (integer AS integer) WITH INOUT", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void csta0151() => CorpusAssert.Parses(@"CREATE CAST (s.mood AS text) WITHOUT FUNCTION", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void csta0152() => CorpusAssert.Parses(@"CREATE CAST (integer AS text) AS ASSIGNMENT", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task csta0144() => CorpusAssert.MatchesPostgres(@"DROP CAST IF (integer AS text)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task csta0145() => CorpusAssert.MatchesPostgres(@"DROP CAST integer AS text", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task csta0146() => CorpusAssert.MatchesPostgres(@"CREATE CAST (integer AS text) WITH FUNCTION nonexistent_fn(integer)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task csta0147() => CorpusAssert.MatchesPostgres(@"CREATE CAST (integer AS text) WITH FUNCTION nonexistent_schema.myfn(integer)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task csta0148() => CorpusAssert.MatchesPostgres(@"CREATE CAST (integer AS text) WITH FUNCTION s.f(integer)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task csta0149() => CorpusAssert.MatchesPostgres(@"CREATE CAST (integer AS text) WITH FUNCTION s.g(integer, integer)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task csta0150() => CorpusAssert.MatchesPostgres(@"CREATE CAST (integer AS integer) WITH INOUT", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task csta0151() => CorpusAssert.MatchesPostgres(@"CREATE CAST (s.mood AS text) WITHOUT FUNCTION", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task csta0152() => CorpusAssert.MatchesPostgres(@"CREATE CAST (integer AS text) AS ASSIGNMENT", "error", false);
     [Fact]
     public void csta0153() => CorpusAssert.Parses(@"CREATE CAST (text AS integer) WITH INOUT AS ASSIGNMENT;
 DROP CAST (text AS integer);

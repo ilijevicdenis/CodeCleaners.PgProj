@@ -5,42 +5,42 @@ namespace PgProj.Core.Tests.Corpus;
 
 public class Corpus_CreateLanguage
 {
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void lnga0001() => CorpusAssert.Parses(@"CREATE LANGUAGE plpgsql", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task lnga0001() => CorpusAssert.MatchesPostgres(@"CREATE LANGUAGE plpgsql", "error", false);
     [Fact]
     public void lnga0002() => CorpusAssert.Parses(@"CREATE OR REPLACE LANGUAGE plpgsql", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void lnga0003() => CorpusAssert.Parses(@"CREATE PROCEDURAL LANGUAGE plpgsql", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task lnga0003() => CorpusAssert.MatchesPostgres(@"CREATE PROCEDURAL LANGUAGE plpgsql", "error", false);
     [Fact]
     public void lnga0004() => CorpusAssert.Parses(@"CREATE OR REPLACE PROCEDURAL LANGUAGE plpgsql", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void lnga0005() => CorpusAssert.Parses(@"CREATE TRUSTED LANGUAGE plpgsql", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task lnga0005() => CorpusAssert.MatchesPostgres(@"CREATE TRUSTED LANGUAGE plpgsql", "error", false);
     [Fact]
     public void lnga0006() => CorpusAssert.Parses(@"CREATE OR REPLACE TRUSTED LANGUAGE plpgsql", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void lnga0007() => CorpusAssert.Parses(@"CREATE TRUSTED PROCEDURAL LANGUAGE plpgsql", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task lnga0007() => CorpusAssert.MatchesPostgres(@"CREATE TRUSTED PROCEDURAL LANGUAGE plpgsql", "error", false);
     [Fact]
     public void lnga0008() => CorpusAssert.Parses(@"CREATE OR REPLACE TRUSTED PROCEDURAL LANGUAGE plpgsql", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void lnga0009() => CorpusAssert.Parses(@"CREATE LANGUAGE IF NOT EXISTS plpgsql", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void lnga0010() => CorpusAssert.Parses(@"DROP LANGUAGE plpgsql", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void lnga0011() => CorpusAssert.Parses(@"DROP LANGUAGE IF EXISTS plpgsql", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task lnga0009() => CorpusAssert.MatchesPostgres(@"CREATE LANGUAGE IF NOT EXISTS plpgsql", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task lnga0010() => CorpusAssert.MatchesPostgres(@"DROP LANGUAGE plpgsql", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task lnga0011() => CorpusAssert.MatchesPostgres(@"DROP LANGUAGE IF EXISTS plpgsql", "error", false);
     [Fact]
     public void lnga0012() => CorpusAssert.Parses(@"DROP LANGUAGE IF EXISTS no_such_language_xyz", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void lnga0013() => CorpusAssert.Parses(@"DROP LANGUAGE no_such_language_xyz", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task lnga0013() => CorpusAssert.MatchesPostgres(@"DROP LANGUAGE no_such_language_xyz", "error", false);
     [Fact]
     public void lnga0014() => CorpusAssert.Parses(@"DROP PROCEDURAL LANGUAGE IF EXISTS no_such_language_xyz", "ok");
     [Fact]
     public void lnga0015() => CorpusAssert.Parses(@"DROP PROCEDURAL LANGUAGE IF EXISTS no_such_language_xyz CASCADE", "ok");
     [Fact]
     public void lnga0016() => CorpusAssert.Parses(@"DROP PROCEDURAL LANGUAGE IF EXISTS no_such_language_xyz RESTRICT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void lnga0017() => CorpusAssert.Parses(@"ALTER LANGUAGE plpgsql RENAME TO plpgsql", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void lnga0018() => CorpusAssert.Parses(@"ALTER PROCEDURAL LANGUAGE plpgsql RENAME TO plpgsql", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task lnga0017() => CorpusAssert.MatchesPostgres(@"ALTER LANGUAGE plpgsql RENAME TO plpgsql", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task lnga0018() => CorpusAssert.MatchesPostgres(@"ALTER PROCEDURAL LANGUAGE plpgsql RENAME TO plpgsql", "error", false);
     [Fact]
     public void lnga0019() => CorpusAssert.Parses(@"ALTER LANGUAGE plpgsql OWNER TO CURRENT_USER", "ok");
     [Fact]
@@ -49,36 +49,36 @@ public class Corpus_CreateLanguage
     public void lnga0021() => CorpusAssert.Parses(@"ALTER LANGUAGE plpgsql OWNER TO SESSION_USER", "ok");
     [Fact]
     public void lnga0022() => CorpusAssert.Parses(@"ALTER PROCEDURAL LANGUAGE plpgsql OWNER TO CURRENT_USER", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void lnga0023() => CorpusAssert.Parses(@"ALTER LANGUAGE no_such_language_xyz RENAME TO foo", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void lnga0024() => CorpusAssert.Parses(@"ALTER LANGUAGE no_such_language_xyz OWNER TO CURRENT_USER", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task lnga0023() => CorpusAssert.MatchesPostgres(@"ALTER LANGUAGE no_such_language_xyz RENAME TO foo", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task lnga0024() => CorpusAssert.MatchesPostgres(@"ALTER LANGUAGE no_such_language_xyz OWNER TO CURRENT_USER", "error", false);
     [Fact]
     public void lnga0025() => CorpusAssert.Parses(@"CREATE LANGUAGE", "error");
     [Fact]
     public void lnga0026() => CorpusAssert.Parses(@"CREATE OR REPLACE LANGUAGE", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void lnga0027() => CorpusAssert.Parses(@"CREATE LANGUAGE 'plpgsql'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void lnga0028() => CorpusAssert.Parses(@"CREATE LANGUAGE plpgsql HANDLER", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void lnga0029() => CorpusAssert.Parses(@"CREATE LANGUAGE HANDLER plpgsql_call_handler", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task lnga0027() => CorpusAssert.MatchesPostgres(@"CREATE LANGUAGE 'plpgsql'", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task lnga0028() => CorpusAssert.MatchesPostgres(@"CREATE LANGUAGE plpgsql HANDLER", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task lnga0029() => CorpusAssert.MatchesPostgres(@"CREATE LANGUAGE HANDLER plpgsql_call_handler", "error", false);
     [Fact]
     public void lnga0030() => CorpusAssert.Parses(@"DROP LANGUAGE", "error");
     [Fact]
     public void lnga0031() => CorpusAssert.Parses(@"DROP LANGUAGE IF EXISTS", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void lnga0032() => CorpusAssert.Parses(@"ALTER LANGUAGE RENAME TO newname", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task lnga0032() => CorpusAssert.MatchesPostgres(@"ALTER LANGUAGE RENAME TO newname", "error", false);
     [Fact]
     public void lnga0033() => CorpusAssert.Parses(@"ALTER LANGUAGE plpgsql RENAME", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void lnga0034() => CorpusAssert.Parses(@"ALTER LANGUAGE plpgsql OWNER", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task lnga0034() => CorpusAssert.MatchesPostgres(@"ALTER LANGUAGE plpgsql OWNER", "error", false);
     [Fact]
     public void lnga0035() => CorpusAssert.Parses(@"ALTER LANGUAGE plpgsql OWNER TO", "error");
     [Fact]
     public void lnga0036() => CorpusAssert.Parses(@"CREATE LANGUAGE my_lang_test HANDLER plpgsql_call_handler", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void lnga0037() => CorpusAssert.Parses(@"CREATE FUNCTION s.my_call_handler() RETURNS language_handler LANGUAGE C STRICT AS 'plpgsql'", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task lnga0037() => CorpusAssert.MatchesPostgres(@"CREATE FUNCTION s.my_call_handler() RETURNS language_handler LANGUAGE C STRICT AS 'plpgsql'", "error", false);
     [Fact]
     public void lnga0038() => CorpusAssert.Parses(@"CREATE LANGUAGE newlang1 HANDLER plpgsql_call_handler INLINE plpgsql_inline_handler VALIDATOR plpgsql_validator", "ok");
     [Fact]
@@ -93,20 +93,20 @@ public class Corpus_CreateLanguage
     public void lnga0043() => CorpusAssert.Parses(@"CREATE OR REPLACE TRUSTED LANGUAGE plpgsql HANDLER plpgsql_call_handler INLINE plpgsql_inline_handler VALIDATOR plpgsql_validator", "ok");
     [Fact]
     public void lnga0044() => CorpusAssert.Parses(@"CREATE OR REPLACE TRUSTED PROCEDURAL LANGUAGE plpgsql HANDLER plpgsql_call_handler INLINE plpgsql_inline_handler VALIDATOR plpgsql_validator", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void lnga0045() => CorpusAssert.Parses(@"create language plpgsql", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task lnga0045() => CorpusAssert.MatchesPostgres(@"create language plpgsql", "error", false);
     [Fact]
     public void lnga0046() => CorpusAssert.Parses(@"create or replace language plpgsql", "ok");
     [Fact]
     public void lnga0047() => CorpusAssert.Parses(@"Create Or Replace Language PLpgSQL", "ok");
     [Fact]
     public void lnga0048() => CorpusAssert.Parses(@"CREATE OR REPLACE LANGUAGE ""plpgsql""", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void lnga0049() => CorpusAssert.Parses(@"DROP LANGUAGE IF EXISTS ""plpgsql""", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task lnga0049() => CorpusAssert.MatchesPostgres(@"DROP LANGUAGE IF EXISTS ""plpgsql""", "error", false);
     [Fact]
     public void lnga0050() => CorpusAssert.Parses(@"ALTER LANGUAGE ""plpgsql"" OWNER TO CURRENT_USER", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void lnga0051() => CorpusAssert.Parses(@"ALTER LANGUAGE ""plpgsql"" RENAME TO ""plpgsql""", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task lnga0051() => CorpusAssert.MatchesPostgres(@"ALTER LANGUAGE ""plpgsql"" RENAME TO ""plpgsql""", "error", false);
     [Fact]
     public void lnga0052() => CorpusAssert.Parses(@"/* comment */ CREATE OR REPLACE LANGUAGE plpgsql", "ok");
     [Fact]
@@ -121,12 +121,12 @@ plpgsql", "ok");
     public void lnga0055() => CorpusAssert.Parses(@"DROP LANGUAGE IF EXISTS no_such_language_xyz CASCADE", "ok");
     [Fact]
     public void lnga0056() => CorpusAssert.Parses(@"DROP LANGUAGE IF EXISTS no_such_language_xyz RESTRICT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void lnga0057() => CorpusAssert.Parses(@"DROP PROCEDURAL LANGUAGE plpgsql CASCADE", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void lnga0058() => CorpusAssert.Parses(@"DROP PROCEDURAL LANGUAGE plpgsql RESTRICT", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void lnga0059() => CorpusAssert.Parses(@"DROP LANGUAGE plpgsql CASCADE", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task lnga0057() => CorpusAssert.MatchesPostgres(@"DROP PROCEDURAL LANGUAGE plpgsql CASCADE", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task lnga0058() => CorpusAssert.MatchesPostgres(@"DROP PROCEDURAL LANGUAGE plpgsql RESTRICT", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task lnga0059() => CorpusAssert.MatchesPostgres(@"DROP LANGUAGE plpgsql CASCADE", "error", false);
     [Fact]
     public void lnga0060() => CorpusAssert.Parses(@"CREATE LANGUAGE my_drop_test HANDLER plpgsql_call_handler;
 DROP LANGUAGE my_drop_test", "ok");
@@ -139,50 +139,50 @@ ALTER LANGUAGE mypgsql RENAME TO plpgsql", "ok");
     [Fact]
     public void lnga0063() => CorpusAssert.Parses(@"ALTER PROCEDURAL LANGUAGE plpgsql RENAME TO mypgsql;
 ALTER PROCEDURAL LANGUAGE mypgsql RENAME TO plpgsql", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void lnga0064() => CorpusAssert.Parses(@"CREATE LANGUAGE no_such_language_xyz", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void lnga0065() => CorpusAssert.Parses(@"CREATE TRUSTED LANGUAGE no_such_language_xyz", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void lnga0066() => CorpusAssert.Parses(@"CREATE PROCEDURAL LANGUAGE no_such_language_xyz", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void lnga0067() => CorpusAssert.Parses(@"CREATE TRUSTED PROCEDURAL LANGUAGE no_such_language_xyz", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void lnga0068() => CorpusAssert.Parses(@"CREATE OR REPLACE LANGUAGE no_such_language_xyz", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void lnga0069() => CorpusAssert.Parses(@"CREATE LANGUAGE plpgsql INLINE plpgsql_inline_handler", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void lnga0070() => CorpusAssert.Parses(@"CREATE LANGUAGE plpgsql VALIDATOR plpgsql_validator HANDLER plpgsql_call_handler", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void lnga0071() => CorpusAssert.Parses(@"CREATE LANGUAGE plpgsql HANDLER plpgsql_call_handler HANDLER plpgsql_call_handler", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void lnga0072() => CorpusAssert.Parses(@"CREATE LANGUAGE plpgsql HANDLER plpgsql_call_handler INLINE plpgsql_inline_handler INLINE plpgsql_inline_handler", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void lnga0073() => CorpusAssert.Parses(@"CREATE LANGUAGE plpgsql HANDLER plpgsql_call_handler VALIDATOR plpgsql_validator VALIDATOR plpgsql_validator", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void lnga0074() => CorpusAssert.Parses(@"CREATE TRUSTED TRUSTED LANGUAGE plpgsql", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void lnga0075() => CorpusAssert.Parses(@"CREATE PROCEDURAL PROCEDURAL LANGUAGE plpgsql", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void lnga0076() => CorpusAssert.Parses(@"CREATE OR OR REPLACE LANGUAGE plpgsql", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void lnga0077() => CorpusAssert.Parses(@"CREATE OR REPLACE OR REPLACE LANGUAGE plpgsql", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task lnga0064() => CorpusAssert.MatchesPostgres(@"CREATE LANGUAGE no_such_language_xyz", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task lnga0065() => CorpusAssert.MatchesPostgres(@"CREATE TRUSTED LANGUAGE no_such_language_xyz", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task lnga0066() => CorpusAssert.MatchesPostgres(@"CREATE PROCEDURAL LANGUAGE no_such_language_xyz", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task lnga0067() => CorpusAssert.MatchesPostgres(@"CREATE TRUSTED PROCEDURAL LANGUAGE no_such_language_xyz", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task lnga0068() => CorpusAssert.MatchesPostgres(@"CREATE OR REPLACE LANGUAGE no_such_language_xyz", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task lnga0069() => CorpusAssert.MatchesPostgres(@"CREATE LANGUAGE plpgsql INLINE plpgsql_inline_handler", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task lnga0070() => CorpusAssert.MatchesPostgres(@"CREATE LANGUAGE plpgsql VALIDATOR plpgsql_validator HANDLER plpgsql_call_handler", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task lnga0071() => CorpusAssert.MatchesPostgres(@"CREATE LANGUAGE plpgsql HANDLER plpgsql_call_handler HANDLER plpgsql_call_handler", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task lnga0072() => CorpusAssert.MatchesPostgres(@"CREATE LANGUAGE plpgsql HANDLER plpgsql_call_handler INLINE plpgsql_inline_handler INLINE plpgsql_inline_handler", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task lnga0073() => CorpusAssert.MatchesPostgres(@"CREATE LANGUAGE plpgsql HANDLER plpgsql_call_handler VALIDATOR plpgsql_validator VALIDATOR plpgsql_validator", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task lnga0074() => CorpusAssert.MatchesPostgres(@"CREATE TRUSTED TRUSTED LANGUAGE plpgsql", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task lnga0075() => CorpusAssert.MatchesPostgres(@"CREATE PROCEDURAL PROCEDURAL LANGUAGE plpgsql", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task lnga0076() => CorpusAssert.MatchesPostgres(@"CREATE OR OR REPLACE LANGUAGE plpgsql", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task lnga0077() => CorpusAssert.MatchesPostgres(@"CREATE OR REPLACE OR REPLACE LANGUAGE plpgsql", "error", false);
     [Fact]
     public void lnga0078() => CorpusAssert.Parses(@"DROP LANGUAGE plpgsql CASCADE RESTRICT", "error");
     [Fact]
     public void lnga0079() => CorpusAssert.Parses(@"DROP LANGUAGE IF plpgsql", "error");
     [Fact]
     public void lnga0080() => CorpusAssert.Parses(@"DROP IF EXISTS LANGUAGE plpgsql", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void lnga0081() => CorpusAssert.Parses(@"ALTER LANGUAGE plpgsql TO newname", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void lnga0082() => CorpusAssert.Parses(@"ALTER LANGUAGE plpgsql SET OWNER TO CURRENT_USER", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task lnga0081() => CorpusAssert.MatchesPostgres(@"ALTER LANGUAGE plpgsql TO newname", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task lnga0082() => CorpusAssert.MatchesPostgres(@"ALTER LANGUAGE plpgsql SET OWNER TO CURRENT_USER", "error", false);
     [Fact]
     public void lnga0083() => CorpusAssert.Parses(@"ALTER LANGUAGE plpgsql RENAME TO", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void lnga0084() => CorpusAssert.Parses(@"ALTER LANGUAGE plpgsql RENAME TO 'newname'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void lnga0085() => CorpusAssert.Parses(@"CREATE REPLACE LANGUAGE plpgsql", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task lnga0084() => CorpusAssert.MatchesPostgres(@"ALTER LANGUAGE plpgsql RENAME TO 'newname'", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task lnga0085() => CorpusAssert.MatchesPostgres(@"CREATE REPLACE LANGUAGE plpgsql", "error", false);
     [Fact]
     public void lnga0086() => CorpusAssert.Parses(@"CREATE LANGUAGE my_roundtrip HANDLER plpgsql_call_handler;
 DROP LANGUAGE my_roundtrip CASCADE;

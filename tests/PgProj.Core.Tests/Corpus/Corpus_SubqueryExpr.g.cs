@@ -29,10 +29,10 @@ public class Corpus_SubqueryExpr
     public void sbqa0011() => CorpusAssert.Parses(@"SELECT (SELECT id FROM s.t), (SELECT name FROM s.t LIMIT 1)", "ok");
     [Fact]
     public void sbqa0012() => CorpusAssert.Parses(@"SELECT (SELECT id FROM s.t WHERE id = -999)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void sbqa0013() => CorpusAssert.Parses(@"SELECT (SELECT id, name FROM s.t LIMIT 1)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void sbqa0014() => CorpusAssert.Parses(@"SELECT (SELECT generate_series(1,2))", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task sbqa0013() => CorpusAssert.MatchesPostgres(@"SELECT (SELECT id, name FROM s.t LIMIT 1)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task sbqa0014() => CorpusAssert.MatchesPostgres(@"SELECT (SELECT generate_series(1,2))", "error", false);
     [Fact]
     public void sbqa0015() => CorpusAssert.Parses(@"SELECT EXISTS (SELECT 1)", "ok");
     [Fact]
@@ -81,10 +81,10 @@ public class Corpus_SubqueryExpr
     public void sbqa0037() => CorpusAssert.Parses(@"SELECT id FROM s.t WHERE id IN (SELECT id FROM s.t UNION SELECT id FROM s.t2)", "ok");
     [Fact]
     public void sbqa0038() => CorpusAssert.Parses(@"SELECT id FROM s.t WHERE id IN SELECT id FROM s.t", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void sbqa0039() => CorpusAssert.Parses(@"SELECT id FROM s.t WHERE id IN (SELECT id, name FROM s.t)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void sbqa0040() => CorpusAssert.Parses(@"SELECT id FROM s.t WHERE id IN (SELECT name FROM s.t)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task sbqa0039() => CorpusAssert.MatchesPostgres(@"SELECT id FROM s.t WHERE id IN (SELECT id, name FROM s.t)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task sbqa0040() => CorpusAssert.MatchesPostgres(@"SELECT id FROM s.t WHERE id IN (SELECT name FROM s.t)", "error", false);
     [Fact]
     public void sbqa0041() => CorpusAssert.Parses(@"SELECT id FROM s.t WHERE (id, name) IN (SELECT id, name FROM s.t)", "ok");
     [Fact]
@@ -131,10 +131,10 @@ public class Corpus_SubqueryExpr
     public void sbqa0062() => CorpusAssert.Parses(@"SELECT id FROM s.t WHERE id ANY (SELECT id FROM s.t)", "error");
     [Fact]
     public void sbqa0063() => CorpusAssert.Parses(@"SELECT id FROM s.t WHERE id ALL (SELECT id FROM s.t)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void sbqa0064() => CorpusAssert.Parses(@"SELECT id FROM s.t WHERE id = ANY (SELECT id, name FROM s.t)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void sbqa0065() => CorpusAssert.Parses(@"SELECT id FROM s.t WHERE id = ALL (SELECT id, name FROM s.t)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task sbqa0064() => CorpusAssert.MatchesPostgres(@"SELECT id FROM s.t WHERE id = ANY (SELECT id, name FROM s.t)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task sbqa0065() => CorpusAssert.MatchesPostgres(@"SELECT id FROM s.t WHERE id = ALL (SELECT id, name FROM s.t)", "error", false);
     [Fact]
     public void sbqa0066() => CorpusAssert.Parses(@"SELECT id FROM s.t WHERE val > SOME (SELECT amount FROM s.t2)", "ok");
     [Fact]
@@ -149,8 +149,8 @@ public class Corpus_SubqueryExpr
     public void sbqa0071() => CorpusAssert.Parses(@"SELECT ROW(1, 2) = (SELECT 1, 2)", "ok");
     [Fact]
     public void sbqa0072() => CorpusAssert.Parses(@"SELECT ROW(1, 2) <> (SELECT 1, 3)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void sbqa0073() => CorpusAssert.Parses(@"SELECT ROW(1, 2) = (SELECT 1, 2 UNION ALL SELECT 3, 4)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task sbqa0073() => CorpusAssert.MatchesPostgres(@"SELECT ROW(1, 2) = (SELECT 1, 2 UNION ALL SELECT 3, 4)", "error", false);
     [Fact]
     public void sbqa0074() => CorpusAssert.Parses(@"SELECT ARRAY(SELECT id FROM s.t)", "ok");
     [Fact]
@@ -163,8 +163,8 @@ public class Corpus_SubqueryExpr
     public void sbqa0078() => CorpusAssert.Parses(@"SELECT ARRAY(SELECT val FROM s.t WHERE val IS NOT NULL ORDER BY val DESC)", "ok");
     [Fact]
     public void sbqa0079() => CorpusAssert.Parses(@"SELECT ARRAY(SELECT DISTINCT status FROM s.t)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void sbqa0080() => CorpusAssert.Parses(@"SELECT ARRAY(SELECT id, name FROM s.t)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task sbqa0080() => CorpusAssert.MatchesPostgres(@"SELECT ARRAY(SELECT id, name FROM s.t)", "error", false);
     [Fact]
     public void sbqa0081() => CorpusAssert.Parses(@"SELECT ARRAY SELECT id FROM s.t", "error");
     [Fact]
@@ -359,8 +359,8 @@ public class Corpus_SubqueryExpr
     public void sbqb0006() => CorpusAssert.Parses(@"SELECT name FROM s.t WHERE (SELECT COUNT(*) FROM s.t2 WHERE t_id = s.t.id) > 0", "ok");
     [Fact]
     public void sbqb0007() => CorpusAssert.Parses(@"SELECT name, (SELECT label FROM s.t2 WHERE t_id = s.t.id LIMIT 1) AS lbl FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void sbqb0008() => CorpusAssert.Parses(@"SELECT (SELECT id, name FROM s.t LIMIT 1)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task sbqb0008() => CorpusAssert.MatchesPostgres(@"SELECT (SELECT id, name FROM s.t LIMIT 1)", "error", false);
     [Fact]
     public void sbqb0009() => CorpusAssert.Parses(@"SELECT name FROM s.t WHERE id = SELECT MIN(id) FROM s.t", "error");
     [Fact]
@@ -389,8 +389,8 @@ public class Corpus_SubqueryExpr
     public void sbqb0021() => CorpusAssert.Parses(@"SELECT name FROM s.t WHERE id NOT IN (SELECT t_id FROM s.t2 WHERE t_id IS NOT NULL)", "ok");
     [Fact]
     public void sbqb0022() => CorpusAssert.Parses(@"SELECT name FROM s.t WHERE name NOT IN (SELECT label FROM s.t2 WHERE label IS NOT NULL)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void sbqb0023() => CorpusAssert.Parses(@"SELECT name FROM s.t WHERE id IN (SELECT id, name FROM s.t)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task sbqb0023() => CorpusAssert.MatchesPostgres(@"SELECT name FROM s.t WHERE id IN (SELECT id, name FROM s.t)", "error", false);
     [Fact]
     public void sbqb0024() => CorpusAssert.Parses(@"SELECT name FROM s.t WHERE id IN SELECT id FROM s.t", "error");
     [Fact]
@@ -433,8 +433,8 @@ public class Corpus_SubqueryExpr
     public void sbqb0043() => CorpusAssert.Parses(@"SELECT ARRAY(SELECT qty FROM s.t LIMIT 5)", "ok");
     [Fact]
     public void sbqb0044() => CorpusAssert.Parses(@"SELECT ARRAY SELECT id FROM s.t", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void sbqb0045() => CorpusAssert.Parses(@"SELECT ARRAY(SELECT id, name FROM s.t)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task sbqb0045() => CorpusAssert.MatchesPostgres(@"SELECT ARRAY(SELECT id, name FROM s.t)", "error", false);
     [Fact]
     public void sbqb0046() => CorpusAssert.Parses(@"SELECT ROW(1, 'a') = (SELECT id, name FROM s.t LIMIT 1)", "ok");
     [Fact]
@@ -443,10 +443,10 @@ public class Corpus_SubqueryExpr
     public void sbqb0048() => CorpusAssert.Parses(@"SELECT (1, 2) < (SELECT id, qty FROM s.t LIMIT 1)", "ok");
     [Fact]
     public void sbqb0049() => CorpusAssert.Parses(@"SELECT ROW(1, 0) = (SELECT id, qty FROM s.t WHERE id = -999 LIMIT 1)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void sbqb0050() => CorpusAssert.Parses(@"SELECT (1, 2) = (SELECT id FROM s.t LIMIT 1)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void sbqb0051() => CorpusAssert.Parses(@"SELECT ROW(id) IN (SELECT ROW(id) FROM s.t2) FROM s.t", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task sbqb0050() => CorpusAssert.MatchesPostgres(@"SELECT (1, 2) = (SELECT id FROM s.t LIMIT 1)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task sbqb0051() => CorpusAssert.MatchesPostgres(@"SELECT ROW(id) IN (SELECT ROW(id) FROM s.t2) FROM s.t", "error", false);
     [Fact]
     public void sbqb0052() => CorpusAssert.Parses(@"SELECT (id, qty) IN (SELECT id, qty FROM s.t) FROM s.t", "ok");
     [Fact]
@@ -487,22 +487,22 @@ public class Corpus_SubqueryExpr
     public void sbqb0070() => CorpusAssert.Parses(@"SELECT name FROM s.t WHERE id IN (SELECT id FROM s.t EXCEPT SELECT t_id FROM s.t2 WHERE t_id IS NOT NULL)", "ok");
     [Fact]
     public void sbqb0071() => CorpusAssert.Parses(@"INSERT INTO s.t2 (t_id, label) VALUES ((SELECT MIN(id) FROM s.t), 'sub') RETURNING id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void sbqb0072() => CorpusAssert.Parses(@"INSERT INTO s.t(name) VALUES ('x'), ('y'); SELECT name FROM s.t WHERE id = (SELECT id FROM s.t)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task sbqb0072() => CorpusAssert.MatchesPostgres(@"INSERT INTO s.t(name) VALUES ('x'), ('y'); SELECT name FROM s.t WHERE id = (SELECT id FROM s.t)", "error", false);
     [Fact]
     public void sbqb0073() => CorpusAssert.Parses(@"SELECT CASE WHEN EXISTS (SELECT 1 FROM s.t) THEN 'yes' ELSE 'no' END", "ok");
     [Fact]
     public void sbqb0074() => CorpusAssert.Parses(@"SELECT CASE WHEN id IN (SELECT id FROM s.t WHERE qty > 0) THEN 'active' ELSE 'inactive' END FROM s.t", "ok");
     [Fact]
     public void sbqb0075() => CorpusAssert.Parses(@"SELECT name FROM s.v WHERE id IN (SELECT id FROM s.t)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void sbqb0076() => CorpusAssert.Parses(@"SELECT name FROM s.t WHERE id IN (SELECT no_such_column FROM s.t2)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task sbqb0076() => CorpusAssert.MatchesPostgres(@"SELECT name FROM s.t WHERE id IN (SELECT no_such_column FROM s.t2)", "error", false);
     [Fact]
     public void sbqb0077() => CorpusAssert.Parses(@"SELECT name FROM s.t WHERE qty > ALL (SELECT amount FROM s.t2 WHERE amount > 0)", "ok");
     [Fact]
     public void sbqb0078() => CorpusAssert.Parses(@"SELECT name FROM s.t WHERE id = ANY (SELECT id FROM s.t WHERE id = ANY (SELECT t_id FROM s.t2 WHERE t_id IS NOT NULL))", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void sbqb0079() => CorpusAssert.Parses(@"SELECT name FROM s.t WHERE id = (SELECT nonexistent_col FROM s.t LIMIT 1)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void sbqb0080() => CorpusAssert.Parses(@"SELECT name FROM s.t WHERE id IN (SELECT id FROM nonexistent_table)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task sbqb0079() => CorpusAssert.MatchesPostgres(@"SELECT name FROM s.t WHERE id = (SELECT nonexistent_col FROM s.t LIMIT 1)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task sbqb0080() => CorpusAssert.MatchesPostgres(@"SELECT name FROM s.t WHERE id IN (SELECT id FROM nonexistent_table)", "error", false);
 }

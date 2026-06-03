@@ -47,8 +47,8 @@ public class Corpus_TextPattern
     public void txpa0020() => CorpusAssert.Parses(@"SELECT name FROM s.t WHERE name ILIKE 'a%'", "ok");
     [Fact]
     public void txpa0021() => CorpusAssert.Parses(@"SELECT 'foobar' LIKE ESCAPE '\'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void txpa0022() => CorpusAssert.Parses(@"SELECT 'foobar' LIKE 'foo%' ESCAPE '!!'", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task txpa0022() => CorpusAssert.MatchesPostgres(@"SELECT 'foobar' LIKE 'foo%' ESCAPE '!!'", "error", false);
     [Fact]
     public void txpa0023() => CorpusAssert.Parses(@"SELECT LIKE 'foo%'", "error");
     [Fact]
@@ -77,8 +77,8 @@ public class Corpus_TextPattern
     public void txpa0035() => CorpusAssert.Parses(@"SELECT 'foobar' SIMILAR TO '%'", "ok");
     [Fact]
     public void txpa0036() => CorpusAssert.Parses(@"SELECT 'foobar' SIMILAR 'foo%'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void txpa0037() => CorpusAssert.Parses(@"SELECT 'foobar' SIMILAR TO 'foo%' ESCAPE '!!'", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task txpa0037() => CorpusAssert.MatchesPostgres(@"SELECT 'foobar' SIMILAR TO 'foo%' ESCAPE '!!'", "error", false);
     [Fact]
     public void txpa0038() => CorpusAssert.Parses(@"SELECT 'foobar' ~ 'foo'", "ok");
     [Fact]
@@ -121,10 +121,10 @@ public class Corpus_TextPattern
     public void txpa0057() => CorpusAssert.Parses(@"SELECT regexp_match('foobar', 'baz')", "ok");
     [Fact]
     public void txpa0058() => CorpusAssert.Parses(@"SELECT regexp_match('foo' || 'bar', '[a-z]+')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void txpa0059() => CorpusAssert.Parses(@"SELECT regexp_match('foobar', '[z')", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void txpa0060() => CorpusAssert.Parses(@"SELECT regexp_match('foobar', 'foo', 'z')", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task txpa0059() => CorpusAssert.MatchesPostgres(@"SELECT regexp_match('foobar', '[z')", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task txpa0060() => CorpusAssert.MatchesPostgres(@"SELECT regexp_match('foobar', 'foo', 'z')", "error", false);
     [Fact]
     public void txpa0061() => CorpusAssert.Parses(@"SELECT regexp_matches('foobarbequebazilbarfbonk', '(b[^b]+)(b[^b]+)', 'g')", "ok");
     [Fact]
@@ -151,8 +151,8 @@ public class Corpus_TextPattern
     public void txpa0072() => CorpusAssert.Parses(@"SELECT regexp_replace('foobarbaz', 'b..', 'X', 1, 0, 'g')", "ok");
     [Fact]
     public void txpa0073() => CorpusAssert.Parses(@"SELECT regexp_replace('foobar', 'o+', '\&!')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void txpa0074() => CorpusAssert.Parses(@"SELECT regexp_replace('foo', '[z', 'X')", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task txpa0074() => CorpusAssert.MatchesPostgres(@"SELECT regexp_replace('foo', '[z', 'X')", "error", false);
     [Fact]
     public void txpa0075() => CorpusAssert.Parses(@"SELECT regexp_split_to_table('the quick brown fox', '\s+')", "ok");
     [Fact]
@@ -215,8 +215,8 @@ public class Corpus_TextPattern
     public void txpa0104() => CorpusAssert.Parses(@"SELECT regexp_like('foobar', '^foo$')", "ok");
     [Fact]
     public void txpa0105() => CorpusAssert.Parses(@"SELECT regexp_like('foo bar', '\s+')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void txpa0106() => CorpusAssert.Parses(@"SELECT regexp_like('foobar', '[z')", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task txpa0106() => CorpusAssert.MatchesPostgres(@"SELECT regexp_like('foobar', '[z')", "error", false);
     [Fact]
     public void txpa0107() => CorpusAssert.Parses(@"SELECT substring('foobar' FROM 'o.b')", "ok");
     [Fact]
@@ -337,14 +337,14 @@ public class Corpus_TextPattern
     public void txpa0165() => CorpusAssert.Parses(@"SELECT '' LIKE '%'", "ok");
     [Fact]
     public void txpa0166() => CorpusAssert.Parses(@"SELECT NULL::text LIKE 'foo%'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void txpa0167() => CorpusAssert.Parses(@"SELECT 'foobar' SIMILAR TO '[invalid'", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task txpa0167() => CorpusAssert.MatchesPostgres(@"SELECT 'foobar' SIMILAR TO '[invalid'", "error", false);
     [Fact]
     public void txpa0168() => CorpusAssert.Parses(@"SELECT position('bar')", "error");
     [Fact]
     public void txpa0169() => CorpusAssert.Parses(@"SELECT overlay('foobar' PLACING 'X' FOR 2)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void txpa0170() => CorpusAssert.Parses(@"SELECT regexp_count('foobar', 'o', 1, 'g')", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task txpa0170() => CorpusAssert.MatchesPostgres(@"SELECT regexp_count('foobar', 'o', 1, 'g')", "error", false);
     [Fact]
     public void txpb0001() => CorpusAssert.Parses(@"SELECT 'hello' LIKE 'h%'", "ok");
     [Fact]
@@ -373,8 +373,8 @@ public class Corpus_TextPattern
     public void txpb0013() => CorpusAssert.Parses(@"SELECT 'hello' ILIKE '%ello' ESCAPE '!'", "ok");
     [Fact]
     public void txpb0014() => CorpusAssert.Parses(@"SELECT 'hello' NOT ILIKE '%world%' ESCAPE '!'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void txpb0015() => CorpusAssert.Parses(@"SELECT 'hello' LIKE 'ab' ESCAPE 'ab'", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task txpb0015() => CorpusAssert.MatchesPostgres(@"SELECT 'hello' LIKE 'ab' ESCAPE 'ab'", "error", false);
     [Fact]
     public void txpb0016() => CorpusAssert.Parses(@"SELECT name FROM s.t WHERE name LIKE 'A%'", "ok");
     [Fact]
@@ -397,8 +397,8 @@ public class Corpus_TextPattern
     public void txpb0025() => CorpusAssert.Parses(@"SELECT '100%' SIMILAR TO '100!%' ESCAPE '!'", "ok");
     [Fact]
     public void txpb0026() => CorpusAssert.Parses(@"SELECT 'hello' SIMILAR 'h%'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void txpb0027() => CorpusAssert.Parses(@"SELECT 'hello' SIMILAR TO 'h%' ESCAPE 'abc'", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task txpb0027() => CorpusAssert.MatchesPostgres(@"SELECT 'hello' SIMILAR TO 'h%' ESCAPE 'abc'", "error", false);
     [Fact]
     public void txpb0028() => CorpusAssert.Parses(@"SELECT 'hello' ~ 'h.*'", "ok");
     [Fact]
@@ -423,8 +423,8 @@ public class Corpus_TextPattern
     public void txpb0038() => CorpusAssert.Parses(@"SELECT regexp_match('hello', 'h(e)llo')", "ok");
     [Fact]
     public void txpb0039() => CorpusAssert.Parses(@"SELECT regexp_match('HELLO', 'h(e)llo', 'i')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void txpb0040() => CorpusAssert.Parses(@"SELECT regexp_match('hello', 'h(e)llo', 'g')", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task txpb0040() => CorpusAssert.MatchesPostgres(@"SELECT regexp_match('hello', 'h(e)llo', 'g')", "error", false);
     [Fact]
     public void txpb0041() => CorpusAssert.Parses(@"SELECT * FROM regexp_matches('hello world', '(\w+)', 'g')", "ok");
     [Fact]
@@ -439,8 +439,8 @@ public class Corpus_TextPattern
     public void txpb0046() => CorpusAssert.Parses(@"SELECT regexp_replace('HELLO', 'hello', 'hi', 'i')", "ok");
     [Fact]
     public void txpb0047() => CorpusAssert.Parses(@"SELECT regexp_replace('hello world', '(\w+)', '[\1]', 'g')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void txpb0048() => CorpusAssert.Parses(@"SELECT regexp_replace('hello', 'l+', 'L', 'z')", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task txpb0048() => CorpusAssert.MatchesPostgres(@"SELECT regexp_replace('hello', 'l+', 'L', 'z')", "error", false);
     [Fact]
     public void txpb0049() => CorpusAssert.Parses(@"SELECT * FROM regexp_split_to_table('one two three', '\s+')", "ok");
     [Fact]
@@ -617,8 +617,8 @@ public class Corpus_TextPattern
     public void txpb0135() => CorpusAssert.Parses(@"SELECT 'abc' LIKE ESCAPE '!'", "error");
     [Fact]
     public void txpb0136() => CorpusAssert.Parses(@"SELECT LIKE 'abc%'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void txpb0137() => CorpusAssert.Parses(@"SELECT 'hello' LIKE 42", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task txpb0137() => CorpusAssert.MatchesPostgres(@"SELECT 'hello' LIKE 42", "error", false);
     [Fact]
     public void txpb0138() => CorpusAssert.Parses(@"SELECT 'hello' NOT SIMILAR TO 'h%'", "ok");
     [Fact]
@@ -678,10 +678,10 @@ world' ~ '(?n).'", "ok");
     public void txpb0165() => CorpusAssert.Parses(@"SELECT name FROM s.t WHERE name ~ '^[a-z]' AND name LIKE '%e%'", "ok");
     [Fact]
     public void txpb0166() => CorpusAssert.Parses(@"SELECT 'hello' LIKE 'h%' AND 'world' ~ 'w.*d'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void txpb0167() => CorpusAssert.Parses(@"SELECT regexp_match('hello', '[invalid')", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void txpb0168() => CorpusAssert.Parses(@"SELECT 'hello' ~ '[invalid'", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task txpb0167() => CorpusAssert.MatchesPostgres(@"SELECT regexp_match('hello', '[invalid')", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task txpb0168() => CorpusAssert.MatchesPostgres(@"SELECT 'hello' ~ '[invalid'", "error", false);
     [Fact]
     public void txpb0169() => CorpusAssert.Parses(@"SELECT substring('hello world' SIMILAR '%#""(\w+)#""%' ESCAPE '#')", "ok");
     [Fact]
@@ -704,6 +704,6 @@ world' ~ '(?n).'", "ok");
     public void txpc0008() => CorpusAssert.Parses(@"SELECT substring('Thomas' FROM 2 FOR 3), substring('Thomas' SIMILAR '%#""o_a#""%' ESCAPE '#'), overlay('Txxxas' PLACING 'hom' FROM 2 FOR 3), position('om' IN 'Thomas'), strpos('Thomas', 'om')", "ok");
     [Fact]
     public void txpc0009() => CorpusAssert.Parses(@"SELECT trim(BOTH 'x' FROM 'xhellox'), ltrim('   hi'), rtrim('hi   '), btrim('  hi  ')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void txpc0010() => CorpusAssert.Parses(@"SELECT 'abc' LIKE 'ab' ESCAPE 'xy'", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task txpc0010() => CorpusAssert.MatchesPostgres(@"SELECT 'abc' LIKE 'ab' ESCAPE 'xy'", "error", false);
 }

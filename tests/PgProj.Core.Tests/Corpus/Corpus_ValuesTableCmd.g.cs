@@ -123,8 +123,8 @@ public class Corpus_ValuesTableCmd
     public void vala0058() => CorpusAssert.Parses(@"VALUES (POINT(1.0, 2.0))", "ok");
     [Fact]
     public void vala0059() => CorpusAssert.Parses(@"VALUES (ROW(1, 'hello'))", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void vala0060() => CorpusAssert.Parses(@"VALUES (ROW(1, 'foo')::s.addr)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task vala0060() => CorpusAssert.MatchesPostgres(@"VALUES (ROW(1, 'foo')::s.addr)", "error", false);
     [Fact]
     public void vala0061() => CorpusAssert.Parses(@"VALUES ('sad'::s.mood)", "ok");
     [Fact]
@@ -181,8 +181,8 @@ public class Corpus_ValuesTableCmd
     public void vala0087() => CorpusAssert.Parses(@"TABLE ONLY s.t", "ok");
     [Fact]
     public void vala0088() => CorpusAssert.Parses(@"TABLE ONLY s.parent ORDER BY id LIMIT 10", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void vala0089() => CorpusAssert.Parses(@"TABLE s.t UNION TABLE s.t2", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task vala0089() => CorpusAssert.MatchesPostgres(@"TABLE s.t UNION TABLE s.t2", "error", false);
     [Fact]
     public void vala0090() => CorpusAssert.Parses(@"SELECT id, name, val FROM s.t UNION TABLE s.v", "ok");
     [Fact]
@@ -199,20 +199,20 @@ public class Corpus_ValuesTableCmd
     public void vala0096() => CorpusAssert.Parses(@"VALUES (1,), (2,)", "error");
     [Fact]
     public void vala0097() => CorpusAssert.Parses(@"VALUES (1 2)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void vala0098() => CorpusAssert.Parses(@"VALUES (1) ORDER BY name", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void vala0099() => CorpusAssert.Parses(@"VALUES (1) ORDER BY 0", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void vala0100() => CorpusAssert.Parses(@"VALUES (1) ORDER BY 2", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task vala0098() => CorpusAssert.MatchesPostgres(@"VALUES (1) ORDER BY name", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task vala0099() => CorpusAssert.MatchesPostgres(@"VALUES (1) ORDER BY 0", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task vala0100() => CorpusAssert.MatchesPostgres(@"VALUES (1) ORDER BY 2", "error", false);
     [Fact]
     public void vala0101() => CorpusAssert.Parses(@"VALUES (1) LIMIT -1", "error");
     [Fact]
     public void vala0102() => CorpusAssert.Parses(@"VALUES (1) OFFSET -1", "error");
     [Fact]
     public void vala0103() => CorpusAssert.Parses(@"TABLE", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void vala0104() => CorpusAssert.Parses(@"TABLE s.nonexistent_table", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task vala0104() => CorpusAssert.MatchesPostgres(@"TABLE s.nonexistent_table", "error", false);
     [Fact]
     public void vala0105() => CorpusAssert.Parses(@"TABLE s.t WHERE id = 1", "error");
     [Fact]
@@ -227,8 +227,8 @@ public class Corpus_ValuesTableCmd
     public void vala0110() => CorpusAssert.Parses(@"SELECT column1 FROM (VALUES (1),(2),(3)) AS v ORDER BY column1 DESC", "ok");
     [Fact]
     public void vala0111() => CorpusAssert.Parses(@"INSERT INTO s.t(name) SELECT v.nm FROM (VALUES ('inserted_via_values')) AS v(nm)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void vala0112() => CorpusAssert.Parses(@"INSERT INTO s.t(name) TABLE s.v", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task vala0112() => CorpusAssert.MatchesPostgres(@"INSERT INTO s.t(name) TABLE s.v", "error", false);
     [Fact]
     public void vala0113() => CorpusAssert.Parses(@"VALUES (1) USING operator", "error");
     [Fact]

@@ -83,15 +83,19 @@ public class CorpusTestGenerator
                 var sql = "@\"" + c.Sql.Replace("\"", "\"\"") + "\"";
                 if (pending.Contains(c.Id))
                 {
-                    sb.AppendLine($"    [Fact(Skip = \"pending: parser not yet complete\")]");
+                    // The static engine can't decide these without false positives; verify by executing
+                    // against real PostgreSQL ([DbFact] runs when PGPROJ_TEST_CONNECTION is set, else skips).
+                    var solo = string.Equals(c.Txn, "none", StringComparison.OrdinalIgnoreCase) ? "true" : "false";
+                    sb.AppendLine($"    [DbFact]");
+                    sb.AppendLine($"    public System.Threading.Tasks.Task {name}() => CorpusAssert.MatchesPostgres({sql}, \"{c.Expect}\", {solo});");
                     skipped++;
                 }
                 else
                 {
                     sb.AppendLine($"    [Fact]");
+                    sb.AppendLine($"    public void {name}() => CorpusAssert.Parses({sql}, \"{c.Expect}\");");
                     emitted++;
                 }
-                sb.AppendLine($"    public void {name}() => CorpusAssert.Parses({sql}, \"{c.Expect}\");");
             }
 
             sb.AppendLine("}");

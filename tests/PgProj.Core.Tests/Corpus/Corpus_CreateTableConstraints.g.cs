@@ -15,8 +15,8 @@ public class Corpus_CreateTableConstraints
     public void ctc0004() => CorpusAssert.Parses(@"CREATE TABLE s.ctc_pk4 (a integer, b text, CONSTRAINT pk_ctc4 PRIMARY KEY (a, b))", "ok");
     [Fact]
     public void ctc0005() => CorpusAssert.Parses(@"CREATE TABLE s.ctc_pk5 (id integer CONSTRAINT pk_ctc5 PRIMARY KEY, name text)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctc0006() => CorpusAssert.Parses(@"CREATE TABLE s.ctc_pk6 (a integer PRIMARY KEY, b integer PRIMARY KEY)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ctc0006() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.ctc_pk6 (a integer PRIMARY KEY, b integer PRIMARY KEY)", "error", false);
     [Fact]
     public void ctc0007() => CorpusAssert.Parses(@"CREATE TABLE s.ctc_pk7 (a integer, b text, PRIMARY KEY (a) INCLUDE (b))", "ok");
     [Fact]
@@ -83,8 +83,8 @@ public class Corpus_CreateTableConstraints
     public void ctc0038() => CorpusAssert.Parses(@"CREATE TABLE s.ctc_ex1 (c circle, EXCLUDE USING gist (c WITH &&))", "ok");
     [Fact]
     public void ctc0039() => CorpusAssert.Parses(@"CREATE TABLE s.ctc_ex2 (id integer, c circle, CONSTRAINT ex_ctc2 EXCLUDE USING gist (c WITH &&) WHERE (id > 0))", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctc0040() => CorpusAssert.Parses(@"CREATE TABLE s.ctc_err1 (id integer PRIMARY KEY PRIMARY KEY)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ctc0040() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.ctc_err1 (id integer PRIMARY KEY PRIMARY KEY)", "error", false);
     [Fact]
     public void ctc0041() => CorpusAssert.Parses(@"CREATE TABLE s.ctc_err2 (id integer, PRIMARY KEY)", "error");
     [Fact]
@@ -121,8 +121,8 @@ public class Corpus_CreateTableConstraints
     public void ctcb0007() => CorpusAssert.Parses(@"CREATE TABLE s.ctcb_pk7 (id integer, PRIMARY KEY ())", "error");
     [Fact]
     public void ctcb0008() => CorpusAssert.Parses(@"CREATE TABLE s.ctcb_pk8 (id integer, PRIMARY KEY (nonexistent_col))", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctcb0009() => CorpusAssert.Parses(@"CREATE TABLE s.ctcb_pk9 (id integer, name text, PRIMARY KEY (id, id))", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ctcb0009() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.ctcb_pk9 (id integer, name text, PRIMARY KEY (id, id))", "error", false);
     [Fact]
     public void ctcb0010() => CorpusAssert.Parses(@"CREATE TABLE s.ctcb_uq1 (id integer, a text, b integer, CONSTRAINT uq_ctcb1 UNIQUE (a, b) INCLUDE (id))", "ok");
     [Fact]
@@ -155,8 +155,8 @@ public class Corpus_CreateTableConstraints
     public void ctcb0024() => CorpusAssert.Parses(@"CREATE TABLE s.ctcb_fk5 (id integer, t_id bigint, FOREIGN KEY (t_id) REFERENCES s.t (id) ON DELETE CASCADE ON UPDATE CASCADE)", "ok");
     [Fact]
     public void ctcb0025() => CorpusAssert.Parses(@"CREATE TABLE s.ctcb_fk6 (id integer, t_id bigint, FOREIGN KEY (t_id) REFERENCES s.t (id) ON UPDATE CASCADE ON DELETE RESTRICT)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctcb0026() => CorpusAssert.Parses(@"CREATE TABLE s.ctcb_fk7 (id integer, t_id bigint, FOREIGN KEY (t_id) REFERENCES s.t (id) MATCH PARTIAL)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ctcb0026() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.ctcb_fk7 (id integer, t_id bigint, FOREIGN KEY (t_id) REFERENCES s.t (id) MATCH PARTIAL)", "error", false);
     [Fact]
     public void ctcb0027() => CorpusAssert.Parses(@"CREATE TABLE s.ctcb_fk8 (id integer, t_id bigint, CONSTRAINT fk_ctcb8 FOREIGN KEY (t_id) REFERENCES s.t (id) MATCH FULL DEFERRABLE INITIALLY DEFERRED)", "ok");
     [Fact]
@@ -175,12 +175,12 @@ public class Corpus_CreateTableConstraints
     public void ctcb0034() => CorpusAssert.Parses(@"CREATE TABLE s.ctcb_fk15 (id integer, t_id bigint, FOREIGN KEY REFERENCES s.t (id))", "error");
     [Fact]
     public void ctcb0035() => CorpusAssert.Parses(@"CREATE TABLE s.ctcb_fk16 (id integer, t_id bigint, FOREIGN KEY (t_id) REFERENCES)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctcb0036() => CorpusAssert.Parses(@"CREATE TABLE s.ctcb_fk17 (id integer, t_id bigint, FOREIGN KEY (t_id) REFERENCES s.t (id) MATCH NONE)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctcb0037() => CorpusAssert.Parses(@"CREATE TABLE s.ctcb_fk18 (id integer, t_id bigint, FOREIGN KEY (t_id) REFERENCES s.t (id) ON DELETE CASCADE ON DELETE RESTRICT)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctcb0038() => CorpusAssert.Parses(@"CREATE TABLE s.ctcb_fk19 (id integer, t_id bigint, FOREIGN KEY (t_id) REFERENCES s.t (id) ON UPDATE CASCADE ON UPDATE NO ACTION)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ctcb0036() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.ctcb_fk17 (id integer, t_id bigint, FOREIGN KEY (t_id) REFERENCES s.t (id) MATCH NONE)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ctcb0037() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.ctcb_fk18 (id integer, t_id bigint, FOREIGN KEY (t_id) REFERENCES s.t (id) ON DELETE CASCADE ON DELETE RESTRICT)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ctcb0038() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.ctcb_fk19 (id integer, t_id bigint, FOREIGN KEY (t_id) REFERENCES s.t (id) ON UPDATE CASCADE ON UPDATE NO ACTION)", "error", false);
     [Fact]
     public void ctcb0039() => CorpusAssert.Parses(@"CREATE TABLE s.ctcb_ck1 (id integer, a integer, b integer, CONSTRAINT ck_ctcb1 CHECK (a > 0 AND b > 0))", "ok");
     [Fact]
@@ -227,12 +227,12 @@ public class Corpus_CreateTableConstraints
     public void ctcb0060() => CorpusAssert.Parses(@"CREATE TABLE s.ctcb_ex4 (id integer, r int4range, EXCLUDE USING gist (r WITH &&))", "ok");
     [Fact]
     public void ctcb0061() => CorpusAssert.Parses(@"CREATE TABLE s.ctcb_ex5 (id integer, EXCLUDE USING btree (id WITH =))", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctcb0062() => CorpusAssert.Parses(@"CREATE TABLE s.ctcb_ex6 (id integer, c circle, EXCLUDE USING gist (c WITH))", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctcb0063() => CorpusAssert.Parses(@"CREATE TABLE s.ctcb_ex7 (id integer, c circle, EXCLUDE USING (c WITH &&))", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctcb0064() => CorpusAssert.Parses(@"CREATE TABLE s.ctcb_ex8 (id integer, c circle, EXCLUDE (c WITH &&))", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ctcb0062() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.ctcb_ex6 (id integer, c circle, EXCLUDE USING gist (c WITH))", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ctcb0063() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.ctcb_ex7 (id integer, c circle, EXCLUDE USING (c WITH &&))", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ctcb0064() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.ctcb_ex8 (id integer, c circle, EXCLUDE (c WITH &&))", "error", false);
     [Fact]
     public void ctcb0065() => CorpusAssert.Parses(@"CREATE TABLE s.ctcb_nv1 (id integer, t_id bigint, FOREIGN KEY (t_id) REFERENCES s.t (id) NOT VALID)", "ok");
     [Fact]
@@ -245,8 +245,8 @@ public class Corpus_CreateTableConstraints
     public void ctcb0069() => CorpusAssert.Parses(@"CREATE TABLE s.ctcb_multi1 (id integer PRIMARY KEY, email text UNIQUE NOT NULL, val integer NOT NULL DEFAULT 0, t_id bigint REFERENCES s.t (id) ON DELETE SET NULL, CHECK (val >= 0))", "ok");
     [Fact]
     public void ctcb0070() => CorpusAssert.Parses(@"CREATE TABLE s.ctcb_multi2 (a integer, b text, c numeric, CONSTRAINT pk_ctcb_m2 PRIMARY KEY (a), CONSTRAINT uq_ctcb_m2 UNIQUE (b), CONSTRAINT fk_ctcb_m2 FOREIGN KEY (a) REFERENCES s.parent (id), CONSTRAINT ck_ctcb_m2 CHECK (c > 0))", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctcb0071() => CorpusAssert.Parses(@"CREATE TABLE s.ctcb_inh1 (val integer CHECK (val > 0) NO INHERIT) INHERITS (s.t)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ctcb0071() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.ctcb_inh1 (val integer CHECK (val > 0) NO INHERIT) INHERITS (s.t)", "error", false);
     [Fact]
     public void ctcb0072() => CorpusAssert.Parses(@"CREATE TABLE s.ctcb_inh2 (extra text CHECK (extra IS NOT NULL) NO INHERIT) INHERITS (s.parent)", "ok");
     [Fact]
@@ -269,25 +269,25 @@ public class Corpus_CreateTableConstraints
     public void ctcb0081() => CorpusAssert.Parses(@"CREATE TABLE s.ctcb_part3 (id bigint, occurred date NOT NULL, CHECK (occurred > '2000-01-01')) PARTITION BY RANGE (occurred)", "ok");
     [Fact]
     public void ctcb0082() => CorpusAssert.Parses(@"CREATE TABLE s.ctcb_part4 (id bigint, occurred date NOT NULL, FOREIGN KEY (id) REFERENCES s.parent (id)) PARTITION BY RANGE (occurred)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctcb0083() => CorpusAssert.Parses(@"CREATE TABLE s.ctcb_fkmc1 (id integer, p1 bigint, p2 text, FOREIGN KEY (p1, p2) REFERENCES s.ctcb_fkmc1_ref (a, b))", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ctcb0083() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.ctcb_fkmc1 (id integer, p1 bigint, p2 text, FOREIGN KEY (p1, p2) REFERENCES s.ctcb_fkmc1_ref (a, b))", "error", false);
     [Fact]
     public void ctcb0084() => CorpusAssert.Parses(@"CREATE TABLE s.ctcb_fkmc_ref (a bigint, b text, PRIMARY KEY (a, b));
 CREATE TABLE s.ctcb_fkmc2 (id integer, x bigint, y text, FOREIGN KEY (x, y) REFERENCES s.ctcb_fkmc_ref (a, b))", "ok");
     [Fact]
     public void ctcb0085() => CorpusAssert.Parses(@"CREATE TABLE s.ctcb_fkmc_ref2 (a bigint, b text, PRIMARY KEY (a, b));
 CREATE TABLE s.ctcb_fkmc3 (id integer, x bigint, y text, FOREIGN KEY (x, y) REFERENCES s.ctcb_fkmc_ref2 (a, b) MATCH FULL)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctcb0086() => CorpusAssert.Parses(@"CREATE TABLE s.ctcb_fkmc_ref3 (a bigint, b text, PRIMARY KEY (a, b));
-CREATE TABLE s.ctcb_fkmc4 (id integer, x bigint, y text, FOREIGN KEY (x, y) REFERENCES s.ctcb_fkmc_ref3 (a, b) MATCH PARTIAL)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ctcb0086() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.ctcb_fkmc_ref3 (a bigint, b text, PRIMARY KEY (a, b));
+CREATE TABLE s.ctcb_fkmc4 (id integer, x bigint, y text, FOREIGN KEY (x, y) REFERENCES s.ctcb_fkmc_ref3 (a, b) MATCH PARTIAL)", "error", false);
     [Fact]
     public void ctcb0087() => CorpusAssert.Parses(@"CREATE TABLE s.ctcb_fkmc_ref4 (a bigint, b text, PRIMARY KEY (a, b));
 CREATE TABLE s.ctcb_fkmc5 (id integer, x bigint, y text, FOREIGN KEY (x, y) REFERENCES s.ctcb_fkmc_ref4 (a, b) ON DELETE CASCADE ON UPDATE RESTRICT)", "ok");
     [Fact]
     public void ctcb0088() => CorpusAssert.Parses(@"CREATE TABLE s.ctcb_fkmc_ref5 (a bigint, b text, PRIMARY KEY (a, b));
 CREATE TABLE s.ctcb_fkmc6 (id integer, x bigint, y text, FOREIGN KEY (x, y) REFERENCES s.ctcb_fkmc_ref5 (a, b) ON DELETE SET NULL (x))", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctcb0089() => CorpusAssert.Parses(@"CREATE TABLE s.ctcb_fkmc7 (id integer, a bigint, b bigint, FOREIGN KEY (a, b) REFERENCES s.t (id))", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ctcb0089() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.ctcb_fkmc7 (id integer, a bigint, b bigint, FOREIGN KEY (a, b) REFERENCES s.t (id))", "error", false);
     [Fact]
     public void ctcb0090() => CorpusAssert.Parses(@"CREATE TABLE s.ctcb_nn1 (id integer, name text, CONSTRAINT nn_ctcb1 NOT NULL name)", "ok");
     [Fact]
@@ -306,10 +306,10 @@ CREATE TABLE s.ctcb_fkmc6 (id integer, x bigint, y text, FOREIGN KEY (x, y) REFE
     public void ctcb0097() => CorpusAssert.Parses(@"CREATE TABLE s.ctcb_cname2 (id integer, CONSTRAINT PRIMARY KEY (id))", "error");
     [Fact]
     public void ctcb0098() => CorpusAssert.Parses(@"CREATE TABLE s.ctcb_cname3 (id integer, CONSTRAINT 123_bad PRIMARY KEY (id))", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctcb0099() => CorpusAssert.Parses(@"CREATE TABLE s.ctcb_uqpk1 (id integer PRIMARY KEY, a text, PRIMARY KEY (a))", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctcb0100() => CorpusAssert.Parses(@"CREATE TABLE s.ctcb_uqpk2 (id integer PRIMARY KEY, a text, CONSTRAINT pk2 PRIMARY KEY (a))", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ctcb0099() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.ctcb_uqpk1 (id integer PRIMARY KEY, a text, PRIMARY KEY (a))", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ctcb0100() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.ctcb_uqpk2 (id integer PRIMARY KEY, a text, CONSTRAINT pk2 PRIMARY KEY (a))", "error", false);
     [Fact]
     public void ctcb0101() => CorpusAssert.Parses(@"CREATE TABLE s.ctcb_colord1 (id integer NOT NULL DEFAULT 1 CHECK (id > 0))", "ok");
     [Fact]
@@ -330,26 +330,26 @@ CREATE TABLE s.ctcb_fkmc6 (id integer, x bigint, y text, FOREIGN KEY (x, y) REFE
     public void ctcb0109() => CorpusAssert.Parses(@"CREATE TABLE s.ctcb_fk_self1 (id integer PRIMARY KEY, parent_id integer REFERENCES s.ctcb_fk_self1 (id))", "ok");
     [Fact]
     public void ctcb0110() => CorpusAssert.Parses(@"CREATE TABLE s.ctcb_fk_self2 (id integer PRIMARY KEY, parent_id integer REFERENCES s.ctcb_fk_self2)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctcb0111() => CorpusAssert.Parses(@"CREATE TABLE s.ctcb_check_subq (id integer, val integer, CHECK (val > (SELECT 1)))", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ctcb0111() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.ctcb_check_subq (id integer, val integer, CHECK (val > (SELECT 1)))", "error", false);
     [Fact]
     public void ctcb0112() => CorpusAssert.Parses(@"CREATE TABLE s.ctcb_check_vol (id integer, created_at timestamptz CHECK (created_at < now()))", "ok");
     [Fact]
     public void ctcb0113() => CorpusAssert.Parses(@"CREATE TABLE s.ctcb_uq_part1 (id bigint, occurred date NOT NULL, a text, UNIQUE (a, occurred)) PARTITION BY RANGE (occurred)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctcb0114() => CorpusAssert.Parses(@"CREATE TABLE s.ctcb_uq_part2 (id bigint, occurred date NOT NULL, a text, UNIQUE (a)) PARTITION BY RANGE (occurred)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ctcb0114() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.ctcb_uq_part2 (id bigint, occurred date NOT NULL, a text, UNIQUE (a)) PARTITION BY RANGE (occurred)", "error", false);
     [Fact]
     public void ctcb0115() => CorpusAssert.Parses(@"CREATE TABLE s.ctcb_ex_multi1 (id integer, c1 circle, c2 circle, EXCLUDE USING gist (c1 WITH &&, c2 WITH &&))", "ok");
     [Fact]
     public void ctcb0116() => CorpusAssert.Parses(@"CREATE TABLE s.ctcb_ex_multi2 (id integer, c circle, CONSTRAINT ex_ctcb_m2 EXCLUDE USING gist (c WITH &&) INCLUDE (id) WHERE (id > 0))", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctcb0117() => CorpusAssert.Parses(@"CREATE TABLE s.ctcb_fk_noref (id integer REFERENCES s.nonexistent_table (id))", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctcb0118() => CorpusAssert.Parses(@"CREATE TABLE s.ctcb_fk_badcol (id integer REFERENCES s.t (nonexistent_col))", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctcb0119() => CorpusAssert.Parses(@"CREATE TABLE s.ctcb_fk_type (id text REFERENCES s.t (id))", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctcb0120() => CorpusAssert.Parses(@"CREATE TABLE s.ctcb_pk_null (id integer NULL PRIMARY KEY)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ctcb0117() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.ctcb_fk_noref (id integer REFERENCES s.nonexistent_table (id))", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ctcb0118() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.ctcb_fk_badcol (id integer REFERENCES s.t (nonexistent_col))", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ctcb0119() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.ctcb_fk_type (id text REFERENCES s.t (id))", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ctcb0120() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.ctcb_pk_null (id integer NULL PRIMARY KEY)", "error", false);
     [Fact]
     public void ctcb0121() => CorpusAssert.Parses(@"CREATE TABLE s.ctcb_ck_true (id integer, CHECK (true))", "ok");
     [Fact]
@@ -369,8 +369,8 @@ CREATE TABLE s.ctcb_fk_setcol1 (id integer, a bigint, b date, FOREIGN KEY (a, b)
     public void ctcb0128() => CorpusAssert.Parses(@"CREATE TABLE s.ctcb_badtable ()", "ok");
     [Fact]
     public void ctcb0129() => CorpusAssert.Parses(@"CREATE TABLE s.ctcb_trailing (id integer,)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctcb0130() => CorpusAssert.Parses(@"CREATE TABLE s.ctcb_dupname (id integer, CONSTRAINT dup CHECK (id > 0), CONSTRAINT dup CHECK (id < 100))", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ctcb0130() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.ctcb_dupname (id integer, CONSTRAINT dup CHECK (id > 0), CONSTRAINT dup CHECK (id < 100))", "error", false);
     [Fact]
     public void ctcb0131() => CorpusAssert.Parses(@"CREATE TABLE s.ctcb_ck_cast (id integer, val text CHECK (val::integer > 0))", "ok");
     [Fact]
@@ -402,16 +402,16 @@ CREATE TABLE IF NOT EXISTS s.ctcb_ifnx1 (id integer PRIMARY KEY)", "ok");
     public void ctcb0144() => CorpusAssert.Parses(@"CREATE TABLE s.ctcb_pk_uuid (id uuid PRIMARY KEY, name text)", "ok");
     [Fact]
     public void ctcb0145() => CorpusAssert.Parses(@"CREATE TABLE s.ctcb_pk_composite3 (a integer, b text, c date, PRIMARY KEY (a, b, c))", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctcb0146() => CorpusAssert.Parses(@"CREATE TABLE s.ctcb_fk_nopk (id integer REFERENCES s.v (id))", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ctcb0146() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.ctcb_fk_nopk (id integer REFERENCES s.v (id))", "error", false);
     [Fact]
     public void ctcb0147() => CorpusAssert.Parses(@"CREATE TABLE s.ctcb_check_colref (a integer, b integer CHECK (b IS NOT NULL OR a > 0))", "ok");
     [Fact]
     public void ctcb0148() => CorpusAssert.Parses(@"CREATE TABLE s.ctcb_uq_named_def (id integer, a text, CONSTRAINT uq_ctcb_def UNIQUE (a) DEFERRABLE INITIALLY DEFERRED NOT VALID)", "error");
     [Fact]
     public void ctcb0149() => CorpusAssert.Parses(@"CREATE TABLE s.ctcb_fk_nv_deferred (id integer, t_id bigint, FOREIGN KEY (t_id) REFERENCES s.t (id) NOT VALID DEFERRABLE INITIALLY DEFERRED)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctcb0150() => CorpusAssert.Parses(@"CREATE TABLE s.ctcb_ex_gist2 (id integer, a text, b text, EXCLUDE USING gist (a WITH <>, b WITH <>))", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ctcb0150() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.ctcb_ex_gist2 (id integer, a text, b text, EXCLUDE USING gist (a WITH <>, b WITH <>))", "error", false);
     [Fact]
     public void ctcb0151() => CorpusAssert.Parses(@"CREATE TABLE s.ctcb_constraint_kw (id integer, CONSTRAINT ""check"" CHECK (id > 0))", "ok");
     [Fact]
@@ -454,8 +454,8 @@ CREATE TABLE IF NOT EXISTS s.ctcb_ifnx1 (id integer PRIMARY KEY)", "ok");
     public void ctcb0170() => CorpusAssert.Parses(@"CREATE TABLE s.ctcb_multi_excl (id integer, c1 circle, c2 circle, EXCLUDE USING gist (c1 WITH &&), EXCLUDE USING gist (c2 WITH &&))", "ok");
     [Fact]
     public void ctcc0001() => CorpusAssert.Parses(@"CREATE TABLE s.ctcc_pk_incl1 (a integer, b text, c numeric, PRIMARY KEY (a) INCLUDE (b, c))", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctcc0002() => CorpusAssert.Parses(@"CREATE TABLE s.ctcc_pk_incl2 (a integer PRIMARY KEY INCLUDE (a))", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ctcc0002() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.ctcc_pk_incl2 (a integer PRIMARY KEY INCLUDE (a))", "error", false);
     [Fact]
     public void ctcc0003() => CorpusAssert.Parses(@"CREATE TABLE s.ctcc_pk_named_incl (a integer, b text, CONSTRAINT pk_ctcc3 PRIMARY KEY (a) INCLUDE (b))", "ok");
     [Fact]
@@ -538,10 +538,10 @@ CREATE TABLE IF NOT EXISTS s.ctcb_ifnx1 (id integer PRIMARY KEY)", "ok");
     public void ctcc0042() => CorpusAssert.Parses(@"CREATE TABLE s.ctcc_excl_gist_where (r int4range, active boolean, EXCLUDE USING gist (r WITH &&) WHERE (active = true))", "ok");
     [Fact]
     public void ctcc0043() => CorpusAssert.Parses(@"CREATE TABLE s.ctcc_excl_gist_incl (r int4range, label text, EXCLUDE USING gist (r WITH &&) INCLUDE (label))", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctcc0044() => CorpusAssert.Parses(@"CREATE TABLE s.ctcc_excl_err_noop (c circle, EXCLUDE USING gist (c WITH =))", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctcc0045() => CorpusAssert.Parses(@"CREATE TABLE s.ctcc_excl_err_nousing (c circle, EXCLUDE (c WITH &&))", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ctcc0044() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.ctcc_excl_err_noop (c circle, EXCLUDE USING gist (c WITH =))", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ctcc0045() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.ctcc_excl_err_nousing (c circle, EXCLUDE (c WITH &&))", "error", false);
     [Fact]
     public void ctcc0046() => CorpusAssert.Parses(@"CREATE TABLE s.ctcc_not_valid_ck (a integer, b integer, CONSTRAINT ck_ctcc46 CHECK (a < b) NOT VALID)", "ok");
     [Fact]
@@ -564,14 +564,14 @@ CREATE TABLE IF NOT EXISTS s.ctcb_ifnx1 (id integer PRIMARY KEY)", "ok");
     public void ctcc0055() => CorpusAssert.Parses(@"CREATE TABLE s.ctcc_fk_no_ref_col (id integer, t_id bigint REFERENCES s.t)", "ok");
     [Fact]
     public void ctcc0056() => CorpusAssert.Parses(@"CREATE TABLE s.ctcc_fk_err_bad_action (id integer, t_id bigint REFERENCES s.t (id) ON DELETE DENY)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctcc0057() => CorpusAssert.Parses(@"CREATE TABLE s.ctcc_fk_err_no_ref (id integer, t_id bigint FOREIGN KEY REFERENCES s.t (id))", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ctcc0057() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.ctcc_fk_err_no_ref (id integer, t_id bigint FOREIGN KEY REFERENCES s.t (id))", "error", false);
     [Fact]
     public void ctcc0058() => CorpusAssert.Parses(@"CREATE TABLE s.ctcc_fk_err_match_bad (id integer, t_id bigint REFERENCES s.t (id) MATCH EXACT)", "error");
     [Fact]
     public void ctcc0059() => CorpusAssert.Parses(@"CREATE TABLE s.ctcc_ck_err_no_paren (id integer, val integer CHECK val > 0)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctcc0060() => CorpusAssert.Parses(@"CREATE TABLE s.ctcc_ck_err_empty (id integer, val integer CHECK ())", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ctcc0060() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.ctcc_ck_err_empty (id integer, val integer CHECK ())", "error", false);
     [Fact]
     public void ctcc0061() => CorpusAssert.Parses(@"CREATE TABLE s.ctcc_pk_err_empty (id integer, PRIMARY KEY ())", "error");
     [Fact]
@@ -596,18 +596,18 @@ CREATE TABLE IF NOT EXISTS s.ctcb_ifnx1 (id integer PRIMARY KEY)", "ok");
     public void ctcc0071() => CorpusAssert.Parses(@"CREATE TABLE s.ctcc_fk_setnull_setnull (id integer, t_id bigint REFERENCES s.t (id) ON DELETE SET NULL ON UPDATE SET NULL)", "ok");
     [Fact]
     public void ctcc0072() => CorpusAssert.Parses(@"CREATE TABLE s.ctcc_pk_uq_both (a integer, b text, PRIMARY KEY (a), UNIQUE (b))", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctcc0073() => CorpusAssert.Parses(@"CREATE TABLE s.ctcc_fk_err_dup_del (id integer, t_id bigint REFERENCES s.t (id) ON DELETE CASCADE ON DELETE RESTRICT)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctcc0074() => CorpusAssert.Parses(@"CREATE TABLE s.ctcc_fk_err_dup_upd (id integer, t_id bigint REFERENCES s.t (id) ON UPDATE CASCADE ON UPDATE RESTRICT)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ctcc0073() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.ctcc_fk_err_dup_del (id integer, t_id bigint REFERENCES s.t (id) ON DELETE CASCADE ON DELETE RESTRICT)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ctcc0074() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.ctcc_fk_err_dup_upd (id integer, t_id bigint REFERENCES s.t (id) ON UPDATE CASCADE ON UPDATE RESTRICT)", "error", false);
     [Fact]
     public void ctcc0075() => CorpusAssert.Parses(@"CREATE TABLE s.ctcc_pk_int_types (a smallint, b int, c bigint, d numeric, PRIMARY KEY (a, b, c, d))", "ok");
     [Fact]
     public void ctcc0076() => CorpusAssert.Parses(@"CREATE TABLE s.ctcc_uq_text_types (a text, b varchar(50), c char(10), UNIQUE (a, b, c))", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctcc0077() => CorpusAssert.Parses(@"CREATE TABLE s.ctcc_ck_subquery_err (id integer, val integer CHECK (val IN (SELECT id FROM s.t)))", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctcc0078() => CorpusAssert.Parses(@"CREATE TABLE s.ctcc_fk_err_self_no_pk (a integer, b integer REFERENCES s.ctcc_fk_err_self_no_pk (a))", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ctcc0077() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.ctcc_ck_subquery_err (id integer, val integer CHECK (val IN (SELECT id FROM s.t)))", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ctcc0078() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.ctcc_fk_err_self_no_pk (a integer, b integer REFERENCES s.ctcc_fk_err_self_no_pk (a))", "error", false);
     [Fact]
     public void ctcc0079() => CorpusAssert.Parses(@"CREATE TABLE s.ctcc_defer_named_fk (id integer, t_id bigint, CONSTRAINT fk_ctcc79 FOREIGN KEY (t_id) REFERENCES s.t (id) DEFERRABLE INITIALLY DEFERRED)", "ok");
     [Fact]
@@ -618,8 +618,8 @@ CREATE TABLE IF NOT EXISTS s.ctcb_ifnx1 (id integer PRIMARY KEY)", "ok");
     public void ctcc0082() => CorpusAssert.Parses(@"CREATE TABLE s.ctcc_excl_gist_named_where (r int4range, active boolean, CONSTRAINT ex_ctcc82 EXCLUDE USING gist (r WITH &&) WHERE (active))", "ok");
     [Fact]
     public void ctcc0083() => CorpusAssert.Parses(@"CREATE TABLE s.ctcc_excl_gist_named_incl_defer (r int4range, label text, CONSTRAINT ex_ctcc83 EXCLUDE USING gist (r WITH &&) INCLUDE (label) DEFERRABLE INITIALLY DEFERRED)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctcc0084() => CorpusAssert.Parses(@"CREATE TABLE s.ctcc_excl_err_syntax (c circle, EXCLUDE USING gist c WITH &&)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ctcc0084() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.ctcc_excl_err_syntax (c circle, EXCLUDE USING gist c WITH &&)", "error", false);
     [Fact]
     public void ctcc0085() => CorpusAssert.Parses(@"CREATE TABLE s.ctcc_fk_named_noaction (id integer, t_id bigint, CONSTRAINT fk_ctcc85 FOREIGN KEY (t_id) REFERENCES s.t (id) ON DELETE NO ACTION ON UPDATE NO ACTION NOT DEFERRABLE)", "ok");
     [Fact]
@@ -642,18 +642,18 @@ CREATE TABLE IF NOT EXISTS s.ctcb_ifnx1 (id integer PRIMARY KEY)", "ok");
     public void ctcc0094() => CorpusAssert.Parses(@"CREATE TABLE s.ctcc_ck_false (id integer, val integer CHECK (false))", "ok");
     [Fact]
     public void ctcc0095() => CorpusAssert.Parses(@"CREATE TABLE s.ctcc_ck_true (id integer, val integer CHECK (true))", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctcc0096() => CorpusAssert.Parses(@"CREATE TABLE s.ctcc_fk_err_col_mismatch (id integer, a bigint, b bigint, FOREIGN KEY (a, b) REFERENCES s.t (id))", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctcc0097() => CorpusAssert.Parses(@"CREATE TABLE s.ctcc_fk_err_nonexist_table (id integer, t_id bigint REFERENCES s.nonexistent (id))", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctcc0098() => CorpusAssert.Parses(@"CREATE TABLE s.ctcc_fk_err_nonexist_col (id integer, t_id bigint REFERENCES s.t (nonexistent_col))", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ctcc0096() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.ctcc_fk_err_col_mismatch (id integer, a bigint, b bigint, FOREIGN KEY (a, b) REFERENCES s.t (id))", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ctcc0097() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.ctcc_fk_err_nonexist_table (id integer, t_id bigint REFERENCES s.nonexistent (id))", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ctcc0098() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.ctcc_fk_err_nonexist_col (id integer, t_id bigint REFERENCES s.t (nonexistent_col))", "error", false);
     [Fact]
     public void ctcc0099() => CorpusAssert.Parses(@"CREATE TABLE s.ctcc_excl_btree (a integer, EXCLUDE USING btree (a WITH =))", "ok");
     [Fact]
     public void ctcc0100() => CorpusAssert.Parses(@"CREATE TABLE s.ctcc_excl_hash (a integer, EXCLUDE USING hash (a WITH =))", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctcc0101() => CorpusAssert.Parses(@"CREATE TABLE s.ctcc_excl_err_no_with (r int4range, EXCLUDE USING gist (r))", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ctcc0101() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.ctcc_excl_err_no_with (r int4range, EXCLUDE USING gist (r))", "error", false);
     [Fact]
     public void ctcc0102() => CorpusAssert.Parses(@"CREATE TABLE s.ctcc_not_valid_fk_defer (id integer, t_id bigint, CONSTRAINT fk_ctcc102 FOREIGN KEY (t_id) REFERENCES s.t (id) NOT VALID DEFERRABLE INITIALLY DEFERRED)", "ok");
     [Fact]

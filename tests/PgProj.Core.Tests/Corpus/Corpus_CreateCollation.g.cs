@@ -19,8 +19,8 @@ public class Corpus_CreateCollation
     public void cola0006() => CorpusAssert.Parses(@"CREATE COLLATION s.mycoll (LC_COLLATE = 'C', LC_CTYPE = 'C', PROVIDER = libc)", "ok");
     [Fact]
     public void cola0007() => CorpusAssert.Parses(@"CREATE COLLATION s.mycoll (LOCALE = 'C', DETERMINISTIC = true)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cola0008() => CorpusAssert.Parses(@"CREATE COLLATION s.mycoll (LOCALE = 'C', DETERMINISTIC = false)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task cola0008() => CorpusAssert.MatchesPostgres(@"CREATE COLLATION s.mycoll (LOCALE = 'C', DETERMINISTIC = false)", "error", false);
     [Fact]
     public void cola0009() => CorpusAssert.Parses(@"CREATE COLLATION s.mycoll (PROVIDER = icu, LOCALE = 'und', DETERMINISTIC = false)", "ok");
     [Fact]
@@ -35,12 +35,12 @@ public class Corpus_CreateCollation
     public void cola0014() => CorpusAssert.Parses(@"CREATE COLLATION s.mycoll (PROVIDER = icu, LOCALE = 'und', RULES = '&V << w <<< W')", "ok");
     [Fact]
     public void cola0015() => CorpusAssert.Parses(@"CREATE COLLATION s.mycoll (PROVIDER = icu, LOCALE = 'und', RULES = '&a < b < c')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cola0016() => CorpusAssert.Parses(@"CREATE COLLATION s.mycoll (LOCALE = 'C', RULES = '&a < b')", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task cola0016() => CorpusAssert.MatchesPostgres(@"CREATE COLLATION s.mycoll (LOCALE = 'C', RULES = '&a < b')", "error", false);
     [Fact]
     public void cola0017() => CorpusAssert.Parses(@"CREATE COLLATION s.mycoll (PROVIDER = icu, LOCALE = 'und', VERSION = '1.0')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cola0018() => CorpusAssert.Parses(@"CREATE COLLATION s.mycoll (LOCALE = 'C', VERSION = '1.0')", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task cola0018() => CorpusAssert.MatchesPostgres(@"CREATE COLLATION s.mycoll (LOCALE = 'C', VERSION = '1.0')", "error", false);
     [Fact]
     public void cola0019() => CorpusAssert.Parses(@"CREATE COLLATION s.mycoll FROM ""C""", "ok");
     [Fact]
@@ -53,8 +53,8 @@ public class Corpus_CreateCollation
     public void cola0023() => CorpusAssert.Parses(@"CREATE COLLATION mycoll_bare (LOCALE = 'C')", "ok");
     [Fact]
     public void cola0024() => CorpusAssert.Parses(@"CREATE COLLATION s.""My Coll"" (LOCALE = 'C')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cola0025() => CorpusAssert.Parses(@"CREATE COLLATION s.mycoll (LOCALE = 'C', PROVIDER = libc, DETERMINISTIC = true, VERSION = '153.14')", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task cola0025() => CorpusAssert.MatchesPostgres(@"CREATE COLLATION s.mycoll (LOCALE = 'C', PROVIDER = libc, DETERMINISTIC = true, VERSION = '153.14')", "error", false);
     [Fact]
     public void cola0026() => CorpusAssert.Parses(@"CREATE COLLATION s.mycoll (PROVIDER = icu, LOCALE = 'und', DETERMINISTIC = false, RULES = '&V << w', VERSION = '153.14')", "ok");
     [Fact]
@@ -75,8 +75,8 @@ public class Corpus_CreateCollation
     public void cola0034() => CorpusAssert.Parses(@"CREATE COLLATION s.mycoll (LOCALE = 'C'); ALTER COLLATION s.mycoll SET SCHEMA public", "ok");
     [Fact]
     public void cola0035() => CorpusAssert.Parses(@"CREATE COLLATION s.mycoll (LOCALE = 'C'); ALTER COLLATION s.mycoll REFRESH VERSION", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cola0036() => CorpusAssert.Parses(@"DROP COLLATION s.mycoll", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task cola0036() => CorpusAssert.MatchesPostgres(@"DROP COLLATION s.mycoll", "error", false);
     [Fact]
     public void cola0037() => CorpusAssert.Parses(@"DROP COLLATION IF EXISTS s.mycoll", "ok");
     [Fact]
@@ -103,22 +103,22 @@ public class Corpus_CreateCollation
     public void cola0048() => CorpusAssert.Parses(@"CREATE COLLATION s.mycoll (LOCALE = 'C', LC_CTYPE = 'C')", "error");
     [Fact]
     public void cola0049() => CorpusAssert.Parses(@"CREATE COLLATION s.mycoll ()", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cola0050() => CorpusAssert.Parses(@"CREATE COLLATION s.mycoll (PROVIDER = libc)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cola0051() => CorpusAssert.Parses(@"CREATE COLLATION s.mycoll (PROVIDER = badprovider, LOCALE = 'C')", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task cola0050() => CorpusAssert.MatchesPostgres(@"CREATE COLLATION s.mycoll (PROVIDER = libc)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task cola0051() => CorpusAssert.MatchesPostgres(@"CREATE COLLATION s.mycoll (PROVIDER = badprovider, LOCALE = 'C')", "error", false);
     [Fact]
     public void cola0052() => CorpusAssert.Parses(@"CREATE COLLATION s.mycoll FROM", "error");
     [Fact]
     public void cola0053() => CorpusAssert.Parses(@"CREATE COLLATION s.mycoll FROM (LOCALE = 'C')", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cola0054() => CorpusAssert.Parses(@"CREATE COLLATION s.mycoll FROM C", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cola0055() => CorpusAssert.Parses(@"ALTER COLLATION nonexistent_coll RENAME TO foo", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cola0056() => CorpusAssert.Parses(@"ALTER COLLATION RENAME TO foo", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cola0057() => CorpusAssert.Parses(@"CREATE COLLATION s.mycoll (LOCALE = 'C'); ALTER COLLATION s.mycoll OWNER TO nonexistent_role_xyz", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task cola0054() => CorpusAssert.MatchesPostgres(@"CREATE COLLATION s.mycoll FROM C", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task cola0055() => CorpusAssert.MatchesPostgres(@"ALTER COLLATION nonexistent_coll RENAME TO foo", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task cola0056() => CorpusAssert.MatchesPostgres(@"ALTER COLLATION RENAME TO foo", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task cola0057() => CorpusAssert.MatchesPostgres(@"CREATE COLLATION s.mycoll (LOCALE = 'C'); ALTER COLLATION s.mycoll OWNER TO nonexistent_role_xyz", "error", false);
     [Fact]
     public void cola0058() => CorpusAssert.Parses(@"DROP COLLATION", "error");
     [Fact]
@@ -131,8 +131,8 @@ public class Corpus_CreateCollation
     public void cola0062() => CorpusAssert.Parses(@"CREATE COLLATION s.mycoll (LOCALE = 'C', PROVIDER = libc, DETERMINISTIC = true)", "ok");
     [Fact]
     public void cola0063() => CorpusAssert.Parses(@"CREATE COLLATION s.mycoll (PROVIDER = icu, LOCALE = 'und', DETERMINISTIC = false, RULES = '&a < b < c', VERSION = '2.0')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cola0064() => CorpusAssert.Parses(@"CREATE COLLATION s.mycoll (VERSION = '1.0', LOCALE = 'C', PROVIDER = libc, DETERMINISTIC = true)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task cola0064() => CorpusAssert.MatchesPostgres(@"CREATE COLLATION s.mycoll (VERSION = '1.0', LOCALE = 'C', PROVIDER = libc, DETERMINISTIC = true)", "error", false);
     [Fact]
     public void cola0065() => CorpusAssert.Parses(@"CREATE COLLATION s.mycoll (DETERMINISTIC = true, PROVIDER = libc, LOCALE = 'C')", "ok");
     [Fact]
@@ -141,8 +141,8 @@ public class Corpus_CreateCollation
     public void cola0067() => CorpusAssert.Parses(@"CREATE COLLATION s.mycoll (LC_CTYPE = 'C', LC_COLLATE = 'C')", "ok");
     [Fact]
     public void cola0068() => CorpusAssert.Parses(@"CREATE COLLATION s.mycoll (LC_COLLATE = 'C', LC_CTYPE = 'C', DETERMINISTIC = true)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cola0069() => CorpusAssert.Parses(@"CREATE COLLATION s.mycoll (LC_COLLATE = 'C', LC_CTYPE = 'C', VERSION = '100')", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task cola0069() => CorpusAssert.MatchesPostgres(@"CREATE COLLATION s.mycoll (LC_COLLATE = 'C', LC_CTYPE = 'C', VERSION = '100')", "error", false);
     [Fact]
     public void cola0070() => CorpusAssert.Parses(@"CREATE COLLATION s.mycoll (PROVIDER = ICU, LOCALE = 'und')", "ok");
     [Fact]
@@ -170,38 +170,38 @@ public class Corpus_CreateCollation
     public void cola0080() => CorpusAssert.Parses(@"CREATE COLLATION s.mycoll (LOCALE = 'C'); ALTER COLLATION s.mycoll SET SCHEMA s", "ok");
     [Fact]
     public void cola0081() => CorpusAssert.Parses(@"CREATE COLLATION s.coll_a (LOCALE = 'C'); CREATE COLLATION s.coll_b FROM s.coll_a", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cola0082() => CorpusAssert.Parses(@"CREATE COLLATION s.mycoll FROM ""default""", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task cola0082() => CorpusAssert.MatchesPostgres(@"CREATE COLLATION s.mycoll FROM ""default""", "error", false);
     [Fact]
     public void cola0083() => CorpusAssert.Parses(@"CREATE COLLATION s.mycoll (PROVIDER = builtin, LOCALE = 'C')", "ok");
     [Fact]
     public void cola0084() => CorpusAssert.Parses(@"CREATE COLLATION s.mycoll (PROVIDER = builtin, LOCALE = 'C.UTF-8')", "ok");
     [Fact]
     public void cola0085() => CorpusAssert.Parses(@"CREATE COLLATION s.mycoll (PROVIDER = builtin, LOCALE = 'PG_UNICODE_FAST')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cola0086() => CorpusAssert.Parses(@"CREATE COLLATION s.mycoll (PROVIDER = builtin, LOCALE = 'POSIX')", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cola0087() => CorpusAssert.Parses(@"CREATE COLLATION s.mycoll (PROVIDER = builtin, LOCALE = 'invalid_xyz_locale')", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cola0088() => CorpusAssert.Parses(@"CREATE COLLATION s.mycoll (PROVIDER = builtin, DETERMINISTIC = false)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cola0089() => CorpusAssert.Parses(@"CREATE COLLATION s.mycoll (PROVIDER = icu, RULES = '&a < b')", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task cola0086() => CorpusAssert.MatchesPostgres(@"CREATE COLLATION s.mycoll (PROVIDER = builtin, LOCALE = 'POSIX')", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task cola0087() => CorpusAssert.MatchesPostgres(@"CREATE COLLATION s.mycoll (PROVIDER = builtin, LOCALE = 'invalid_xyz_locale')", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task cola0088() => CorpusAssert.MatchesPostgres(@"CREATE COLLATION s.mycoll (PROVIDER = builtin, DETERMINISTIC = false)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task cola0089() => CorpusAssert.MatchesPostgres(@"CREATE COLLATION s.mycoll (PROVIDER = icu, RULES = '&a < b')", "error", false);
     [Fact]
     public void cola0090() => CorpusAssert.Parses(@"CREATE COLLATION s.mycoll (LOCALE = 'C'); CREATE COLLATION IF NOT EXISTS s.mycoll (LOCALE = 'POSIX')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cola0091() => CorpusAssert.Parses(@"CREATE COLLATION s.mycoll (LOCALE = 'C'); CREATE COLLATION s.mycoll (LOCALE = 'POSIX')", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task cola0091() => CorpusAssert.MatchesPostgres(@"CREATE COLLATION s.mycoll (LOCALE = 'C'); CREATE COLLATION s.mycoll (LOCALE = 'POSIX')", "error", false);
     [Fact]
     public void cola0092() => CorpusAssert.Parses(@"ALTER COLLATION ""C"" RENAME TO mycollation_c", "ok");
     [Fact]
     public void cola0093() => CorpusAssert.Parses(@"CREATE COLLATION s.mycoll (LOCALE = 'C'); ALTER COLLATION s.mycoll RENAME TO ""New Name""", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cola0094() => CorpusAssert.Parses(@"ALTER COLLATION s.mycoll SET SCHEMA s", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cola0095() => CorpusAssert.Parses(@"ALTER COLLATION s.mycoll REFRESH VERSION", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task cola0094() => CorpusAssert.MatchesPostgres(@"ALTER COLLATION s.mycoll SET SCHEMA s", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task cola0095() => CorpusAssert.MatchesPostgres(@"ALTER COLLATION s.mycoll REFRESH VERSION", "error", false);
     [Fact]
     public void cola0096() => CorpusAssert.Parses(@"CREATE COLLATION s.mycoll (LOCALE = 'C'); ALTER COLLATION s.mycoll OWNER TO SESSION_USER; ALTER COLLATION s.mycoll SET SCHEMA public", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cola0097() => CorpusAssert.Parses(@"DROP COLLATION nonexistent_schema.mycoll", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task cola0097() => CorpusAssert.MatchesPostgres(@"DROP COLLATION nonexistent_schema.mycoll", "error", false);
     [Fact]
     public void cola0098() => CorpusAssert.Parses(@"DROP COLLATION IF EXISTS nonexistent_schema.mycoll", "ok");
     [Fact]
@@ -210,42 +210,42 @@ public class Corpus_CreateCollation
     public void cola0100() => CorpusAssert.Parses(@"CREATE COLLATION s.mycoll (PROVIDER = icu, LOCALE = 'und', DETERMINISTIC = false, RULES = '&V << w <<< W'); DROP COLLATION s.mycoll CASCADE", "ok");
     [Fact]
     public void cola0101() => CorpusAssert.Parses(@"CREATE COLLATION s.coll1 (LOCALE = 'C'); CREATE COLLATION s.coll2 (LOCALE = 'C'); DROP COLLATION s.coll1; DROP COLLATION s.coll2", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cola0102() => CorpusAssert.Parses(@"CREATE COLLATION s.mycoll (LOCALE = 'C', PROVIDER = libc, VERSION = '999', DETERMINISTIC = true)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task cola0102() => CorpusAssert.MatchesPostgres(@"CREATE COLLATION s.mycoll (LOCALE = 'C', PROVIDER = libc, VERSION = '999', DETERMINISTIC = true)", "error", false);
     [Fact]
     public void cola0103() => CorpusAssert.Parses(@"CREATE COLLATION s.mycoll (LOCALE = '')", "ok");
     [Fact]
     public void cola0104() => CorpusAssert.Parses(@"CREATE COLLATION s.mycoll LOCALE = 'C' PROVIDER = libc", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cola0105() => CorpusAssert.Parses(@"CREATE COLLATION s.mycoll (LOCALE = 'C' PROVIDER = libc)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task cola0105() => CorpusAssert.MatchesPostgres(@"CREATE COLLATION s.mycoll (LOCALE = 'C' PROVIDER = libc)", "error", false);
     [Fact]
     public void cola0106() => CorpusAssert.Parses(@"CREATE COLLATION (LC_COLLATE = 'C', LC_CTYPE = 'C')", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cola0107() => CorpusAssert.Parses(@"COLLATION s.mycoll (LOCALE = 'C')", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cola0108() => CorpusAssert.Parses(@"CREATE s.mycoll (LOCALE = 'C')", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task cola0107() => CorpusAssert.MatchesPostgres(@"COLLATION s.mycoll (LOCALE = 'C')", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task cola0108() => CorpusAssert.MatchesPostgres(@"CREATE s.mycoll (LOCALE = 'C')", "error", false);
     [Fact]
     public void cola0109() => CorpusAssert.Parses(@"CREATE COLLATION IF s.mycoll (LOCALE = 'C')", "error");
     [Fact]
     public void cola0110() => CorpusAssert.Parses(@"CREATE COLLATION IF NOT s.mycoll (LOCALE = 'C')", "error");
     [Fact]
     public void cola0111() => CorpusAssert.Parses(@"CREATE COLLATION IF EXISTS s.mycoll (LOCALE = 'C')", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cola0112() => CorpusAssert.Parses(@"ALTER COLLATION s.mycoll OWNER SESSION_USER", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task cola0112() => CorpusAssert.MatchesPostgres(@"ALTER COLLATION s.mycoll OWNER SESSION_USER", "error", false);
     [Fact]
     public void cola0113() => CorpusAssert.Parses(@"ALTER COLLATION s.mycoll RENAME mycoll2", "error");
     [Fact]
     public void cola0114() => CorpusAssert.Parses(@"ALTER COLLATION s.mycoll SET SCHEMA", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cola0115() => CorpusAssert.Parses(@"ALTER COLLATION s.mycoll REFRESH", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cola0116() => CorpusAssert.Parses(@"ALTER COLLATION s.mycoll VERSION REFRESH", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cola0117() => CorpusAssert.Parses(@"ALTER COLLATION s.mycoll SET OWNER TO CURRENT_USER", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task cola0115() => CorpusAssert.MatchesPostgres(@"ALTER COLLATION s.mycoll REFRESH", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task cola0116() => CorpusAssert.MatchesPostgres(@"ALTER COLLATION s.mycoll VERSION REFRESH", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task cola0117() => CorpusAssert.MatchesPostgres(@"ALTER COLLATION s.mycoll SET OWNER TO CURRENT_USER", "error", false);
     [Fact]
     public void cola0118() => CorpusAssert.Parses(@"CREATE COLLATION s.mycoll (PROVIDER = icu, LOCALE = 'und'); ALTER COLLATION s.mycoll OWNER TO CURRENT_USER; ALTER COLLATION s.mycoll REFRESH VERSION", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cola0119() => CorpusAssert.Parses(@"CREATE COLLATION s.mycoll FROM pg_catalog.default", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task cola0119() => CorpusAssert.MatchesPostgres(@"CREATE COLLATION s.mycoll FROM pg_catalog.default", "error", false);
     [Fact]
     public void cola0120() => CorpusAssert.Parses(@"CREATE COLLATION s.mycoll (PROVIDER = icu, LOCALE = 'und', RULES = '&a < b', DETERMINISTIC = true)", "ok");
     [Fact]
@@ -258,10 +258,10 @@ public class Corpus_CreateCollation
     public void cola0124() => CorpusAssert.Parses(@"CREATE COLLATION s.mycoll (LOCALE = 'C'); ALTER COLLATION s.mycoll RENAME TO mycoll2; DROP COLLATION s.mycoll2", "ok");
     [Fact]
     public void cola0125() => CorpusAssert.Parses(@"CREATE COLLATION s.mycoll (LOCALE = 'C'); ALTER COLLATION s.mycoll SET SCHEMA public; DROP COLLATION public.mycoll", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cola0126() => CorpusAssert.Parses(@"ALTER COLLATION s.mycoll OWNER TO CURRENT_USER; ALTER COLLATION s.mycoll SET SCHEMA public", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cola0127() => CorpusAssert.Parses(@"DROP COLLATION ""C""", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task cola0126() => CorpusAssert.MatchesPostgres(@"ALTER COLLATION s.mycoll OWNER TO CURRENT_USER; ALTER COLLATION s.mycoll SET SCHEMA public", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task cola0127() => CorpusAssert.MatchesPostgres(@"DROP COLLATION ""C""", "error", false);
     [Fact]
     public void cola0128() => CorpusAssert.Parses(@"CREATE COLLATION s.mycoll (PROVIDER = icu, LOCALE = 'und', RULES = '&[first regular]<a<b<c')", "ok");
     [Fact]

@@ -27,8 +27,8 @@ public class Corpus_CreateAggregate
     public void agga0010() => CorpusAssert.Parses(@"CREATE AGGREGATE agga0010_mysum (integer) (SFUNC = int4pl, STYPE = integer, PARALLEL = UNSAFE)", "ok");
     [Fact]
     public void agga0011() => CorpusAssert.Parses(@"CREATE AGGREGATE agga0011_myagg (integer) (SFUNC = int4pl, STYPE = integer, FINALFUNC = s.f)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void agga0012() => CorpusAssert.Parses(@"CREATE AGGREGATE agga0012_myagg (integer) (SFUNC = int4pl, STYPE = integer, FINALFUNC = s.f, FINALFUNC_EXTRA)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task agga0012() => CorpusAssert.MatchesPostgres(@"CREATE AGGREGATE agga0012_myagg (integer) (SFUNC = int4pl, STYPE = integer, FINALFUNC = s.f, FINALFUNC_EXTRA)", "error", false);
     [Fact]
     public void agga0013() => CorpusAssert.Parses(@"CREATE AGGREGATE agga0013_myagg (integer) (SFUNC = int4pl, STYPE = integer, FINALFUNC = s.f, FINALFUNC_MODIFY = READ_ONLY)", "ok");
     [Fact]
@@ -49,8 +49,8 @@ public class Corpus_CreateAggregate
     public void agga0021() => CorpusAssert.Parses(@"CREATE AGGREGATE agga0021_myagg (myarg integer) (SFUNC = int4pl, STYPE = integer)", "ok");
     [Fact]
     public void agga0022() => CorpusAssert.Parses(@"CREATE AGGREGATE agga0022_myagg (IN myarg integer) (SFUNC = int4pl, STYPE = integer)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void agga0023() => CorpusAssert.Parses(@"CREATE AGGREGATE agga0023_myagg (integer, integer) (SFUNC = int4pl, STYPE = integer)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task agga0023() => CorpusAssert.MatchesPostgres(@"CREATE AGGREGATE agga0023_myagg (integer, integer) (SFUNC = int4pl, STYPE = integer)", "error", false);
     [Fact]
     public void agga0024() => CorpusAssert.Parses(@"CREATE FUNCTION agga0024_sfunc(state integer, a integer, b integer) RETURNS integer LANGUAGE sql AS $$ SELECT state + a + b $$;
 CREATE AGGREGATE agga0024_myagg (integer, integer) (SFUNC = agga0024_sfunc, STYPE = integer, INITCOND = '0')", "ok");
@@ -58,8 +58,8 @@ CREATE AGGREGATE agga0024_myagg (integer, integer) (SFUNC = agga0024_sfunc, STYP
     public void agga0025() => CorpusAssert.Parses(@"CREATE OR REPLACE AGGREGATE agga0001_mysum (integer) (SFUNC = int4pl, STYPE = integer)", "ok");
     [Fact]
     public void agga0026() => CorpusAssert.Parses(@"CREATE OR REPLACE AGGREGATE agga0026_newone (integer) (SFUNC = int4pl, STYPE = integer)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void agga0027() => CorpusAssert.Parses(@"CREATE AGGREGATE agga0027_myagg (VARIADIC integer[]) (SFUNC = int4pl, STYPE = integer, INITCOND = '0')", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task agga0027() => CorpusAssert.MatchesPostgres(@"CREATE AGGREGATE agga0027_myagg (VARIADIC integer[]) (SFUNC = int4pl, STYPE = integer, INITCOND = '0')", "error", false);
     [Fact]
     public void agga0028() => CorpusAssert.Parses(@"CREATE AGGREGATE agga0028_myagg (integer) (SFUNC = int4pl, STYPE = integer, INITCOND = '0', PARALLEL = SAFE, SSPACE = 4)", "ok");
     [Fact]
@@ -70,8 +70,8 @@ CREATE AGGREGATE agga0024_myagg (integer, integer) (SFUNC = agga0024_sfunc, STYP
     public void agga0031() => CorpusAssert.Parses(@"CREATE AGGREGATE agga0031_myagg (integer) (SFUNC = int4pl, STYPE = integer, MSFUNC = int4pl, MINVFUNC = int4mi, MSTYPE = integer, MSSPACE = 4)", "ok");
     [Fact]
     public void agga0032() => CorpusAssert.Parses(@"CREATE AGGREGATE agga0032_myagg (integer) (SFUNC = int4pl, STYPE = integer, MSFUNC = int4pl, MINVFUNC = int4mi, MSTYPE = integer, MFINALFUNC = s.f)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void agga0033() => CorpusAssert.Parses(@"CREATE AGGREGATE agga0033_myagg (integer) (SFUNC = int4pl, STYPE = integer, MSFUNC = int4pl, MINVFUNC = int4mi, MSTYPE = integer, MFINALFUNC = s.f, MFINALFUNC_EXTRA)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task agga0033() => CorpusAssert.MatchesPostgres(@"CREATE AGGREGATE agga0033_myagg (integer) (SFUNC = int4pl, STYPE = integer, MSFUNC = int4pl, MINVFUNC = int4mi, MSTYPE = integer, MFINALFUNC = s.f, MFINALFUNC_EXTRA)", "error", false);
     [Fact]
     public void agga0034() => CorpusAssert.Parses(@"CREATE AGGREGATE agga0034_myagg (integer) (SFUNC = int4pl, STYPE = integer, MSFUNC = int4pl, MINVFUNC = int4mi, MSTYPE = integer, MFINALFUNC = s.f, MFINALFUNC_MODIFY = READ_ONLY)", "ok");
     [Fact]
@@ -92,8 +92,8 @@ CREATE AGGREGATE agga0024_myagg (integer, integer) (SFUNC = agga0024_sfunc, STYP
     public void agga0042() => CorpusAssert.Parses(@"CREATE AGGREGATE agga0042_ordered (text ORDER BY text) (SFUNC = textcat, STYPE = text, INITCOND = '', FINALFUNC_MODIFY = READ_WRITE)", "ok");
     [Fact]
     public void agga0043() => CorpusAssert.Parses(@"CREATE AGGREGATE agga0043_ordered (float8 ORDER BY float8) (SFUNC = float8pl, STYPE = float8, PARALLEL = SAFE)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void agga0044() => CorpusAssert.Parses(@"CREATE AGGREGATE agga0044_myagg (integer) (SFUNC = int4pl, STYPE = integer, HYPOTHETICAL)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task agga0044() => CorpusAssert.MatchesPostgres(@"CREATE AGGREGATE agga0044_myagg (integer) (SFUNC = int4pl, STYPE = integer, HYPOTHETICAL)", "error", false);
     [Fact]
     public void agga0045() => CorpusAssert.Parses(@"CREATE AGGREGATE agga0045_old (BASETYPE = integer, SFUNC = int4pl, STYPE = integer)", "ok");
     [Fact]
@@ -138,31 +138,31 @@ CREATE AGGREGATE agga0024_myagg (integer, integer) (SFUNC = agga0024_sfunc, STYP
     public void agga0065() => CorpusAssert.Parses(@"CREATE AGGREGATE agga0065_myagg (integer) (SFUNC int4pl, STYPE integer)", "error");
     [Fact]
     public void agga0066() => CorpusAssert.Parses(@"CREATE AGGREGATE agga0066_myagg (integer) (SFUNC = int4pl, STYPE = integer, SFUNC = int4pl)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void agga0067() => CorpusAssert.Parses(@"CREATE AGGREGATE agga0067_myagg (integer) (SFUNC = int4pl, STYPE = integer, STYPE = int8)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task agga0067() => CorpusAssert.MatchesPostgres(@"CREATE AGGREGATE agga0067_myagg (integer) (SFUNC = int4pl, STYPE = integer, STYPE = int8)", "error", false);
     [Fact]
     public void agga0068() => CorpusAssert.Parses(@"CREATE AGGREGATE agga0068_myagg (integer) (SFUNC = int4pl, STYPE = integer, INITCOND = 0)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void agga0069() => CorpusAssert.Parses(@"CREATE AGGREGATE agga0069_myagg (integer) (SFUNC = nonexistent_fn, STYPE = integer)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void agga0070() => CorpusAssert.Parses(@"CREATE AGGREGATE agga0070_myagg (integer) (SFUNC = int4pl, STYPE = nonexistent_type)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void agga0071() => CorpusAssert.Parses(@"CREATE AGGREGATE agga0071_myagg (integer) (SFUNC = int4pl, STYPE = integer, SORTOP = !)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void agga0072() => CorpusAssert.Parses(@"CREATE AGGREGATE agga0072_myagg (integer) (SFUNC = int4pl, STYPE = integer, MSFUNC = int4pl, MSTYPE = integer)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void agga0073() => CorpusAssert.Parses(@"CREATE AGGREGATE agga0073_myagg (integer) (SFUNC = int4pl, STYPE = integer, MINVFUNC = int4mi, MSTYPE = integer)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void agga0074() => CorpusAssert.Parses(@"CREATE AGGREGATE agga0074_myagg (integer) (SFUNC = int4pl, STYPE = integer, MSFUNC = int4pl, MINVFUNC = int4mi)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void agga0075() => CorpusAssert.Parses(@"CREATE AGGREGATE agga0075_ordered (ORDER BY float8) (SFUNC = float8pl, STYPE = float8, HYPOTHETICAL)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void agga0076() => CorpusAssert.Parses(@"CREATE AGGREGATE agga0076_myagg (integer) (SFUNC = int4pl, STYPE = integer, BASETYPE = integer)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void agga0077() => CorpusAssert.Parses(@"CREATE AGGREGATE agga0077_old (BASETYPE = integer, SFUNC = int4pl, STYPE = integer, HYPOTHETICAL)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void agga0078() => CorpusAssert.Parses(@"CREATE AGGREGATE agga0078_myagg (integer) (SFUNC = int4pl, STYPE = integer);
-CREATE AGGREGATE agga0078_myagg (integer) (SFUNC = int4pl, STYPE = integer)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task agga0069() => CorpusAssert.MatchesPostgres(@"CREATE AGGREGATE agga0069_myagg (integer) (SFUNC = nonexistent_fn, STYPE = integer)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task agga0070() => CorpusAssert.MatchesPostgres(@"CREATE AGGREGATE agga0070_myagg (integer) (SFUNC = int4pl, STYPE = nonexistent_type)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task agga0071() => CorpusAssert.MatchesPostgres(@"CREATE AGGREGATE agga0071_myagg (integer) (SFUNC = int4pl, STYPE = integer, SORTOP = !)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task agga0072() => CorpusAssert.MatchesPostgres(@"CREATE AGGREGATE agga0072_myagg (integer) (SFUNC = int4pl, STYPE = integer, MSFUNC = int4pl, MSTYPE = integer)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task agga0073() => CorpusAssert.MatchesPostgres(@"CREATE AGGREGATE agga0073_myagg (integer) (SFUNC = int4pl, STYPE = integer, MINVFUNC = int4mi, MSTYPE = integer)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task agga0074() => CorpusAssert.MatchesPostgres(@"CREATE AGGREGATE agga0074_myagg (integer) (SFUNC = int4pl, STYPE = integer, MSFUNC = int4pl, MINVFUNC = int4mi)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task agga0075() => CorpusAssert.MatchesPostgres(@"CREATE AGGREGATE agga0075_ordered (ORDER BY float8) (SFUNC = float8pl, STYPE = float8, HYPOTHETICAL)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task agga0076() => CorpusAssert.MatchesPostgres(@"CREATE AGGREGATE agga0076_myagg (integer) (SFUNC = int4pl, STYPE = integer, BASETYPE = integer)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task agga0077() => CorpusAssert.MatchesPostgres(@"CREATE AGGREGATE agga0077_old (BASETYPE = integer, SFUNC = int4pl, STYPE = integer, HYPOTHETICAL)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task agga0078() => CorpusAssert.MatchesPostgres(@"CREATE AGGREGATE agga0078_myagg (integer) (SFUNC = int4pl, STYPE = integer);
+CREATE AGGREGATE agga0078_myagg (integer) (SFUNC = int4pl, STYPE = integer)", "error", false);
     [Fact]
     public void agga0079() => CorpusAssert.Parses(@"CREATE AGGREGATE agga0079_myagg (bigint) (SFUNC = int8pl, STYPE = bigint, INITCOND = '0')", "ok");
     [Fact]
@@ -203,8 +203,8 @@ CREATE AGGREGATE agga0078_myagg (integer) (SFUNC = int4pl, STYPE = integer)", "e
     public void agga0095() => CorpusAssert.Parses(@"CREATE AGGREGATE agga0095_myagg (integer) (SFUNC = int4pl, STYPE = integer); DROP AGGREGATE IF EXISTS agga0095_myagg(integer)", "ok");
     [Fact]
     public void agga0096() => CorpusAssert.Parses(@"DROP AGGREGATE IF EXISTS agga0096_nonexistent(integer)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void agga0097() => CorpusAssert.Parses(@"DROP AGGREGATE agga0097_nonexistent(integer)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task agga0097() => CorpusAssert.MatchesPostgres(@"DROP AGGREGATE agga0097_nonexistent(integer)", "error", false);
     [Fact]
     public void agga0098() => CorpusAssert.Parses(@"CREATE AGGREGATE agga0098_ordered (float8, float8 ORDER BY float8) (SFUNC = float8pl, STYPE = float8, INITCOND = '0')", "ok");
     [Fact]
@@ -213,14 +213,14 @@ CREATE AGGREGATE agga0078_myagg (integer) (SFUNC = int4pl, STYPE = integer)", "e
     public void agga0100() => CorpusAssert.Parses(@"CREATE AGGREGATE agga0100_ordered (integer ORDER BY integer) (SFUNC = int4pl, STYPE = integer, INITCOND = '0', HYPOTHETICAL)", "ok");
     [Fact]
     public void agga0101() => CorpusAssert.Parses(@"CREATE AGGREGATE agga0101_ordered (text ORDER BY text) (SFUNC = textcat, STYPE = text, INITCOND = '', HYPOTHETICAL)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void agga0102() => CorpusAssert.Parses(@"CREATE AGGREGATE agga0102_myagg (integer) (SFUNC = int4pl, STYPE = integer, COMBINEFUNC = int4pl, SERIALFUNC = int4send, DESERIALFUNC = int4recv)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void agga0103() => CorpusAssert.Parses(@"CREATE AGGREGATE agga0103_myagg (integer) (SFUNC = int4pl, STYPE = integer, SERIALFUNC = int4send)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void agga0104() => CorpusAssert.Parses(@"CREATE AGGREGATE agga0104_myagg (integer) (SFUNC = int4pl, STYPE = integer, DESERIALFUNC = int4recv)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void agga0105() => CorpusAssert.Parses(@"CREATE AGGREGATE agga0105_myagg (integer) (SFUNC = int4pl, STYPE = integer, INITCOND = 'hello')", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task agga0102() => CorpusAssert.MatchesPostgres(@"CREATE AGGREGATE agga0102_myagg (integer) (SFUNC = int4pl, STYPE = integer, COMBINEFUNC = int4pl, SERIALFUNC = int4send, DESERIALFUNC = int4recv)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task agga0103() => CorpusAssert.MatchesPostgres(@"CREATE AGGREGATE agga0103_myagg (integer) (SFUNC = int4pl, STYPE = integer, SERIALFUNC = int4send)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task agga0104() => CorpusAssert.MatchesPostgres(@"CREATE AGGREGATE agga0104_myagg (integer) (SFUNC = int4pl, STYPE = integer, DESERIALFUNC = int4recv)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task agga0105() => CorpusAssert.MatchesPostgres(@"CREATE AGGREGATE agga0105_myagg (integer) (SFUNC = int4pl, STYPE = integer, INITCOND = 'hello')", "error", false);
     [Fact]
     public void agga0106() => CorpusAssert.Parses(@"CREATE AGGREGATE agga0106_myagg (integer) (SFUNC = int4pl, STYPE = integer, SSPACE = 0)", "ok");
     [Fact]
@@ -229,14 +229,14 @@ CREATE AGGREGATE agga0078_myagg (integer) (SFUNC = int4pl, STYPE = integer)", "e
     public void agga0108() => CorpusAssert.Parses(@"CREATE AGGREGATE agga0108_myagg (integer) (SFUNC = int4pl, STYPE = integer, SSPACE = 1000)", "ok");
     [Fact]
     public void agga0109() => CorpusAssert.Parses(@"CREATE AGGREGATE agga0109_myagg (s.pos_int) (SFUNC = int4pl, STYPE = integer)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void agga0110() => CorpusAssert.Parses(@"CREATE AGGREGATE agga0110_myagg (s.mood) (SFUNC = textcat, STYPE = text)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void agga0111() => CorpusAssert.Parses(@"CREATE AGGREGATE agga0111_myagg (integer) (SFUNC = int4pl, STYPE = integer, FINALFUNC = s.f, FINALFUNC_EXTRA, FINALFUNC_MODIFY = READ_ONLY)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task agga0110() => CorpusAssert.MatchesPostgres(@"CREATE AGGREGATE agga0110_myagg (s.mood) (SFUNC = textcat, STYPE = text)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task agga0111() => CorpusAssert.MatchesPostgres(@"CREATE AGGREGATE agga0111_myagg (integer) (SFUNC = int4pl, STYPE = integer, FINALFUNC = s.f, FINALFUNC_EXTRA, FINALFUNC_MODIFY = READ_ONLY)", "error", false);
     [Fact]
     public void agga0112() => CorpusAssert.Parses(@"CREATE AGGREGATE agga0112_myagg (integer) (SFUNC = int4pl, STYPE = integer, FINALFUNC = s.f, FINALFUNC_MODIFY = SHAREABLE, PARALLEL = SAFE)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void agga0113() => CorpusAssert.Parses(@"CREATE AGGREGATE agga0113_myagg (integer, bigint) (SFUNC = int4pl, STYPE = integer)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task agga0113() => CorpusAssert.MatchesPostgres(@"CREATE AGGREGATE agga0113_myagg (integer, bigint) (SFUNC = int4pl, STYPE = integer)", "error", false);
     [Fact]
     public void agga0114() => CorpusAssert.Parses(@"CREATE AGGREGATE agga0114_myagg (integer) (SFUNC = int4pl, STYPE = integer, INITCOND = '0', SORTOP = =)", "ok");
     [Fact]
@@ -247,51 +247,51 @@ CREATE AGGREGATE agga0078_myagg (integer) (SFUNC = int4pl, STYPE = integer)", "e
     public void agga0117() => CorpusAssert.Parses(@"CREATE AGGREGATE agga0117_myagg (text) (SFUNC = textcat, STYPE = text, SORTOP = <)", "ok");
     [Fact]
     public void agga0118() => CorpusAssert.Parses(@"CREATE AGGREGATE agga0118_myagg (integer) (SFUNC = int4pl, STYPE = integer, COMBINEFUNC = int4larger)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void agga0119() => CorpusAssert.Parses(@"CREATE AGGREGATE agga0119_myagg (VARIADIC ""any"") (SFUNC = textcat, STYPE = text)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task agga0119() => CorpusAssert.MatchesPostgres(@"CREATE AGGREGATE agga0119_myagg (VARIADIC ""any"") (SFUNC = textcat, STYPE = text)", "error", false);
     [Fact]
     public void agga0120() => CorpusAssert.Parses(@"CREATE AGGREGATE agga0120_myagg (integer) (SFUNC = int4pl, STYPE = integer, INITCOND = '2147483647')", "ok");
     [Fact]
     public void agga0121() => CorpusAssert.Parses(@"CREATE AGGREGATE agga0121_old (BASETYPE = integer, SFUNC = int4pl, STYPE = integer, COMBINEFUNC = int4pl, FINALFUNC = s.f)", "ok");
     [Fact]
     public void agga0122() => CorpusAssert.Parses(@"CREATE AGGREGATE agga0122_old (BASETYPE = integer, SFUNC = int4pl, STYPE = integer, MSFUNC = int4pl, MINVFUNC = int4mi, MSTYPE = integer, MINITCOND = '0')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void agga0123() => CorpusAssert.Parses(@"CREATE AGGREGATE agga0123_old (BASETYPE = integer, SFUNC = int4pl, STYPE = integer, FINALFUNC_EXTRA)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void agga0124() => CorpusAssert.Parses(@"CREATE AGGREGATE agga0124_old (BASETYPE = integer, SFUNC = int4pl, STYPE = integer, SSPACE = 4, PARALLEL = SAFE)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task agga0123() => CorpusAssert.MatchesPostgres(@"CREATE AGGREGATE agga0123_old (BASETYPE = integer, SFUNC = int4pl, STYPE = integer, FINALFUNC_EXTRA)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task agga0124() => CorpusAssert.MatchesPostgres(@"CREATE AGGREGATE agga0124_old (BASETYPE = integer, SFUNC = int4pl, STYPE = integer, SSPACE = 4, PARALLEL = SAFE)", "error", false);
     [Fact]
     public void agga0125() => CorpusAssert.Parses(@"CREATE AGGREGATE agga0125_myagg (integer) (SFUNC = int4pl, STYPE = integer, -- comment
  INITCOND = '0')", "ok");
     [Fact]
     public void agga0126() => CorpusAssert.Parses(@"CREATE AGGREGATE agga0126_myagg (IN integer) (SFUNC = int4pl, STYPE = integer)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void agga0127() => CorpusAssert.Parses(@"CREATE AGGREGATE agga0127_myagg (OUT integer) (SFUNC = int4pl, STYPE = integer)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void agga0128() => CorpusAssert.Parses(@"CREATE AGGREGATE agga0128_myagg (INOUT integer) (SFUNC = int4pl, STYPE = integer)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void agga0129() => CorpusAssert.Parses(@"CREATE AGGREGATE agga0129_myagg (integer, VARIADIC integer[]) (SFUNC = int4pl, STYPE = integer)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void agga0130() => CorpusAssert.Parses(@"CREATE AGGREGATE agga0130_myagg (integer) (SFUNC = int4pl, STYPE = integer, INITCOND = '', FINALFUNC = s.f)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task agga0127() => CorpusAssert.MatchesPostgres(@"CREATE AGGREGATE agga0127_myagg (OUT integer) (SFUNC = int4pl, STYPE = integer)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task agga0128() => CorpusAssert.MatchesPostgres(@"CREATE AGGREGATE agga0128_myagg (INOUT integer) (SFUNC = int4pl, STYPE = integer)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task agga0129() => CorpusAssert.MatchesPostgres(@"CREATE AGGREGATE agga0129_myagg (integer, VARIADIC integer[]) (SFUNC = int4pl, STYPE = integer)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task agga0130() => CorpusAssert.MatchesPostgres(@"CREATE AGGREGATE agga0130_myagg (integer) (SFUNC = int4pl, STYPE = integer, INITCOND = '', FINALFUNC = s.f)", "error", false);
     [Fact]
     public void agga0131() => CorpusAssert.Parses(@"CREATE AGGREGATE agga0131_myagg (integer) (SFUNC = int4pl, STYPE = integer, INITCOND = '0', SSPACE = 4, PARALLEL = SAFE, COMBINEFUNC = int4pl, FINALFUNC = s.f, FINALFUNC_MODIFY = READ_ONLY)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void agga0132() => CorpusAssert.Parses(@"CREATE AGGREGATE agga0132_myagg (integer) (SFUNC = int4pl, STYPE = integer, MSFUNC = int4pl, MINVFUNC = int4mi, MSTYPE = integer, MINITCOND = '0', MSSPACE = 8, MFINALFUNC = s.f, MFINALFUNC_EXTRA, MFINALFUNC_MODIFY = READ_ONLY)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task agga0132() => CorpusAssert.MatchesPostgres(@"CREATE AGGREGATE agga0132_myagg (integer) (SFUNC = int4pl, STYPE = integer, MSFUNC = int4pl, MINVFUNC = int4mi, MSTYPE = integer, MINITCOND = '0', MSSPACE = 8, MFINALFUNC = s.f, MFINALFUNC_EXTRA, MFINALFUNC_MODIFY = READ_ONLY)", "error", false);
     [Fact]
     public void agga0133() => CorpusAssert.Parses(@"CREATE AGGREGATE agga0133_ordered (float8 ORDER BY float8) (SFUNC = float8pl, STYPE = float8, INITCOND = '0', FINALFUNC_EXTRA, FINALFUNC_MODIFY = READ_WRITE)", "ok");
     [Fact]
     public void agga0134() => CorpusAssert.Parses(@"CREATE AGGREGATE agga0134_ordered (float8 ORDER BY float8) (SFUNC = float8pl, STYPE = float8, INITCOND = '0', MSFUNC = float8pl, MINVFUNC = float8mi, MSTYPE = float8)", "ok");
     [Fact]
     public void agga0135() => CorpusAssert.Parses(@"CREATE AGGREGATE agga0135_myagg (integer) (SFUNC = int4pl, STYPE = integer, INITCOND = '0', MSFUNC = int4pl, MINVFUNC = int4mi, MSTYPE = integer, MSFUNC = int4pl)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void agga0136() => CorpusAssert.Parses(@"CREATE AGGREGATE agga0136_myagg (integer) (SFUNC = int4pl, STYPE = integer, INITCOND = '0', COMBINEFUNC = int4pl, SERIALFUNC = int4send, DESERIALFUNC = int4recv, PARALLEL = SAFE)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task agga0136() => CorpusAssert.MatchesPostgres(@"CREATE AGGREGATE agga0136_myagg (integer) (SFUNC = int4pl, STYPE = integer, INITCOND = '0', COMBINEFUNC = int4pl, SERIALFUNC = int4send, DESERIALFUNC = int4recv, PARALLEL = SAFE)", "error", false);
     [Fact]
     public void agga0137() => CorpusAssert.Parses(@"CREATE AGGREGATE agga0137_old (BASETYPE = integer, SFUNC = int4pl, STYPE = integer, FINALFUNC_MODIFY = READ_ONLY)", "ok");
     [Fact]
     public void agga0138() => CorpusAssert.Parses(@"CREATE AGGREGATE agga0138_old (BASETYPE = integer, SFUNC = int4pl, STYPE = integer, FINALFUNC_MODIFY = SHAREABLE)", "ok");
     [Fact]
     public void agga0139() => CorpusAssert.Parses(@"CREATE AGGREGATE agga0139_old (BASETYPE = integer, SFUNC = int4pl, STYPE = integer, FINALFUNC_MODIFY = READ_WRITE)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void agga0140() => CorpusAssert.Parses(@"CREATE AGGREGATE agga0140_old (BASETYPE = integer, SFUNC = int4pl, STYPE = integer, MFINALFUNC_EXTRA)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task agga0140() => CorpusAssert.MatchesPostgres(@"CREATE AGGREGATE agga0140_old (BASETYPE = integer, SFUNC = int4pl, STYPE = integer, MFINALFUNC_EXTRA)", "error", false);
     [Fact]
     public void agga0141() => CorpusAssert.Parses(@"CREATE AGGREGATE agga0141_myagg (integer) (SFUNC = int4pl, STYPE = integer, PARALLEL = safe)", "ok");
     [Fact]
@@ -311,14 +311,14 @@ CREATE AGGREGATE agga0146_myagg (a integer, b integer) (SFUNC = agga0146_sfunc, 
 CREATE AGGREGATE agga0147_myagg (IN a integer, IN b integer) (SFUNC = agga0147_sfunc, STYPE = integer, INITCOND = '0')", "ok");
     [Fact]
     public void agga0148() => CorpusAssert.Parses(@"CREATE AGGREGATE agga0148_myagg (integer) (SFUNC = int4pl, STYPE = integer, SORTOP = operator(pg_catalog.<))", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void agga0149() => CorpusAssert.Parses(@"CREATE AGGREGATE agga0149_myagg (integer) (SFUNC = int4pl, STYPE = integer, SORTOP = pg_catalog.<)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void agga0150() => CorpusAssert.Parses(@"CREATE AGGREGATE agga0150_myagg (integer) (SFUNC = int4pl, STYPE = integer, INITCOND = $tag$initial$tag$)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task agga0149() => CorpusAssert.MatchesPostgres(@"CREATE AGGREGATE agga0149_myagg (integer) (SFUNC = int4pl, STYPE = integer, SORTOP = pg_catalog.<)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task agga0150() => CorpusAssert.MatchesPostgres(@"CREATE AGGREGATE agga0150_myagg (integer) (SFUNC = int4pl, STYPE = integer, INITCOND = $tag$initial$tag$)", "error", false);
     [Fact]
     public void agga0151() => CorpusAssert.Parses(@"CREATE AGGREGATE agga0151_myagg (integer) (SFUNC = int4pl, STYPE = integer, INITCOND = $$0$$)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void agga0152() => CorpusAssert.Parses(@"CREATE AGGREGATE agga0152_myagg (integer) (SFUNC = int4pl, STYPE = integer, INITCOND = E'\000')", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task agga0152() => CorpusAssert.MatchesPostgres(@"CREATE AGGREGATE agga0152_myagg (integer) (SFUNC = int4pl, STYPE = integer, INITCOND = E'\000')", "error", false);
     [Fact]
     public void agga0153() => CorpusAssert.Parses(@"CREATE AGGREGATE agga0153_myagg (*) (SFUNC = int8inc, STYPE = int8, INITCOND = '0', PARALLEL = SAFE)", "ok");
     [Fact]
@@ -347,14 +347,14 @@ CREATE AGGREGATE agga0159_hypo (float8, float8 ORDER BY float8, float8) (SFUNC =
     public void agga0164() => CorpusAssert.Parses(@"CREATE AGGREGATE agga0164_myagg (integer) (SFUNC = int4pl, STYPE = integer); ALTER AGGREGATE agga0164_myagg(integer) SET SCHEMA s", "ok");
     [Fact]
     public void agga0165() => CorpusAssert.Parses(@"CREATE AGGREGATE agga0165_myagg (integer) (SFUNC = int4pl, STYPE = integer); COMMENT ON AGGREGATE agga0165_myagg(integer) IS 'my aggregate'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void agga0166() => CorpusAssert.Parses(@"CREATE AGGREGATE agga0166_old (BASETYPE = integer, SFUNC = int4pl, STYPE = integer, FINALFUNC_EXTRA)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task agga0166() => CorpusAssert.MatchesPostgres(@"CREATE AGGREGATE agga0166_old (BASETYPE = integer, SFUNC = int4pl, STYPE = integer, FINALFUNC_EXTRA)", "error", false);
     [Fact]
     public void agga0167() => CorpusAssert.Parses(@"CREATE AGGREGATE agga0167_myagg (integer) (SFUNC = int4pl, STYPE = integer, INITCOND = '0', MSFUNC = int4pl, MINVFUNC = int4mi, MSTYPE = integer, PARALLEL = SAFE)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void agga0168() => CorpusAssert.Parses(@"CREATE AGGREGATE agga0168_hypo (integer, text ORDER BY integer, text) (SFUNC = int4pl, STYPE = integer, INITCOND = '0', HYPOTHETICAL)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void agga0169() => CorpusAssert.Parses(@"CREATE AGGREGATE agga0169_myagg (integer) (SFUNC = int4pl, STYPE = integer, FINALFUNC = nonexistent_fn)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task agga0168() => CorpusAssert.MatchesPostgres(@"CREATE AGGREGATE agga0168_hypo (integer, text ORDER BY integer, text) (SFUNC = int4pl, STYPE = integer, INITCOND = '0', HYPOTHETICAL)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task agga0169() => CorpusAssert.MatchesPostgres(@"CREATE AGGREGATE agga0169_myagg (integer) (SFUNC = int4pl, STYPE = integer, FINALFUNC = nonexistent_fn)", "error", false);
     [Fact]
     public void agga0170() => CorpusAssert.Parses(@"CREATE AGGREGATE agga0170_myagg (integer) (SFUNC = int4pl, STYPE = integer, INITCOND = '0', COMBINEFUNC = int4pl, PARALLEL = SAFE, SSPACE = 4, FINALFUNC = s.f, FINALFUNC_MODIFY = READ_ONLY, MSFUNC = int4pl, MINVFUNC = int4mi, MSTYPE = integer, MINITCOND = '0', MSSPACE = 8)", "ok");
     [Fact]
@@ -416,12 +416,12 @@ CREATE AGGREGATE agga0159_hypo (float8, float8 ORDER BY float8, float8) (SFUNC =
     public void aggb0018() => CorpusAssert.Parses(@"CREATE AGGREGATE s.my_old_syntax(BASETYPE = integer, SFUNC = int4pl, STYPE = integer, INITCOND = '0');", "ok");
     [Fact]
     public void aggb0019() => CorpusAssert.Parses(@"CREATE AGGREGATE s.my_old_any(BASETYPE = ""any"", SFUNC = int8inc, STYPE = bigint, INITCOND = '0');", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void aggb0020() => CorpusAssert.Parses(@"CREATE AGGREGATE s.my_variadic_agg(VARIADIC integer[]) (SFUNC = int4pl, STYPE = integer, INITCOND = '0');", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task aggb0020() => CorpusAssert.MatchesPostgres(@"CREATE AGGREGATE s.my_variadic_agg(VARIADIC integer[]) (SFUNC = int4pl, STYPE = integer, INITCOND = '0');", "error", false);
     [Fact]
     public void aggb0021() => CorpusAssert.Parses(@"CREATE AGGREGATE s.my_schema_qual(integer) (SFUNC = pg_catalog.int4pl, STYPE = pg_catalog.int4, INITCOND = '0');", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void aggb0022() => CorpusAssert.Parses(@"CREATE AGGREGATE s.my_two_arg(integer, integer) (SFUNC = int4pl, STYPE = integer, INITCOND = '0');", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task aggb0022() => CorpusAssert.MatchesPostgres(@"CREATE AGGREGATE s.my_two_arg(integer, integer) (SFUNC = int4pl, STYPE = integer, INITCOND = '0');", "error", false);
     [Fact]
     public void aggb0023() => CorpusAssert.Parses(@"CREATE AGGREGATE s.no_sfunc(integer) (STYPE = integer);", "error");
     [Fact]
@@ -434,8 +434,8 @@ CREATE AGGREGATE agga0159_hypo (float8, float8 ORDER BY float8, float8) (SFUNC =
     public void aggb0027() => CorpusAssert.Parses(@"CREATE AGGREGATE s.bad_finalfunc_mod(integer) (SFUNC = int4pl, STYPE = integer, FINALFUNC_MODIFY = PARTIAL);", "error");
     [Fact]
     public void aggb0028() => CorpusAssert.Parses(@"CREATE AGGREGATE s.hyp_agg(""any"" ORDER BY ""any"") (SFUNC = ordered_set_transition_multi, STYPE = internal, FINALFUNC = percent_rank_final, FINALFUNC_MODIFY = READ_WRITE, HYPOTHETICAL);", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void aggb0029() => CorpusAssert.Parses(@"CREATE AGGREGATE s.bad_hyp_no_orderby(integer) (SFUNC = int4pl, STYPE = integer, HYPOTHETICAL);", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task aggb0029() => CorpusAssert.MatchesPostgres(@"CREATE AGGREGATE s.bad_hyp_no_orderby(integer) (SFUNC = int4pl, STYPE = integer, HYPOTHETICAL);", "error", false);
     [Fact]
     public void aggb0030() => CorpusAssert.Parses(@"CREATE AGGREGATE s.my_mfinalfunc_modify(integer) (
   SFUNC = int4_avg_accum,

@@ -188,10 +188,10 @@ public class Corpus_PlpgsqlIfCase
     public void ppica0090() => CorpusAssert.Parses(@"CREATE OR REPLACE FUNCTION s.case_fn(x int) RETURNS text LANGUAGE plpgsql AS $$ BEGIN CASE x WHEN 1 THEN RETURN 'one'; WHEN 2 THEN RETURN 'two'; ELSE RETURN 'other'; END CASE; END $$;", "ok");
     [Fact]
     public void ppica0091() => CorpusAssert.Parses(@"CREATE OR REPLACE FUNCTION s.searched_case_fn(x int) RETURNS text LANGUAGE plpgsql AS $$ BEGIN CASE WHEN x < 0 THEN RETURN 'neg'; WHEN x = 0 THEN RETURN 'zero'; ELSE RETURN 'pos'; END CASE; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppica0092() => CorpusAssert.Parses(@"DO $$ DECLARE x int := 5; BEGIN CASE x WHEN 1 THEN RAISE NOTICE 'one'; END CASE; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppica0093() => CorpusAssert.Parses(@"DO $$ DECLARE x int := 5; BEGIN CASE WHEN false THEN RAISE NOTICE 'no'; END CASE; END $$;", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ppica0092() => CorpusAssert.MatchesPostgres(@"DO $$ DECLARE x int := 5; BEGIN CASE x WHEN 1 THEN RAISE NOTICE 'one'; END CASE; END $$;", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ppica0093() => CorpusAssert.MatchesPostgres(@"DO $$ DECLARE x int := 5; BEGIN CASE WHEN false THEN RAISE NOTICE 'no'; END CASE; END $$;", "error", false);
     [Fact]
     public void ppica0094() => CorpusAssert.Parses(@"DO $$ BEGIN IF THEN RAISE NOTICE 'bad'; END IF; END $$;", "error");
     [Fact]
@@ -202,18 +202,18 @@ public class Corpus_PlpgsqlIfCase
     public void ppica0097() => CorpusAssert.Parses(@"DO $$ BEGIN IF true THEN RAISE NOTICE 'bad'; END; END $$;", "error");
     [Fact]
     public void ppica0098() => CorpusAssert.Parses(@"DO $$ BEGIN IF true THEN RAISE NOTICE 'bad'; ENDIF; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppica0099() => CorpusAssert.Parses(@"DO $$ BEGIN ELSEIF true THEN RAISE NOTICE 'bad'; END IF; END $$;", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ppica0099() => CorpusAssert.MatchesPostgres(@"DO $$ BEGIN ELSEIF true THEN RAISE NOTICE 'bad'; END IF; END $$;", "error", false);
     [Fact]
     public void ppica0100() => CorpusAssert.Parses(@"DO $$ BEGIN IF true THEN RAISE NOTICE 'a'; ELSE IF true THEN RAISE NOTICE 'b'; END IF; END IF; END $$;", "ok");
     [Fact]
     public void ppica0101() => CorpusAssert.Parses(@"DO $$ BEGIN IF true THEN RAISE NOTICE 'a'; ELSE RAISE NOTICE 'b'; ELSIF true THEN RAISE NOTICE 'c'; END IF; END $$;", "error");
     [Fact]
     public void ppica0102() => CorpusAssert.Parses(@"DO $$ BEGIN IF true THEN RAISE NOTICE 'a'; ELSE RAISE NOTICE 'b'; ELSE RAISE NOTICE 'c'; END IF; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppica0103() => CorpusAssert.Parses(@"DO $$ BEGIN IF true THEN RAISE NOTICE 'a'; THEN RAISE NOTICE 'b'; END IF; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppica0104() => CorpusAssert.Parses(@"DO $$ BEGIN RAISE NOTICE 'a'; END IF; END $$;", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ppica0103() => CorpusAssert.MatchesPostgres(@"DO $$ BEGIN IF true THEN RAISE NOTICE 'a'; THEN RAISE NOTICE 'b'; END IF; END $$;", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ppica0104() => CorpusAssert.MatchesPostgres(@"DO $$ BEGIN RAISE NOTICE 'a'; END IF; END $$;", "error", false);
     [Fact]
     public void ppica0105() => CorpusAssert.Parses(@"DO $$ BEGIN IF true THEN RAISE NOTICE 'a'; ELSIF THEN RAISE NOTICE 'b'; END IF; END $$;", "error");
     [Fact]
@@ -224,34 +224,34 @@ public class Corpus_PlpgsqlIfCase
     public void ppica0108() => CorpusAssert.Parses(@"DO $$ BEGIN CASE WHEN true THEN RAISE NOTICE 'ok'; END; END $$;", "error");
     [Fact]
     public void ppica0109() => CorpusAssert.Parses(@"DO $$ BEGIN CASE WHEN true THEN RAISE NOTICE 'ok'; ENDCASE; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppica0110() => CorpusAssert.Parses(@"DO $$ DECLARE x int := 1; BEGIN CASE x RAISE NOTICE 'bad'; END CASE; END $$;", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ppica0110() => CorpusAssert.MatchesPostgres(@"DO $$ DECLARE x int := 1; BEGIN CASE x RAISE NOTICE 'bad'; END CASE; END $$;", "error", false);
     [Fact]
     public void ppica0111() => CorpusAssert.Parses(@"DO $$ DECLARE x int := 1; BEGIN CASE x WHEN THEN RAISE NOTICE 'bad'; END CASE; END $$;", "error");
     [Fact]
     public void ppica0112() => CorpusAssert.Parses(@"DO $$ DECLARE x int := 1; BEGIN CASE x WHEN 1 RAISE NOTICE 'bad'; END CASE; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppica0113() => CorpusAssert.Parses(@"DO $$ BEGIN CASE WHEN true THEN RAISE NOTICE 'ok'; ELSE RAISE NOTICE 'no'; WHEN false THEN RAISE NOTICE 'also no'; END CASE; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppica0114() => CorpusAssert.Parses(@"DO $$ BEGIN CASE WHEN true THEN RAISE NOTICE 'a'; ELSE RAISE NOTICE 'b'; ELSE RAISE NOTICE 'c'; END CASE; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppica0115() => CorpusAssert.Parses(@"DO $$ BEGIN CASE true THEN RAISE NOTICE 'bad'; END CASE; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppica0116() => CorpusAssert.Parses(@"DO $$ DECLARE x int := 1; BEGIN CASE x WHEN 1 THEN RAISE NOTICE 'one'; END CASE END $$;", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ppica0113() => CorpusAssert.MatchesPostgres(@"DO $$ BEGIN CASE WHEN true THEN RAISE NOTICE 'ok'; ELSE RAISE NOTICE 'no'; WHEN false THEN RAISE NOTICE 'also no'; END CASE; END $$;", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ppica0114() => CorpusAssert.MatchesPostgres(@"DO $$ BEGIN CASE WHEN true THEN RAISE NOTICE 'a'; ELSE RAISE NOTICE 'b'; ELSE RAISE NOTICE 'c'; END CASE; END $$;", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ppica0115() => CorpusAssert.MatchesPostgres(@"DO $$ BEGIN CASE true THEN RAISE NOTICE 'bad'; END CASE; END $$;", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ppica0116() => CorpusAssert.MatchesPostgres(@"DO $$ DECLARE x int := 1; BEGIN CASE x WHEN 1 THEN RAISE NOTICE 'one'; END CASE END $$;", "error", false);
     [Fact]
     public void ppica0117() => CorpusAssert.Parses(@"DO $$ BEGIN IF END IF; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppica0118() => CorpusAssert.Parses(@"DO $$ BEGIN ELSIF true THEN RAISE NOTICE 'bad'; END IF; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppica0119() => CorpusAssert.Parses(@"DO $$ BEGIN ELSE RAISE NOTICE 'bad'; END IF; END $$;", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ppica0118() => CorpusAssert.MatchesPostgres(@"DO $$ BEGIN ELSIF true THEN RAISE NOTICE 'bad'; END IF; END $$;", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ppica0119() => CorpusAssert.MatchesPostgres(@"DO $$ BEGIN ELSE RAISE NOTICE 'bad'; END IF; END $$;", "error", false);
     [Fact]
     public void ppica0120() => CorpusAssert.Parses(@"DO $$ DECLARE x int := 5; BEGIN IF x > 0 THEN RAISE NOTICE 'pos'; -- missing END IF
  END $$;", "error");
     [Fact]
     public void ppica0121() => CorpusAssert.Parses(@"DO $$ DECLARE x int := 5; BEGIN CASE WHEN x > 0 THEN RAISE NOTICE 'pos'; -- missing END CASE
  END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppica0122() => CorpusAssert.Parses(@"DO $$ DECLARE x int := 5; BEGIN IF x > 0 THEN RAISE NOTICE 'pos'; END IF END IF; END $$;", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ppica0122() => CorpusAssert.MatchesPostgres(@"DO $$ DECLARE x int := 5; BEGIN IF x > 0 THEN RAISE NOTICE 'pos'; END IF END IF; END $$;", "error", false);
     [Fact]
     public void ppica0123() => CorpusAssert.Parses(@"DO $$ DECLARE v int := 5; r text := ''; BEGIN IF v > 0 THEN r := r || 'pos'; END IF; IF v < 10 THEN r := r || '_small'; END IF; RAISE NOTICE '%', r; END $$;", "ok");
     [Fact]
@@ -490,8 +490,8 @@ END IF; END $$;", "ok");
     public void ppicb0067() => CorpusAssert.Parses(@"DO $$ BEGIN IF true NULL; END IF; END $$;", "error");
     [Fact]
     public void ppicb0068() => CorpusAssert.Parses(@"DO $$ BEGIN IF true THEN NULL; END; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppicb0069() => CorpusAssert.Parses(@"DO $$ BEGIN IF true THEN NULL; END IF END $$;", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ppicb0069() => CorpusAssert.MatchesPostgres(@"DO $$ BEGIN IF true THEN NULL; END IF END $$;", "error", false);
     [Fact]
     public void ppicb0070() => CorpusAssert.Parses(@"DO $$ BEGIN IF true THEN NULL; ELSEIF true THEN NULL; END IF; END $$;", "ok");
     [Fact]
@@ -506,12 +506,12 @@ END IF; END $$;", "ok");
     public void ppicb0075() => CorpusAssert.Parses(@"DO $$ BEGIN CASE 1 WHEN 1 THEN NULL; END; END $$;", "error");
     [Fact]
     public void ppicb0076() => CorpusAssert.Parses(@"DO $$ BEGIN CASE WHEN true THEN NULL; END; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppicb0077() => CorpusAssert.Parses(@"DO $$ BEGIN CASE 1 THEN NULL; END CASE; END $$;", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ppicb0077() => CorpusAssert.MatchesPostgres(@"DO $$ BEGIN CASE 1 THEN NULL; END CASE; END $$;", "error", false);
     [Fact]
     public void ppicb0078() => CorpusAssert.Parses(@"DO $$ BEGIN CASE WHEN THEN NULL; END CASE; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppicb0079() => CorpusAssert.Parses(@"DO $$ DECLARE x int := 9; BEGIN CASE x WHEN 1 THEN NULL; WHEN 2 THEN NULL; END CASE; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppicb0080() => CorpusAssert.Parses(@"DO $$ BEGIN CASE WHEN false THEN NULL; END CASE; END $$;", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ppicb0079() => CorpusAssert.MatchesPostgres(@"DO $$ DECLARE x int := 9; BEGIN CASE x WHEN 1 THEN NULL; WHEN 2 THEN NULL; END CASE; END $$;", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ppicb0080() => CorpusAssert.MatchesPostgres(@"DO $$ BEGIN CASE WHEN false THEN NULL; END CASE; END $$;", "error", false);
 }

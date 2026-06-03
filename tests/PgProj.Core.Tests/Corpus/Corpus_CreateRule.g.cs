@@ -78,9 +78,9 @@ CREATE RULE rula_r20 AS ON INSERT TO rula_t20 DO (INSERT INTO rula_dest20 VALUES
 CREATE TABLE rula_log21 (a text);
 CREATE TABLE rula_log21b (a text);
 CREATE RULE rula_r21 AS ON INSERT TO rula_t21 DO (INSERT INTO rula_log21(a) VALUES ('a'); INSERT INTO rula_log21b(a) VALUES ('b'))", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void rula0022() => CorpusAssert.Parses(@"CREATE TABLE rula_t22 (id int, name text);
-CREATE RULE rula_r22 AS ON INSERT TO rula_t22 DO INSTEAD (NOTHING)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task rula0022() => CorpusAssert.MatchesPostgres(@"CREATE TABLE rula_t22 (id int, name text);
+CREATE RULE rula_r22 AS ON INSERT TO rula_t22 DO INSTEAD (NOTHING)", "error", false);
     [Fact]
     public void rula0023() => CorpusAssert.Parses(@"CREATE TABLE rula_t23 (id int, name text);
 CREATE TABLE rula_dest23 (id int, name text);
@@ -105,37 +105,37 @@ CREATE RULE rula_r28b AS ON INSERT TO rula_t28 DO NOTHING", "ok");
     [Fact]
     public void rula0029() => CorpusAssert.Parses(@"CREATE TABLE rula_t29 (id int, name text);
 CREATE RULE rula_r29 AS ON INSERT TO s.t DO NOTHING", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void rula0030() => CorpusAssert.Parses(@"CREATE RULE rula_r30 AS ON INSERT TO rula_nonexist DO NOTHING", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void rula0031() => CorpusAssert.Parses(@"CREATE RULE AS ON INSERT TO rula_t DO NOTHING", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void rula0032() => CorpusAssert.Parses(@"CREATE TABLE rula_t32 (id int);
-CREATE RULE rula_r32 ON INSERT TO rula_t32 DO NOTHING", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void rula0033() => CorpusAssert.Parses(@"CREATE TABLE rula_t33 (id int);
-CREATE RULE rula_r33 AS INSERT TO rula_t33 DO NOTHING", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void rula0034() => CorpusAssert.Parses(@"CREATE TABLE rula_t34 (id int);
-CREATE RULE rula_r34 AS ON INSERT rula_t34 DO NOTHING", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void rula0035() => CorpusAssert.Parses(@"CREATE TABLE rula_t35 (id int);
-CREATE RULE rula_r35 AS ON INSERT TO rula_t35 NOTHING", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void rula0036() => CorpusAssert.Parses(@"CREATE TABLE rula_t36 (id int);
-CREATE RULE rula_r36 AS ON TRUNCATE TO rula_t36 DO NOTHING", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void rula0037() => CorpusAssert.Parses(@"CREATE TABLE rula_t37 (id int);
-CREATE RULE rula_r37 AS ON INSERT TO rula_t37 DO", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void rula0038() => CorpusAssert.Parses(@"CREATE TABLE rula_t38 (id int);
-CREATE RULE rula_r38 AS ON INSERT TO rula_t38 DO ALSO", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void rula0039() => CorpusAssert.Parses(@"CREATE TABLE rula_t39 (id int);
-CREATE RULE rula_r39 AS ON INSERT TO rula_t39 DO INSTEAD", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void rula0040() => CorpusAssert.Parses(@"CREATE TABLE rula_t40 (id int);
-CREATE RULE rula_r40 AS ON INSERT TO rula_t40 DO ALSO INSTEAD NOTHING", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task rula0030() => CorpusAssert.MatchesPostgres(@"CREATE RULE rula_r30 AS ON INSERT TO rula_nonexist DO NOTHING", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task rula0031() => CorpusAssert.MatchesPostgres(@"CREATE RULE AS ON INSERT TO rula_t DO NOTHING", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task rula0032() => CorpusAssert.MatchesPostgres(@"CREATE TABLE rula_t32 (id int);
+CREATE RULE rula_r32 ON INSERT TO rula_t32 DO NOTHING", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task rula0033() => CorpusAssert.MatchesPostgres(@"CREATE TABLE rula_t33 (id int);
+CREATE RULE rula_r33 AS INSERT TO rula_t33 DO NOTHING", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task rula0034() => CorpusAssert.MatchesPostgres(@"CREATE TABLE rula_t34 (id int);
+CREATE RULE rula_r34 AS ON INSERT rula_t34 DO NOTHING", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task rula0035() => CorpusAssert.MatchesPostgres(@"CREATE TABLE rula_t35 (id int);
+CREATE RULE rula_r35 AS ON INSERT TO rula_t35 NOTHING", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task rula0036() => CorpusAssert.MatchesPostgres(@"CREATE TABLE rula_t36 (id int);
+CREATE RULE rula_r36 AS ON TRUNCATE TO rula_t36 DO NOTHING", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task rula0037() => CorpusAssert.MatchesPostgres(@"CREATE TABLE rula_t37 (id int);
+CREATE RULE rula_r37 AS ON INSERT TO rula_t37 DO", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task rula0038() => CorpusAssert.MatchesPostgres(@"CREATE TABLE rula_t38 (id int);
+CREATE RULE rula_r38 AS ON INSERT TO rula_t38 DO ALSO", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task rula0039() => CorpusAssert.MatchesPostgres(@"CREATE TABLE rula_t39 (id int);
+CREATE RULE rula_r39 AS ON INSERT TO rula_t39 DO INSTEAD", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task rula0040() => CorpusAssert.MatchesPostgres(@"CREATE TABLE rula_t40 (id int);
+CREATE RULE rula_r40 AS ON INSERT TO rula_t40 DO ALSO INSTEAD NOTHING", "error", false);
     [Fact]
     public void rula0041() => CorpusAssert.Parses(@"CREATE TABLE rula_t41 (id int, name text);
 CREATE RULE rula_r41 AS ON UPDATE TO rula_t41 DO ALSO UPDATE rula_t41 SET name = NEW.name WHERE id = NEW.id", "ok");
@@ -186,9 +186,9 @@ CREATE RULE rula_r55 AS ON INSERT TO rula_t55 WHERE NEW.id IN (1, 2, 3) DO NOTHI
     [Fact]
     public void rula0056() => CorpusAssert.Parses(@"CREATE TABLE rula_t56 (id int, name text);
 CREATE RULE ""rula rule 56"" AS ON INSERT TO rula_t56 DO NOTHING", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void rula0057() => CorpusAssert.Parses(@"CREATE TABLE rula_t57 (id int, name text);
-CREATE RULE ""_RETURN"" AS ON INSERT TO rula_t57 DO NOTHING", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task rula0057() => CorpusAssert.MatchesPostgres(@"CREATE TABLE rula_t57 (id int, name text);
+CREATE RULE ""_RETURN"" AS ON INSERT TO rula_t57 DO NOTHING", "error", false);
     [Fact]
     public void rula0058() => CorpusAssert.Parses(@"CREATE TABLE rula_t58 (id int);
 CREATE RULE RuLa_R58 AS ON INSERT TO rula_t58 DO NOTHING", "ok");
@@ -199,15 +199,15 @@ CREATE RULE rula_r59 AS ON INSERT TO rula_t59 DO INSTEAD (SELECT 1)", "ok");
     public void rula0060() => CorpusAssert.Parses(@"CREATE TABLE rula_t60 (id int, name text);
 CREATE TABLE rula_log60 (op text);
 CREATE RULE rula_r60 AS ON DELETE TO rula_t60 DO INSTEAD (INSERT INTO rula_log60(op) VALUES ('del'); DELETE FROM rula_t60 WHERE id = OLD.id)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void rula0061() => CorpusAssert.Parses(@"CREATE TABLE rula_t61 (id int, name text);
-CREATE RULE rula_r61 AS ON INSERT TO rula_t61 DO (NOTHING)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void rula0062() => CorpusAssert.Parses(@"CREATE TABLE rula_t62 (id int);
-CREATE RULE rula_r62 AS ON INSERT TO rula_t62 DO ALSO (NOTHING)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void rula0063() => CorpusAssert.Parses(@"CREATE TABLE rula_t63 (id int);
-CREATE RULE rula_r63 AS ON INSERT TO rula_t63 DO INSTEAD (NOTHING)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task rula0061() => CorpusAssert.MatchesPostgres(@"CREATE TABLE rula_t61 (id int, name text);
+CREATE RULE rula_r61 AS ON INSERT TO rula_t61 DO (NOTHING)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task rula0062() => CorpusAssert.MatchesPostgres(@"CREATE TABLE rula_t62 (id int);
+CREATE RULE rula_r62 AS ON INSERT TO rula_t62 DO ALSO (NOTHING)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task rula0063() => CorpusAssert.MatchesPostgres(@"CREATE TABLE rula_t63 (id int);
+CREATE RULE rula_r63 AS ON INSERT TO rula_t63 DO INSTEAD (NOTHING)", "error", false);
     [Fact]
     public void rula0064() => CorpusAssert.Parses(@"CREATE TABLE rula_t64 (id int, name text);
 CREATE RULE rula_r64 AS ON INSERT TO rula_t64 DO ALSO (SELECT 1; SELECT 2)", "ok");
@@ -308,38 +308,38 @@ CREATE RULE rula_r91 AS ON INSERT TO rula_t91 DO ALSO (SELECT 1; SELECT 2; SELEC
     public void rula0092() => CorpusAssert.Parses(@"CREATE TABLE rula_t92 (id int, name text);
 CREATE TABLE rula_dest92 (id int, name text);
 CREATE RULE rula_r92 AS ON INSERT TO s.""t"" DO NOTHING", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void rula0093() => CorpusAssert.Parses(@"CREATE TABLE rula_t93 (id int);
-CREATE RULE rula_r93 AS ON SELECT TO rula_t93 DO INSTEAD SELECT 1", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void rula0094() => CorpusAssert.Parses(@"CREATE TABLE rula_t94 (id int);
-CREATE RULE rula_r94 AS ON INSERT TO rula_t94 WHERE count(*) > 0 DO NOTHING", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void rula0095() => CorpusAssert.Parses(@"CREATE TABLE rula_t95 (id int);
-CREATE RULE rula_r95 AS ON DELETE TO rula_t95 WHERE NEW.id > 0 DO NOTHING", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void rula0096() => CorpusAssert.Parses(@"CREATE TABLE rula_t96 (id int);
-CREATE RULE rula_r96 AS ON INSERT TO rula_t96 WHERE OLD.id > 0 DO NOTHING", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void rula0097() => CorpusAssert.Parses(@"CREATE TABLE rula_t97 (id int);
+    [DbFact]
+    public System.Threading.Tasks.Task rula0093() => CorpusAssert.MatchesPostgres(@"CREATE TABLE rula_t93 (id int);
+CREATE RULE rula_r93 AS ON SELECT TO rula_t93 DO INSTEAD SELECT 1", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task rula0094() => CorpusAssert.MatchesPostgres(@"CREATE TABLE rula_t94 (id int);
+CREATE RULE rula_r94 AS ON INSERT TO rula_t94 WHERE count(*) > 0 DO NOTHING", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task rula0095() => CorpusAssert.MatchesPostgres(@"CREATE TABLE rula_t95 (id int);
+CREATE RULE rula_r95 AS ON DELETE TO rula_t95 WHERE NEW.id > 0 DO NOTHING", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task rula0096() => CorpusAssert.MatchesPostgres(@"CREATE TABLE rula_t96 (id int);
+CREATE RULE rula_r96 AS ON INSERT TO rula_t96 WHERE OLD.id > 0 DO NOTHING", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task rula0097() => CorpusAssert.MatchesPostgres(@"CREATE TABLE rula_t97 (id int);
 CREATE RULE rula_r97 AS ON INSERT TO rula_t97 DO NOTHING;
-CREATE RULE rula_r97 AS ON INSERT TO rula_t97 DO INSTEAD NOTHING", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void rula0098() => CorpusAssert.Parses(@"CREATE TABLE rula_t98 (id int, name text);
+CREATE RULE rula_r97 AS ON INSERT TO rula_t97 DO INSTEAD NOTHING", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task rula0098() => CorpusAssert.MatchesPostgres(@"CREATE TABLE rula_t98 (id int, name text);
 CREATE VIEW rula_v98 AS SELECT id, name FROM rula_t98;
-CREATE RULE notreturn98 AS ON SELECT TO rula_v98 DO INSTEAD SELECT id, name FROM rula_t98", "error");
+CREATE RULE notreturn98 AS ON SELECT TO rula_v98 DO INSTEAD SELECT id, name FROM rula_t98", "error", false);
     [Fact]
     public void rula0099() => CorpusAssert.Parses(@"CREATE TABLE rula_t99 (id int);
 CREATE RULE rula_r99 AS ON INSERT TO rula_t99 DO ALSO ()", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void rula0100() => CorpusAssert.Parses(@"CREATE TABLE rula_t100 (id int, name text);
-CREATE RULE rula_r100 AS ON INSERT TO rula_t100 DO ALSO NOTHING NOTHING", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void rula0101() => CorpusAssert.Parses(@"CREATE TABLE rula_t101 (id int);
+    [DbFact]
+    public System.Threading.Tasks.Task rula0100() => CorpusAssert.MatchesPostgres(@"CREATE TABLE rula_t100 (id int, name text);
+CREATE RULE rula_r100 AS ON INSERT TO rula_t100 DO ALSO NOTHING NOTHING", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task rula0101() => CorpusAssert.MatchesPostgres(@"CREATE TABLE rula_t101 (id int);
 CREATE RULE rula_r101 AS ON INSERT TO rula_t101 DO ALSO NOTHING;
-CREATE RULE rula_r101 AS ON UPDATE TO rula_t101 DO ALSO NOTHING", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void rula0102() => CorpusAssert.Parses(@"REPLACE RULE rula_r102 AS ON INSERT TO rula_t102 DO NOTHING", "error");
+CREATE RULE rula_r101 AS ON UPDATE TO rula_t101 DO ALSO NOTHING", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task rula0102() => CorpusAssert.MatchesPostgres(@"REPLACE RULE rula_r102 AS ON INSERT TO rula_t102 DO NOTHING", "error", false);
     [Fact]
     public void rula0103() => CorpusAssert.Parses(@"CREATE TABLE rula_t103 (id int);
 CREATE RULE rula_r103 AS ON INSERT TO rula_t103 DO ALSO INSERT INTO rula_t103 VALUES (NEW.id)", "ok");
@@ -446,14 +446,14 @@ ALTER TABLE rula_t127 DISABLE RULE rula_r127", "ok");
 CREATE RULE rula_r128 AS ON INSERT TO rula_t128 DO ALSO NOTIFY rula_t128;
 ALTER TABLE rula_t128 DISABLE RULE rula_r128;
 ALTER TABLE rula_t128 ENABLE RULE rula_r128", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void rula0129() => CorpusAssert.Parses(@"CREATE TABLE rula_t129 (id int, name text);
+    [DbFact]
+    public System.Threading.Tasks.Task rula0129() => CorpusAssert.MatchesPostgres(@"CREATE TABLE rula_t129 (id int, name text);
 CREATE RULE rula_r129 AS ON INSERT TO rula_t129 DO ALSO NOTIFY rula_t129;
-ALTER TABLE rula_t129 DISABLE ALL RULES", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void rula0130() => CorpusAssert.Parses(@"CREATE TABLE rula_t130 (id int, name text);
+ALTER TABLE rula_t129 DISABLE ALL RULES", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task rula0130() => CorpusAssert.MatchesPostgres(@"CREATE TABLE rula_t130 (id int, name text);
 CREATE RULE rula_r130 AS ON INSERT TO rula_t130 DO ALSO NOTIFY rula_t130;
-ALTER TABLE rula_t130 ENABLE ALL RULES", "error");
+ALTER TABLE rula_t130 ENABLE ALL RULES", "error", false);
     [Fact]
     public void rula0131() => CorpusAssert.Parses(@"CREATE TABLE rula_t131 (id int, name text);
 CREATE RULE rula_r131 AS ON INSERT TO rula_t131 DO NOTHING;
@@ -487,10 +487,10 @@ CREATE RULE rula_r136 AS ON INSERT TO rula_t136 DO ALSO (
 CREATE TABLE rula_dest137 (id int, old_name text, new_name text);
 CREATE RULE rula_r137 AS ON UPDATE TO rula_t137 DO ALSO
   INSERT INTO rula_dest137 VALUES (NEW.id, OLD.name, NEW.name)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void rula0138() => CorpusAssert.Parses(@"CREATE TABLE rula_t138 (id int);
+    [DbFact]
+    public System.Threading.Tasks.Task rula0138() => CorpusAssert.MatchesPostgres(@"CREATE TABLE rula_t138 (id int);
 CREATE RULE rula_r138 AS ON INSERT TO rula_t138 DO INSTEAD NOTHING;
-CREATE RULE rula_r138 AS ON INSERT TO rula_t138 DO ALSO NOTHING", "error");
+CREATE RULE rula_r138 AS ON INSERT TO rula_t138 DO ALSO NOTHING", "error", false);
     [Fact]
     public void rula0139() => CorpusAssert.Parses(@"CREATE TABLE rula_t139 (id int);
 CREATE RULE rula_r139 AS ON UPDATE TO rula_t139 DO ALSO DELETE FROM rula_t139 WHERE id = OLD.id", "ok");

@@ -50,15 +50,15 @@ CREATE TABLE s.ctaa_hashpart3_0 PARTITION OF s.ctaa_hashpart3 FOR VALUES WITH (m
     [Fact]
     public void ctaa0020() => CorpusAssert.Parses(@"CREATE TABLE s.ctaa_listpart3 (region text) PARTITION BY LIST (region);
 CREATE TABLE s.ctaa_listpart3_def PARTITION OF s.ctaa_listpart3 DEFAULT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctaa0021() => CorpusAssert.Parses(@"CREATE TABLE s.ctaa_bad_in PARTITION OF s.events FOR VALUES IN ('2025-01-01')", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctaa0022() => CorpusAssert.Parses(@"CREATE TABLE s.ctaa_bad_from PARTITION OF s.ctaa_listpart3x FOR VALUES FROM (1) TO (10)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctaa0023() => CorpusAssert.Parses(@"CREATE TABLE s.ctaa_bad_modulus PARTITION OF s.events FOR VALUES WITH (modulus 4, remainder 0)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctaa0024() => CorpusAssert.Parses(@"CREATE TABLE s.ctaa_bad_remainder (x int) PARTITION BY HASH (x);
-CREATE TABLE s.ctaa_bad_rem_p PARTITION OF s.ctaa_bad_remainder FOR VALUES WITH (modulus 4, remainder 5)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ctaa0021() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.ctaa_bad_in PARTITION OF s.events FOR VALUES IN ('2025-01-01')", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ctaa0022() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.ctaa_bad_from PARTITION OF s.ctaa_listpart3x FOR VALUES FROM (1) TO (10)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ctaa0023() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.ctaa_bad_modulus PARTITION OF s.events FOR VALUES WITH (modulus 4, remainder 0)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ctaa0024() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.ctaa_bad_remainder (x int) PARTITION BY HASH (x);
+CREATE TABLE s.ctaa_bad_rem_p PARTITION OF s.ctaa_bad_remainder FOR VALUES WITH (modulus 4, remainder 5)", "error", false);
     [Fact]
     public void ctaa0025() => CorpusAssert.Parses(@"CREATE TABLE s.ctaa_part_of_col PARTITION OF s.events (payload DEFAULT 'null'::jsonb) FOR VALUES FROM ('2027-01-01') TO ('2028-01-01')", "ok");
     [Fact]
@@ -69,20 +69,20 @@ CREATE TABLE s.ctaa_bad_rem_p PARTITION OF s.ctaa_bad_remainder FOR VALUES WITH 
     public void ctaa0028() => CorpusAssert.Parses(@"CREATE TABLE s.ctaa_inh2 () INHERITS (s.parent)", "ok");
     [Fact]
     public void ctaa0029() => CorpusAssert.Parses(@"CREATE TABLE s.ctaa_inh3 (extra text) INHERITS (s.parent, s.t2)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctaa0030() => CorpusAssert.Parses(@"CREATE TABLE s.ctaa_inh_bad INHERITS (s.parent)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctaa0031() => CorpusAssert.Parses(@"CREATE TABLE s.ctaa_inh_noexist () INHERITS (s.nonexistent_table)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ctaa0030() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.ctaa_inh_bad INHERITS (s.parent)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ctaa0031() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.ctaa_inh_noexist () INHERITS (s.nonexistent_table)", "error", false);
     [Fact]
     public void ctaa0032() => CorpusAssert.Parses(@"CREATE TABLE s.ctaa_of1 OF s.addr", "ok");
     [Fact]
     public void ctaa0033() => CorpusAssert.Parses(@"CREATE TABLE s.ctaa_of2 OF s.addr (street WITH OPTIONS DEFAULT 'unknown')", "ok");
     [Fact]
     public void ctaa0034() => CorpusAssert.Parses(@"CREATE TABLE s.ctaa_of3 OF s.addr (street WITH OPTIONS NOT NULL)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctaa0035() => CorpusAssert.Parses(@"CREATE TABLE s.ctaa_of_bad OF s.nonexistent_type", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctaa0036() => CorpusAssert.Parses(@"CREATE TABLE s.ctaa_of_enum OF s.mood", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ctaa0035() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.ctaa_of_bad OF s.nonexistent_type", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ctaa0036() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.ctaa_of_enum OF s.mood", "error", false);
     [Fact]
     public void ctaa0037() => CorpusAssert.Parses(@"CREATE TABLE s.ctaa_like1 (LIKE s.t)", "ok");
     [Fact]
@@ -115,8 +115,8 @@ CREATE TABLE s.ctaa_bad_rem_p PARTITION OF s.ctaa_bad_remainder FOR VALUES WITH 
     public void ctaa0051() => CorpusAssert.Parses(@"CREATE TABLE s.ctaa_like_multi_inc (LIKE s.t INCLUDING DEFAULTS INCLUDING CONSTRAINTS)", "ok");
     [Fact]
     public void ctaa0052() => CorpusAssert.Parses(@"CREATE TABLE s.ctaa_like_inc_excl (LIKE s.t INCLUDING ALL EXCLUDING INDEXES)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctaa0053() => CorpusAssert.Parses(@"CREATE TABLE s.ctaa_like_noexist (LIKE s.nonexistent_source)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ctaa0053() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.ctaa_like_noexist (LIKE s.nonexistent_source)", "error", false);
     [Fact]
     public void ctaa0054() => CorpusAssert.Parses(@"CREATE TABLE s.ctaa_like_bad_opt (LIKE s.t INCLUDING BADOPTION)", "error");
     [Fact]
@@ -131,8 +131,8 @@ CREATE TABLE s.ctaa_bad_rem_p PARTITION OF s.ctaa_bad_remainder FOR VALUES WITH 
     public void ctaa0059() => CorpusAssert.Parses(@"CREATE TABLE s.ctaa_storage5 (a text) WITH (toast_tuple_target = 128)", "ok");
     [Fact]
     public void ctaa0060() => CorpusAssert.Parses(@"CREATE TABLE s.ctaa_storage_bad (a text) WITH (fillfactor = 200)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctaa0061() => CorpusAssert.Parses(@"CREATE TABLE s.ctaa_storage_badkey (a text) WITH (nonexistent_param = 1)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ctaa0061() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.ctaa_storage_badkey (a text) WITH (nonexistent_param = 1)", "error", false);
     [Fact]
     public void ctaa0062() => CorpusAssert.Parses(@"CREATE TABLE s.ctaa_storage_empty (a text) WITH ()", "error");
     [Fact]
@@ -161,19 +161,19 @@ CREATE TABLE s.ctaa_bad_rem_p PARTITION OF s.ctaa_bad_remainder FOR VALUES WITH 
     public void ctaa0074() => CorpusAssert.Parses(@"CREATE LOCAL TEMP TABLE ctaa_ltemp (id int)", "ok");
     [Fact]
     public void ctaa0075() => CorpusAssert.Parses(@"CREATE TABLE s.ctaa_ts1 (id int) TABLESPACE pg_default", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctaa0076() => CorpusAssert.Parses(@"CREATE TABLE s.ctaa_ts_bad (id int) TABLESPACE nonexistent_tbspc", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctaa0077() => CorpusAssert.Parses(@"CREATE TABLE s.ctaa_range_with_ts (id bigint, val int) PARTITION BY RANGE (val) TABLESPACE pg_default", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ctaa0076() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.ctaa_ts_bad (id int) TABLESPACE nonexistent_tbspc", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ctaa0077() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.ctaa_range_with_ts (id bigint, val int) PARTITION BY RANGE (val) TABLESPACE pg_default", "error", false);
     [Fact]
     public void ctaa0078() => CorpusAssert.Parses(@"CREATE TABLE s.ctaa_part_ts PARTITION OF s.events FOR VALUES FROM ('2029-01-01') TO ('2030-01-01') TABLESPACE pg_default", "ok");
     [Fact]
     public void ctaa0079() => CorpusAssert.Parses(@"CREATE TABLE IF NOT EXISTS s.ctaa_ifnotexists1 (id int, val text)", "ok");
     [Fact]
     public void ctaa0080() => CorpusAssert.Parses(@"CREATE TABLE IF NOT EXISTS s.t (extra_col int)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctaa0081() => CorpusAssert.Parses(@"CREATE TABLE s.ctaa_noifnotexist (id int);
-CREATE TABLE s.ctaa_noifnotexist (id int)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ctaa0081() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.ctaa_noifnotexist (id int);
+CREATE TABLE s.ctaa_noifnotexist (id int)", "error", false);
     [Fact]
     public void ctaa0082() => CorpusAssert.Parses(@"CREATE UNLOGGED TABLE IF NOT EXISTS s.ctaa_unlog_ifne (id int)", "ok");
     [Fact]
@@ -235,17 +235,17 @@ CREATE TABLE s.ctaa_range_text_p PARTITION OF s.ctaa_range_text FOR VALUES FROM 
     [Fact]
     public void ctaa0106() => CorpusAssert.Parses(@"CREATE TABLE s.ctaa_hash_mod1 (id int) PARTITION BY HASH (id);
 CREATE TABLE s.ctaa_hash_mod1_0 PARTITION OF s.ctaa_hash_mod1 FOR VALUES WITH (modulus 1, remainder 0)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctaa0107() => CorpusAssert.Parses(@"CREATE TABLE s.ctaa_hash_nomod (id int) PARTITION BY HASH (id);
-CREATE TABLE s.ctaa_hash_nomod_p PARTITION OF s.ctaa_hash_nomod FOR VALUES WITH (remainder 0)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctaa0108() => CorpusAssert.Parses(@"CREATE TABLE s.ctaa_hash_norem (id int) PARTITION BY HASH (id);
-CREATE TABLE s.ctaa_hash_norem_p PARTITION OF s.ctaa_hash_norem FOR VALUES WITH (modulus 4)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctaa0109() => CorpusAssert.Parses(@"CREATE TABLE s.ctaa_range_reverse PARTITION OF s.events FOR VALUES FROM ('2035-01-01') TO ('2034-01-01')", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctaa0110() => CorpusAssert.Parses(@"CREATE TABLE s.ctaa_part_overlap1 PARTITION OF s.events FOR VALUES FROM ('2025-01-01') TO ('2026-01-01');
-CREATE TABLE s.ctaa_part_overlap2 PARTITION OF s.events FOR VALUES FROM ('2025-06-01') TO ('2026-06-01')", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ctaa0107() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.ctaa_hash_nomod (id int) PARTITION BY HASH (id);
+CREATE TABLE s.ctaa_hash_nomod_p PARTITION OF s.ctaa_hash_nomod FOR VALUES WITH (remainder 0)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ctaa0108() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.ctaa_hash_norem (id int) PARTITION BY HASH (id);
+CREATE TABLE s.ctaa_hash_norem_p PARTITION OF s.ctaa_hash_norem FOR VALUES WITH (modulus 4)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ctaa0109() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.ctaa_range_reverse PARTITION OF s.events FOR VALUES FROM ('2035-01-01') TO ('2034-01-01')", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ctaa0110() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.ctaa_part_overlap1 PARTITION OF s.events FOR VALUES FROM ('2025-01-01') TO ('2026-01-01');
+CREATE TABLE s.ctaa_part_overlap2 PARTITION OF s.events FOR VALUES FROM ('2025-06-01') TO ('2026-06-01')", "error", false);
     [Fact]
     public void ctaa0111() => CorpusAssert.Parses(@"CREATE TABLE s.ctaa_like_seq (LIKE s.t INCLUDING IDENTITY INCLUDING GENERATED)", "ok");
     [Fact]
@@ -254,8 +254,8 @@ CREATE TABLE s.ctaa_part_overlap2 PARTITION OF s.events FOR VALUES FROM ('2025-0
     public void ctaa0113() => CorpusAssert.Parses(@"CREATE TABLE s.ctaa_like_all_excl2 (LIKE s.t INCLUDING ALL EXCLUDING COMMENTS EXCLUDING STORAGE)", "ok");
     [Fact]
     public void ctaa0114() => CorpusAssert.Parses(@"CREATE TABLE s.ctaa_withoids (id int) WITHOUT OIDS", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctaa0115() => CorpusAssert.Parses(@"CREATE TABLE s.ctaa_nooid_storage (id int) WITH (fillfactor = 75) WITHOUT OIDS", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ctaa0115() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.ctaa_nooid_storage (id int) WITH (fillfactor = 75) WITHOUT OIDS", "error", false);
     [Fact]
     public void ctaa0116() => CorpusAssert.Parses(@"CREATE TABLE s.ctaa_part_with_storage PARTITION OF s.events FOR VALUES FROM ('2036-01-01') TO ('2037-01-01') WITH (fillfactor = 80)", "ok");
     [Fact]
@@ -268,10 +268,10 @@ CREATE TABLE s.ctaa_range_nulls_high PARTITION OF s.ctaa_range_nulls FOR VALUES 
     public void ctaa0119() => CorpusAssert.Parses(@"CREATE TABLE s.ctaa_list_multi (id int, a text, b text) PARTITION BY LIST (a);
 CREATE TABLE s.ctaa_list_multi_p1 PARTITION OF s.ctaa_list_multi FOR VALUES IN ('x', 'y', 'z');
 CREATE TABLE s.ctaa_list_multi_p2 PARTITION OF s.ctaa_list_multi FOR VALUES IN ('a', 'b', 'c')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctaa0120() => CorpusAssert.Parses(@"CREATE TABLE s.ctaa_list_dup (id int, region text) PARTITION BY LIST (region);
+    [DbFact]
+    public System.Threading.Tasks.Task ctaa0120() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.ctaa_list_dup (id int, region text) PARTITION BY LIST (region);
 CREATE TABLE s.ctaa_list_dup_p1 PARTITION OF s.ctaa_list_dup FOR VALUES IN ('east');
-CREATE TABLE s.ctaa_list_dup_p2 PARTITION OF s.ctaa_list_dup FOR VALUES IN ('east')", "error");
+CREATE TABLE s.ctaa_list_dup_p2 PARTITION OF s.ctaa_list_dup FOR VALUES IN ('east')", "error", false);
     [Fact]
     public void ctaa0121() => CorpusAssert.Parses(@"CREATE TABLE s.ctaa_part_named PARTITION OF s.events (CONSTRAINT chk_year CHECK (EXTRACT(year FROM occurred) = 2040)) FOR VALUES FROM ('2040-01-01') TO ('2041-01-01')", "ok");
     [Fact]
@@ -315,9 +315,9 @@ ALTER TABLE s.ctaa_noinherit NO INHERIT s.parent", "ok");
     public void ctaa0136() => CorpusAssert.Parses(@"CREATE TABLE s.ctaa_part_of_with PARTITION OF s.events FOR VALUES FROM ('2043-01-01') TO ('2044-01-01') WITH (autovacuum_enabled = true)", "ok");
     [Fact]
     public void ctaa0137() => CorpusAssert.Parses(@"CREATE TABLE s.ctaa_range_collate (id int, tag text) PARTITION BY RANGE (tag COLLATE ""C"")", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctaa0138() => CorpusAssert.Parses(@"CREATE TABLE s.ctaa_temp_part (id int, v int) PARTITION BY RANGE (v);
-CREATE TEMP TABLE ctaa_temp_part_p PARTITION OF s.ctaa_temp_part FOR VALUES FROM (0) TO (100)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ctaa0138() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.ctaa_temp_part (id int, v int) PARTITION BY RANGE (v);
+CREATE TEMP TABLE ctaa_temp_part_p PARTITION OF s.ctaa_temp_part FOR VALUES FROM (0) TO (100)", "error", false);
     [Fact]
     public void ctaa0139() => CorpusAssert.Parses(@"CREATE TABLE s.ctaa_range_ts (id int, ts timestamptz) PARTITION BY RANGE (ts);
 CREATE TABLE s.ctaa_range_ts_p PARTITION OF s.ctaa_range_ts FOR VALUES FROM ('2020-01-01 00:00:00+00') TO ('2021-01-01 00:00:00+00')", "ok");
@@ -325,11 +325,11 @@ CREATE TABLE s.ctaa_range_ts_p PARTITION OF s.ctaa_range_ts FOR VALUES FROM ('20
     public void ctaa0140() => CorpusAssert.Parses(@"CREATE TABLE s.ctaa_hash_bigint (id bigint, tenant bigint) PARTITION BY HASH (tenant);
 CREATE TABLE s.ctaa_hash_bigint_0 PARTITION OF s.ctaa_hash_bigint FOR VALUES WITH (modulus 2, remainder 0);
 CREATE TABLE s.ctaa_hash_bigint_1 PARTITION OF s.ctaa_hash_bigint FOR VALUES WITH (modulus 2, remainder 1)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctaa0141() => CorpusAssert.Parses(@"CREATE TABLE s.ctaa_list_default2 (code text) PARTITION BY LIST (code);
+    [DbFact]
+    public System.Threading.Tasks.Task ctaa0141() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.ctaa_list_default2 (code text) PARTITION BY LIST (code);
 CREATE TABLE s.ctaa_list_p1 PARTITION OF s.ctaa_list_default2 FOR VALUES IN ('a');
 CREATE TABLE s.ctaa_list_default2_def PARTITION OF s.ctaa_list_default2 DEFAULT;
-CREATE TABLE s.ctaa_list_default2_def2 PARTITION OF s.ctaa_list_default2 DEFAULT", "error");
+CREATE TABLE s.ctaa_list_default2_def2 PARTITION OF s.ctaa_list_default2 DEFAULT", "error", false);
     [Fact]
     public void ctaa0142() => CorpusAssert.Parses(@"CREATE TABLE s.ctaa_like_excl_gen (LIKE s.t EXCLUDING GENERATED)", "ok");
     [Fact]
@@ -341,12 +341,12 @@ CREATE TABLE s.ctaa_list_default2_def2 PARTITION OF s.ctaa_list_default2 DEFAULT
     [Fact]
     public void ctaa0146() => CorpusAssert.Parses(@"CREATE TABLE s.ctaa_part_tablespc PARTITION OF s.events FOR VALUES FROM ('2044-01-01') TO ('2045-01-01');
 CREATE INDEX ON s.ctaa_part_tablespc (payload) TABLESPACE pg_default", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctaa0147() => CorpusAssert.Parses(@"CREATE TABLE s.ctaa_hash_zero_mod (id int) PARTITION BY HASH (id);
-CREATE TABLE s.ctaa_hash_zero_mod_p PARTITION OF s.ctaa_hash_zero_mod FOR VALUES WITH (modulus 0, remainder 0)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctaa0148() => CorpusAssert.Parses(@"CREATE TABLE s.ctaa_hash_neg_rem (id int) PARTITION BY HASH (id);
-CREATE TABLE s.ctaa_hash_neg_rem_p PARTITION OF s.ctaa_hash_neg_rem FOR VALUES WITH (modulus 4, remainder -1)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ctaa0147() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.ctaa_hash_zero_mod (id int) PARTITION BY HASH (id);
+CREATE TABLE s.ctaa_hash_zero_mod_p PARTITION OF s.ctaa_hash_zero_mod FOR VALUES WITH (modulus 0, remainder 0)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ctaa0148() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.ctaa_hash_neg_rem (id int) PARTITION BY HASH (id);
+CREATE TABLE s.ctaa_hash_neg_rem_p PARTITION OF s.ctaa_hash_neg_rem FOR VALUES WITH (modulus 4, remainder -1)", "error", false);
     [Fact]
     public void ctaa0149() => CorpusAssert.Parses(@"CREATE TABLE s.ctaa_list_empty_in (code text) PARTITION BY LIST (code);
 CREATE TABLE s.ctaa_list_empty_in_p PARTITION OF s.ctaa_list_empty_in FOR VALUES IN ()", "error");
@@ -355,14 +355,14 @@ CREATE TABLE s.ctaa_list_empty_in_p PARTITION OF s.ctaa_list_empty_in FOR VALUES
     [Fact]
     public void ctaa0151() => CorpusAssert.Parses(@"CREATE TABLE s.ctaa_range_numbound (id int, v numeric) PARTITION BY RANGE (v);
 CREATE TABLE s.ctaa_range_numbound_p PARTITION OF s.ctaa_range_numbound FOR VALUES FROM (0.01) TO (999.99)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctaa0152() => CorpusAssert.Parses(@"CREATE TABLE s.ctaa_part_pk PARTITION OF s.events (PRIMARY KEY (id, occurred)) FOR VALUES FROM ('2045-01-01') TO ('2046-01-01')", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ctaa0152() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.ctaa_part_pk PARTITION OF s.events (PRIMARY KEY (id, occurred)) FOR VALUES FROM ('2045-01-01') TO ('2046-01-01')", "error", false);
     [Fact]
     public void ctaa0153() => CorpusAssert.Parses(@"CREATE TABLE s.ctaa_of_check OF s.addr (CHECK (zip IS NOT NULL))", "ok");
     [Fact]
     public void ctaa0154() => CorpusAssert.Parses(@"CREATE TABLE s.ctaa_of_named_check OF s.addr (CONSTRAINT addr_zip_nn CHECK (zip IS NOT NULL))", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctaa0155() => CorpusAssert.Parses(@"CREATE TABLE s.ctaa_part_of_nofor PARTITION OF s.events", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ctaa0155() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.ctaa_part_of_nofor PARTITION OF s.events", "error", false);
     [Fact]
     public void ctaa0156() => CorpusAssert.Parses(@"CREATE TABLE s.ctaa_storage_analyze (a text) WITH (autovacuum_analyze_threshold = 100, autovacuum_analyze_scale_factor = 0.05)", "ok");
     [Fact]
@@ -373,8 +373,8 @@ CREATE TABLE s.ctaa_range_numbound_p PARTITION OF s.ctaa_range_numbound FOR VALU
     public void ctaa0159() => CorpusAssert.Parses(@"CREATE TABLE s.ctaa_list_bool (active boolean) PARTITION BY LIST (active);
 CREATE TABLE s.ctaa_list_bool_t PARTITION OF s.ctaa_list_bool FOR VALUES IN (true);
 CREATE TABLE s.ctaa_list_bool_f PARTITION OF s.ctaa_list_bool FOR VALUES IN (false)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctaa0160() => CorpusAssert.Parses(@"CREATE TABLE s.ctaa_part_of_named PARTITION OF s.events (CONSTRAINT occurred_nn NOT NULL (occurred)) FOR VALUES FROM ('2046-01-01') TO ('2047-01-01')", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ctaa0160() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.ctaa_part_of_named PARTITION OF s.events (CONSTRAINT occurred_nn NOT NULL (occurred)) FOR VALUES FROM ('2046-01-01') TO ('2047-01-01')", "error", false);
     [Fact]
     public void ctaa0161() => CorpusAssert.Parses(@"CREATE TABLE s.ctaa_range_cast (id int, val int) PARTITION BY RANGE (val);
 CREATE TABLE s.ctaa_range_cast_p PARTITION OF s.ctaa_range_cast FOR VALUES FROM (1::int) TO (100::int)", "ok");
@@ -389,8 +389,8 @@ CREATE TABLE s.ctaa_hash_colexpr_0 PARTITION OF s.ctaa_hash_colexpr FOR VALUES W
     public void ctaa0165() => CorpusAssert.Parses(@"CREATE TABLE s.ctaa_temp_on_commit_del (id int);
 CREATE TEMP TABLE ctaa_temp_del_rows (id int) ON COMMIT DELETE ROWS;
 INSERT INTO ctaa_temp_del_rows VALUES (1),(2)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctaa0166() => CorpusAssert.Parses(@"CREATE TABLE s.ctaa_list_of PARTITION OF s.events FOR VALUES IN ('2025-01-01')", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ctaa0166() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.ctaa_list_of PARTITION OF s.events FOR VALUES IN ('2025-01-01')", "error", false);
     [Fact]
     public void ctaa0167() => CorpusAssert.Parses(@"CREATE TABLE s.ctaa_range_like (LIKE s.t EXCLUDING ALL) PARTITION BY RANGE (id)", "ok");
     [Fact]
@@ -400,8 +400,8 @@ INSERT INTO ctaa_temp_del_rows VALUES (1),(2)", "ok");
 CREATE TABLE s.ctaa_range_part_def_low PARTITION OF s.ctaa_range_part_def FOR VALUES FROM (MINVALUE) TO (0);
 CREATE TABLE s.ctaa_range_part_def_high PARTITION OF s.ctaa_range_part_def FOR VALUES FROM (0) TO (MAXVALUE);
 CREATE TABLE s.ctaa_range_part_def_def PARTITION OF s.ctaa_range_part_def DEFAULT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctaa0170() => CorpusAssert.Parses(@"CREATE TABLE s.ctaa_part_of_empty PARTITION OF s.events (payload SET NOT NULL) FOR VALUES FROM ('2047-01-01') TO ('2048-01-01')", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ctaa0170() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.ctaa_part_of_empty PARTITION OF s.events (payload SET NOT NULL) FOR VALUES FROM ('2047-01-01') TO ('2048-01-01')", "error", false);
     [Fact]
     public void ctab0001() => CorpusAssert.Parses(@"CREATE TABLE s.ctab_part_range (id bigint, occurred date NOT NULL, PRIMARY KEY (id, occurred)) PARTITION BY RANGE (occurred)", "ok");
     [Fact]
@@ -569,33 +569,33 @@ CREATE TABLE s.ctab_partcol2_us PARTITION OF s.ctab_partcol2 (region WITH OPTION
     public void ctab0070() => CorpusAssert.Parses(@"CREATE TABLE s.ctab_nooid1 (id int) WITHOUT OIDS", "ok");
     [Fact]
     public void ctab0071() => CorpusAssert.Parses(@"CREATE TABLE (id int)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctab0072() => CorpusAssert.Parses(@"CREATE TABLE s.ctab_e1 PARTITION BY RANGE (id)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ctab0072() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.ctab_e1 PARTITION BY RANGE (id)", "error", false);
     [Fact]
     public void ctab0073() => CorpusAssert.Parses(@"CREATE TABLE s.ctab_e2 (id int) PARTITION BY RANGE ()", "error");
     [Fact]
     public void ctab0074() => CorpusAssert.Parses(@"CREATE TABLE s.ctab_e3 (id int) PARTITION BY BOGUS (id)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctab0075() => CorpusAssert.Parses(@"CREATE TABLE s.ctab_e4 (id int, d date NOT NULL, PRIMARY KEY (id, d)) PARTITION BY RANGE (d);
-CREATE TABLE s.ctab_e4_p1 PARTITION OF s.ctab_e4 FOR VALUES FROM ('2025-01-01') TO ('2024-01-01')", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctab0076() => CorpusAssert.Parses(@"CREATE TABLE s.ctab_e5 (id int) PARTITION BY HASH (id);
-CREATE TABLE s.ctab_e5_p1 PARTITION OF s.ctab_e5 FOR VALUES WITH (MODULUS 4, REMAINDER 4)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctab0077() => CorpusAssert.Parses(@"CREATE TABLE s.ctab_e6 (id int) PARTITION BY HASH (id);
-CREATE TABLE s.ctab_e6_p1 PARTITION OF s.ctab_e6 FOR VALUES WITH (MODULUS 0, REMAINDER 0)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctab0078() => CorpusAssert.Parses(@"CREATE TABLE s.ctab_e7 (id int) PARTITION BY LIST (id);
-CREATE TABLE s.ctab_e7_p1 PARTITION OF s.ctab_e7 FOR VALUES FROM (1) TO (10)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctab0079() => CorpusAssert.Parses(@"CREATE TABLE s.ctab_e8 (id int, d date NOT NULL, PRIMARY KEY (id, d)) PARTITION BY RANGE (d);
-CREATE TABLE s.ctab_e8_p1 PARTITION OF s.ctab_e8 FOR VALUES IN ('2024-01-01')", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctab0080() => CorpusAssert.Parses(@"CREATE TABLE s.ctab_e9 (id int NOT NULL) PARTITION BY HASH (id);
-CREATE TABLE s.ctab_e9_p1 PARTITION OF s.ctab_e9 FOR VALUES WITH (REMAINDER 0)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctab0081() => CorpusAssert.Parses(@"CREATE TABLE s.ctab_e10 (id int NOT NULL) PARTITION BY HASH (id);
-CREATE TABLE s.ctab_e10_p1 PARTITION OF s.ctab_e10 FOR VALUES WITH (MODULUS 4)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ctab0075() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.ctab_e4 (id int, d date NOT NULL, PRIMARY KEY (id, d)) PARTITION BY RANGE (d);
+CREATE TABLE s.ctab_e4_p1 PARTITION OF s.ctab_e4 FOR VALUES FROM ('2025-01-01') TO ('2024-01-01')", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ctab0076() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.ctab_e5 (id int) PARTITION BY HASH (id);
+CREATE TABLE s.ctab_e5_p1 PARTITION OF s.ctab_e5 FOR VALUES WITH (MODULUS 4, REMAINDER 4)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ctab0077() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.ctab_e6 (id int) PARTITION BY HASH (id);
+CREATE TABLE s.ctab_e6_p1 PARTITION OF s.ctab_e6 FOR VALUES WITH (MODULUS 0, REMAINDER 0)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ctab0078() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.ctab_e7 (id int) PARTITION BY LIST (id);
+CREATE TABLE s.ctab_e7_p1 PARTITION OF s.ctab_e7 FOR VALUES FROM (1) TO (10)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ctab0079() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.ctab_e8 (id int, d date NOT NULL, PRIMARY KEY (id, d)) PARTITION BY RANGE (d);
+CREATE TABLE s.ctab_e8_p1 PARTITION OF s.ctab_e8 FOR VALUES IN ('2024-01-01')", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ctab0080() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.ctab_e9 (id int NOT NULL) PARTITION BY HASH (id);
+CREATE TABLE s.ctab_e9_p1 PARTITION OF s.ctab_e9 FOR VALUES WITH (REMAINDER 0)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ctab0081() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.ctab_e10 (id int NOT NULL) PARTITION BY HASH (id);
+CREATE TABLE s.ctab_e10_p1 PARTITION OF s.ctab_e10 FOR VALUES WITH (MODULUS 4)", "error", false);
     [Fact]
     public void ctab0082() => CorpusAssert.Parses(@"CREATE UNLOGGED TABLE s.ctab_e11 (id int) PARTITION BY RANGE (id);
 CREATE TABLE s.ctab_e11_p1 PARTITION OF s.ctab_e11 FOR VALUES FROM (0) TO (100)", "error");
@@ -604,23 +604,23 @@ CREATE TABLE s.ctab_e11_p1 PARTITION OF s.ctab_e11 FOR VALUES FROM (0) TO (100)"
 CREATE TEMP TABLE ctab_tmp_part_p1 PARTITION OF ctab_tmp_part FOR VALUES FROM (1) TO (100)", "ok");
     [Fact]
     public void ctab0084() => CorpusAssert.Parses(@"CREATE TABLE s.ctab_inh_like (LIKE s.t INCLUDING ALL) INHERITS (s.parent)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctab0085() => CorpusAssert.Parses(@"CREATE TABLE s.ctab_part_expr (id int, amount numeric) PARTITION BY RANGE (amount * 100)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctab0086() => CorpusAssert.Parses(@"CREATE TABLE s.ctab_partof_inh (id int, d date NOT NULL) PARTITION BY RANGE (d);
+    [DbFact]
+    public System.Threading.Tasks.Task ctab0085() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.ctab_part_expr (id int, amount numeric) PARTITION BY RANGE (amount * 100)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ctab0086() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.ctab_partof_inh (id int, d date NOT NULL) PARTITION BY RANGE (d);
 CREATE TABLE s.ctab_partof_inh_p PARTITION OF s.ctab_partof_inh FOR VALUES FROM ('2024-01-01') TO ('2025-01-01');
-CREATE TABLE s.ctab_partof_child () INHERITS (s.ctab_partof_inh_p)", "error");
+CREATE TABLE s.ctab_partof_child () INHERITS (s.ctab_partof_inh_p)", "error", false);
     [Fact]
     public void ctab0087() => CorpusAssert.Parses(@"CREATE TABLE s.ctab_with_ff (id int) WITH (fillfactor = 0)", "error");
     [Fact]
     public void ctab0088() => CorpusAssert.Parses(@"CREATE TABLE s.ctab_with_ff2 (id int) WITH (fillfactor = 101)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctab0089() => CorpusAssert.Parses(@"CREATE TABLE s.ctab_with_bad (id int) WITH (nonexistent_param = 42)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctab0090() => CorpusAssert.Parses(@"CREATE TABLE s.ctab_partcol3 (id int, d date NOT NULL, PRIMARY KEY (id, d)) PARTITION BY RANGE (d);
-CREATE TABLE s.ctab_partcol3_p PARTITION OF s.ctab_partcol3 (extra_col text) FOR VALUES FROM ('2024-01-01') TO ('2025-01-01')", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctab0091() => CorpusAssert.Parses(@"CREATE TABLE s.ctab_ofbad OF s.mood", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ctab0089() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.ctab_with_bad (id int) WITH (nonexistent_param = 42)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ctab0090() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.ctab_partcol3 (id int, d date NOT NULL, PRIMARY KEY (id, d)) PARTITION BY RANGE (d);
+CREATE TABLE s.ctab_partcol3_p PARTITION OF s.ctab_partcol3 (extra_col text) FOR VALUES FROM ('2024-01-01') TO ('2025-01-01')", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ctab0091() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.ctab_ofbad OF s.mood", "error", false);
     [Fact]
     public void ctab0092() => CorpusAssert.Parses(@"CREATE TABLE s.ctab_of_and_inh OF s.addr () INHERITS (s.parent)", "error");
     [Fact]
@@ -661,18 +661,18 @@ CREATE TABLE s.ctab_inh_multi2 () INHERITS (s.ctab_inh_multi)", "ok");
 CREATE TABLE s.ctab_partwith2_0 PARTITION OF s.ctab_partwith2 FOR VALUES WITH (MODULUS 2, REMAINDER 0) WITH (fillfactor = 90)", "ok");
     [Fact]
     public void ctab0106() => CorpusAssert.Parses(@"CREATE TABLE s.ctab_temp_oncommit (id int) ON COMMIT DROP", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctab0107() => CorpusAssert.Parses(@"CREATE TABLE s.ctab_range_nobound (id int, d date NOT NULL, PRIMARY KEY (id, d)) PARTITION BY RANGE (d);
-CREATE TABLE s.ctab_range_nobound_p PARTITION OF s.ctab_range_nobound FOR VALUES FROM ('2024-01-01')", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctab0108() => CorpusAssert.Parses(@"CREATE TABLE s.ctab_range_nofrom (id int, d date NOT NULL, PRIMARY KEY (id, d)) PARTITION BY RANGE (d);
-CREATE TABLE s.ctab_range_nofrom_p PARTITION OF s.ctab_range_nofrom FOR VALUES TO ('2024-01-01')", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctab0109() => CorpusAssert.Parses(@"CREATE TABLE s.ctab_part_nofor (id int, d date NOT NULL, PRIMARY KEY (id, d)) PARTITION BY RANGE (d);
-CREATE TABLE s.ctab_part_nofor_p PARTITION OF s.ctab_part_nofor FROM ('2024-01-01') TO ('2025-01-01')", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctab0110() => CorpusAssert.Parses(@"CREATE TABLE s.ctab_partnotpartitioned (id int);
-CREATE TABLE s.ctab_partnotpartitioned_p PARTITION OF s.ctab_partnotpartitioned FOR VALUES FROM (1) TO (10)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ctab0107() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.ctab_range_nobound (id int, d date NOT NULL, PRIMARY KEY (id, d)) PARTITION BY RANGE (d);
+CREATE TABLE s.ctab_range_nobound_p PARTITION OF s.ctab_range_nobound FOR VALUES FROM ('2024-01-01')", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ctab0108() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.ctab_range_nofrom (id int, d date NOT NULL, PRIMARY KEY (id, d)) PARTITION BY RANGE (d);
+CREATE TABLE s.ctab_range_nofrom_p PARTITION OF s.ctab_range_nofrom FOR VALUES TO ('2024-01-01')", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ctab0109() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.ctab_part_nofor (id int, d date NOT NULL, PRIMARY KEY (id, d)) PARTITION BY RANGE (d);
+CREATE TABLE s.ctab_part_nofor_p PARTITION OF s.ctab_part_nofor FROM ('2024-01-01') TO ('2025-01-01')", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ctab0110() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.ctab_partnotpartitioned (id int);
+CREATE TABLE s.ctab_partnotpartitioned_p PARTITION OF s.ctab_partnotpartitioned FOR VALUES FROM (1) TO (10)", "error", false);
     [Fact]
     public void ctab0111() => CorpusAssert.Parses(@"CREATE TABLE s.ctab_rng_expr (id int, amount numeric) PARTITION BY RANGE ((amount::int))", "ok");
     [Fact]
@@ -710,23 +710,23 @@ CREATE TABLE s.ctab_part_opclass_p1 PARTITION OF s.ctab_part_opclass FOR VALUES 
     [Fact]
     public void ctab0126() => CorpusAssert.Parses(@"CREATE TABLE s.ctab_partts (id int, d date NOT NULL, PRIMARY KEY (id, d)) PARTITION BY RANGE (d);
 CREATE TABLE s.ctab_partts_2024 PARTITION OF s.ctab_partts FOR VALUES FROM ('2024-01-01') TO ('2025-01-01') TABLESPACE pg_default", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctab0127() => CorpusAssert.Parses(@"CREATE TABLE s.ctab_part_and_def (id int) PARTITION BY LIST (id);
+    [DbFact]
+    public System.Threading.Tasks.Task ctab0127() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.ctab_part_and_def (id int) PARTITION BY LIST (id);
 CREATE TABLE s.ctab_pad_p1 PARTITION OF s.ctab_part_and_def FOR VALUES IN (1);
 CREATE TABLE s.ctab_pad_def PARTITION OF s.ctab_part_and_def DEFAULT;
-CREATE TABLE s.ctab_pad_def2 PARTITION OF s.ctab_part_and_def DEFAULT", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctab0128() => CorpusAssert.Parses(@"CREATE TABLE s.ctab_rng_overlap (id int, d date NOT NULL, PRIMARY KEY (id, d)) PARTITION BY RANGE (d);
+CREATE TABLE s.ctab_pad_def2 PARTITION OF s.ctab_part_and_def DEFAULT", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ctab0128() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.ctab_rng_overlap (id int, d date NOT NULL, PRIMARY KEY (id, d)) PARTITION BY RANGE (d);
 CREATE TABLE s.ctab_rng_overlap_p1 PARTITION OF s.ctab_rng_overlap FOR VALUES FROM ('2024-01-01') TO ('2025-01-01');
-CREATE TABLE s.ctab_rng_overlap_p2 PARTITION OF s.ctab_rng_overlap FOR VALUES FROM ('2024-06-01') TO ('2025-06-01')", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctab0129() => CorpusAssert.Parses(@"CREATE TABLE s.ctab_list_dup (id int, region text) PARTITION BY LIST (region);
+CREATE TABLE s.ctab_rng_overlap_p2 PARTITION OF s.ctab_rng_overlap FOR VALUES FROM ('2024-06-01') TO ('2025-06-01')", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ctab0129() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.ctab_list_dup (id int, region text) PARTITION BY LIST (region);
 CREATE TABLE s.ctab_list_dup_p1 PARTITION OF s.ctab_list_dup FOR VALUES IN ('US', 'CA');
-CREATE TABLE s.ctab_list_dup_p2 PARTITION OF s.ctab_list_dup FOR VALUES IN ('CA', 'MX')", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctab0130() => CorpusAssert.Parses(@"CREATE TABLE s.ctab_hash_dup (id int NOT NULL) PARTITION BY HASH (id);
+CREATE TABLE s.ctab_list_dup_p2 PARTITION OF s.ctab_list_dup FOR VALUES IN ('CA', 'MX')", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ctab0130() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.ctab_hash_dup (id int NOT NULL) PARTITION BY HASH (id);
 CREATE TABLE s.ctab_hash_dup_p1 PARTITION OF s.ctab_hash_dup FOR VALUES WITH (MODULUS 4, REMAINDER 0);
-CREATE TABLE s.ctab_hash_dup_p2 PARTITION OF s.ctab_hash_dup FOR VALUES WITH (MODULUS 4, REMAINDER 0)", "error");
+CREATE TABLE s.ctab_hash_dup_p2 PARTITION OF s.ctab_hash_dup FOR VALUES WITH (MODULUS 4, REMAINDER 0)", "error", false);
     [Fact]
     public void ctab0131() => CorpusAssert.Parses(@"CREATE TABLE s.ctab_with_str (id int) WITH (fillfactor = '80')", "ok");
     [Fact]
@@ -736,15 +736,15 @@ CREATE TABLE s.ctab_hash_dup_p2 PARTITION OF s.ctab_hash_dup FOR VALUES WITH (MO
     [Fact]
     public void ctab0134() => CorpusAssert.Parses(@"CREATE TABLE s.ctab_partofcols (id int, region text, extra text) PARTITION BY LIST (region);
 CREATE TABLE s.ctab_partofcols_p PARTITION OF s.ctab_partofcols (id NOT NULL, extra DEFAULT 'none') FOR VALUES IN ('US')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctab0135() => CorpusAssert.Parses(@"CREATE TABLE s.ctab_range_equal (id int, score int) PARTITION BY RANGE (score);
-CREATE TABLE s.ctab_range_equal_p PARTITION OF s.ctab_range_equal FOR VALUES FROM (10) TO (10)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctab0136() => CorpusAssert.Parses(@"CREATE TABLE s.ctab_hash_neg (id int NOT NULL) PARTITION BY HASH (id);
-CREATE TABLE s.ctab_hash_neg_p PARTITION OF s.ctab_hash_neg FOR VALUES WITH (MODULUS -1, REMAINDER 0)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctab0137() => CorpusAssert.Parses(@"CREATE TABLE s.ctab_rng_wrong_types (id int, d date NOT NULL, PRIMARY KEY (id, d)) PARTITION BY RANGE (d);
-CREATE TABLE s.ctab_rng_wt_p PARTITION OF s.ctab_rng_wrong_types FOR VALUES FROM (1) TO (100)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ctab0135() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.ctab_range_equal (id int, score int) PARTITION BY RANGE (score);
+CREATE TABLE s.ctab_range_equal_p PARTITION OF s.ctab_range_equal FOR VALUES FROM (10) TO (10)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ctab0136() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.ctab_hash_neg (id int NOT NULL) PARTITION BY HASH (id);
+CREATE TABLE s.ctab_hash_neg_p PARTITION OF s.ctab_hash_neg FOR VALUES WITH (MODULUS -1, REMAINDER 0)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ctab0137() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.ctab_rng_wrong_types (id int, d date NOT NULL, PRIMARY KEY (id, d)) PARTITION BY RANGE (d);
+CREATE TABLE s.ctab_rng_wt_p PARTITION OF s.ctab_rng_wrong_types FOR VALUES FROM (1) TO (100)", "error", false);
     [Fact]
     public void ctab0138() => CorpusAssert.Parses(@"CREATE TABLE s.ctab_gencol_like (LIKE s.t INCLUDING ALL EXCLUDING IDENTITY)", "ok");
     [Fact]
@@ -761,18 +761,18 @@ CREATE TABLE s.ctab_partofdef_child PARTITION OF s.ctab_partofdef_noparent DEFAU
 CREATE TABLE s.ctab_range_mm_p PARTITION OF s.ctab_range_minmax FOR VALUES FROM (MINVALUE) TO (MAXVALUE)", "ok");
     [Fact]
     public void ctab0144() => CorpusAssert.Parses(@"CREATE TABLE s.ctab_like_schema (LIKE s.t2 INCLUDING DEFAULTS EXCLUDING INDEXES)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctab0145() => CorpusAssert.Parses(@"CREATE TABLE s.ctab_inh_noparent () INHERITS (s.nonexistent_table)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctab0146() => CorpusAssert.Parses(@"CREATE TABLE s.ctab_of_nonexistent OF s.nonexistent_type", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctab0147() => CorpusAssert.Parses(@"CREATE TABLE s.ctab_ts_bad (id int) TABLESPACE nonexistent_ts", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ctab0145() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.ctab_inh_noparent () INHERITS (s.nonexistent_table)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ctab0146() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.ctab_of_nonexistent OF s.nonexistent_type", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ctab0147() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.ctab_ts_bad (id int) TABLESPACE nonexistent_ts", "error", false);
     [Fact]
     public void ctab0148() => CorpusAssert.Parses(@"CREATE TABLE s.ctab_part_hash_with_ts (id int NOT NULL) PARTITION BY HASH (id);
 CREATE TABLE s.ctab_part_hw_0 PARTITION OF s.ctab_part_hash_with_ts FOR VALUES WITH (MODULUS 2, REMAINDER 0) TABLESPACE pg_default;
 CREATE TABLE s.ctab_part_hw_1 PARTITION OF s.ctab_part_hash_with_ts FOR VALUES WITH (MODULUS 2, REMAINDER 1) TABLESPACE pg_default", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctab0149() => CorpusAssert.Parses(@"CREATE TABLE s.ctab_inherits_view () INHERITS (s.v)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ctab0149() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.ctab_inherits_view () INHERITS (s.v)", "error", false);
     [Fact]
     public void ctab0150() => CorpusAssert.Parses(@"CREATE TABLE s.ctab_rng_adj (id int, score int) PARTITION BY RANGE (score);
 CREATE TABLE s.ctab_rng_adj_p1 PARTITION OF s.ctab_rng_adj FOR VALUES FROM (MINVALUE) TO (50);
@@ -787,15 +787,15 @@ CREATE TABLE s.ctab_listnull2_null PARTITION OF s.ctab_listnull2 FOR VALUES IN (
 CREATE TABLE s.ctab_partof_opts_p PARTITION OF s.ctab_partof_opts FOR VALUES FROM ('2024-01-01') TO ('2025-01-01') WITH (fillfactor = 90) TABLESPACE pg_default", "ok");
     [Fact]
     public void ctab0154() => CorpusAssert.Parses(@"CREATE TABLE s.ctab_of_pk OF s.addr (CONSTRAINT pk PRIMARY KEY (street))", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctab0155() => CorpusAssert.Parses(@"CREATE TABLE s.ctab_of_fk (OF s.addr);
-CREATE TABLE s.ctab_of_fk2 (street text REFERENCES s.ctab_of_fk (street))", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ctab0155() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.ctab_of_fk (OF s.addr);
+CREATE TABLE s.ctab_of_fk2 (street text REFERENCES s.ctab_of_fk (street))", "error", false);
     [Fact]
     public void ctab0156() => CorpusAssert.Parses(@"CREATE TABLE s.ctab_inh_col_conflict (col1 text) INHERITS (s.t)", "ok");
     [Fact]
     public void ctab0157() => CorpusAssert.Parses(@"CREATE TABLE s.ctab_inh_dup_col (name text) INHERITS (s.t)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctab0158() => CorpusAssert.Parses(@"CREATE TABLE s.ctab_inh_dup_type (name int) INHERITS (s.t)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ctab0158() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.ctab_inh_dup_type (name int) INHERITS (s.t)", "error", false);
     [Fact]
     public void ctab0159() => CorpusAssert.Parses(@"CREATE TABLE s.ctab_part_range_date_check (id int, d date NOT NULL, PRIMARY KEY (id, d)) PARTITION BY RANGE (d);
 CREATE TABLE s.ctab_prdc_p PARTITION OF s.ctab_part_range_date_check FOR VALUES FROM ('2024-01-01') TO ('2025-01-01') WITH (autovacuum_enabled = true)", "ok");
@@ -816,8 +816,8 @@ CREATE TABLE s.ctab_partexpr_abs_p PARTITION OF s.ctab_partexpr_abs FOR VALUES F
     [Fact]
     public void ctab0165() => CorpusAssert.Parses(@"CREATE TABLE s.ctab_list_many (id int, code text) PARTITION BY LIST (code);
 CREATE TABLE s.ctab_list_many_p1 PARTITION OF s.ctab_list_many FOR VALUES IN ('A','B','C','D','E','F','G','H','I','J')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctab0166() => CorpusAssert.Parses(@"CREATE TABLE s.ctab_inh_self (id int) INHERITS (s.ctab_inh_self)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ctab0166() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.ctab_inh_self (id int) INHERITS (s.ctab_inh_self)", "error", false);
     [Fact]
     public void ctab0167() => CorpusAssert.Parses(@"CREATE TABLE s.ctab_with_vac (id int) WITH (autovacuum_vacuum_threshold = 100, autovacuum_vacuum_scale_factor = 0.1)", "ok");
     [Fact]
@@ -828,9 +828,9 @@ CREATE TABLE s.ctab_rng_ts2_q2 PARTITION OF s.ctab_rng_ts2 FOR VALUES FROM ('202
     public void ctab0169() => CorpusAssert.Parses(@"CREATE TABLE s.ctab_list_default_overlap (id int, region text) PARTITION BY LIST (region);
 CREATE TABLE s.ctab_ldo_def PARTITION OF s.ctab_list_default_overlap DEFAULT;
 CREATE TABLE s.ctab_ldo_us PARTITION OF s.ctab_list_default_overlap FOR VALUES IN ('US')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctab0170() => CorpusAssert.Parses(@"CREATE TABLE s.ctab_part_range_norow (id int, score int NOT NULL) PARTITION BY RANGE (score);
-INSERT INTO s.ctab_part_range_norow VALUES (1, 50)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ctab0170() => CorpusAssert.MatchesPostgres(@"CREATE TABLE s.ctab_part_range_norow (id int, score int NOT NULL) PARTITION BY RANGE (score);
+INSERT INTO s.ctab_part_range_norow VALUES (1, 50)", "error", false);
     [Fact]
     public void ctac0001() => CorpusAssert.Parses(@"CREATE TABLE ctac_range1 (id int, d date NOT NULL) PARTITION BY RANGE (d)", "ok");
     [Fact]
@@ -839,8 +839,8 @@ INSERT INTO s.ctab_part_range_norow VALUES (1, 50)", "error");
     public void ctac0003() => CorpusAssert.Parses(@"CREATE TABLE ctac_hash1 (id int NOT NULL, val text) PARTITION BY HASH (id)", "ok");
     [Fact]
     public void ctac0004() => CorpusAssert.Parses(@"CREATE TABLE ctac_range_mc (a int, b text, c date) PARTITION BY RANGE (a, c)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctac0005() => CorpusAssert.Parses(@"CREATE TABLE ctac_list_mc (a int, b text) PARTITION BY LIST (a, b)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ctac0005() => CorpusAssert.MatchesPostgres(@"CREATE TABLE ctac_list_mc (a int, b text) PARTITION BY LIST (a, b)", "error", false);
     [Fact]
     public void ctac0006() => CorpusAssert.Parses(@"CREATE TABLE ctac_hash_mc (a int, b int) PARTITION BY HASH (a, b)", "ok");
     [Fact]
@@ -888,8 +888,8 @@ CREATE TABLE ctac_grandchild (detail text) INHERITS (ctac_child3)", "ok");
     public void ctac0021() => CorpusAssert.Parses(@"CREATE TABLE ctac_of1 OF s.addr", "ok");
     [Fact]
     public void ctac0022() => CorpusAssert.Parses(@"CREATE TABLE ctac_of2 OF s.addr (street WITH OPTIONS DEFAULT 'unknown', city NOT NULL)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctac0023() => CorpusAssert.Parses(@"CREATE TABLE ctac_of_bad OF nonexistent_type_xyz (a int)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ctac0023() => CorpusAssert.MatchesPostgres(@"CREATE TABLE ctac_of_bad OF nonexistent_type_xyz (a int)", "error", false);
     [Fact]
     public void ctac0024() => CorpusAssert.Parses(@"CREATE TABLE ctac_like1 (LIKE s.t)", "ok");
     [Fact]
@@ -930,8 +930,8 @@ CREATE TABLE ctac_grandchild (detail text) INHERITS (ctac_child3)", "ok");
     public void ctac0042() => CorpusAssert.Parses(@"CREATE TABLE ctac_like19 (extra_col text, LIKE s.t2 INCLUDING DEFAULTS)", "ok");
     [Fact]
     public void ctac0043() => CorpusAssert.Parses(@"CREATE TABLE ctac_like20 (LIKE s.t INCLUDING ALL, extra_col text)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctac0044() => CorpusAssert.Parses(@"CREATE TABLE ctac_like_bad (LIKE nonexistent_xyz INCLUDING ALL)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ctac0044() => CorpusAssert.MatchesPostgres(@"CREATE TABLE ctac_like_bad (LIKE nonexistent_xyz INCLUDING ALL)", "error", false);
     [Fact]
     public void ctac0045() => CorpusAssert.Parses(@"CREATE TABLE ctac_with1 (id int) WITH (fillfactor = 70)", "ok");
     [Fact]
@@ -942,8 +942,8 @@ CREATE TABLE ctac_grandchild (detail text) INHERITS (ctac_child3)", "ok");
     public void ctac0048() => CorpusAssert.Parses(@"CREATE TABLE ctac_with4 (id int) WITH (autovacuum_vacuum_scale_factor = 0.01)", "ok");
     [Fact]
     public void ctac0049() => CorpusAssert.Parses(@"CREATE TABLE ctac_with5 (id int) WITH (toast.autovacuum_enabled = false)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctac0050() => CorpusAssert.Parses(@"CREATE TABLE ctac_with_bad (id int) WITH (badparam_xyz = 99)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ctac0050() => CorpusAssert.MatchesPostgres(@"CREATE TABLE ctac_with_bad (id int) WITH (badparam_xyz = 99)", "error", false);
     [Fact]
     public void ctac0051() => CorpusAssert.Parses(@"CREATE UNLOGGED TABLE ctac_unlogged1 (id int, val text)", "ok");
     [Fact]
@@ -962,8 +962,8 @@ CREATE TABLE ctac_grandchild (detail text) INHERITS (ctac_child3)", "ok");
     public void ctac0058() => CorpusAssert.Parses(@"CREATE TABLE ctac_oncommit_perm (id int) ON COMMIT DROP", "error");
     [Fact]
     public void ctac0059() => CorpusAssert.Parses(@"CREATE TABLE ctac_ts1 (id int) TABLESPACE pg_default", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctac0060() => CorpusAssert.Parses(@"CREATE TABLE ctac_ts_bad (id int) TABLESPACE nonexistent_ts_xyz", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ctac0060() => CorpusAssert.MatchesPostgres(@"CREATE TABLE ctac_ts_bad (id int) TABLESPACE nonexistent_ts_xyz", "error", false);
     [Fact]
     public void ctac0061() => CorpusAssert.Parses(@"CREATE TABLE ctac_ifnotexists (id int);
 CREATE TABLE IF NOT EXISTS ctac_ifnotexists (id int)", "ok");
@@ -987,19 +987,19 @@ CREATE TABLE ctac_range_num_p1 PARTITION OF ctac_range_num FOR VALUES FROM (0.00
     [Fact]
     public void ctac0067() => CorpusAssert.Parses(@"CREATE TABLE ctac_range_ts (id int, ts timestamptz) PARTITION BY RANGE (ts);
 CREATE TABLE ctac_range_ts_p1 PARTITION OF ctac_range_ts FOR VALUES FROM ('2024-01-01 00:00:00+00') TO ('2025-01-01 00:00:00+00')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctac0068() => CorpusAssert.Parses(@"CREATE TABLE ctac_range_bad1 (id int, d date) PARTITION BY RANGE (d);
-CREATE TABLE ctac_range_bad1_p1 PARTITION OF ctac_range_bad1 FOR VALUES FROM ('2024-01-01') TO ('2023-01-01')", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctac0069() => CorpusAssert.Parses(@"CREATE TABLE ctac_hash_bad1 (id int NOT NULL) PARTITION BY HASH (id);
-CREATE TABLE ctac_hash_bad1_p0 PARTITION OF ctac_hash_bad1 FOR VALUES WITH (MODULUS 4, REMAINDER 4)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctac0070() => CorpusAssert.Parses(@"CREATE TABLE ctac_hash_bad2 (id int NOT NULL) PARTITION BY HASH (id);
-CREATE TABLE ctac_hash_bad2_p0 PARTITION OF ctac_hash_bad2 FOR VALUES WITH (MODULUS 0, REMAINDER 0)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctac0071() => CorpusAssert.Parses(@"CREATE TABLE ctac_part_default_bad (id int, d date) PARTITION BY RANGE (d);
+    [DbFact]
+    public System.Threading.Tasks.Task ctac0068() => CorpusAssert.MatchesPostgres(@"CREATE TABLE ctac_range_bad1 (id int, d date) PARTITION BY RANGE (d);
+CREATE TABLE ctac_range_bad1_p1 PARTITION OF ctac_range_bad1 FOR VALUES FROM ('2024-01-01') TO ('2023-01-01')", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ctac0069() => CorpusAssert.MatchesPostgres(@"CREATE TABLE ctac_hash_bad1 (id int NOT NULL) PARTITION BY HASH (id);
+CREATE TABLE ctac_hash_bad1_p0 PARTITION OF ctac_hash_bad1 FOR VALUES WITH (MODULUS 4, REMAINDER 4)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ctac0070() => CorpusAssert.MatchesPostgres(@"CREATE TABLE ctac_hash_bad2 (id int NOT NULL) PARTITION BY HASH (id);
+CREATE TABLE ctac_hash_bad2_p0 PARTITION OF ctac_hash_bad2 FOR VALUES WITH (MODULUS 0, REMAINDER 0)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ctac0071() => CorpusAssert.MatchesPostgres(@"CREATE TABLE ctac_part_default_bad (id int, d date) PARTITION BY RANGE (d);
 CREATE TABLE ctac_part_default_bad_p1 PARTITION OF ctac_part_default_bad DEFAULT;
-CREATE TABLE ctac_part_default_bad_p2 PARTITION OF ctac_part_default_bad DEFAULT", "error");
+CREATE TABLE ctac_part_default_bad_p2 PARTITION OF ctac_part_default_bad DEFAULT", "error", false);
     [Fact]
     public void ctac0072() => CorpusAssert.Parses(@"CREATE TABLE ctac_range9 (id int, d date) PARTITION BY RANGE (d);
 CREATE TABLE ctac_range9_sub (id int, d date) PARTITION BY RANGE (d);
@@ -1008,10 +1008,10 @@ ALTER TABLE ctac_range9 ATTACH PARTITION ctac_range9_sub FOR VALUES FROM ('2024-
     [Fact]
     public void ctac0073() => CorpusAssert.Parses(@"CREATE TABLE ctac_list_mc2 (a int, b text) PARTITION BY LIST (b);
 CREATE TABLE ctac_list_mc2_ab PARTITION OF ctac_list_mc2 FOR VALUES IN ('a', 'b', 'c')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctac0074() => CorpusAssert.Parses(@"CREATE TABLE ctac_range_expr (id int, d date) PARTITION BY RANGE (date_trunc('month', d))", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctac0075() => CorpusAssert.Parses(@"CREATE TABLE ctac_hash_expr (id int NOT NULL) PARTITION BY HASH (id % 10)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ctac0074() => CorpusAssert.MatchesPostgres(@"CREATE TABLE ctac_range_expr (id int, d date) PARTITION BY RANGE (date_trunc('month', d))", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ctac0075() => CorpusAssert.MatchesPostgres(@"CREATE TABLE ctac_hash_expr (id int NOT NULL) PARTITION BY HASH (id % 10)", "error", false);
     [Fact]
     public void ctac0076() => CorpusAssert.Parses(@"CREATE UNLOGGED TABLE ctac_partitioned_unlogged (id int NOT NULL) PARTITION BY HASH (id)", "error");
     [Fact]
@@ -1022,19 +1022,19 @@ CREATE TABLE ctac_list_mc2_ab PARTITION OF ctac_list_mc2 FOR VALUES IN ('a', 'b'
     public void ctac0079() => CorpusAssert.Parses(@"CREATE TABLE ctac_range10 (id int, d date) PARTITION BY RANGE (d);
 CREATE TABLE ctac_range10_p1 PARTITION OF ctac_range10 FOR VALUES FROM ('2024-01-01') TO ('2025-01-01');
 CREATE TABLE ctac_range10_sub PARTITION OF ctac_range10 FOR VALUES FROM ('2025-01-01') TO ('2026-01-01') PARTITION BY LIST (id)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctac0080() => CorpusAssert.Parses(@"CREATE TABLE ctac_partof_noparent PARTITION OF nonexistent_parent_xyz FOR VALUES FROM (1) TO (10)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctac0081() => CorpusAssert.Parses(@"CREATE TABLE ctac_partof_notpart PARTITION OF s.t FOR VALUES FROM (1) TO (10)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctac0082() => CorpusAssert.Parses(@"CREATE TABLE ctac_range_novals (id int, d date) PARTITION BY RANGE (d);
-CREATE TABLE ctac_range_novals_p1 PARTITION OF ctac_range_novals FOR VALUES IN ('north')", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctac0083() => CorpusAssert.Parses(@"CREATE TABLE ctac_list_range_bad (id int, d text) PARTITION BY LIST (d);
-CREATE TABLE ctac_list_range_bad_p1 PARTITION OF ctac_list_range_bad FOR VALUES FROM ('a') TO ('z')", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctac0084() => CorpusAssert.Parses(@"CREATE TABLE ctac_list_hash_bad (id int NOT NULL) PARTITION BY LIST (id);
-CREATE TABLE ctac_list_hash_bad_p1 PARTITION OF ctac_list_hash_bad FOR VALUES WITH (MODULUS 2, REMAINDER 0)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ctac0080() => CorpusAssert.MatchesPostgres(@"CREATE TABLE ctac_partof_noparent PARTITION OF nonexistent_parent_xyz FOR VALUES FROM (1) TO (10)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ctac0081() => CorpusAssert.MatchesPostgres(@"CREATE TABLE ctac_partof_notpart PARTITION OF s.t FOR VALUES FROM (1) TO (10)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ctac0082() => CorpusAssert.MatchesPostgres(@"CREATE TABLE ctac_range_novals (id int, d date) PARTITION BY RANGE (d);
+CREATE TABLE ctac_range_novals_p1 PARTITION OF ctac_range_novals FOR VALUES IN ('north')", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ctac0083() => CorpusAssert.MatchesPostgres(@"CREATE TABLE ctac_list_range_bad (id int, d text) PARTITION BY LIST (d);
+CREATE TABLE ctac_list_range_bad_p1 PARTITION OF ctac_list_range_bad FOR VALUES FROM ('a') TO ('z')", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ctac0084() => CorpusAssert.MatchesPostgres(@"CREATE TABLE ctac_list_hash_bad (id int NOT NULL) PARTITION BY LIST (id);
+CREATE TABLE ctac_list_hash_bad_p1 PARTITION OF ctac_list_hash_bad FOR VALUES WITH (MODULUS 2, REMAINDER 0)", "error", false);
     [Fact]
     public void ctac0085() => CorpusAssert.Parses(@"CREATE TABLE ctac_syntax_part_bad PARTITION BY", "error");
     [Fact]
@@ -1042,8 +1042,8 @@ CREATE TABLE ctac_list_hash_bad_p1 PARTITION OF ctac_list_hash_bad FOR VALUES WI
     [Fact]
     public void ctac0087() => CorpusAssert.Parses(@"CREATE UNLOGGED TABLE ctac_unlogged_part (id int NOT NULL) PARTITION BY HASH (id);
 CREATE TABLE ctac_unlogged_child PARTITION OF ctac_unlogged_part FOR VALUES WITH (MODULUS 2, REMAINDER 0)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctac0088() => CorpusAssert.Parses(@"CREATE TABLE ctac_with_oids_bad (id int) WITH OIDS", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ctac0088() => CorpusAssert.MatchesPostgres(@"CREATE TABLE ctac_with_oids_bad (id int) WITH OIDS", "error", false);
     [Fact]
     public void ctac0089() => CorpusAssert.Parses(@"CREATE TABLE ctac_without_oids (id int) WITHOUT OIDS", "ok");
     [Fact]
@@ -1067,19 +1067,19 @@ CREATE TABLE ctac_range_tz_p2 PARTITION OF ctac_range_tz FOR VALUES FROM ('2024-
 CREATE TABLE ctac_list5_p1 PARTITION OF ctac_list5 FOR VALUES IN (1, 2, 3);
 CREATE TABLE ctac_list5_p2 PARTITION OF ctac_list5 FOR VALUES IN (4, 5, 6);
 CREATE TABLE ctac_list5_def PARTITION OF ctac_list5 DEFAULT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctac0097() => CorpusAssert.Parses(@"CREATE TABLE ctac_inherits_noparent () INHERITS (nonexistent_parent_abc)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ctac0097() => CorpusAssert.MatchesPostgres(@"CREATE TABLE ctac_inherits_noparent () INHERITS (nonexistent_parent_abc)", "error", false);
     [Fact]
     public void ctac0098() => CorpusAssert.Parses(@"CREATE TABLE ctac_like_excl_multi (LIKE s.t EXCLUDING DEFAULTS EXCLUDING INDEXES EXCLUDING CONSTRAINTS)", "ok");
     [Fact]
     public void ctac0099() => CorpusAssert.Parses(@"CREATE TABLE ctac_like_incl_excl_mix (LIKE s.t INCLUDING DEFAULTS EXCLUDING INDEXES INCLUDING CONSTRAINTS EXCLUDING GENERATED)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctac0100() => CorpusAssert.Parses(@"CREATE TABLE ctac_range_nokey PARTITION BY RANGE", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ctac0100() => CorpusAssert.MatchesPostgres(@"CREATE TABLE ctac_range_nokey PARTITION BY RANGE", "error", false);
     [Fact]
     public void ctac0101() => CorpusAssert.Parses(@"CREATE TABLE ctac_ctas_like (my_id int, LIKE s.t INCLUDING DEFAULTS, extra_col boolean DEFAULT false)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctac0102() => CorpusAssert.Parses(@"CREATE TABLE ctac_part_nofor (id int, d date) PARTITION BY RANGE (d);
-CREATE TABLE ctac_part_nofor_p1 PARTITION OF ctac_part_nofor FROM ('2024-01-01') TO ('2025-01-01')", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ctac0102() => CorpusAssert.MatchesPostgres(@"CREATE TABLE ctac_part_nofor (id int, d date) PARTITION BY RANGE (d);
+CREATE TABLE ctac_part_nofor_p1 PARTITION OF ctac_part_nofor FROM ('2024-01-01') TO ('2025-01-01')", "error", false);
     [Fact]
     public void ctac0103() => CorpusAssert.Parses(@"CREATE TABLE ctac_hash5 (id int NOT NULL) PARTITION BY HASH (id);
 CREATE TABLE ctac_hash5_p0 PARTITION OF ctac_hash5 FOR VALUES WITH (REMAINDER 0, MODULUS 3)", "ok");
@@ -1088,13 +1088,13 @@ CREATE TABLE ctac_hash5_p0 PARTITION OF ctac_hash5 FOR VALUES WITH (REMAINDER 0,
 CREATE TABLE ctac_part_primary_p1 PARTITION OF ctac_part_primary (PRIMARY KEY (id, d)) FOR VALUES FROM ('2024-01-01') TO ('2025-01-01')", "ok");
     [Fact]
     public void ctac0105() => CorpusAssert.Parses(@"CREATE TABLE ctac_of_with OF s.addr WITH (fillfactor = 75)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctac0106() => CorpusAssert.Parses(@"CREATE TABLE ctac_range11 (id int, d date) PARTITION BY RANGE (d);
+    [DbFact]
+    public System.Threading.Tasks.Task ctac0106() => CorpusAssert.MatchesPostgres(@"CREATE TABLE ctac_range11 (id int, d date) PARTITION BY RANGE (d);
 CREATE TABLE ctac_range11_p1 PARTITION OF ctac_range11 FOR VALUES FROM ('2024-01-01') TO ('2024-06-01');
-CREATE TABLE ctac_range11_p2 PARTITION OF ctac_range11 FOR VALUES FROM ('2024-01-01') TO ('2024-07-01')", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ctac0107() => CorpusAssert.Parses(@"CREATE TABLE ctac_range_nullbound (id int, d date) PARTITION BY RANGE (d);
-CREATE TABLE ctac_range_nullbound_p1 PARTITION OF ctac_range_nullbound FOR VALUES FROM (NULL) TO ('2025-01-01')", "error");
+CREATE TABLE ctac_range11_p2 PARTITION OF ctac_range11 FOR VALUES FROM ('2024-01-01') TO ('2024-07-01')", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ctac0107() => CorpusAssert.MatchesPostgres(@"CREATE TABLE ctac_range_nullbound (id int, d date) PARTITION BY RANGE (d);
+CREATE TABLE ctac_range_nullbound_p1 PARTITION OF ctac_range_nullbound FOR VALUES FROM (NULL) TO ('2025-01-01')", "error", false);
     [Fact]
     public void ctac0108() => CorpusAssert.Parses(@"CREATE TABLE ctac_inherits_child2 (extra2 text) INHERITS (s.child)", "ok");
     [Fact]

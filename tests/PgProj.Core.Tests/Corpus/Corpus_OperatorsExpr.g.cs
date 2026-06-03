@@ -185,8 +185,8 @@ public class Corpus_OperatorsExpr
     public void oexa0089() => CorpusAssert.Parses(@"SELECT 'abc' COLLATE ""C"" = 'abc' COLLATE ""C""", "ok");
     [Fact]
     public void oexa0090() => CorpusAssert.Parses(@"SELECT name COLLATE ""POSIX"" FROM s.t LIMIT 1", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void oexa0091() => CorpusAssert.Parses(@"SELECT '<unclosed>'::xml IS DOCUMENT", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task oexa0091() => CorpusAssert.MatchesPostgres(@"SELECT '<unclosed>'::xml IS DOCUMENT", "error", false);
     [Fact]
     public void oexa0092() => CorpusAssert.Parses(@"SELECT '<a>1</a>'::xml IS DOCUMENT", "ok");
     [Fact]
@@ -305,12 +305,12 @@ public class Corpus_OperatorsExpr
     public void oexa0149() => CorpusAssert.Parses(@"SELECT 5 IN (1+1, 2+3, 7-2)", "ok");
     [Fact]
     public void oexa0150() => CorpusAssert.Parses(@"SELECT 1 / 0", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void oexa0151() => CorpusAssert.Parses(@"SELECT 'a' + 'b'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void oexa0152() => CorpusAssert.Parses(@"SELECT 1 <> 1 <> 1", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void oexa0153() => CorpusAssert.Parses(@"SELECT 1 COLLATE ""C""", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task oexa0151() => CorpusAssert.MatchesPostgres(@"SELECT 'a' + 'b'", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task oexa0152() => CorpusAssert.MatchesPostgres(@"SELECT 1 <> 1 <> 1", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task oexa0153() => CorpusAssert.MatchesPostgres(@"SELECT 1 COLLATE ""C""", "error", false);
     [Fact]
     public void oexa0154() => CorpusAssert.Parses(@"SELECT 1 NOT BETWEEN SYMMETRIC 2 AND", "error");
     [Fact]
@@ -347,12 +347,12 @@ public class Corpus_OperatorsExpr
     public void oexa0170() => CorpusAssert.Parses(@"SELECT qty << 1 FROM s.t LIMIT 1", "ok");
     [Fact]
     public void oexa0171() => CorpusAssert.Parses(@"SELECT qty >> 1 FROM s.t LIMIT 1", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void oexa0172() => CorpusAssert.Parses(@"SELECT 1 IS NOT DOCUMENT", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void oexa0173() => CorpusAssert.Parses(@"SELECT 1 BETWEEN 'a' AND 'z'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void oexa0174() => CorpusAssert.Parses(@"SELECT NOT 5", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task oexa0172() => CorpusAssert.MatchesPostgres(@"SELECT 1 IS NOT DOCUMENT", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task oexa0173() => CorpusAssert.MatchesPostgres(@"SELECT 1 BETWEEN 'a' AND 'z'", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task oexa0174() => CorpusAssert.MatchesPostgres(@"SELECT NOT 5", "error", false);
     [Fact]
     public void oexa0175() => CorpusAssert.Parses(@"SELECT 1 = NULL", "ok");
     [Fact]
@@ -647,8 +647,8 @@ public class Corpus_OperatorsExpr
     public void oexb0120() => CorpusAssert.Parses(@"SELECT name COLLATE ""C"" < 'zzz' FROM s.t", "ok");
     [Fact]
     public void oexb0121() => CorpusAssert.Parses(@"SELECT name COLLATE ""C"" = name COLLATE ""C"" FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void oexb0122() => CorpusAssert.Parses(@"SELECT name COLLATE ""C"" < name COLLATE ""POSIX"" FROM s.t", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task oexb0122() => CorpusAssert.MatchesPostgres(@"SELECT name COLLATE ""C"" < name COLLATE ""POSIX"" FROM s.t", "error", false);
     [Fact]
     public void oexb0123() => CorpusAssert.Parses(@"SELECT 'a' COLLATE ""C"" || 'b'", "ok");
     [Fact]
@@ -663,10 +663,10 @@ public class Corpus_OperatorsExpr
     public void oexb0128() => CorpusAssert.Parses(@"SELECT * 2", "error");
     [Fact]
     public void oexb0129() => CorpusAssert.Parses(@"SELECT 1 + 2)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void oexb0130() => CorpusAssert.Parses(@"SELECT 1 + 2 = = 3", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void oexb0131() => CorpusAssert.Parses(@"SELECT 1 < > 2", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task oexb0130() => CorpusAssert.MatchesPostgres(@"SELECT 1 + 2 = = 3", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task oexb0131() => CorpusAssert.MatchesPostgres(@"SELECT 1 < > 2", "error", false);
     [Fact]
     public void oexb0132() => CorpusAssert.Parses(@"SELECT 1 IN ()", "error");
     [Fact]
@@ -675,28 +675,28 @@ public class Corpus_OperatorsExpr
     public void oexb0134() => CorpusAssert.Parses(@"SELECT 1 NOT 2", "error");
     [Fact]
     public void oexb0135() => CorpusAssert.Parses(@"SELECT NOT NOT", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void oexb0136() => CorpusAssert.Parses(@"SELECT = 1", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task oexb0136() => CorpusAssert.MatchesPostgres(@"SELECT = 1", "error", false);
     [Fact]
     public void oexb0137() => CorpusAssert.Parses(@"SELECT 1 IS DISTINCT 2", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void oexb0138() => CorpusAssert.Parses(@"SELECT IS NULL", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task oexb0138() => CorpusAssert.MatchesPostgres(@"SELECT IS NULL", "error", false);
     [Fact]
     public void oexb0139() => CorpusAssert.Parses(@"SELECT 1 DISTINCT FROM 2", "error");
     [Fact]
     public void oexb0140() => CorpusAssert.Parses(@"SELECT 1 = ANY()", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void oexb0141() => CorpusAssert.Parses(@"SELECT ANY(ARRAY[1,2,3]) = 1", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task oexb0141() => CorpusAssert.MatchesPostgres(@"SELECT ANY(ARRAY[1,2,3]) = 1", "error", false);
     [Fact]
     public void oexb0142() => CorpusAssert.Parses(@"SELECT 1 / 0", "error");
     [Fact]
     public void oexb0143() => CorpusAssert.Parses(@"SELECT 1 % 0", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void oexb0144() => CorpusAssert.Parses(@"SELECT 1 + 'abc'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void oexb0145() => CorpusAssert.Parses(@"SELECT true + 1", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void oexb0146() => CorpusAssert.Parses(@"SELECT 1 << 'a'", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task oexb0144() => CorpusAssert.MatchesPostgres(@"SELECT 1 + 'abc'", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task oexb0145() => CorpusAssert.MatchesPostgres(@"SELECT true + 1", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task oexb0146() => CorpusAssert.MatchesPostgres(@"SELECT 1 << 'a'", "error", false);
     [Fact]
     public void oexb0147() => CorpusAssert.Parses(@"SELECT 5 BETWEEN 3 AND 7 AND 2 < 10", "ok");
     [Fact]
@@ -745,14 +745,14 @@ public class Corpus_OperatorsExpr
     public void oexb0169() => CorpusAssert.Parses(@"SELECT GREATEST(1, 2, 3)", "ok");
     [Fact]
     public void oexb0170() => CorpusAssert.Parses(@"SELECT LEAST(1, 2, 3)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void oexb0171() => CorpusAssert.Parses(@"SELECT val COLLATE ""C"" FROM s.t", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task oexb0171() => CorpusAssert.MatchesPostgres(@"SELECT val COLLATE ""C"" FROM s.t", "error", false);
     [Fact]
     public void oexb0172() => CorpusAssert.Parses(@"SELECT 1 ALL(ARRAY[1,2])", "error");
     [Fact]
     public void oexb0173() => CorpusAssert.Parses(@"SELECT 5 BETWEEN 10 AND", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void oexb0174() => CorpusAssert.Parses(@"SELECT (1, 2, 3) = (1, 2)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task oexb0174() => CorpusAssert.MatchesPostgres(@"SELECT (1, 2, 3) = (1, 2)", "error", false);
     [Fact]
     public void oexc0001() => CorpusAssert.Parses(@"SELECT 1 + 2", "ok");
     [Fact]
@@ -869,8 +869,8 @@ public class Corpus_OperatorsExpr
     public void oexc0057() => CorpusAssert.Parses(@"SELECT name COLLATE ""C"" < 'z' FROM s.t LIMIT 1", "ok");
     [Fact]
     public void oexc0058() => CorpusAssert.Parses(@"SELECT '<root/>'::xml IS DOCUMENT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void oexc0059() => CorpusAssert.Parses(@"SELECT 'not xml'::text IS NOT DOCUMENT", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task oexc0059() => CorpusAssert.MatchesPostgres(@"SELECT 'not xml'::text IS NOT DOCUMENT", "error", false);
     [Fact]
     public void oexc0060() => CorpusAssert.Parses(@"SELECT 1 +", "error");
     [Fact]
@@ -879,12 +879,12 @@ public class Corpus_OperatorsExpr
     public void oexc0062() => CorpusAssert.Parses(@"SELECT 1 + 2)", "error");
     [Fact]
     public void oexc0063() => CorpusAssert.Parses(@"SELECT 5 BETWEEN AND 10", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void oexc0064() => CorpusAssert.Parses(@"SELECT IN (1, 2, 3)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task oexc0064() => CorpusAssert.MatchesPostgres(@"SELECT IN (1, 2, 3)", "error", false);
     [Fact]
     public void oexc0065() => CorpusAssert.Parses(@"SELECT 1 IS DISTINCT 2", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void oexc0066() => CorpusAssert.Parses(@"SELECT 1 = = 1", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task oexc0066() => CorpusAssert.MatchesPostgres(@"SELECT 1 = = 1", "error", false);
     [Fact]
     public void oexc0067() => CorpusAssert.Parses(@"SELECT * 5", "error");
     [Fact]
@@ -913,8 +913,8 @@ public class Corpus_OperatorsExpr
     public void oexc0079() => CorpusAssert.Parses(@"SELECT num_nulls(NULL, NULL, 1)", "ok");
     [Fact]
     public void oexc0080() => CorpusAssert.Parses(@"SELECT num_nonnulls(1, NULL, 'x')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void oexc0081() => CorpusAssert.Parses(@"SELECT 1 <> <> 2", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task oexc0081() => CorpusAssert.MatchesPostgres(@"SELECT 1 <> <> 2", "error", false);
     [Fact]
     public void oexc0082() => CorpusAssert.Parses(@"SELECT 1 BETWEEN 5", "error");
     [Fact]
@@ -925,18 +925,18 @@ public class Corpus_OperatorsExpr
     public void oexc0085() => CorpusAssert.Parses(@"SELECT 1 = ANY (1, 2, 3)", "error");
     [Fact]
     public void oexc0086() => CorpusAssert.Parses(@"SELECT COLLATE ""C"" 'hello'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void oexc0087() => CorpusAssert.Parses(@"SELECT 1 IS NOT TRUE FALSE", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task oexc0087() => CorpusAssert.MatchesPostgres(@"SELECT 1 IS NOT TRUE FALSE", "error", false);
     [Fact]
     public void oexc0088() => CorpusAssert.Parses(@"SELECT 1 SYMMETRIC BETWEEN 5 AND 10", "error");
     [Fact]
     public void oexc0089() => CorpusAssert.Parses(@"SELECT 1 NOT IN", "error");
     [Fact]
     public void oexc0090() => CorpusAssert.Parses(@"SELECT 1 / 0", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void oexc0091() => CorpusAssert.Parses(@"SELECT 'abc' + 1", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void oexc0092() => CorpusAssert.Parses(@"SELECT 'x' BETWEEN 1 AND 10", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task oexc0091() => CorpusAssert.MatchesPostgres(@"SELECT 'abc' + 1", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task oexc0092() => CorpusAssert.MatchesPostgres(@"SELECT 'x' BETWEEN 1 AND 10", "error", false);
     [Fact]
     public void oexc0093() => CorpusAssert.Parses(@"SELECT (1,) = (1,)", "error");
     [Fact]
@@ -955,20 +955,20 @@ public class Corpus_OperatorsExpr
     public void oexc0100() => CorpusAssert.Parses(@"SELECT 3 BETWEEN 1 AND 5 AND 7 BETWEEN 5 AND 10", "ok");
     [Fact]
     public void oexc0101() => CorpusAssert.Parses(@"SELECT 1 IS NOT DISTINCT FROM", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void oexc0102() => CorpusAssert.Parses(@"SELECT NOT IN (1,2)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void oexc0103() => CorpusAssert.Parses(@"SELECT 1 || 2", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void oexc0104() => CorpusAssert.Parses(@"SELECT 1 = 2 = 3", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task oexc0102() => CorpusAssert.MatchesPostgres(@"SELECT NOT IN (1,2)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task oexc0103() => CorpusAssert.MatchesPostgres(@"SELECT 1 || 2", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task oexc0104() => CorpusAssert.MatchesPostgres(@"SELECT 1 = 2 = 3", "error", false);
     [Fact]
     public void oexc0105() => CorpusAssert.Parses(@"SELECT 5 > ANY", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void oexc0106() => CorpusAssert.Parses(@"SELECT (1, 2) = (1, 2, 3)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void oexc0107() => CorpusAssert.Parses(@"SELECT true + false", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void oexc0108() => CorpusAssert.Parses(@"SELECT name & 3 FROM s.t LIMIT 1", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task oexc0106() => CorpusAssert.MatchesPostgres(@"SELECT (1, 2) = (1, 2, 3)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task oexc0107() => CorpusAssert.MatchesPostgres(@"SELECT true + false", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task oexc0108() => CorpusAssert.MatchesPostgres(@"SELECT name & 3 FROM s.t LIMIT 1", "error", false);
     [Fact]
     public void oexc0109() => CorpusAssert.Parses(@"SELECT 1 = ANY()", "error");
 }

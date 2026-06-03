@@ -365,16 +365,16 @@ public class Corpus_AggregateFuncs
     public void aggfb0009() => CorpusAssert.Parses(@"SELECT sum(DISTINCT val) FROM s.t", "ok");
     [Fact]
     public void aggfb0010() => CorpusAssert.Parses(@"SELECT sum() FROM s.t", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void aggfb0011() => CorpusAssert.Parses(@"SELECT sum(name) FROM s.t", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task aggfb0011() => CorpusAssert.MatchesPostgres(@"SELECT sum(name) FROM s.t", "error", false);
     [Fact]
     public void aggfb0012() => CorpusAssert.Parses(@"SELECT avg(val) FROM s.t", "ok");
     [Fact]
     public void aggfb0013() => CorpusAssert.Parses(@"SELECT avg(DISTINCT val) FROM s.t", "ok");
     [Fact]
     public void aggfb0014() => CorpusAssert.Parses(@"SELECT avg() FROM s.t", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void aggfb0015() => CorpusAssert.Parses(@"SELECT avg(name) FROM s.t", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task aggfb0015() => CorpusAssert.MatchesPostgres(@"SELECT avg(name) FROM s.t", "error", false);
     [Fact]
     public void aggfb0016() => CorpusAssert.Parses(@"SELECT min(val) FROM s.t", "ok");
     [Fact]
@@ -445,10 +445,10 @@ public class Corpus_AggregateFuncs
     public void aggfb0049() => CorpusAssert.Parses(@"SELECT jsonb_object_agg(name, val) FROM s.t", "ok");
     [Fact]
     public void aggfb0050() => CorpusAssert.Parses(@"SELECT json_object_agg(name, qty ORDER BY name) FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void aggfb0051() => CorpusAssert.Parses(@"SELECT json_object_agg(name) FROM s.t", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void aggfb0052() => CorpusAssert.Parses(@"SELECT jsonb_object_agg(name) FROM s.t", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task aggfb0051() => CorpusAssert.MatchesPostgres(@"SELECT json_object_agg(name) FROM s.t", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task aggfb0052() => CorpusAssert.MatchesPostgres(@"SELECT jsonb_object_agg(name) FROM s.t", "error", false);
     [Fact]
     public void aggfb0053() => CorpusAssert.Parses(@"SELECT json_agg() FROM s.t", "error");
     [Fact]
@@ -465,8 +465,8 @@ public class Corpus_AggregateFuncs
     public void aggfb0059() => CorpusAssert.Parses(@"SELECT bool_and() FROM s.t", "error");
     [Fact]
     public void aggfb0060() => CorpusAssert.Parses(@"SELECT bool_or() FROM s.t", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void aggfb0061() => CorpusAssert.Parses(@"SELECT bool_and(name) FROM s.t", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task aggfb0061() => CorpusAssert.MatchesPostgres(@"SELECT bool_and(name) FROM s.t", "error", false);
     [Fact]
     public void aggfb0062() => CorpusAssert.Parses(@"SELECT bit_and(qty) FROM s.t", "ok");
     [Fact]
@@ -477,10 +477,10 @@ public class Corpus_AggregateFuncs
     public void aggfb0065() => CorpusAssert.Parses(@"SELECT name, bit_and(qty), bit_or(qty), bit_xor(qty) FROM s.t GROUP BY name", "ok");
     [Fact]
     public void aggfb0066() => CorpusAssert.Parses(@"SELECT bit_and() FROM s.t", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void aggfb0067() => CorpusAssert.Parses(@"SELECT bit_xor(qty, val) FROM s.t", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void aggfb0068() => CorpusAssert.Parses(@"SELECT bit_and(name) FROM s.t", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task aggfb0067() => CorpusAssert.MatchesPostgres(@"SELECT bit_xor(qty, val) FROM s.t", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task aggfb0068() => CorpusAssert.MatchesPostgres(@"SELECT bit_and(name) FROM s.t", "error", false);
     [Fact]
     public void aggfb0069() => CorpusAssert.Parses(@"SELECT count(*) FILTER (WHERE val > 0) FROM s.t", "ok");
     [Fact]
@@ -539,8 +539,8 @@ public class Corpus_AggregateFuncs
     public void aggfb0096() => CorpusAssert.Parses(@"SELECT percentile_cont(0.5) FROM s.t", "error");
     [Fact]
     public void aggfb0097() => CorpusAssert.Parses(@"SELECT percentile_disc(0.5) FROM s.t", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void aggfb0098() => CorpusAssert.Parses(@"SELECT mode(val) WITHIN GROUP (ORDER BY val) FROM s.t", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task aggfb0098() => CorpusAssert.MatchesPostgres(@"SELECT mode(val) WITHIN GROUP (ORDER BY val) FROM s.t", "error", false);
     [Fact]
     public void aggfb0099() => CorpusAssert.Parses(@"SELECT rank(1) WITHIN GROUP (ORDER BY qty) FROM s.t", "ok");
     [Fact]
@@ -553,10 +553,10 @@ public class Corpus_AggregateFuncs
     public void aggfb0103() => CorpusAssert.Parses(@"SELECT rank(5, 'text') WITHIN GROUP (ORDER BY qty, name) FROM s.t", "ok");
     [Fact]
     public void aggfb0104() => CorpusAssert.Parses(@"SELECT name, rank(1) WITHIN GROUP (ORDER BY qty) FROM s.t GROUP BY name", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void aggfb0105() => CorpusAssert.Parses(@"SELECT rank() WITHIN GROUP (ORDER BY qty) FROM s.t", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void aggfb0106() => CorpusAssert.Parses(@"SELECT dense_rank() WITHIN GROUP (ORDER BY qty) FROM s.t", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task aggfb0105() => CorpusAssert.MatchesPostgres(@"SELECT rank() WITHIN GROUP (ORDER BY qty) FROM s.t", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task aggfb0106() => CorpusAssert.MatchesPostgres(@"SELECT dense_rank() WITHIN GROUP (ORDER BY qty) FROM s.t", "error", false);
     [Fact]
     public void aggfb0107() => CorpusAssert.Parses(@"SELECT corr(qty, val) FROM s.t", "ok");
     [Fact]
@@ -577,12 +577,12 @@ public class Corpus_AggregateFuncs
     public void aggfb0115() => CorpusAssert.Parses(@"SELECT var_samp(val) FROM s.t", "ok");
     [Fact]
     public void aggfb0116() => CorpusAssert.Parses(@"SELECT corr(val) FROM s.t", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void aggfb0117() => CorpusAssert.Parses(@"SELECT regr_slope(val) FROM s.t", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task aggfb0117() => CorpusAssert.MatchesPostgres(@"SELECT regr_slope(val) FROM s.t", "error", false);
     [Fact]
     public void aggfb0118() => CorpusAssert.Parses(@"SELECT covar_pop(val) FROM s.t", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void aggfb0119() => CorpusAssert.Parses(@"SELECT stddev(name) FROM s.t", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task aggfb0119() => CorpusAssert.MatchesPostgres(@"SELECT stddev(name) FROM s.t", "error", false);
     [Fact]
     public void aggfb0120() => CorpusAssert.Parses(@"SELECT regr_slope(qty, val) FROM s.t", "ok");
     [Fact]
@@ -609,10 +609,10 @@ public class Corpus_AggregateFuncs
     public void aggfb0131() => CorpusAssert.Parses(@"SELECT name, range_agg(span) FROM s.t GROUP BY name", "ok");
     [Fact]
     public void aggfb0132() => CorpusAssert.Parses(@"SELECT range_agg(span) FILTER (WHERE span IS NOT NULL) FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void aggfb0133() => CorpusAssert.Parses(@"SELECT range_agg(val) FROM s.t", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void aggfb0134() => CorpusAssert.Parses(@"SELECT range_intersect_agg(name) FROM s.t", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task aggfb0133() => CorpusAssert.MatchesPostgres(@"SELECT range_agg(val) FROM s.t", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task aggfb0134() => CorpusAssert.MatchesPostgres(@"SELECT range_intersect_agg(name) FROM s.t", "error", false);
     [Fact]
     public void aggfb0135() => CorpusAssert.Parses(@"SELECT grouping(name) FROM s.t GROUP BY name", "ok");
     [Fact]
@@ -621,10 +621,10 @@ public class Corpus_AggregateFuncs
     public void aggfb0137() => CorpusAssert.Parses(@"SELECT name, grouping(name) FROM s.t GROUP BY CUBE (name)", "ok");
     [Fact]
     public void aggfb0138() => CorpusAssert.Parses(@"SELECT name, status, grouping(name) + grouping(status) FROM s.t GROUP BY ROLLUP (name, status)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void aggfb0139() => CorpusAssert.Parses(@"SELECT grouping(name) FROM s.t", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void aggfb0140() => CorpusAssert.Parses(@"SELECT grouping() FROM s.t GROUP BY name", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task aggfb0139() => CorpusAssert.MatchesPostgres(@"SELECT grouping(name) FROM s.t", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task aggfb0140() => CorpusAssert.MatchesPostgres(@"SELECT grouping() FROM s.t GROUP BY name", "error", false);
     [Fact]
     public void aggfb0141() => CorpusAssert.Parses(@"SELECT count(*) FILTER (WHERE flag) FROM s.t", "ok");
     [Fact]
@@ -673,14 +673,14 @@ public class Corpus_AggregateFuncs
     public void aggfb0163() => CorpusAssert.Parses(@"SELECT name, count(*) FROM s.t GROUP BY name HAVING HAVING count(*) > 0", "error");
     [Fact]
     public void aggfb0164() => CorpusAssert.Parses(@"SELECT name FROM s.t HAVING", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void aggfb0165() => CorpusAssert.Parses(@"SELECT name FROM s.t WHERE count(*) > 0", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void aggfb0166() => CorpusAssert.Parses(@"SELECT name FROM s.t WHERE sum(val) > 100", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void aggfb0167() => CorpusAssert.Parses(@"SELECT name, qty FROM s.t GROUP BY name", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void aggfb0168() => CorpusAssert.Parses(@"SELECT name FROM s.t GROUP BY name HAVING qty > 0", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task aggfb0165() => CorpusAssert.MatchesPostgres(@"SELECT name FROM s.t WHERE count(*) > 0", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task aggfb0166() => CorpusAssert.MatchesPostgres(@"SELECT name FROM s.t WHERE sum(val) > 100", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task aggfb0167() => CorpusAssert.MatchesPostgres(@"SELECT name, qty FROM s.t GROUP BY name", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task aggfb0168() => CorpusAssert.MatchesPostgres(@"SELECT name FROM s.t GROUP BY name HAVING qty > 0", "error", false);
     [Fact]
     public void aggfb0169() => CorpusAssert.Parses(@"SELECT name, count(*) FROM s.t GROUP BY name HAVING count(*) > 0 GROUP BY name", "error");
     [Fact]

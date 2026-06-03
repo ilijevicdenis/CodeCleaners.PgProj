@@ -205,49 +205,49 @@ public class Corpus_PlpgsqlAssign
     public void ppaa0099() => CorpusAssert.Parses(@"DO $$ DECLARE x s.pos_int; BEGIN x := 5; END $$;", "ok");
     [Fact]
     public void ppaa0100() => CorpusAssert.Parses(@"DO $$ DECLARE x s.pos_int; BEGIN x := -1; EXCEPTION WHEN check_violation THEN NULL; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppaa0101() => CorpusAssert.Parses(@"DO $$ DECLARE x int; BEGIN x 42; END $$;", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ppaa0101() => CorpusAssert.MatchesPostgres(@"DO $$ DECLARE x int; BEGIN x 42; END $$;", "error", false);
     [Fact]
     public void ppaa0102() => CorpusAssert.Parses(@"DO $$ DECLARE x int; BEGIN := 42; END $$;", "error");
     [Fact]
     public void ppaa0103() => CorpusAssert.Parses(@"DO $$ DECLARE x int; BEGIN x := ; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppaa0104() => CorpusAssert.Parses(@"DO $$ DECLARE x int; BEGIN x :== 42; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppaa0105() => CorpusAssert.Parses(@"DO $$ BEGIN SELECT 1 INTO; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppaa0106() => CorpusAssert.Parses(@"DO $$ BEGIN INTO x SELECT 1; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppaa0107() => CorpusAssert.Parses(@"DO $$ BEGIN GET DIAGNOSTICS = ROW_COUNT; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppaa0108() => CorpusAssert.Parses(@"DO $$ BEGIN GET DIAGNOSTICS x = INVALID_ITEM; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppaa0109() => CorpusAssert.Parses(@"DO $$ BEGIN PERFORM INTO x SELECT 1; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppaa0110() => CorpusAssert.Parses(@"DO $$ DECLARE x int; BEGIN x := 1 +; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppaa0111() => CorpusAssert.Parses(@"DO $$ DECLARE x int; BEGIN x := (1 + 2; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppaa0112() => CorpusAssert.Parses(@"DO $$ DECLARE x int; BEGIN x := 'not_a_number'; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppaa0113() => CorpusAssert.Parses(@"DO $$ DECLARE x int; BEGIN SELECT 'notanumber' INTO x; END $$;", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ppaa0104() => CorpusAssert.MatchesPostgres(@"DO $$ DECLARE x int; BEGIN x :== 42; END $$;", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ppaa0105() => CorpusAssert.MatchesPostgres(@"DO $$ BEGIN SELECT 1 INTO; END $$;", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ppaa0106() => CorpusAssert.MatchesPostgres(@"DO $$ BEGIN INTO x SELECT 1; END $$;", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ppaa0107() => CorpusAssert.MatchesPostgres(@"DO $$ BEGIN GET DIAGNOSTICS = ROW_COUNT; END $$;", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ppaa0108() => CorpusAssert.MatchesPostgres(@"DO $$ BEGIN GET DIAGNOSTICS x = INVALID_ITEM; END $$;", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ppaa0109() => CorpusAssert.MatchesPostgres(@"DO $$ BEGIN PERFORM INTO x SELECT 1; END $$;", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ppaa0110() => CorpusAssert.MatchesPostgres(@"DO $$ DECLARE x int; BEGIN x := 1 +; END $$;", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ppaa0111() => CorpusAssert.MatchesPostgres(@"DO $$ DECLARE x int; BEGIN x := (1 + 2; END $$;", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ppaa0112() => CorpusAssert.MatchesPostgres(@"DO $$ DECLARE x int; BEGIN x := 'not_a_number'; END $$;", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ppaa0113() => CorpusAssert.MatchesPostgres(@"DO $$ DECLARE x int; BEGIN SELECT 'notanumber' INTO x; END $$;", "error", false);
     [Fact]
     public void ppaa0114() => CorpusAssert.Parses(@"DO $$ DECLARE x int; y int; BEGIN x := 1; y := 2; x = y; y = x; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppaa0115() => CorpusAssert.Parses(@"DO $$ DECLARE x int; BEGIN x := undeclared_var; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppaa0116() => CorpusAssert.Parses(@"DO $$ BEGIN GET ROW_COUNT; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppaa0117() => CorpusAssert.Parses(@"DO $$ DECLARE x int; BEGIN x := SELECT 1; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppaa0118() => CorpusAssert.Parses(@"DO $$ DECLARE x int; BEGIN PERFORM SELECT 1; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppaa0119() => CorpusAssert.Parses(@"DO $$ DECLARE x int; BEGIN x := *; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppaa0120() => CorpusAssert.Parses(@"DO $$ DECLARE x int; BEGIN x.field := 1; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppaa0121() => CorpusAssert.Parses(@"DO $$ DECLARE x int; BEGIN x := 42
-END $$;", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ppaa0115() => CorpusAssert.MatchesPostgres(@"DO $$ DECLARE x int; BEGIN x := undeclared_var; END $$;", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ppaa0116() => CorpusAssert.MatchesPostgres(@"DO $$ BEGIN GET ROW_COUNT; END $$;", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ppaa0117() => CorpusAssert.MatchesPostgres(@"DO $$ DECLARE x int; BEGIN x := SELECT 1; END $$;", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ppaa0118() => CorpusAssert.MatchesPostgres(@"DO $$ DECLARE x int; BEGIN PERFORM SELECT 1; END $$;", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ppaa0119() => CorpusAssert.MatchesPostgres(@"DO $$ DECLARE x int; BEGIN x := *; END $$;", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ppaa0120() => CorpusAssert.MatchesPostgres(@"DO $$ DECLARE x int; BEGIN x.field := 1; END $$;", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task ppaa0121() => CorpusAssert.MatchesPostgres(@"DO $$ DECLARE x int; BEGIN x := 42
+END $$;", "error", false);
     [Fact]
     public void ppaa0122() => CorpusAssert.Parses(@"DO $$ DECLARE x int; BEGIN x := 1 + 2 * 3; END $$;", "ok");
     [Fact]
@@ -345,8 +345,8 @@ END $$;", "ok");
     public void ppaa0168() => CorpusAssert.Parses(@"DO $$ DECLARE r record; rc bigint; BEGIN INSERT INTO s.t(name) VALUES ('ppaa0168') RETURNING id, name INTO r; GET DIAGNOSTICS rc = ROW_COUNT; END $$;", "ok");
     [Fact]
     public void ppaa0169() => CorpusAssert.Parses(@"DO $$ DECLARE x int; BEGIN SELECT id INTO x FROM s.t WHERE id = (SELECT min(id) FROM s.t); END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppaa0170() => CorpusAssert.Parses(@"DO $$ DECLARE x int; BEGIN x := 42 END $$;", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ppaa0170() => CorpusAssert.MatchesPostgres(@"DO $$ DECLARE x int; BEGIN x := 42 END $$;", "error", false);
     [Fact]
     public void ppab0001() => CorpusAssert.Parses(@"DO $$ DECLARE x int; BEGIN x := 42; END $$;", "ok");
     [Fact]
@@ -401,10 +401,10 @@ END $$;", "ok");
     public void ppab0026() => CorpusAssert.Parses(@"DO $$ DECLARE x int; BEGIN SELECT count(*) FROM s.t INTO x; END $$;", "ok");
     [Fact]
     public void ppab0027() => CorpusAssert.Parses(@"DO $$ DECLARE oid_var oid; BEGIN GET DIAGNOSTICS oid_var = PG_ROUTINE_OID; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppab0028() => CorpusAssert.Parses(@"DO $$ DECLARE x int; BEGIN x 42; END $$;", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ppab0028() => CorpusAssert.MatchesPostgres(@"DO $$ DECLARE x int; BEGIN x 42; END $$;", "error", false);
     [Fact]
     public void ppab0029() => CorpusAssert.Parses(@"DO $$ DECLARE x int; BEGIN := 42; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void ppab0030() => CorpusAssert.Parses(@"DO $$ DECLARE x int; BEGIN SELECT name INTO FROM s.t LIMIT 1; END $$;", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task ppab0030() => CorpusAssert.MatchesPostgres(@"DO $$ DECLARE x int; BEGIN SELECT name INTO FROM s.t LIMIT 1; END $$;", "error", false);
 }

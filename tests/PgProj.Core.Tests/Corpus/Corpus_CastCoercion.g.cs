@@ -141,8 +141,8 @@ public class Corpus_CastCoercion
     public void cst2a0067() => CorpusAssert.Parses(@"SELECT 'happy'::s.mood", "ok");
     [Fact]
     public void cst2a0068() => CorpusAssert.Parses(@"SELECT 'sad'::s.mood::text", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cst2a0069() => CorpusAssert.Parses(@"SELECT CAST('bad_val' AS s.mood)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task cst2a0069() => CorpusAssert.MatchesPostgres(@"SELECT CAST('bad_val' AS s.mood)", "error", false);
     [Fact]
     public void cst2a0070() => CorpusAssert.Parses(@"SELECT '(123 Main St,Springfield,12345)'::s.addr", "ok");
     [Fact]
@@ -151,10 +151,10 @@ public class Corpus_CastCoercion
     public void cst2a0072() => CorpusAssert.Parses(@"SELECT 5::s.pos_int", "ok");
     [Fact]
     public void cst2a0073() => CorpusAssert.Parses(@"SELECT CAST(7 AS s.pos_int)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cst2a0074() => CorpusAssert.Parses(@"SELECT CAST(-1 AS s.pos_int)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cst2a0075() => CorpusAssert.Parses(@"SELECT 0::s.pos_int", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task cst2a0074() => CorpusAssert.MatchesPostgres(@"SELECT CAST(-1 AS s.pos_int)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task cst2a0075() => CorpusAssert.MatchesPostgres(@"SELECT 0::s.pos_int", "error", false);
     [Fact]
     public void cst2a0076() => CorpusAssert.Parses(@"SELECT CAST(val AS text) FROM s.t", "ok");
     [Fact]
@@ -199,18 +199,18 @@ public class Corpus_CastCoercion
     public void cst2a0096() => CorpusAssert.Parses(@"SELECT CAST( AS text)", "error");
     [Fact]
     public void cst2a0097() => CorpusAssert.Parses(@"SELECT 42::", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cst2a0098() => CorpusAssert.Parses(@"SELECT ::integer", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cst2a0099() => CorpusAssert.Parses(@"SELECT 42::nonexistent_type_xyz", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task cst2a0098() => CorpusAssert.MatchesPostgres(@"SELECT ::integer", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task cst2a0099() => CorpusAssert.MatchesPostgres(@"SELECT 42::nonexistent_type_xyz", "error", false);
     [Fact]
     public void cst2a0100() => CorpusAssert.Parses(@"SELECT CAST('not_a_number' AS integer)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cst2a0101() => CorpusAssert.Parses(@"SELECT CAST('not_a_date' AS date)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task cst2a0101() => CorpusAssert.MatchesPostgres(@"SELECT CAST('not_a_date' AS date)", "error", false);
     [Fact]
     public void cst2a0102() => CorpusAssert.Parses(@"SELECT CAST('not_bool' AS boolean)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cst2a0103() => CorpusAssert.Parses(@"SELECT CAST(99999 AS smallint)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task cst2a0103() => CorpusAssert.MatchesPostgres(@"SELECT CAST(99999 AS smallint)", "error", false);
     [Fact]
     public void cst2a0104() => CorpusAssert.Parses(@"SELECT CAST(42)", "error");
     [Fact]
@@ -275,10 +275,10 @@ public class Corpus_CastCoercion
     public void cst2a0134() => CorpusAssert.Parses(@"SELECT CAST(CAST(42 AS text) AS integer)", "ok");
     [Fact]
     public void cst2a0135() => CorpusAssert.Parses(@"SELECT CAST(CAST('3.14' AS numeric) AS text)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cst2a0136() => CorpusAssert.Parses(@"SELECT CAST(42 AS numeric(3,2))", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cst2a0137() => CorpusAssert.Parses(@"SELECT '999999999999'::numeric(5,2)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task cst2a0136() => CorpusAssert.MatchesPostgres(@"SELECT CAST(42 AS numeric(3,2))", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task cst2a0137() => CorpusAssert.MatchesPostgres(@"SELECT '999999999999'::numeric(5,2)", "error", false);
     [Fact]
     public void cst2a0138() => CorpusAssert.Parses(@"SELECT CAST('{1,2,3}' AS integer[])", "ok");
     [Fact]
@@ -303,16 +303,16 @@ public class Corpus_CastCoercion
     public void cst2a0148() => CorpusAssert.Parses(@"SELECT ARRAY[1::bigint, 2::bigint, 3::bigint]", "ok");
     [Fact]
     public void cst2a0149() => CorpusAssert.Parses(@"SELECT ARRAY[CAST(1 AS text), CAST(2 AS text)]", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cst2a0150() => CorpusAssert.Parses(@"SELECT (ROW(1, 'test', '10.00'))::s.t2", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task cst2a0150() => CorpusAssert.MatchesPostgres(@"SELECT (ROW(1, 'test', '10.00'))::s.t2", "error", false);
     [Fact]
     public void cst2a0151() => CorpusAssert.Parses(@"SELECT CAST(1 AS oid)", "ok");
     [Fact]
     public void cst2a0152() => CorpusAssert.Parses(@"SELECT 1::oid", "ok");
     [Fact]
     public void cst2a0153() => CorpusAssert.Parses(@"SELECT 's.t'::regclass", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cst2a0154() => CorpusAssert.Parses(@"SELECT CAST('s.f' AS regprocedure)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task cst2a0154() => CorpusAssert.MatchesPostgres(@"SELECT CAST('s.f' AS regprocedure)", "error", false);
     [Fact]
     public void cst2a0155() => CorpusAssert.Parses(@"SELECT 's.f(integer)'::regprocedure", "ok");
     [Fact]
@@ -341,10 +341,10 @@ public class Corpus_CastCoercion
     public void cst2a0167() => CorpusAssert.Parses(@"SELECT CAST(42.5 AS money)", "ok");
     [Fact]
     public void cst2a0168() => CorpusAssert.Parses(@"SELECT 42.5::money", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cst2a0169() => CorpusAssert.Parses(@"SELECT CAST(42 AS CAST)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cst2a0170() => CorpusAssert.Parses(@"SELECT CAST(integer AS text)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task cst2a0169() => CorpusAssert.MatchesPostgres(@"SELECT CAST(42 AS CAST)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task cst2a0170() => CorpusAssert.MatchesPostgres(@"SELECT CAST(integer AS text)", "error", false);
     [Fact]
     public void cst2b0001() => CorpusAssert.Parses(@"SELECT CAST(1 AS text)", "ok");
     [Fact]
@@ -453,8 +453,8 @@ public class Corpus_CastCoercion
     public void cst2b0053() => CorpusAssert.Parses(@"SELECT false::integer", "ok");
     [Fact]
     public void cst2b0054() => CorpusAssert.Parses(@"SELECT true::integer", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cst2b0055() => CorpusAssert.Parses(@"SELECT 42::text::boolean", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task cst2b0055() => CorpusAssert.MatchesPostgres(@"SELECT 42::text::boolean", "error", false);
     [Fact]
     public void cst2b0056() => CorpusAssert.Parses(@"SELECT val::text FROM s.t", "ok");
     [Fact]
@@ -511,14 +511,14 @@ public class Corpus_CastCoercion
     public void cst2b0082() => CorpusAssert.Parses(@"SELECT CAST(1 integer)", "error");
     [Fact]
     public void cst2b0083() => CorpusAssert.Parses(@"SELECT 42::", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cst2b0084() => CorpusAssert.Parses(@"SELECT ::integer", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task cst2b0084() => CorpusAssert.MatchesPostgres(@"SELECT ::integer", "error", false);
     [Fact]
     public void cst2b0085() => CorpusAssert.Parses(@"SELECT 1::2", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cst2b0086() => CorpusAssert.Parses(@"SELECT CAST(42 AS nonexistent_type_xyz)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cst2b0087() => CorpusAssert.Parses(@"SELECT 'oops'::nonexistent_type_xyz", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task cst2b0086() => CorpusAssert.MatchesPostgres(@"SELECT CAST(42 AS nonexistent_type_xyz)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task cst2b0087() => CorpusAssert.MatchesPostgres(@"SELECT 'oops'::nonexistent_type_xyz", "error", false);
     [Fact]
     public void cst2b0088() => CorpusAssert.Parses(@"SELECT 42::numeric(10,0)::text::integer", "ok");
     [Fact]

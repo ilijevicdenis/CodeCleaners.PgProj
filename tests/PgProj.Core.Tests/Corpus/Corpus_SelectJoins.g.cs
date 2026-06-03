@@ -219,8 +219,8 @@ public class Corpus_SelectJoins
     public void selja0106() => CorpusAssert.Parses(@"SELECT t.id, t.name FROM s.t JOIN s.t2 ON t.id = t2.t_id WHERE t.id = ANY(ARRAY[1,2,3]::bigint[])", "ok");
     [Fact]
     public void selja0107() => CorpusAssert.Parses(@"SELECT t.id FROM s.t JOIN s.t2 ON t.id = t2.t_id WHERE t.id = ALL(ARRAY[1]::bigint[])", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selja0108() => CorpusAssert.Parses(@"SELECT t.id, t2.label FROM s.t JOIN s.t2 ON t.id = t2.t_id WHERE t.span @> 5::int4range", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task selja0108() => CorpusAssert.MatchesPostgres(@"SELECT t.id, t2.label FROM s.t JOIN s.t2 ON t.id = t2.t_id WHERE t.span @> 5::int4range", "error", false);
     [Fact]
     public void selja0109() => CorpusAssert.Parses(@"SELECT t.id, t2.label FROM s.t JOIN s.t2 ON t.id = t2.t_id WHERE t.span @> int4range(1, 10)", "ok");
     [Fact]
@@ -291,14 +291,14 @@ public class Corpus_SelectJoins
     public void selja0142() => CorpusAssert.Parses(@"SELECT t.id FROM s.t LEFT s.t2 ON t.id = t2.t_id", "error");
     [Fact]
     public void selja0143() => CorpusAssert.Parses(@"SELECT t.id FROM s.t JOIN s.t2 ON t.id = t2.t_id ON t.id = t2.t_id", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selja0144() => CorpusAssert.Parses(@"SELECT t.id FROM s.t JOIN s.t2 USING (nonexistent_col)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task selja0144() => CorpusAssert.MatchesPostgres(@"SELECT t.id FROM s.t JOIN s.t2 USING (nonexistent_col)", "error", false);
     [Fact]
     public void selja0145() => CorpusAssert.Parses(@"SELECT t.id FROM s.t JOIN s.nonexistent ON t.id = s.nonexistent.id", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selja0146() => CorpusAssert.Parses(@"SELECT t.id FROM s.t JOIN s.t2 ON t.id = t2.nonexistent_col", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selja0147() => CorpusAssert.Parses(@"SELECT t.id FROM s.t LATERAL JOIN s.t2 ON t.id = t2.t_id", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task selja0146() => CorpusAssert.MatchesPostgres(@"SELECT t.id FROM s.t JOIN s.t2 ON t.id = t2.nonexistent_col", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task selja0147() => CorpusAssert.MatchesPostgres(@"SELECT t.id FROM s.t LATERAL JOIN s.t2 ON t.id = t2.t_id", "error", false);
     [Fact]
     public void selja0148() => CorpusAssert.Parses(@"SELECT t.id FROM s.t JOIN LATERAL (SELECT id, t_id FROM s.t2) AS sub ON t.id = sub.t_id", "ok");
     [Fact]
@@ -317,8 +317,8 @@ public class Corpus_SelectJoins
     public void selja0155() => CorpusAssert.Parses(@"SELECT t1.id FROM s.t t1 JOIN s.t t2 ON t1.name = t2.name JOIN s.t t3 ON t2.val = t3.val", "ok");
     [Fact]
     public void selja0156() => CorpusAssert.Parses(@"SELECT t.id FROM s.t WHERE t.id IN (SELECT t_id FROM s.t2 JOIN s.parent ON s.t2.id = s.parent.id)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selja0157() => CorpusAssert.Parses(@"SELECT combined.id FROM (s.t CROSS JOIN s.t2) AS combined (id)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task selja0157() => CorpusAssert.MatchesPostgres(@"SELECT combined.id FROM (s.t CROSS JOIN s.t2) AS combined (id)", "error", false);
     [Fact]
     public void selja0158() => CorpusAssert.Parses(@"SELECT t.id FROM s.t JOIN s.t2 ON t.id = t2.t_id WHERE t.qty > 0 ORDER BY t.id LIMIT 10 OFFSET 0", "ok");
     [Fact]
@@ -341,8 +341,8 @@ public class Corpus_SelectJoins
     public void selja0167() => CorpusAssert.Parses(@"SELECT t.id FROM s.t JOIN s.t2 ON t.id = t2.t_id WHERE t.span && int4range(1, 10)", "ok");
     [Fact]
     public void selja0168() => CorpusAssert.Parses(@"SELECT t.id FROM s.t JOIN s.t2 ON t.id = t2.t_id WHERE t.val IS NOT NULL ORDER BY t.val DESC NULLS LAST LIMIT 20", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selja0169() => CorpusAssert.Parses(@"SELECT RIGHT FROM s.t JOIN s.t2 ON t.id = t2.t_id", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task selja0169() => CorpusAssert.MatchesPostgres(@"SELECT RIGHT FROM s.t JOIN s.t2 ON t.id = t2.t_id", "error", false);
     [Fact]
     public void selja0170() => CorpusAssert.Parses(@"SELECT t.id FROM s.t JOIN s.t2 ON t.id = t2.t_id WHERE t.id BETWEEN 1 AND 100 AND t2.amount > 0 GROUP BY t.id HAVING t.id > 0 ORDER BY t.id LIMIT 100 OFFSET 0", "ok");
     [Fact]
@@ -459,8 +459,8 @@ public class Corpus_SelectJoins
     public void seljb0056() => CorpusAssert.Parses(@"SELECT * FROM s.t NATURAL JOIN s.t2 USING (id)", "error");
     [Fact]
     public void seljb0057() => CorpusAssert.Parses(@"SELECT * FROM JOIN s.t2 ON true", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void seljb0058() => CorpusAssert.Parses(@"SELECT * FROM s.t OUTER JOIN s.t2 ON s.t.id = s.t2.t_id", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task seljb0058() => CorpusAssert.MatchesPostgres(@"SELECT * FROM s.t OUTER JOIN s.t2 ON s.t.id = s.t2.t_id", "error", false);
     [Fact]
     public void seljb0059() => CorpusAssert.Parses(@"SELECT * FROM s.t JOIN ON s.t.id = s.t2.t_id", "error");
     [Fact]
@@ -469,8 +469,8 @@ public class Corpus_SelectJoins
     public void seljb0061() => CorpusAssert.Parses(@"SELECT t.id FROM s.t JOIN s.t2 ON t.id = t2.t_id JOIN s.parent ON t.id = s.parent.id LEFT JOIN s.child ON s.parent.id = s.child.id", "ok");
     [Fact]
     public void seljb0062() => CorpusAssert.Parses(@"SELECT a.id, b.id, c.id FROM s.t a, s.t b, s.t c WHERE a.id < b.id AND b.id < c.id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void seljb0063() => CorpusAssert.Parses(@"SELECT * FROM s.t JOIN s.t2 USING (id, id)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task seljb0063() => CorpusAssert.MatchesPostgres(@"SELECT * FROM s.t JOIN s.t2 USING (id, id)", "error", false);
     [Fact]
     public void seljb0064() => CorpusAssert.Parses(@"SELECT * FROM s.parent JOIN s.child ON s.parent.id = s.child.id", "ok");
     [Fact]
@@ -601,18 +601,18 @@ public class Corpus_SelectJoins
     public void seljb0127() => CorpusAssert.Parses(@"SELECT * FROM s.t JOIN s.t2 USING ()", "error");
     [Fact]
     public void seljb0128() => CorpusAssert.Parses(@"SELECT * FROM s.t CROSS JOIN", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void seljb0129() => CorpusAssert.Parses(@"SELECT * FROM s.t NATURAL CROSS JOIN s.t2", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task seljb0129() => CorpusAssert.MatchesPostgres(@"SELECT * FROM s.t NATURAL CROSS JOIN s.t2", "error", false);
     [Fact]
     public void seljb0130() => CorpusAssert.Parses(@"SELECT * FROM s.t JOIN s.t2 ON s.t.id = s.t2.t_id ON s.t.id = s.t2.t_id", "error");
     [Fact]
     public void seljb0131() => CorpusAssert.Parses(@"SELECT * FROM s.t JOIN s.t2 USING (id) ON s.t.id = s.t2.t_id", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void seljb0132() => CorpusAssert.Parses(@"SELECT * FROM s.t LATERAL JOIN s.t2 ON s.t.id = s.t2.t_id", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void seljb0133() => CorpusAssert.Parses(@"SELECT * FROM LATERAL s.t JOIN s.t2 ON s.t.id = s.t2.t_id", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void seljb0134() => CorpusAssert.Parses(@"SELECT * FROM s.t JOIN s.t2 ON s.t.nosuchcol = s.t2.t_id", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task seljb0132() => CorpusAssert.MatchesPostgres(@"SELECT * FROM s.t LATERAL JOIN s.t2 ON s.t.id = s.t2.t_id", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task seljb0133() => CorpusAssert.MatchesPostgres(@"SELECT * FROM LATERAL s.t JOIN s.t2 ON s.t.id = s.t2.t_id", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task seljb0134() => CorpusAssert.MatchesPostgres(@"SELECT * FROM s.t JOIN s.t2 ON s.t.nosuchcol = s.t2.t_id", "error", false);
     [Fact]
     public void seljb0135() => CorpusAssert.Parses(@"SELECT * FROM s.t NATURAL JOIN s.t2 NATURAL JOIN s.parent", "ok");
     [Fact]
@@ -661,12 +661,12 @@ public class Corpus_SelectJoins
     public void seljb0157() => CorpusAssert.Parses(@"SELECT t.id FROM s.t JOIN (VALUES (1::bigint),(2::bigint)) AS v(vid) ON t.id = v.vid", "ok");
     [Fact]
     public void seljb0158() => CorpusAssert.Parses(@"SELECT * FROM s.t JOIN s.t2 ON s.t.id = s.t2.t_id WHERE s.t.id = s.t2.t_id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void seljb0159() => CorpusAssert.Parses(@"SELECT * FROM s.t JOIN s.t2 ON s.t.id = s.t2.t_id HAVING count(*) > 0", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task seljb0159() => CorpusAssert.MatchesPostgres(@"SELECT * FROM s.t JOIN s.t2 ON s.t.id = s.t2.t_id HAVING count(*) > 0", "error", false);
     [Fact]
     public void seljb0160() => CorpusAssert.Parses(@"SELECT t.id FROM s.t JOIN s.t2 ON t.id = t2.t_id WHERE t.id = (SELECT min(id) FROM s.t)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void seljb0161() => CorpusAssert.Parses(@"SELECT * FROM s.t JOIN s.t2 USING (nonexistent_column)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task seljb0161() => CorpusAssert.MatchesPostgres(@"SELECT * FROM s.t JOIN s.t2 USING (nonexistent_column)", "error", false);
     [Fact]
     public void seljb0162() => CorpusAssert.Parses(@"SELECT t.id FROM s.t JOIN s.t2 ON t.id = t2.t_id OFFSET -1", "error");
     [Fact]
@@ -749,10 +749,10 @@ public class Corpus_SelectJoins
     public void seljc0031() => CorpusAssert.Parses(@"SELECT * FROM s.t INNER s.t2 ON s.t.id = s.t2.t_id", "error");
     [Fact]
     public void seljc0032() => CorpusAssert.Parses(@"SELECT * FROM s.t JOIN s.t2 ON", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void seljc0033() => CorpusAssert.Parses(@"SELECT * FROM s.t OUTER JOIN s.t2 ON s.t.id = s.t2.t_id", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task seljc0033() => CorpusAssert.MatchesPostgres(@"SELECT * FROM s.t OUTER JOIN s.t2 ON s.t.id = s.t2.t_id", "error", false);
     [Fact]
     public void seljc0034() => CorpusAssert.Parses(@"SELECT t.id FROM s.t JOIN s.t2 USING ()", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void seljc0035() => CorpusAssert.Parses(@"SELECT * FROM s.t NATURAL CROSS JOIN s.t2", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task seljc0035() => CorpusAssert.MatchesPostgres(@"SELECT * FROM s.t NATURAL CROSS JOIN s.t2", "error", false);
 }

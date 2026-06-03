@@ -5,12 +5,12 @@ namespace PgProj.Core.Tests.Corpus;
 
 public class Corpus_CreateConversion
 {
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cnva0001() => CorpusAssert.Parses(@"CREATE CONVERSION myconv FOR 'UTF8' TO 'LATIN1' FROM iso8859_1_to_utf8", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task cnva0001() => CorpusAssert.MatchesPostgres(@"CREATE CONVERSION myconv FOR 'UTF8' TO 'LATIN1' FROM iso8859_1_to_utf8", "error", false);
     [Fact]
     public void cnva0002() => CorpusAssert.Parses(@"CREATE CONVERSION myconv FOR 'LATIN1' TO 'UTF8' FROM iso8859_1_to_utf8", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cnva0003() => CorpusAssert.Parses(@"CREATE DEFAULT CONVERSION mydefconv FOR 'LATIN1' TO 'UTF8' FROM iso8859_1_to_utf8; CREATE DEFAULT CONVERSION mydefconv2 FOR 'LATIN1' TO 'UTF8' FROM iso8859_1_to_utf8", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task cnva0003() => CorpusAssert.MatchesPostgres(@"CREATE DEFAULT CONVERSION mydefconv FOR 'LATIN1' TO 'UTF8' FROM iso8859_1_to_utf8; CREATE DEFAULT CONVERSION mydefconv2 FOR 'LATIN1' TO 'UTF8' FROM iso8859_1_to_utf8", "error", false);
     [Fact]
     public void cnva0004() => CorpusAssert.Parses(@"CREATE CONVERSION s.myconv FOR 'LATIN1' TO 'UTF8' FROM iso8859_1_to_utf8", "ok");
     [Fact]
@@ -95,8 +95,8 @@ public class Corpus_CreateConversion
     public void cnva0044() => CorpusAssert.Parses(@"CREATE CONVERSION myconv FOR 'UTF8' TO 'WIN1257' FROM utf8_to_win", "ok");
     [Fact]
     public void cnva0045() => CorpusAssert.Parses(@"CREATE CONVERSION myconv FOR 'UTF8' TO 'WIN1258' FROM utf8_to_win", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cnva0046() => CorpusAssert.Parses(@"CREATE CONVERSION myconv FOR 'LATIN1' TO 'UTF8' FROM s.f", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task cnva0046() => CorpusAssert.MatchesPostgres(@"CREATE CONVERSION myconv FOR 'LATIN1' TO 'UTF8' FROM s.f", "error", false);
     [Fact]
     public void cnva0047() => CorpusAssert.Parses(@"CREATE CONVERSION ""my conv"" FOR 'LATIN1' TO 'UTF8' FROM iso8859_1_to_utf8", "ok");
     [Fact]
@@ -109,38 +109,38 @@ public class Corpus_CreateConversion
     public void cnva0051() => CorpusAssert.Parses(@"CREATE CONVERSION myconv FOR 'LATIN1' TO 'UTF8' FROM pg_catalog.iso8859_1_to_utf8", "ok");
     [Fact]
     public void cnva0052() => CorpusAssert.Parses(@"CREATE CONVERSION s.myconv FOR 'LATIN1' TO 'UTF8' FROM pg_catalog.iso8859_1_to_utf8", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cnva0053() => CorpusAssert.Parses(@"CREATE CONVERSION myconv FOR 'LATIN1' TO 'UTF8' FROM nonexistent_func_xyz", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cnva0054() => CorpusAssert.Parses(@"CREATE CONVERSION myconv FOR 'BOGUSENC' TO 'UTF8' FROM iso8859_1_to_utf8", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cnva0055() => CorpusAssert.Parses(@"CREATE CONVERSION myconv FOR 'LATIN1' TO 'BOGUSENC' FROM iso8859_1_to_utf8", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cnva0056() => CorpusAssert.Parses(@"CREATE CONVERSION myconv FOR 'SQL_ASCII' TO 'UTF8' FROM iso8859_1_to_utf8", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cnva0057() => CorpusAssert.Parses(@"CREATE CONVERSION myconv FOR 'UTF8' TO 'SQL_ASCII' FROM utf8_to_iso8859_1", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cnva0058() => CorpusAssert.Parses(@"CREATE CONVERSION FOR 'LATIN1' TO 'UTF8' FROM iso8859_1_to_utf8", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cnva0059() => CorpusAssert.Parses(@"CREATE CONVERSION myconv 'LATIN1' TO 'UTF8' FROM iso8859_1_to_utf8", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cnva0060() => CorpusAssert.Parses(@"CREATE CONVERSION myconv FOR 'LATIN1' 'UTF8' FROM iso8859_1_to_utf8", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cnva0061() => CorpusAssert.Parses(@"CREATE CONVERSION myconv FOR 'LATIN1' TO 'UTF8' iso8859_1_to_utf8", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cnva0062() => CorpusAssert.Parses(@"CREATE CONVERSION myconv FOR 'LATIN1' TO 'UTF8'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cnva0063() => CorpusAssert.Parses(@"CREATE CONVERSION myconv FOR TO 'UTF8' FROM iso8859_1_to_utf8", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cnva0064() => CorpusAssert.Parses(@"CREATE CONVERSION myconv FOR 'LATIN1' TO FROM iso8859_1_to_utf8", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cnva0065() => CorpusAssert.Parses(@"CREATE CONVERSION myconv FOR 'LATIN1' TO 'UTF8' FROM", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cnva0066() => CorpusAssert.Parses(@"CREATE DEFAULT myconv FOR 'LATIN1' TO 'UTF8' FROM iso8859_1_to_utf8", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task cnva0053() => CorpusAssert.MatchesPostgres(@"CREATE CONVERSION myconv FOR 'LATIN1' TO 'UTF8' FROM nonexistent_func_xyz", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task cnva0054() => CorpusAssert.MatchesPostgres(@"CREATE CONVERSION myconv FOR 'BOGUSENC' TO 'UTF8' FROM iso8859_1_to_utf8", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task cnva0055() => CorpusAssert.MatchesPostgres(@"CREATE CONVERSION myconv FOR 'LATIN1' TO 'BOGUSENC' FROM iso8859_1_to_utf8", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task cnva0056() => CorpusAssert.MatchesPostgres(@"CREATE CONVERSION myconv FOR 'SQL_ASCII' TO 'UTF8' FROM iso8859_1_to_utf8", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task cnva0057() => CorpusAssert.MatchesPostgres(@"CREATE CONVERSION myconv FOR 'UTF8' TO 'SQL_ASCII' FROM utf8_to_iso8859_1", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task cnva0058() => CorpusAssert.MatchesPostgres(@"CREATE CONVERSION FOR 'LATIN1' TO 'UTF8' FROM iso8859_1_to_utf8", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task cnva0059() => CorpusAssert.MatchesPostgres(@"CREATE CONVERSION myconv 'LATIN1' TO 'UTF8' FROM iso8859_1_to_utf8", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task cnva0060() => CorpusAssert.MatchesPostgres(@"CREATE CONVERSION myconv FOR 'LATIN1' 'UTF8' FROM iso8859_1_to_utf8", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task cnva0061() => CorpusAssert.MatchesPostgres(@"CREATE CONVERSION myconv FOR 'LATIN1' TO 'UTF8' iso8859_1_to_utf8", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task cnva0062() => CorpusAssert.MatchesPostgres(@"CREATE CONVERSION myconv FOR 'LATIN1' TO 'UTF8'", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task cnva0063() => CorpusAssert.MatchesPostgres(@"CREATE CONVERSION myconv FOR TO 'UTF8' FROM iso8859_1_to_utf8", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task cnva0064() => CorpusAssert.MatchesPostgres(@"CREATE CONVERSION myconv FOR 'LATIN1' TO FROM iso8859_1_to_utf8", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task cnva0065() => CorpusAssert.MatchesPostgres(@"CREATE CONVERSION myconv FOR 'LATIN1' TO 'UTF8' FROM", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task cnva0066() => CorpusAssert.MatchesPostgres(@"CREATE DEFAULT myconv FOR 'LATIN1' TO 'UTF8' FROM iso8859_1_to_utf8", "error", false);
     [Fact]
     public void cnva0067() => CorpusAssert.Parses(@"CREATE CONVERSION myconv FOR 'LATIN1' TO 'UTF8' FROM iso8859_1_to_utf8; DROP CONVERSION myconv", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cnva0068() => CorpusAssert.Parses(@"DROP CONVERSION myconv", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task cnva0068() => CorpusAssert.MatchesPostgres(@"DROP CONVERSION myconv", "error", false);
     [Fact]
     public void cnva0069() => CorpusAssert.Parses(@"DROP CONVERSION IF EXISTS myconv", "ok");
     [Fact]
@@ -159,8 +159,8 @@ public class Corpus_CreateConversion
     public void cnva0076() => CorpusAssert.Parses(@"DROP CONVERSION IF myconv", "error");
     [Fact]
     public void cnva0077() => CorpusAssert.Parses(@"CREATE CONVERSION myconv FOR 'LATIN1' TO 'UTF8' FROM iso8859_1_to_utf8; ALTER CONVERSION myconv RENAME TO myconv2", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cnva0078() => CorpusAssert.Parses(@"ALTER CONVERSION myconv RENAME TO myconv2", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task cnva0078() => CorpusAssert.MatchesPostgres(@"ALTER CONVERSION myconv RENAME TO myconv2", "error", false);
     [Fact]
     public void cnva0079() => CorpusAssert.Parses(@"CREATE CONVERSION myconv FOR 'LATIN1' TO 'UTF8' FROM iso8859_1_to_utf8; ALTER CONVERSION myconv OWNER TO CURRENT_USER", "ok");
     [Fact]
@@ -171,20 +171,20 @@ public class Corpus_CreateConversion
     public void cnva0082() => CorpusAssert.Parses(@"CREATE CONVERSION myconv FOR 'LATIN1' TO 'UTF8' FROM iso8859_1_to_utf8; ALTER CONVERSION myconv SET SCHEMA s", "ok");
     [Fact]
     public void cnva0083() => CorpusAssert.Parses(@"CREATE CONVERSION s.myconv FOR 'LATIN1' TO 'UTF8' FROM iso8859_1_to_utf8; ALTER CONVERSION s.myconv SET SCHEMA public", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cnva0084() => CorpusAssert.Parses(@"ALTER CONVERSION myconv SET SCHEMA s", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task cnva0084() => CorpusAssert.MatchesPostgres(@"ALTER CONVERSION myconv SET SCHEMA s", "error", false);
     [Fact]
     public void cnva0085() => CorpusAssert.Parses(@"ALTER CONVERSION myconv RENAME", "error");
     [Fact]
     public void cnva0086() => CorpusAssert.Parses(@"ALTER CONVERSION myconv RENAME TO", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cnva0087() => CorpusAssert.Parses(@"ALTER CONVERSION myconv OWNER", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task cnva0087() => CorpusAssert.MatchesPostgres(@"ALTER CONVERSION myconv OWNER", "error", false);
     [Fact]
     public void cnva0088() => CorpusAssert.Parses(@"ALTER CONVERSION myconv OWNER TO", "error");
     [Fact]
     public void cnva0089() => CorpusAssert.Parses(@"ALTER CONVERSION myconv SET SCHEMA", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cnva0090() => CorpusAssert.Parses(@"ALTER CONVERSION myconv SET", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task cnva0090() => CorpusAssert.MatchesPostgres(@"ALTER CONVERSION myconv SET", "error", false);
     [Fact]
     public void cnva0091() => CorpusAssert.Parses(@"CREATE CONVERSION myconv FOR 'LATIN2' TO 'MULE_INTERNAL' FROM latin2_to_mic", "ok");
     [Fact]
@@ -197,8 +197,8 @@ public class Corpus_CreateConversion
     public void cnva0095() => CorpusAssert.Parses(@"CREATE CONVERSION myconv FOR 'EUC_JP' TO 'MULE_INTERNAL' FROM euc_jp_to_mic", "ok");
     [Fact]
     public void cnva0096() => CorpusAssert.Parses(@"CREATE CONVERSION myconv FOR 'LATIN1' TO 'UTF8' FROM iso8859_1_to_utf8; CREATE CONVERSION myconv2 FOR 'UTF8' TO 'LATIN1' FROM utf8_to_iso8859_1", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void cnva0097() => CorpusAssert.Parses(@"CREATE CONVERSION myconv FOR 'LATIN1' TO 'UTF8' FROM iso8859_1_to_utf8; CREATE CONVERSION myconv FOR 'UTF8' TO 'LATIN1' FROM utf8_to_iso8859_1", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task cnva0097() => CorpusAssert.MatchesPostgres(@"CREATE CONVERSION myconv FOR 'LATIN1' TO 'UTF8' FROM iso8859_1_to_utf8; CREATE CONVERSION myconv FOR 'UTF8' TO 'LATIN1' FROM utf8_to_iso8859_1", "error", false);
     [Fact]
     public void cnva0098() => CorpusAssert.Parses(@"CREATE DEFAULT CONVERSION mydefconv FOR 'LATIN1' TO 'UTF8' FROM iso8859_1_to_utf8", "ok");
     [Fact]

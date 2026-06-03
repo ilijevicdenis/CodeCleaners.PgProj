@@ -13,19 +13,19 @@ public class Corpus_CreateTextsearch
     public void tsa0003() => CorpusAssert.Parses(@"CREATE TEXT SEARCH CONFIGURATION s.copyconfig (COPY = pg_catalog.english)", "ok");
     [Fact]
     public void tsa0004() => CorpusAssert.Parses(@"CREATE TEXT SEARCH CONFIGURATION copysimple (COPY = pg_catalog.simple)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tsa0005() => CorpusAssert.Parses(@"CREATE TEXT SEARCH CONFIGURATION s.cfgdup (PARSER = pg_catalog.default);
-CREATE TEXT SEARCH CONFIGURATION s.cfgdup (PARSER = pg_catalog.default)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task tsa0005() => CorpusAssert.MatchesPostgres(@"CREATE TEXT SEARCH CONFIGURATION s.cfgdup (PARSER = pg_catalog.default);
+CREATE TEXT SEARCH CONFIGURATION s.cfgdup (PARSER = pg_catalog.default)", "error", false);
     [Fact]
     public void tsa0006() => CorpusAssert.Parses(@"CREATE TEXT SEARCH CONFIGURATION (PARSER = pg_catalog.default)", "error");
     [Fact]
     public void tsa0007() => CorpusAssert.Parses(@"CREATE TEXT SEARCH CONFIGURATION s.badcfg (PARSER = pg_catalog.default, COPY = pg_catalog.simple)", "error");
     [Fact]
     public void tsa0008() => CorpusAssert.Parses(@"CREATE TEXT SEARCH CONFIGURATION s.emptycfg ()", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tsa0009() => CorpusAssert.Parses(@"CREATE TEXT SEARCH CONFIGURATION s.badparser (PARSER = nonexistent_parser)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tsa0010() => CorpusAssert.Parses(@"CREATE TEXT SEARCH CONFIGURATION s.badcopy (COPY = nonexistent_config)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task tsa0009() => CorpusAssert.MatchesPostgres(@"CREATE TEXT SEARCH CONFIGURATION s.badparser (PARSER = nonexistent_parser)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tsa0010() => CorpusAssert.MatchesPostgres(@"CREATE TEXT SEARCH CONFIGURATION s.badcopy (COPY = nonexistent_config)", "error", false);
     [Fact]
     public void tsa0011() => CorpusAssert.Parses(@"CREATE TEXT SEARCH CONFIGURATION s.cfg1 (PARSER = pg_catalog.default);
 ALTER TEXT SEARCH CONFIGURATION s.cfg1 ADD MAPPING FOR asciiword WITH pg_catalog.english_stem", "ok");
@@ -56,13 +56,13 @@ ALTER TEXT SEARCH CONFIGURATION s.cfg8 DROP MAPPING FOR asciiword", "ok");
     [Fact]
     public void tsa0019() => CorpusAssert.Parses(@"CREATE TEXT SEARCH CONFIGURATION s.cfg9 (PARSER = pg_catalog.default);
 ALTER TEXT SEARCH CONFIGURATION s.cfg9 DROP MAPPING IF EXISTS FOR asciiword", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tsa0020() => CorpusAssert.Parses(@"CREATE TEXT SEARCH CONFIGURATION s.cfg10 (PARSER = pg_catalog.default);
+    [DbFact]
+    public System.Threading.Tasks.Task tsa0020() => CorpusAssert.MatchesPostgres(@"CREATE TEXT SEARCH CONFIGURATION s.cfg10 (PARSER = pg_catalog.default);
 ALTER TEXT SEARCH CONFIGURATION s.cfg10 ADD MAPPING FOR asciiword WITH pg_catalog.english_stem;
-ALTER TEXT SEARCH CONFIGURATION s.cfg10 DROP MAPPING FOR asciiword, word", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tsa0021() => CorpusAssert.Parses(@"CREATE TEXT SEARCH CONFIGURATION s.cfg11 (PARSER = pg_catalog.default);
-ALTER TEXT SEARCH CONFIGURATION s.cfg11 DROP MAPPING FOR asciiword", "error");
+ALTER TEXT SEARCH CONFIGURATION s.cfg10 DROP MAPPING FOR asciiword, word", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tsa0021() => CorpusAssert.MatchesPostgres(@"CREATE TEXT SEARCH CONFIGURATION s.cfg11 (PARSER = pg_catalog.default);
+ALTER TEXT SEARCH CONFIGURATION s.cfg11 DROP MAPPING FOR asciiword", "error", false);
     [Fact]
     public void tsa0022() => CorpusAssert.Parses(@"CREATE TEXT SEARCH CONFIGURATION s.rencfg (PARSER = pg_catalog.default);
 ALTER TEXT SEARCH CONFIGURATION s.rencfg RENAME TO s.rencfg2", "error");
@@ -92,8 +92,8 @@ DROP TEXT SEARCH CONFIGURATION s.dropcfg2 RESTRICT", "ok");
 DROP TEXT SEARCH CONFIGURATION s.dropcfg3 CASCADE", "ok");
     [Fact]
     public void tsa0031() => CorpusAssert.Parses(@"DROP TEXT SEARCH CONFIGURATION IF EXISTS s.nonexistent_cfg", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tsa0032() => CorpusAssert.Parses(@"DROP TEXT SEARCH CONFIGURATION s.nonexistent_cfg2", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task tsa0032() => CorpusAssert.MatchesPostgres(@"DROP TEXT SEARCH CONFIGURATION s.nonexistent_cfg2", "error", false);
     [Fact]
     public void tsa0033() => CorpusAssert.Parses(@"DROP TEXT SEARCH CONFIGURATION IF EXISTS s.nonexistent_cfg3 CASCADE", "ok");
     [Fact]
@@ -106,17 +106,17 @@ DROP TEXT SEARCH CONFIGURATION s.dropcfg3 CASCADE", "ok");
     public void tsa0037() => CorpusAssert.Parses(@"CREATE TEXT SEARCH DICTIONARY s.snowdict (TEMPLATE = pg_catalog.snowball, LANGUAGE = english)", "ok");
     [Fact]
     public void tsa0038() => CorpusAssert.Parses(@"CREATE TEXT SEARCH DICTIONARY s.snowdict2 (TEMPLATE = pg_catalog.snowball, LANGUAGE = english, STOPWORDS = english)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tsa0039() => CorpusAssert.Parses(@"CREATE TEXT SEARCH DICTIONARY s.syndict (TEMPLATE = pg_catalog.synonym, SYNONYMS = pg_catalog.pg_dict)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task tsa0039() => CorpusAssert.MatchesPostgres(@"CREATE TEXT SEARCH DICTIONARY s.syndict (TEMPLATE = pg_catalog.synonym, SYNONYMS = pg_catalog.pg_dict)", "error", false);
     [Fact]
     public void tsa0040() => CorpusAssert.Parses(@"CREATE TEXT SEARCH DICTIONARY s.notempl ()", "error");
     [Fact]
     public void tsa0041() => CorpusAssert.Parses(@"CREATE TEXT SEARCH DICTIONARY (TEMPLATE = pg_catalog.simple)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tsa0042() => CorpusAssert.Parses(@"CREATE TEXT SEARCH DICTIONARY s.badtempl (TEMPLATE = nonexistent_template)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tsa0043() => CorpusAssert.Parses(@"CREATE TEXT SEARCH DICTIONARY s.dictdup (TEMPLATE = pg_catalog.simple);
-CREATE TEXT SEARCH DICTIONARY s.dictdup (TEMPLATE = pg_catalog.simple)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task tsa0042() => CorpusAssert.MatchesPostgres(@"CREATE TEXT SEARCH DICTIONARY s.badtempl (TEMPLATE = nonexistent_template)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tsa0043() => CorpusAssert.MatchesPostgres(@"CREATE TEXT SEARCH DICTIONARY s.dictdup (TEMPLATE = pg_catalog.simple);
+CREATE TEXT SEARCH DICTIONARY s.dictdup (TEMPLATE = pg_catalog.simple)", "error", false);
     [Fact]
     public void tsa0044() => CorpusAssert.Parses(@"CREATE TEXT SEARCH DICTIONARY s.dictren (TEMPLATE = pg_catalog.simple);
 ALTER TEXT SEARCH DICTIONARY s.dictren RENAME TO dictren2", "ok");
@@ -142,8 +142,8 @@ DROP TEXT SEARCH DICTIONARY s.dropd2 CASCADE", "ok");
 DROP TEXT SEARCH DICTIONARY s.dropd3 RESTRICT", "ok");
     [Fact]
     public void tsa0052() => CorpusAssert.Parses(@"DROP TEXT SEARCH DICTIONARY IF EXISTS s.nosuchdict", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tsa0053() => CorpusAssert.Parses(@"DROP TEXT SEARCH DICTIONARY s.nosuchdict2", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task tsa0053() => CorpusAssert.MatchesPostgres(@"DROP TEXT SEARCH DICTIONARY s.nosuchdict2", "error", false);
     [Fact]
     public void tsa0054() => CorpusAssert.Parses(@"DROP TEXT SEARCH DICTIONARY IF EXISTS s.nosuchdict3 CASCADE", "ok");
     [Fact]
@@ -164,11 +164,11 @@ DROP TEXT SEARCH DICTIONARY s.dropd3 RESTRICT", "ok");
     public void tsa0062() => CorpusAssert.Parses(@"CREATE TEXT SEARCH PARSER s.badparser4 (START = prsd_start, GETTOKEN = prsd_nexttoken, END = prsd_end)", "error");
     [Fact]
     public void tsa0063() => CorpusAssert.Parses(@"CREATE TEXT SEARCH PARSER (START = prsd_start, GETTOKEN = prsd_nexttoken, END = prsd_end, LEXTYPES = prsd_lextype)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tsa0064() => CorpusAssert.Parses(@"CREATE TEXT SEARCH PARSER s.parserdup (START = prsd_start, GETTOKEN = prsd_nexttoken, END = prsd_end, LEXTYPES = prsd_lextype);
-CREATE TEXT SEARCH PARSER s.parserdup (START = prsd_start, GETTOKEN = prsd_nexttoken, END = prsd_end, LEXTYPES = prsd_lextype)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tsa0065() => CorpusAssert.Parses(@"CREATE TEXT SEARCH PARSER s.badparser5 (START = nonexistent_fn, GETTOKEN = prsd_nexttoken, END = prsd_end, LEXTYPES = prsd_lextype)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task tsa0064() => CorpusAssert.MatchesPostgres(@"CREATE TEXT SEARCH PARSER s.parserdup (START = prsd_start, GETTOKEN = prsd_nexttoken, END = prsd_end, LEXTYPES = prsd_lextype);
+CREATE TEXT SEARCH PARSER s.parserdup (START = prsd_start, GETTOKEN = prsd_nexttoken, END = prsd_end, LEXTYPES = prsd_lextype)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tsa0065() => CorpusAssert.MatchesPostgres(@"CREATE TEXT SEARCH PARSER s.badparser5 (START = nonexistent_fn, GETTOKEN = prsd_nexttoken, END = prsd_end, LEXTYPES = prsd_lextype)", "error", false);
     [Fact]
     public void tsa0066() => CorpusAssert.Parses(@"CREATE TEXT SEARCH PARSER s.renparser (START = prsd_start, GETTOKEN = prsd_nexttoken, END = prsd_end, LEXTYPES = prsd_lextype);
 ALTER TEXT SEARCH PARSER s.renparser RENAME TO renparser2", "ok");
@@ -186,8 +186,8 @@ DROP TEXT SEARCH PARSER s.dropparser2 CASCADE", "ok");
 DROP TEXT SEARCH PARSER s.dropparser3 RESTRICT", "ok");
     [Fact]
     public void tsa0071() => CorpusAssert.Parses(@"DROP TEXT SEARCH PARSER IF EXISTS s.nosuchparser", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tsa0072() => CorpusAssert.Parses(@"DROP TEXT SEARCH PARSER s.nosuchparser2", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task tsa0072() => CorpusAssert.MatchesPostgres(@"DROP TEXT SEARCH PARSER s.nosuchparser2", "error", false);
     [Fact]
     public void tsa0073() => CorpusAssert.Parses(@"DROP TEXT SEARCH PARSER IF EXISTS s.nosuchparser3 CASCADE", "ok");
     [Fact]
@@ -204,11 +204,11 @@ DROP TEXT SEARCH PARSER s.dropparser3 RESTRICT", "ok");
     public void tsa0079() => CorpusAssert.Parses(@"CREATE TEXT SEARCH TEMPLATE s.badtempl2 ()", "error");
     [Fact]
     public void tsa0080() => CorpusAssert.Parses(@"CREATE TEXT SEARCH TEMPLATE (LEXIZE = dsimple_lexize)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tsa0081() => CorpusAssert.Parses(@"CREATE TEXT SEARCH TEMPLATE s.templdup (LEXIZE = dsimple_lexize);
-CREATE TEXT SEARCH TEMPLATE s.templdup (LEXIZE = dsimple_lexize)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tsa0082() => CorpusAssert.Parses(@"CREATE TEXT SEARCH TEMPLATE s.badtempl3 (LEXIZE = nonexistent_lexize_fn)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task tsa0081() => CorpusAssert.MatchesPostgres(@"CREATE TEXT SEARCH TEMPLATE s.templdup (LEXIZE = dsimple_lexize);
+CREATE TEXT SEARCH TEMPLATE s.templdup (LEXIZE = dsimple_lexize)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tsa0082() => CorpusAssert.MatchesPostgres(@"CREATE TEXT SEARCH TEMPLATE s.badtempl3 (LEXIZE = nonexistent_lexize_fn)", "error", false);
     [Fact]
     public void tsa0083() => CorpusAssert.Parses(@"CREATE TEXT SEARCH TEMPLATE s.rentempl (LEXIZE = dsimple_lexize);
 ALTER TEXT SEARCH TEMPLATE s.rentempl RENAME TO rentempl2", "ok");
@@ -226,8 +226,8 @@ DROP TEXT SEARCH TEMPLATE s.droptempl2 CASCADE", "ok");
 DROP TEXT SEARCH TEMPLATE s.droptempl3 RESTRICT", "ok");
     [Fact]
     public void tsa0088() => CorpusAssert.Parses(@"DROP TEXT SEARCH TEMPLATE IF EXISTS s.nosuchtempl", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tsa0089() => CorpusAssert.Parses(@"DROP TEXT SEARCH TEMPLATE s.nosuchtempl2", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task tsa0089() => CorpusAssert.MatchesPostgres(@"DROP TEXT SEARCH TEMPLATE s.nosuchtempl2", "error", false);
     [Fact]
     public void tsa0090() => CorpusAssert.Parses(@"DROP TEXT SEARCH TEMPLATE IF EXISTS s.nosuchtempl3 CASCADE", "ok");
     [Fact]
@@ -298,18 +298,18 @@ ALTER TEXT SEARCH CONFIGURATION s.cfg_blank ADD MAPPING FOR blank WITH pg_catalo
     [Fact]
     public void tsa0112() => CorpusAssert.Parses(@"CREATE TEXT SEARCH CONFIGURATION s.altcfg1 (PARSER = pg_catalog.default);
 ALTER TEXT SEARCH CONFIGURATION s.altcfg1 ADD MAPPING FOR asciiword, word, numword, email WITH pg_catalog.simple", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tsa0113() => CorpusAssert.Parses(@"CREATE TEXT SEARCH CONFIGURATION s.altcfg2 (PARSER = pg_catalog.default);
+    [DbFact]
+    public System.Threading.Tasks.Task tsa0113() => CorpusAssert.MatchesPostgres(@"CREATE TEXT SEARCH CONFIGURATION s.altcfg2 (PARSER = pg_catalog.default);
 ALTER TEXT SEARCH CONFIGURATION s.altcfg2 ADD MAPPING FOR asciiword WITH pg_catalog.english_stem;
-ALTER TEXT SEARCH CONFIGURATION s.altcfg2 ADD MAPPING FOR asciiword WITH pg_catalog.simple", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tsa0114() => CorpusAssert.Parses(@"ALTER TEXT SEARCH CONFIGURATION pg_catalog.english ADD MAPPING FOR asciiword WITH pg_catalog.simple", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tsa0115() => CorpusAssert.Parses(@"CREATE TEXT SEARCH CONFIGURATION s.cfg_nomap (PARSER = pg_catalog.default);
-ALTER TEXT SEARCH CONFIGURATION s.cfg_nomap ADD MAPPING FOR badtokentype WITH pg_catalog.simple", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tsa0116() => CorpusAssert.Parses(@"CREATE TEXT SEARCH CONFIGURATION s.cfg_baddict (PARSER = pg_catalog.default);
-ALTER TEXT SEARCH CONFIGURATION s.cfg_baddict ADD MAPPING FOR asciiword WITH nonexistent_dict", "error");
+ALTER TEXT SEARCH CONFIGURATION s.altcfg2 ADD MAPPING FOR asciiword WITH pg_catalog.simple", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tsa0114() => CorpusAssert.MatchesPostgres(@"ALTER TEXT SEARCH CONFIGURATION pg_catalog.english ADD MAPPING FOR asciiword WITH pg_catalog.simple", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tsa0115() => CorpusAssert.MatchesPostgres(@"CREATE TEXT SEARCH CONFIGURATION s.cfg_nomap (PARSER = pg_catalog.default);
+ALTER TEXT SEARCH CONFIGURATION s.cfg_nomap ADD MAPPING FOR badtokentype WITH pg_catalog.simple", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tsa0116() => CorpusAssert.MatchesPostgres(@"CREATE TEXT SEARCH CONFIGURATION s.cfg_baddict (PARSER = pg_catalog.default);
+ALTER TEXT SEARCH CONFIGURATION s.cfg_baddict ADD MAPPING FOR asciiword WITH nonexistent_dict", "error", false);
     [Fact]
     public void tsa0117() => CorpusAssert.Parses(@"CREATE TEXT SEARCH CONFIGURATION s.cfg_syntax1 (PARSER pg_catalog.default)", "error");
     [Fact]
@@ -354,17 +354,17 @@ ALTER TEXT SEARCH CONFIGURATION s.cfg_altmap ALTER MAPPING FOR asciiword WITH pg
     public void tsa0134() => CorpusAssert.Parses(@"CREATE TEXT SEARCH CONFIGURATION s.cfg_replace (COPY = pg_catalog.english);
 ALTER TEXT SEARCH CONFIGURATION s.cfg_replace ALTER MAPPING REPLACE pg_catalog.english_stem WITH pg_catalog.simple;
 ALTER TEXT SEARCH CONFIGURATION s.cfg_replace ALTER MAPPING REPLACE pg_catalog.simple WITH pg_catalog.english_stem", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tsa0135() => CorpusAssert.Parses(@"ALTER TEXT SEARCH CONFIGURATION nonexistent_cfg ADD MAPPING FOR asciiword WITH pg_catalog.simple", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tsa0136() => CorpusAssert.Parses(@"CREATE TEXT SEARCH CONFIGURATION s.cfg_miss_with (PARSER = pg_catalog.default);
-ALTER TEXT SEARCH CONFIGURATION s.cfg_miss_with ADD MAPPING FOR asciiword pg_catalog.simple", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tsa0137() => CorpusAssert.Parses(@"CREATE TEXT SEARCH CONFIGURATION s.cfg_miss_for (PARSER = pg_catalog.default);
-ALTER TEXT SEARCH CONFIGURATION s.cfg_miss_for ADD MAPPING asciiword WITH pg_catalog.simple", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tsa0138() => CorpusAssert.Parses(@"CREATE TEXT SEARCH CONFIGURATION s.cfg_miss_for2 (PARSER = pg_catalog.default);
-ALTER TEXT SEARCH CONFIGURATION s.cfg_miss_for2 DROP MAPPING asciiword", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task tsa0135() => CorpusAssert.MatchesPostgres(@"ALTER TEXT SEARCH CONFIGURATION nonexistent_cfg ADD MAPPING FOR asciiword WITH pg_catalog.simple", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tsa0136() => CorpusAssert.MatchesPostgres(@"CREATE TEXT SEARCH CONFIGURATION s.cfg_miss_with (PARSER = pg_catalog.default);
+ALTER TEXT SEARCH CONFIGURATION s.cfg_miss_with ADD MAPPING FOR asciiword pg_catalog.simple", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tsa0137() => CorpusAssert.MatchesPostgres(@"CREATE TEXT SEARCH CONFIGURATION s.cfg_miss_for (PARSER = pg_catalog.default);
+ALTER TEXT SEARCH CONFIGURATION s.cfg_miss_for ADD MAPPING asciiword WITH pg_catalog.simple", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tsa0138() => CorpusAssert.MatchesPostgres(@"CREATE TEXT SEARCH CONFIGURATION s.cfg_miss_for2 (PARSER = pg_catalog.default);
+ALTER TEXT SEARCH CONFIGURATION s.cfg_miss_for2 DROP MAPPING asciiword", "error", false);
     [Fact]
     public void tsa0139() => CorpusAssert.Parses(@"CREATE TEXT SEARCH DICTIONARY s.snowdict3 (TEMPLATE = pg_catalog.snowball, LANGUAGE = danish)", "ok");
     [Fact]
@@ -373,11 +373,11 @@ ALTER TEXT SEARCH CONFIGURATION s.cfg_miss_for2 DROP MAPPING asciiword", "error"
     public void tsa0141() => CorpusAssert.Parses(@"CREATE TEXT SEARCH DICTIONARY s.snowdict5 (TEMPLATE = pg_catalog.snowball, LANGUAGE = spanish)", "ok");
     [Fact]
     public void tsa0142() => CorpusAssert.Parses(@"CREATE TEXT SEARCH DICTIONARY s.snowdict6 (TEMPLATE = pg_catalog.snowball, LANGUAGE = german)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tsa0143() => CorpusAssert.Parses(@"CREATE TEXT SEARCH DICTIONARY s.unaccdict (TEMPLATE = pg_catalog.simple, UNACCENT = false)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tsa0144() => CorpusAssert.Parses(@"CREATE TEXT SEARCH CONFIGURATION s.cfg_copy_english (COPY = pg_catalog.english);
-ALTER TEXT SEARCH CONFIGURATION s.cfg_copy_english ADD MAPPING FOR asciiword WITH pg_catalog.english_stem", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task tsa0143() => CorpusAssert.MatchesPostgres(@"CREATE TEXT SEARCH DICTIONARY s.unaccdict (TEMPLATE = pg_catalog.simple, UNACCENT = false)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tsa0144() => CorpusAssert.MatchesPostgres(@"CREATE TEXT SEARCH CONFIGURATION s.cfg_copy_english (COPY = pg_catalog.english);
+ALTER TEXT SEARCH CONFIGURATION s.cfg_copy_english ADD MAPPING FOR asciiword WITH pg_catalog.english_stem", "error", false);
     [Fact]
     public void tsa0145() => CorpusAssert.Parses(@"CREATE TEXT SEARCH CONFIGURATION s.cfg_two_parsers (PARSER = pg_catalog.default, PARSER = pg_catalog.default)", "ok");
     [Fact]
@@ -399,21 +399,21 @@ ALTER TEXT SEARCH DICTIONARY s.dictaltparams (STOPWORDS = english, ACCEPT = fals
     [Fact]
     public void tsa0151() => CorpusAssert.Parses(@"CREATE TEXT SEARCH DICTIONARY s.dictaltparams2 (TEMPLATE = pg_catalog.snowball, LANGUAGE = english);
 ALTER TEXT SEARCH DICTIONARY s.dictaltparams2 (LANGUAGE = french)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tsa0152() => CorpusAssert.Parses(@"ALTER TEXT SEARCH DICTIONARY nonexistent_dict (STOPWORDS = english)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task tsa0152() => CorpusAssert.MatchesPostgres(@"ALTER TEXT SEARCH DICTIONARY nonexistent_dict (STOPWORDS = english)", "error", false);
     [Fact]
     public void tsa0153() => CorpusAssert.Parses(@"CREATE TEXT SEARCH CONFIGURATION s.cfg_ifnotex (PARSER = pg_catalog.default);
 CREATE TEXT SEARCH CONFIGURATION IF NOT EXISTS s.cfg_ifnotex (PARSER = pg_catalog.default)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tsa0154() => CorpusAssert.Parses(@"CREATE OR REPLACE TEXT SEARCH CONFIGURATION s.cfg_orrepl (PARSER = pg_catalog.default)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tsa0155() => CorpusAssert.Parses(@"CREATE OR REPLACE TEXT SEARCH DICTIONARY s.dict_orrepl (TEMPLATE = pg_catalog.simple)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task tsa0154() => CorpusAssert.MatchesPostgres(@"CREATE OR REPLACE TEXT SEARCH CONFIGURATION s.cfg_orrepl (PARSER = pg_catalog.default)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tsa0155() => CorpusAssert.MatchesPostgres(@"CREATE OR REPLACE TEXT SEARCH DICTIONARY s.dict_orrepl (TEMPLATE = pg_catalog.simple)", "error", false);
     [Fact]
     public void tsa0156() => CorpusAssert.Parses(@"CREATE TEXT SEARCH DICTIONARY IF NOT EXISTS s.dict_ifnotex (TEMPLATE = pg_catalog.simple)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tsa0157() => CorpusAssert.Parses(@"CREATE OR REPLACE TEXT SEARCH PARSER s.parser_orrepl (START = prsd_start, GETTOKEN = prsd_nexttoken, END = prsd_end, LEXTYPES = prsd_lextype)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tsa0158() => CorpusAssert.Parses(@"CREATE OR REPLACE TEXT SEARCH TEMPLATE s.templ_orrepl (LEXIZE = dsimple_lexize)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task tsa0157() => CorpusAssert.MatchesPostgres(@"CREATE OR REPLACE TEXT SEARCH PARSER s.parser_orrepl (START = prsd_start, GETTOKEN = prsd_nexttoken, END = prsd_end, LEXTYPES = prsd_lextype)", "error", false);
+    [DbFact]
+    public System.Threading.Tasks.Task tsa0158() => CorpusAssert.MatchesPostgres(@"CREATE OR REPLACE TEXT SEARCH TEMPLATE s.templ_orrepl (LEXIZE = dsimple_lexize)", "error", false);
     [Fact]
     public void tsa0159() => CorpusAssert.Parses(@"CREATE TEXT SEARCH CONFIGURATION s.cfg_qparser (PARSER = ""pg_catalog"".""default"")", "ok");
     [Fact]
@@ -468,8 +468,8 @@ ALTER TEXT SEARCH CONFIGURATION s.cfg_chain ADD MAPPING FOR asciiword WITH s.dch
     public void tsb0007() => CorpusAssert.Parses(@"CREATE TEXT SEARCH CONFIGURATION (PARSER = pg_catalog.default)", "error");
     [Fact]
     public void tsb0008() => CorpusAssert.Parses(@"CREATE TEXT SEARCH CONFIGURATION myconf PARSER = pg_catalog.default", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tsb0009() => CorpusAssert.Parses(@"CREATE TEXT SEARCH CONFIGURATION myconf (COPY = nonexistent_config_xyz)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task tsb0009() => CorpusAssert.MatchesPostgres(@"CREATE TEXT SEARCH CONFIGURATION myconf (COPY = nonexistent_config_xyz)", "error", false);
     [Fact]
     public void tsb0010() => CorpusAssert.Parses(@"CREATE TEXT SEARCH CONFIGURATION myconf (PARSER = pg_catalog.default);
 DROP TEXT SEARCH CONFIGURATION myconf", "ok");
@@ -478,8 +478,8 @@ DROP TEXT SEARCH CONFIGURATION myconf", "ok");
 DROP TEXT SEARCH CONFIGURATION IF EXISTS myconf", "ok");
     [Fact]
     public void tsb0012() => CorpusAssert.Parses(@"DROP TEXT SEARCH CONFIGURATION IF EXISTS no_such_config_xyz", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tsb0013() => CorpusAssert.Parses(@"DROP TEXT SEARCH CONFIGURATION no_such_config_xyz", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task tsb0013() => CorpusAssert.MatchesPostgres(@"DROP TEXT SEARCH CONFIGURATION no_such_config_xyz", "error", false);
     [Fact]
     public void tsb0014() => CorpusAssert.Parses(@"CREATE TEXT SEARCH CONFIGURATION myconf (PARSER = pg_catalog.default);
 DROP TEXT SEARCH CONFIGURATION myconf CASCADE", "ok");
@@ -504,9 +504,9 @@ ALTER TEXT SEARCH CONFIGURATION myconf DROP MAPPING FOR word", "ok");
     [Fact]
     public void tsb0021() => CorpusAssert.Parses(@"CREATE TEXT SEARCH CONFIGURATION myconf (COPY = pg_catalog.english);
 ALTER TEXT SEARCH CONFIGURATION myconf DROP MAPPING IF EXISTS FOR word", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tsb0022() => CorpusAssert.Parses(@"CREATE TEXT SEARCH CONFIGURATION myconf (COPY = pg_catalog.english);
-ALTER TEXT SEARCH CONFIGURATION myconf DROP MAPPING IF EXISTS FOR no_such_token_type_xyz", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task tsb0022() => CorpusAssert.MatchesPostgres(@"CREATE TEXT SEARCH CONFIGURATION myconf (COPY = pg_catalog.english);
+ALTER TEXT SEARCH CONFIGURATION myconf DROP MAPPING IF EXISTS FOR no_such_token_type_xyz", "error", false);
     [Fact]
     public void tsb0023() => CorpusAssert.Parses(@"CREATE TEXT SEARCH CONFIGURATION myconf (PARSER = pg_catalog.default);
 ALTER TEXT SEARCH CONFIGURATION myconf ADD MAPPING FOR word WITH simple, english_stem", "ok");
@@ -519,8 +519,8 @@ ALTER TEXT SEARCH CONFIGURATION myconf OWNER TO CURRENT_USER", "ok");
     [Fact]
     public void tsb0026() => CorpusAssert.Parses(@"CREATE TEXT SEARCH CONFIGURATION myconf (PARSER = pg_catalog.default);
 ALTER TEXT SEARCH CONFIGURATION myconf SET SCHEMA s", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tsb0027() => CorpusAssert.Parses(@"ALTER TEXT SEARCH CONFIGURATION pg_catalog.english ADD MAPPING FOR word WITH simple", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task tsb0027() => CorpusAssert.MatchesPostgres(@"ALTER TEXT SEARCH CONFIGURATION pg_catalog.english ADD MAPPING FOR word WITH simple", "error", false);
     [Fact]
     public void tsb0028() => CorpusAssert.Parses(@"CREATE TEXT SEARCH DICTIONARY mydict (TEMPLATE = pg_catalog.simple)", "ok");
     [Fact]
@@ -533,8 +533,8 @@ ALTER TEXT SEARCH CONFIGURATION myconf SET SCHEMA s", "ok");
     public void tsb0032() => CorpusAssert.Parses(@"CREATE TEXT SEARCH DICTIONARY mydict (TEMPLATE = pg_catalog.snowball, LANGUAGE = english, STOPWORDS = english)", "ok");
     [Fact]
     public void tsb0033() => CorpusAssert.Parses(@"CREATE TEXT SEARCH DICTIONARY mydict ()", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tsb0034() => CorpusAssert.Parses(@"CREATE TEXT SEARCH DICTIONARY mydict (TEMPLATE = nonexistent_template_xyz)", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task tsb0034() => CorpusAssert.MatchesPostgres(@"CREATE TEXT SEARCH DICTIONARY mydict (TEMPLATE = nonexistent_template_xyz)", "error", false);
     [Fact]
     public void tsb0035() => CorpusAssert.Parses(@"CREATE TEXT SEARCH DICTIONARY (TEMPLATE = pg_catalog.simple)", "error");
     [Fact]
@@ -544,8 +544,8 @@ ALTER TEXT SEARCH CONFIGURATION myconf SET SCHEMA s", "ok");
 DROP TEXT SEARCH DICTIONARY mydict", "ok");
     [Fact]
     public void tsb0038() => CorpusAssert.Parses(@"DROP TEXT SEARCH DICTIONARY IF EXISTS no_such_dict_xyz", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tsb0039() => CorpusAssert.Parses(@"DROP TEXT SEARCH DICTIONARY no_such_dict_xyz", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task tsb0039() => CorpusAssert.MatchesPostgres(@"DROP TEXT SEARCH DICTIONARY no_such_dict_xyz", "error", false);
     [Fact]
     public void tsb0040() => CorpusAssert.Parses(@"CREATE TEXT SEARCH DICTIONARY mydict (TEMPLATE = pg_catalog.simple);
 DROP TEXT SEARCH DICTIONARY mydict CASCADE", "ok");
@@ -571,8 +571,8 @@ DROP TEXT SEARCH DICTIONARY mydict RESTRICT", "ok");
 DROP TEXT SEARCH PARSER myparser", "ok");
     [Fact]
     public void tsb0050() => CorpusAssert.Parses(@"DROP TEXT SEARCH PARSER IF EXISTS no_such_parser_xyz", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tsb0051() => CorpusAssert.Parses(@"DROP TEXT SEARCH PARSER no_such_parser_xyz", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task tsb0051() => CorpusAssert.MatchesPostgres(@"DROP TEXT SEARCH PARSER no_such_parser_xyz", "error", false);
     [Fact]
     public void tsb0052() => CorpusAssert.Parses(@"CREATE TEXT SEARCH TEMPLATE mytempl (INIT = dsimple_init, LEXIZE = dsimple_lexize)", "ok");
     [Fact]
@@ -588,8 +588,8 @@ DROP TEXT SEARCH PARSER myparser", "ok");
 DROP TEXT SEARCH TEMPLATE mytempl", "ok");
     [Fact]
     public void tsb0058() => CorpusAssert.Parses(@"DROP TEXT SEARCH TEMPLATE IF EXISTS no_such_template_xyz", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void tsb0059() => CorpusAssert.Parses(@"DROP TEXT SEARCH TEMPLATE no_such_template_xyz", "error");
+    [DbFact]
+    public System.Threading.Tasks.Task tsb0059() => CorpusAssert.MatchesPostgres(@"DROP TEXT SEARCH TEMPLATE no_such_template_xyz", "error", false);
     [Fact]
     public void tsb0060() => CorpusAssert.Parses(@"CREATE TEXT SEARCH TEMPLATE mytempl (LEXIZE = dsimple_lexize);
 DROP TEXT SEARCH TEMPLATE mytempl CASCADE", "ok");
