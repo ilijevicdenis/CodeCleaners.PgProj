@@ -101,6 +101,26 @@ public class CorpusTestGenerator
         Assert.Equal(cases.Count, emitted + skipped);
     }
 
+    [Fact]
+    public void Dump_false_rejections()
+    {
+        if (Environment.GetEnvironmentVariable("PGPROJ_DUMP_REJECTIONS") != "1") return;
+        var rej = CorpusData.LoadAll()
+            .Where(c => c.Expect == "ok" && CorpusData.Verdict(c.Sql) == CorpusVerdict.Error)
+            .ToList();
+        _out.WriteLine($"false rejections (expect=ok, parser=error): {rej.Count}");
+        File.WriteAllLines(Path.Combine(CorpusData.CorpusDir, "_phase1_targets.txt"),
+            rej.Select(c => c.Id).OrderBy(x => x, StringComparer.Ordinal));
+        foreach (var c in rej.OrderBy(c => c.Category, StringComparer.Ordinal).ThenBy(c => c.Id, StringComparer.Ordinal))
+        {
+            var p = new PgProj.Core.Parsing.AstParser();
+            p.Parse(c.Sql);
+            _out.WriteLine($"[{c.Id}] {c.Category}");
+            _out.WriteLine($"    sql: {c.Sql.Replace("\n", " ")}");
+            _out.WriteLine($"    diag: {string.Join(" | ", p.Diagnostics)}");
+        }
+    }
+
     private static string Pascal(string kebab) =>
         string.Concat(kebab.Split('-', '_', ' ')
             .Where(p => p.Length > 0)

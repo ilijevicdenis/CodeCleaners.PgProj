@@ -64,7 +64,7 @@ public static class CorpusData
         return cases;
     }
 
-    /// <summary>Run the parser and classify the outcome.</summary>
+    /// <summary>Legacy-parser 3-way classification (used by the informational coverage report).</summary>
     public static CorpusVerdict Verdict(string sql)
     {
         var p = new AstParser();
@@ -73,8 +73,26 @@ public static class CorpusData
         return script.Statements.Count > 0 ? CorpusVerdict.Parsed : CorpusVerdict.Empty;
     }
 
-    /// <summary>True when the parser already does the right thing for this case.</summary>
-    public static bool Passes(CorpusCase c) =>
-        c.Expect == "ok" ? Verdict(c.Sql) == CorpusVerdict.Parsed
-                         : Verdict(c.Sql) == CorpusVerdict.Error;
+    /// <summary>
+    /// True when the active parser already does the right thing for this case — mirrors CorpusAssert:
+    /// the new PgParser is authoritative for kinds it owns, otherwise the legacy parser decides.
+    /// </summary>
+    public static bool Passes(CorpusCase c)
+    {
+        var res = new Syntax.PgParser().Parse(c.Sql);
+        bool parsedClean, hasError;
+        if (res.FullyRecognized)
+        {
+            parsedClean = res.Diagnostics.Count == 0 && res.Statements.Count > 0;
+            hasError = res.Diagnostics.Count > 0;
+        }
+        else
+        {
+            var p = new AstParser();
+            var script = p.Parse(c.Sql);
+            parsedClean = p.Diagnostics.Count == 0 && script.Statements.Count > 0;
+            hasError = p.Diagnostics.Count > 0;
+        }
+        return c.Expect == "ok" ? parsedClean : hasError;
+    }
 }
