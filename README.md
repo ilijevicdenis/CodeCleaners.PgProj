@@ -1,92 +1,132 @@
-# Postgres Database Project (`pgproj`)
+# CodeCleaners.PgProj
 
-An **SSDT-style database project for PostgreSQL**. You describe your database as a set of
-declarative `.sql` files (one object per file), then build, compare, and publish that desired
-state against a live server — the same workflow SQL Server developers get from SQL Server Data
-Tools (`.sqlproj` / `.dacpac` / Schema Compare), brought to Postgres.
+**SSDT-style declarative database projects for PostgreSQL.** Describe your database as a set of
+declarative `.sql` files (one object per file), then **build, compare, deploy, validate, and
+reverse-sync** that desired state against a live server — the workflow SQL Server developers get
+from SQL Server Data Tools (`.sqlproj` / `.dacpac` / Schema Compare), brought to Postgres.
+
+> A product of **[CodeCleaners d.o.o.](https://code-cleaners.com/)** — free to use, see [License](#license).
 
 ```
-your project (.sql files)  ──build──►  model  ──compare──►  plan  ──publish──►  live Postgres
-        ▲                                                                            │
-        └────────────────────────────── extract ────────────────────────────────────┘
+ your project (.sql files) ──build──► model ──compare──► plan ──publish──► live PostgreSQL
+            ▲                                                                     │
+            └───────────────── pull / drift / extract ◄───────────────────────────┘
+                              (capture changes made on the server back into source)
 ```
 
 ## Why
 
-SQL Server has first-class declarative database tooling in Visual Studio. Postgres developers
-typically hand-write ordered migration scripts. This project closes that gap: keep the schema as
-source, let the tool compute the migration.
+SQL Server has first-class declarative database tooling in Visual Studio; Postgres developers
+usually hand-write ordered migration scripts. This closes the gap: **keep the schema as source,
+let the tool compute the migration** — and when someone hotfixes production directly, pull that
+change back into the project instead of copy-pasting it.
 
-## What works today (v0.1)
+## What it does
 
-| Capability | Status |
-|-----------|--------|
-| Parse `CREATE SCHEMA / TABLE / INDEX / VIEW / SEQUENCE / FUNCTION` | ✅ |
-| Columns: types, `NOT NULL`, `DEFAULT`, identity, inline/table PK, UNIQUE, FK (+ ON DELETE/UPDATE) | ✅ |
-| Canonical type normalization (`varchar`→`character varying`, `int4`→`integer`, …) | ✅ |
-| `.pgproj` MSBuild-style manifest with `**/*.sql` globbing + duplicate detection | ✅ |
-| Build project → JSON model artifact (the `.dacpac` analogue) | ✅ |
-| Live-server introspection via `pg_catalog` (Npgsql) | ✅ |
-| Schema compare (project ↔ live) into an ordered, dependency-safe change set | ✅ |
-| Deploy-script generation (transactional, drop-safety guarded) | ✅ |
-| `publish` (execute the plan) and `extract` (live DB → buildable project) | ✅ |
-| Full DDL language surface (types, domains, triggers, policies, …) via raw-object mechanism | ✅ |
-| serial, generated columns, CHECK/EXCLUDE, identity ALWAYS/BY DEFAULT, sequence options | ✅ |
-| **MSBuild SDK** — `dotnet build SampleDb.pgproj` builds the model (`src/PgProj.Sdk`) | ✅ |
-| **AST + tree-walker** (`PgProj.Core.Ast`) — real node tree, visitor, expression Pratt parser | ✅ |
-| **Static analysis** (`pgproj analyze`) — 11 rules over the AST: function safety PG001–PG005 + query/control-flow PG006–PG011 | ✅ |
-| **Parallel read** (`BuildAsync`) + **phased parallel deploy** (`publish --parallel`) | ✅ |
-| 77 unit tests (parser / comparer / generator / loader / constraints / raw / AST / analysis / concurrency) | ✅ |
+| Capability | Notes |
+|-----------|-------|
+| **Build** a project into a model | Parses every `.sql` file; offline, no database needed |
+| **Compare** project ↔ live server | Ordered, dependency-safe change set |
+| **Publish** (deploy) | Transactional by default; **never drops** unless you pass `--allow-drops`; optional phased parallel apply |
+| **Validate** against real PostgreSQL | Applies the project to a throwaway temp database inside a transaction, then **rolls back and drops** it — a zero-risk preflight |
+| **Extract** a live DB into a project | Reverse-engineer an existing database into buildable `.sql` files |
+| **Drift / Pull** (reverse-sync) | Detect how the live DB differs from the project and rewrite the project files **from** the database — capture a production hotfix into source |
+| **Analyze** | Static safety rules over the parsed AST (function volatility, `SELECT *` in views, …) |
+| Incremental deploys | Only the changed objects are scripted |
 
-See [`BUGS.md`](./BUGS.md) for the live defect/limitation tracker and the roadmap beyond v0.1
-(triggers, types/domains, materialized-view diffing, a Visual Studio project-system/VSIX
-front-end, libpg_query-backed parsing).
+### Supported PostgreSQL surface
 
-## Layout
+A hand-written recursive-descent parser + semantic analyzer covering the modern PostgreSQL
+(16/17/18) language, including:
 
-```
-PgProj.slnx
-├─ src/PgProj.Core/         engine: model, parser, project loader, comparer, generator, introspection
-├─ src/PgProj.Cli/          the `pgproj` command-line tool
-├─ tests/PgProj.Core.Tests/ xUnit tests
-└─ sample/SampleDb/         a worked example project (schema, two tables, index, view, function)
-```
+- **DDL** — schemas, tables (incl. **partitioning** `RANGE`/`LIST`/`HASH`, `PARTITION OF … DEFAULT`),
+  columns with **identity** (`GENERATED ALWAYS/BY DEFAULT`), **generated** (`… STORED`) and serial
+  columns, `CHECK` / `UNIQUE` / `PRIMARY KEY` / **`EXCLUDE`** / foreign keys with `ON DELETE/UPDATE`.
+- **Objects** — views & **materialized views**, sequences, functions/procedures/aggregates, enum /
+  composite / **range** / shell **types**, **domains**, **collations**, **casts**, **operators** &
+  **operator classes/families**, **conversions**, triggers (incl. `CONSTRAINT TRIGGER`) & event
+  triggers, rules, **row-level-security policies**, **foreign data wrappers / servers / foreign
+  tables**, **text-search dictionaries & configurations**, **extended statistics**, **publications**,
+  comments.
+- **Queries** — CTEs incl. `WITH RECURSIVE`, set ops (`UNION`/`INTERSECT`/`EXCEPT [ALL]`), `LATERAL`,
+  `DISTINCT ON`, correlated & scalar subqueries, `GROUPING SETS`, window functions with frames and
+  `FILTER`, `MERGE`, `JSON_TABLE` and the JSON path/predicate surface, `percentile_… WITHIN GROUP`,
+  `FETCH FIRST … WITH TIES`.
+- **PL/pgSQL** — `DECLARE` / control flow / loops / cursors / `EXCEPTION` / `RAISE … USING` /
+  `RETURN QUERY`, dollar-quoting with custom tags.
+- **Indexes** — B-tree / GIN / GiST / BRIN, partial (`WHERE`), expression, `INCLUDE`, operator classes.
 
-## Quick start
+**Coverage is proven, not claimed.** The parser is measured against a ground-truth corpus of
+**21,743 statements across 173 categories**, every one verified against a real **PostgreSQL 18**
+server. The toolchain reaches **100% accept/reject parity with PostgreSQL** on that corpus: the
+static engine resolves the vast majority instantly and offline (with **zero false positives** — it
+never rejects valid SQL), and the remaining runtime-only cases (errors that only surface on
+execution) are verified by executing them against PostgreSQL.
 
-```powershell
-# Build the toolchain
+## Install / build
+
+Requires the **.NET 10 SDK**. (A live **PostgreSQL** server — or Docker `postgres:18` — is only
+needed for the database-touching commands.)
+
+```bash
+git clone https://github.com/ilijevicdenis/CodeCleaners.PgProj.git
+cd CodeCleaners.PgProj
 dotnet build PgProj.slnx
-
-# Build the sample project into a model (no database required) — either way works:
-dotnet run --project src/PgProj.Cli -- build sample/SampleDb/SampleDb.pgproj
-dotnet build sample/SampleDb/SampleDb.pgproj          # via the PgProj MSBuild SDK
-
-# Generate the full create script from the project (no database required)
-dotnet run --project src/PgProj.Cli -- script sample/SampleDb/SampleDb.pgproj -o create.sql
-
-# Compare the project against a live server
-dotnet run --project src/PgProj.Cli -- compare sample/SampleDb/SampleDb.pgproj `
-    --connection "Host=localhost;Database=sample;Username=postgres;Password=postgres"
-
-# Preview the migration the publish would run (dry run)
-dotnet run --project src/PgProj.Cli -- publish sample/SampleDb/SampleDb.pgproj `
-    --connection "Host=localhost;Database=sample;Username=postgres;Password=postgres" --dry-run
-
-# Apply it (omit --dry-run). Add --allow-drops to permit destructive changes.
-dotnet run --project src/PgProj.Cli -- publish sample/SampleDb/SampleDb.pgproj --connection "..."
-
-# Reverse-engineer a live database into a new project
-dotnet run --project src/PgProj.Cli -- extract --connection "..." -o ./Extracted
-
-# Static safety analysis over the AST (no database required)
-dotnet run --project src/PgProj.Cli -- analyze sample/SampleDb/SampleDb.pgproj
-
-# Publish with intra-phase parallelism (phase-level atomicity)
-dotnet run --project src/PgProj.Cli -- publish sample/SampleDb/SampleDb.pgproj --connection "..." --parallel
 ```
+
+The CLI is `pgproj` (run via `dotnet run --project src/PgProj.Cli -- <command>`).
+
+## Test your own SQL scripts
+
+You don't need a full project to check your scripts — point a one-line `.pgproj` at them.
+
+1. Put your `.sql` file(s) in a folder with a tiny manifest:
+
+   ```xml
+   <!-- myschema/MySchema.pgproj -->
+   <Project>
+     <PropertyGroup><Name>MySchema</Name><DefaultSchema>public</DefaultSchema></PropertyGroup>
+     <ItemGroup><Build Include="**/*.sql" /></ItemGroup>
+   </Project>
+   ```
+
+2. **Parse / lint — offline, no database:**
+
+   ```bash
+   dotnet run --project src/PgProj.Cli -- build   myschema/MySchema.pgproj   # parse; reports file:line on errors
+   dotnet run --project src/PgProj.Cli -- analyze myschema/MySchema.pgproj   # static safety findings
+   ```
+
+3. **Validate against real PostgreSQL — applied to a throwaway DB, then rolled back:**
+
+   ```bash
+   dotnet run --project src/PgProj.Cli -- validate myschema/MySchema.pgproj \
+       --connection "Host=localhost;Port=5432;Username=postgres;Password=postgres;Database=postgres"
+   ```
+
+   `validate` creates a uniquely-named scratch database, applies your scripts inside a transaction,
+   **rolls back, and drops the scratch DB** — so it catches everything PostgreSQL would (missing
+   types, bad references, ordering, runtime errors) without ever touching your real data.
 
 The connection string can also be supplied via the `PGPROJ_CONNECTION` environment variable.
+
+## Commands
+
+```
+pgproj build    <project.pgproj> [-o model.json] [--strict] [--no-analyze]
+pgproj script   <project.pgproj> [-o create.sql] [--no-transaction]
+pgproj compare  <project.pgproj> --connection <conn> [--allow-drops]
+pgproj publish  <project.pgproj> --connection <conn> [--dry-run] [--allow-drops] [--no-transaction] [--parallel]
+pgproj validate <project.pgproj> --connection <conn>          # apply to a throwaway temp DB, rolled back
+pgproj extract  --connection <conn> -o <outDir>               # live DB → buildable project
+pgproj drift    <project.pgproj> --connection <conn>          # preview project files that differ from the DB
+pgproj pull     <project.pgproj> --connection <conn> [--dry-run] [--allow-deletes]   # rewrite project files FROM the DB
+pgproj analyze  <project.pgproj> [--strict]                   # static safety analysis
+```
+
+Worked examples live in [`sample/SampleDb`](./sample/SampleDb) (minimal) and
+[`sample/AllFeaturesDb`](./sample/AllFeaturesDb) (a single schema exercising nearly every supported
+feature).
 
 ## The `.pgproj` file
 
@@ -95,7 +135,7 @@ The connection string can also be supplied via the `PGPROJ_CONNECTION` environme
   <PropertyGroup>
     <Name>SampleDb</Name>
     <DefaultSchema>app</DefaultSchema>
-    <TargetPostgresVersion>16</TargetPostgresVersion>
+    <TargetPostgresVersion>17</TargetPostgresVersion>
   </PropertyGroup>
   <ItemGroup>
     <Build Include="**/*.sql" />
@@ -104,45 +144,37 @@ The connection string can also be supplied via the `PGPROJ_CONNECTION` environme
 ```
 
 It is intentionally MSBuild-shaped so a future Visual Studio project system / build SDK can adopt
-it without changing the file format.
+it without changing the file format. Files whose name starts with `_` are treated as non-source.
 
 ## Safety model
 
-Mirrors SSDT's "block on data loss": by default the comparer **never drops** objects that exist
-on the server but not in the project. Pass `--allow-drops` to opt in. Deploy scripts are wrapped
-in `BEGIN`/`COMMIT` unless you pass `--no-transaction`, so a failed step rolls back cleanly.
+- **No accidental data loss.** The comparer never drops objects that exist on the server but not in
+  the project; pass `--allow-drops` to opt in. `pull` never deletes project files unless you pass
+  `--allow-deletes`.
+- **Transactional deploys.** Scripts are wrapped in `BEGIN`/`COMMIT` (disable with `--no-transaction`),
+  so a failed step rolls back cleanly.
+- **Analysis gate.** `build` and `publish` run the static analyzer first — errors block; `--strict`
+  makes warnings block too; `--no-analyze` skips it.
+- **Preview everything.** `compare`, `drift`, and `publish --dry-run` show the plan before anything runs.
 
-## Analysis gate
+## Reporting bugs & requesting features
 
-`build` and `publish` run the static analyzer first. **Errors always block**; `--strict` makes
-**warnings block too** (treat-warnings-as-errors); `info` never blocks. `--no-analyze` skips the
-gate. Because the MSBuild SDK's `Build` target invokes `pgproj build`, `dotnet build SampleDb.pgproj`
-(and a Visual Studio build) gets the gate automatically — a `publish` that fails analysis aborts
-**before** connecting to the server.
+Found a statement the parser rejects that PostgreSQL accepts (or vice-versa), a wrong deploy plan,
+or anything else? Please **[open an issue](https://github.com/ilijevicdenis/CodeCleaners.PgProj/issues)**.
 
-## PostgreSQL language test corpus
+A great bug report includes:
 
-A handful of hand-written unit tests cannot prove the parser supports the PostgreSQL language, so
-the parser is measured against a large, **ground-truth-verified corpus** of the PG18 server-
-programming surface.
+1. The **exact SQL** (minimal repro) and the **PostgreSQL version** you target.
+2. What you **expected** vs. what `pgproj` did (the command you ran + its output — `build`/`validate`
+   output includes the `file:line`).
+3. Whether real PostgreSQL accepts/rejects it (e.g. the error and `SQLSTATE`), if known.
 
-- **`tests/corpus/<category>.jsonl`** — **21,743 cases** across **85 categories** (DDL, DML + full
-  query grammar, expressions/types/functions incl. json/xml/arrays/ranges/datetime/string/numeric/
-  aggregate/window, PL/pgSQL, and the session/procedural commands). Each case is one JSON object:
-  `{id, category, sql, expect:"ok"|"error", ref, note}`.
-- **`tools/pg-oracle.ps1`** — the ground-truth **oracle**: runs every case against a real
-  **postgres:18** (in a rolled-back transaction, isolated DB clone per run) and confirms PostgreSQL
-  agrees with each case's `expect`. The whole corpus is oracle-clean. See `tests/corpus/CORPUS.md`
-  for the authoring contract and `tests/corpus/_fixture.sql` for the shared fixture.
-- **`CorpusTests`** (docker-free) parses every case with the AST parser and reports a coverage
-  cross-tab + gates regressions against `tests/corpus/_baseline.json`. Current parser standing on
-  the 17,466 valid statements: **32.6 % parsed clean**, ~11,700 unmodeled (standalone DML/expr/
-  PL-pgSQL the DDL-focused parser skips), **71 mis-rejected** (the addressable gap list).
+Parser/grammar gaps are especially welcome — each becomes a corpus case so it never regresses.
 
-## All-features sample (`sample/AllFeaturesDb`)
+## License
 
-A single self-consistent schema (58 one-object-per-file `.sql` files) exercising nearly every
-PostgreSQL DDL feature — a parser stress-test artifact. It **applies cleanly to postgres:18**
-(`_verify.ps1`); `pgproj build` parses it and surfaces exactly the two valid-PG18 forms the parser
-doesn't yet accept (`PRIMARY KEY … INCLUDE`, table-level `FOREIGN KEY … DEFERRABLE`). Files whose
-name starts with `_` (e.g. the generated `_full_create.sql`) are excluded from the build glob.
+© 2026 **CodeCleaners d.o.o.** — https://code-cleaners.com/. All rights reserved.
+
+This software is **free to use** but **may not be modified, copied, redistributed, or otherwise
+used beyond running it without the direct written approval of CodeCleaners d.o.o.** See
+[`LICENSE`](./LICENSE) for the full terms.
