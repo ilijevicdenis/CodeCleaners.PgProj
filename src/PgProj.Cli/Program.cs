@@ -131,8 +131,18 @@ public static class Program
             return 0;
         }
 
-        await new DatabaseDeployer().ExecuteAsync(RequireConnection(args), script);
-        Console.WriteLine($"Published {changes.Count} change(s) successfully.");
+        if (HasFlag(args, "--parallel"))
+        {
+            // Intra-phase parallelism with phase barriers (phase-level atomicity).
+            await new PhasedDeployer(RequireConnection(args)).ExecuteAsync(changes);
+            Console.WriteLine($"Published {changes.Count} change(s) successfully (parallel, phased).");
+        }
+        else
+        {
+            // Default: whole script in one transaction (strict all-or-nothing).
+            await new DatabaseDeployer().ExecuteAsync(RequireConnection(args), script);
+            Console.WriteLine($"Published {changes.Count} change(s) successfully.");
+        }
         return 0;
     }
 
@@ -269,6 +279,7 @@ public static class Program
           --dry-run          Generate the deploy script but do not execute it
           --allow-drops      Allow destructive changes (drop tables/columns/etc. not in the project)
           --no-transaction   Do not wrap the deploy script in BEGIN/COMMIT
+          --parallel         Publish with intra-phase parallelism (phase-level atomicity)
         """);
     }
 }

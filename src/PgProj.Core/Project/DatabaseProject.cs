@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Xml.Linq;
 using PgProj.Core.Model;
 using PgProj.Core.Parsing;
@@ -104,6 +106,77 @@ public sealed class DatabaseProject
 
         return new ProjectBuildResult(model, diagnostics, files);
     }
+
+    /// <summary>
+    /// Parallel analogue of <see cref="Build"/>: parses each .sql file in isolation (a private
+    /// parser + model per file, since neither is thread-safe) with bounded concurrency, then merges
+    /// the partial models deterministically in sorted-file order so the result is byte-identical to
+    /// the sequential build. Per-file errors are isolated as diagnostics, never aborting the build.
+    /// (Design: concurrency-orchestrator agent, 2026-06-03.)
+    /// </summary>
+    public async Task<ProjectBuildResult> BuildAsync(CancellationToken ct = default)
+    {
+        var files = ResolveSqlFiles();                 // already sorted → defines merge order
+        var parts = new PartialParse[files.Count];     // one slot per file; index = order
+
+        var options = new ParallelOptions
+        {
+            MaxDegreeOfParallelism = Environment.ProcessorCount,
+            CancellationToken = ct,
+        };
+
+        await Parallel.ForEachAsync(EnumerateIndexed(files), options, (item, _) =>
+        {
+            parts[item.Index] = ParseOne(item.Path);   // total: never throws a domain error
+            return ValueTask.CompletedTask;            // CPU-bound body — no real awaiting
+        });
+
+        return Merge(parts, files);
+    }
+
+    private PartialParse ParseOne(string path)
+    {
+        try
+        {
+            var parser = new SqlParser(DefaultSchema); // private instance → isolated per worker
+            var model = parser.Parse(File.ReadAllText(path));
+            return new PartialParse(model, new List<string>(parser.Diagnostics));
+        }
+        catch (Exception ex) // unreadable file / catastrophic parser failure → isolate to this file
+        {
+            return new PartialParse(new DatabaseModel(),
+                new List<string> { $"Failed to read/parse '{Path.GetFileName(path)}': {ex.Message}" });
+        }
+    }
+
+    private static ProjectBuildResult Merge(PartialParse[] parts, IReadOnlyList<string> files)
+    {
+        var model = new DatabaseModel();
+        var diagnostics = new List<string>();
+
+        foreach (var part in parts) // ordered walk → deterministic, matches sequential Build()
+        {
+            foreach (var s in part.Model.Schemas)
+                if (!model.HasSchema(s.Name)) model.Schemas.Add(s); // first-occurrence wins
+            model.Tables.AddRange(part.Model.Tables);
+            model.Indexes.AddRange(part.Model.Indexes);
+            model.Views.AddRange(part.Model.Views);
+            model.Sequences.AddRange(part.Model.Sequences);
+            model.Functions.AddRange(part.Model.Functions);
+            model.Objects.AddRange(part.Model.Objects);
+            diagnostics.AddRange(part.Diagnostics);
+        }
+
+        diagnostics.AddRange(FindDuplicates(model)); // same post-merge dup scan as Build()
+        return new ProjectBuildResult(model, diagnostics, files);
+    }
+
+    private static IEnumerable<(int Index, string Path)> EnumerateIndexed(IReadOnlyList<string> files)
+    {
+        for (var i = 0; i < files.Count; i++) yield return (i, files[i]);
+    }
+
+    private readonly record struct PartialParse(DatabaseModel Model, List<string> Diagnostics);
 
     private static IEnumerable<string> FindDuplicates(DatabaseModel model)
     {
