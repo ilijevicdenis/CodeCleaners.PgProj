@@ -36,6 +36,7 @@ public sealed class SchemaComparer
         CompareIndexes(source, target, changes, options);
         CompareViews(source, target, changes, options);
         CompareFunctions(source, target, changes);
+        CompareRawObjects(source, target, changes, options);
 
         return changes.OrderBy(c => c.Phase).ToList();
     }
@@ -197,6 +198,32 @@ public sealed class SchemaComparer
                 DatabaseModel.NameEquals(f.Schema, src.Schema) && DatabaseModel.NameEquals(f.Name, src.Name));
             if (tgt is null || NormalizeText(src.Body) != NormalizeText(tgt.Body))
                 changes.Add(new CreateOrReplaceFunctionChange(src));
+        }
+    }
+
+    private void CompareRawObjects(DatabaseModel source, DatabaseModel target, List<SchemaChange> changes, ComparerOptions options)
+    {
+        foreach (var src in source.Objects)
+        {
+            var tgt = target.FindObject(src.Identity);
+            if (tgt is null)
+            {
+                changes.Add(new CreateRawObjectChange(src));
+            }
+            else if (NormalizeText(src.Body) != NormalizeText(tgt.Body))
+            {
+                // A destructive recreate (type/domain/foreign table can cascade-drop columns) is
+                // only emitted when drops are allowed; in-place redefinitions always proceed.
+                if (RawObjectMeta.IsDestructiveRecreate(src.Kind) && !options.DropObjectsNotInSource)
+                    continue;
+                changes.Add(new RecreateRawObjectChange(src));
+            }
+        }
+
+        if (options.DropObjectsNotInSource)
+        {
+            foreach (var tgt in target.Objects.Where(o => o.Kind != ObjectKind.Comment && source.FindObject(o.Identity) is null))
+                changes.Add(new DropRawObjectChange(tgt));
         }
     }
 

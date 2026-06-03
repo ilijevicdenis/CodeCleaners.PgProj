@@ -175,3 +175,49 @@ public sealed record DropTableChange(string Schema, string Name) : SchemaChange
     public override string Describe() => $"Drop table {Schema}.{Name}";
     public override string ToSql() => $"DROP TABLE IF EXISTS {SqlEmitter.Qualified(Schema, Name)};";
 }
+
+// ---- generic raw objects (extension/type/domain/trigger/policy/comment/…) ----------------
+
+file static class RawSql
+{
+    public static string EnsureSemicolon(string body)
+    {
+        var b = body.TrimEnd();
+        return b.EndsWith(";", System.StringComparison.Ordinal) ? b : b + ";";
+    }
+}
+
+public sealed record CreateRawObjectChange(RawObjectDefinition Def) : SchemaChange
+{
+    public override int Phase => RawObjectMeta.Phase(Def.Kind);
+    public override bool IsDestructive => false;
+    public override string Describe() => $"Create {Def.Kind.ToString().ToLowerInvariant()} {Identifier()}";
+    public override string ToSql() => RawSql.EnsureSemicolon(Def.Body);
+
+    private string Identifier() =>
+        !string.IsNullOrEmpty(Def.OnObject) ? $"{Def.Name} on {Def.OnObject}"
+        : !string.IsNullOrEmpty(Def.Schema) ? $"{Def.Schema}.{Def.Name}"
+        : Def.Name;
+}
+
+public sealed record RecreateRawObjectChange(RawObjectDefinition Def) : SchemaChange
+{
+    public override int Phase => RawObjectMeta.Phase(Def.Kind);
+    public override bool IsDestructive => RawObjectMeta.IsDestructiveRecreate(Def.Kind);
+    public override string Describe() => $"Recreate {Def.Kind.ToString().ToLowerInvariant()} {Def.Name}";
+
+    public override string ToSql()
+    {
+        var drop = RawObjectMeta.DropSql(Def); // empty for comments
+        var body = RawSql.EnsureSemicolon(Def.Body);
+        return string.IsNullOrEmpty(drop) ? body : drop + "\n" + body;
+    }
+}
+
+public sealed record DropRawObjectChange(RawObjectDefinition Def) : SchemaChange
+{
+    public override int Phase => RawObjectMeta.Phase(Def.Kind);
+    public override bool IsDestructive => true;
+    public override string Describe() => $"Drop {Def.Kind.ToString().ToLowerInvariant()} {Def.Name}";
+    public override string ToSql() => RawObjectMeta.DropSql(Def);
+}

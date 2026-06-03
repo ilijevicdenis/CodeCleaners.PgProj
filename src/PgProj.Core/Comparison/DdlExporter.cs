@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -47,6 +48,13 @@ public static class DdlExporter
 
         foreach (var f in model.Functions)
             files[$"Functions/{f.Schema}.{f.Name}.sql"] = SqlEmitter.Function(f) + "\n";
+
+        foreach (var o in model.Objects)
+        {
+            var body = o.Body.TrimEnd();
+            if (!body.EndsWith(";", StringComparison.Ordinal)) body += ";";
+            files[$"{RawObjectMeta.Folder(o.Kind)}/{RawObjectMeta.FileName(o)}"] = body + "\n";
+        }
 
         return files;
     }

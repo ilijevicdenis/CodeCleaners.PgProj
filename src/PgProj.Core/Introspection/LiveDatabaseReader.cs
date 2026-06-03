@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Npgsql;
+using PgProj.Core.Comparison;
 using PgProj.Core.Model;
 
 namespace PgProj.Core.Introspection;
@@ -34,6 +35,7 @@ public sealed class LiveDatabaseReader
         await ReadViewsAsync(conn, model, ct);
         await ReadSequencesAsync(conn, model, ct);
         await ReadFunctionsAsync(conn, model, ct);
+        await ReadRawObjectsAsync(conn, model, ct);
         return model;
     }
 
@@ -304,6 +306,143 @@ public sealed class LiveDatabaseReader
             var args = r.IsDBNull(2) ? string.Empty : r.GetString(2);
             var def = r.GetString(3);
             model.Functions.Add(new FunctionDefinition(schema, name, $"{schema}.{name}({args})", def));
+        }
+    }
+
+    // Introspects the common raw-object kinds. Identities match SqlParser.BuildIdentity exactly so
+    // a project object and its live counterpart line up. (Remaining kinds: see COVERAGE.md / BUGS.)
+    private async Task ReadRawObjectsAsync(NpgsqlConnection conn, DatabaseModel model, CancellationToken ct)
+    {
+        await ReadExtensionsAsync(conn, model, ct);
+        await ReadEnumTypesAsync(conn, model, ct);
+        await ReadCompositeTypesAsync(conn, model, ct);
+        await ReadDomainsAsync(conn, model, ct);
+        await ReadTriggersAsync(conn, model, ct);
+    }
+
+    private static void AddRaw(DatabaseModel model, ObjectKind kind, string schema, string name, string identity, string body, string? on = null) =>
+        model.Objects.Add(new RawObjectDefinition(kind, schema, name, identity.ToLowerInvariant(), body, on));
+
+    private async Task ReadExtensionsAsync(NpgsqlConnection conn, DatabaseModel model, CancellationToken ct)
+    {
+        await using var cmd = new NpgsqlCommand("SELECT extname FROM pg_extension ORDER BY extname;", conn);
+        await using var r = await cmd.ExecuteReaderAsync(ct);
+        while (await r.ReadAsync(ct))
+        {
+            var name = r.GetString(0);
+            AddRaw(model, ObjectKind.Extension, "", name, $"extension:{name}",
+                $"CREATE EXTENSION IF NOT EXISTS {SqlEmitter.Quote(name)};");
+        }
+    }
+
+    private async Task ReadEnumTypesAsync(NpgsqlConnection conn, DatabaseModel model, CancellationToken ct)
+    {
+        const string sql = @"
+            SELECT n.nspname, t.typname, e.enumlabel
+            FROM pg_type t
+            JOIN pg_namespace n ON n.oid = t.typnamespace
+            JOIN pg_enum e ON e.enumtypid = t.oid
+            WHERE n.nspname NOT IN ('pg_catalog','information_schema') AND n.nspname NOT LIKE 'pg_%'
+            ORDER BY n.nspname, t.typname, e.enumsortorder;";
+
+        var labels = new Dictionary<(string, string), List<string>>();
+        await using (var cmd = new NpgsqlCommand(sql, conn))
+        await using (var r = await cmd.ExecuteReaderAsync(ct))
+            while (await r.ReadAsync(ct))
+            {
+                var key = (r.GetString(0), r.GetString(1));
+                if (!labels.TryGetValue(key, out var list)) labels[key] = list = new List<string>();
+                list.Add(r.GetString(2));
+            }
+
+        foreach (var ((schema, name), vals) in labels)
+        {
+            var literals = string.Join(", ", vals.Select(v => "'" + v.Replace("'", "''") + "'"));
+            AddRaw(model, ObjectKind.Type, schema, name, $"type:{schema}.{name}",
+                $"CREATE TYPE {schema}.{name} AS ENUM ({literals});");
+        }
+    }
+
+    private async Task ReadCompositeTypesAsync(NpgsqlConnection conn, DatabaseModel model, CancellationToken ct)
+    {
+        const string sql = @"
+            SELECT n.nspname, t.typname, a.attname, format_type(a.atttypid, a.atttypmod)
+            FROM pg_type t
+            JOIN pg_namespace n ON n.oid = t.typnamespace
+            JOIN pg_class c ON c.oid = t.typrelid
+            JOIN pg_attribute a ON a.attrelid = c.oid AND a.attnum > 0 AND NOT a.attisdropped
+            WHERE t.typtype = 'c' AND c.relkind = 'c'
+              AND n.nspname NOT IN ('pg_catalog','information_schema') AND n.nspname NOT LIKE 'pg_%'
+            ORDER BY n.nspname, t.typname, a.attnum;";
+
+        var attrs = new Dictionary<(string, string), List<string>>();
+        await using (var cmd = new NpgsqlCommand(sql, conn))
+        await using (var r = await cmd.ExecuteReaderAsync(ct))
+            while (await r.ReadAsync(ct))
+            {
+                var key = (r.GetString(0), r.GetString(1));
+                if (!attrs.TryGetValue(key, out var list)) attrs[key] = list = new List<string>();
+                list.Add($"{r.GetString(2)} {r.GetString(3)}");
+            }
+
+        foreach (var ((schema, name), cols) in attrs)
+            AddRaw(model, ObjectKind.Type, schema, name, $"type:{schema}.{name}",
+                $"CREATE TYPE {schema}.{name} AS ({string.Join(", ", cols)});");
+    }
+
+    private async Task ReadDomainsAsync(NpgsqlConnection conn, DatabaseModel model, CancellationToken ct)
+    {
+        const string sql = @"
+            SELECT n.nspname, t.typname, format_type(t.typbasetype, t.typtypmod) AS basetype,
+                   t.typnotnull, t.typdefault,
+                   (SELECT string_agg(pg_get_constraintdef(c.oid), ' ')
+                      FROM pg_constraint c WHERE c.contypid = t.oid) AS checks
+            FROM pg_type t
+            JOIN pg_namespace n ON n.oid = t.typnamespace
+            WHERE t.typtype = 'd'
+              AND n.nspname NOT IN ('pg_catalog','information_schema') AND n.nspname NOT LIKE 'pg_%'
+            ORDER BY n.nspname, t.typname;";
+
+        await using var cmd = new NpgsqlCommand(sql, conn);
+        await using var r = await cmd.ExecuteReaderAsync(ct);
+        while (await r.ReadAsync(ct))
+        {
+            var schema = r.GetString(0);
+            var name = r.GetString(1);
+            var baseType = r.GetString(2);
+            var notNull = r.GetBoolean(3);
+            var def = r.IsDBNull(4) ? null : r.GetString(4);
+            var checks = r.IsDBNull(5) ? null : r.GetString(5);
+
+            var body = $"CREATE DOMAIN {schema}.{name} AS {baseType}";
+            if (notNull) body += " NOT NULL";
+            if (!string.IsNullOrWhiteSpace(def)) body += $" DEFAULT {def}";
+            if (!string.IsNullOrWhiteSpace(checks)) body += $" {checks}";
+            AddRaw(model, ObjectKind.Domain, schema, name, $"domain:{schema}.{name}", body + ";");
+        }
+    }
+
+    private async Task ReadTriggersAsync(NpgsqlConnection conn, DatabaseModel model, CancellationToken ct)
+    {
+        const string sql = @"
+            SELECT n.nspname, c.relname, t.tgname, pg_get_triggerdef(t.oid, true) AS def
+            FROM pg_trigger t
+            JOIN pg_class c ON c.oid = t.tgrelid
+            JOIN pg_namespace n ON n.oid = c.relnamespace
+            WHERE NOT t.tgisinternal
+              AND n.nspname NOT IN ('pg_catalog','information_schema') AND n.nspname NOT LIKE 'pg_%'
+            ORDER BY n.nspname, c.relname, t.tgname;";
+
+        await using var cmd = new NpgsqlCommand(sql, conn);
+        await using var r = await cmd.ExecuteReaderAsync(ct);
+        while (await r.ReadAsync(ct))
+        {
+            var schema = r.GetString(0);
+            var table = r.GetString(1);
+            var name = r.GetString(2);
+            var def = r.GetString(3);
+            var on = $"{schema}.{table}";
+            AddRaw(model, ObjectKind.Trigger, schema, name, $"trigger:{name} on {on}", def, on);
         }
     }
 }

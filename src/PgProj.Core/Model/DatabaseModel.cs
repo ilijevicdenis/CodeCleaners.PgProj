@@ -17,6 +17,12 @@ public sealed class DatabaseModel
     public List<SequenceDefinition> Sequences { get; } = new();
     public List<FunctionDefinition> Functions { get; } = new();
 
+    /// <summary>All object kinds handled by the generic raw-object mechanism (see <see cref="RawObjectDefinition"/>).</summary>
+    public List<RawObjectDefinition> Objects { get; } = new();
+
+    public RawObjectDefinition? FindObject(string identity) =>
+        Objects.Find(o => string.Equals(o.Identity, identity, System.StringComparison.OrdinalIgnoreCase));
+
     public TableDefinition? FindTable(string schema, string name) =>
         Tables.FirstOrDefault(t => NameEquals(t.Schema, schema) && NameEquals(t.Name, name));
 
