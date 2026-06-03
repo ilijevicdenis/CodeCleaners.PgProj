@@ -190,7 +190,7 @@ END $$;", "ok");
     public void doca0086() => CorpusAssert.Parses(@"DO 42;", "error");
     [Fact]
     public void doca0087() => CorpusAssert.Parses(@"DO BEGIN END;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void doca0088() => CorpusAssert.Parses(@"DO $$ RETURNS void BEGIN END $$;", "error");
     [Fact]
     public void doca0089() => CorpusAssert.Parses(@"DO $$ BEGIN END $$ LANGUAGE plpgsql LANGUAGE plpgsql;", "error");
@@ -336,7 +336,7 @@ DROP PROCEDURE s.pnamed2(integer, integer);", "ok");
     public void doca0147() => CorpusAssert.Parses(@"DO $$ DECLARE x jsonb := '{""key"": ""value""}'; BEGIN PERFORM x; END $$;", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void doca0148() => CorpusAssert.Parses(@"CALL s.p(n => 1, n => 1);", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void doca0149() => CorpusAssert.Parses(@"DO $$ AS $inner$ BEGIN END $inner$ $$;", "error");
     [Fact]
     public void doca0150() => CorpusAssert.Parses(@"DO $$ DECLARE x integer; BEGIN SELECT 1 INTO x; RETURN; END $$;", "ok");

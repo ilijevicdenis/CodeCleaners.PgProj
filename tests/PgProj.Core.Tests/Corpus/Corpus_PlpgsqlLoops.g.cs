@@ -393,13 +393,13 @@ END $$;", "ok");
     public void pplb0149() => CorpusAssert.Parses(@"DO $$ DECLARE i int; BEGIN WHILE 1..10 LOOP NULL; END LOOP; END $$;", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void pplb0150() => CorpusAssert.Parses(@"DO $$ DECLARE i int; BEGIN FOR i IN 1 LOOP NULL; END LOOP; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0151() => CorpusAssert.Parses(@"DO $$ DECLARE i int; BEGIN FOR IN 1..5 LOOP NULL; END LOOP; END $$;", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void pplb0152() => CorpusAssert.Parses(@"DO $$ DECLARE i int; BEGIN FOR i IN REVERSE LOOP NULL; END LOOP; END $$;", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void pplb0153() => CorpusAssert.Parses(@"DO $$ DECLARE i int; BEGIN FOR i IN 1..10 BY 0 LOOP NULL; END LOOP; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pplb0154() => CorpusAssert.Parses(@"DO $$ DECLARE x int; BEGIN FOREACH IN ARRAY ARRAY[1,2] LOOP NULL; END LOOP; END $$;", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void pplb0155() => CorpusAssert.Parses(@"DO $$ DECLARE x int; arr int[] := ARRAY[1,2]; BEGIN FOREACH x ARRAY arr LOOP NULL; END LOOP; END $$;", "error");

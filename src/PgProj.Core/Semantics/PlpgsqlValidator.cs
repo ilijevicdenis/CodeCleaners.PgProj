@@ -54,7 +54,7 @@ public sealed class PlpgsqlValidator
         try { toks = OperatorLexer.Merge(Tokenizer.Tokenize(src)); }
         catch { return Array.Empty<string>(); }
         var v = new PlpgsqlValidator(new TokenCursor(toks), ctx);
-        try { v.ParseBlock(); }
+        try { v.ParseBlock(topLevel: true); }
         catch (ParseException) { /* lost the thread — never report a generic failure */ }
         return v._errors;
     }
@@ -74,15 +74,34 @@ public sealed class PlpgsqlValidator
 
     // ---- block structure ----------------------------------------------------
 
-    private void ParseBlock()
+    private void ParseBlock(bool topLevel)
     {
         MatchLabel();
         if (_c.MatchWord("DECLARE")) ParseDeclareSection();
-        if (!_c.MatchWord("BEGIN")) throw Lost();
+        if (!_c.MatchWord("BEGIN")) { if (topLevel) Err("a PL/pgSQL block must start with BEGIN (or DECLARE … BEGIN)"); throw Lost(); }
         ParseStatements();
         if (_c.MatchWord("EXCEPTION")) ParseHandlers();
         if (!_c.MatchWord("END")) throw Lost();
         if (_c.Current is { Kind: TokenKind.Word }) _c.Advance();   // optional end label
+    }
+
+    // Consume "<condition> THEN", reporting an empty condition or a missing THEN. CASE…END expressions
+    // inside the condition are tracked so their inner THEN/END are not mistaken for the clause's THEN.
+    private void ParseConditionThen()
+    {
+        if (_c.AtWord("THEN")) { Err("missing condition before THEN"); throw Lost(); }
+        int paren = 0, caseDepth = 0;
+        while (!_c.AtEnd)
+        {
+            if (_c.AtWord("CASE")) { caseDepth++; _c.Advance(); continue; }
+            if (caseDepth > 0 && _c.AtWord("END")) { caseDepth--; _c.Advance(); continue; }
+            if (paren == 0 && caseDepth == 0 && _c.AtWord("THEN")) { _c.Advance(); return; }
+            if (paren == 0 && _c.AtSymbol(';')) { Err("expected THEN"); throw Lost(); }
+            if (_c.AtSymbol('(') || _c.AtSymbol('[')) paren++;
+            else if (_c.AtSymbol(')') || _c.AtSymbol(']')) paren--;
+            _c.Advance();
+        }
+        Err("expected THEN"); throw Lost();
     }
 
     private void MatchLabel()
@@ -103,14 +122,15 @@ public sealed class PlpgsqlValidator
     private void ParseStatement()
     {
         // nested block
-        if (_c.AtOperator("<<") || _c.AtWord("DECLARE") || _c.AtWord("BEGIN")) { ParseBlock(); _c.MatchSymbol(';'); return; }
+        if (_c.AtOperator("<<") || _c.AtWord("DECLARE") || _c.AtWord("BEGIN")) { ParseBlock(topLevel: false); _c.MatchSymbol(';'); return; }
         if (_c.MatchWord("IF")) { ParseIf(); return; }
         if (_c.MatchWord("CASE")) { ParseCase(); return; }
         if (_c.MatchWord("LOOP")) { _loopDepth++; ParseStatements(); _loopDepth--; ExpectEnd("LOOP"); return; }
         if (_c.MatchWord("WHILE")) { ConsumeUntilWord("LOOP"); ExpectWord("LOOP"); _loopDepth++; ParseStatements(); _loopDepth--; ExpectEnd("LOOP"); return; }
-        if (_c.AtWord("FOR") || _c.AtWord("FOREACH")) { _c.Advance(); ConsumeUntilWord("LOOP"); ExpectWord("LOOP"); _loopDepth++; ParseStatements(); _loopDepth--; ExpectEnd("LOOP"); return; }
+        if (_c.AtWord("FOR") || _c.AtWord("FOREACH")) { _c.Advance(); if (_c.AtWord("IN")) Err("missing loop variable in FOR"); ConsumeUntilWord("LOOP"); ExpectWord("LOOP"); _loopDepth++; ParseStatements(); _loopDepth--; ExpectEnd("LOOP"); return; }
         if (_c.AtAnyWord("EXIT", "CONTINUE")) { var kw = _c.Advance().Value.ToUpperInvariant(); if ((_c.AtSymbol(';') || _c.AtWord("WHEN")) && _loopDepth == 0) Err($"{kw} cannot be used outside a loop"); ConsumeToSemicolon(); return; }
         if (_c.MatchWord("RETURN")) { ParseReturn(); return; }
+        if (_c.MatchWord("EXECUTE")) { ParseExecute(); return; }
         if (_c.MatchWord("RAISE")) { ParseRaise(); return; }
         if (_c.AtAnyWord("FETCH", "MOVE")) { ParseFetchMove(); return; }
         if (_c.MatchWord("CLOSE")) { if (_c.AtEnd || _c.AtSymbol(';')) Err("CLOSE requires a cursor name"); ConsumeToSemicolon(); return; }
@@ -145,19 +165,49 @@ public sealed class PlpgsqlValidator
 
     private void ParseIf()
     {
-        ConsumeUntilWord("THEN"); ExpectWord("THEN");
+        ParseConditionThen();
         ParseStatements();
-        while (_c.MatchWord("ELSIF") || _c.MatchWord("ELSEIF")) { ConsumeUntilWord("THEN"); ExpectWord("THEN"); ParseStatements(); }
-        if (_c.MatchWord("ELSE")) ParseStatements();
+        while (_c.MatchWord("ELSIF") || _c.MatchWord("ELSEIF")) { ParseConditionThen(); ParseStatements(); }
+        if (_c.MatchWord("ELSE"))
+        {
+            ParseStatements();
+            if (_c.AtAnyWord("ELSIF", "ELSEIF")) { Err("ELSIF cannot appear after ELSE"); throw Lost(); }
+            if (_c.AtWord("ELSE")) { Err("only one ELSE is allowed in IF"); throw Lost(); }
+        }
         ExpectEnd("IF");
     }
 
     private void ParseCase()
     {
         ConsumeUntilWord("WHEN");                                // optional test expression
-        while (_c.MatchWord("WHEN")) { ConsumeUntilWord("THEN"); ExpectWord("THEN"); ParseStatements(); }
+        while (_c.MatchWord("WHEN")) { ParseConditionThen(); ParseStatements(); }
         if (_c.MatchWord("ELSE")) ParseStatements();
         ExpectEnd("CASE");
+    }
+
+    // EXECUTE <command> [INTO [STRICT] targets] [USING args] ;
+    private void ParseExecute()
+    {
+        if (_c.AtEnd || _c.AtSymbol(';')) { Err("EXECUTE requires a command string"); throw Lost(); }
+        if (_c.AtWord("INTO")) { Err("EXECUTE requires a command string before INTO"); throw Lost(); }
+        int paren = 0;
+        while (!_c.AtEnd)                                        // the command expression, up to INTO/USING/;
+        {
+            if (paren == 0 && (_c.AtSymbol(';') || _c.AtWord("INTO") || _c.AtWord("USING"))) break;
+            if (_c.AtSymbol('(') || _c.AtSymbol('[')) paren++;
+            else if (_c.AtSymbol(')') || _c.AtSymbol(']')) paren--;
+            _c.Advance();
+        }
+        if (_c.MatchWord("INTO"))
+        {
+            _c.MatchWord("STRICT");
+            while (!_c.AtEnd && !_c.AtSymbol(';') && !_c.AtWord("USING")) _c.Advance();
+        }
+        if (_c.MatchWord("USING"))
+        {
+            if (_c.AtEnd || _c.AtSymbol(';')) Err("USING requires at least one argument");
+        }
+        ConsumeToSemicolon();
     }
 
     private void ExpectEnd(string what)

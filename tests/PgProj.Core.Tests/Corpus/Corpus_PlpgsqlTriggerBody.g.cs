@@ -116,7 +116,7 @@ CREATE OR REPLACE FUNCTION s.trg_or_replace() RETURNS trigger LANGUAGE plpgsql A
     public void pptba0054() => CorpusAssert.Parses(@"CREATE FUNCTION s.trg_no_return() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN RAISE NOTICE 'hi'; END $$;", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void pptba0055() => CorpusAssert.Parses(@"CREATE FUNCTION s.trg_no_parens RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN RETURN NEW; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pptba0056() => CorpusAssert.Parses(@"CREATE FUNCTION s.trg_missing_begin() RETURNS trigger LANGUAGE plpgsql AS $$ RETURN NEW; END $$;", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void pptba0057() => CorpusAssert.Parses(@"CREATE FUNCTION s.trg_no_as() RETURNS trigger LANGUAGE plpgsql $body$ BEGIN RETURN NEW; END $body$;", "error");
@@ -237,7 +237,7 @@ CREATE TRIGGER t_bad BEFORE INSERT ON s.t FOR EACH ROW EXECUTE FUNCTION s.trg_re
     public void pptba0114() => CorpusAssert.Parses(@"CREATE FUNCTION s.trg_bad_case_noend() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN CASE TG_OP WHEN 'INSERT' THEN RETURN NEW; END $$;", "error");
     [Fact]
     public void pptba0115() => CorpusAssert.Parses(@"CREATE FUNCTION s.trg_bad_raise_level() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN RAISE BADLEVEL 'msg'; RETURN NEW; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pptba0116() => CorpusAssert.Parses(@"CREATE FUNCTION s.trg_bad_for_syntax() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN FOR IN 1..5 LOOP RETURN NEW; END LOOP; END $$;", "error");
     [Fact]
     public void pptba0117() => CorpusAssert.Parses(@"CREATE FUNCTION s.trg_current_user() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN NEW.name := current_user; RETURN NEW; END $$;", "ok");
@@ -403,7 +403,7 @@ CREATE TRIGGER t_stmt_trg AFTER INSERT ON s.t FOR EACH STATEMENT EXECUTE FUNCTIO
     public void pptbb0025() => CorpusAssert.Parses(@"CREATE OR REPLACE FUNCTION s.trg_argv_text() RETURNS trigger LANGUAGE plpgsql AS $$ DECLARE col_name text; BEGIN col_name := TG_ARGV[0]; RETURN NEW; END $$;", "ok");
     [Fact]
     public void pptbb0026() => CorpusAssert.Parses(@"CREATE FUNCTION s.trg_bad_syntax_declare() RETURNS trigger LANGUAGE plpgsql AS $$ DECLARE x RETURN NEW; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pptbb0027() => CorpusAssert.Parses(@"CREATE FUNCTION bad_trg_syntax_if() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN IF TG_OP = 'INSERT' RETURN NEW; END IF; END $$;", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void pptbb0028() => CorpusAssert.Parses(@"CREATE FUNCTION bad_trg_syntax() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN RETURN NEW END $$;", "error");

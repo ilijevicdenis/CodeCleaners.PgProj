@@ -192,9 +192,9 @@ public class Corpus_PlpgsqlIfCase
     public void ppica0092() => CorpusAssert.Parses(@"DO $$ DECLARE x int := 5; BEGIN CASE x WHEN 1 THEN RAISE NOTICE 'one'; END CASE; END $$;", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void ppica0093() => CorpusAssert.Parses(@"DO $$ DECLARE x int := 5; BEGIN CASE WHEN false THEN RAISE NOTICE 'no'; END CASE; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppica0094() => CorpusAssert.Parses(@"DO $$ BEGIN IF THEN RAISE NOTICE 'bad'; END IF; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppica0095() => CorpusAssert.Parses(@"DO $$ BEGIN IF true RAISE NOTICE 'bad'; END IF; END $$;", "error");
     [Fact]
     public void ppica0096() => CorpusAssert.Parses(@"DO $$ BEGIN IF true THEN RAISE NOTICE 'bad'; END $$;", "error");
@@ -206,19 +206,19 @@ public class Corpus_PlpgsqlIfCase
     public void ppica0099() => CorpusAssert.Parses(@"DO $$ BEGIN ELSEIF true THEN RAISE NOTICE 'bad'; END IF; END $$;", "error");
     [Fact]
     public void ppica0100() => CorpusAssert.Parses(@"DO $$ BEGIN IF true THEN RAISE NOTICE 'a'; ELSE IF true THEN RAISE NOTICE 'b'; END IF; END IF; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppica0101() => CorpusAssert.Parses(@"DO $$ BEGIN IF true THEN RAISE NOTICE 'a'; ELSE RAISE NOTICE 'b'; ELSIF true THEN RAISE NOTICE 'c'; END IF; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppica0102() => CorpusAssert.Parses(@"DO $$ BEGIN IF true THEN RAISE NOTICE 'a'; ELSE RAISE NOTICE 'b'; ELSE RAISE NOTICE 'c'; END IF; END $$;", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void ppica0103() => CorpusAssert.Parses(@"DO $$ BEGIN IF true THEN RAISE NOTICE 'a'; THEN RAISE NOTICE 'b'; END IF; END $$;", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void ppica0104() => CorpusAssert.Parses(@"DO $$ BEGIN RAISE NOTICE 'a'; END IF; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppica0105() => CorpusAssert.Parses(@"DO $$ BEGIN IF true THEN RAISE NOTICE 'a'; ELSIF THEN RAISE NOTICE 'b'; END IF; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppica0106() => CorpusAssert.Parses(@"DO $$ BEGIN IF true THEN RAISE NOTICE 'a'; ELSIF true RAISE NOTICE 'b'; END IF; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppica0107() => CorpusAssert.Parses(@"DO $$ BEGIN CASE WHEN THEN RAISE NOTICE 'one'; END CASE; END $$;", "error");
     [Fact]
     public void ppica0108() => CorpusAssert.Parses(@"DO $$ BEGIN CASE WHEN true THEN RAISE NOTICE 'ok'; END; END $$;", "error");
@@ -226,9 +226,9 @@ public class Corpus_PlpgsqlIfCase
     public void ppica0109() => CorpusAssert.Parses(@"DO $$ BEGIN CASE WHEN true THEN RAISE NOTICE 'ok'; ENDCASE; END $$;", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void ppica0110() => CorpusAssert.Parses(@"DO $$ DECLARE x int := 1; BEGIN CASE x RAISE NOTICE 'bad'; END CASE; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppica0111() => CorpusAssert.Parses(@"DO $$ DECLARE x int := 1; BEGIN CASE x WHEN THEN RAISE NOTICE 'bad'; END CASE; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppica0112() => CorpusAssert.Parses(@"DO $$ DECLARE x int := 1; BEGIN CASE x WHEN 1 RAISE NOTICE 'bad'; END CASE; END $$;", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void ppica0113() => CorpusAssert.Parses(@"DO $$ BEGIN CASE WHEN true THEN RAISE NOTICE 'ok'; ELSE RAISE NOTICE 'no'; WHEN false THEN RAISE NOTICE 'also no'; END CASE; END $$;", "error");
@@ -238,7 +238,7 @@ public class Corpus_PlpgsqlIfCase
     public void ppica0115() => CorpusAssert.Parses(@"DO $$ BEGIN CASE true THEN RAISE NOTICE 'bad'; END CASE; END $$;", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void ppica0116() => CorpusAssert.Parses(@"DO $$ DECLARE x int := 1; BEGIN CASE x WHEN 1 THEN RAISE NOTICE 'one'; END CASE END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppica0117() => CorpusAssert.Parses(@"DO $$ BEGIN IF END IF; END $$;", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void ppica0118() => CorpusAssert.Parses(@"DO $$ BEGIN ELSIF true THEN RAISE NOTICE 'bad'; END IF; END $$;", "error");
@@ -484,9 +484,9 @@ END IF; END $$;", "ok");
     public void ppicb0064() => CorpusAssert.Parses(@"DO $$ DECLARE x int := 1; BEGIN CASE x WHEN 1 THEN PERFORM s.f(x); WHEN 2 THEN PERFORM s.g(x, x); ELSE NULL; END CASE; END $$;", "ok");
     [Fact]
     public void ppicb0065() => CorpusAssert.Parses(@"DO $$ DECLARE x int := 1; BEGIN IF x = 1 THEN RETURN; END IF; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppicb0066() => CorpusAssert.Parses(@"DO $$ BEGIN IF THEN NULL; END IF; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppicb0067() => CorpusAssert.Parses(@"DO $$ BEGIN IF true NULL; END IF; END $$;", "error");
     [Fact]
     public void ppicb0068() => CorpusAssert.Parses(@"DO $$ BEGIN IF true THEN NULL; END; END $$;", "error");
@@ -496,11 +496,11 @@ END IF; END $$;", "ok");
     public void ppicb0070() => CorpusAssert.Parses(@"DO $$ BEGIN IF true THEN NULL; ELSEIF true THEN NULL; END IF; END $$;", "ok");
     [Fact]
     public void ppicb0071() => CorpusAssert.Parses(@"DO $$ BEGIN IF true THEN NULL; ELSE IF true THEN NULL; END IF; END IF; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppicb0072() => CorpusAssert.Parses(@"DO $$ BEGIN IF true THEN NULL; ELSIF THEN NULL; END IF; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppicb0073() => CorpusAssert.Parses(@"DO $$ BEGIN IF true THEN NULL; ELSE NULL; ELSIF true THEN NULL; END IF; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppicb0074() => CorpusAssert.Parses(@"DO $$ BEGIN IF true THEN NULL; ELSE NULL; ELSE NULL; END IF; END $$;", "error");
     [Fact]
     public void ppicb0075() => CorpusAssert.Parses(@"DO $$ BEGIN CASE 1 WHEN 1 THEN NULL; END; END $$;", "error");
@@ -508,7 +508,7 @@ END IF; END $$;", "ok");
     public void ppicb0076() => CorpusAssert.Parses(@"DO $$ BEGIN CASE WHEN true THEN NULL; END; END $$;", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void ppicb0077() => CorpusAssert.Parses(@"DO $$ BEGIN CASE 1 THEN NULL; END CASE; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppicb0078() => CorpusAssert.Parses(@"DO $$ BEGIN CASE WHEN THEN NULL; END CASE; END $$;", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void ppicb0079() => CorpusAssert.Parses(@"DO $$ DECLARE x int := 9; BEGIN CASE x WHEN 1 THEN NULL; WHEN 2 THEN NULL; END CASE; END $$;", "error");

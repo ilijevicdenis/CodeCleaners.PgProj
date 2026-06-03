@@ -117,13 +117,13 @@ public class Corpus_PlpgsqlDynamic
     public void ppdya0055() => CorpusAssert.Parses(@"DO $$ DECLARE rec record; BEGIN FOR rec IN EXECUTE 'SELECT id, name FROM s.t' USING 1 LOOP END LOOP; END $$;", "ok");
     [Fact]
     public void ppdya0056() => CorpusAssert.Parses(@"DO $$ BEGIN EXECUTE 'SELECT 1' USING 1; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppdya0057() => CorpusAssert.Parses(@"DO $$ DECLARE r integer; BEGIN EXECUTE 'SELECT 1' INTO r USING; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppdya0058() => CorpusAssert.Parses(@"DO $$ DECLARE r integer; BEGIN EXECUTE INTO r 'SELECT 1'; END $$;", "error");
     [Fact]
     public void ppdya0059() => CorpusAssert.Parses(@"DO $$ DECLARE r integer; BEGIN EXECUTE 'SELECT 1' USING 42 INTO r; END $$;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppdya0060() => CorpusAssert.Parses(@"DO $$ DECLARE r integer; BEGIN EXECUTE INTO STRICT r 'SELECT 1'; END $$;", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void ppdya0061() => CorpusAssert.Parses(@"DO $$ DECLARE r integer; BEGIN EXECUTE 'NOT VALID SQL @@##' INTO r; END $$;", "error");
@@ -415,11 +415,11 @@ public class Corpus_PlpgsqlDynamic
     public void ppdyb0034() => CorpusAssert.Parses(@"DO $$ DECLARE a text; b numeric; BEGIN EXECUTE 'SELECT name, val FROM s.t LIMIT 1' INTO a, b; END $$;", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void ppdyb0035() => CorpusAssert.Parses(@"DO $$ DECLARE a text; b numeric; c integer; BEGIN EXECUTE 'SELECT name, val, qty FROM s.t LIMIT 1' INTO STRICT a, b, c; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppdyb0036() => CorpusAssert.Parses(@"DO $$ BEGIN EXECUTE 'SELECT 1' USING; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppdyb0037() => CorpusAssert.Parses(@"DO $$ BEGIN EXECUTE; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppdyb0038() => CorpusAssert.Parses(@"DO $$ BEGIN EXECUTE 'INSERT INTO s.t(name) VALUES($1)' USING; END $$;", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void ppdyb0039() => CorpusAssert.Parses(@"DO $$ DECLARE v text; BEGIN EXECUTE 'NOT VALID SQL !!!@#$%' INTO v; END $$;", "error");
