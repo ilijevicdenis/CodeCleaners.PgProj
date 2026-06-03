@@ -117,7 +117,7 @@ CREATE TABLE s.ctaa_bad_rem_p PARTITION OF s.ctaa_bad_remainder FOR VALUES WITH 
     public void ctaa0052() => CorpusAssert.Parses(@"CREATE TABLE s.ctaa_like_inc_excl (LIKE s.t INCLUDING ALL EXCLUDING INDEXES)", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void ctaa0053() => CorpusAssert.Parses(@"CREATE TABLE s.ctaa_like_noexist (LIKE s.nonexistent_source)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ctaa0054() => CorpusAssert.Parses(@"CREATE TABLE s.ctaa_like_bad_opt (LIKE s.t INCLUDING BADOPTION)", "error");
     [Fact]
     public void ctaa0055() => CorpusAssert.Parses(@"CREATE TABLE s.ctaa_storage1 (a text, b int) WITH (fillfactor = 70)", "ok");
@@ -1037,7 +1037,7 @@ CREATE TABLE ctac_list_range_bad_p1 PARTITION OF ctac_list_range_bad FOR VALUES 
 CREATE TABLE ctac_list_hash_bad_p1 PARTITION OF ctac_list_hash_bad FOR VALUES WITH (MODULUS 2, REMAINDER 0)", "error");
     [Fact]
     public void ctac0085() => CorpusAssert.Parses(@"CREATE TABLE ctac_syntax_part_bad PARTITION BY", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ctac0086() => CorpusAssert.Parses(@"CREATE TABLE ctac_like_incl_bad (LIKE s.t INCLUDING BADOPTION)", "error");
     [Fact]
     public void ctac0087() => CorpusAssert.Parses(@"CREATE UNLOGGED TABLE ctac_unlogged_part (id int NOT NULL) PARTITION BY HASH (id);

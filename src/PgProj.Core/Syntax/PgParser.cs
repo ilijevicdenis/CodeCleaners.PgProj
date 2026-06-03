@@ -27,6 +27,8 @@ public sealed partial class PgParser
     };
     private static readonly HashSet<string> StorageModes = new(StringComparer.OrdinalIgnoreCase) { "PLAIN", "EXTERNAL", "EXTENDED", "MAIN", "DEFAULT" };
     private static readonly HashSet<string> MatchTypes = new(StringComparer.OrdinalIgnoreCase) { "FULL", "SIMPLE" };
+    private static readonly HashSet<string> LikeOptions = new(StringComparer.OrdinalIgnoreCase)
+    { "ALL", "COMMENTS", "COMPRESSION", "CONSTRAINTS", "DEFAULTS", "GENERATED", "IDENTITY", "INDEXES", "STATISTICS", "STORAGE" };
 
     public ParseResult Parse(string sql)
     {
@@ -293,7 +295,18 @@ public sealed partial class PgParser
         if (cname is not null)
             throw new ParseException("expected a table constraint after CONSTRAINT name", b.Here);
 
-        if (b.AtWord("LIKE")) { CaptureToElementEnd(b); table.HasLikeElement = true; return; }   // LIKE source [ INCLUDING … ]
+        if (b.AtWord("LIKE"))   // LIKE source [ { INCLUDING | EXCLUDING } option ]…
+        {
+            b.Advance();
+            ParseQualifiedName(b);
+            while (b.MatchWord("INCLUDING") || b.MatchWord("EXCLUDING"))
+            {
+                var opt = b.ExpectIdentifier();
+                if (!LikeOptions.Contains(opt)) throw new ParseException($"unrecognized LIKE option \"{opt}\"", b.Here);
+            }
+            table.HasLikeElement = true;
+            return;
+        }
 
         table.Columns.Add(ParseColumnDef(b));
     }
