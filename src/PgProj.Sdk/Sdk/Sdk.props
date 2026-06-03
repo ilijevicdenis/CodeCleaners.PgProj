@@ -1,0 +1,20 @@
+<!--
+  PgProj MSBuild SDK — props.
+  Imported at the top of a .pgproj. Establishes defaults so a database project builds with the
+  same `dotnet build` / Visual Studio gesture as any other project.
+-->
+<Project>
+  <PropertyGroup>
+    <Configuration Condition="'$(Configuration)' == ''">Debug</Configuration>
+
+    <!-- The pgproj CLI. When the SDK is consumed from source (this repo) it points at the CLI
+         project; a packaged SDK would instead carry the tool in tools/. -->
+    <PgProjCliProject Condition="'$(PgProjCliProject)' == ''">$([MSBuild]::NormalizePath('$(MSBuildThisFileDirectory)..\..\PgProj.Cli\PgProj.Cli.csproj'))</PgProjCliProject>
+
+    <!-- Build artifact (the JSON model — the .dacpac analogue). -->
+    <PgProjOutput Condition="'$(PgProjOutput)' == ''">$(MSBuildProjectDirectory)\bin\$(MSBuildProjectName).model.json</PgProjOutput>
+
+    <!-- So IDEs that key off these don't choke on an unfamiliar project type. -->
+    <DefaultLanguageSourceExtension>.sql</DefaultLanguageSourceExtension>
+  </PropertyGroup>
+</Project>

@@ -1,0 +1,23 @@
+<!--
+  PgProj MSBuild SDK — targets.
+  Wires the standard MSBuild verbs (Restore/Build/Rebuild/Clean) to the pgproj CLI so the database
+  project participates in `dotnet build`, solution builds, and the Visual Studio Build command.
+-->
+<Project>
+  <!-- Restore is invoked implicitly by `dotnet build`; a database project has nothing to restore. -->
+  <Target Name="Restore" />
+
+  <Target Name="Build">
+    <Message Importance="high" Text="pgproj: building database project '$(MSBuildProjectName)'" />
+    <Exec Command="dotnet run --project &quot;$(PgProjCliProject)&quot; -c $(Configuration) -- build &quot;$(MSBuildProjectFullPath)&quot; -o &quot;$(PgProjOutput)&quot;" />
+  </Target>
+
+  <Target Name="Clean">
+    <Delete Files="$(PgProjOutput)" Condition="Exists('$(PgProjOutput)')" />
+  </Target>
+
+  <Target Name="Rebuild" DependsOnTargets="Clean;Build" />
+
+  <!-- Allow `dotnet publish`/`pack` to no-op rather than error on an unfamiliar project. -->
+  <Target Name="Publish" DependsOnTargets="Build" />
+</Project>

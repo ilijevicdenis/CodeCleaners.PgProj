@@ -1,4 +1,5 @@
-<Project Sdk="PgProj.Sdk/0.1.0">
+<Project DefaultTargets="Build">
+  <Import Project="..\..\src\PgProj.Sdk\Sdk\Sdk.props" />
   <PropertyGroup>
     <Name>SampleDb</Name>
     <DefaultSchema>app</DefaultSchema>
@@ -7,4 +8,5 @@
   <ItemGroup>
     <Build Include="**/*.sql" />
   </ItemGroup>
+  <Import Project="..\..\src\PgProj.Sdk\Sdk\Sdk.targets" />
 </Project>

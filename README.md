@@ -30,7 +30,10 @@ source, let the tool compute the migration.
 | Schema compare (project ↔ live) into an ordered, dependency-safe change set | ✅ |
 | Deploy-script generation (transactional, drop-safety guarded) | ✅ |
 | `publish` (execute the plan) and `extract` (live DB → buildable project) | ✅ |
-| 33 unit tests (parser / comparer / generator / normalizer / loader) | ✅ |
+| Full DDL language surface (types, domains, triggers, policies, …) via raw-object mechanism | ✅ |
+| serial, generated columns, CHECK/EXCLUDE, identity ALWAYS/BY DEFAULT, sequence options | ✅ |
+| **MSBuild SDK** — `dotnet build SampleDb.pgproj` builds the model (`src/PgProj.Sdk`) | ✅ |
+| 65 unit tests (parser / comparer / generator / normalizer / loader / constraints / raw objects) | ✅ |
 
 See [`BUGS.md`](./BUGS.md) for the live defect/limitation tracker and the roadmap beyond v0.1
 (triggers, types/domains, materialized-view diffing, a Visual Studio project-system/VSIX
@@ -52,8 +55,9 @@ PgProj.slnx
 # Build the toolchain
 dotnet build PgProj.slnx
 
-# Build the sample project into a model (no database required)
+# Build the sample project into a model (no database required) — either way works:
 dotnet run --project src/PgProj.Cli -- build sample/SampleDb/SampleDb.pgproj
+dotnet build sample/SampleDb/SampleDb.pgproj          # via the PgProj MSBuild SDK
 
 # Generate the full create script from the project (no database required)
 dotnet run --project src/PgProj.Cli -- script sample/SampleDb/SampleDb.pgproj -o create.sql
