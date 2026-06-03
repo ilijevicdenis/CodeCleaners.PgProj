@@ -238,7 +238,12 @@ public sealed class AstParser
         r.MatchWord("AS");
         var body = new List<Token>();
         while (!r.Eof) body.Add(r.Next());
-        return new CreateViewStatement { Schema = schema, Name = name, Materialized = materialized, BodyText = Token.Render(body) };
+        return new CreateViewStatement
+        {
+            Schema = schema, Name = name, Materialized = materialized,
+            BodyText = Token.Render(body),
+            Query = QueryParser.Parse(body),
+        };
     }
 
     // ---- function -----------------------------------------------------------------------

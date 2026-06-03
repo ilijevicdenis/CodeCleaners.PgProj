@@ -46,7 +46,7 @@ public static class ExpressionParser
                 return t.Value.ToUpperInvariant() switch
                 {
                     "OR" => 1, "AND" => 2,
-                    "LIKE" or "ILIKE" or "IN" or "IS" or "SIMILAR" => 7,
+                    "NOT" or "LIKE" or "ILIKE" or "IN" or "IS" or "SIMILAR" or "BETWEEN" => 7,
                     _ => 0,
                 };
             }
@@ -85,6 +85,7 @@ public static class ExpressionParser
                     if (up == "NULL") return new LiteralExpr { Value = "null", Kind = LiteralKind.Null };
                     if (up is "TRUE" or "FALSE") return new LiteralExpr { Value = up.ToLowerInvariant(), Kind = LiteralKind.Boolean };
                     if (up == "NOT") return new UnaryExpr { Op = "NOT", Operand = ParseExpr(6) };
+                    if (up == "CASE") return ParseCase();
                     return ParseIdentifierOrCall(t.Value);
                 }
                 case TokenKind.QuotedIdent:
@@ -93,12 +94,57 @@ public static class ExpressionParser
                     return new UnaryExpr { Op = t.Value, Operand = ParseExpr(25) };
                 case TokenKind.Symbol when t.Value == "(":
                 {
+                    // A parenthesised subquery (SELECT … / WITH …) vs a grouped scalar expression.
+                    if (Cur is { Kind: TokenKind.Word } w2 && (w2.IsWord("SELECT") || w2.IsWord("WITH")))
+                    {
+                        var sub = CaptureBalancedFromOpen();
+                        return new SubqueryExpr { Query = QueryParser.Parse(sub) };
+                    }
                     var inner = ParseExpr(0);
                     Expect(")");
                     return new ParenExpr { Inner = inner };
                 }
             }
             throw new ParseException($"Unexpected token '{t.Value}' in expression.");
+        }
+
+        private Expression ParseCase()
+        {
+            // 'CASE' already consumed. Optional simple-form operand, then WHEN…THEN…, optional ELSE, END.
+            Expression? operand = null;
+            if (!(Cur is { } w && w.IsWord("WHEN")))
+                operand = ParseExpr(0);
+
+            var branches = new List<CaseBranch>();
+            while (Cur is { } wt && wt.IsWord("WHEN"))
+            {
+                _i++; // WHEN
+                var cond = ParseExpr(0);
+                if (!(Cur is { } th && th.IsWord("THEN"))) throw new ParseException("Expected THEN in CASE.");
+                _i++; // THEN
+                var result = ParseExpr(0);
+                branches.Add(new CaseBranch { When = cond, Then = result });
+            }
+
+            Expression? elseExpr = null;
+            if (Cur is { } e && e.IsWord("ELSE")) { _i++; elseExpr = ParseExpr(0); }
+            if (!(Cur is { } end && end.IsWord("END"))) throw new ParseException("Expected END in CASE.");
+            _i++; // END
+            return new CaseExpr { Operand = operand, Branches = branches, Else = elseExpr };
+        }
+
+        // The cursor sits just after a consumed '('; collect through the matching ')'.
+        private List<Token> CaptureBalancedFromOpen()
+        {
+            var toks = new List<Token>(); var depth = 1;
+            while (!AtEnd)
+            {
+                var t = _t[_i++];
+                if (t.IsSymbol('(')) depth++;
+                else if (t.IsSymbol(')')) { depth--; if (depth == 0) break; }
+                toks.Add(t);
+            }
+            return toks;
         }
 
         private Expression ParseIdentifierOrCall(string first)
@@ -143,10 +189,41 @@ public static class ExpressionParser
                 if (Cur is { } nu && nu.IsWord("NULL")) { _i++; return new UnaryExpr { Op = not ? "IS NOT NULL" : "IS NULL", Operand = left }; }
                 return new UnaryExpr { Op = "IS", Operand = left };
             }
+            if (t.Kind == TokenKind.Word && t.Value.ToUpperInvariant() == "IN")
+            {
+                _i++;
+                return ParseIn(left, negated: false);
+            }
+            if (t.Kind == TokenKind.Word && t.Value.ToUpperInvariant() == "NOT")
+            {
+                _i++;
+                if (Cur is { } n2 && n2.IsWord("IN")) { _i++; return ParseIn(left, negated: true); }
+                if (Cur is { } n3 && (n3.IsWord("LIKE") || n3.IsWord("ILIKE")))
+                    return new BinaryExpr { Op = "NOT " + Next().Value.ToUpperInvariant(), Left = left, Right = ParseExpr(7) };
+                return new BinaryExpr { Op = "NOT", Left = left, Right = ParseExpr(7) };
+            }
             var op = Next().Value;
             var bp = Lbp(t);
             var right = ParseExpr(bp);
             return new BinaryExpr { Op = op, Left = left, Right = right };
+        }
+
+        private Expression ParseIn(Expression left, bool negated)
+        {
+            Expect("(");
+            if (Cur is { } w && (w.IsWord("SELECT") || w.IsWord("WITH")))
+            {
+                var sub = CaptureBalancedFromOpen();
+                return new InExpr { Operand = left, Negated = negated, Subquery = new SubqueryExpr { Query = QueryParser.Parse(sub) } };
+            }
+            var items = new List<Expression>();
+            if (!(Cur is { } close && close.IsSymbol(')')))
+            {
+                items.Add(ParseExpr(0));
+                while (Cur is { } comma && comma.IsSymbol(',')) { _i++; items.Add(ParseExpr(0)); }
+            }
+            Expect(")");
+            return new InExpr { Operand = left, Negated = negated, Items = items };
         }
 
         private void Expect(string symbol)

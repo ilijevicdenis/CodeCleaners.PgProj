@@ -75,7 +75,9 @@ public sealed class CreateViewStatement : SqlStatement
     public required string Schema { get; init; }
     public required string Name { get; init; }
     public bool Materialized { get; init; }
-    public required string BodyText { get; init; }
+    public required string BodyText { get; init; }   // verbatim AS query (used to build the model)
+    public SelectQuery? Query { get; init; }          // structured form, for analysis
+    public override IEnumerable<SqlNode> Children => Query is null ? base.Children : new[] { Query };
 }
 
 public sealed class CreateFunctionStatement : SqlStatement
@@ -211,6 +213,8 @@ public sealed class DmlStatementNode : BodyStatement
     public required string Verb { get; init; }     // SELECT | INSERT | UPDATE | DELETE | TRUNCATE | PERFORM
     public string? TargetTable { get; init; }
     public bool HasWhere { get; init; }
+    public Expression? WhereExpression { get; init; }  // parsed predicate when present
+    public override IEnumerable<SqlNode> Children => WhereExpression is null ? base.Children : new[] { WhereExpression };
 }
 
 /// <summary>EXECUTE / dynamic SQL — an injection surface; rules flag it for review.</summary>
@@ -275,5 +279,89 @@ public sealed class ParenExpr : Expression
     public override IEnumerable<SqlNode> Children => new[] { Inner };
 }
 
+public sealed class CaseExpr : Expression
+{
+    public Expression? Operand { get; init; }                 // CASE <operand> WHEN … (simple form)
+    public IReadOnlyList<CaseBranch> Branches { get; init; } = new List<CaseBranch>();
+    public Expression? Else { get; init; }
+    public override IEnumerable<SqlNode> Children
+    {
+        get
+        {
+            var nodes = new List<SqlNode>();
+            if (Operand is not null) nodes.Add(Operand);
+            foreach (var b in Branches) { nodes.Add(b.When); nodes.Add(b.Then); }
+            if (Else is not null) nodes.Add(Else);
+            return nodes;
+        }
+    }
+}
+
+public sealed class CaseBranch : SqlNode
+{
+    public required Expression When { get; init; }
+    public required Expression Then { get; init; }
+    public override IEnumerable<SqlNode> Children => new[] { When, Then };
+}
+
+/// <summary>A parenthesised subquery used as an expression — e.g. <c>x IN (SELECT …)</c>.</summary>
+public sealed class SubqueryExpr : Expression
+{
+    public required SelectQuery Query { get; init; }
+    public override IEnumerable<SqlNode> Children => new[] { Query };
+}
+
+/// <summary><c>expr IN (a, b, …)</c> or <c>expr IN (SELECT …)</c>.</summary>
+public sealed class InExpr : Expression
+{
+    public required Expression Operand { get; init; }
+    public bool Negated { get; init; }
+    public IReadOnlyList<Expression> Items { get; init; } = new List<Expression>();
+    public SubqueryExpr? Subquery { get; init; }
+    public override IEnumerable<SqlNode> Children
+    {
+        get
+        {
+            var nodes = new List<SqlNode> { Operand };
+            nodes.AddRange(Items);
+            if (Subquery is not null) nodes.Add(Subquery);
+            return nodes;
+        }
+    }
+}
+
 /// <summary>Fallback for expression fragments the Pratt parser doesn't fully model.</summary>
 public sealed class RawExpr : Expression { public required string Text { get; init; } }
+
+// ---- queries ----------------------------------------------------------------------------
+
+/// <summary>
+/// A SELECT query, modelled to the depth static analysis needs: its CTEs (<c>WITH</c>) and a parsed
+/// <c>WHERE</c> predicate are structured; the projection / FROM / trailing clauses are kept as text
+/// (no full join/group-by grammar yet). Used by views and as a subquery payload.
+/// </summary>
+public sealed class SelectQuery : SqlNode
+{
+    public bool Recursive { get; init; }
+    public IReadOnlyList<CommonTableExpression> With { get; init; } = new List<CommonTableExpression>();
+    public string ProjectionText { get; init; } = "";
+    public string? FromText { get; init; }
+    public Expression? Where { get; init; }
+    public string? Tail { get; init; } // GROUP BY / HAVING / ORDER BY / LIMIT, captured raw
+    public override IEnumerable<SqlNode> Children
+    {
+        get
+        {
+            var nodes = new List<SqlNode>(With);
+            if (Where is not null) nodes.Add(Where);
+            return nodes;
+        }
+    }
+}
+
+public sealed class CommonTableExpression : SqlNode
+{
+    public required string Name { get; init; }
+    public required SelectQuery Query { get; init; }
+    public override IEnumerable<SqlNode> Children => new[] { Query };
+}

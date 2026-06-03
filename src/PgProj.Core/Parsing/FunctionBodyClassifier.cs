@@ -62,6 +62,7 @@ public static class FunctionBodyClassifier
                     Verb = first,
                     TargetTable = ExtractTarget(tokens, first),
                     HasWhere = HasTopLevelWord(tokens, "WHERE"),
+                    WhereExpression = ExtractWhere(tokens),
                 };
             case "EXECUTE":
                 return new DynamicSqlStatementNode { RawText = raw };
@@ -89,6 +90,36 @@ public static class FunctionBodyClassifier
                 return t.Value.ToUpperInvariant();
         }
         return "";
+    }
+
+    private static readonly HashSet<string> WhereStops = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "GROUP", "HAVING", "WINDOW", "ORDER", "LIMIT", "OFFSET", "FETCH", "RETURNING",
+    };
+
+    private static PgProj.Core.Ast.Expression? ExtractWhere(List<Token> tokens)
+    {
+        var depth = 0; var i = 0;
+        for (; i < tokens.Count; i++)
+        {
+            var t = tokens[i];
+            if (t.IsSymbol('(')) depth++;
+            else if (t.IsSymbol(')')) depth = Math.Max(0, depth - 1);
+            else if (depth == 0 && t.IsWord("WHERE")) { i++; break; }
+        }
+        if (i >= tokens.Count) return null;
+
+        var pred = new List<Token>();
+        depth = 0;
+        for (; i < tokens.Count; i++)
+        {
+            var t = tokens[i];
+            if (t.IsSymbol('(')) depth++;
+            else if (t.IsSymbol(')')) depth = Math.Max(0, depth - 1);
+            if (depth == 0 && t.Kind == TokenKind.Word && WhereStops.Contains(t.Value)) break;
+            pred.Add(t);
+        }
+        return pred.Count == 0 ? null : ExpressionParser.Parse(pred);
     }
 
     private static bool HasTopLevelWord(List<Token> tokens, string word)
