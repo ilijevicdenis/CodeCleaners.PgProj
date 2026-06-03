@@ -296,8 +296,16 @@ public sealed class SchemaComparer
     // catalog's pg_get_functiondef rendering, which picks its own tag.
     private static readonly Regex DollarTag = new(@"\$[A-Za-z0-9_]*\$", RegexOptions.Compiled);
 
-    /// <summary>Body comparison for verbatim objects: case/whitespace-insensitive, dollar-tag- and trailing-`;`-agnostic.</summary>
-    private static string NormalizeBody(string s) => NormalizeText(DollarTag.Replace(s, "$$$$")).TrimEnd(';', ' ');
+    // pg_get_viewdef adds a result-type cast to literals (0 -> 0::bigint). Strip casts on numeric/
+    // string LITERALS only (not column/expression casts), so a view round-trips with zero diff.
+    private static readonly Regex LiteralCast = new(@"(\b\d+(?:\.\d+)?|'[^']*')::[a-z0-9_]+", RegexOptions.Compiled);
+    // Reconcile punctuation spacing: our Token.Render is tight ("a,b" / "x=y") while pg_get_viewdef
+    // is spaced ("a, b" / "x = y"). A space is only meaningful between two word characters.
+    private static readonly Regex PunctSpace = new(@"\s*([^\w\s])\s*", RegexOptions.Compiled);
+
+    /// <summary>Body comparison for verbatim objects: case-, whitespace-, punctuation-spacing-, dollar-tag-, literal-cast- and trailing-`;`-agnostic.</summary>
+    private static string NormalizeBody(string s)
+        => PunctSpace.Replace(LiteralCast.Replace(NormalizeText(DollarTag.Replace(s, "$$$$")), "$1"), "$1").TrimEnd(';', ' ');
 
     private static bool IndexesEqual(IndexDefinition a, IndexDefinition b) =>
         a.IsUnique == b.IsUnique
