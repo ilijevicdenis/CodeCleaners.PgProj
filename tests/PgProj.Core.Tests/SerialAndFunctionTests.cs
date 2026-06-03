@@ -8,7 +8,7 @@ namespace PgProj.Core.Tests;
 
 public class SerialAndFunctionTests
 {
-    private static DatabaseModel Parse(string sql) => new SqlParser().Parse(sql);
+    private static DatabaseModel Parse(string sql) => TestModel.Build(sql);
 
     [Fact]
     public void Serial_column_is_flagged_not_null_and_scripts_as_serial()

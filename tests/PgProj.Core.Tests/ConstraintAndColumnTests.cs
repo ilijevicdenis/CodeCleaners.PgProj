@@ -8,7 +8,7 @@ namespace PgProj.Core.Tests;
 
 public class ConstraintAndColumnTests
 {
-    private static DatabaseModel Parse(string sql) => new SqlParser().Parse(sql);
+    private static DatabaseModel Parse(string sql) => TestModel.Build(sql);
 
     [Fact]
     public void Column_check_is_captured()

@@ -8,7 +8,7 @@ namespace PgProj.Core.Tests;
 
 public class ComparerTests
 {
-    private static DatabaseModel Parse(string sql) => new SqlParser().Parse(sql);
+    private static DatabaseModel Parse(string sql) => TestModel.Build(sql);
     private static readonly SchemaComparer Comparer = new();
 
     [Fact]

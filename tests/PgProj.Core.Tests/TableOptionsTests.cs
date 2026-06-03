@@ -8,7 +8,7 @@ namespace PgProj.Core.Tests;
 
 public class TableOptionsTests
 {
-    private static DatabaseModel Parse(string sql) => new SqlParser().Parse(sql);
+    private static DatabaseModel Parse(string sql) => TestModel.Build(sql);
 
     [Fact]
     public void Partition_by_clause_round_trips()

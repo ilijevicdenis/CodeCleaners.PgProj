@@ -11,7 +11,7 @@ public class ScriptGeneratorTests
     [Fact]
     public void Wraps_in_transaction_and_emits_create_table()
     {
-        var source = new SqlParser().Parse("CREATE TABLE app.t (id int PRIMARY KEY, name text NOT NULL);");
+        var source = TestModel.Build("CREATE TABLE app.t (id int PRIMARY KEY, name text NOT NULL);");
         var changes = new SchemaComparer().Compare(source, new DatabaseModel());
         var script = new DeployScriptGenerator().Generate(changes);
 
@@ -34,7 +34,7 @@ public class ScriptGeneratorTests
     [Fact]
     public void Can_disable_transaction_wrapper()
     {
-        var source = new SqlParser().Parse("CREATE TABLE app.t (id int);");
+        var source = TestModel.Build("CREATE TABLE app.t (id int);");
         var changes = new SchemaComparer().Compare(source, new DatabaseModel());
         var script = new DeployScriptGenerator().Generate(changes, new DeployOptions { WrapInTransaction = false });
         Assert.DoesNotContain("BEGIN;", script);
@@ -44,7 +44,7 @@ public class ScriptGeneratorTests
     public void Statements_are_ordered_by_phase()
     {
         // schema (10) must come before table (40) which comes before foreign key (70).
-        var source = new SqlParser().Parse("""
+        var source = TestModel.Build("""
             CREATE TABLE app.parent (id int PRIMARY KEY);
             CREATE TABLE app.child (id int, pid int REFERENCES app.parent (id));
             """);
