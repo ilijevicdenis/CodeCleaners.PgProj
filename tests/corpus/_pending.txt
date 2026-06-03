@@ -580,14 +580,12 @@ ctcolb0090
 ctcolb0091
 ctcolb0105
 ctcolb0126
-ctcolb0127
 ctcolc0068
 ctcolc0081
 ctcolc0095
 ctcolc0096
 ctcolc0100
 ctcolc0101
-ctcolc0102
 cursa0106
 cursa0107
 cursa0108

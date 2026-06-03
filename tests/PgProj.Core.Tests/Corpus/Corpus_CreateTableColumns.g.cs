@@ -597,7 +597,7 @@ public class Corpus_CreateTableColumns
     public void ctcolb0125() => CorpusAssert.Parses(@"CREATE TABLE s.col125 (a)", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void ctcolb0126() => CorpusAssert.Parses(@"CREATE TABLE s.col126 (integer a)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ctcolb0127() => CorpusAssert.Parses(@"CREATE TABLE s.col127 (a integer, a text)", "error");
     [Fact]
     public void ctcolb0128() => CorpusAssert.Parses(@"CREATE TABLE s.col128 (""a"" integer, ""A"" text)", "ok");
@@ -887,7 +887,7 @@ public class Corpus_CreateTableColumns
     public void ctcolc0100() => CorpusAssert.Parses(@"CREATE TABLE s.col_nolist1 (a integer b text)", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void ctcolc0101() => CorpusAssert.Parses(@"CREATE TABLE s.col_badtype1 (a nonexistent_type_xyz)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ctcolc0102() => CorpusAssert.Parses(@"CREATE TABLE s.col_dupname1 (a integer, a text)", "error");
     [Fact]
     public void ctcolc0103() => CorpusAssert.Parses(@"CREATE TABLE s.col_badmod1 (a integer(10))", "error");

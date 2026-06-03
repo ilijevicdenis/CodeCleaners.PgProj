@@ -284,6 +284,11 @@ public sealed partial class PgParser
             if (!b.MatchSymbol(',')) break;
         }
         if (!b.AtEnd) throw new ParseException($"unexpected '{b.Current!.Value}' in table definition", b.Here);
+
+        // case-sensitive: quoted "a"/"A" are distinct columns; comparing ordinally avoids any false positive
+        var seenCols = new HashSet<string>(StringComparer.Ordinal);
+        foreach (var col in table.Columns)
+            if (!seenCols.Add(col.Name)) throw new ParseException($"column \"{col.Name}\" specified more than once", b.Here);
     }
 
     private void ParseTableElement(TokenCursor b, CreateTableStatement table)
