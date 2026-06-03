@@ -28,6 +28,7 @@ public static class Program
                 "compare" => await Compare(args),
                 "publish" => await Publish(args),
                 "extract" => await Extract(args),
+                "analyze" => Analyze(args),
                 "script" => Script(args),
                 "help" or "--help" or "-h" => PrintUsageReturn(0),
                 _ => Fail($"Unknown command '{args[0]}'."),
@@ -170,6 +171,37 @@ public static class Program
         return 0;
     }
 
+    // ---- analyze (static analysis over the AST) -----------------------------------------
+
+    private static int Analyze(string[] args)
+    {
+        var project = DatabaseProject.Load(RequirePositional(args, "project file"));
+        var parser = new PgProj.Core.Parsing.AstParser(project.DefaultSchema);
+        var statements = new List<PgProj.Core.Ast.SqlStatement>();
+        foreach (var file in project.ResolveSqlFiles())
+            statements.AddRange(parser.Parse(File.ReadAllText(file)).Statements);
+
+        var script = new PgProj.Core.Ast.SqlScript { Statements = statements };
+        var analyzer = PgProj.Core.Analysis.SqlAnalyzer.Default();
+        var findings = analyzer.Analyze(script);
+
+        Console.WriteLine($"Analyzed '{project.Name}': {statements.Count} statement(s), {analyzer.Rules.Count} rule(s).");
+        foreach (var d in parser.Diagnostics) Console.Error.WriteLine($"  parse: {d}");
+
+        if (findings.Count == 0) { Console.WriteLine("No findings. ✓"); return 0; }
+
+        foreach (var d in findings.OrderByDescending(f => f.Severity))
+            Console.WriteLine($"  {d}");
+
+        var errors = findings.Count(f => f.Severity == PgProj.Core.Analysis.DiagnosticSeverity.Error);
+        var warnings = findings.Count(f => f.Severity == PgProj.Core.Analysis.DiagnosticSeverity.Warning);
+        var infos = findings.Count(f => f.Severity == PgProj.Core.Analysis.DiagnosticSeverity.Info);
+        Console.WriteLine($"\n{findings.Count} finding(s): {errors} error, {warnings} warning, {infos} info.");
+
+        var strict = HasFlag(args, "--strict");
+        return errors > 0 || (strict && warnings > 0) ? 1 : 0;
+    }
+
     // ---- script (full create from project, no server) -----------------------------------
 
     private static int Script(string[] args)
@@ -272,6 +304,7 @@ public static class Program
           pgproj compare <project.pgproj> --connection <conn> [--allow-drops]
           pgproj publish <project.pgproj> --connection <conn> [--dry-run] [-o script.sql] [--allow-drops] [--no-transaction]
           pgproj extract --connection <conn> -o <outDir>
+          pgproj analyze <project.pgproj> [--strict]    (static safety analysis over the AST)
 
         Options:
           -c, --connection   Postgres connection string (or set PGPROJ_CONNECTION)
