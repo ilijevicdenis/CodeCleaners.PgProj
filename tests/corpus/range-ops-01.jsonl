@@ -1,0 +1,170 @@
+{"id":"rnga0001","category":"range-ops","sql":"SELECT int4range(1, 10)","expect":"ok","ref":"functions-range","note":"int4range constructor default bounds [)"}
+{"id":"rnga0002","category":"range-ops","sql":"SELECT int4range(1, 10, '[)')","expect":"ok","ref":"functions-range","note":"int4range constructor explicit [) bounds"}
+{"id":"rnga0003","category":"range-ops","sql":"SELECT int4range(1, 10, '[]')","expect":"ok","ref":"functions-range","note":"int4range constructor [] inclusive bounds"}
+{"id":"rnga0004","category":"range-ops","sql":"SELECT int4range(1, 10, '(]')","expect":"ok","ref":"functions-range","note":"int4range constructor (] bounds"}
+{"id":"rnga0005","category":"range-ops","sql":"SELECT int4range(1, 10, '()')","expect":"ok","ref":"functions-range","note":"int4range constructor () exclusive bounds"}
+{"id":"rnga0006","category":"range-ops","sql":"SELECT int4range('empty')","expect":"ok","ref":"functions-range","note":"int4range empty literal cast"}
+{"id":"rnga0007","category":"range-ops","sql":"SELECT int8range(100, 200)","expect":"ok","ref":"functions-range","note":"int8range constructor default bounds"}
+{"id":"rnga0008","category":"range-ops","sql":"SELECT int8range(100, 200, '[)')","expect":"ok","ref":"functions-range","note":"int8range constructor explicit [) bounds"}
+{"id":"rnga0009","category":"range-ops","sql":"SELECT int8range(100, 200, '[]')","expect":"ok","ref":"functions-range","note":"int8range constructor [] bounds"}
+{"id":"rnga0010","category":"range-ops","sql":"SELECT int8range(100, 200, '(]')","expect":"ok","ref":"functions-range","note":"int8range constructor (] bounds"}
+{"id":"rnga0011","category":"range-ops","sql":"SELECT int8range(100, 200, '()')","expect":"ok","ref":"functions-range","note":"int8range constructor () bounds"}
+{"id":"rnga0012","category":"range-ops","sql":"SELECT int8range('empty')","expect":"ok","ref":"functions-range","note":"int8range empty"}
+{"id":"rnga0013","category":"range-ops","sql":"SELECT numrange(1.5, 2.5)","expect":"ok","ref":"functions-range","note":"numrange constructor default bounds"}
+{"id":"rnga0014","category":"range-ops","sql":"SELECT numrange(1.5, 2.5, '[)')","expect":"ok","ref":"functions-range","note":"numrange constructor [) bounds"}
+{"id":"rnga0015","category":"range-ops","sql":"SELECT numrange(1.5, 2.5, '[]')","expect":"ok","ref":"functions-range","note":"numrange constructor [] bounds"}
+{"id":"rnga0016","category":"range-ops","sql":"SELECT numrange(1.5, 2.5, '(]')","expect":"ok","ref":"functions-range","note":"numrange constructor (] bounds"}
+{"id":"rnga0017","category":"range-ops","sql":"SELECT numrange(1.5, 2.5, '()')","expect":"ok","ref":"functions-range","note":"numrange constructor () bounds"}
+{"id":"rnga0018","category":"range-ops","sql":"SELECT numrange('empty')","expect":"ok","ref":"functions-range","note":"numrange empty"}
+{"id":"rnga0019","category":"range-ops","sql":"SELECT tsrange('2024-01-01', '2024-12-31')","expect":"ok","ref":"functions-range","note":"tsrange constructor default bounds"}
+{"id":"rnga0020","category":"range-ops","sql":"SELECT tsrange('2024-01-01', '2024-12-31', '[)')","expect":"ok","ref":"functions-range","note":"tsrange constructor [) bounds"}
+{"id":"rnga0021","category":"range-ops","sql":"SELECT tsrange('2024-01-01', '2024-12-31', '[]')","expect":"ok","ref":"functions-range","note":"tsrange constructor [] bounds"}
+{"id":"rnga0022","category":"range-ops","sql":"SELECT tsrange('2024-01-01', '2024-12-31', '(]')","expect":"ok","ref":"functions-range","note":"tsrange constructor (] bounds"}
+{"id":"rnga0023","category":"range-ops","sql":"SELECT tsrange('2024-01-01', '2024-12-31', '()')","expect":"ok","ref":"functions-range","note":"tsrange constructor () bounds"}
+{"id":"rnga0024","category":"range-ops","sql":"SELECT tstzrange('2024-01-01 00:00:00+00', '2024-12-31 00:00:00+00')","expect":"ok","ref":"functions-range","note":"tstzrange constructor default bounds"}
+{"id":"rnga0025","category":"range-ops","sql":"SELECT tstzrange('2024-01-01 00:00:00+00', '2024-12-31 00:00:00+00', '[)')","expect":"ok","ref":"functions-range","note":"tstzrange constructor [) bounds"}
+{"id":"rnga0026","category":"range-ops","sql":"SELECT tstzrange('2024-01-01 00:00:00+00', '2024-12-31 00:00:00+00', '[]')","expect":"ok","ref":"functions-range","note":"tstzrange constructor [] bounds"}
+{"id":"rnga0027","category":"range-ops","sql":"SELECT tstzrange('2024-01-01 00:00:00+00', '2024-12-31 00:00:00+00', '(]')","expect":"ok","ref":"functions-range","note":"tstzrange constructor (] bounds"}
+{"id":"rnga0028","category":"range-ops","sql":"SELECT tstzrange('2024-01-01 00:00:00+00', '2024-12-31 00:00:00+00', '()')","expect":"ok","ref":"functions-range","note":"tstzrange constructor () bounds"}
+{"id":"rnga0029","category":"range-ops","sql":"SELECT daterange('2024-01-01', '2024-12-31')","expect":"ok","ref":"functions-range","note":"daterange constructor default bounds"}
+{"id":"rnga0030","category":"range-ops","sql":"SELECT daterange('2024-01-01', '2024-12-31', '[)')","expect":"ok","ref":"functions-range","note":"daterange constructor [) bounds"}
+{"id":"rnga0031","category":"range-ops","sql":"SELECT daterange('2024-01-01', '2024-12-31', '[]')","expect":"ok","ref":"functions-range","note":"daterange constructor [] bounds"}
+{"id":"rnga0032","category":"range-ops","sql":"SELECT daterange('2024-01-01', '2024-12-31', '(]')","expect":"ok","ref":"functions-range","note":"daterange constructor (] bounds"}
+{"id":"rnga0033","category":"range-ops","sql":"SELECT daterange('2024-01-01', '2024-12-31', '()')","expect":"ok","ref":"functions-range","note":"daterange constructor () bounds"}
+{"id":"rnga0034","category":"range-ops","sql":"SELECT daterange('empty')","expect":"ok","ref":"functions-range","note":"daterange empty literal"}
+{"id":"rnga0035","category":"range-ops","sql":"SELECT int4range(NULL, 10)","expect":"ok","ref":"functions-range","note":"int4range with null lower bound (unbounded)"}
+{"id":"rnga0036","category":"range-ops","sql":"SELECT int4range(1, NULL)","expect":"ok","ref":"functions-range","note":"int4range with null upper bound (unbounded)"}
+{"id":"rnga0037","category":"range-ops","sql":"SELECT int4range(NULL, NULL)","expect":"ok","ref":"functions-range","note":"int4range with both null bounds (unbounded)"}
+{"id":"rnga0038","category":"range-ops","sql":"SELECT '[1,10)'::int4range","expect":"ok","ref":"functions-range","note":"int4range literal cast [) form"}
+{"id":"rnga0039","category":"range-ops","sql":"SELECT '[1,10]'::int4range","expect":"ok","ref":"functions-range","note":"int4range literal cast [] form"}
+{"id":"rnga0040","category":"range-ops","sql":"SELECT '(1,10]'::int4range","expect":"ok","ref":"functions-range","note":"int4range literal cast (] form"}
+{"id":"rnga0041","category":"range-ops","sql":"SELECT '(1,10)'::int4range","expect":"ok","ref":"functions-range","note":"int4range literal cast () form"}
+{"id":"rnga0042","category":"range-ops","sql":"SELECT 'empty'::int4range","expect":"ok","ref":"functions-range","note":"int4range empty via cast"}
+{"id":"rnga0043","category":"range-ops","sql":"SELECT int4range(1, 10) @> int4range(3, 5)","expect":"ok","ref":"functions-range","note":"@> range contains range"}
+{"id":"rnga0044","category":"range-ops","sql":"SELECT int4range(1, 10) @> 5","expect":"ok","ref":"functions-range","note":"@> range contains element"}
+{"id":"rnga0045","category":"range-ops","sql":"SELECT 5 <@ int4range(1, 10)","expect":"ok","ref":"functions-range","note":"<@ element contained by range"}
+{"id":"rnga0046","category":"range-ops","sql":"SELECT int4range(3, 5) <@ int4range(1, 10)","expect":"ok","ref":"functions-range","note":"<@ range contained by range"}
+{"id":"rnga0047","category":"range-ops","sql":"SELECT int4range(1, 5) && int4range(3, 8)","expect":"ok","ref":"functions-range","note":"&& ranges overlap"}
+{"id":"rnga0048","category":"range-ops","sql":"SELECT int4range(1, 5) << int4range(7, 10)","expect":"ok","ref":"functions-range","note":"<< strictly left of"}
+{"id":"rnga0049","category":"range-ops","sql":"SELECT int4range(7, 10) >> int4range(1, 5)","expect":"ok","ref":"functions-range","note":">> strictly right of"}
+{"id":"rnga0050","category":"range-ops","sql":"SELECT int4range(1, 10) &< int4range(5, 15)","expect":"ok","ref":"functions-range","note":"&< does not extend to right of"}
+{"id":"rnga0051","category":"range-ops","sql":"SELECT int4range(5, 15) &> int4range(1, 10)","expect":"ok","ref":"functions-range","note":"&> does not extend to left of"}
+{"id":"rnga0052","category":"range-ops","sql":"SELECT int4range(1, 5) -|- int4range(5, 10)","expect":"ok","ref":"functions-range","note":"-|- adjacent ranges"}
+{"id":"rnga0053","category":"range-ops","sql":"SELECT int4range(1, 5) + int4range(3, 10)","expect":"ok","ref":"functions-range","note":"+ union of overlapping ranges"}
+{"id":"rnga0054","category":"range-ops","sql":"SELECT int4range(1, 10) * int4range(5, 15)","expect":"ok","ref":"functions-range","note":"* intersection of ranges"}
+{"id":"rnga0055","category":"range-ops","sql":"SELECT int4range(1, 10) - int4range(5, 15)","expect":"ok","ref":"functions-range","note":"- difference of ranges"}
+{"id":"rnga0056","category":"range-ops","sql":"SELECT numrange(1.0, 5.0) @> numrange(2.0, 4.0)","expect":"ok","ref":"functions-range","note":"@> numrange contains numrange"}
+{"id":"rnga0057","category":"range-ops","sql":"SELECT numrange(1.0, 5.0) @> 3.0","expect":"ok","ref":"functions-range","note":"@> numrange contains element"}
+{"id":"rnga0058","category":"range-ops","sql":"SELECT numrange(1.5, 2.2) -|- numrange(2.2, 3.3)","expect":"ok","ref":"functions-range","note":"-|- adjacent numranges"}
+{"id":"rnga0059","category":"range-ops","sql":"SELECT daterange('2024-01-01', '2024-06-01') @> '2024-03-15'::date","expect":"ok","ref":"functions-range","note":"@> daterange contains date element"}
+{"id":"rnga0060","category":"range-ops","sql":"SELECT daterange('2024-01-01', '2024-06-01') && daterange('2024-05-01', '2024-12-31')","expect":"ok","ref":"functions-range","note":"&& dateranges overlap"}
+{"id":"rnga0061","category":"range-ops","sql":"SELECT lower(int4range(1, 10))","expect":"ok","ref":"functions-range","note":"lower() on int4range"}
+{"id":"rnga0062","category":"range-ops","sql":"SELECT upper(int4range(1, 10))","expect":"ok","ref":"functions-range","note":"upper() on int4range"}
+{"id":"rnga0063","category":"range-ops","sql":"SELECT isempty(int4range(1, 10))","expect":"ok","ref":"functions-range","note":"isempty() on non-empty range"}
+{"id":"rnga0064","category":"range-ops","sql":"SELECT isempty('empty'::int4range)","expect":"ok","ref":"functions-range","note":"isempty() on empty range"}
+{"id":"rnga0065","category":"range-ops","sql":"SELECT lower_inc(int4range(1, 10))","expect":"ok","ref":"functions-range","note":"lower_inc() on [) range"}
+{"id":"rnga0066","category":"range-ops","sql":"SELECT lower_inc(int4range(1, 10, '(]'))","expect":"ok","ref":"functions-range","note":"lower_inc() on (] range returns false"}
+{"id":"rnga0067","category":"range-ops","sql":"SELECT upper_inc(int4range(1, 10, '[]'))","expect":"ok","ref":"functions-range","note":"upper_inc() on [] range returns true"}
+{"id":"rnga0068","category":"range-ops","sql":"SELECT upper_inc(int4range(1, 10))","expect":"ok","ref":"functions-range","note":"upper_inc() on [) range returns false"}
+{"id":"rnga0069","category":"range-ops","sql":"SELECT lower_inf(int4range(NULL, 10))","expect":"ok","ref":"functions-range","note":"lower_inf() on unbounded lower"}
+{"id":"rnga0070","category":"range-ops","sql":"SELECT lower_inf(int4range(1, 10))","expect":"ok","ref":"functions-range","note":"lower_inf() on bounded lower returns false"}
+{"id":"rnga0071","category":"range-ops","sql":"SELECT upper_inf(int4range(1, NULL))","expect":"ok","ref":"functions-range","note":"upper_inf() on unbounded upper"}
+{"id":"rnga0072","category":"range-ops","sql":"SELECT upper_inf(int4range(1, 10))","expect":"ok","ref":"functions-range","note":"upper_inf() on bounded upper returns false"}
+{"id":"rnga0073","category":"range-ops","sql":"SELECT lower_inf('(,)'::daterange)","expect":"ok","ref":"functions-range","note":"lower_inf() on (, ) daterange"}
+{"id":"rnga0074","category":"range-ops","sql":"SELECT upper_inf('(,)'::daterange)","expect":"ok","ref":"functions-range","note":"upper_inf() on (, ) daterange"}
+{"id":"rnga0075","category":"range-ops","sql":"SELECT lower(numrange(1.1, 2.2))","expect":"ok","ref":"functions-range","note":"lower() on numrange"}
+{"id":"rnga0076","category":"range-ops","sql":"SELECT upper(numrange(1.1, 2.2))","expect":"ok","ref":"functions-range","note":"upper() on numrange"}
+{"id":"rnga0077","category":"range-ops","sql":"SELECT lower_inc(numrange(1.1, 2.2))","expect":"ok","ref":"functions-range","note":"lower_inc() on numrange default [)"}
+{"id":"rnga0078","category":"range-ops","sql":"SELECT upper_inc(numrange(1.1, 2.2, '[]'))","expect":"ok","ref":"functions-range","note":"upper_inc() on numrange [] bounds"}
+{"id":"rnga0079","category":"range-ops","sql":"SELECT range_merge('[1,5)'::int4range, '[3,10)'::int4range)","expect":"ok","ref":"functions-range","note":"range_merge two overlapping int4ranges"}
+{"id":"rnga0080","category":"range-ops","sql":"SELECT range_merge('[1,2)'::int4range, '[8,10)'::int4range)","expect":"ok","ref":"functions-range","note":"range_merge two disjoint int4ranges"}
+{"id":"rnga0081","category":"range-ops","sql":"SELECT range_merge('[2024-01-01,2024-06-01)'::daterange, '[2024-03-01,2024-12-31)'::daterange)","expect":"ok","ref":"functions-range","note":"range_merge two dateranges"}
+{"id":"rnga0082","category":"range-ops","sql":"SELECT range_merge(numrange(1.0, 3.0), numrange(2.0, 5.0))","expect":"ok","ref":"functions-range","note":"range_merge two numranges via constructor"}
+{"id":"rnga0083","category":"range-ops","sql":"SELECT int4multirange(int4range(1, 5), int4range(8, 12))","expect":"ok","ref":"functions-range","note":"int4multirange constructor with two ranges"}
+{"id":"rnga0084","category":"range-ops","sql":"SELECT int4multirange()","expect":"ok","ref":"functions-range","note":"int4multirange empty constructor"}
+{"id":"rnga0085","category":"range-ops","sql":"SELECT int4multirange(int4range(1, 5))","expect":"ok","ref":"functions-range","note":"int4multirange single range"}
+{"id":"rnga0086","category":"range-ops","sql":"SELECT int8multirange(int8range(100, 200), int8range(300, 400))","expect":"ok","ref":"functions-range","note":"int8multirange constructor with two ranges"}
+{"id":"rnga0087","category":"range-ops","sql":"SELECT nummultirange(numrange(1.0, 2.0), numrange(3.0, 4.0))","expect":"ok","ref":"functions-range","note":"nummultirange constructor"}
+{"id":"rnga0088","category":"range-ops","sql":"SELECT tsmultirange(tsrange('2024-01-01', '2024-06-01'), tsrange('2024-07-01', '2024-12-31'))","expect":"ok","ref":"functions-range","note":"tsmultirange constructor"}
+{"id":"rnga0089","category":"range-ops","sql":"SELECT datemultirange(daterange('2024-01-01', '2024-06-01'), daterange('2024-07-01', '2024-12-31'))","expect":"ok","ref":"functions-range","note":"datemultirange constructor"}
+{"id":"rnga0090","category":"range-ops","sql":"SELECT '{[1,5),[8,12)}'::int4multirange","expect":"ok","ref":"functions-range","note":"int4multirange literal cast"}
+{"id":"rnga0091","category":"range-ops","sql":"SELECT '{}'::int4multirange","expect":"ok","ref":"functions-range","note":"int4multirange empty literal cast"}
+{"id":"rnga0092","category":"range-ops","sql":"SELECT '{[2024-01-01,2024-06-01)}'::datemultirange","expect":"ok","ref":"functions-range","note":"datemultirange single range literal cast"}
+{"id":"rnga0093","category":"range-ops","sql":"SELECT '{[1.0,2.0),[3.0,4.0)}'::nummultirange","expect":"ok","ref":"functions-range","note":"nummultirange literal cast"}
+{"id":"rnga0094","category":"range-ops","sql":"SELECT int4multirange(int4range(1,5), int4range(8,12)) @> 3","expect":"ok","ref":"functions-range","note":"@> multirange contains element"}
+{"id":"rnga0095","category":"range-ops","sql":"SELECT int4multirange(int4range(1,5), int4range(8,12)) @> int4range(2,4)","expect":"ok","ref":"functions-range","note":"@> multirange contains range"}
+{"id":"rnga0096","category":"range-ops","sql":"SELECT int4range(1,10) @> int4multirange(int4range(2,4), int4range(6,8))","expect":"ok","ref":"functions-range","note":"@> range contains multirange"}
+{"id":"rnga0097","category":"range-ops","sql":"SELECT 3 <@ int4multirange(int4range(1,5), int4range(8,12))","expect":"ok","ref":"functions-range","note":"<@ element contained by multirange"}
+{"id":"rnga0098","category":"range-ops","sql":"SELECT int4range(2,4) <@ int4multirange(int4range(1,5), int4range(8,12))","expect":"ok","ref":"functions-range","note":"<@ range contained by multirange"}
+{"id":"rnga0099","category":"range-ops","sql":"SELECT int4multirange(int4range(1,5)) <@ int4multirange(int4range(0,10))","expect":"ok","ref":"functions-range","note":"<@ multirange contained by multirange"}
+{"id":"rnga0100","category":"range-ops","sql":"SELECT int4multirange(int4range(1,5), int4range(8,12)) && int4range(4,9)","expect":"ok","ref":"functions-range","note":"&& multirange overlaps range"}
+{"id":"rnga0101","category":"range-ops","sql":"SELECT int4multirange(int4range(1,5), int4range(8,12)) && int4multirange(int4range(3,9))","expect":"ok","ref":"functions-range","note":"&& multirange overlaps multirange"}
+{"id":"rnga0102","category":"range-ops","sql":"SELECT int4multirange(int4range(1,5)) << int4multirange(int4range(8,12))","expect":"ok","ref":"functions-range","note":"<< multirange strictly left of multirange"}
+{"id":"rnga0103","category":"range-ops","sql":"SELECT int4multirange(int4range(8,12)) >> int4multirange(int4range(1,5))","expect":"ok","ref":"functions-range","note":">> multirange strictly right of multirange"}
+{"id":"rnga0104","category":"range-ops","sql":"SELECT int4multirange(int4range(1,5)) &< int4multirange(int4range(3,10))","expect":"ok","ref":"functions-range","note":"&< multirange does not extend right of multirange"}
+{"id":"rnga0105","category":"range-ops","sql":"SELECT int4multirange(int4range(3,10)) &> int4multirange(int4range(1,5))","expect":"ok","ref":"functions-range","note":"&> multirange does not extend left of multirange"}
+{"id":"rnga0106","category":"range-ops","sql":"SELECT int4multirange(int4range(1,5)) -|- int4multirange(int4range(5,10))","expect":"ok","ref":"functions-range","note":"-|- adjacent multiranges"}
+{"id":"rnga0107","category":"range-ops","sql":"SELECT int4multirange(int4range(1,5)) + int4multirange(int4range(8,12))","expect":"ok","ref":"functions-range","note":"+ multirange union (disjoint, returns multirange)"}
+{"id":"rnga0108","category":"range-ops","sql":"SELECT int4multirange(int4range(1,10)) * int4multirange(int4range(5,15))","expect":"ok","ref":"functions-range","note":"* multirange intersection"}
+{"id":"rnga0109","category":"range-ops","sql":"SELECT int4multirange(int4range(1,10)) - int4multirange(int4range(5,15))","expect":"ok","ref":"functions-range","note":"- multirange difference"}
+{"id":"rnga0110","category":"range-ops","sql":"SELECT lower(int4multirange(int4range(1,5), int4range(8,12)))","expect":"ok","ref":"functions-range","note":"lower() on multirange"}
+{"id":"rnga0111","category":"range-ops","sql":"SELECT upper(int4multirange(int4range(1,5), int4range(8,12)))","expect":"ok","ref":"functions-range","note":"upper() on multirange"}
+{"id":"rnga0112","category":"range-ops","sql":"SELECT isempty(int4multirange())","expect":"ok","ref":"functions-range","note":"isempty() on empty multirange"}
+{"id":"rnga0113","category":"range-ops","sql":"SELECT isempty(int4multirange(int4range(1,5)))","expect":"ok","ref":"functions-range","note":"isempty() on non-empty multirange"}
+{"id":"rnga0114","category":"range-ops","sql":"SELECT lower_inc(int4multirange(int4range(1,5)))","expect":"ok","ref":"functions-range","note":"lower_inc() on multirange"}
+{"id":"rnga0115","category":"range-ops","sql":"SELECT upper_inc(int4multirange(int4range(1,5)))","expect":"ok","ref":"functions-range","note":"upper_inc() on multirange"}
+{"id":"rnga0116","category":"range-ops","sql":"SELECT lower_inf(int4multirange(int4range(NULL,5)))","expect":"ok","ref":"functions-range","note":"lower_inf() on multirange with unbounded lower"}
+{"id":"rnga0117","category":"range-ops","sql":"SELECT upper_inf(int4multirange(int4range(1,NULL)))","expect":"ok","ref":"functions-range","note":"upper_inf() on multirange with unbounded upper"}
+{"id":"rnga0118","category":"range-ops","sql":"SELECT range_merge(int4multirange(int4range(1,5), int4range(8,12)))","expect":"ok","ref":"functions-range","note":"range_merge on multirange returns spanning range"}
+{"id":"rnga0119","category":"range-ops","sql":"SELECT multirange(int4range(1,10))","expect":"ok","ref":"functions-range","note":"multirange() function converts range to multirange"}
+{"id":"rnga0120","category":"range-ops","sql":"SELECT unnest(int4multirange(int4range(1,5), int4range(8,12)))","expect":"ok","ref":"functions-range","note":"unnest multirange into set of ranges"}
+{"id":"rnga0121","category":"range-ops","sql":"SELECT unnest('{[1,5),[8,12),[20,30)}'::int4multirange)","expect":"ok","ref":"functions-range","note":"unnest multirange literal"}
+{"id":"rnga0122","category":"range-ops","sql":"SELECT span FROM s.t WHERE span @> 5","expect":"ok","ref":"functions-range","note":"@> range column contains element in WHERE"}
+{"id":"rnga0123","category":"range-ops","sql":"SELECT span FROM s.t WHERE span && int4range(1, 100)","expect":"ok","ref":"functions-range","note":"&& range column overlaps in WHERE"}
+{"id":"rnga0124","category":"range-ops","sql":"SELECT span FROM s.t WHERE span << int4range(200, 300)","expect":"ok","ref":"functions-range","note":"<< range column strictly left of in WHERE"}
+{"id":"rnga0125","category":"range-ops","sql":"SELECT span FROM s.t WHERE span >> int4range(0, 1)","expect":"ok","ref":"functions-range","note":">> range column strictly right of in WHERE"}
+{"id":"rnga0126","category":"range-ops","sql":"SELECT span FROM s.t WHERE isempty(span)","expect":"ok","ref":"functions-range","note":"isempty() used in WHERE on column"}
+{"id":"rnga0127","category":"range-ops","sql":"SELECT lower(span), upper(span) FROM s.t","expect":"ok","ref":"functions-range","note":"lower() and upper() on range column in SELECT"}
+{"id":"rnga0128","category":"range-ops","sql":"SELECT lower_inc(span), upper_inc(span) FROM s.t","expect":"ok","ref":"functions-range","note":"lower_inc() and upper_inc() on range column"}
+{"id":"rnga0129","category":"range-ops","sql":"SELECT lower_inf(span), upper_inf(span) FROM s.t","expect":"ok","ref":"functions-range","note":"lower_inf() and upper_inf() on range column"}
+{"id":"rnga0130","category":"range-ops","sql":"SELECT range_merge(span, int4range(50, 100)) FROM s.t","expect":"ok","ref":"functions-range","note":"range_merge with column and literal"}
+{"id":"rnga0131","category":"range-ops","sql":"SELECT range_agg(span) FROM s.t","expect":"ok","ref":"functions-range","note":"range_agg aggregate on range column"}
+{"id":"rnga0132","category":"range-ops","sql":"SELECT range_agg(span) FROM s.t GROUP BY status","expect":"ok","ref":"functions-range","note":"range_agg with GROUP BY"}
+{"id":"rnga0133","category":"range-ops","sql":"SELECT range_agg(int4range(1,5))","expect":"ok","ref":"functions-range","note":"range_agg on literal range"}
+{"id":"rnga0134","category":"range-ops","sql":"SELECT int4range(5, 1)","expect":"error","ref":"functions-range","note":"int4range with inverted bounds (error: lower > upper)"}
+{"id":"rnga0135","category":"range-ops","sql":"SELECT int4range(1, 10, '><')","expect":"error","ref":"functions-range","note":"int4range with invalid bound string"}
+{"id":"rnga0136","category":"range-ops","sql":"SELECT int4range(1, 10, 'XY')","expect":"error","ref":"functions-range","note":"int4range with garbage bound string"}
+{"id":"rnga0137","category":"range-ops","sql":"SELECT int4range(1, 10, '')","expect":"error","ref":"functions-range","note":"int4range with empty bound string"}
+{"id":"rnga0138","category":"range-ops","sql":"SELECT '[abc,10)'::int4range","expect":"error","ref":"functions-range","note":"int4range literal with non-integer lower bound"}
+{"id":"rnga0139","category":"range-ops","sql":"SELECT '[1,abc)'::int4range","expect":"error","ref":"functions-range","note":"int4range literal with non-integer upper bound"}
+{"id":"rnga0140","category":"range-ops","sql":"SELECT '(1,10'::int4range","expect":"error","ref":"functions-range","note":"int4range literal missing closing bracket"}
+{"id":"rnga0141","category":"range-ops","sql":"SELECT '1,10)'::int4range","expect":"error","ref":"functions-range","note":"int4range literal missing opening bracket"}
+{"id":"rnga0142","category":"range-ops","sql":"SELECT int4range(1, 5) + int4range(8, 12)","expect":"error","ref":"functions-range","note":"+ union of disjoint ranges errors (would produce multirange)"}
+{"id":"rnga0143","category":"range-ops","sql":"SELECT int4range(1, 5) @> numrange(2.0, 4.0)","expect":"error","ref":"functions-range","note":"@> type mismatch int4range vs numrange"}
+{"id":"rnga0144","category":"range-ops","sql":"SELECT int4range(1, 5) && numrange(2.0, 4.0)","expect":"error","ref":"functions-range","note":"&& type mismatch int4range vs numrange"}
+{"id":"rnga0145","category":"range-ops","sql":"SELECT lower()","expect":"error","ref":"functions-range","note":"lower() called with no arguments"}
+{"id":"rnga0146","category":"range-ops","sql":"SELECT upper()","expect":"error","ref":"functions-range","note":"upper() called with no arguments"}
+{"id":"rnga0147","category":"range-ops","sql":"SELECT isempty(1, 2)","expect":"error","ref":"functions-range","note":"isempty() with too many arguments"}
+{"id":"rnga0148","category":"range-ops","sql":"SELECT range_merge(int4range(1,5), numrange(3.0,8.0))","expect":"error","ref":"functions-range","note":"range_merge type mismatch"}
+{"id":"rnga0149","category":"range-ops","sql":"SELECT int4range(1, 10) @> 3.5","expect":"error","ref":"functions-range","note":"@> element type mismatch (float vs int range)"}
+{"id":"rnga0150","category":"range-ops","sql":"SELECT numrange(1.0, 5.0) + numrange(8.0, 12.0)","expect":"error","ref":"functions-range","note":"+ union of disjoint numranges errors"}
+{"id":"rnga0151","category":"range-ops","sql":"SELECT int4range(1,10) << 5","expect":"error","ref":"functions-range","note":"<< operator with non-range right operand"}
+{"id":"rnga0152","category":"range-ops","sql":"SELECT 'badrange'::int4range","expect":"error","ref":"functions-range","note":"int4range cast of invalid string"}
+{"id":"rnga0153","category":"range-ops","sql":"SELECT int4range(1, 10, '[]') @> int4range(1, 10, '[]')","expect":"ok","ref":"functions-range","note":"@> with inclusive bounds both sides"}
+{"id":"rnga0154","category":"range-ops","sql":"SELECT int4range(1, 10) = int4range(1, 10)","expect":"ok","ref":"functions-range","note":"range equality operator"}
+{"id":"rnga0155","category":"range-ops","sql":"SELECT int4range(1, 10) <> int4range(1, 11)","expect":"ok","ref":"functions-range","note":"range inequality operator"}
+{"id":"rnga0156","category":"range-ops","sql":"SELECT int4range(1, 10) < int4range(5, 15)","expect":"ok","ref":"functions-range","note":"range less-than comparison"}
+{"id":"rnga0157","category":"range-ops","sql":"SELECT int4range(5, 15) > int4range(1, 10)","expect":"ok","ref":"functions-range","note":"range greater-than comparison"}
+{"id":"rnga0158","category":"range-ops","sql":"SELECT int4range(1, 10) <= int4range(1, 10)","expect":"ok","ref":"functions-range","note":"range less-than-or-equal comparison"}
+{"id":"rnga0159","category":"range-ops","sql":"SELECT int4range(1, 10) >= int4range(1, 10)","expect":"ok","ref":"functions-range","note":"range greater-than-or-equal comparison"}
+{"id":"rnga0160","category":"range-ops","sql":"SELECT lower('empty'::int4range)","expect":"ok","ref":"functions-range","note":"lower() on empty range returns NULL"}
+{"id":"rnga0161","category":"range-ops","sql":"SELECT upper('empty'::int4range)","expect":"ok","ref":"functions-range","note":"upper() on empty range returns NULL"}
+{"id":"rnga0162","category":"range-ops","sql":"SELECT lower_inc('empty'::int4range)","expect":"ok","ref":"functions-range","note":"lower_inc() on empty range returns false"}
+{"id":"rnga0163","category":"range-ops","sql":"SELECT upper_inc('empty'::int4range)","expect":"ok","ref":"functions-range","note":"upper_inc() on empty range returns false"}
+{"id":"rnga0164","category":"range-ops","sql":"SELECT 'empty'::int4range @> 'empty'::int4range","expect":"ok","ref":"functions-range","note":"empty range contains empty range"}
+{"id":"rnga0165","category":"range-ops","sql":"SELECT tstzrange('2024-01-01 00:00:00+00', '2024-12-31 00:00:00+00') @> '2024-06-15 12:00:00+00'::timestamptz","expect":"ok","ref":"functions-range","note":"@> tstzrange contains timestamptz element"}
+{"id":"rnga0166","category":"range-ops","sql":"SELECT tsrange('2024-01-01', '2024-12-31') @> '2024-06-15 00:00:00'::timestamp","expect":"ok","ref":"functions-range","note":"@> tsrange contains timestamp element"}
+{"id":"rnga0167","category":"range-ops","sql":"SELECT multirange(daterange('2024-01-01','2024-12-31'))","expect":"ok","ref":"functions-range","note":"multirange() converts daterange to datemultirange"}
+{"id":"rnga0168","category":"range-ops","sql":"SELECT nummultirange() @> 1.0","expect":"ok","ref":"functions-range","note":"@> empty multirange contains nothing returns false"}
+{"id":"rnga0169","category":"range-ops","sql":"SELECT int4range(1, 10, '()') = int4range(2, 9, '[]')","expect":"ok","ref":"functions-range","note":"range equality after normalization (discrete type)"}
+{"id":"rnga0170","category":"range-ops","sql":"SELECT int4range(1, 10) - int4range(1, 10)","expect":"ok","ref":"functions-range","note":"- difference producing empty range"}

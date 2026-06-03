@@ -1,0 +1,250 @@
+{"id":"numfa0001","category":"numeric-funcs","sql":"SELECT abs(-17.4)","expect":"ok","ref":"functions-math","note":"abs() with negative numeric"}
+{"id":"numfa0002","category":"numeric-funcs","sql":"SELECT abs(17.4)","expect":"ok","ref":"functions-math","note":"abs() with positive numeric"}
+{"id":"numfa0003","category":"numeric-funcs","sql":"SELECT abs(0)","expect":"ok","ref":"functions-math","note":"abs() with zero"}
+{"id":"numfa0004","category":"numeric-funcs","sql":"SELECT abs(-2147483647::integer)","expect":"ok","ref":"functions-math","note":"abs() integer type near min value"}
+{"id":"numfa0005","category":"numeric-funcs","sql":"SELECT abs(-9223372036854775807::bigint)","expect":"ok","ref":"functions-math","note":"abs() bigint type"}
+{"id":"numfa0006","category":"numeric-funcs","sql":"SELECT abs(-1.5::double precision)","expect":"ok","ref":"functions-math","note":"abs() double precision"}
+{"id":"numfa0007","category":"numeric-funcs","sql":"SELECT @ -5.0","expect":"ok","ref":"functions-math","note":"@ operator absolute value"}
+{"id":"numfa0008","category":"numeric-funcs","sql":"SELECT @ 5","expect":"ok","ref":"functions-math","note":"@ operator absolute value positive"}
+{"id":"numfa0009","category":"numeric-funcs","sql":"SELECT abs()","expect":"error","ref":"functions-math","note":"abs() with no arguments - syntax error"}
+{"id":"numfa0010","category":"numeric-funcs","sql":"SELECT abs(1, 2)","expect":"error","ref":"functions-math","note":"abs() with too many arguments"}
+{"id":"numfa0011","category":"numeric-funcs","sql":"SELECT ceil(42.2)","expect":"ok","ref":"functions-math","note":"ceil() numeric argument"}
+{"id":"numfa0012","category":"numeric-funcs","sql":"SELECT ceil(-42.2)","expect":"ok","ref":"functions-math","note":"ceil() negative numeric"}
+{"id":"numfa0013","category":"numeric-funcs","sql":"SELECT ceil(42.2::double precision)","expect":"ok","ref":"functions-math","note":"ceil() double precision"}
+{"id":"numfa0014","category":"numeric-funcs","sql":"SELECT ceiling(95.3)","expect":"ok","ref":"functions-math","note":"ceiling() alias for ceil()"}
+{"id":"numfa0015","category":"numeric-funcs","sql":"SELECT ceiling(-95.3)","expect":"ok","ref":"functions-math","note":"ceiling() with negative value"}
+{"id":"numfa0016","category":"numeric-funcs","sql":"SELECT ceil(42)","expect":"ok","ref":"functions-math","note":"ceil() integer argument"}
+{"id":"numfa0017","category":"numeric-funcs","sql":"SELECT ceil()","expect":"error","ref":"functions-math","note":"ceil() with no arguments - syntax error"}
+{"id":"numfa0018","category":"numeric-funcs","sql":"SELECT floor(42.8)","expect":"ok","ref":"functions-math","note":"floor() numeric argument"}
+{"id":"numfa0019","category":"numeric-funcs","sql":"SELECT floor(-42.8)","expect":"ok","ref":"functions-math","note":"floor() negative numeric"}
+{"id":"numfa0020","category":"numeric-funcs","sql":"SELECT floor(42.8::double precision)","expect":"ok","ref":"functions-math","note":"floor() double precision"}
+{"id":"numfa0021","category":"numeric-funcs","sql":"SELECT floor(42)","expect":"ok","ref":"functions-math","note":"floor() integer argument"}
+{"id":"numfa0022","category":"numeric-funcs","sql":"SELECT floor()","expect":"error","ref":"functions-math","note":"floor() with no arguments - syntax error"}
+{"id":"numfa0023","category":"numeric-funcs","sql":"SELECT round(42.4)","expect":"ok","ref":"functions-math","note":"round() single argument rounds to nearest integer"}
+{"id":"numfa0024","category":"numeric-funcs","sql":"SELECT round(42.5)","expect":"ok","ref":"functions-math","note":"round() halfway value"}
+{"id":"numfa0025","category":"numeric-funcs","sql":"SELECT round(-42.5)","expect":"ok","ref":"functions-math","note":"round() negative halfway value"}
+{"id":"numfa0026","category":"numeric-funcs","sql":"SELECT round(42.4382, 2)","expect":"ok","ref":"functions-math","note":"round(v,s) round to 2 decimal places"}
+{"id":"numfa0027","category":"numeric-funcs","sql":"SELECT round(42.4382, 0)","expect":"ok","ref":"functions-math","note":"round(v,s) with s=0"}
+{"id":"numfa0028","category":"numeric-funcs","sql":"SELECT round(42.4382, -1)","expect":"ok","ref":"functions-math","note":"round(v,s) with negative s"}
+{"id":"numfa0029","category":"numeric-funcs","sql":"SELECT round(42.4::double precision)","expect":"ok","ref":"functions-math","note":"round() double precision single arg"}
+{"id":"numfa0030","category":"numeric-funcs","sql":"SELECT round()","expect":"error","ref":"functions-math","note":"round() with no arguments - syntax error"}
+{"id":"numfa0031","category":"numeric-funcs","sql":"SELECT round(1.5, 2, 3)","expect":"error","ref":"functions-math","note":"round() with three arguments - wrong arity"}
+{"id":"numfa0032","category":"numeric-funcs","sql":"SELECT trunc(42.8)","expect":"ok","ref":"functions-math","note":"trunc() single argument truncate to integer"}
+{"id":"numfa0033","category":"numeric-funcs","sql":"SELECT trunc(-42.8)","expect":"ok","ref":"functions-math","note":"trunc() negative value"}
+{"id":"numfa0034","category":"numeric-funcs","sql":"SELECT trunc(42.4382, 2)","expect":"ok","ref":"functions-math","note":"trunc(v,s) truncate to 2 decimal places"}
+{"id":"numfa0035","category":"numeric-funcs","sql":"SELECT trunc(42.4382, 0)","expect":"ok","ref":"functions-math","note":"trunc(v,s) with s=0"}
+{"id":"numfa0036","category":"numeric-funcs","sql":"SELECT trunc(42.4382, -1)","expect":"ok","ref":"functions-math","note":"trunc(v,s) with negative s"}
+{"id":"numfa0037","category":"numeric-funcs","sql":"SELECT trunc(42.8::double precision)","expect":"ok","ref":"functions-math","note":"trunc() double precision single arg"}
+{"id":"numfa0038","category":"numeric-funcs","sql":"SELECT trunc()","expect":"error","ref":"functions-math","note":"trunc() with no arguments - syntax error"}
+{"id":"numfa0039","category":"numeric-funcs","sql":"SELECT mod(9, 4)","expect":"ok","ref":"functions-math","note":"mod() integer arguments"}
+{"id":"numfa0040","category":"numeric-funcs","sql":"SELECT mod(9.5, 4.0)","expect":"ok","ref":"functions-math","note":"mod() numeric arguments"}
+{"id":"numfa0041","category":"numeric-funcs","sql":"SELECT mod(-9, 4)","expect":"ok","ref":"functions-math","note":"mod() negative dividend"}
+{"id":"numfa0042","category":"numeric-funcs","sql":"SELECT mod(9, -4)","expect":"ok","ref":"functions-math","note":"mod() negative divisor"}
+{"id":"numfa0043","category":"numeric-funcs","sql":"SELECT 9 % 4","expect":"ok","ref":"functions-math","note":"% operator modulo"}
+{"id":"numfa0044","category":"numeric-funcs","sql":"SELECT mod()","expect":"error","ref":"functions-math","note":"mod() with no arguments - syntax error"}
+{"id":"numfa0045","category":"numeric-funcs","sql":"SELECT mod(9)","expect":"error","ref":"functions-math","note":"mod() with single argument - wrong arity"}
+{"id":"numfa0046","category":"numeric-funcs","sql":"SELECT power(9, 3)","expect":"ok","ref":"functions-math","note":"power() integer arguments"}
+{"id":"numfa0047","category":"numeric-funcs","sql":"SELECT power(9.0, 3.0)","expect":"ok","ref":"functions-math","note":"power() numeric arguments"}
+{"id":"numfa0048","category":"numeric-funcs","sql":"SELECT power(2.0, -1.0)","expect":"ok","ref":"functions-math","note":"power() negative exponent"}
+{"id":"numfa0049","category":"numeric-funcs","sql":"SELECT power(2.0, 0.5)","expect":"ok","ref":"functions-math","note":"power() fractional exponent"}
+{"id":"numfa0050","category":"numeric-funcs","sql":"SELECT 2 ^ 3","expect":"ok","ref":"functions-math","note":"^ operator exponentiation"}
+{"id":"numfa0051","category":"numeric-funcs","sql":"SELECT 2 ^ 3 ^ 3","expect":"ok","ref":"functions-math","note":"^ operator left-associative chaining"}
+{"id":"numfa0052","category":"numeric-funcs","sql":"SELECT 2.0 ^ 0.5","expect":"ok","ref":"functions-math","note":"^ operator with fractional exponent"}
+{"id":"numfa0053","category":"numeric-funcs","sql":"SELECT power()","expect":"error","ref":"functions-math","note":"power() with no arguments - syntax error"}
+{"id":"numfa0054","category":"numeric-funcs","sql":"SELECT power(2)","expect":"error","ref":"functions-math","note":"power() with single argument - wrong arity"}
+{"id":"numfa0055","category":"numeric-funcs","sql":"SELECT sqrt(2)","expect":"ok","ref":"functions-math","note":"sqrt() integer argument"}
+{"id":"numfa0056","category":"numeric-funcs","sql":"SELECT sqrt(2.0)","expect":"ok","ref":"functions-math","note":"sqrt() numeric argument"}
+{"id":"numfa0057","category":"numeric-funcs","sql":"SELECT sqrt(25.0::double precision)","expect":"ok","ref":"functions-math","note":"sqrt() double precision"}
+{"id":"numfa0058","category":"numeric-funcs","sql":"SELECT |/ 25.0","expect":"ok","ref":"functions-math","note":"|/ prefix operator square root"}
+{"id":"numfa0059","category":"numeric-funcs","sql":"SELECT sqrt()","expect":"error","ref":"functions-math","note":"sqrt() with no arguments - syntax error"}
+{"id":"numfa0060","category":"numeric-funcs","sql":"SELECT sqrt(-1.0)","expect":"error","ref":"functions-math","note":"sqrt() of negative number - runtime error"}
+{"id":"numfa0061","category":"numeric-funcs","sql":"SELECT cbrt(64.0)","expect":"ok","ref":"functions-math","note":"cbrt() double precision argument"}
+{"id":"numfa0062","category":"numeric-funcs","sql":"SELECT cbrt(-27.0)","expect":"ok","ref":"functions-math","note":"cbrt() negative argument"}
+{"id":"numfa0063","category":"numeric-funcs","sql":"SELECT cbrt(0.0)","expect":"ok","ref":"functions-math","note":"cbrt() zero"}
+{"id":"numfa0064","category":"numeric-funcs","sql":"SELECT ||/ 64.0","expect":"ok","ref":"functions-math","note":"||/ prefix operator cube root"}
+{"id":"numfa0065","category":"numeric-funcs","sql":"SELECT cbrt()","expect":"error","ref":"functions-math","note":"cbrt() with no arguments - syntax error"}
+{"id":"numfa0066","category":"numeric-funcs","sql":"SELECT exp(1.0)","expect":"ok","ref":"functions-math","note":"exp() numeric argument e^1"}
+{"id":"numfa0067","category":"numeric-funcs","sql":"SELECT exp(0.0)","expect":"ok","ref":"functions-math","note":"exp() zero gives 1"}
+{"id":"numfa0068","category":"numeric-funcs","sql":"SELECT exp(-1.0)","expect":"ok","ref":"functions-math","note":"exp() negative argument"}
+{"id":"numfa0069","category":"numeric-funcs","sql":"SELECT exp(1.0::double precision)","expect":"ok","ref":"functions-math","note":"exp() double precision"}
+{"id":"numfa0070","category":"numeric-funcs","sql":"SELECT exp()","expect":"error","ref":"functions-math","note":"exp() with no arguments - syntax error"}
+{"id":"numfa0071","category":"numeric-funcs","sql":"SELECT ln(2.0)","expect":"ok","ref":"functions-math","note":"ln() natural logarithm numeric"}
+{"id":"numfa0072","category":"numeric-funcs","sql":"SELECT ln(1.0)","expect":"ok","ref":"functions-math","note":"ln(1) = 0"}
+{"id":"numfa0073","category":"numeric-funcs","sql":"SELECT ln(2.718281828::double precision)","expect":"ok","ref":"functions-math","note":"ln() double precision"}
+{"id":"numfa0074","category":"numeric-funcs","sql":"SELECT ln(0.0)","expect":"error","ref":"functions-math","note":"ln(0) - runtime error out of range"}
+{"id":"numfa0075","category":"numeric-funcs","sql":"SELECT ln(-1.0)","expect":"error","ref":"functions-math","note":"ln() negative argument - runtime error"}
+{"id":"numfa0076","category":"numeric-funcs","sql":"SELECT ln()","expect":"error","ref":"functions-math","note":"ln() with no arguments - syntax error"}
+{"id":"numfa0077","category":"numeric-funcs","sql":"SELECT log(100)","expect":"ok","ref":"functions-math","note":"log() single arg base-10 logarithm"}
+{"id":"numfa0078","category":"numeric-funcs","sql":"SELECT log(1000.0)","expect":"ok","ref":"functions-math","note":"log() numeric base-10"}
+{"id":"numfa0079","category":"numeric-funcs","sql":"SELECT log10(100)","expect":"ok","ref":"functions-math","note":"log10() explicit base-10 function"}
+{"id":"numfa0080","category":"numeric-funcs","sql":"SELECT log10(1000.0)","expect":"ok","ref":"functions-math","note":"log10() numeric argument"}
+{"id":"numfa0081","category":"numeric-funcs","sql":"SELECT log(2.0, 64.0)","expect":"ok","ref":"functions-math","note":"log(b,x) two-arg logarithm base 2"}
+{"id":"numfa0082","category":"numeric-funcs","sql":"SELECT log(10.0, 1000.0)","expect":"ok","ref":"functions-math","note":"log(b,x) two-arg logarithm base 10"}
+{"id":"numfa0083","category":"numeric-funcs","sql":"SELECT log(2.0, 1.0)","expect":"ok","ref":"functions-math","note":"log(b,x) result 0"}
+{"id":"numfa0084","category":"numeric-funcs","sql":"SELECT log()","expect":"error","ref":"functions-math","note":"log() with no arguments - syntax error"}
+{"id":"numfa0085","category":"numeric-funcs","sql":"SELECT log10()","expect":"error","ref":"functions-math","note":"log10() with no arguments - syntax error"}
+{"id":"numfa0086","category":"numeric-funcs","sql":"SELECT log(0.0)","expect":"error","ref":"functions-math","note":"log(0) - runtime error out of range"}
+{"id":"numfa0087","category":"numeric-funcs","sql":"SELECT log(-1.0)","expect":"error","ref":"functions-math","note":"log() negative argument - runtime error"}
+{"id":"numfa0088","category":"numeric-funcs","sql":"SELECT div(9, 4)","expect":"ok","ref":"functions-math","note":"div() integer quotient positive args"}
+{"id":"numfa0089","category":"numeric-funcs","sql":"SELECT div(-9, 4)","expect":"ok","ref":"functions-math","note":"div() negative dividend truncates toward zero"}
+{"id":"numfa0090","category":"numeric-funcs","sql":"SELECT div(9, -4)","expect":"ok","ref":"functions-math","note":"div() negative divisor"}
+{"id":"numfa0091","category":"numeric-funcs","sql":"SELECT div(9.5, 4.0)","expect":"ok","ref":"functions-math","note":"div() numeric arguments"}
+{"id":"numfa0092","category":"numeric-funcs","sql":"SELECT div()","expect":"error","ref":"functions-math","note":"div() with no arguments - syntax error"}
+{"id":"numfa0093","category":"numeric-funcs","sql":"SELECT div(9)","expect":"error","ref":"functions-math","note":"div() single argument - wrong arity"}
+{"id":"numfa0094","category":"numeric-funcs","sql":"SELECT div(9, 0)","expect":"error","ref":"functions-math","note":"div() by zero - runtime error"}
+{"id":"numfa0095","category":"numeric-funcs","sql":"SELECT gcd(1071, 462)","expect":"ok","ref":"functions-math","note":"gcd() integer arguments"}
+{"id":"numfa0096","category":"numeric-funcs","sql":"SELECT gcd(0, 5)","expect":"ok","ref":"functions-math","note":"gcd() with zero"}
+{"id":"numfa0097","category":"numeric-funcs","sql":"SELECT gcd(0, 0)","expect":"ok","ref":"functions-math","note":"gcd() both zero"}
+{"id":"numfa0098","category":"numeric-funcs","sql":"SELECT gcd(-12, 8)","expect":"ok","ref":"functions-math","note":"gcd() negative argument"}
+{"id":"numfa0099","category":"numeric-funcs","sql":"SELECT gcd(12::bigint, 8::bigint)","expect":"ok","ref":"functions-math","note":"gcd() bigint arguments"}
+{"id":"numfa0100","category":"numeric-funcs","sql":"SELECT gcd()","expect":"error","ref":"functions-math","note":"gcd() with no arguments - syntax error"}
+{"id":"numfa0101","category":"numeric-funcs","sql":"SELECT lcm(1071, 462)","expect":"ok","ref":"functions-math","note":"lcm() integer arguments"}
+{"id":"numfa0102","category":"numeric-funcs","sql":"SELECT lcm(0, 5)","expect":"ok","ref":"functions-math","note":"lcm() with zero gives 0"}
+{"id":"numfa0103","category":"numeric-funcs","sql":"SELECT lcm(-12, 8)","expect":"ok","ref":"functions-math","note":"lcm() negative argument"}
+{"id":"numfa0104","category":"numeric-funcs","sql":"SELECT lcm(12::bigint, 8::bigint)","expect":"ok","ref":"functions-math","note":"lcm() bigint arguments"}
+{"id":"numfa0105","category":"numeric-funcs","sql":"SELECT lcm()","expect":"error","ref":"functions-math","note":"lcm() with no arguments - syntax error"}
+{"id":"numfa0106","category":"numeric-funcs","sql":"SELECT sign(-8.4)","expect":"ok","ref":"functions-math","note":"sign() negative returns -1"}
+{"id":"numfa0107","category":"numeric-funcs","sql":"SELECT sign(8.4)","expect":"ok","ref":"functions-math","note":"sign() positive returns 1"}
+{"id":"numfa0108","category":"numeric-funcs","sql":"SELECT sign(0)","expect":"ok","ref":"functions-math","note":"sign() zero returns 0"}
+{"id":"numfa0109","category":"numeric-funcs","sql":"SELECT sign(-8.4::double precision)","expect":"ok","ref":"functions-math","note":"sign() double precision"}
+{"id":"numfa0110","category":"numeric-funcs","sql":"SELECT sign()","expect":"error","ref":"functions-math","note":"sign() with no arguments - syntax error"}
+{"id":"numfa0111","category":"numeric-funcs","sql":"SELECT scale(8.4100)","expect":"ok","ref":"functions-math","note":"scale() returns decimal digits in fractional part"}
+{"id":"numfa0112","category":"numeric-funcs","sql":"SELECT scale(8)","expect":"ok","ref":"functions-math","note":"scale() integer has no fractional digits"}
+{"id":"numfa0113","category":"numeric-funcs","sql":"SELECT scale(8.41::numeric)","expect":"ok","ref":"functions-math","note":"scale() explicit numeric cast"}
+{"id":"numfa0114","category":"numeric-funcs","sql":"SELECT scale()","expect":"error","ref":"functions-math","note":"scale() with no arguments - syntax error"}
+{"id":"numfa0115","category":"numeric-funcs","sql":"SELECT min_scale(8.4100)","expect":"ok","ref":"functions-math","note":"min_scale() minimum scale to represent value"}
+{"id":"numfa0116","category":"numeric-funcs","sql":"SELECT min_scale(8.41)","expect":"ok","ref":"functions-math","note":"min_scale() no trailing zeros"}
+{"id":"numfa0117","category":"numeric-funcs","sql":"SELECT min_scale(8.00)","expect":"ok","ref":"functions-math","note":"min_scale() all zeros in fractional part"}
+{"id":"numfa0118","category":"numeric-funcs","sql":"SELECT min_scale()","expect":"error","ref":"functions-math","note":"min_scale() with no arguments - syntax error"}
+{"id":"numfa0119","category":"numeric-funcs","sql":"SELECT trim_scale(8.4100)","expect":"ok","ref":"functions-math","note":"trim_scale() removes trailing zeros"}
+{"id":"numfa0120","category":"numeric-funcs","sql":"SELECT trim_scale(8.41)","expect":"ok","ref":"functions-math","note":"trim_scale() no trailing zeros to remove"}
+{"id":"numfa0121","category":"numeric-funcs","sql":"SELECT trim_scale(8.00)","expect":"ok","ref":"functions-math","note":"trim_scale() all zeros gives integer-like result"}
+{"id":"numfa0122","category":"numeric-funcs","sql":"SELECT trim_scale()","expect":"error","ref":"functions-math","note":"trim_scale() with no arguments - syntax error"}
+{"id":"numfa0123","category":"numeric-funcs","sql":"SELECT factorial(5)","expect":"ok","ref":"functions-math","note":"factorial() of 5"}
+{"id":"numfa0124","category":"numeric-funcs","sql":"SELECT factorial(0)","expect":"ok","ref":"functions-math","note":"factorial(0) = 1"}
+{"id":"numfa0125","category":"numeric-funcs","sql":"SELECT factorial(10)","expect":"ok","ref":"functions-math","note":"factorial() of 10"}
+{"id":"numfa0126","category":"numeric-funcs","sql":"SELECT factorial(-1)","expect":"error","ref":"functions-math","note":"factorial() negative argument - runtime error"}
+{"id":"numfa0127","category":"numeric-funcs","sql":"SELECT factorial()","expect":"error","ref":"functions-math","note":"factorial() with no arguments - syntax error"}
+{"id":"numfa0128","category":"numeric-funcs","sql":"SELECT bit_count(44::bit(8))","expect":"ok","ref":"functions-math","note":"bit_count() on bit string type"}
+{"id":"numfa0129","category":"numeric-funcs","sql":"SELECT bit_count(B'10111')","expect":"ok","ref":"functions-math","note":"bit_count() on bit string literal"}
+{"id":"numfa0130","category":"numeric-funcs","sql":"SELECT bit_count(B'00000000')","expect":"ok","ref":"functions-math","note":"bit_count() all-zero bit string"}
+{"id":"numfa0131","category":"numeric-funcs","sql":"SELECT bit_count(B'11111111')","expect":"ok","ref":"functions-math","note":"bit_count() all-ones bit string"}
+{"id":"numfa0132","category":"numeric-funcs","sql":"SELECT bit_count()","expect":"error","ref":"functions-math","note":"bit_count() with no arguments - syntax error"}
+{"id":"numfa0133","category":"numeric-funcs","sql":"SELECT width_bucket(5.35, 0.024, 10.06, 5)","expect":"ok","ref":"functions-math","note":"width_bucket() numeric equal-width buckets"}
+{"id":"numfa0134","category":"numeric-funcs","sql":"SELECT width_bucket(9::double precision, 10::double precision, 0::double precision, 10)","expect":"ok","ref":"functions-math","note":"width_bucket() double precision with reversed bounds"}
+{"id":"numfa0135","category":"numeric-funcs","sql":"SELECT width_bucket(-1.0, 0.0, 10.0, 5)","expect":"ok","ref":"functions-math","note":"width_bucket() below lower bound returns 0"}
+{"id":"numfa0136","category":"numeric-funcs","sql":"SELECT width_bucket(15.0, 0.0, 10.0, 5)","expect":"ok","ref":"functions-math","note":"width_bucket() above upper bound returns count+1"}
+{"id":"numfa0137","category":"numeric-funcs","sql":"SELECT width_bucket(5, ARRAY[1,2,3,4,5,6,7,8,9,10])","expect":"ok","ref":"functions-math","note":"width_bucket() with threshold array variant"}
+{"id":"numfa0138","category":"numeric-funcs","sql":"SELECT width_bucket(0, ARRAY[1,2,3,4,5])","expect":"ok","ref":"functions-math","note":"width_bucket() array variant below all thresholds"}
+{"id":"numfa0139","category":"numeric-funcs","sql":"SELECT width_bucket(10, ARRAY[1,2,3,4,5])","expect":"ok","ref":"functions-math","note":"width_bucket() array variant above all thresholds"}
+{"id":"numfa0140","category":"numeric-funcs","sql":"SELECT width_bucket()","expect":"error","ref":"functions-math","note":"width_bucket() with no arguments - syntax error"}
+{"id":"numfa0141","category":"numeric-funcs","sql":"SELECT width_bucket(5.0, 0.0, 10.0)","expect":"error","ref":"functions-math","note":"width_bucket() missing count argument - wrong arity"}
+{"id":"numfa0142","category":"numeric-funcs","sql":"SELECT random()","expect":"ok","ref":"functions-math","note":"random() returns value in [0.0, 1.0)"}
+{"id":"numfa0143","category":"numeric-funcs","sql":"SELECT random(1, 10)","expect":"ok","ref":"functions-math","note":"random(min,max) integer range PG17+"}
+{"id":"numfa0144","category":"numeric-funcs","sql":"SELECT random(1::bigint, 100::bigint)","expect":"ok","ref":"functions-math","note":"random(min,max) bigint range"}
+{"id":"numfa0145","category":"numeric-funcs","sql":"SELECT random(-0.499::numeric, 0.499::numeric)","expect":"ok","ref":"functions-math","note":"random(min,max) numeric range"}
+{"id":"numfa0146","category":"numeric-funcs","sql":"SELECT setseed(0.12345)","expect":"ok","ref":"functions-math","note":"setseed() sets PRNG seed"}
+{"id":"numfa0147","category":"numeric-funcs","sql":"SELECT setseed(1.0)","expect":"ok","ref":"functions-math","note":"setseed() max valid value 1.0"}
+{"id":"numfa0148","category":"numeric-funcs","sql":"SELECT setseed(-1.0)","expect":"ok","ref":"functions-math","note":"setseed() min valid value -1.0"}
+{"id":"numfa0149","category":"numeric-funcs","sql":"SELECT setseed(2.0)","expect":"error","ref":"functions-math","note":"setseed() value out of range > 1.0"}
+{"id":"numfa0150","category":"numeric-funcs","sql":"SELECT setseed()","expect":"error","ref":"functions-math","note":"setseed() with no arguments - syntax error"}
+{"id":"numfa0151","category":"numeric-funcs","sql":"SELECT sin(1.0)","expect":"ok","ref":"functions-math","note":"sin() radian-based sine"}
+{"id":"numfa0152","category":"numeric-funcs","sql":"SELECT cos(0.0)","expect":"ok","ref":"functions-math","note":"cos() radian-based cosine"}
+{"id":"numfa0153","category":"numeric-funcs","sql":"SELECT tan(1.0)","expect":"ok","ref":"functions-math","note":"tan() radian-based tangent"}
+{"id":"numfa0154","category":"numeric-funcs","sql":"SELECT cot(0.5)","expect":"ok","ref":"functions-math","note":"cot() radian-based cotangent"}
+{"id":"numfa0155","category":"numeric-funcs","sql":"SELECT asin(1.0)","expect":"ok","ref":"functions-math","note":"asin() inverse sine returns radians"}
+{"id":"numfa0156","category":"numeric-funcs","sql":"SELECT acos(1.0)","expect":"ok","ref":"functions-math","note":"acos() inverse cosine returns radians"}
+{"id":"numfa0157","category":"numeric-funcs","sql":"SELECT atan(1.0)","expect":"ok","ref":"functions-math","note":"atan() inverse tangent returns radians"}
+{"id":"numfa0158","category":"numeric-funcs","sql":"SELECT atan2(1.0, 0.0)","expect":"ok","ref":"functions-math","note":"atan2(y,x) inverse tangent of y/x"}
+{"id":"numfa0159","category":"numeric-funcs","sql":"SELECT atan2(0.0, 0.0)","expect":"ok","ref":"functions-math","note":"atan2(0,0) edge case"}
+{"id":"numfa0160","category":"numeric-funcs","sql":"SELECT asin(2.0)","expect":"error","ref":"functions-math","note":"asin() out of domain argument > 1 - runtime error"}
+{"id":"numfa0161","category":"numeric-funcs","sql":"SELECT acos(-2.0)","expect":"error","ref":"functions-math","note":"acos() out of domain argument < -1 - runtime error"}
+{"id":"numfa0162","category":"numeric-funcs","sql":"SELECT sin()","expect":"error","ref":"functions-math","note":"sin() with no arguments - syntax error"}
+{"id":"numfa0163","category":"numeric-funcs","sql":"SELECT cos()","expect":"error","ref":"functions-math","note":"cos() with no arguments - syntax error"}
+{"id":"numfa0164","category":"numeric-funcs","sql":"SELECT atan2()","expect":"error","ref":"functions-math","note":"atan2() with no arguments - syntax error"}
+{"id":"numfa0165","category":"numeric-funcs","sql":"SELECT sind(30.0)","expect":"ok","ref":"functions-math","note":"sind() degree-based sine"}
+{"id":"numfa0166","category":"numeric-funcs","sql":"SELECT cosd(60.0)","expect":"ok","ref":"functions-math","note":"cosd() degree-based cosine"}
+{"id":"numfa0167","category":"numeric-funcs","sql":"SELECT tand(45.0)","expect":"ok","ref":"functions-math","note":"tand() degree-based tangent"}
+{"id":"numfa0168","category":"numeric-funcs","sql":"SELECT cotd(45.0)","expect":"ok","ref":"functions-math","note":"cotd() degree-based cotangent"}
+{"id":"numfa0169","category":"numeric-funcs","sql":"SELECT asind(0.5)","expect":"ok","ref":"functions-math","note":"asind() degree-based inverse sine"}
+{"id":"numfa0170","category":"numeric-funcs","sql":"SELECT acosd(0.5)","expect":"ok","ref":"functions-math","note":"acosd() degree-based inverse cosine"}
+{"id":"numfa0171","category":"numeric-funcs","sql":"SELECT atand(1.0)","expect":"ok","ref":"functions-math","note":"atand() degree-based inverse tangent"}
+{"id":"numfa0172","category":"numeric-funcs","sql":"SELECT atan2d(1.0, 0.0)","expect":"ok","ref":"functions-math","note":"atan2d(y,x) degree-based inverse tangent"}
+{"id":"numfa0173","category":"numeric-funcs","sql":"SELECT sind(0.0)","expect":"ok","ref":"functions-math","note":"sind(0) = 0 exact"}
+{"id":"numfa0174","category":"numeric-funcs","sql":"SELECT cosd(90.0)","expect":"ok","ref":"functions-math","note":"cosd(90) = 0 exact"}
+{"id":"numfa0175","category":"numeric-funcs","sql":"SELECT sind(90.0)","expect":"ok","ref":"functions-math","note":"sind(90) = 1 exact"}
+{"id":"numfa0176","category":"numeric-funcs","sql":"SELECT asind(2.0)","expect":"error","ref":"functions-math","note":"asind() out of domain > 1 - runtime error"}
+{"id":"numfa0177","category":"numeric-funcs","sql":"SELECT acosd(-2.0)","expect":"error","ref":"functions-math","note":"acosd() out of domain < -1 - runtime error"}
+{"id":"numfa0178","category":"numeric-funcs","sql":"SELECT sind()","expect":"error","ref":"functions-math","note":"sind() with no arguments - syntax error"}
+{"id":"numfa0179","category":"numeric-funcs","sql":"SELECT sinh(1.0)","expect":"ok","ref":"functions-math","note":"sinh() hyperbolic sine"}
+{"id":"numfa0180","category":"numeric-funcs","sql":"SELECT cosh(0.0)","expect":"ok","ref":"functions-math","note":"cosh() hyperbolic cosine cosh(0)=1"}
+{"id":"numfa0181","category":"numeric-funcs","sql":"SELECT tanh(1.0)","expect":"ok","ref":"functions-math","note":"tanh() hyperbolic tangent"}
+{"id":"numfa0182","category":"numeric-funcs","sql":"SELECT asinh(1.0)","expect":"ok","ref":"functions-math","note":"asinh() inverse hyperbolic sine"}
+{"id":"numfa0183","category":"numeric-funcs","sql":"SELECT acosh(1.0)","expect":"ok","ref":"functions-math","note":"acosh(1) = 0"}
+{"id":"numfa0184","category":"numeric-funcs","sql":"SELECT acosh(0.5)","expect":"error","ref":"functions-math","note":"acosh() argument < 1 - runtime error"}
+{"id":"numfa0185","category":"numeric-funcs","sql":"SELECT atanh(0.5)","expect":"ok","ref":"functions-math","note":"atanh() inverse hyperbolic tangent"}
+{"id":"numfa0186","category":"numeric-funcs","sql":"SELECT atanh(1.5)","expect":"error","ref":"functions-math","note":"atanh() argument > 1 - runtime error out of domain"}
+{"id":"numfa0187","category":"numeric-funcs","sql":"SELECT sinh()","expect":"error","ref":"functions-math","note":"sinh() with no arguments - syntax error"}
+{"id":"numfa0188","category":"numeric-funcs","sql":"SELECT degrees(0.5)","expect":"ok","ref":"functions-math","note":"degrees() convert radians to degrees"}
+{"id":"numfa0189","category":"numeric-funcs","sql":"SELECT degrees(pi())","expect":"ok","ref":"functions-math","note":"degrees(pi()) = 180"}
+{"id":"numfa0190","category":"numeric-funcs","sql":"SELECT radians(45.0)","expect":"ok","ref":"functions-math","note":"radians() convert degrees to radians"}
+{"id":"numfa0191","category":"numeric-funcs","sql":"SELECT radians(180.0)","expect":"ok","ref":"functions-math","note":"radians(180) = pi"}
+{"id":"numfa0192","category":"numeric-funcs","sql":"SELECT pi()","expect":"ok","ref":"functions-math","note":"pi() returns approximate value of pi"}
+{"id":"numfa0193","category":"numeric-funcs","sql":"SELECT degrees()","expect":"error","ref":"functions-math","note":"degrees() with no arguments - syntax error"}
+{"id":"numfa0194","category":"numeric-funcs","sql":"SELECT radians()","expect":"error","ref":"functions-math","note":"radians() with no arguments - syntax error"}
+{"id":"numfa0195","category":"numeric-funcs","sql":"SELECT to_number('12,454.8-', '99G999D9S')","expect":"ok","ref":"functions-math","note":"to_number() with format string"}
+{"id":"numfa0196","category":"numeric-funcs","sql":"SELECT to_number('3.14', '9.99')","expect":"ok","ref":"functions-math","note":"to_number() simple decimal format"}
+{"id":"numfa0197","category":"numeric-funcs","sql":"SELECT to_number('$1,234.56', 'L9,999.99')","expect":"ok","ref":"functions-math","note":"to_number() with currency symbol format"}
+{"id":"numfa0198","category":"numeric-funcs","sql":"SELECT to_number('1234', '9999')","expect":"ok","ref":"functions-math","note":"to_number() integer format"}
+{"id":"numfa0199","category":"numeric-funcs","sql":"SELECT to_number('1.234,56', '9G999D99')","expect":"ok","ref":"functions-math","note":"to_number() with European decimal separator format"}
+{"id":"numfa0200","category":"numeric-funcs","sql":"SELECT to_number()","expect":"error","ref":"functions-math","note":"to_number() with no arguments - syntax error"}
+{"id":"numfa0201","category":"numeric-funcs","sql":"SELECT to_number('3.14')","expect":"error","ref":"functions-math","note":"to_number() with single argument - wrong arity"}
+{"id":"numfa0202","category":"numeric-funcs","sql":"SELECT abs(val) FROM s.t","expect":"ok","ref":"functions-math","note":"abs() applied to table column"}
+{"id":"numfa0203","category":"numeric-funcs","sql":"SELECT ceil(val), floor(val), round(val) FROM s.t","expect":"ok","ref":"functions-math","note":"ceil/floor/round applied to table column"}
+{"id":"numfa0204","category":"numeric-funcs","sql":"SELECT sqrt(abs(val)) FROM s.t","expect":"ok","ref":"functions-math","note":"nested abs and sqrt on table column"}
+{"id":"numfa0205","category":"numeric-funcs","sql":"SELECT power(abs(qty), 2) FROM s.t","expect":"ok","ref":"functions-math","note":"power() with abs on integer column"}
+{"id":"numfa0206","category":"numeric-funcs","sql":"SELECT width_bucket(val, 0, 1000, 10) FROM s.t","expect":"ok","ref":"functions-math","note":"width_bucket() applied to table column"}
+{"id":"numfa0207","category":"numeric-funcs","sql":"SELECT mod(qty, 3) FROM s.t","expect":"ok","ref":"functions-math","note":"mod() applied to integer table column"}
+{"id":"numfa0208","category":"numeric-funcs","sql":"SELECT sign(val) FROM s.t","expect":"ok","ref":"functions-math","note":"sign() applied to table column"}
+{"id":"numfa0209","category":"numeric-funcs","sql":"SELECT 2 + 3","expect":"ok","ref":"functions-math","note":"basic addition operator"}
+{"id":"numfa0210","category":"numeric-funcs","sql":"SELECT 2 - 3","expect":"ok","ref":"functions-math","note":"basic subtraction operator"}
+{"id":"numfa0211","category":"numeric-funcs","sql":"SELECT 2 * 3","expect":"ok","ref":"functions-math","note":"basic multiplication operator"}
+{"id":"numfa0212","category":"numeric-funcs","sql":"SELECT 5.0 / 2","expect":"ok","ref":"functions-math","note":"division with numeric gives decimal"}
+{"id":"numfa0213","category":"numeric-funcs","sql":"SELECT 5 / 2","expect":"ok","ref":"functions-math","note":"integer division truncates"}
+{"id":"numfa0214","category":"numeric-funcs","sql":"SELECT + 3.5","expect":"ok","ref":"functions-math","note":"unary plus operator"}
+{"id":"numfa0215","category":"numeric-funcs","sql":"SELECT - (-4)","expect":"ok","ref":"functions-math","note":"unary negation operator"}
+{"id":"numfa0216","category":"numeric-funcs","sql":"SELECT 91 & 15","expect":"ok","ref":"functions-math","note":"bitwise AND operator"}
+{"id":"numfa0217","category":"numeric-funcs","sql":"SELECT 32 | 3","expect":"ok","ref":"functions-math","note":"bitwise OR operator"}
+{"id":"numfa0218","category":"numeric-funcs","sql":"SELECT 17 # 5","expect":"ok","ref":"functions-math","note":"bitwise XOR operator"}
+{"id":"numfa0219","category":"numeric-funcs","sql":"SELECT ~1","expect":"ok","ref":"functions-math","note":"bitwise NOT operator"}
+{"id":"numfa0220","category":"numeric-funcs","sql":"SELECT 1 << 4","expect":"ok","ref":"functions-math","note":"bitwise shift left operator"}
+{"id":"numfa0221","category":"numeric-funcs","sql":"SELECT 8 >> 2","expect":"ok","ref":"functions-math","note":"bitwise shift right operator"}
+{"id":"numfa0222","category":"numeric-funcs","sql":"SELECT erf(1.0)","expect":"ok","ref":"functions-math","note":"erf() error function"}
+{"id":"numfa0223","category":"numeric-funcs","sql":"SELECT erfc(1.0)","expect":"ok","ref":"functions-math","note":"erfc() complementary error function"}
+{"id":"numfa0224","category":"numeric-funcs","sql":"SELECT gamma(0.5)","expect":"ok","ref":"functions-math","note":"gamma() gamma function"}
+{"id":"numfa0225","category":"numeric-funcs","sql":"SELECT lgamma(1000.0)","expect":"ok","ref":"functions-math","note":"lgamma() log gamma function"}
+{"id":"numfa0226","category":"numeric-funcs","sql":"SELECT random_normal()","expect":"ok","ref":"functions-math","note":"random_normal() default mean=0 stddev=1"}
+{"id":"numfa0227","category":"numeric-funcs","sql":"SELECT random_normal(0.0, 1.0)","expect":"ok","ref":"functions-math","note":"random_normal() explicit mean and stddev"}
+{"id":"numfa0228","category":"numeric-funcs","sql":"SELECT abs(round(3.14159, 2))","expect":"ok","ref":"functions-math","note":"composed abs and round functions"}
+{"id":"numfa0229","category":"numeric-funcs","sql":"SELECT ln(exp(1.0))","expect":"ok","ref":"functions-math","note":"ln and exp are inverses"}
+{"id":"numfa0230","category":"numeric-funcs","sql":"SELECT sqrt(power(3.0, 2.0) + power(4.0, 2.0))","expect":"ok","ref":"functions-math","note":"Pythagorean theorem using sqrt and power"}
+{"id":"numfa0231","category":"numeric-funcs","sql":"SELECT degrees(atan2(1.0, 1.0))","expect":"ok","ref":"functions-math","note":"degrees applied to atan2 result"}
+{"id":"numfa0232","category":"numeric-funcs","sql":"SELECT sin(radians(30.0))","expect":"ok","ref":"functions-math","note":"sin composed with radians conversion"}
+{"id":"numfa0233","category":"numeric-funcs","sql":"SELECT log(2.0, power(2.0, 10.0))","expect":"ok","ref":"functions-math","note":"log(b,x) composed with power"}
+{"id":"numfa0234","category":"numeric-funcs","sql":"SELECT gcd(lcm(12, 8), 4)","expect":"ok","ref":"functions-math","note":"gcd and lcm composed"}
+{"id":"numfa0235","category":"numeric-funcs","sql":"SELECT trim_scale(round(3.14159265, 4))","expect":"ok","ref":"functions-math","note":"trim_scale composed with round"}
+{"id":"numfa0236","category":"numeric-funcs","sql":"SELECT abs(val), sign(val), ceil(val), floor(val) FROM s.t WHERE val IS NOT NULL","expect":"ok","ref":"functions-math","note":"multiple numeric functions on filtered rows"}
+{"id":"numfa0237","category":"numeric-funcs","sql":"SELECT 1 / 0","expect":"error","ref":"functions-math","note":"integer division by zero - runtime error"}
+{"id":"numfa0238","category":"numeric-funcs","sql":"SELECT 1.0 / 0.0","expect":"error","ref":"functions-math","note":"numeric division by zero - runtime error"}
+{"id":"numfa0239","category":"numeric-funcs","sql":"SELECT power(-1.0, 0.5)","expect":"error","ref":"functions-math","note":"power() with negative base and fractional exponent - runtime error"}
+{"id":"numfa0240","category":"numeric-funcs","sql":"SELECT width_bucket(5.0, 0.0, 10.0, 0)","expect":"error","ref":"functions-math","note":"width_bucket() with count=0 - runtime error"}
+{"id":"numfa0241","category":"numeric-funcs","sql":"SELECT width_bucket(5.0, 10.0, 10.0, 5)","expect":"error","ref":"functions-math","note":"width_bucket() with equal bounds - runtime error"}
+{"id":"numfa0242","category":"numeric-funcs","sql":"SELECT abs(1 2)","expect":"error","ref":"functions-math","note":"missing comma in function args - syntax error"}
+{"id":"numfa0243","category":"numeric-funcs","sql":"SELECT round(1.5 2)","expect":"error","ref":"functions-math","note":"missing comma in round two-arg form - syntax error"}
+{"id":"numfa0244","category":"numeric-funcs","sql":"SELECT log(, 64.0)","expect":"error","ref":"functions-math","note":"missing first argument to log - syntax error"}
+{"id":"numfa0245","category":"numeric-funcs","sql":"SELECT pi(1)","expect":"error","ref":"functions-math","note":"pi() takes no arguments - wrong arity error"}
+{"id":"numfa0246","category":"numeric-funcs","sql":"SELECT sin(1.0, 2.0)","expect":"error","ref":"functions-math","note":"sin() with two arguments - wrong arity"}
+{"id":"numfa0247","category":"numeric-funcs","sql":"SELECT atan2(1.0)","expect":"error","ref":"functions-math","note":"atan2() requires two arguments - wrong arity"}
+{"id":"numfa0248","category":"numeric-funcs","sql":"SELECT log(2.0, 3.0, 4.0)","expect":"error","ref":"functions-math","note":"log() with three arguments - wrong arity"}
+{"id":"numfa0249","category":"numeric-funcs","sql":"SELECT factorial(20::bigint)","expect":"ok","ref":"functions-math","note":"factorial() explicit bigint cast"}
+{"id":"numfa0250","category":"numeric-funcs","sql":"SELECT scale(8.41::numeric(10,4))","expect":"ok","ref":"functions-math","note":"scale() on precision-constrained numeric"}

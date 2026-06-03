@@ -1,0 +1,170 @@
+{"id":"cst2a0001","category":"cast-coercion","sql":"SELECT CAST(1 AS text)","expect":"ok","ref":"sql-expressions","note":"CAST integer literal to text"}
+{"id":"cst2a0002","category":"cast-coercion","sql":"SELECT CAST(3.14 AS integer)","expect":"ok","ref":"sql-expressions","note":"CAST numeric literal to integer (truncates)"}
+{"id":"cst2a0003","category":"cast-coercion","sql":"SELECT CAST('42' AS integer)","expect":"ok","ref":"sql-expressions","note":"CAST text literal to integer"}
+{"id":"cst2a0004","category":"cast-coercion","sql":"SELECT CAST('3.14' AS numeric)","expect":"ok","ref":"sql-expressions","note":"CAST text literal to numeric"}
+{"id":"cst2a0005","category":"cast-coercion","sql":"SELECT CAST('true' AS boolean)","expect":"ok","ref":"sql-expressions","note":"CAST text literal to boolean"}
+{"id":"cst2a0006","category":"cast-coercion","sql":"SELECT CAST('false' AS boolean)","expect":"ok","ref":"sql-expressions","note":"CAST text 'false' to boolean"}
+{"id":"cst2a0007","category":"cast-coercion","sql":"SELECT CAST(true AS text)","expect":"ok","ref":"sql-expressions","note":"CAST boolean to text"}
+{"id":"cst2a0008","category":"cast-coercion","sql":"SELECT CAST(false AS integer)","expect":"ok","ref":"sql-expressions","note":"CAST boolean to integer — PostgreSQL supports explicit bool→int cast"}
+{"id":"cst2a0009","category":"cast-coercion","sql":"SELECT CAST(1 AS boolean)","expect":"ok","ref":"sql-expressions","note":"CAST integer to boolean — PostgreSQL supports explicit int→bool cast"}
+{"id":"cst2a0010","category":"cast-coercion","sql":"SELECT CAST('2024-01-15' AS date)","expect":"ok","ref":"sql-expressions","note":"CAST text literal to date"}
+{"id":"cst2a0011","category":"cast-coercion","sql":"SELECT CAST('2024-01-15 12:00:00' AS timestamp)","expect":"ok","ref":"sql-expressions","note":"CAST text to timestamp"}
+{"id":"cst2a0012","category":"cast-coercion","sql":"SELECT CAST('2024-01-15 12:00:00+00' AS timestamptz)","expect":"ok","ref":"sql-expressions","note":"CAST text to timestamptz"}
+{"id":"cst2a0013","category":"cast-coercion","sql":"SELECT CAST('1 day' AS interval)","expect":"ok","ref":"sql-expressions","note":"CAST text to interval"}
+{"id":"cst2a0014","category":"cast-coercion","sql":"SELECT CAST(42 AS bigint)","expect":"ok","ref":"sql-expressions","note":"CAST integer to bigint"}
+{"id":"cst2a0015","category":"cast-coercion","sql":"SELECT CAST(42 AS smallint)","expect":"ok","ref":"sql-expressions","note":"CAST integer to smallint"}
+{"id":"cst2a0016","category":"cast-coercion","sql":"SELECT CAST(42 AS real)","expect":"ok","ref":"sql-expressions","note":"CAST integer to real"}
+{"id":"cst2a0017","category":"cast-coercion","sql":"SELECT CAST(42 AS double precision)","expect":"ok","ref":"sql-expressions","note":"CAST integer to double precision"}
+{"id":"cst2a0018","category":"cast-coercion","sql":"SELECT CAST(3.14 AS numeric(10,2))","expect":"ok","ref":"sql-expressions","note":"CAST with typmod numeric(10,2)"}
+{"id":"cst2a0019","category":"cast-coercion","sql":"SELECT CAST('hello' AS varchar(5))","expect":"ok","ref":"sql-expressions","note":"CAST text to varchar with length typmod"}
+{"id":"cst2a0020","category":"cast-coercion","sql":"SELECT CAST('hello world' AS char(5))","expect":"ok","ref":"sql-expressions","note":"CAST text to char with length typmod (truncates)"}
+{"id":"cst2a0021","category":"cast-coercion","sql":"SELECT CAST('{\"a\":1}' AS json)","expect":"ok","ref":"sql-expressions","note":"CAST text to json"}
+{"id":"cst2a0022","category":"cast-coercion","sql":"SELECT CAST('{\"a\":1}' AS jsonb)","expect":"ok","ref":"sql-expressions","note":"CAST text to jsonb"}
+{"id":"cst2a0023","category":"cast-coercion","sql":"SELECT CAST(1 AS text)::integer","expect":"ok","ref":"sql-expressions","note":"CAST followed by :: operator (chained)"}
+{"id":"cst2a0024","category":"cast-coercion","sql":"SELECT 1::text","expect":"ok","ref":"sql-expressions","note":":: cast integer to text"}
+{"id":"cst2a0025","category":"cast-coercion","sql":"SELECT '42'::integer","expect":"ok","ref":"sql-expressions","note":":: cast text literal to integer"}
+{"id":"cst2a0026","category":"cast-coercion","sql":"SELECT '3.14'::numeric","expect":"ok","ref":"sql-expressions","note":":: cast text to numeric"}
+{"id":"cst2a0027","category":"cast-coercion","sql":"SELECT '3.14'::numeric(10,2)","expect":"ok","ref":"sql-expressions","note":":: cast with typmod numeric(10,2)"}
+{"id":"cst2a0028","category":"cast-coercion","sql":"SELECT 'hello'::varchar(3)","expect":"ok","ref":"sql-expressions","note":":: cast with varchar typmod"}
+{"id":"cst2a0029","category":"cast-coercion","sql":"SELECT 42::bigint","expect":"ok","ref":"sql-expressions","note":":: cast integer to bigint"}
+{"id":"cst2a0030","category":"cast-coercion","sql":"SELECT 42::smallint","expect":"ok","ref":"sql-expressions","note":":: cast integer to smallint"}
+{"id":"cst2a0031","category":"cast-coercion","sql":"SELECT 42::real","expect":"ok","ref":"sql-expressions","note":":: cast integer to real"}
+{"id":"cst2a0032","category":"cast-coercion","sql":"SELECT 42::double precision","expect":"ok","ref":"sql-expressions","note":":: cast integer to double precision"}
+{"id":"cst2a0033","category":"cast-coercion","sql":"SELECT 42::float8","expect":"ok","ref":"sql-expressions","note":":: cast integer to float8 alias"}
+{"id":"cst2a0034","category":"cast-coercion","sql":"SELECT 42::float4","expect":"ok","ref":"sql-expressions","note":":: cast integer to float4 alias"}
+{"id":"cst2a0035","category":"cast-coercion","sql":"SELECT 42::int2","expect":"ok","ref":"sql-expressions","note":":: cast to int2 alias"}
+{"id":"cst2a0036","category":"cast-coercion","sql":"SELECT 42::int4","expect":"ok","ref":"sql-expressions","note":":: cast to int4 alias"}
+{"id":"cst2a0037","category":"cast-coercion","sql":"SELECT 42::int8","expect":"ok","ref":"sql-expressions","note":":: cast to int8 alias"}
+{"id":"cst2a0038","category":"cast-coercion","sql":"SELECT 'true'::boolean","expect":"ok","ref":"sql-expressions","note":":: cast text to boolean"}
+{"id":"cst2a0039","category":"cast-coercion","sql":"SELECT true::text","expect":"ok","ref":"sql-expressions","note":":: cast boolean to text"}
+{"id":"cst2a0040","category":"cast-coercion","sql":"SELECT '2024-01-15'::date","expect":"ok","ref":"sql-expressions","note":":: cast text to date"}
+{"id":"cst2a0041","category":"cast-coercion","sql":"SELECT '12:00:00'::time","expect":"ok","ref":"sql-expressions","note":":: cast text to time"}
+{"id":"cst2a0042","category":"cast-coercion","sql":"SELECT '2024-01-15 12:00:00'::timestamp","expect":"ok","ref":"sql-expressions","note":":: cast text to timestamp"}
+{"id":"cst2a0043","category":"cast-coercion","sql":"SELECT '2024-01-15 12:00:00+00'::timestamptz","expect":"ok","ref":"sql-expressions","note":":: cast text to timestamptz"}
+{"id":"cst2a0044","category":"cast-coercion","sql":"SELECT '1 year 2 months'::interval","expect":"ok","ref":"sql-expressions","note":":: cast text to interval"}
+{"id":"cst2a0045","category":"cast-coercion","sql":"SELECT '{\"key\":\"val\"}'::json","expect":"ok","ref":"sql-expressions","note":":: cast text to json"}
+{"id":"cst2a0046","category":"cast-coercion","sql":"SELECT '{\"key\":\"val\"}'::jsonb","expect":"ok","ref":"sql-expressions","note":":: cast text to jsonb"}
+{"id":"cst2a0047","category":"cast-coercion","sql":"SELECT '\\xDEADBEEF'::bytea","expect":"ok","ref":"sql-expressions","note":":: cast text to bytea (hex escape)"}
+{"id":"cst2a0048","category":"cast-coercion","sql":"SELECT 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'::uuid","expect":"ok","ref":"sql-expressions","note":":: cast text to uuid"}
+{"id":"cst2a0049","category":"cast-coercion","sql":"SELECT '192.168.1.1'::inet","expect":"ok","ref":"sql-expressions","note":":: cast text to inet"}
+{"id":"cst2a0050","category":"cast-coercion","sql":"SELECT '192.168.1.0/24'::cidr","expect":"ok","ref":"sql-expressions","note":":: cast text to cidr"}
+{"id":"cst2a0051","category":"cast-coercion","sql":"SELECT '08:00:2b:01:02:03'::macaddr","expect":"ok","ref":"sql-expressions","note":":: cast text to macaddr"}
+{"id":"cst2a0052","category":"cast-coercion","sql":"SELECT '3.14'::numeric::text","expect":"ok","ref":"sql-expressions","note":"chained :: casts: numeric then text"}
+{"id":"cst2a0053","category":"cast-coercion","sql":"SELECT '42'::text::integer::bigint","expect":"ok","ref":"sql-expressions","note":"triple chained :: casts"}
+{"id":"cst2a0054","category":"cast-coercion","sql":"SELECT 1::text::integer","expect":"ok","ref":"sql-expressions","note":"chain :: integer→text→integer round-trip"}
+{"id":"cst2a0055","category":"cast-coercion","sql":"SELECT 3.14::numeric(5,1)::text","expect":"ok","ref":"sql-expressions","note":"chain :: with typmod then text"}
+{"id":"cst2a0056","category":"cast-coercion","sql":"SELECT true::text::boolean","expect":"ok","ref":"sql-expressions","note":"chain :: boolean→text→boolean round-trip"}
+{"id":"cst2a0057","category":"cast-coercion","sql":"SELECT ARRAY[1,2,3]::text[]","expect":"ok","ref":"sql-expressions","note":"CAST array literal to text array"}
+{"id":"cst2a0058","category":"cast-coercion","sql":"SELECT ARRAY[1,2,3]::bigint[]","expect":"ok","ref":"sql-expressions","note":"CAST integer array to bigint array"}
+{"id":"cst2a0059","category":"cast-coercion","sql":"SELECT '{1,2,3}'::integer[]","expect":"ok","ref":"sql-expressions","note":":: cast text to integer array"}
+{"id":"cst2a0060","category":"cast-coercion","sql":"SELECT '{1,2,3}'::bigint[]","expect":"ok","ref":"sql-expressions","note":":: cast text to bigint array"}
+{"id":"cst2a0061","category":"cast-coercion","sql":"SELECT '{\"a\",\"b\"}'::text[]","expect":"ok","ref":"sql-expressions","note":":: cast text to text array"}
+{"id":"cst2a0062","category":"cast-coercion","sql":"SELECT CAST('{1,2,3}' AS integer[])","expect":"ok","ref":"sql-expressions","note":"CAST text to integer array"}
+{"id":"cst2a0063","category":"cast-coercion","sql":"SELECT CAST(ARRAY['1','2','3'] AS integer[])","expect":"ok","ref":"sql-expressions","note":"CAST text array to integer array"}
+{"id":"cst2a0064","category":"cast-coercion","sql":"SELECT ARRAY['1','2']::integer[]","expect":"ok","ref":"sql-expressions","note":":: cast text[] to integer[]"}
+{"id":"cst2a0065","category":"cast-coercion","sql":"SELECT '{{1,2},{3,4}}'::integer[][]","expect":"ok","ref":"sql-expressions","note":":: cast text to 2-D integer array"}
+{"id":"cst2a0066","category":"cast-coercion","sql":"SELECT CAST('ok' AS s.mood)","expect":"ok","ref":"sql-expressions","note":"CAST text to enum type s.mood"}
+{"id":"cst2a0067","category":"cast-coercion","sql":"SELECT 'happy'::s.mood","expect":"ok","ref":"sql-expressions","note":":: cast text to enum s.mood"}
+{"id":"cst2a0068","category":"cast-coercion","sql":"SELECT 'sad'::s.mood::text","expect":"ok","ref":"sql-expressions","note":"enum :: to text via chained cast"}
+{"id":"cst2a0069","category":"cast-coercion","sql":"SELECT CAST('bad_val' AS s.mood)","expect":"error","ref":"sql-expressions","note":"CAST invalid literal to enum — semantic error"}
+{"id":"cst2a0070","category":"cast-coercion","sql":"SELECT '(123 Main St,Springfield,12345)'::s.addr","expect":"ok","ref":"sql-expressions","note":":: cast text to composite type s.addr"}
+{"id":"cst2a0071","category":"cast-coercion","sql":"SELECT CAST('(Main St,Cityville,99999)' AS s.addr)","expect":"ok","ref":"sql-expressions","note":"CAST text to composite type s.addr"}
+{"id":"cst2a0072","category":"cast-coercion","sql":"SELECT 5::s.pos_int","expect":"ok","ref":"sql-expressions","note":":: cast integer to domain s.pos_int (value passes check)"}
+{"id":"cst2a0073","category":"cast-coercion","sql":"SELECT CAST(7 AS s.pos_int)","expect":"ok","ref":"sql-expressions","note":"CAST integer to domain s.pos_int"}
+{"id":"cst2a0074","category":"cast-coercion","sql":"SELECT CAST(-1 AS s.pos_int)","expect":"error","ref":"sql-expressions","note":"CAST negative integer to pos_int domain — check violation (semantic)"}
+{"id":"cst2a0075","category":"cast-coercion","sql":"SELECT 0::s.pos_int","expect":"error","ref":"sql-expressions","note":":: cast zero to pos_int domain — check violation (semantic)"}
+{"id":"cst2a0076","category":"cast-coercion","sql":"SELECT CAST(val AS text) FROM s.t","expect":"ok","ref":"sql-expressions","note":"CAST column expression to text in SELECT"}
+{"id":"cst2a0077","category":"cast-coercion","sql":"SELECT val::text FROM s.t","expect":"ok","ref":"sql-expressions","note":":: cast column numeric to text"}
+{"id":"cst2a0078","category":"cast-coercion","sql":"SELECT qty::bigint FROM s.t","expect":"ok","ref":"sql-expressions","note":":: cast integer column to bigint"}
+{"id":"cst2a0079","category":"cast-coercion","sql":"SELECT flag::text FROM s.t","expect":"ok","ref":"sql-expressions","note":":: cast boolean column to text"}
+{"id":"cst2a0080","category":"cast-coercion","sql":"SELECT status::text FROM s.t","expect":"ok","ref":"sql-expressions","note":":: cast enum column to text"}
+{"id":"cst2a0081","category":"cast-coercion","sql":"SELECT CAST(name AS varchar(10)) FROM s.t","expect":"ok","ref":"sql-expressions","note":"CAST text column to varchar with typmod"}
+{"id":"cst2a0082","category":"cast-coercion","sql":"SELECT data::text FROM s.t","expect":"ok","ref":"sql-expressions","note":":: cast jsonb column to text"}
+{"id":"cst2a0083","category":"cast-coercion","sql":"SELECT data::json FROM s.t","expect":"ok","ref":"sql-expressions","note":":: cast jsonb column to json"}
+{"id":"cst2a0084","category":"cast-coercion","sql":"SELECT CAST(data AS json) FROM s.t","expect":"ok","ref":"sql-expressions","note":"CAST jsonb column to json"}
+{"id":"cst2a0085","category":"cast-coercion","sql":"SELECT home::text FROM s.t","expect":"ok","ref":"sql-expressions","note":":: cast composite column s.addr to text"}
+{"id":"cst2a0086","category":"cast-coercion","sql":"SELECT CAST(42 AS numeric(10,2))","expect":"ok","ref":"sql-expressions","note":"CAST integer to numeric with precision and scale typmod"}
+{"id":"cst2a0087","category":"cast-coercion","sql":"SELECT CAST(3.14159 AS numeric(5,2))","expect":"ok","ref":"sql-expressions","note":"CAST numeric with typmod rounding"}
+{"id":"cst2a0088","category":"cast-coercion","sql":"SELECT CAST('hello' AS char(10))","expect":"ok","ref":"sql-expressions","note":"CAST text to char with length typmod (right-pads)"}
+{"id":"cst2a0089","category":"cast-coercion","sql":"SELECT CAST('hello world' AS character varying(5))","expect":"ok","ref":"sql-expressions","note":"CAST text to character varying with typmod (truncates)"}
+{"id":"cst2a0090","category":"cast-coercion","sql":"SELECT '2024-01-15 12:00:00'::timestamp(0)","expect":"ok","ref":"sql-expressions","note":":: cast to timestamp with precision typmod"}
+{"id":"cst2a0091","category":"cast-coercion","sql":"SELECT '12:00:00.123'::time(2)","expect":"ok","ref":"sql-expressions","note":":: cast to time with precision typmod"}
+{"id":"cst2a0092","category":"cast-coercion","sql":"SELECT '1 day 2 hours'::interval(0)","expect":"ok","ref":"sql-expressions","note":":: cast to interval with precision typmod"}
+{"id":"cst2a0093","category":"cast-coercion","sql":"SELECT CAST AS text","expect":"error","ref":"sql-expressions","note":"CAST missing opening paren and expr — syntax error"}
+{"id":"cst2a0094","category":"cast-coercion","sql":"SELECT CAST(42 text)","expect":"error","ref":"sql-expressions","note":"CAST missing AS keyword — syntax error"}
+{"id":"cst2a0095","category":"cast-coercion","sql":"SELECT CAST(42 AS)","expect":"error","ref":"sql-expressions","note":"CAST missing target type — syntax error"}
+{"id":"cst2a0096","category":"cast-coercion","sql":"SELECT CAST( AS text)","expect":"error","ref":"sql-expressions","note":"CAST missing source expression — syntax error"}
+{"id":"cst2a0097","category":"cast-coercion","sql":"SELECT 42::","expect":"error","ref":"sql-expressions","note":":: with no target type — syntax error"}
+{"id":"cst2a0098","category":"cast-coercion","sql":"SELECT ::integer","expect":"error","ref":"sql-expressions","note":":: with no source expression — syntax error"}
+{"id":"cst2a0099","category":"cast-coercion","sql":"SELECT 42::nonexistent_type_xyz","expect":"error","ref":"sql-expressions","note":":: cast to unknown type — semantic error"}
+{"id":"cst2a0100","category":"cast-coercion","sql":"SELECT CAST('not_a_number' AS integer)","expect":"error","ref":"sql-expressions","note":"CAST non-numeric string to integer — invalid input (semantic)"}
+{"id":"cst2a0101","category":"cast-coercion","sql":"SELECT CAST('not_a_date' AS date)","expect":"error","ref":"sql-expressions","note":"CAST invalid date string — semantic error"}
+{"id":"cst2a0102","category":"cast-coercion","sql":"SELECT CAST('not_bool' AS boolean)","expect":"error","ref":"sql-expressions","note":"CAST unrecognized boolean string — semantic error"}
+{"id":"cst2a0103","category":"cast-coercion","sql":"SELECT CAST(99999 AS smallint)","expect":"error","ref":"sql-expressions","note":"CAST integer out of smallint range — numeric overflow (semantic)"}
+{"id":"cst2a0104","category":"cast-coercion","sql":"SELECT CAST(42)","expect":"error","ref":"sql-expressions","note":"CAST with only one argument, missing AS type — syntax error"}
+{"id":"cst2a0105","category":"cast-coercion","sql":"SELECT CAST(1.5 AS integer)","expect":"ok","ref":"sql-expressions","note":"CAST numeric to integer truncates toward zero"}
+{"id":"cst2a0106","category":"cast-coercion","sql":"SELECT CAST(-1.9 AS integer)","expect":"ok","ref":"sql-expressions","note":"CAST negative numeric to integer truncates"}
+{"id":"cst2a0107","category":"cast-coercion","sql":"SELECT CAST(NULL AS integer)","expect":"ok","ref":"sql-expressions","note":"CAST NULL to integer yields NULL"}
+{"id":"cst2a0108","category":"cast-coercion","sql":"SELECT CAST(NULL AS text)","expect":"ok","ref":"sql-expressions","note":"CAST NULL to text yields NULL"}
+{"id":"cst2a0109","category":"cast-coercion","sql":"SELECT NULL::integer","expect":"ok","ref":"sql-expressions","note":":: cast NULL to integer"}
+{"id":"cst2a0110","category":"cast-coercion","sql":"SELECT NULL::text","expect":"ok","ref":"sql-expressions","note":":: cast NULL to text"}
+{"id":"cst2a0111","category":"cast-coercion","sql":"SELECT NULL::s.mood","expect":"ok","ref":"sql-expressions","note":":: cast NULL to enum type"}
+{"id":"cst2a0112","category":"cast-coercion","sql":"SELECT NULL::integer[]","expect":"ok","ref":"sql-expressions","note":":: cast NULL to integer array"}
+{"id":"cst2a0113","category":"cast-coercion","sql":"SELECT (1+2)::text","expect":"ok","ref":"sql-expressions","note":":: cast arithmetic expression to text"}
+{"id":"cst2a0114","category":"cast-coercion","sql":"SELECT (s.f(3))::text","expect":"ok","ref":"sql-expressions","note":":: cast function call result to text"}
+{"id":"cst2a0115","category":"cast-coercion","sql":"SELECT s.f(1)::bigint","expect":"ok","ref":"sql-expressions","note":":: cast function return value to bigint"}
+{"id":"cst2a0116","category":"cast-coercion","sql":"SELECT CAST(s.f(2) AS bigint)","expect":"ok","ref":"sql-expressions","note":"CAST function call result to bigint"}
+{"id":"cst2a0117","category":"cast-coercion","sql":"SELECT (SELECT 1)::text","expect":"ok","ref":"sql-expressions","note":":: cast scalar subquery result to text"}
+{"id":"cst2a0118","category":"cast-coercion","sql":"SELECT CAST((SELECT 42) AS bigint)","expect":"ok","ref":"sql-expressions","note":"CAST scalar subquery to bigint"}
+{"id":"cst2a0119","category":"cast-coercion","sql":"SELECT CASE WHEN true THEN 1 ELSE 2 END::text","expect":"ok","ref":"sql-expressions","note":":: cast CASE expression result to text"}
+{"id":"cst2a0120","category":"cast-coercion","sql":"SELECT CAST(CASE WHEN 1=1 THEN '42' ELSE '0' END AS integer)","expect":"ok","ref":"sql-expressions","note":"CAST CASE expression to integer"}
+{"id":"cst2a0121","category":"cast-coercion","sql":"SELECT COALESCE(NULL, 42)::text","expect":"ok","ref":"sql-expressions","note":":: cast COALESCE result to text"}
+{"id":"cst2a0122","category":"cast-coercion","sql":"SELECT CAST(COALESCE(NULL, '3.14') AS numeric)","expect":"ok","ref":"sql-expressions","note":"CAST COALESCE result to numeric"}
+{"id":"cst2a0123","category":"cast-coercion","sql":"SELECT NULLIF(1,1)::text","expect":"ok","ref":"sql-expressions","note":":: cast NULLIF result to text"}
+{"id":"cst2a0124","category":"cast-coercion","sql":"SELECT GREATEST(1,2,3)::text","expect":"ok","ref":"sql-expressions","note":":: cast GREATEST result to text"}
+{"id":"cst2a0125","category":"cast-coercion","sql":"SELECT LEAST(1,2,3)::bigint","expect":"ok","ref":"sql-expressions","note":":: cast LEAST result to bigint"}
+{"id":"cst2a0126","category":"cast-coercion","sql":"SELECT CAST(name AS text) FROM s.t WHERE id::integer > 0","expect":"ok","ref":"sql-expressions","note":"CAST in SELECT and WHERE clauses together"}
+{"id":"cst2a0127","category":"cast-coercion","sql":"SELECT * FROM s.t WHERE CAST(qty AS bigint) > 0","expect":"ok","ref":"sql-expressions","note":"CAST column in WHERE predicate"}
+{"id":"cst2a0128","category":"cast-coercion","sql":"SELECT * FROM s.t ORDER BY val::text","expect":"ok","ref":"sql-expressions","note":":: cast in ORDER BY clause"}
+{"id":"cst2a0129","category":"cast-coercion","sql":"SELECT CAST(val AS text) FROM s.t GROUP BY CAST(val AS text)","expect":"ok","ref":"sql-expressions","note":"CAST in SELECT and GROUP BY"}
+{"id":"cst2a0130","category":"cast-coercion","sql":"SELECT CAST(avg(qty) AS bigint) FROM s.t HAVING CAST(avg(qty) AS bigint) > 0","expect":"ok","ref":"sql-expressions","note":"CAST aggregate result in HAVING clause"}
+{"id":"cst2a0131","category":"cast-coercion","sql":"SELECT CAST(id AS text) || ' ' || name FROM s.t","expect":"ok","ref":"sql-expressions","note":"CAST in string concatenation expression"}
+{"id":"cst2a0132","category":"cast-coercion","sql":"SELECT (1.5::numeric(10,4) + 2.5::numeric(10,4))::text","expect":"ok","ref":"sql-expressions","note":"arithmetic on typed cast operands, then cast to text"}
+{"id":"cst2a0133","category":"cast-coercion","sql":"SELECT CAST('1'::integer AS bigint)","expect":"ok","ref":"sql-expressions","note":"CAST of a :: expression (nested)"}
+{"id":"cst2a0134","category":"cast-coercion","sql":"SELECT CAST(CAST(42 AS text) AS integer)","expect":"ok","ref":"sql-expressions","note":"nested CAST expressions round-trip"}
+{"id":"cst2a0135","category":"cast-coercion","sql":"SELECT CAST(CAST('3.14' AS numeric) AS text)","expect":"ok","ref":"sql-expressions","note":"nested CAST numeric→text"}
+{"id":"cst2a0136","category":"cast-coercion","sql":"SELECT CAST(42 AS numeric(3,2))","expect":"error","ref":"sql-expressions","note":"CAST integer out of numeric(3,2) precision — numeric field overflow (semantic)"}
+{"id":"cst2a0137","category":"cast-coercion","sql":"SELECT '999999999999'::numeric(5,2)","expect":"error","ref":"sql-expressions","note":":: cast large numeric to small precision typmod — numeric field overflow (semantic)"}
+{"id":"cst2a0138","category":"cast-coercion","sql":"SELECT CAST('{1,2,3}' AS integer[])","expect":"ok","ref":"sql-expressions","note":"CAST text to integer array using [] syntax"}
+{"id":"cst2a0139","category":"cast-coercion","sql":"SELECT CAST('{1,2,3}' AS integer ARRAY)","expect":"ok","ref":"sql-expressions","note":"CAST text to integer ARRAY (keyword form)"}
+{"id":"cst2a0140","category":"cast-coercion","sql":"SELECT 42::text::numeric::bigint","expect":"ok","ref":"sql-expressions","note":"four-level chained :: casts"}
+{"id":"cst2a0141","category":"cast-coercion","sql":"SELECT 'sad'::s.mood = 'ok'::s.mood","expect":"ok","ref":"sql-expressions","note":"compare two enum-cast values"}
+{"id":"cst2a0142","category":"cast-coercion","sql":"SELECT 'ok'::s.mood > 'sad'::s.mood","expect":"ok","ref":"sql-expressions","note":"enum ordering comparison after cast"}
+{"id":"cst2a0143","category":"cast-coercion","sql":"SELECT CAST(1 AS integer) + CAST(2 AS integer)","expect":"ok","ref":"sql-expressions","note":"arithmetic on two CAST expressions"}
+{"id":"cst2a0144","category":"cast-coercion","sql":"SELECT CAST(1 AS bigint) * CAST(2 AS bigint)","expect":"ok","ref":"sql-expressions","note":"multiplication on CAST bigint operands"}
+{"id":"cst2a0145","category":"cast-coercion","sql":"SELECT CAST('2024-01-15' AS date) + CAST('1 day' AS interval)","expect":"ok","ref":"sql-expressions","note":"date + interval arithmetic via CAST"}
+{"id":"cst2a0146","category":"cast-coercion","sql":"SELECT CAST('{\"a\":1}' AS jsonb) -> 'a'","expect":"ok","ref":"sql-expressions","note":"CAST to jsonb then use json operator"}
+{"id":"cst2a0147","category":"cast-coercion","sql":"SELECT ('{\"a\":1}'::jsonb) ->> 'a'","expect":"ok","ref":"sql-expressions","note":":: cast to jsonb then text extraction operator"}
+{"id":"cst2a0148","category":"cast-coercion","sql":"SELECT ARRAY[1::bigint, 2::bigint, 3::bigint]","expect":"ok","ref":"sql-expressions","note":"array constructor with :: cast elements"}
+{"id":"cst2a0149","category":"cast-coercion","sql":"SELECT ARRAY[CAST(1 AS text), CAST(2 AS text)]","expect":"ok","ref":"sql-expressions","note":"array constructor with CAST elements"}
+{"id":"cst2a0150","category":"cast-coercion","sql":"SELECT (ROW(1, 'test', '10.00'))::s.t2","expect":"error","ref":"sql-expressions","note":"cast ROW to table type — requires matching columns (semantic error for mismatched fields)"}
+{"id":"cst2a0151","category":"cast-coercion","sql":"SELECT CAST(1 AS oid)","expect":"ok","ref":"sql-expressions","note":"CAST to oid type"}
+{"id":"cst2a0152","category":"cast-coercion","sql":"SELECT 1::oid","expect":"ok","ref":"sql-expressions","note":":: cast to oid"}
+{"id":"cst2a0153","category":"cast-coercion","sql":"SELECT 's.t'::regclass","expect":"ok","ref":"sql-expressions","note":":: cast schema-qualified text to regclass"}
+{"id":"cst2a0154","category":"cast-coercion","sql":"SELECT CAST('s.f' AS regprocedure)","expect":"error","ref":"sql-expressions","note":"CAST to regprocedure requires argument types notation — semantic error"}
+{"id":"cst2a0155","category":"cast-coercion","sql":"SELECT 's.f(integer)'::regprocedure","expect":"ok","ref":"sql-expressions","note":":: cast text with arg types to regprocedure"}
+{"id":"cst2a0156","category":"cast-coercion","sql":"SELECT CAST('integer' AS regtype)","expect":"ok","ref":"sql-expressions","note":"CAST text to regtype"}
+{"id":"cst2a0157","category":"cast-coercion","sql":"SELECT 'integer'::regtype","expect":"ok","ref":"sql-expressions","note":":: cast text to regtype"}
+{"id":"cst2a0158","category":"cast-coercion","sql":"SELECT CAST(1 AS text) = CAST(1 AS text)","expect":"ok","ref":"sql-expressions","note":"equality of two CAST results"}
+{"id":"cst2a0159","category":"cast-coercion","sql":"SELECT CAST(name AS text) IS NOT NULL FROM s.t","expect":"ok","ref":"sql-expressions","note":"CAST result in IS NOT NULL test"}
+{"id":"cst2a0160","category":"cast-coercion","sql":"SELECT val::numeric(12,2) IS NULL FROM s.t","expect":"ok","ref":"sql-expressions","note":":: cast with typmod in IS NULL test"}
+{"id":"cst2a0161","category":"cast-coercion","sql":"SELECT CAST(qty AS numeric) / CAST(10 AS numeric) FROM s.t","expect":"ok","ref":"sql-expressions","note":"division with CAST operands from table column"}
+{"id":"cst2a0162","category":"cast-coercion","sql":"SELECT name::bytea FROM s.t","expect":"ok","ref":"sql-expressions","note":":: cast text column to bytea"}
+{"id":"cst2a0163","category":"cast-coercion","sql":"SELECT CAST(42 AS bit(8))","expect":"ok","ref":"sql-expressions","note":"CAST integer to bit type with length typmod"}
+{"id":"cst2a0164","category":"cast-coercion","sql":"SELECT 42::bit(8)","expect":"ok","ref":"sql-expressions","note":":: cast integer to bit(8)"}
+{"id":"cst2a0165","category":"cast-coercion","sql":"SELECT CAST(B'1010' AS integer)","expect":"ok","ref":"sql-expressions","note":"CAST bit string literal to integer"}
+{"id":"cst2a0166","category":"cast-coercion","sql":"SELECT B'1010'::integer","expect":"ok","ref":"sql-expressions","note":":: cast bit literal to integer"}
+{"id":"cst2a0167","category":"cast-coercion","sql":"SELECT CAST(42.5 AS money)","expect":"ok","ref":"sql-expressions","note":"CAST numeric to money type"}
+{"id":"cst2a0168","category":"cast-coercion","sql":"SELECT 42.5::money","expect":"ok","ref":"sql-expressions","note":":: cast numeric to money"}
+{"id":"cst2a0169","category":"cast-coercion","sql":"SELECT CAST(42 AS CAST)","expect":"error","ref":"sql-expressions","note":"CAST using 'CAST' as type name — syntax error"}
+{"id":"cst2a0170","category":"cast-coercion","sql":"SELECT CAST(integer AS text)","expect":"error","ref":"sql-expressions","note":"CAST with type name as expression, not a value — semantic error"}

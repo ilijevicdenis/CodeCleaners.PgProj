@@ -1,0 +1,150 @@
+{"id":"doca0001","category":"do-call","sql":"DO $$ BEGIN END $$;","expect":"ok","ref":"sql-do","note":"minimal DO block, dollar-quoted, default language plpgsql"}
+{"id":"doca0002","category":"do-call","sql":"DO $$ BEGIN PERFORM 1; END $$;","expect":"ok","ref":"sql-do","note":"DO block with PERFORM statement"}
+{"id":"doca0003","category":"do-call","sql":"DO LANGUAGE plpgsql $$ BEGIN END $$;","expect":"ok","ref":"sql-do","note":"explicit LANGUAGE before code block"}
+{"id":"doca0004","category":"do-call","sql":"DO $$ BEGIN END $$ LANGUAGE plpgsql;","expect":"ok","ref":"sql-do","note":"LANGUAGE clause after code block"}
+{"id":"doca0005","category":"do-call","sql":"DO LANGUAGE plpgsql $$ DECLARE x integer := 1; BEGIN PERFORM x; END $$;","expect":"ok","ref":"sql-do","note":"DO with DECLARE section and variable assignment"}
+{"id":"doca0006","category":"do-call","sql":"DO $$ DECLARE v integer; BEGIN v := 42; END $$;","expect":"ok","ref":"sql-do","note":"DECLARE with uninitialized variable, assignment in body"}
+{"id":"doca0007","category":"do-call","sql":"DO $$ DECLARE x integer := 0; BEGIN x := x + 1; END $$;","expect":"ok","ref":"sql-do","note":"arithmetic assignment in DO block"}
+{"id":"doca0008","category":"do-call","sql":"DO $$ DECLARE r RECORD; BEGIN SELECT 1 AS a INTO r; END $$;","expect":"ok","ref":"sql-do","note":"DECLARE RECORD variable with SELECT INTO"}
+{"id":"doca0009","category":"do-call","sql":"DO $body$ BEGIN END $body$;","expect":"ok","ref":"sql-do","note":"named dollar-quote tag"}
+{"id":"doca0010","category":"do-call","sql":"DO $BLOCK$ DECLARE i int := 0; BEGIN i := i + 1; END $BLOCK$;","expect":"ok","ref":"sql-do","note":"uppercase named dollar-quote tag"}
+{"id":"doca0011","category":"do-call","sql":"DO $q$ BEGIN RAISE NOTICE 'hello'; END $q$;","expect":"ok","ref":"sql-do","note":"RAISE NOTICE inside DO block"}
+{"id":"doca0012","category":"do-call","sql":"DO $$ BEGIN INSERT INTO s.t(name) VALUES ('do_test'); END $$;","expect":"ok","ref":"sql-do","note":"DML INSERT inside DO block referencing fixture table"}
+{"id":"doca0013","category":"do-call","sql":"DO $$ BEGIN UPDATE s.t SET val = 1.0 WHERE id = -999; END $$;","expect":"ok","ref":"sql-do","note":"DML UPDATE with no matching rows inside DO block"}
+{"id":"doca0014","category":"do-call","sql":"DO $$ BEGIN DELETE FROM s.t WHERE id = -999; END $$;","expect":"ok","ref":"sql-do","note":"DML DELETE with no matching rows inside DO block"}
+{"id":"doca0015","category":"do-call","sql":"DO $$ DECLARE cnt integer; BEGIN SELECT count(*) INTO cnt FROM s.t; END $$;","expect":"ok","ref":"sql-do","note":"SELECT INTO scalar variable inside DO"}
+{"id":"doca0016","category":"do-call","sql":"DO $$ BEGIN IF true THEN NULL; END IF; END $$;","expect":"ok","ref":"sql-do","note":"IF statement inside DO block"}
+{"id":"doca0017","category":"do-call","sql":"DO $$ BEGIN IF false THEN NULL; ELSE NULL; END IF; END $$;","expect":"ok","ref":"sql-do","note":"IF-ELSE inside DO block"}
+{"id":"doca0018","category":"do-call","sql":"DO $$ DECLARE i int := 0; BEGIN WHILE i < 3 LOOP i := i + 1; END LOOP; END $$;","expect":"ok","ref":"sql-do","note":"WHILE loop inside DO block"}
+{"id":"doca0019","category":"do-call","sql":"DO $$ BEGIN FOR i IN 1..3 LOOP PERFORM i; END LOOP; END $$;","expect":"ok","ref":"sql-do","note":"FOR integer loop inside DO block"}
+{"id":"doca0020","category":"do-call","sql":"DO $$ BEGIN FOR i IN REVERSE 3..1 LOOP PERFORM i; END LOOP; END $$;","expect":"ok","ref":"sql-do","note":"FOR REVERSE loop inside DO block"}
+{"id":"doca0021","category":"do-call","sql":"DO $$ DECLARE r RECORD; BEGIN FOR r IN SELECT id FROM s.t LOOP PERFORM r.id; END LOOP; END $$;","expect":"ok","ref":"sql-do","note":"FOR record loop over query inside DO block"}
+{"id":"doca0022","category":"do-call","sql":"DO $$ BEGIN PERFORM s.f(1); END $$;","expect":"ok","ref":"sql-do","note":"PERFORM function call inside DO block"}
+{"id":"doca0023","category":"do-call","sql":"DO $$ BEGIN PERFORM s.g(2, 3); END $$;","expect":"ok","ref":"sql-do","note":"PERFORM multi-arg function inside DO block"}
+{"id":"doca0024","category":"do-call","sql":"DO $$ BEGIN PERFORM s.g(a => 5, b => 10); END $$;","expect":"ok","ref":"sql-do","note":"PERFORM function with named arguments inside DO block"}
+{"id":"doca0025","category":"do-call","sql":"DO $$ DECLARE x s.mood; BEGIN x := 'happy'; END $$;","expect":"ok","ref":"sql-do","note":"DECLARE variable of custom enum type"}
+{"id":"doca0026","category":"do-call","sql":"DO $$ DECLARE a s.addr; BEGIN a := ROW('Main St', 'Springfield', '12345')::s.addr; END $$;","expect":"ok","ref":"sql-do","note":"DECLARE variable of composite type"}
+{"id":"doca0027","category":"do-call","sql":"DO $$ DECLARE v s.pos_int; BEGIN v := 5; END $$;","expect":"ok","ref":"sql-do","note":"DECLARE variable of domain type"}
+{"id":"doca0028","category":"do-call","sql":"DO $$ BEGIN RAISE EXCEPTION 'test error'; EXCEPTION WHEN OTHERS THEN NULL; END $$;","expect":"ok","ref":"sql-do","note":"exception handler in DO block"}
+{"id":"doca0029","category":"do-call","sql":"DO $$ BEGIN RAISE EXCEPTION 'err %', 42; EXCEPTION WHEN raise_exception THEN NULL; END $$;","expect":"ok","ref":"sql-do","note":"RAISE with format arg, catch raise_exception"}
+{"id":"doca0030","category":"do-call","sql":"DO $$ DECLARE x integer; BEGIN x := s.f(10); END $$;","expect":"ok","ref":"sql-do","note":"assign function return value to variable"}
+{"id":"doca0031","category":"do-call","sql":"DO $$ BEGIN CALL s.p(1); END $$;","expect":"ok","ref":"sql-do","note":"CALL procedure inside DO block"}
+{"id":"doca0032","category":"do-call","sql":"DO $$ BEGIN CALL s.p(n => 5); END $$;","expect":"ok","ref":"sql-do","note":"CALL procedure with named argument inside DO block"}
+{"id":"doca0033","category":"do-call","sql":"DO $$ DECLARE arr integer[] := ARRAY[1,2,3]; BEGIN PERFORM arr[1]; END $$;","expect":"ok","ref":"sql-do","note":"DECLARE array variable inside DO block"}
+{"id":"doca0034","category":"do-call","sql":"DO $$ DECLARE t TEXT := 'hello world'; BEGIN PERFORM length(t); END $$;","expect":"ok","ref":"sql-do","note":"DECLARE text variable inside DO block"}
+{"id":"doca0035","category":"do-call","sql":"DO $$ DECLARE b BOOLEAN := true; BEGIN IF NOT b THEN NULL; END IF; END $$;","expect":"ok","ref":"sql-do","note":"DECLARE boolean variable"}
+{"id":"doca0036","category":"do-call","sql":"DO $$ BEGIN NULL; END $$;","expect":"ok","ref":"sql-do","note":"DO block with only NULL statement"}
+{"id":"doca0037","category":"do-call","sql":"DO $$ BEGIN -- inline comment\n NULL; END $$;","expect":"ok","ref":"sql-do","note":"inline SQL comment inside DO block body"}
+{"id":"doca0038","category":"do-call","sql":"DO $$ BEGIN /* block comment */ NULL; END $$;","expect":"ok","ref":"sql-do","note":"block comment inside DO block body"}
+{"id":"doca0039","category":"do-call","sql":"do $$ begin end $$;","expect":"ok","ref":"sql-do","note":"DO keyword lowercase"}
+{"id":"doca0040","category":"do-call","sql":"DO language plpgsql $$ BEGIN END $$;","expect":"ok","ref":"sql-do","note":"LANGUAGE keyword lowercase"}
+{"id":"doca0041","category":"do-call","sql":"DO $$ DECLARE\n  x integer := 1;\n  y text := 'a';\nBEGIN\n  PERFORM x;\nEND $$;","expect":"ok","ref":"sql-do","note":"multiple declarations on separate lines"}
+{"id":"doca0042","category":"do-call","sql":"DO $$ DECLARE x CONSTANT integer := 99; BEGIN PERFORM x; END $$;","expect":"ok","ref":"sql-do","note":"CONSTANT variable declaration"}
+{"id":"doca0043","category":"do-call","sql":"DO $$ DECLARE x integer NOT NULL := 1; BEGIN PERFORM x; END $$;","expect":"ok","ref":"sql-do","note":"NOT NULL variable declaration"}
+{"id":"doca0044","category":"do-call","sql":"DO $$ DECLARE x integer DEFAULT 0; BEGIN PERFORM x; END $$;","expect":"ok","ref":"sql-do","note":"DEFAULT keyword in variable declaration (alternative to :=)"}
+{"id":"doca0045","category":"do-call","sql":"DO $$ DECLARE x s.t%ROWTYPE; BEGIN NULL; END $$;","expect":"ok","ref":"sql-do","note":"%ROWTYPE variable declaration"}
+{"id":"doca0046","category":"do-call","sql":"DO $$ DECLARE x s.t.name%TYPE; BEGIN NULL; END $$;","expect":"ok","ref":"sql-do","note":"%TYPE variable declaration"}
+{"id":"doca0047","category":"do-call","sql":"DO $$ <<outer>> BEGIN NULL; END outer $$;","expect":"ok","ref":"sql-do","note":"labeled block in DO"}
+{"id":"doca0048","category":"do-call","sql":"DO $$ <<lbl>> DECLARE x int := 0; BEGIN x := lbl.x + 1; END lbl $$;","expect":"ok","ref":"sql-do","note":"labeled block with variable reference using label qualifier"}
+{"id":"doca0049","category":"do-call","sql":"DO $$ BEGIN <<inner>> BEGIN NULL; END inner; END $$;","expect":"ok","ref":"sql-do","note":"nested labeled sub-block"}
+{"id":"doca0050","category":"do-call","sql":"DO $$ BEGIN\nBEGIN\n  PERFORM 1;\nEXCEPTION WHEN OTHERS THEN NULL;\nEND;\nEND $$;","expect":"ok","ref":"sql-do","note":"nested sub-block with exception handler"}
+{"id":"doca0051","category":"do-call","sql":"DO $$ DECLARE cur CURSOR FOR SELECT id FROM s.t; BEGIN OPEN cur; CLOSE cur; END $$;","expect":"ok","ref":"sql-do","note":"cursor declaration and open/close in DO block"}
+{"id":"doca0052","category":"do-call","sql":"DO $$ DECLARE cur REFCURSOR; BEGIN OPEN cur FOR SELECT id FROM s.t; CLOSE cur; END $$;","expect":"ok","ref":"sql-do","note":"REFCURSOR variable in DO block"}
+{"id":"doca0053","category":"do-call","sql":"DO $$ DECLARE x integer; BEGIN SELECT s.f(3) INTO STRICT x; END $$;","expect":"ok","ref":"sql-do","note":"SELECT INTO STRICT inside DO block"}
+{"id":"doca0054","category":"do-call","sql":"DO $$ DECLARE x integer := 0; BEGIN LOOP x := x + 1; EXIT WHEN x >= 5; END LOOP; END $$;","expect":"ok","ref":"sql-do","note":"LOOP with EXIT WHEN inside DO block"}
+{"id":"doca0055","category":"do-call","sql":"DO $$ DECLARE x integer := 0; BEGIN <<myloop>> LOOP x := x + 1; EXIT myloop WHEN x >= 3; END LOOP; END $$;","expect":"ok","ref":"sql-do","note":"labeled LOOP with EXIT label WHEN"}
+{"id":"doca0056","category":"do-call","sql":"DO $$ DECLARE x integer := 0; BEGIN FOR i IN 1..10 LOOP CONTINUE WHEN i < 5; x := x + 1; END LOOP; END $$;","expect":"ok","ref":"sql-do","note":"CONTINUE WHEN inside FOR loop"}
+{"id":"doca0057","category":"do-call","sql":"DO $$ BEGIN RETURN; END $$;","expect":"ok","ref":"sql-do","note":"RETURN without value in DO block (void return)"}
+{"id":"doca0058","category":"do-call","sql":"DO $$ DECLARE x integer; BEGIN x := NULL; END $$;","expect":"ok","ref":"sql-do","note":"assign NULL to variable"}
+{"id":"doca0059","category":"do-call","sql":"DO $$ DECLARE x text; BEGIN x := 'it''s a test'; END $$;","expect":"ok","ref":"sql-do","note":"string literal with escaped single quote inside DO"}
+{"id":"doca0060","category":"do-call","sql":"DO $$ DECLARE x text; BEGIN x := E'line1\\nline2'; END $$;","expect":"ok","ref":"sql-do","note":"E-escape string literal inside DO"}
+{"id":"doca0061","category":"do-call","sql":"DO $$ DECLARE x integer; BEGIN EXECUTE 'SELECT 1' INTO x; END $$;","expect":"ok","ref":"sql-do","note":"dynamic EXECUTE with INTO inside DO"}
+{"id":"doca0062","category":"do-call","sql":"DO $$ DECLARE x integer := 5; BEGIN EXECUTE format('SELECT %s', x) INTO x; END $$;","expect":"ok","ref":"sql-do","note":"EXECUTE format() with USING-style interpolation"}
+{"id":"doca0063","category":"do-call","sql":"DO $$ DECLARE x integer; BEGIN EXECUTE 'SELECT $1 + $2' INTO x USING 3, 4; END $$;","expect":"ok","ref":"sql-do","note":"EXECUTE ... USING parameters inside DO"}
+{"id":"doca0064","category":"do-call","sql":"DO $$ BEGIN IF EXISTS (SELECT 1 FROM s.t WHERE id < 0) THEN NULL; END IF; END $$;","expect":"ok","ref":"sql-do","note":"IF EXISTS subquery inside DO block"}
+{"id":"doca0065","category":"do-call","sql":"DO $$ DECLARE n bigint; BEGIN GET DIAGNOSTICS n = ROW_COUNT; END $$;","expect":"ok","ref":"sql-do","note":"GET DIAGNOSTICS ROW_COUNT inside DO block"}
+{"id":"doca0066","category":"do-call","sql":"DO $$ DECLARE n bigint; BEGIN INSERT INTO s.t(name) VALUES('diag_test'); GET DIAGNOSTICS n = ROW_COUNT; END $$;","expect":"ok","ref":"sql-do","note":"GET DIAGNOSTICS after INSERT in DO block"}
+{"id":"doca0067","category":"do-call","sql":"DO $$ DECLARE b boolean; BEGIN b := FOUND; END $$;","expect":"ok","ref":"sql-do","note":"read FOUND special variable inside DO block"}
+{"id":"doca0068","category":"do-call","sql":"DO $$ BEGIN PERFORM nextval('s.seq'); END $$;","expect":"ok","ref":"sql-do","note":"nextval sequence call inside DO block"}
+{"id":"doca0069","category":"do-call","sql":"DO $$ BEGIN FOREACH x SLICE 0 IN ARRAY ARRAY[1,2,3] LOOP PERFORM x; END LOOP; END $$;","expect":"error","ref":"sql-do","note":"FOREACH without declaring x — semantic error (undeclared variable)"}
+{"id":"doca0070","category":"do-call","sql":"DO $$ DECLARE x integer; BEGIN FOREACH x IN ARRAY ARRAY[1,2,3] LOOP PERFORM x; END LOOP; END $$;","expect":"ok","ref":"sql-do","note":"FOREACH over integer array in DO block"}
+{"id":"doca0071","category":"do-call","sql":"DO $$ DECLARE x integer[][]; BEGIN FOREACH x SLICE 1 IN ARRAY ARRAY[[1,2],[3,4]] LOOP PERFORM x; END LOOP; END $$;","expect":"ok","ref":"sql-do","note":"FOREACH SLICE 1 over 2D array in DO block"}
+{"id":"doca0072","category":"do-call","sql":"DO $$ BEGIN RAISE DEBUG 'debug msg'; END $$;","expect":"ok","ref":"sql-do","note":"RAISE DEBUG level inside DO"}
+{"id":"doca0073","category":"do-call","sql":"DO $$ BEGIN RAISE INFO 'info msg'; END $$;","expect":"ok","ref":"sql-do","note":"RAISE INFO level inside DO"}
+{"id":"doca0074","category":"do-call","sql":"DO $$ BEGIN RAISE WARNING 'warn msg'; END $$;","expect":"ok","ref":"sql-do","note":"RAISE WARNING level inside DO"}
+{"id":"doca0075","category":"do-call","sql":"DO $$ BEGIN RAISE LOG 'log msg'; END $$;","expect":"ok","ref":"sql-do","note":"RAISE LOG level inside DO"}
+{"id":"doca0076","category":"do-call","sql":"DO $$ BEGIN RAISE NOTICE 'val: %', 42; END $$;","expect":"ok","ref":"sql-do","note":"RAISE NOTICE with format placeholder"}
+{"id":"doca0077","category":"do-call","sql":"DO $$ BEGIN RAISE EXCEPTION 'error' USING ERRCODE = 'P0001'; END $$;","expect":"error","ref":"sql-do","note":"RAISE EXCEPTION with USING ERRCODE — runtime error (intentional)"}
+{"id":"doca0078","category":"do-call","sql":"DO $$ BEGIN RAISE EXCEPTION 'boom' USING HINT = 'try again'; EXCEPTION WHEN OTHERS THEN NULL; END $$;","expect":"ok","ref":"sql-do","note":"RAISE EXCEPTION USING HINT caught by handler"}
+{"id":"doca0079","category":"do-call","sql":"DO $$ DECLARE x integer; BEGIN x := (SELECT val FROM s.t LIMIT 1); END $$;","expect":"ok","ref":"sql-do","note":"subquery assignment with implicit cast to integer (val is numeric)"}
+{"id":"doca0080","category":"do-call","sql":"DO $$ BEGIN PERFORM (SELECT 1); END $$;","expect":"ok","ref":"sql-do","note":"PERFORM with parenthesized subquery"}
+{"id":"doca0081","category":"do-call","sql":"DO LANGUAGE sql $$ SELECT 1 $$;","expect":"error","ref":"sql-do","note":"LANGUAGE sql is not a procedural language for DO — semantic error"}
+{"id":"doca0082","category":"do-call","sql":"DO LANGUAGE nonexistent_lang $$ BEGIN END $$;","expect":"error","ref":"sql-do","note":"non-existent language name — semantic error"}
+{"id":"doca0083","category":"do-call","sql":"DO LANGUAGE 'plpgsql' $$ BEGIN END $$;","expect":"ok","ref":"sql-do","note":"LANGUAGE name as quoted string literal"}
+{"id":"doca0084","category":"do-call","sql":"DO $$ BEGIN END $$","expect":"ok","ref":"sql-do","note":"DO block without trailing semicolon"}
+{"id":"doca0085","category":"do-call","sql":"DO 'BEGIN';","expect":"error","ref":"sql-do","note":"single-quoted body with just BEGIN but no END — syntax error inside plpgsql"}
+{"id":"doca0086","category":"do-call","sql":"DO 42;","expect":"error","ref":"sql-do","note":"DO with numeric literal (not a string) as code body — syntax error"}
+{"id":"doca0087","category":"do-call","sql":"DO BEGIN END;","expect":"error","ref":"sql-do","note":"code not quoted — syntax error (bare BEGIN not a string)"}
+{"id":"doca0088","category":"do-call","sql":"DO $$ RETURNS void BEGIN END $$;","expect":"error","ref":"sql-do","note":"RETURNS clause not valid in DO — syntax error"}
+{"id":"doca0089","category":"do-call","sql":"DO $$ BEGIN END $$ LANGUAGE plpgsql LANGUAGE plpgsql;","expect":"error","ref":"sql-do","note":"duplicate LANGUAGE clause — syntax error"}
+{"id":"doca0090","category":"do-call","sql":"DO LANGUAGE plpgsql;","expect":"error","ref":"sql-do","note":"LANGUAGE without code body — syntax error"}
+{"id":"doca0091","category":"do-call","sql":"DO;","expect":"error","ref":"sql-do","note":"DO with no arguments — syntax error"}
+{"id":"doca0092","category":"do-call","sql":"DO $$ BEGIN RETURN 1; END $$;","expect":"error","ref":"sql-do","note":"RETURN with value in void DO block — error (cannot use RETURN with a value)"}
+{"id":"doca0093","category":"do-call","sql":"DO $$ DECLARE x integer; y integer; BEGIN x := 1; y := 2; END $$;","expect":"ok","ref":"sql-do","note":"multiple declarations comma-free (each on own declaration)"}
+{"id":"doca0094","category":"do-call","sql":"DO $$ DECLARE\n  x integer := 1;\nBEGIN\n  DECLARE\n    y integer := x + 1;\n  BEGIN\n    PERFORM y;\n  END;\nEND $$;","expect":"ok","ref":"sql-do","note":"DECLARE in nested sub-block"}
+{"id":"doca0095","category":"do-call","sql":"DO $$ BEGIN IF 1=1 THEN NULL; ELSIF 1=2 THEN NULL; ELSE NULL; END IF; END $$;","expect":"ok","ref":"sql-do","note":"IF-ELSIF-ELSE chain inside DO"}
+{"id":"doca0096","category":"do-call","sql":"DO $$ DECLARE x int := 2; BEGIN CASE x WHEN 1 THEN NULL; WHEN 2 THEN NULL; ELSE NULL; END CASE; END $$;","expect":"ok","ref":"sql-do","note":"simple CASE statement inside DO"}
+{"id":"doca0097","category":"do-call","sql":"DO $$ DECLARE x int := 2; BEGIN CASE WHEN x < 0 THEN NULL; WHEN x = 0 THEN NULL; ELSE NULL; END CASE; END $$;","expect":"ok","ref":"sql-do","note":"searched CASE statement inside DO"}
+{"id":"doca0098","category":"do-call","sql":"DO $$ DECLARE rec RECORD; BEGIN FOR rec IN EXECUTE 'SELECT id FROM s.t' LOOP PERFORM rec.id; END LOOP; END $$;","expect":"ok","ref":"sql-do","note":"FOR loop over dynamic query inside DO — rec must be declared RECORD"}
+{"id":"doca0099","category":"do-call","sql":"DO $$ DECLARE x integer; BEGIN SELECT id INTO x FROM s.t WHERE false; IF NOT FOUND THEN NULL; END IF; END $$;","expect":"ok","ref":"sql-do","note":"FOUND check after SELECT INTO with no rows"}
+{"id":"doca0100","category":"do-call","sql":"DO $$ BEGIN PERFORM 1; PERFORM 2; PERFORM 3; END $$;","expect":"ok","ref":"sql-do","note":"multiple PERFORM statements in sequence"}
+{"id":"doca0101","category":"do-call","sql":"CALL s.p(1);","expect":"ok","ref":"sql-call","note":"basic CALL with positional integer argument"}
+{"id":"doca0102","category":"do-call","sql":"CALL s.p(0);","expect":"ok","ref":"sql-call","note":"CALL with zero as argument"}
+{"id":"doca0103","category":"do-call","sql":"CALL s.p(-1);","expect":"ok","ref":"sql-call","note":"CALL with negative integer argument"}
+{"id":"doca0104","category":"do-call","sql":"CALL s.p(100);","expect":"ok","ref":"sql-call","note":"CALL with larger integer constant"}
+{"id":"doca0105","category":"do-call","sql":"CALL s.p(n => 5);","expect":"ok","ref":"sql-call","note":"CALL with named argument using => syntax"}
+{"id":"doca0106","category":"do-call","sql":"CALL s.p(n := 7);","expect":"ok","ref":"sql-call","note":"CALL with named argument using := syntax"}
+{"id":"doca0107","category":"do-call","sql":"call s.p(1);","expect":"ok","ref":"sql-call","note":"CALL keyword lowercase"}
+{"id":"doca0108","category":"do-call","sql":"CALL s.p(1 + 1);","expect":"ok","ref":"sql-call","note":"CALL with expression as argument"}
+{"id":"doca0109","category":"do-call","sql":"CALL s.p(s.f(2));","expect":"ok","ref":"sql-call","note":"CALL with function call as argument"}
+{"id":"doca0110","category":"do-call","sql":"CALL s.p(abs(-3));","expect":"ok","ref":"sql-call","note":"CALL with built-in function as argument"}
+{"id":"doca0111","category":"do-call","sql":"CALL s.p(CAST(1.9 AS integer));","expect":"ok","ref":"sql-call","note":"CALL with CAST expression as argument"}
+{"id":"doca0112","category":"do-call","sql":"CALL s.p(1::integer);","expect":"ok","ref":"sql-call","note":"CALL with typecast :: expression as argument"}
+{"id":"doca0113","category":"do-call","sql":"CALL s.p(NULL);","expect":"ok","ref":"sql-call","note":"CALL with NULL argument"}
+{"id":"doca0114","category":"do-call","sql":"CALL s.p(n => NULL);","expect":"ok","ref":"sql-call","note":"CALL with named NULL argument"}
+{"id":"doca0115","category":"do-call","sql":"CALL s.p((SELECT 2));","expect":"error","ref":"sql-call","note":"CALL with scalar subquery as argument — not permitted (semantic error)"}
+{"id":"doca0116","category":"do-call","sql":"CALL s.p(1, 2);","expect":"error","ref":"sql-call","note":"CALL with too many arguments — semantic error"}
+{"id":"doca0117","category":"do-call","sql":"CALL s.p();","expect":"error","ref":"sql-call","note":"CALL with missing required argument — semantic error"}
+{"id":"doca0118","category":"do-call","sql":"CALL s.f(1);","expect":"error","ref":"sql-call","note":"CALL on a function (not procedure) — semantic error"}
+{"id":"doca0119","category":"do-call","sql":"CALL s.t(1);","expect":"error","ref":"sql-call","note":"CALL on a table name — semantic error"}
+{"id":"doca0120","category":"do-call","sql":"CALL nonexistent_proc(1);","expect":"error","ref":"sql-call","note":"CALL on non-existent procedure — semantic error"}
+{"id":"doca0121","category":"do-call","sql":"CALL;","expect":"error","ref":"sql-call","note":"CALL with no procedure name — syntax error"}
+{"id":"doca0122","category":"do-call","sql":"CALL s.p 1;","expect":"error","ref":"sql-call","note":"CALL without parentheses — syntax error"}
+{"id":"doca0123","category":"do-call","sql":"CALL s.p(n => 1, n => 2);","expect":"error","ref":"sql-call","note":"CALL with duplicate named argument — semantic error"}
+{"id":"doca0124","category":"do-call","sql":"CALL s.p(nosuchparam => 1);","expect":"error","ref":"sql-call","note":"CALL with non-existent named parameter — semantic error"}
+{"id":"doca0125","category":"do-call","sql":"DO $$ DECLARE p text; BEGIN p := 'test'; EXECUTE 'CALL s.p($1)' USING 1; END $$;","expect":"ok","ref":"sql-do","note":"dynamic CALL inside DO block using EXECUTE USING"}
+{"id":"doca0126","category":"do-call","sql":"DO $$ BEGIN CALL s.p(1); CALL s.p(2); END $$;","expect":"ok","ref":"sql-do","note":"multiple CALL statements inside single DO block"}
+{"id":"doca0127","category":"do-call","sql":"DO $$ DECLARE x integer := 3; BEGIN CALL s.p(x); END $$;","expect":"ok","ref":"sql-do","note":"CALL with variable as argument inside DO block"}
+{"id":"doca0128","category":"do-call","sql":"DO $$ BEGIN\n  IF true THEN\n    CALL s.p(1);\n  END IF;\nEND $$;","expect":"ok","ref":"sql-do","note":"CALL inside conditional branch in DO block"}
+{"id":"doca0129","category":"do-call","sql":"CREATE PROCEDURE s.pout(INOUT result integer) LANGUAGE plpgsql AS $$ BEGIN result := result * 2; END $$;\nCALL s.pout(5);\nDROP PROCEDURE s.pout(integer);","expect":"ok","ref":"sql-call","note":"CALL procedure with INOUT parameter — result returned"}
+{"id":"doca0130","category":"do-call","sql":"CREATE PROCEDURE s.pout2(IN a integer, INOUT b integer) LANGUAGE plpgsql AS $$ BEGIN b := a + b; END $$;\nCALL s.pout2(3, 4);\nDROP PROCEDURE s.pout2(integer, integer);","expect":"ok","ref":"sql-call","note":"CALL procedure with IN and INOUT parameters"}
+{"id":"doca0131","category":"do-call","sql":"CREATE PROCEDURE s.pout3(OUT x integer) LANGUAGE plpgsql AS $$ BEGIN x := 42; END $$;\nCALL s.pout3(NULL);\nDROP PROCEDURE s.pout3(integer);","expect":"ok","ref":"sql-call","note":"CALL procedure with OUT parameter, NULL placeholder convention"}
+{"id":"doca0132","category":"do-call","sql":"CREATE PROCEDURE s.pmulti(IN a integer, IN b integer, OUT c integer) LANGUAGE plpgsql AS $$ BEGIN c := a + b; END $$;\nCALL s.pmulti(1, 2, NULL);\nDROP PROCEDURE s.pmulti(integer, integer, integer);","expect":"ok","ref":"sql-call","note":"CALL procedure with multiple IN and one OUT parameter"}
+{"id":"doca0133","category":"do-call","sql":"CREATE PROCEDURE s.pnamed(IN x integer DEFAULT 10, IN y integer DEFAULT 20) LANGUAGE plpgsql AS $$ BEGIN PERFORM x + y; END $$;\nCALL s.pnamed();\nDROP PROCEDURE s.pnamed(integer, integer);","expect":"ok","ref":"sql-call","note":"CALL procedure with all-default parameters — empty arg list"}
+{"id":"doca0134","category":"do-call","sql":"CREATE PROCEDURE s.pnamed2(IN x integer DEFAULT 10, IN y integer DEFAULT 20) LANGUAGE plpgsql AS $$ BEGIN PERFORM x + y; END $$;\nCALL s.pnamed2(y => 5);\nDROP PROCEDURE s.pnamed2(integer, integer);","expect":"ok","ref":"sql-call","note":"CALL with named arg skipping first defaulted parameter"}
+{"id":"doca0135","category":"do-call","sql":"DO $$ BEGIN END $$; DO $$ BEGIN END $$;","expect":"ok","ref":"sql-do","note":"two DO blocks as separate statements in single case"}
+{"id":"doca0136","category":"do-call","sql":"DO $outer$ BEGIN DO $inner$ BEGIN NULL; END $inner$; END $outer$;","expect":"ok","ref":"sql-do","note":"nested DO inside DO via EXECUTE — plpgsql executes inner DO as dynamic SQL"}
+{"id":"doca0137","category":"do-call","sql":"DO $$ BEGIN END $$ ; -- trailing comment","expect":"ok","ref":"sql-do","note":"DO block with trailing comment after semicolon"}
+{"id":"doca0138","category":"do-call","sql":"/* leading comment */ DO $$ BEGIN END $$;","expect":"ok","ref":"sql-do","note":"leading block comment before DO"}
+{"id":"doca0139","category":"do-call","sql":"DO $$ DECLARE x integer := 2147483647; BEGIN PERFORM x + 0; END $$;","expect":"ok","ref":"sql-do","note":"max integer value in DO block"}
+{"id":"doca0140","category":"do-call","sql":"DO $$ DECLARE x bigint := 9223372036854775807; BEGIN PERFORM x; END $$;","expect":"ok","ref":"sql-do","note":"max bigint value in DO block"}
+{"id":"doca0141","category":"do-call","sql":"DO $$ DECLARE x numeric := 1.23456789012345678901234567890; BEGIN PERFORM x; END $$;","expect":"ok","ref":"sql-do","note":"high-precision numeric literal in DO block"}
+{"id":"doca0142","category":"do-call","sql":"DO $$ DECLARE x text := U&'\\0041\\0042\\0043'; BEGIN PERFORM x; END $$;","expect":"ok","ref":"sql-do","note":"Unicode escape string literal in DO block"}
+{"id":"doca0143","category":"do-call","sql":"DO $$ DECLARE x bytea := '\\xDEADBEEF'; BEGIN PERFORM x; END $$;","expect":"ok","ref":"sql-do","note":"bytea hex literal in DO block"}
+{"id":"doca0144","category":"do-call","sql":"DO $$ DECLARE x timestamptz := '2024-01-01 00:00:00+00'; BEGIN PERFORM x; END $$;","expect":"ok","ref":"sql-do","note":"timestamptz literal assignment in DO block"}
+{"id":"doca0145","category":"do-call","sql":"DO $$ DECLARE x interval := '1 year 2 months 3 days'; BEGIN PERFORM x; END $$;","expect":"ok","ref":"sql-do","note":"interval literal assignment in DO block"}
+{"id":"doca0146","category":"do-call","sql":"DO $$ DECLARE x uuid := 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'; BEGIN PERFORM x; END $$;","expect":"ok","ref":"sql-do","note":"uuid literal assignment in DO block"}
+{"id":"doca0147","category":"do-call","sql":"DO $$ DECLARE x jsonb := '{\"key\": \"value\"}'; BEGIN PERFORM x; END $$;","expect":"ok","ref":"sql-do","note":"jsonb literal assignment in DO block"}
+{"id":"doca0148","category":"do-call","sql":"CALL s.p(n => 1, n => 1);","expect":"error","ref":"sql-call","note":"repeated named parameter in CALL — error"}
+{"id":"doca0149","category":"do-call","sql":"DO $$ AS $inner$ BEGIN END $inner$ $$;","expect":"error","ref":"sql-do","note":"AS keyword inside dollar-quoted body — invalid plpgsql syntax"}
+{"id":"doca0150","category":"do-call","sql":"DO $$ DECLARE x integer; BEGIN SELECT 1 INTO x; RETURN; END $$;","expect":"ok","ref":"sql-do","note":"RETURN with no value (void) after statements — valid in DO"}

@@ -1,0 +1,20 @@
+{"id":"updc0001","category":"update","sql":"UPDATE s.t SET name = 'new_name'","expect":"ok","ref":"sql-update","note":"minimal UPDATE: SET single column with scalar literal"}
+{"id":"updc0002","category":"update","sql":"UPDATE s.t SET name = 'multi', qty = 5, flag = true","expect":"ok","ref":"sql-update","note":"SET multiple columns with comma-separated assignments"}
+{"id":"updc0003","category":"update","sql":"UPDATE s.t SET val = NULL WHERE id = 1","expect":"ok","ref":"sql-update","note":"SET column to NULL with WHERE clause filtering by primary key"}
+{"id":"updc0004","category":"update","sql":"UPDATE s.t SET (name, qty) = ('tuple_name', 42)","expect":"ok","ref":"sql-update","note":"SET column-list tuple syntax with row literal on RHS"}
+{"id":"updc0005","category":"update","sql":"UPDATE s.t SET (name, qty) = (SELECT label, 99 FROM s.t2 LIMIT 1)","expect":"ok","ref":"sql-update","note":"SET column-list tuple from subselect on RHS"}
+{"id":"updc0006","category":"update","sql":"UPDATE s.t SET qty = DEFAULT","expect":"ok","ref":"sql-update","note":"SET column to DEFAULT keyword (resets to column default)"}
+{"id":"updc0007","category":"update","sql":"UPDATE s.t AS upd SET name = upd.name || '_sfx' WHERE upd.qty > 0","expect":"ok","ref":"sql-update","note":"table alias in UPDATE with alias reference in SET expression and WHERE"}
+{"id":"updc0008","category":"update","sql":"UPDATE s.t SET val = t2.amount FROM s.t2 WHERE s.t.id = s.t2.t_id","expect":"ok","ref":"sql-update","note":"FROM clause joining secondary table; SET value from joined table"}
+{"id":"updc0009","category":"update","sql":"UPDATE s.t SET qty = qty + 1 WHERE id IN (SELECT t_id FROM s.t2 WHERE amount > 0) RETURNING id, qty","expect":"ok","ref":"sql-update","note":"subselect in WHERE + RETURNING clause"}
+{"id":"updc0010","category":"update","sql":"UPDATE ONLY s.parent SET kind = 'base_only' WHERE id = 1","expect":"ok","ref":"sql-update","note":"ONLY keyword restricts update to parent table, excluding child rows"}
+{"id":"updc0011","category":"update","sql":"UPDATE s.t SET name = 'ret_all', qty = 0 RETURNING *","expect":"ok","ref":"sql-update","note":"RETURNING * returns all columns of updated rows"}
+{"id":"updc0012","category":"update","sql":"UPDATE s.t SET val = val * 1.1 WHERE flag = false RETURNING id, val AS new_val","expect":"ok","ref":"sql-update","note":"RETURNING with expression alias"}
+{"id":"updc0013","category":"update","sql":"UPDATE s.t SET name = (SELECT label FROM s.t2 WHERE s.t2.t_id = s.t.id LIMIT 1)","expect":"ok","ref":"sql-update","note":"correlated subquery in SET expression"}
+{"id":"updc0014","category":"update","sql":"UPDATE s.t2 SET amount = amount + s.t.val FROM s.t WHERE s.t.id = s.t2.t_id AND s.t.flag = true RETURNING s.t2.id, s.t2.amount","expect":"ok","ref":"sql-update","note":"FROM with WHERE join condition, RETURNING columns from updated table"}
+{"id":"updc0015","category":"update","sql":"UPDATE s.t SET name = 'a' WHERE id = 1; UPDATE s.t SET name = 'b' WHERE id = 2","expect":"ok","ref":"sql-update","note":"two UPDATE statements sequentially in one case"}
+{"id":"updc0016","category":"update","sql":"UPDATE s.t SET","expect":"error","ref":"sql-update","note":"syntax error: SET with no assignments"}
+{"id":"updc0017","category":"update","sql":"UPDATE s.t name = 'missing_set'","expect":"error","ref":"sql-update","note":"syntax error: missing SET keyword"}
+{"id":"updc0018","category":"update","sql":"UPDATE s.t SET name 'no_eq'","expect":"error","ref":"sql-update","note":"syntax error: missing = in SET assignment"}
+{"id":"updc0019","category":"update","sql":"UPDATE s.t SET (name, qty) = (SELECT 'too_few' LIMIT 1)","expect":"error","ref":"sql-update","note":"error: column-list tuple subselect returns fewer columns than target list"}
+{"id":"updc0020","category":"update","sql":"UPDATE s.t SET qty = qty + 1 RETURNING","expect":"error","ref":"sql-update","note":"syntax error: RETURNING with no output expressions"}

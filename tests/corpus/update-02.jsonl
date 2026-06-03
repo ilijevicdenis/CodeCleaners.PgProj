@@ -1,0 +1,170 @@
+{"id":"updb0001","category":"update","sql":"UPDATE s.t SET name = 'x'","expect":"ok","ref":"sql-update","note":"basic single column update no WHERE"}
+{"id":"updb0002","category":"update","sql":"UPDATE s.t SET name = 'x' WHERE id = 1","expect":"ok","ref":"sql-update","note":"basic single column update with WHERE"}
+{"id":"updb0003","category":"update","sql":"UPDATE s.t SET name = 'a', val = 1.5","expect":"ok","ref":"sql-update","note":"two column SET list"}
+{"id":"updb0004","category":"update","sql":"UPDATE s.t SET name = 'a', val = 1.5, qty = 10","expect":"ok","ref":"sql-update","note":"three column SET list"}
+{"id":"updb0005","category":"update","sql":"UPDATE s.t SET name = 'a', val = 2.0, qty = 5, flag = true","expect":"ok","ref":"sql-update","note":"four column SET list"}
+{"id":"updb0006","category":"update","sql":"UPDATE s.t SET qty = qty + 1","expect":"ok","ref":"sql-update","note":"SET column to expression referencing itself"}
+{"id":"updb0007","category":"update","sql":"UPDATE s.t SET val = val * 2 WHERE val IS NOT NULL","expect":"ok","ref":"sql-update","note":"arithmetic expression in SET with IS NOT NULL WHERE"}
+{"id":"updb0008","category":"update","sql":"UPDATE s.t SET flag = NOT flag","expect":"ok","ref":"sql-update","note":"boolean negation in SET"}
+{"id":"updb0009","category":"update","sql":"UPDATE s.t SET name = upper(name)","expect":"ok","ref":"sql-update","note":"function call in SET expression"}
+{"id":"updb0010","category":"update","sql":"UPDATE s.t SET data = '{\"k\":\"v\"}'::jsonb","expect":"ok","ref":"sql-update","note":"cast expression in SET"}
+{"id":"updb0011","category":"update","sql":"UPDATE s.t SET qty = DEFAULT","expect":"ok","ref":"sql-update","note":"SET single column to DEFAULT"}
+{"id":"updb0012","category":"update","sql":"UPDATE s.t SET flag = DEFAULT, qty = DEFAULT","expect":"ok","ref":"sql-update","note":"SET multiple columns to DEFAULT"}
+{"id":"updb0013","category":"update","sql":"UPDATE s.t SET (name, val) = ('a', 1.0)","expect":"ok","ref":"sql-update","note":"multi-column tuple SET form"}
+{"id":"updb0014","category":"update","sql":"UPDATE s.t SET (name, val, qty) = ('b', 2.5, 3)","expect":"ok","ref":"sql-update","note":"three-column tuple SET form"}
+{"id":"updb0015","category":"update","sql":"UPDATE s.t SET (qty, flag) = (0, false)","expect":"ok","ref":"sql-update","note":"tuple SET two columns"}
+{"id":"updb0016","category":"update","sql":"UPDATE s.t SET (name, val) = ROW('c', 3.0)","expect":"ok","ref":"sql-update","note":"tuple SET with ROW keyword"}
+{"id":"updb0017","category":"update","sql":"UPDATE s.t SET (name, qty) = ROW('d', 7)","expect":"ok","ref":"sql-update","note":"tuple SET ROW two cols"}
+{"id":"updb0018","category":"update","sql":"UPDATE s.t SET (qty, flag) = (DEFAULT, DEFAULT)","expect":"ok","ref":"sql-update","note":"tuple SET all DEFAULT values"}
+{"id":"updb0019","category":"update","sql":"UPDATE s.t SET (name, qty) = (SELECT 'sub', 42)","expect":"ok","ref":"sql-update","note":"tuple SET from scalar subselect"}
+{"id":"updb0020","category":"update","sql":"UPDATE s.t SET (name, val) = (SELECT t2.label, t2.amount FROM s.t2 t2 WHERE t2.t_id = s.t.id LIMIT 1)","expect":"ok","ref":"sql-update","note":"tuple SET from correlated subselect"}
+{"id":"updb0021","category":"update","sql":"UPDATE s.t SET name = (SELECT label FROM s.t2 WHERE t_id = s.t.id LIMIT 1)","expect":"ok","ref":"sql-update","note":"single column SET from correlated subselect"}
+{"id":"updb0022","category":"update","sql":"UPDATE s.t SET val = (SELECT max(amount) FROM s.t2)","expect":"ok","ref":"sql-update","note":"single column SET from aggregate subselect"}
+{"id":"updb0023","category":"update","sql":"UPDATE s.t SET qty = (SELECT count(*) FROM s.t2)::integer","expect":"ok","ref":"sql-update","note":"subselect with cast in SET"}
+{"id":"updb0024","category":"update","sql":"UPDATE ONLY s.parent SET kind = 'base'","expect":"ok","ref":"sql-update","note":"ONLY keyword prevents update on child tables"}
+{"id":"updb0025","category":"update","sql":"UPDATE s.parent SET kind = 'all'","expect":"ok","ref":"sql-update","note":"update parent without ONLY includes children"}
+{"id":"updb0026","category":"update","sql":"UPDATE ONLY s.parent * SET kind = 'star'","expect":"error","ref":"sql-update","note":"ONLY with * is a syntax error"}
+{"id":"updb0027","category":"update","sql":"UPDATE s.parent * SET kind = 'star'","expect":"ok","ref":"sql-update","note":"table_name * explicitly includes descendants"}
+{"id":"updb0028","category":"update","sql":"UPDATE s.t AS tbl SET name = 'aliased' WHERE tbl.id = 1","expect":"ok","ref":"sql-update","note":"table alias usable in WHERE but not in SET column reference"}
+{"id":"updb0029","category":"update","sql":"UPDATE s.t tbl SET name = 'no-as' WHERE tbl.qty > 0","expect":"ok","ref":"sql-update","note":"table alias without AS keyword used in WHERE"}
+{"id":"updb0030","category":"update","sql":"UPDATE s.t AS u SET name = 'alias2', qty = 0 WHERE u.id = 1","expect":"ok","ref":"sql-update","note":"alias used in WHERE, unqualified col names in SET"}
+{"id":"updb0031","category":"update","sql":"UPDATE s.t SET name = 'x' WHERE id = 1 RETURNING id","expect":"ok","ref":"sql-update","note":"RETURNING single column"}
+{"id":"updb0032","category":"update","sql":"UPDATE s.t SET name = 'x' RETURNING *","expect":"ok","ref":"sql-update","note":"RETURNING star"}
+{"id":"updb0033","category":"update","sql":"UPDATE s.t SET qty = qty + 1 RETURNING id, name, qty","expect":"ok","ref":"sql-update","note":"RETURNING multiple columns"}
+{"id":"updb0034","category":"update","sql":"UPDATE s.t SET val = 5.0 RETURNING id AS updated_id, val AS new_val","expect":"ok","ref":"sql-update","note":"RETURNING with column aliases"}
+{"id":"updb0035","category":"update","sql":"UPDATE s.t SET name = 'x' RETURNING name || '_done' AS label","expect":"ok","ref":"sql-update","note":"RETURNING with expression"}
+{"id":"updb0036","category":"update","sql":"UPDATE s.t SET qty = 0 RETURNING NEW.qty AS new_qty","expect":"ok","ref":"sql-update","note":"RETURNING NEW.column explicit"}
+{"id":"updb0037","category":"update","sql":"UPDATE s.t SET qty = 99 RETURNING OLD.qty AS old_qty, NEW.qty AS new_qty","expect":"ok","ref":"sql-update","note":"RETURNING OLD and NEW columns"}
+{"id":"updb0038","category":"update","sql":"UPDATE s.t SET name = 'z' RETURNING WITH (OLD AS before, NEW AS after) before.name, after.name","expect":"ok","ref":"sql-update","note":"RETURNING WITH OLD/NEW aliases"}
+{"id":"updb0039","category":"update","sql":"UPDATE s.t SET val = 1.0 RETURNING WITH (OLD AS o) o.val AS old_val, val AS new_val","expect":"ok","ref":"sql-update","note":"RETURNING WITH only OLD alias"}
+{"id":"updb0040","category":"update","sql":"UPDATE s.t SET name = 'a' FROM s.t2 WHERE s.t2.t_id = s.t.id","expect":"ok","ref":"sql-update","note":"FROM clause join to another table"}
+{"id":"updb0041","category":"update","sql":"UPDATE s.t SET name = s.t2.label FROM s.t2 WHERE s.t2.t_id = s.t.id","expect":"ok","ref":"sql-update","note":"FROM clause value from joined table in SET"}
+{"id":"updb0042","category":"update","sql":"UPDATE s.t SET name = t2.label, val = t2.amount FROM s.t2 t2 WHERE t2.t_id = s.t.id","expect":"ok","ref":"sql-update","note":"FROM with alias, two SET cols from joined table"}
+{"id":"updb0043","category":"update","sql":"UPDATE s.t SET qty = 0 FROM s.t2 a, s.t2 b WHERE a.t_id = s.t.id AND b.t_id = s.t.id","expect":"ok","ref":"sql-update","note":"FROM with two aliased references to same table"}
+{"id":"updb0044","category":"update","sql":"UPDATE s.t2 SET amount = s.t.val FROM s.t WHERE s.t.id = s.t2.t_id AND s.t.val > 100","expect":"ok","ref":"sql-update","note":"FROM with WHERE condition on joined table"}
+{"id":"updb0045","category":"update","sql":"UPDATE s.t SET flag = true FROM s.t2 INNER JOIN s.t AS src ON s.t2.t_id = src.id WHERE s.t.id = src.id","expect":"ok","ref":"sql-update","note":"FROM with JOIN that also references target table via alias"}
+{"id":"updb0046","category":"update","sql":"UPDATE s.t SET name = 'joined' FROM (SELECT id AS sid, label FROM s.t2) sub WHERE sub.sid = s.t.id","expect":"ok","ref":"sql-update","note":"FROM with derived table subquery"}
+{"id":"updb0047","category":"update","sql":"UPDATE s.t SET name = 'fromcte' FROM (WITH cte AS (SELECT t_id, label FROM s.t2) SELECT * FROM cte) sub WHERE sub.t_id = s.t.id","expect":"ok","ref":"sql-update","note":"FROM with CTE wrapped in subquery"}
+{"id":"updb0048","category":"update","sql":"WITH src AS (SELECT id, label FROM s.t2) UPDATE s.t SET name = src.label FROM src WHERE src.id = s.t.id","expect":"ok","ref":"sql-update","note":"WITH CTE referenced in FROM"}
+{"id":"updb0049","category":"update","sql":"WITH src AS (SELECT t_id, max(amount) AS ma FROM s.t2 GROUP BY t_id) UPDATE s.t SET val = src.ma FROM src WHERE src.t_id = s.t.id","expect":"ok","ref":"sql-update","note":"WITH CTE with aggregate referenced in FROM"}
+{"id":"updb0050","category":"update","sql":"WITH RECURSIVE r AS (SELECT id, 0 AS depth FROM s.t WHERE id = 1 UNION ALL SELECT s.t.id, r.depth+1 FROM s.t JOIN r ON s.t.id = r.id+1 WHERE r.depth < 3) UPDATE s.t SET qty = r.depth FROM r WHERE r.id = s.t.id","expect":"ok","ref":"sql-update","note":"WITH RECURSIVE CTE used in UPDATE FROM"}
+{"id":"updb0051","category":"update","sql":"WITH u AS (UPDATE s.t2 SET amount = 0 RETURNING t_id) UPDATE s.t SET val = 0 FROM u WHERE u.t_id = s.t.id","expect":"ok","ref":"sql-update","note":"WITH writable CTE chaining two updates"}
+{"id":"updb0052","category":"update","sql":"UPDATE s.t SET name = 'x' WHERE name = 'old'","expect":"ok","ref":"sql-update","note":"WHERE equality on text column"}
+{"id":"updb0053","category":"update","sql":"UPDATE s.t SET qty = qty + 1 WHERE qty < 100","expect":"ok","ref":"sql-update","note":"WHERE comparison on numeric"}
+{"id":"updb0054","category":"update","sql":"UPDATE s.t SET flag = true WHERE flag = false AND val IS NOT NULL","expect":"ok","ref":"sql-update","note":"WHERE compound AND condition"}
+{"id":"updb0055","category":"update","sql":"UPDATE s.t SET name = 'default_name' WHERE name IS NULL OR name = ''","expect":"ok","ref":"sql-update","note":"WHERE IS NULL OR condition"}
+{"id":"updb0056","category":"update","sql":"UPDATE s.t SET qty = 0 WHERE id IN (1, 2, 3)","expect":"ok","ref":"sql-update","note":"WHERE IN list"}
+{"id":"updb0057","category":"update","sql":"UPDATE s.t SET qty = 0 WHERE id NOT IN (1, 2, 3)","expect":"ok","ref":"sql-update","note":"WHERE NOT IN list"}
+{"id":"updb0058","category":"update","sql":"UPDATE s.t SET val = 0 WHERE id BETWEEN 1 AND 100","expect":"ok","ref":"sql-update","note":"WHERE BETWEEN"}
+{"id":"updb0059","category":"update","sql":"UPDATE s.t SET name = 'match' WHERE name LIKE 'prefix%'","expect":"ok","ref":"sql-update","note":"WHERE LIKE pattern"}
+{"id":"updb0060","category":"update","sql":"UPDATE s.t SET name = 'match' WHERE name ILIKE 'prefix%'","expect":"ok","ref":"sql-update","note":"WHERE ILIKE case-insensitive pattern"}
+{"id":"updb0061","category":"update","sql":"UPDATE s.t SET name = 'regex' WHERE name ~ '^[a-z]'","expect":"ok","ref":"sql-update","note":"WHERE regex match"}
+{"id":"updb0062","category":"update","sql":"UPDATE s.t SET status = 'happy' WHERE status = 'sad'","expect":"ok","ref":"sql-update","note":"WHERE enum column equality"}
+{"id":"updb0063","category":"update","sql":"UPDATE s.t SET data = data || '{\"new\":true}'::jsonb WHERE data IS NOT NULL","expect":"ok","ref":"sql-update","note":"jsonb concatenation in SET with WHERE jsonb not null"}
+{"id":"updb0064","category":"update","sql":"UPDATE s.t SET tags = ARRAY['a','b'] WHERE tags IS NULL","expect":"ok","ref":"sql-update","note":"SET array column with array literal"}
+{"id":"updb0065","category":"update","sql":"UPDATE s.t SET tags = tags || '{\"c\"}' WHERE tags IS NOT NULL","expect":"ok","ref":"sql-update","note":"array append in SET"}
+{"id":"updb0066","category":"update","sql":"UPDATE s.t SET qty = 0 WHERE id = ANY(ARRAY[1,2,3])","expect":"ok","ref":"sql-update","note":"WHERE ANY array condition"}
+{"id":"updb0067","category":"update","sql":"UPDATE s.t SET qty = 0 WHERE id = ANY(SELECT id FROM s.t2 WHERE amount > 0)","expect":"ok","ref":"sql-update","note":"WHERE ANY subquery condition"}
+{"id":"updb0068","category":"update","sql":"UPDATE s.t SET val = 0 WHERE EXISTS (SELECT 1 FROM s.t2 WHERE t2.t_id = s.t.id)","expect":"ok","ref":"sql-update","note":"WHERE EXISTS subquery"}
+{"id":"updb0069","category":"update","sql":"UPDATE s.t SET val = 0 WHERE NOT EXISTS (SELECT 1 FROM s.t2 WHERE t2.t_id = s.t.id)","expect":"ok","ref":"sql-update","note":"WHERE NOT EXISTS subquery"}
+{"id":"updb0070","category":"update","sql":"UPDATE s.t SET name = 'x' WHERE id = (SELECT min(id) FROM s.t2)","expect":"ok","ref":"sql-update","note":"WHERE scalar subquery comparison"}
+{"id":"updb0071","category":"update","sql":"UPDATE s.t SET name = 'x' RETURNING id, name","expect":"ok","ref":"sql-update","note":"RETURNING with explicit column list"}
+{"id":"updb0072","category":"update","sql":"UPDATE s.t SET qty = qty + 1 RETURNING id, qty AS new_qty, qty - 1 AS old_qty","expect":"ok","ref":"sql-update","note":"RETURNING with expression simulating old value"}
+{"id":"updb0073","category":"update","sql":"UPDATE s.t SET name = 'x' RETURNING s.f(qty) AS computed","expect":"ok","ref":"sql-update","note":"RETURNING with function call expression"}
+{"id":"updb0074","category":"update","sql":"UPDATE s.t SET val = 1.0 RETURNING OLD.val, NEW.val","expect":"ok","ref":"sql-update","note":"RETURNING OLD and NEW implicit aliases"}
+{"id":"updb0075","category":"update","sql":"UPDATE s.t SET name = 'x' RETURNING WITH (NEW AS n) n.name","expect":"ok","ref":"sql-update","note":"RETURNING WITH only NEW alias"}
+{"id":"updb0076","category":"update","sql":"UPDATE s.t2 SET amount = amount + 1 RETURNING *","expect":"ok","ref":"sql-update","note":"RETURNING star on t2"}
+{"id":"updb0077","category":"update","sql":"UPDATE s.t SET name = 'x', val = 1.0, qty = 5, flag = true, tags = NULL, data = NULL RETURNING id","expect":"ok","ref":"sql-update","note":"UPDATE many columns including NULLs"}
+{"id":"updb0078","category":"update","sql":"UPDATE s.t SET home = ROW('123 Main','Springfield','12345')::s.addr","expect":"ok","ref":"sql-update","note":"SET composite type column via ROW cast"}
+{"id":"updb0079","category":"update","sql":"UPDATE s.t SET home = ('456 Oak','Shelbyville','67890')::s.addr","expect":"ok","ref":"sql-update","note":"SET composite type column via tuple cast"}
+{"id":"updb0080","category":"update","sql":"UPDATE s.t SET span = int4range(1,10)","expect":"ok","ref":"sql-update","note":"SET range type column"}
+{"id":"updb0081","category":"update","sql":"UPDATE s.t SET created_at = now()","expect":"ok","ref":"sql-update","note":"SET timestamptz column to now()"}
+{"id":"updb0082","category":"update","sql":"UPDATE s.t SET created_at = CURRENT_TIMESTAMP","expect":"ok","ref":"sql-update","note":"SET timestamptz to CURRENT_TIMESTAMP"}
+{"id":"updb0083","category":"update","sql":"UPDATE s.t SET name = $1","expect":"error","ref":"sql-update","note":"parameter placeholder outside prepared statement context errors semantically"}
+{"id":"updb0084","category":"update","sql":"UPDATE s.t SET name = 'x' WHERE false","expect":"ok","ref":"sql-update","note":"WHERE false updates nothing but is valid"}
+{"id":"updb0085","category":"update","sql":"UPDATE s.t SET name = 'x' WHERE true","expect":"ok","ref":"sql-update","note":"WHERE true updates all rows"}
+{"id":"updb0086","category":"update","sql":"UPDATE s.t SET name = 'x' WHERE 1 = 1","expect":"ok","ref":"sql-update","note":"WHERE tautology"}
+{"id":"updb0087","category":"update","sql":"UPDATE s.t SET name = CASE WHEN qty > 0 THEN 'positive' ELSE 'zero' END","expect":"ok","ref":"sql-update","note":"CASE expression in SET"}
+{"id":"updb0088","category":"update","sql":"UPDATE s.t SET val = CASE status WHEN 'happy' THEN 10.0 WHEN 'sad' THEN 1.0 ELSE 5.0 END","expect":"ok","ref":"sql-update","note":"simple CASE expression in SET"}
+{"id":"updb0089","category":"update","sql":"UPDATE s.t SET name = COALESCE(name, 'default')","expect":"ok","ref":"sql-update","note":"COALESCE in SET"}
+{"id":"updb0090","category":"update","sql":"UPDATE s.t SET val = NULLIF(val, 0)","expect":"ok","ref":"sql-update","note":"NULLIF in SET"}
+{"id":"updb0091","category":"update","sql":"UPDATE s.t SET name = NULLIF(name, '')","expect":"ok","ref":"sql-update","note":"NULLIF empty string in SET"}
+{"id":"updb0092","category":"update","sql":"UPDATE s.t SET qty = GREATEST(qty, 0)","expect":"ok","ref":"sql-update","note":"GREATEST function in SET"}
+{"id":"updb0093","category":"update","sql":"UPDATE s.t SET qty = LEAST(qty, 1000)","expect":"ok","ref":"sql-update","note":"LEAST function in SET"}
+{"id":"updb0094","category":"update","sql":"UPDATE s.t SET val = val + 1 WHERE id IN (SELECT t_id FROM s.t2 WHERE amount > 50)","expect":"ok","ref":"sql-update","note":"WHERE IN with subquery"}
+{"id":"updb0095","category":"update","sql":"UPDATE s.t2 SET label = 'top' FROM (SELECT t_id FROM s.t2 ORDER BY amount DESC LIMIT 1) top WHERE s.t2.t_id = top.t_id","expect":"ok","ref":"sql-update","note":"FROM with LIMIT subquery"}
+{"id":"updb0096","category":"update","sql":"UPDATE s.t SET name = 'x' SET val = 1.0","expect":"error","ref":"sql-update","note":"duplicate SET keyword is a syntax error"}
+{"id":"updb0097","category":"update","sql":"UPDATE s.t name = 'x'","expect":"error","ref":"sql-update","note":"missing SET keyword is a syntax error"}
+{"id":"updb0098","category":"update","sql":"UPDATE SET name = 'x'","expect":"error","ref":"sql-update","note":"missing table name is a syntax error"}
+{"id":"updb0099","category":"update","sql":"UPDATE s.t SET","expect":"error","ref":"sql-update","note":"SET with no assignments is a syntax error"}
+{"id":"updb0100","category":"update","sql":"UPDATE s.t SET name 'x'","expect":"error","ref":"sql-update","note":"missing = in SET is a syntax error"}
+{"id":"updb0101","category":"update","sql":"UPDATE s.t SET = 'x'","expect":"error","ref":"sql-update","note":"SET with no column name is a syntax error"}
+{"id":"updb0102","category":"update","sql":"UPDATE s.t SET name = 'x', WHERE id = 1","expect":"error","ref":"sql-update","note":"trailing comma before WHERE is a syntax error"}
+{"id":"updb0103","category":"update","sql":"UPDATE s.t SET (name) = 'x'","expect":"error","ref":"sql-update","note":"tuple LHS but scalar RHS is a syntax error"}
+{"id":"updb0104","category":"update","sql":"UPDATE s.t SET () = ()","expect":"error","ref":"sql-update","note":"empty tuple LHS is a syntax error"}
+{"id":"updb0105","category":"update","sql":"UPDATE s.t SET (name, val) = ('a')","expect":"error","ref":"sql-update","note":"tuple column count mismatch is a semantic error"}
+{"id":"updb0106","category":"update","sql":"UPDATE s.t SET name = 'x' WHERE","expect":"error","ref":"sql-update","note":"WHERE with no condition is a syntax error"}
+{"id":"updb0107","category":"update","sql":"UPDATE s.t SET name = 'x' RETURNING","expect":"error","ref":"sql-update","note":"RETURNING with no columns is a syntax error"}
+{"id":"updb0108","category":"update","sql":"UPDATE s.t SET name = 'x' FROM","expect":"error","ref":"sql-update","note":"FROM with no table is a syntax error"}
+{"id":"updb0109","category":"update","sql":"UPDATE s.nonexistent SET name = 'x'","expect":"error","ref":"sql-update","note":"nonexistent table is a semantic error"}
+{"id":"updb0110","category":"update","sql":"UPDATE s.t SET nonexistent_col = 'x'","expect":"error","ref":"sql-update","note":"nonexistent column is a semantic error"}
+{"id":"updb0111","category":"update","sql":"UPDATE s.t SET id = 'not_a_number'","expect":"error","ref":"sql-update","note":"type mismatch in SET is a semantic error"}
+{"id":"updb0112","category":"update","sql":"UPDATE s.t SET name = 'x', name = 'y'","expect":"error","ref":"sql-update","note":"duplicate column in SET list is a semantic error"}
+{"id":"updb0113","category":"update","sql":"UPDATE s.mv SET n = 1","expect":"error","ref":"sql-update","note":"update materialized view is rejected with error"}
+{"id":"updb0114","category":"update","sql":"UPDATE s.t SET name = 'x'; UPDATE s.t SET val = 1.0","expect":"ok","ref":"sql-update","note":"two UPDATE statements in one case"}
+{"id":"updb0115","category":"update","sql":"UPDATE s.t SET name = 'x' WHERE id = 1; UPDATE s.t2 SET amount = 5.0 WHERE t_id = 1","expect":"ok","ref":"sql-update","note":"UPDATE on two different tables sequentially"}
+{"id":"updb0116","category":"update","sql":"UPDATE s.t SET qty = qty + 1 FROM s.t2 WHERE s.t2.t_id = s.t.id RETURNING s.t.id, s.t.qty","expect":"ok","ref":"sql-update","note":"FROM + RETURNING with schema-qualified columns"}
+{"id":"updb0117","category":"update","sql":"WITH changed AS (UPDATE s.t SET name = 'changed' WHERE id = 1 RETURNING id, name) SELECT * FROM changed","expect":"ok","ref":"sql-update","note":"UPDATE as CTE with SELECT from it"}
+{"id":"updb0118","category":"update","sql":"WITH moved AS (UPDATE s.t2 SET amount = 0 WHERE amount < 0 RETURNING t_id, amount) SELECT count(*) FROM moved","expect":"ok","ref":"sql-update","note":"writable CTE with aggregate SELECT"}
+{"id":"updb0119","category":"update","sql":"UPDATE s.t SET name = 'x' WHERE id = (SELECT id FROM s.t LIMIT 1)","expect":"ok","ref":"sql-update","note":"WHERE subquery referencing target table"}
+{"id":"updb0120","category":"update","sql":"UPDATE s.t AS t1 SET name = t2.label FROM s.t2 AS t2 WHERE t2.t_id = t1.id AND t1.val > 0","expect":"ok","ref":"sql-update","note":"both target and FROM tables aliased"}
+{"id":"updb0121","category":"update","sql":"UPDATE s.t SET name = 'x' FROM s.t2 WHERE s.t2.t_id = s.t.id AND s.t2.amount > 100 RETURNING s.t.id, s.t2.label","expect":"ok","ref":"sql-update","note":"RETURNING can reference FROM clause table columns"}
+{"id":"updb0122","category":"update","sql":"UPDATE s.t SET name = 'x' FROM s.t2 WHERE s.t2.t_id = s.t.id RETURNING s.t.id","expect":"ok","ref":"sql-update","note":"RETURNING target table column with FROM clause"}
+{"id":"updb0123","category":"update","sql":"UPDATE s.t SET (name, val, qty) = (DEFAULT, DEFAULT, DEFAULT)","expect":"ok","ref":"sql-update","note":"tuple SET all columns to DEFAULT"}
+{"id":"updb0124","category":"update","sql":"UPDATE s.t SET name = 'x' WHERE created_at > '2020-01-01'::timestamptz","expect":"ok","ref":"sql-update","note":"WHERE timestamp comparison"}
+{"id":"updb0125","category":"update","sql":"UPDATE s.t SET name = 'x' WHERE span && int4range(1,5)","expect":"ok","ref":"sql-update","note":"WHERE range overlap operator"}
+{"id":"updb0126","category":"update","sql":"UPDATE s.t SET val = 0 WHERE (home).city = 'NYC'","expect":"ok","ref":"sql-update","note":"WHERE composite type field access"}
+{"id":"updb0127","category":"update","sql":"UPDATE s.t SET data = jsonb_set(data, '{key}', '\"val\"') WHERE data IS NOT NULL","expect":"ok","ref":"sql-update","note":"jsonb_set in SET expression"}
+{"id":"updb0128","category":"update","sql":"UPDATE s.t SET data = data - 'oldkey' WHERE data IS NOT NULL","expect":"ok","ref":"sql-update","note":"jsonb delete key operator in SET"}
+{"id":"updb0129","category":"update","sql":"UPDATE s.t SET name = trim(name)","expect":"ok","ref":"sql-update","note":"string function trim in SET"}
+{"id":"updb0130","category":"update","sql":"UPDATE s.t SET name = lower(name)","expect":"ok","ref":"sql-update","note":"lower() in SET"}
+{"id":"updb0131","category":"update","sql":"UPDATE s.t SET val = round(val, 0)","expect":"ok","ref":"sql-update","note":"round() in SET"}
+{"id":"updb0132","category":"update","sql":"UPDATE s.t SET qty = abs(qty)","expect":"ok","ref":"sql-update","note":"abs() in SET"}
+{"id":"updb0133","category":"update","sql":"UPDATE s.t SET name = concat(name, '_suffix')","expect":"ok","ref":"sql-update","note":"concat() in SET"}
+{"id":"updb0134","category":"update","sql":"UPDATE s.t SET name = name || '_appended'","expect":"ok","ref":"sql-update","note":"string concatenation operator in SET"}
+{"id":"updb0135","category":"update","sql":"UPDATE s.t SET tags = NULL WHERE tags = '{}'","expect":"ok","ref":"sql-update","note":"SET array to NULL where empty array"}
+{"id":"updb0136","category":"update","sql":"UPDATE s.t SET val = NULL WHERE val = 0","expect":"ok","ref":"sql-update","note":"SET nullable column to NULL"}
+{"id":"updb0137","category":"update","sql":"UPDATE s.t SET name = 'x' WHERE id > ALL(SELECT id FROM s.t2 WHERE amount < 0)","expect":"ok","ref":"sql-update","note":"WHERE ALL subquery"}
+{"id":"updb0138","category":"update","sql":"UPDATE s.t SET name = 'x' WHERE id > SOME(SELECT id FROM s.t2)","expect":"ok","ref":"sql-update","note":"WHERE SOME subquery"}
+{"id":"updb0139","category":"update","sql":"UPDATE s.t SET status = 'ok'::s.mood","expect":"ok","ref":"sql-update","note":"SET enum column with explicit cast"}
+{"id":"updb0140","category":"update","sql":"UPDATE s.t SET status = 'happy'","expect":"ok","ref":"sql-update","note":"SET enum column with implicit string coercion"}
+{"id":"updb0141","category":"update","sql":"UPDATE s.t SET status = 'invalid_mood'","expect":"error","ref":"sql-update","note":"invalid enum value is a semantic error"}
+{"id":"updb0142","category":"update","sql":"UPDATE s.t SET qty = 1 FROM s.t AS src WHERE src.id != s.t.id","expect":"ok","ref":"sql-update","note":"self-join via FROM alias is allowed in PostgreSQL"}
+{"id":"updb0143","category":"update","sql":"ONLY UPDATE s.t SET name = 'x'","expect":"error","ref":"sql-update","note":"ONLY before UPDATE keyword is a syntax error"}
+{"id":"updb0144","category":"update","sql":"UPDATE s.t SET name = 'x' FROM s.t2 LEFT JOIN s.t AS tref ON s.t2.t_id = tref.id","expect":"ok","ref":"sql-update","note":"FROM with LEFT JOIN referencing target table via alias is allowed"}
+{"id":"updb0145","category":"update","sql":"UPDATE s.t2 SET label = coalesce(s.t2.label, s.t.name) FROM s.t WHERE s.t.id = s.t2.t_id","expect":"ok","ref":"sql-update","note":"COALESCE with FROM table column"}
+{"id":"updb0146","category":"update","sql":"UPDATE s.t SET val = s.g(qty, 2)","expect":"ok","ref":"sql-update","note":"user-defined function with two args in SET"}
+{"id":"updb0147","category":"update","sql":"UPDATE s.t SET qty = s.f(qty)","expect":"ok","ref":"sql-update","note":"user-defined function in SET"}
+{"id":"updb0148","category":"update","sql":"UPDATE s.t SET name = 'x' WHERE s.f(qty) > 5","expect":"ok","ref":"sql-update","note":"user-defined function in WHERE"}
+{"id":"updb0149","category":"update","sql":"UPDATE s.t SET (name, qty) = (SELECT label, id::integer FROM s.t2 WHERE t_id = s.t.id ORDER BY id LIMIT 1)","expect":"ok","ref":"sql-update","note":"tuple SET from subselect with ORDER BY LIMIT"}
+{"id":"updb0150","category":"update","sql":"UPDATE s.t SET name = 'x' WHERE (SELECT count(*) FROM s.t2 WHERE t_id = s.t.id) > 0","expect":"ok","ref":"sql-update","note":"WHERE clause with subquery aggregate comparison"}
+{"id":"updb0151","category":"update","sql":"UPDATE s.events_2024 SET payload = '{}'::jsonb WHERE occurred = '2024-06-01'","expect":"ok","ref":"sql-update","note":"UPDATE on partition directly"}
+{"id":"updb0152","category":"update","sql":"UPDATE s.events SET payload = '{}'::jsonb WHERE occurred = '2024-06-01'","expect":"ok","ref":"sql-update","note":"UPDATE on partitioned table root"}
+{"id":"updb0153","category":"update","sql":"UPDATE ONLY s.events SET payload = '{}'::jsonb","expect":"ok","ref":"sql-update","note":"ONLY on partitioned root updates no rows but is valid syntax"}
+{"id":"updb0154","category":"update","sql":"UPDATE s.t SET name = 'x' WHERE id = 1 AND name = 'y' AND val > 0 AND qty < 100 AND flag = true","expect":"ok","ref":"sql-update","note":"WHERE with many AND conditions"}
+{"id":"updb0155","category":"update","sql":"UPDATE s.t SET name = 'x' WHERE (id = 1 OR id = 2) AND (name = 'a' OR name = 'b')","expect":"ok","ref":"sql-update","note":"WHERE with nested OR conditions"}
+{"id":"updb0156","category":"update","sql":"UPDATE s.t SET name = 'x' WHERE NOT (id = 1 OR flag = false)","expect":"ok","ref":"sql-update","note":"WHERE with NOT and nested OR"}
+{"id":"updb0157","category":"update","sql":"UPDATE s.t SET qty = qty * 2 WHERE qty BETWEEN 10 AND 100 RETURNING id, qty","expect":"ok","ref":"sql-update","note":"BETWEEN in WHERE with RETURNING"}
+{"id":"updb0158","category":"update","sql":"UPDATE s.t2 SET amount = 0 FROM s.t WHERE s.t.id = s.t2.t_id AND s.t.status = 'sad' RETURNING s.t2.id, s.t2.amount","expect":"ok","ref":"sql-update","note":"FROM with enum WHERE and RETURNING"}
+{"id":"updb0159","category":"update","sql":"UPDATE s.t SET name = 'x' FROM s.t2 WHERE s.t2.t_id = s.t.id AND s.t2.amount BETWEEN 0 AND 100","expect":"ok","ref":"sql-update","note":"FROM with BETWEEN in WHERE"}
+{"id":"updb0160","category":"update","sql":"UPDATE s.t SET data = (SELECT jsonb_object_agg(label, amount) FROM s.t2 WHERE t_id = s.t.id)","expect":"ok","ref":"sql-update","note":"SET jsonb to aggregate subquery result"}
+{"id":"updb0161","category":"update","sql":"UPDATE s.t SET tags = ARRAY(SELECT label FROM s.t2 WHERE t_id = s.t.id)","expect":"ok","ref":"sql-update","note":"SET array column using ARRAY subquery constructor"}
+{"id":"updb0162","category":"update","sql":"UPDATE s.t SET name = 'x' LIMIT 1","expect":"error","ref":"sql-update","note":"LIMIT is not a valid UPDATE clause (syntax error)"}
+{"id":"updb0163","category":"update","sql":"UPDATE s.t SET name = 'x' ORDER BY id","expect":"error","ref":"sql-update","note":"ORDER BY is not a valid UPDATE clause (syntax error)"}
+{"id":"updb0164","category":"update","sql":"UPDATE s.t SET name = 'x' FROM s.t2 WHERE s.t2.t_id = s.t.id WHERE s.t.id = 1","expect":"error","ref":"sql-update","note":"duplicate WHERE clause is a syntax error"}
+{"id":"updb0165","category":"update","sql":"UPDATE s.t SET val = 1 / 0","expect":"error","ref":"sql-update","note":"division by zero in SET is a runtime error"}
+{"id":"updb0166","category":"update","sql":"UPDATE s.t SET name = 'x' RETURNING WITH () *","expect":"error","ref":"sql-update","note":"RETURNING WITH empty alias list is a syntax error"}
+{"id":"updb0167","category":"update","sql":"UPDATE s.t SET name = repeat('a', 1000)","expect":"ok","ref":"sql-update","note":"repeat() string function in SET"}
+{"id":"updb0168","category":"update","sql":"UPDATE s.t SET qty = extract(epoch from created_at)::integer","expect":"ok","ref":"sql-update","note":"extract epoch cast to integer in SET"}
+{"id":"updb0169","category":"update","sql":"UPDATE s.t SET val = width_bucket(qty::numeric, 0, 100, 10)","expect":"ok","ref":"sql-update","note":"width_bucket in SET expression"}
+{"id":"updb0170","category":"update","sql":"UPDATE s.t SET name = 'x' FROM s.t2 a JOIN s.t2 b ON a.t_id = b.t_id WHERE a.t_id = s.t.id","expect":"ok","ref":"sql-update","note":"FROM with explicit JOIN between two non-target tables"}

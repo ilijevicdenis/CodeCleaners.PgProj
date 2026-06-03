@@ -1,0 +1,200 @@
+{"id":"selba0001","category":"select-basic","sql":"SELECT 1","expect":"ok","ref":"sql-select","note":"simplest select constant integer"}
+{"id":"selba0002","category":"select-basic","sql":"SELECT 'hello'","expect":"ok","ref":"sql-select","note":"select string constant"}
+{"id":"selba0003","category":"select-basic","sql":"SELECT true","expect":"ok","ref":"sql-select","note":"select boolean constant"}
+{"id":"selba0004","category":"select-basic","sql":"SELECT NULL","expect":"ok","ref":"sql-select","note":"select NULL literal"}
+{"id":"selba0005","category":"select-basic","sql":"SELECT 1, 2, 3","expect":"ok","ref":"sql-select","note":"select multiple constants"}
+{"id":"selba0006","category":"select-basic","sql":"SELECT 1 + 1","expect":"ok","ref":"sql-select","note":"select arithmetic expression"}
+{"id":"selba0007","category":"select-basic","sql":"SELECT 1 AS one","expect":"ok","ref":"sql-select","note":"select constant with AS alias"}
+{"id":"selba0008","category":"select-basic","sql":"SELECT 1 one","expect":"ok","ref":"sql-select","note":"select constant with implicit (no AS) alias"}
+{"id":"selba0009","category":"select-basic","sql":"SELECT 'x' AS \"myAlias\"","expect":"ok","ref":"sql-select","note":"select with double-quoted alias"}
+{"id":"selba0010","category":"select-basic","sql":"SELECT 42 AS \"the answer\"","expect":"ok","ref":"sql-select","note":"select with quoted alias containing space"}
+{"id":"selba0011","category":"select-basic","sql":"SELECT id FROM s.t","expect":"ok","ref":"sql-select","note":"select single column from qualified table"}
+{"id":"selba0012","category":"select-basic","sql":"SELECT id, name FROM s.t","expect":"ok","ref":"sql-select","note":"select two columns from table"}
+{"id":"selba0013","category":"select-basic","sql":"SELECT * FROM s.t","expect":"ok","ref":"sql-select","note":"select all columns with star"}
+{"id":"selba0014","category":"select-basic","sql":"SELECT s.t.id FROM s.t","expect":"ok","ref":"sql-select","note":"select fully schema-qualified column reference"}
+{"id":"selba0015","category":"select-basic","sql":"SELECT t.id FROM s.t","expect":"ok","ref":"sql-select","note":"select table-qualified column reference"}
+{"id":"selba0016","category":"select-basic","sql":"SELECT t.* FROM s.t","expect":"ok","ref":"sql-select","note":"select table.star qualified"}
+{"id":"selba0017","category":"select-basic","sql":"SELECT s.t.* FROM s.t","expect":"ok","ref":"sql-select","note":"select schema.table.star"}
+{"id":"selba0018","category":"select-basic","sql":"SELECT id, name, val, qty, flag FROM s.t","expect":"ok","ref":"sql-select","note":"select many named columns"}
+{"id":"selba0019","category":"select-basic","sql":"SELECT id AS identifier, name AS full_name FROM s.t","expect":"ok","ref":"sql-select","note":"multiple columns with AS aliases"}
+{"id":"selba0020","category":"select-basic","sql":"SELECT id + 1 AS next_id FROM s.t","expect":"ok","ref":"sql-select","note":"computed column with alias"}
+{"id":"selba0021","category":"select-basic","sql":"SELECT name || ' suffix' AS labeled FROM s.t","expect":"ok","ref":"sql-select","note":"string concatenation in target list"}
+{"id":"selba0022","category":"select-basic","sql":"SELECT qty * 2 AS doubled FROM s.t","expect":"ok","ref":"sql-select","note":"arithmetic multiplication in select list"}
+{"id":"selba0023","category":"select-basic","sql":"SELECT DISTINCT name FROM s.t","expect":"ok","ref":"sql-select","note":"SELECT DISTINCT single column"}
+{"id":"selba0024","category":"select-basic","sql":"SELECT DISTINCT name, status FROM s.t","expect":"ok","ref":"sql-select","note":"SELECT DISTINCT multiple columns"}
+{"id":"selba0025","category":"select-basic","sql":"SELECT ALL name FROM s.t","expect":"ok","ref":"sql-select","note":"SELECT ALL (default, explicit keyword)"}
+{"id":"selba0026","category":"select-basic","sql":"SELECT DISTINCT ON (status) id, name, status FROM s.t ORDER BY status, id","expect":"ok","ref":"sql-select","note":"SELECT DISTINCT ON single expr"}
+{"id":"selba0027","category":"select-basic","sql":"SELECT DISTINCT ON (status, name) id, name FROM s.t ORDER BY status, name","expect":"ok","ref":"sql-select","note":"SELECT DISTINCT ON multiple exprs"}
+{"id":"selba0028","category":"select-basic","sql":"SELECT DISTINCT ON (qty) id, qty FROM s.t ORDER BY qty","expect":"ok","ref":"sql-select","note":"DISTINCT ON numeric column"}
+{"id":"selba0029","category":"select-basic","sql":"SELECT id FROM s.t WHERE id = 1","expect":"ok","ref":"sql-select","note":"WHERE equality predicate"}
+{"id":"selba0030","category":"select-basic","sql":"SELECT id FROM s.t WHERE id <> 1","expect":"ok","ref":"sql-select","note":"WHERE not-equal predicate <>"}
+{"id":"selba0031","category":"select-basic","sql":"SELECT id FROM s.t WHERE id != 1","expect":"ok","ref":"sql-select","note":"WHERE not-equal predicate !="}
+{"id":"selba0032","category":"select-basic","sql":"SELECT id FROM s.t WHERE qty > 0","expect":"ok","ref":"sql-select","note":"WHERE greater-than predicate"}
+{"id":"selba0033","category":"select-basic","sql":"SELECT id FROM s.t WHERE qty >= 0","expect":"ok","ref":"sql-select","note":"WHERE greater-or-equal predicate"}
+{"id":"selba0034","category":"select-basic","sql":"SELECT id FROM s.t WHERE qty < 100","expect":"ok","ref":"sql-select","note":"WHERE less-than predicate"}
+{"id":"selba0035","category":"select-basic","sql":"SELECT id FROM s.t WHERE qty <= 100","expect":"ok","ref":"sql-select","note":"WHERE less-or-equal predicate"}
+{"id":"selba0036","category":"select-basic","sql":"SELECT id FROM s.t WHERE name = 'Alice'","expect":"ok","ref":"sql-select","note":"WHERE string equality"}
+{"id":"selba0037","category":"select-basic","sql":"SELECT id FROM s.t WHERE flag = true","expect":"ok","ref":"sql-select","note":"WHERE boolean equality"}
+{"id":"selba0038","category":"select-basic","sql":"SELECT id FROM s.t WHERE flag IS TRUE","expect":"ok","ref":"sql-select","note":"WHERE IS TRUE predicate"}
+{"id":"selba0039","category":"select-basic","sql":"SELECT id FROM s.t WHERE flag IS FALSE","expect":"ok","ref":"sql-select","note":"WHERE IS FALSE predicate"}
+{"id":"selba0040","category":"select-basic","sql":"SELECT id FROM s.t WHERE val IS NULL","expect":"ok","ref":"sql-select","note":"WHERE IS NULL predicate"}
+{"id":"selba0041","category":"select-basic","sql":"SELECT id FROM s.t WHERE val IS NOT NULL","expect":"ok","ref":"sql-select","note":"WHERE IS NOT NULL predicate"}
+{"id":"selba0042","category":"select-basic","sql":"SELECT id FROM s.t WHERE name LIKE 'A%'","expect":"ok","ref":"sql-select","note":"WHERE LIKE pattern match"}
+{"id":"selba0043","category":"select-basic","sql":"SELECT id FROM s.t WHERE name ILIKE 'a%'","expect":"ok","ref":"sql-select","note":"WHERE ILIKE case-insensitive match"}
+{"id":"selba0044","category":"select-basic","sql":"SELECT id FROM s.t WHERE name NOT LIKE 'A%'","expect":"ok","ref":"sql-select","note":"WHERE NOT LIKE"}
+{"id":"selba0045","category":"select-basic","sql":"SELECT id FROM s.t WHERE name SIMILAR TO 'A%'","expect":"ok","ref":"sql-select","note":"WHERE SIMILAR TO regex-like match"}
+{"id":"selba0046","category":"select-basic","sql":"SELECT id FROM s.t WHERE id BETWEEN 1 AND 10","expect":"ok","ref":"sql-select","note":"WHERE BETWEEN predicate"}
+{"id":"selba0047","category":"select-basic","sql":"SELECT id FROM s.t WHERE id NOT BETWEEN 1 AND 10","expect":"ok","ref":"sql-select","note":"WHERE NOT BETWEEN"}
+{"id":"selba0048","category":"select-basic","sql":"SELECT id FROM s.t WHERE id IN (1, 2, 3)","expect":"ok","ref":"sql-select","note":"WHERE IN list predicate"}
+{"id":"selba0049","category":"select-basic","sql":"SELECT id FROM s.t WHERE id NOT IN (1, 2, 3)","expect":"ok","ref":"sql-select","note":"WHERE NOT IN list"}
+{"id":"selba0050","category":"select-basic","sql":"SELECT id FROM s.t WHERE name = ANY(ARRAY['Alice','Bob'])","expect":"ok","ref":"sql-select","note":"WHERE = ANY(array)"}
+{"id":"selba0051","category":"select-basic","sql":"SELECT id FROM s.t WHERE name = ALL(ARRAY['Alice'])","expect":"ok","ref":"sql-select","note":"WHERE = ALL(array)"}
+{"id":"selba0052","category":"select-basic","sql":"SELECT id FROM s.t WHERE qty > 0 AND flag = true","expect":"ok","ref":"sql-select","note":"WHERE with AND conjunction"}
+{"id":"selba0053","category":"select-basic","sql":"SELECT id FROM s.t WHERE qty > 0 OR flag = true","expect":"ok","ref":"sql-select","note":"WHERE with OR disjunction"}
+{"id":"selba0054","category":"select-basic","sql":"SELECT id FROM s.t WHERE NOT flag","expect":"ok","ref":"sql-select","note":"WHERE NOT unary operator"}
+{"id":"selba0055","category":"select-basic","sql":"SELECT id FROM s.t WHERE (qty > 0 AND flag) OR val IS NULL","expect":"ok","ref":"sql-select","note":"WHERE complex parenthesized condition"}
+{"id":"selba0056","category":"select-basic","sql":"SELECT id FROM s.t WHERE EXISTS (SELECT 1 FROM s.t2 WHERE s.t2.t_id = s.t.id)","expect":"ok","ref":"sql-select","note":"WHERE EXISTS subquery"}
+{"id":"selba0057","category":"select-basic","sql":"SELECT id FROM s.t WHERE NOT EXISTS (SELECT 1 FROM s.t2 WHERE s.t2.t_id = s.t.id)","expect":"ok","ref":"sql-select","note":"WHERE NOT EXISTS subquery"}
+{"id":"selba0058","category":"select-basic","sql":"SELECT id FROM s.t WHERE id IN (SELECT t_id FROM s.t2 WHERE t_id IS NOT NULL)","expect":"ok","ref":"sql-select","note":"WHERE IN subquery"}
+{"id":"selba0059","category":"select-basic","sql":"SELECT id FROM s.t WHERE id = (SELECT MAX(id) FROM s.t)","expect":"ok","ref":"sql-select","note":"WHERE scalar subquery"}
+{"id":"selba0060","category":"select-basic","sql":"SELECT id FROM s.t WHERE name ~ '^A'","expect":"ok","ref":"sql-select","note":"WHERE regex match operator ~"}
+{"id":"selba0061","category":"select-basic","sql":"SELECT id FROM s.t WHERE name !~ '^A'","expect":"ok","ref":"sql-select","note":"WHERE regex no-match operator !~"}
+{"id":"selba0062","category":"select-basic","sql":"SELECT id FROM s.t WHERE name ~* '^a'","expect":"ok","ref":"sql-select","note":"WHERE case-insensitive regex ~*"}
+{"id":"selba0063","category":"select-basic","sql":"SELECT id FROM s.t WHERE status = 'ok'::s.mood","expect":"ok","ref":"sql-select","note":"WHERE cast to enum type"}
+{"id":"selba0064","category":"select-basic","sql":"SELECT id FROM s.t WHERE data @> '{\"key\":1}'::jsonb","expect":"ok","ref":"sql-select","note":"WHERE jsonb containment operator @>"}
+{"id":"selba0065","category":"select-basic","sql":"SELECT id, name FROM s.t WHERE id > 0 ORDER BY id","expect":"ok","ref":"sql-select","note":"SELECT with ORDER BY column"}
+{"id":"selba0066","category":"select-basic","sql":"SELECT id, name FROM s.t ORDER BY name ASC","expect":"ok","ref":"sql-select","note":"ORDER BY ASC direction"}
+{"id":"selba0067","category":"select-basic","sql":"SELECT id, name FROM s.t ORDER BY name DESC","expect":"ok","ref":"sql-select","note":"ORDER BY DESC direction"}
+{"id":"selba0068","category":"select-basic","sql":"SELECT id, name FROM s.t ORDER BY 1","expect":"ok","ref":"sql-select","note":"ORDER BY positional reference"}
+{"id":"selba0069","category":"select-basic","sql":"SELECT id, name FROM s.t ORDER BY 2, 1","expect":"ok","ref":"sql-select","note":"ORDER BY multiple positional references"}
+{"id":"selba0070","category":"select-basic","sql":"SELECT id, name FROM s.t ORDER BY name NULLS FIRST","expect":"ok","ref":"sql-select","note":"ORDER BY NULLS FIRST"}
+{"id":"selba0071","category":"select-basic","sql":"SELECT id, name FROM s.t ORDER BY name NULLS LAST","expect":"ok","ref":"sql-select","note":"ORDER BY NULLS LAST"}
+{"id":"selba0072","category":"select-basic","sql":"SELECT id, name FROM s.t ORDER BY name ASC NULLS LAST","expect":"ok","ref":"sql-select","note":"ORDER BY ASC NULLS LAST"}
+{"id":"selba0073","category":"select-basic","sql":"SELECT id, name FROM s.t ORDER BY name DESC NULLS FIRST","expect":"ok","ref":"sql-select","note":"ORDER BY DESC NULLS FIRST"}
+{"id":"selba0074","category":"select-basic","sql":"SELECT id FROM s.t LIMIT 10","expect":"ok","ref":"sql-select","note":"LIMIT clause"}
+{"id":"selba0075","category":"select-basic","sql":"SELECT id FROM s.t LIMIT 10 OFFSET 5","expect":"ok","ref":"sql-select","note":"LIMIT with OFFSET"}
+{"id":"selba0076","category":"select-basic","sql":"SELECT id FROM s.t OFFSET 5","expect":"ok","ref":"sql-select","note":"OFFSET without LIMIT"}
+{"id":"selba0077","category":"select-basic","sql":"SELECT id FROM s.t OFFSET 5 ROWS","expect":"ok","ref":"sql-select","note":"OFFSET with ROWS keyword"}
+{"id":"selba0078","category":"select-basic","sql":"SELECT id FROM s.t FETCH FIRST 5 ROWS ONLY","expect":"ok","ref":"sql-select","note":"FETCH FIRST n ROWS ONLY"}
+{"id":"selba0079","category":"select-basic","sql":"SELECT id FROM s.t FETCH NEXT 5 ROWS ONLY","expect":"ok","ref":"sql-select","note":"FETCH NEXT n ROWS ONLY"}
+{"id":"selba0080","category":"select-basic","sql":"SELECT id FROM s.t FETCH FIRST 1 ROW ONLY","expect":"ok","ref":"sql-select","note":"FETCH FIRST 1 ROW ONLY (singular)"}
+{"id":"selba0081","category":"select-basic","sql":"SELECT id FROM s.t OFFSET 2 ROWS FETCH NEXT 3 ROWS ONLY","expect":"ok","ref":"sql-select","note":"OFFSET ROWS + FETCH NEXT ROWS ONLY"}
+{"id":"selba0082","category":"select-basic","sql":"SELECT id FROM s.t ORDER BY id FETCH FIRST 5 ROWS WITH TIES","expect":"ok","ref":"sql-select","note":"FETCH FIRST WITH TIES requires ORDER BY"}
+{"id":"selba0083","category":"select-basic","sql":"SELECT id, name FROM s.t ORDER BY id FETCH FIRST 5 ROWS WITH TIES","expect":"ok","ref":"sql-select","note":"FETCH WITH TIES with ORDER BY"}
+{"id":"selba0084","category":"select-basic","sql":"SELECT id FROM s.t LIMIT NULL","expect":"ok","ref":"sql-select","note":"LIMIT NULL means no limit"}
+{"id":"selba0085","category":"select-basic","sql":"SELECT id FROM s.t LIMIT ALL","expect":"ok","ref":"sql-select","note":"LIMIT ALL means no limit"}
+{"id":"selba0086","category":"select-basic","sql":"SELECT id, name FROM s.t AS t1","expect":"ok","ref":"sql-select","note":"table alias with AS"}
+{"id":"selba0087","category":"select-basic","sql":"SELECT id, name FROM s.t t1","expect":"ok","ref":"sql-select","note":"table alias without AS"}
+{"id":"selba0088","category":"select-basic","sql":"SELECT t1.id, t1.name FROM s.t AS t1","expect":"ok","ref":"sql-select","note":"qualified column via table alias"}
+{"id":"selba0089","category":"select-basic","sql":"SELECT a.id, b.label FROM s.t a, s.t2 b","expect":"ok","ref":"sql-select","note":"FROM multiple tables (implicit cross join) with aliases"}
+{"id":"selba0090","category":"select-basic","sql":"SELECT a.id FROM s.t a CROSS JOIN s.t2 b","expect":"ok","ref":"sql-select","note":"CROSS JOIN explicit"}
+{"id":"selba0091","category":"select-basic","sql":"SELECT a.id FROM s.t a INNER JOIN s.t2 b ON a.id = b.t_id","expect":"ok","ref":"sql-select","note":"INNER JOIN with ON"}
+{"id":"selba0092","category":"select-basic","sql":"SELECT a.id FROM s.t a LEFT JOIN s.t2 b ON a.id = b.t_id","expect":"ok","ref":"sql-select","note":"LEFT JOIN"}
+{"id":"selba0093","category":"select-basic","sql":"SELECT a.id FROM s.t a LEFT OUTER JOIN s.t2 b ON a.id = b.t_id","expect":"ok","ref":"sql-select","note":"LEFT OUTER JOIN explicit OUTER keyword"}
+{"id":"selba0094","category":"select-basic","sql":"SELECT a.id FROM s.t a RIGHT JOIN s.t2 b ON a.id = b.t_id","expect":"ok","ref":"sql-select","note":"RIGHT JOIN"}
+{"id":"selba0095","category":"select-basic","sql":"SELECT a.id FROM s.t a RIGHT OUTER JOIN s.t2 b ON a.id = b.t_id","expect":"ok","ref":"sql-select","note":"RIGHT OUTER JOIN"}
+{"id":"selba0096","category":"select-basic","sql":"SELECT a.id FROM s.t a FULL JOIN s.t2 b ON a.id = b.t_id","expect":"ok","ref":"sql-select","note":"FULL JOIN"}
+{"id":"selba0097","category":"select-basic","sql":"SELECT a.id FROM s.t a FULL OUTER JOIN s.t2 b ON a.id = b.t_id","expect":"ok","ref":"sql-select","note":"FULL OUTER JOIN explicit OUTER keyword"}
+{"id":"selba0098","category":"select-basic","sql":"SELECT a.id FROM s.t a JOIN s.t2 b USING (id)","expect":"ok","ref":"sql-select","note":"JOIN USING with shared column name id present in both tables"}
+{"id":"selba0099","category":"select-basic","sql":"SELECT a.id FROM s.t a NATURAL JOIN s.t2 b","expect":"ok","ref":"sql-select","note":"NATURAL JOIN"}
+{"id":"selba0100","category":"select-basic","sql":"SELECT a.id FROM s.t a JOIN s.t2 b ON a.id = b.t_id WHERE b.amount > 0","expect":"ok","ref":"sql-select","note":"JOIN with WHERE filter (qualify ambiguous id)"}
+{"id":"selba0101","category":"select-basic","sql":"SELECT id FROM s.t WHERE id = (SELECT id FROM s.t LIMIT 1)","expect":"ok","ref":"sql-select","note":"correlated scalar subquery in WHERE"}
+{"id":"selba0102","category":"select-basic","sql":"SELECT (SELECT name FROM s.t LIMIT 1) AS first_name","expect":"ok","ref":"sql-select","note":"scalar subquery in select list"}
+{"id":"selba0103","category":"select-basic","sql":"SELECT id FROM (SELECT id FROM s.t) sub","expect":"ok","ref":"sql-select","note":"subquery in FROM (derived table)"}
+{"id":"selba0104","category":"select-basic","sql":"SELECT id FROM (SELECT id FROM s.t) AS sub","expect":"ok","ref":"sql-select","note":"subquery in FROM with AS alias"}
+{"id":"selba0105","category":"select-basic","sql":"SELECT sub.id FROM (SELECT id, name FROM s.t) AS sub WHERE sub.id > 0","expect":"ok","ref":"sql-select","note":"reference derived table columns in outer query"}
+{"id":"selba0106","category":"select-basic","sql":"SELECT id FROM s.t UNION SELECT id FROM s.t2","expect":"ok","ref":"sql-select","note":"UNION of two SELECT statements"}
+{"id":"selba0107","category":"select-basic","sql":"SELECT id FROM s.t UNION ALL SELECT id FROM s.t2","expect":"ok","ref":"sql-select","note":"UNION ALL (no dedup)"}
+{"id":"selba0108","category":"select-basic","sql":"SELECT id FROM s.t INTERSECT SELECT id FROM s.t2","expect":"ok","ref":"sql-select","note":"INTERSECT set operation"}
+{"id":"selba0109","category":"select-basic","sql":"SELECT id FROM s.t INTERSECT ALL SELECT id FROM s.t2","expect":"ok","ref":"sql-select","note":"INTERSECT ALL"}
+{"id":"selba0110","category":"select-basic","sql":"SELECT id FROM s.t EXCEPT SELECT id FROM s.t2","expect":"ok","ref":"sql-select","note":"EXCEPT set operation"}
+{"id":"selba0111","category":"select-basic","sql":"SELECT id FROM s.t EXCEPT ALL SELECT id FROM s.t2","expect":"ok","ref":"sql-select","note":"EXCEPT ALL"}
+{"id":"selba0112","category":"select-basic","sql":"SELECT COUNT(*) FROM s.t","expect":"ok","ref":"sql-select","note":"aggregate COUNT(*) in select list"}
+{"id":"selba0113","category":"select-basic","sql":"SELECT COUNT(id), SUM(qty), AVG(qty), MIN(qty), MAX(qty) FROM s.t","expect":"ok","ref":"sql-select","note":"multiple aggregates in select list"}
+{"id":"selba0114","category":"select-basic","sql":"SELECT status, COUNT(*) FROM s.t GROUP BY status","expect":"ok","ref":"sql-select","note":"GROUP BY single column"}
+{"id":"selba0115","category":"select-basic","sql":"SELECT status, flag, COUNT(*) FROM s.t GROUP BY status, flag","expect":"ok","ref":"sql-select","note":"GROUP BY multiple columns"}
+{"id":"selba0116","category":"select-basic","sql":"SELECT status, COUNT(*) FROM s.t GROUP BY status HAVING COUNT(*) > 0","expect":"ok","ref":"sql-select","note":"GROUP BY with HAVING clause"}
+{"id":"selba0117","category":"select-basic","sql":"SELECT status, COUNT(*) AS n FROM s.t GROUP BY status ORDER BY n DESC","expect":"ok","ref":"sql-select","note":"ORDER BY alias from aggregate"}
+{"id":"selba0118","category":"select-basic","sql":"SELECT CASE WHEN qty > 0 THEN 'positive' ELSE 'zero' END FROM s.t","expect":"ok","ref":"sql-select","note":"CASE WHEN THEN ELSE END in select list"}
+{"id":"selba0119","category":"select-basic","sql":"SELECT CASE qty WHEN 0 THEN 'zero' WHEN 1 THEN 'one' ELSE 'many' END FROM s.t","expect":"ok","ref":"sql-select","note":"simple CASE expression"}
+{"id":"selba0120","category":"select-basic","sql":"SELECT COALESCE(val, 0) FROM s.t","expect":"ok","ref":"sql-select","note":"COALESCE function in select list"}
+{"id":"selba0121","category":"select-basic","sql":"SELECT NULLIF(qty, 0) FROM s.t","expect":"ok","ref":"sql-select","note":"NULLIF function in select list"}
+{"id":"selba0122","category":"select-basic","sql":"SELECT GREATEST(qty, 0) FROM s.t","expect":"ok","ref":"sql-select","note":"GREATEST function"}
+{"id":"selba0123","category":"select-basic","sql":"SELECT LEAST(qty, 100) FROM s.t","expect":"ok","ref":"sql-select","note":"LEAST function"}
+{"id":"selba0124","category":"select-basic","sql":"SELECT id::text FROM s.t","expect":"ok","ref":"sql-select","note":"cast with :: operator"}
+{"id":"selba0125","category":"select-basic","sql":"SELECT CAST(id AS text) FROM s.t","expect":"ok","ref":"sql-select","note":"CAST(... AS type) syntax"}
+{"id":"selba0126","category":"select-basic","sql":"SELECT id, name FROM s.t FOR UPDATE","expect":"ok","ref":"sql-select","note":"FOR UPDATE locking clause"}
+{"id":"selba0127","category":"select-basic","sql":"SELECT id FROM s.t FOR SHARE","expect":"ok","ref":"sql-select","note":"FOR SHARE locking clause"}
+{"id":"selba0128","category":"select-basic","sql":"SELECT id FROM s.t FOR UPDATE OF t","expect":"ok","ref":"sql-select","note":"FOR UPDATE OF specific table"}
+{"id":"selba0129","category":"select-basic","sql":"SELECT id FROM s.t FOR UPDATE NOWAIT","expect":"ok","ref":"sql-select","note":"FOR UPDATE NOWAIT option"}
+{"id":"selba0130","category":"select-basic","sql":"SELECT id FROM s.t FOR UPDATE SKIP LOCKED","expect":"ok","ref":"sql-select","note":"FOR UPDATE SKIP LOCKED option"}
+{"id":"selba0131","category":"select-basic","sql":"SELECT id FROM s.t FOR NO KEY UPDATE","expect":"ok","ref":"sql-select","note":"FOR NO KEY UPDATE locking strength"}
+{"id":"selba0132","category":"select-basic","sql":"SELECT id FROM s.t FOR KEY SHARE","expect":"ok","ref":"sql-select","note":"FOR KEY SHARE locking strength"}
+{"id":"selba0133","category":"select-basic","sql":"SELECT s.f(5)","expect":"ok","ref":"sql-select","note":"call scalar function in select list without FROM"}
+{"id":"selba0134","category":"select-basic","sql":"SELECT s.g(3, 4)","expect":"ok","ref":"sql-select","note":"call function with two args no FROM"}
+{"id":"selba0135","category":"select-basic","sql":"SELECT s.g(a => 3, b => 4)","expect":"ok","ref":"sql-select","note":"named parameter syntax in function call"}
+{"id":"selba0136","category":"select-basic","sql":"SELECT * FROM s.rows_f()","expect":"ok","ref":"sql-select","note":"SELECT * from set-returning function"}
+{"id":"selba0137","category":"select-basic","sql":"SELECT id, name FROM s.rows_f()","expect":"ok","ref":"sql-select","note":"select specific columns from SRF"}
+{"id":"selba0138","category":"select-basic","sql":"SELECT nextval('s.seq')","expect":"ok","ref":"sql-select","note":"nextval() system function in select list"}
+{"id":"selba0139","category":"select-basic","sql":"SELECT current_timestamp","expect":"ok","ref":"sql-select","note":"current_timestamp pseudo-function"}
+{"id":"selba0140","category":"select-basic","sql":"SELECT current_date","expect":"ok","ref":"sql-select","note":"current_date pseudo-function"}
+{"id":"selba0141","category":"select-basic","sql":"SELECT current_user","expect":"ok","ref":"sql-select","note":"current_user pseudo-function"}
+{"id":"selba0142","category":"select-basic","sql":"SELECT session_user","expect":"ok","ref":"sql-select","note":"session_user pseudo-function"}
+{"id":"selba0143","category":"select-basic","sql":"SELECT version()","expect":"ok","ref":"sql-select","note":"version() built-in function"}
+{"id":"selba0144","category":"select-basic","sql":"SELECT id FROM s.t WHERE id > 0 ORDER BY id LIMIT 5 OFFSET 2","expect":"ok","ref":"sql-select","note":"WHERE + ORDER BY + LIMIT + OFFSET combined"}
+{"id":"selba0145","category":"select-basic","sql":"SELECT DISTINCT id FROM s.t WHERE flag ORDER BY id LIMIT 10","expect":"ok","ref":"sql-select","note":"DISTINCT + WHERE + ORDER BY + LIMIT"}
+{"id":"selba0146","category":"select-basic","sql":"SELECT id FROM s.v","expect":"ok","ref":"sql-select","note":"SELECT from a view"}
+{"id":"selba0147","category":"select-basic","sql":"SELECT status, n FROM s.mv","expect":"ok","ref":"sql-select","note":"SELECT from a materialized view"}
+{"id":"selba0148","category":"select-basic","sql":"SELECT * FROM s.parent","expect":"ok","ref":"sql-select","note":"SELECT from parent table (inheritance)"}
+{"id":"selba0149","category":"select-basic","sql":"SELECT * FROM ONLY s.parent","expect":"ok","ref":"sql-select","note":"SELECT ONLY from parent (exclude children)"}
+{"id":"selba0150","category":"select-basic","sql":"SELECT * FROM s.child","expect":"ok","ref":"sql-select","note":"SELECT from child table (inherits parent)"}
+{"id":"selba0151","category":"select-basic","sql":"SELECT * FROM s.events","expect":"ok","ref":"sql-select","note":"SELECT from partitioned table"}
+{"id":"selba0152","category":"select-basic","sql":"SELECT * FROM s.events_2024","expect":"ok","ref":"sql-select","note":"SELECT from specific partition"}
+{"id":"selba0153","category":"select-basic","sql":"SELECT id, (home).street FROM s.t","expect":"ok","ref":"sql-select","note":"select composite type field with parens"}
+{"id":"selba0154","category":"select-basic","sql":"SELECT id, (home).city AS city FROM s.t","expect":"ok","ref":"sql-select","note":"composite field access with alias"}
+{"id":"selba0155","category":"select-basic","sql":"SELECT tags[1] FROM s.t","expect":"ok","ref":"sql-select","note":"array subscript in select list"}
+{"id":"selba0156","category":"select-basic","sql":"SELECT tags[1:2] FROM s.t","expect":"ok","ref":"sql-select","note":"array slice subscript"}
+{"id":"selba0157","category":"select-basic","sql":"SELECT data->>'key' FROM s.t","expect":"ok","ref":"sql-select","note":"jsonb ->> operator in select list"}
+{"id":"selba0158","category":"select-basic","sql":"SELECT data->'nested' FROM s.t","expect":"ok","ref":"sql-select","note":"jsonb -> operator"}
+{"id":"selba0159","category":"select-basic","sql":"SELECT id, row_number() OVER () FROM s.t","expect":"ok","ref":"sql-select","note":"window function row_number() with empty OVER"}
+{"id":"selba0160","category":"select-basic","sql":"SELECT id, rank() OVER (ORDER BY id) FROM s.t","expect":"ok","ref":"sql-select","note":"window function rank() with OVER ORDER BY"}
+{"id":"selba0161","category":"select-basic","sql":"SELECT id, lag(id) OVER (ORDER BY id) FROM s.t","expect":"ok","ref":"sql-select","note":"window function lag() with OVER ORDER BY"}
+{"id":"selba0162","category":"select-basic","sql":"SELECT id, sum(qty) OVER (PARTITION BY status ORDER BY id) FROM s.t","expect":"ok","ref":"sql-select","note":"window function with PARTITION BY and ORDER BY"}
+{"id":"selba0163","category":"select-basic","sql":"SELECT id, sum(qty) OVER (PARTITION BY status) FROM s.t","expect":"ok","ref":"sql-select","note":"window function with PARTITION BY only"}
+{"id":"selba0164","category":"select-basic","sql":"SELECT ROW(1, 'a', true)","expect":"ok","ref":"sql-select","note":"ROW constructor expression"}
+{"id":"selba0165","category":"select-basic","sql":"SELECT ARRAY[1, 2, 3]","expect":"ok","ref":"sql-select","note":"ARRAY constructor literal"}
+{"id":"selba0166","category":"select-basic","sql":"SELECT ARRAY(SELECT id FROM s.t)","expect":"ok","ref":"sql-select","note":"ARRAY from subquery"}
+{"id":"selba0167","category":"select-basic","sql":"SELECT id FROM s.t TABLESAMPLE BERNOULLI(100)","expect":"ok","ref":"sql-select","note":"TABLESAMPLE BERNOULLI method"}
+{"id":"selba0168","category":"select-basic","sql":"SELECT id FROM s.t TABLESAMPLE SYSTEM(100)","expect":"ok","ref":"sql-select","note":"TABLESAMPLE SYSTEM method"}
+{"id":"selba0169","category":"select-basic","sql":"SELECT 1 WHERE true","expect":"ok","ref":"sql-select","note":"SELECT without FROM with WHERE condition"}
+{"id":"selba0170","category":"select-basic","sql":"SELECT generate_series(1, 5)","expect":"ok","ref":"sql-select","note":"set-returning function in select list without FROM"}
+{"id":"selba0171","category":"select-basic","sql":"SELECT id FROM s.t UNION","expect":"error","ref":"sql-select","note":"error: UNION with no second select"}
+{"id":"selba0172","category":"select-basic","sql":"SELECT FROM s.t","expect":"ok","ref":"sql-select","note":"SELECT with empty target list and FROM (PostgreSQL extension)"}
+{"id":"selba0173","category":"select-basic","sql":"SELECT id, FROM s.t","expect":"error","ref":"sql-select","note":"error: dangling comma in target list"}
+{"id":"selba0174","category":"select-basic","sql":"SELECT id FROM","expect":"error","ref":"sql-select","note":"error: FROM with no table name"}
+{"id":"selba0175","category":"select-basic","sql":"SELECT id FROM s.t WHERE","expect":"error","ref":"sql-select","note":"error: WHERE with no predicate"}
+{"id":"selba0176","category":"select-basic","sql":"SELECT id FROM s.t ORDER BY","expect":"error","ref":"sql-select","note":"error: ORDER BY with no expression"}
+{"id":"selba0177","category":"select-basic","sql":"SELECT id FROM s.t LIMIT","expect":"error","ref":"sql-select","note":"error: LIMIT with no count"}
+{"id":"selba0178","category":"select-basic","sql":"SELECT DISTINCT ON id FROM s.t ORDER BY id","expect":"error","ref":"sql-select","note":"error: DISTINCT ON missing parentheses"}
+{"id":"selba0179","category":"select-basic","sql":"SELECT id FROM s.t GROUP BY","expect":"error","ref":"sql-select","note":"error: GROUP BY with no expression"}
+{"id":"selba0180","category":"select-basic","sql":"SELECT id WHERE id = 1","expect":"error","ref":"sql-select","note":"error: WHERE without FROM referencing column"}
+{"id":"selba0181","category":"select-basic","sql":"SELECT *, FROM s.t","expect":"error","ref":"sql-select","note":"error: trailing comma after star in target list"}
+{"id":"selba0182","category":"select-basic","sql":"SELECT id FROM s.t JOIN s.t2","expect":"error","ref":"sql-select","note":"error: JOIN without ON or USING clause"}
+{"id":"selba0183","category":"select-basic","sql":"SELECT id FROM s.t HAVING COUNT(*) > 0","expect":"error","ref":"sql-select","note":"error: HAVING without GROUP BY (semantic: col must be in group by)"}
+{"id":"selba0184","category":"select-basic","sql":"SELECT ALL DISTINCT id FROM s.t","expect":"error","ref":"sql-select","note":"error: ALL and DISTINCT cannot be combined"}
+{"id":"selba0185","category":"select-basic","sql":"SELECT id FROM s.t FETCH FIRST ROWS ONLY","expect":"ok","ref":"sql-select","note":"FETCH FIRST ROWS ONLY without count (PostgreSQL extension: defaults to 1)"}
+{"id":"selba0186","category":"select-basic","sql":"SELECT id name extra FROM s.t","expect":"error","ref":"sql-select","note":"error: two implicit aliases in a row (ambiguous parse)"}
+{"id":"selba0187","category":"select-basic","sql":"SELECT 1 + * FROM s.t","expect":"error","ref":"sql-select","note":"error: invalid use of star in arithmetic expression"}
+{"id":"selba0188","category":"select-basic","sql":"SELECT id FROM s.t WHERE id =","expect":"error","ref":"sql-select","note":"error: incomplete binary operator expression"}
+{"id":"selba0189","category":"select-basic","sql":"SELECT id FROM s.t WHERE BETWEEN 1 AND 10","expect":"error","ref":"sql-select","note":"error: BETWEEN missing left operand"}
+{"id":"selba0190","category":"select-basic","sql":"SELECT id FROM s.t OFFSET -1","expect":"error","ref":"sql-select","note":"error: OFFSET with negative value (runtime error)"}
+{"id":"selba0191","category":"select-basic","sql":"SELECT id FROM s.nonexistent_table","expect":"error","ref":"sql-select","note":"error: table does not exist (semantic)"}
+{"id":"selba0192","category":"select-basic","sql":"SELECT no_col FROM s.t","expect":"error","ref":"sql-select","note":"error: column does not exist (semantic)"}
+{"id":"selba0193","category":"select-basic","sql":"SELECT id FROM s.t ORDER BY id LIMIT 5 FOR UPDATE","expect":"ok","ref":"sql-select","note":"ORDER BY + LIMIT + FOR UPDATE combined"}
+{"id":"selba0194","category":"select-basic","sql":"SELECT status::text FROM s.t","expect":"ok","ref":"sql-select","note":"cast enum column to text"}
+{"id":"selba0195","category":"select-basic","sql":"SELECT DISTINCT ON (status) * FROM s.t ORDER BY status","expect":"ok","ref":"sql-select","note":"DISTINCT ON with SELECT *"}
+{"id":"selba0196","category":"select-basic","sql":"SELECT id, name FROM s.t WHERE id > ALL(SELECT t_id FROM s.t2 WHERE t_id IS NOT NULL)","expect":"ok","ref":"sql-select","note":"WHERE > ALL subquery"}
+{"id":"selba0197","category":"select-basic","sql":"SELECT id FROM s.t WHERE id > SOME(SELECT t_id FROM s.t2 WHERE t_id IS NOT NULL)","expect":"ok","ref":"sql-select","note":"WHERE > SOME subquery (SOME = ANY)"}
+{"id":"selba0198","category":"select-basic","sql":"SELECT 1 AS n UNION SELECT 2 UNION SELECT 3 ORDER BY n","expect":"ok","ref":"sql-select","note":"chained UNION with ORDER BY on alias"}
+{"id":"selba0199","category":"select-basic","sql":"SELECT id FROM s.t WHERE id IS DISTINCT FROM NULL","expect":"ok","ref":"sql-select","note":"IS DISTINCT FROM predicate"}
+{"id":"selba0200","category":"select-basic","sql":"SELECT id FROM s.t WHERE id IS NOT DISTINCT FROM NULL","expect":"ok","ref":"sql-select","note":"IS NOT DISTINCT FROM predicate"}

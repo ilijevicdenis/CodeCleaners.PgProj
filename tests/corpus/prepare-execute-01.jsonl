@@ -1,0 +1,150 @@
+{"id":"prxa0001","category":"prepare-execute","sql":"PREPARE q1 AS SELECT 1","expect":"ok","ref":"sql-prepare","note":"minimal PREPARE: no params, constant SELECT"}
+{"id":"prxa0002","category":"prepare-execute","sql":"PREPARE q2 AS SELECT * FROM s.t","expect":"ok","ref":"sql-prepare","note":"PREPARE: SELECT all columns from fixture table"}
+{"id":"prxa0003","category":"prepare-execute","sql":"PREPARE q3 (integer) AS SELECT * FROM s.t WHERE id = $1","expect":"ok","ref":"sql-prepare","note":"PREPARE: one typed param, SELECT with WHERE"}
+{"id":"prxa0004","category":"prepare-execute","sql":"PREPARE q4 (integer, text) AS SELECT * FROM s.t WHERE id = $1 AND name = $2","expect":"ok","ref":"sql-prepare","note":"PREPARE: two typed params, SELECT with AND"}
+{"id":"prxa0005","category":"prepare-execute","sql":"PREPARE q5 (text) AS INSERT INTO s.t (name) VALUES ($1)","expect":"ok","ref":"sql-prepare","note":"PREPARE: INSERT with one typed param"}
+{"id":"prxa0006","category":"prepare-execute","sql":"PREPARE q6 (integer, text) AS UPDATE s.t SET name = $2 WHERE id = $1","expect":"ok","ref":"sql-prepare","note":"PREPARE: UPDATE with two typed params"}
+{"id":"prxa0007","category":"prepare-execute","sql":"PREPARE q7 (integer) AS DELETE FROM s.t WHERE id = $1","expect":"ok","ref":"sql-prepare","note":"PREPARE: DELETE with one typed param"}
+{"id":"prxa0008","category":"prepare-execute","sql":"PREPARE q8 AS VALUES (1, 'hello'), (2, 'world')","expect":"ok","ref":"sql-prepare","note":"PREPARE: VALUES statement"}
+{"id":"prxa0009","category":"prepare-execute","sql":"PREPARE q9 (integer) AS SELECT id, name FROM s.t WHERE qty > $1 ORDER BY name","expect":"ok","ref":"sql-prepare","note":"PREPARE: SELECT with ORDER BY"}
+{"id":"prxa0010","category":"prepare-execute","sql":"PREPARE q10 (integer) AS SELECT id, name FROM s.t WHERE qty > $1 LIMIT 10","expect":"ok","ref":"sql-prepare","note":"PREPARE: SELECT with LIMIT"}
+{"id":"prxa0011","category":"prepare-execute","sql":"PREPARE q11 (integer) AS SELECT id, name FROM s.t WHERE qty > $1 LIMIT 10 OFFSET 5","expect":"ok","ref":"sql-prepare","note":"PREPARE: SELECT with LIMIT and OFFSET"}
+{"id":"prxa0012","category":"prepare-execute","sql":"PREPARE q12 AS SELECT t.id, t2.label FROM s.t JOIN s.t2 ON t.id = t2.t_id","expect":"ok","ref":"sql-prepare","note":"PREPARE: JOIN query"}
+{"id":"prxa0013","category":"prepare-execute","sql":"PREPARE q13 (numeric) AS SELECT * FROM s.t WHERE val > $1","expect":"ok","ref":"sql-prepare","note":"PREPARE: numeric param type"}
+{"id":"prxa0014","category":"prepare-execute","sql":"PREPARE q14 (boolean) AS SELECT * FROM s.t WHERE flag = $1","expect":"ok","ref":"sql-prepare","note":"PREPARE: boolean param type"}
+{"id":"prxa0015","category":"prepare-execute","sql":"PREPARE q15 (text[]) AS SELECT * FROM s.t WHERE tags = $1","expect":"ok","ref":"sql-prepare","note":"PREPARE: array param type"}
+{"id":"prxa0016","category":"prepare-execute","sql":"PREPARE q16 (jsonb) AS SELECT * FROM s.t WHERE data = $1","expect":"ok","ref":"sql-prepare","note":"PREPARE: jsonb param type"}
+{"id":"prxa0017","category":"prepare-execute","sql":"PREPARE q17 (timestamptz) AS SELECT * FROM s.t WHERE created_at < $1","expect":"ok","ref":"sql-prepare","note":"PREPARE: timestamptz param type"}
+{"id":"prxa0018","category":"prepare-execute","sql":"PREPARE q18 (s.mood) AS SELECT * FROM s.t WHERE status = $1","expect":"ok","ref":"sql-prepare","note":"PREPARE: custom enum param type"}
+{"id":"prxa0019","category":"prepare-execute","sql":"PREPARE q19 (int4range) AS SELECT * FROM s.t WHERE span = $1","expect":"ok","ref":"sql-prepare","note":"PREPARE: range param type"}
+{"id":"prxa0020","category":"prepare-execute","sql":"PREPARE q20 (integer, integer, integer) AS SELECT $1 + $2 + $3","expect":"ok","ref":"sql-prepare","note":"PREPARE: three params expression"}
+{"id":"prxa0021","category":"prepare-execute","sql":"PREPARE q21 AS SELECT id FROM s.t WHERE id = ANY(ARRAY[1,2,3])","expect":"ok","ref":"sql-prepare","note":"PREPARE: no params, ANY array predicate"}
+{"id":"prxa0022","category":"prepare-execute","sql":"PREPARE q22 (integer[]) AS SELECT * FROM s.t WHERE id = ANY($1)","expect":"ok","ref":"sql-prepare","note":"PREPARE: array param used with ANY"}
+{"id":"prxa0023","category":"prepare-execute","sql":"PREPARE q23 AS SELECT status, count(*) FROM s.t GROUP BY status","expect":"ok","ref":"sql-prepare","note":"PREPARE: GROUP BY aggregate query"}
+{"id":"prxa0024","category":"prepare-execute","sql":"PREPARE q24 (integer) AS SELECT status, count(*) FROM s.t GROUP BY status HAVING count(*) > $1","expect":"ok","ref":"sql-prepare","note":"PREPARE: HAVING clause with param"}
+{"id":"prxa0025","category":"prepare-execute","sql":"PREPARE q25 AS SELECT * FROM s.t UNION SELECT * FROM s.t","expect":"ok","ref":"sql-prepare","note":"PREPARE: UNION query"}
+{"id":"prxa0026","category":"prepare-execute","sql":"PREPARE q26 AS SELECT * FROM s.t INTERSECT SELECT * FROM s.t","expect":"ok","ref":"sql-prepare","note":"PREPARE: INTERSECT query"}
+{"id":"prxa0027","category":"prepare-execute","sql":"PREPARE q27 AS SELECT * FROM s.t EXCEPT SELECT * FROM s.t WHERE id < 0","expect":"ok","ref":"sql-prepare","note":"PREPARE: EXCEPT query"}
+{"id":"prxa0028","category":"prepare-execute","sql":"PREPARE q28 AS WITH cte AS (SELECT id FROM s.t) SELECT * FROM cte","expect":"ok","ref":"sql-prepare","note":"PREPARE: CTE (WITH) query"}
+{"id":"prxa0029","category":"prepare-execute","sql":"PREPARE q29 AS INSERT INTO s.t (name, qty) VALUES ('x', 1) RETURNING id","expect":"ok","ref":"sql-prepare","note":"PREPARE: INSERT with RETURNING"}
+{"id":"prxa0030","category":"prepare-execute","sql":"PREPARE q30 (integer) AS DELETE FROM s.t WHERE id = $1 RETURNING *","expect":"ok","ref":"sql-prepare","note":"PREPARE: DELETE with RETURNING *"}
+{"id":"prxa0031","category":"prepare-execute","sql":"PREPARE q31 (text, integer) AS UPDATE s.t SET name = $1 WHERE id = $2 RETURNING id, name","expect":"ok","ref":"sql-prepare","note":"PREPARE: UPDATE with RETURNING columns"}
+{"id":"prxa0032","category":"prepare-execute","sql":"PREPARE q32 AS INSERT INTO s.t2 (t_id, label) SELECT id, name FROM s.t WHERE id < 0","expect":"ok","ref":"sql-prepare","note":"PREPARE: INSERT ... SELECT form"}
+{"id":"prxa0033","category":"prepare-execute","sql":"PREPARE q33 (integer) AS SELECT * FROM s.t WHERE id = $1 FOR UPDATE","expect":"ok","ref":"sql-prepare","note":"PREPARE: SELECT FOR UPDATE locking"}
+{"id":"prxa0034","category":"prepare-execute","sql":"PREPARE q34 (integer) AS SELECT * FROM s.t WHERE id = $1 FOR SHARE","expect":"ok","ref":"sql-prepare","note":"PREPARE: SELECT FOR SHARE locking"}
+{"id":"prxa0035","category":"prepare-execute","sql":"PREPARE q35 AS SELECT id, name FROM s.t ORDER BY id DESC","expect":"ok","ref":"sql-prepare","note":"PREPARE: ORDER BY DESC"}
+{"id":"prxa0036","category":"prepare-execute","sql":"PREPARE q36 AS SELECT id, name FROM s.t ORDER BY id NULLS FIRST","expect":"ok","ref":"sql-prepare","note":"PREPARE: ORDER BY NULLS FIRST"}
+{"id":"prxa0037","category":"prepare-execute","sql":"PREPARE q37 AS SELECT id, name FROM s.t ORDER BY id NULLS LAST","expect":"ok","ref":"sql-prepare","note":"PREPARE: ORDER BY NULLS LAST"}
+{"id":"prxa0038","category":"prepare-execute","sql":"PREPARE q38 (date) AS SELECT * FROM s.events WHERE occurred = $1","expect":"ok","ref":"sql-prepare","note":"PREPARE: date param for partitioned table"}
+{"id":"prxa0039","category":"prepare-execute","sql":"PREPARE q39 AS SELECT * FROM s.v","expect":"ok","ref":"sql-prepare","note":"PREPARE: SELECT from view"}
+{"id":"prxa0040","category":"prepare-execute","sql":"PREPARE q40 AS SELECT * FROM s.mv","expect":"ok","ref":"sql-prepare","note":"PREPARE: SELECT from materialized view"}
+{"id":"prxa0041","category":"prepare-execute","sql":"PREPARE q41 (integer) AS SELECT s.f($1)","expect":"ok","ref":"sql-prepare","note":"PREPARE: call fixture function in SELECT"}
+{"id":"prxa0042","category":"prepare-execute","sql":"PREPARE q42 (integer, integer) AS SELECT s.g($1, $2)","expect":"ok","ref":"sql-prepare","note":"PREPARE: call two-param fixture function"}
+{"id":"prxa0043","category":"prepare-execute","sql":"PREPARE q43 AS SELECT * FROM s.rows_f()","expect":"ok","ref":"sql-prepare","note":"PREPARE: set-returning function in FROM"}
+{"id":"prxa0044","category":"prepare-execute","sql":"PREPARE \"MyPlan\" AS SELECT 1","expect":"ok","ref":"sql-prepare","note":"PREPARE: quoted mixed-case name"}
+{"id":"prxa0045","category":"prepare-execute","sql":"PREPARE plan_with_underscores AS SELECT 1","expect":"ok","ref":"sql-prepare","note":"PREPARE: name with underscores"}
+{"id":"prxa0046","category":"prepare-execute","sql":"PREPARE p123 AS SELECT 1","expect":"ok","ref":"sql-prepare","note":"PREPARE: alphanumeric name starting with letter"}
+{"id":"prxa0047","category":"prepare-execute","sql":"PREPARE q47 (integer) AS SELECT * FROM s.t WHERE id = $1; EXECUTE q47 (42)","expect":"ok","ref":"sql-prepare","note":"PREPARE then EXECUTE in same sql block"}
+{"id":"prxa0048","category":"prepare-execute","sql":"PREPARE q48 AS SELECT * FROM s.t; EXECUTE q48","expect":"ok","ref":"sql-prepare","note":"EXECUTE no-param plan without parens"}
+{"id":"prxa0049","category":"prepare-execute","sql":"EXECUTE q49()","expect":"error","ref":"sql-prepare","note":"error: EXECUTE with empty parens is a syntax error"}
+{"id":"prxa0050","category":"prepare-execute","sql":"PREPARE q50 (integer, text) AS SELECT * FROM s.t WHERE id = $1 AND name = $2; EXECUTE q50 (1, 'foo')","expect":"ok","ref":"sql-prepare","note":"EXECUTE with two literal params"}
+{"id":"prxa0051","category":"prepare-execute","sql":"PREPARE q51 (integer) AS SELECT $1 * 2; EXECUTE q51 (7)","expect":"ok","ref":"sql-prepare","note":"EXECUTE: arithmetic expression with param"}
+{"id":"prxa0052","category":"prepare-execute","sql":"PREPARE q52 (text) AS SELECT $1 || ' world'; EXECUTE q52 ('hello')","expect":"ok","ref":"sql-prepare","note":"EXECUTE: string concatenation with param"}
+{"id":"prxa0053","category":"prepare-execute","sql":"PREPARE q53 (boolean) AS SELECT * FROM s.t WHERE flag = $1; EXECUTE q53 (true)","expect":"ok","ref":"sql-prepare","note":"EXECUTE: boolean literal param"}
+{"id":"prxa0054","category":"prepare-execute","sql":"PREPARE q54 (boolean) AS SELECT * FROM s.t WHERE flag = $1; EXECUTE q54 (false)","expect":"ok","ref":"sql-prepare","note":"EXECUTE: false boolean literal param"}
+{"id":"prxa0055","category":"prepare-execute","sql":"PREPARE q55 (integer) AS SELECT * FROM s.t WHERE id = $1; EXECUTE q55 (NULL)","expect":"ok","ref":"sql-prepare","note":"EXECUTE: NULL as parameter value"}
+{"id":"prxa0056","category":"prepare-execute","sql":"PREPARE q56 (numeric) AS SELECT * FROM s.t WHERE val > $1; EXECUTE q56 (3.14)","expect":"ok","ref":"sql-prepare","note":"EXECUTE: decimal numeric literal param"}
+{"id":"prxa0057","category":"prepare-execute","sql":"PREPARE q57 (integer) AS SELECT * FROM s.t WHERE id = $1; EXECUTE q57 (1 + 1)","expect":"ok","ref":"sql-prepare","note":"EXECUTE: expression as parameter"}
+{"id":"prxa0058","category":"prepare-execute","sql":"PREPARE q58 (integer) AS DELETE FROM s.t WHERE id = $1; EXECUTE q58 (-1)","expect":"ok","ref":"sql-prepare","note":"EXECUTE: negative integer param"}
+{"id":"prxa0059","category":"prepare-execute","sql":"PREPARE q59 (text) AS SELECT * FROM s.t WHERE name LIKE $1; EXECUTE q59 ('%foo%')","expect":"ok","ref":"sql-prepare","note":"EXECUTE: LIKE pattern as param"}
+{"id":"prxa0060","category":"prepare-execute","sql":"PREPARE q60 AS SELECT 1; DEALLOCATE q60","expect":"ok","ref":"sql-prepare","note":"DEALLOCATE named plan (bare name)"}
+{"id":"prxa0061","category":"prepare-execute","sql":"PREPARE q61 AS SELECT 1; DEALLOCATE PREPARE q61","expect":"ok","ref":"sql-prepare","note":"DEALLOCATE PREPARE keyword optional variant"}
+{"id":"prxa0062","category":"prepare-execute","sql":"PREPARE q62a AS SELECT 1; PREPARE q62b AS SELECT 2; DEALLOCATE ALL","expect":"ok","ref":"sql-deallocate","note":"DEALLOCATE ALL removes all plans"}
+{"id":"prxa0063","category":"prepare-execute","sql":"PREPARE q63a AS SELECT 1; PREPARE q63b AS SELECT 2; DEALLOCATE PREPARE ALL","expect":"ok","ref":"sql-deallocate","note":"DEALLOCATE PREPARE ALL with optional keyword"}
+{"id":"prxa0064","category":"prepare-execute","sql":"PREPARE q64 AS SELECT 1; EXECUTE q64; DEALLOCATE q64","expect":"ok","ref":"sql-prepare","note":"PREPARE, EXECUTE, then DEALLOCATE sequence"}
+{"id":"prxa0065","category":"prepare-execute","sql":"PREPARE q65 (integer) AS SELECT * FROM s.t WHERE id = $1; EXECUTE q65(10); DEALLOCATE q65","expect":"ok","ref":"sql-prepare","note":"full lifecycle with param"}
+{"id":"prxa0066","category":"prepare-execute","sql":"PREPARE q66 AS INSERT INTO s.t (name) VALUES ('test'); EXECUTE q66; DEALLOCATE q66","expect":"ok","ref":"sql-prepare","note":"full lifecycle with INSERT"}
+{"id":"prxa0067","category":"prepare-execute","sql":"PREPARE q67 (integer, text, numeric) AS INSERT INTO s.t (id, name, val) VALUES ($1, $2, $3); DEALLOCATE q67","expect":"ok","ref":"sql-prepare","note":"PREPARE three-param INSERT then DEALLOCATE without EXECUTE"}
+{"id":"prxa0068","category":"prepare-execute","sql":"PREPARE q68 AS SELECT count(*) FROM s.t","expect":"ok","ref":"sql-prepare","note":"PREPARE: aggregate function count(*)"}
+{"id":"prxa0069","category":"prepare-execute","sql":"PREPARE q69 AS SELECT sum(val), avg(val), max(val), min(val) FROM s.t","expect":"ok","ref":"sql-prepare","note":"PREPARE: multiple aggregates"}
+{"id":"prxa0070","category":"prepare-execute","sql":"PREPARE q70 AS SELECT id, name, row_number() OVER () FROM s.t","expect":"ok","ref":"sql-prepare","note":"PREPARE: window function"}
+{"id":"prxa0071","category":"prepare-execute","sql":"PREPARE q71 AS SELECT id, sum(val) OVER (PARTITION BY status) FROM s.t","expect":"ok","ref":"sql-prepare","note":"PREPARE: window function with PARTITION BY"}
+{"id":"prxa0072","category":"prepare-execute","sql":"PREPARE q72 AS SELECT DISTINCT status FROM s.t","expect":"ok","ref":"sql-prepare","note":"PREPARE: SELECT DISTINCT"}
+{"id":"prxa0073","category":"prepare-execute","sql":"PREPARE q73 AS SELECT id FROM s.t WHERE EXISTS (SELECT 1 FROM s.t2 WHERE t2.t_id = s.t.id)","expect":"ok","ref":"sql-prepare","note":"PREPARE: correlated EXISTS subquery"}
+{"id":"prxa0074","category":"prepare-execute","sql":"PREPARE q74 (integer) AS SELECT id FROM s.t WHERE id IN (SELECT t_id FROM s.t2 WHERE amount > $1)","expect":"ok","ref":"sql-prepare","note":"PREPARE: IN subquery with param"}
+{"id":"prxa0075","category":"prepare-execute","sql":"PREPARE q75 AS SELECT id, (SELECT label FROM s.t2 WHERE t2.t_id = t.id LIMIT 1) FROM s.t","expect":"ok","ref":"sql-prepare","note":"PREPARE: scalar subquery in SELECT list"}
+{"id":"prxa0076","category":"prepare-execute","sql":"PREPARE q76 AS SELECT t.id, t2.label FROM s.t LEFT JOIN s.t2 ON t.id = t2.t_id","expect":"ok","ref":"sql-prepare","note":"PREPARE: LEFT JOIN"}
+{"id":"prxa0077","category":"prepare-execute","sql":"PREPARE q77 AS SELECT t.id, t2.label FROM s.t RIGHT JOIN s.t2 ON t.id = t2.t_id","expect":"ok","ref":"sql-prepare","note":"PREPARE: RIGHT JOIN"}
+{"id":"prxa0078","category":"prepare-execute","sql":"PREPARE q78 AS SELECT t.id, t2.label FROM s.t FULL JOIN s.t2 ON t.id = t2.t_id","expect":"ok","ref":"sql-prepare","note":"PREPARE: FULL OUTER JOIN"}
+{"id":"prxa0079","category":"prepare-execute","sql":"PREPARE q79 AS SELECT t.id FROM s.t CROSS JOIN s.t2","expect":"ok","ref":"sql-prepare","note":"PREPARE: CROSS JOIN"}
+{"id":"prxa0080","category":"prepare-execute","sql":"PREPARE q80 AS SELECT * FROM s.t NATURAL JOIN s.t2","expect":"ok","ref":"sql-prepare","note":"PREPARE: NATURAL JOIN"}
+{"id":"prxa0081","category":"prepare-execute","sql":"PREPARE q81 (s.mood) AS SELECT * FROM s.t WHERE status = $1; EXECUTE q81 ('ok'::s.mood)","expect":"ok","ref":"sql-prepare","note":"EXECUTE: cast enum literal as param"}
+{"id":"prxa0082","category":"prepare-execute","sql":"PREPARE q82 AS SELECT CASE WHEN val > 0 THEN 'positive' ELSE 'non-positive' END FROM s.t","expect":"ok","ref":"sql-prepare","note":"PREPARE: CASE expression"}
+{"id":"prxa0083","category":"prepare-execute","sql":"PREPARE q83 (integer) AS SELECT CASE $1 WHEN 1 THEN 'one' WHEN 2 THEN 'two' ELSE 'other' END","expect":"ok","ref":"sql-prepare","note":"PREPARE: simple CASE expression with param"}
+{"id":"prxa0084","category":"prepare-execute","sql":"PREPARE q84 AS SELECT COALESCE(val, 0) FROM s.t","expect":"ok","ref":"sql-prepare","note":"PREPARE: COALESCE expression"}
+{"id":"prxa0085","category":"prepare-execute","sql":"PREPARE q85 AS SELECT NULLIF(qty, 0) FROM s.t","expect":"ok","ref":"sql-prepare","note":"PREPARE: NULLIF expression"}
+{"id":"prxa0086","category":"prepare-execute","sql":"PREPARE q86 AS SELECT GREATEST(val, 0) FROM s.t","expect":"ok","ref":"sql-prepare","note":"PREPARE: GREATEST expression"}
+{"id":"prxa0087","category":"prepare-execute","sql":"PREPARE q87 AS SELECT LEAST(val, 100) FROM s.t","expect":"ok","ref":"sql-prepare","note":"PREPARE: LEAST expression"}
+{"id":"prxa0088","category":"prepare-execute","sql":"PREPARE q88 AS SELECT data->>'key' FROM s.t","expect":"ok","ref":"sql-prepare","note":"PREPARE: JSON arrow operator"}
+{"id":"prxa0089","category":"prepare-execute","sql":"PREPARE q89 (text) AS SELECT data->$1 FROM s.t","expect":"ok","ref":"sql-prepare","note":"PREPARE: JSON arrow operator with param key"}
+{"id":"prxa0090","category":"prepare-execute","sql":"PREPARE q90 AS SELECT (home).city FROM s.t","expect":"ok","ref":"sql-prepare","note":"PREPARE: composite type field access"}
+{"id":"prxa0091","category":"prepare-execute","sql":"PREPARE q91 AS SELECT tags[1] FROM s.t","expect":"ok","ref":"sql-prepare","note":"PREPARE: array subscript access"}
+{"id":"prxa0092","category":"prepare-execute","sql":"PREPARE q92 AS SELECT id FROM s.t WHERE tags @> ARRAY['a']","expect":"ok","ref":"sql-prepare","note":"PREPARE: array containment operator"}
+{"id":"prxa0093","category":"prepare-execute","sql":"PREPARE q93 AS SELECT id FROM s.t WHERE data @> '{\"k\":1}'","expect":"ok","ref":"sql-prepare","note":"PREPARE: jsonb containment operator"}
+{"id":"prxa0094","category":"prepare-execute","sql":"PREPARE q94 AS SELECT id FROM s.t WHERE name ~* 'foo'","expect":"ok","ref":"sql-prepare","note":"PREPARE: regex match operator"}
+{"id":"prxa0095","category":"prepare-execute","sql":"PREPARE q95 AS SELECT id FROM s.t WHERE span @> 5","expect":"ok","ref":"sql-prepare","note":"PREPARE: range containment operator"}
+{"id":"prxa0096","category":"prepare-execute","sql":"PREPARE q96 (integer) AS SELECT * FROM s.t WHERE id = $1; EXECUTE q96(1); EXECUTE q96(2); EXECUTE q96(3)","expect":"ok","ref":"sql-prepare","note":"EXECUTE same plan multiple times with different params"}
+{"id":"prxa0097","category":"prepare-execute","sql":"PREPARE q97 AS SELECT nextval('s.seq')","expect":"ok","ref":"sql-prepare","note":"PREPARE: nextval sequence call"}
+{"id":"prxa0098","category":"prepare-execute","sql":"PREPARE q98 AS SELECT currval('s.seq')","expect":"ok","ref":"sql-prepare","note":"PREPARE: currval after nextval (currval without prior nextval may error at runtime but is valid to prepare)"}
+{"id":"prxa0099","category":"prepare-execute","sql":"PREPARE q99 AS SELECT id, name FROM s.t FETCH FIRST 5 ROWS ONLY","expect":"ok","ref":"sql-prepare","note":"PREPARE: FETCH FIRST ... ROWS ONLY"}
+{"id":"prxa0100","category":"prepare-execute","sql":"PREPARE q100 AS SELECT id, name FROM s.t OFFSET 3 ROWS FETCH NEXT 5 ROWS ONLY","expect":"ok","ref":"sql-prepare","note":"PREPARE: SQL standard OFFSET ... FETCH NEXT"}
+{"id":"prxa0101","category":"prepare-execute","sql":"PREPARE q101 AS SELECT id, name FROM s.t FETCH FIRST 1 ROW ONLY","expect":"ok","ref":"sql-prepare","note":"PREPARE: FETCH FIRST 1 ROW ONLY singular form"}
+{"id":"prxa0102","category":"prepare-execute","sql":"PREPARE q102 (integer) AS SELECT * FROM s.t WHERE id = $1; EXPLAIN EXECUTE q102(1)","expect":"ok","ref":"sql-prepare","note":"EXPLAIN EXECUTE to inspect prepared plan"}
+{"id":"prxa0103","category":"prepare-execute","sql":"PREPARE q103 (integer) AS SELECT * FROM s.t WHERE id = $1; EXPLAIN (ANALYZE false, COSTS true) EXECUTE q103(1)","expect":"ok","ref":"sql-prepare","note":"EXPLAIN with options and EXECUTE"}
+{"id":"prxa0104","category":"prepare-execute","sql":"PREPARE q104 AS SELECT * FROM s.parent UNION ALL SELECT id, kind FROM s.child","expect":"ok","ref":"sql-prepare","note":"PREPARE: UNION ALL with inherited table"}
+{"id":"prxa0105","category":"prepare-execute","sql":"PREPARE q105 AS SELECT * FROM s.t WHERE created_at BETWEEN '2020-01-01' AND '2025-01-01'","expect":"ok","ref":"sql-prepare","note":"PREPARE: BETWEEN date range predicate"}
+{"id":"prxa0106","category":"prepare-execute","sql":"PREPARE q106 (timestamptz, timestamptz) AS SELECT * FROM s.t WHERE created_at BETWEEN $1 AND $2","expect":"ok","ref":"sql-prepare","note":"PREPARE: BETWEEN with two timestamp params"}
+{"id":"prxa0107","category":"prepare-execute","sql":"PREPARE q107 AS SELECT id, name FROM s.t WHERE name IS NOT NULL","expect":"ok","ref":"sql-prepare","note":"PREPARE: IS NOT NULL predicate"}
+{"id":"prxa0108","category":"prepare-execute","sql":"PREPARE q108 AS SELECT id, name FROM s.t WHERE val IS NULL","expect":"ok","ref":"sql-prepare","note":"PREPARE: IS NULL predicate"}
+{"id":"prxa0109","category":"prepare-execute","sql":"PREPARE q109 AS SELECT id, name FROM s.t WHERE name NOT LIKE '%test%'","expect":"ok","ref":"sql-prepare","note":"PREPARE: NOT LIKE predicate"}
+{"id":"prxa0110","category":"prepare-execute","sql":"PREPARE q110 AS SELECT id, name FROM s.t WHERE name ILIKE 'foo%'","expect":"ok","ref":"sql-prepare","note":"PREPARE: ILIKE case-insensitive pattern"}
+{"id":"prxa0111","category":"prepare-execute","sql":"PREPARE q111 AS SELECT id, name FROM s.t WHERE status IN ('ok', 'happy')","expect":"ok","ref":"sql-prepare","note":"PREPARE: IN list predicate"}
+{"id":"prxa0112","category":"prepare-execute","sql":"PREPARE q112 AS SELECT id, name FROM s.t WHERE status NOT IN ('sad')","expect":"ok","ref":"sql-prepare","note":"PREPARE: NOT IN predicate"}
+{"id":"prxa0113","category":"prepare-execute","sql":"PREPARE q113 (text) AS SELECT * FROM s.t WHERE name SIMILAR TO $1","expect":"ok","ref":"sql-prepare","note":"PREPARE: SIMILAR TO with param"}
+{"id":"prxa0114","category":"prepare-execute","sql":"PREPARE q114 AS INSERT INTO s.t (name, qty, flag) VALUES ('a', 1, true), ('b', 2, false)","expect":"ok","ref":"sql-prepare","note":"PREPARE: multi-row VALUES INSERT"}
+{"id":"prxa0115","category":"prepare-execute","sql":"PREPARE q115 AS UPDATE s.t SET qty = qty + 1 WHERE flag = true","expect":"ok","ref":"sql-prepare","note":"PREPARE: UPDATE with expression increment"}
+{"id":"prxa0116","category":"prepare-execute","sql":"PREPARE q116 AS UPDATE s.t SET (name, qty) = ('updated', 99) WHERE id < 0","expect":"ok","ref":"sql-prepare","note":"PREPARE: UPDATE with column list assignment"}
+{"id":"prxa0117","category":"prepare-execute","sql":"PREPARE q117 (integer) AS UPDATE s.t2 SET amount = amount * 2 WHERE t_id = $1","expect":"ok","ref":"sql-prepare","note":"PREPARE: UPDATE with arithmetic expression"}
+{"id":"prxa0118","category":"prepare-execute","sql":"PREPARE q118 AS DELETE FROM s.t2 WHERE amount = 0","expect":"ok","ref":"sql-prepare","note":"PREPARE: DELETE with simple condition"}
+{"id":"prxa0119","category":"prepare-execute","sql":"PREPARE q119 AS DELETE FROM s.t WHERE id IN (SELECT t_id FROM s.t2 WHERE amount < 0)","expect":"ok","ref":"sql-prepare","note":"PREPARE: DELETE with IN subquery"}
+{"id":"prxa0120","category":"prepare-execute","sql":"PREPARE q120 AS SELECT id FROM s.t TABLESAMPLE SYSTEM(50)","expect":"ok","ref":"sql-prepare","note":"PREPARE: TABLESAMPLE SYSTEM"}
+{"id":"prxa0121","category":"prepare-execute","sql":"PREPARE q121 AS SELECT id FROM s.t TABLESAMPLE BERNOULLI(25)","expect":"ok","ref":"sql-prepare","note":"PREPARE: TABLESAMPLE BERNOULLI"}
+{"id":"prxa0122","category":"prepare-execute","sql":"PREPARE q122 AS SELECT * FROM s.t WHERE data IS NOT NULL AND jsonb_typeof(data) = 'object'","expect":"ok","ref":"sql-prepare","note":"PREPARE: JSON type check function"}
+{"id":"prxa0123","category":"prepare-execute","sql":"PREPARE q123 AS SELECT id, name FROM s.t WHERE id = ANY(SELECT t_id FROM s.t2)","expect":"ok","ref":"sql-prepare","note":"PREPARE: ANY with subquery"}
+{"id":"prxa0124","category":"prepare-execute","sql":"PREPARE q124 AS SELECT id, name FROM s.t WHERE id > ALL(SELECT t_id FROM s.t2 WHERE amount > 0)","expect":"ok","ref":"sql-prepare","note":"PREPARE: ALL with subquery"}
+{"id":"prxa0125","category":"prepare-execute","sql":"PREPARE q125 AS WITH RECURSIVE nums(n) AS (SELECT 1 UNION ALL SELECT n+1 FROM nums WHERE n < 5) SELECT * FROM nums","expect":"ok","ref":"sql-prepare","note":"PREPARE: recursive CTE"}
+{"id":"prxa0126","category":"prepare-execute","sql":"PREPARE q126 (integer) AS SELECT * FROM s.t WHERE id = $1; EXECUTE q126(1 + 1)","expect":"ok","ref":"sql-prepare","note":"EXECUTE: expression evaluating to param value"}
+{"id":"prxa0127","category":"prepare-execute","sql":"PREPARE q127 AS SELECT id, name FROM s.t WHERE id = $1","expect":"ok","ref":"sql-prepare","note":"PREPARE: param in WHERE without explicit type (type inference)"}
+{"id":"prxa0128","category":"prepare-execute","sql":"PREPARE q128 (integer, text, numeric, boolean) AS INSERT INTO s.t (qty, name, val, flag) VALUES ($1, $2, $3, $4)","expect":"ok","ref":"sql-prepare","note":"PREPARE: four typed params INSERT"}
+{"id":"prxa0129","category":"prepare-execute","sql":"PREPARE q129 AS SELECT p.id, c.extra FROM s.parent p JOIN s.child c ON p.id = c.id","expect":"ok","ref":"sql-prepare","note":"PREPARE: JOIN with inherited table and aliases"}
+{"id":"prxa0130","category":"prepare-execute","sql":"PREPARE q130 AS SELECT * FROM s.events_2024 WHERE occurred = '2024-06-01'","expect":"ok","ref":"sql-prepare","note":"PREPARE: query against table partition directly"}
+{"id":"prxa0131","category":"prepare-execute","sql":"PREPARE q131 (text) AS SELECT * FROM s.t WHERE to_tsvector('english', name) @@ plainto_tsquery('english', $1)","expect":"ok","ref":"sql-prepare","note":"PREPARE: full-text search with param"}
+{"id":"prxa0132","category":"prepare-execute","sql":"PREPARE q132 AS SELECT id, name, val FROM s.t WHERE id = $1 OR name = $2","expect":"ok","ref":"sql-prepare","note":"PREPARE: two untyped params inferred from context"}
+{"id":"prxa0133","category":"prepare-execute","sql":"DEALLOCATE nonexistent_plan","expect":"error","ref":"sql-deallocate","note":"error: DEALLOCATE non-existent plan name"}
+{"id":"prxa0134","category":"prepare-execute","sql":"EXECUTE nonexistent_plan","expect":"error","ref":"sql-prepare","note":"error: EXECUTE non-existent prepared statement"}
+{"id":"prxa0135","category":"prepare-execute","sql":"PREPARE AS SELECT 1","expect":"error","ref":"sql-prepare","note":"error: PREPARE missing name before AS"}
+{"id":"prxa0136","category":"prepare-execute","sql":"PREPARE q136 SELECT 1","expect":"error","ref":"sql-prepare","note":"error: PREPARE missing AS keyword"}
+{"id":"prxa0137","category":"prepare-execute","sql":"PREPARE q137 AS","expect":"error","ref":"sql-prepare","note":"error: PREPARE with nothing after AS"}
+{"id":"prxa0138","category":"prepare-execute","sql":"PREPARE q138 AS CREATE TABLE foo (x int)","expect":"error","ref":"sql-prepare","note":"error: PREPARE with DDL (CREATE TABLE) not allowed"}
+{"id":"prxa0139","category":"prepare-execute","sql":"PREPARE q139 AS BEGIN","expect":"error","ref":"sql-prepare","note":"error: PREPARE transaction control statement BEGIN"}
+{"id":"prxa0140","category":"prepare-execute","sql":"PREPARE q140 (badtype) AS SELECT $1","expect":"error","ref":"sql-prepare","note":"error: PREPARE with nonexistent param type"}
+{"id":"prxa0141","category":"prepare-execute","sql":"PREPARE q141 () AS SELECT 1","expect":"error","ref":"sql-prepare","note":"error: PREPARE with empty type list (parens but no types)"}
+{"id":"prxa0142","category":"prepare-execute","sql":"PREPARE 123bad AS SELECT 1","expect":"error","ref":"sql-prepare","note":"error: PREPARE with name starting with digit (invalid identifier)"}
+{"id":"prxa0143","category":"prepare-execute","sql":"PREPARE q143 (integer,) AS SELECT $1","expect":"error","ref":"sql-prepare","note":"error: PREPARE with trailing comma in type list"}
+{"id":"prxa0144","category":"prepare-execute","sql":"PREPARE q144 AS SELECT * FROM nonexistent_table_xyz","expect":"error","ref":"sql-prepare","note":"error: PREPARE references non-existent table (semantic error)"}
+{"id":"prxa0145","category":"prepare-execute","sql":"PREPARE q145 AS VACUUM s.t","expect":"error","ref":"sql-prepare","note":"error: PREPARE with VACUUM statement not allowed"}
+{"id":"prxa0146","category":"prepare-execute","sql":"DEALLOCATE","expect":"error","ref":"sql-deallocate","note":"error: DEALLOCATE with no name and no ALL"}
+{"id":"prxa0147","category":"prepare-execute","sql":"PREPARE q147 (integer) AS SELECT * FROM s.t WHERE id = $1; EXECUTE q147(1, 2)","expect":"error","ref":"sql-prepare","note":"error: EXECUTE with too many params (wrong count)"}
+{"id":"prxa0148","category":"prepare-execute","sql":"PREPARE q148 (integer, text) AS SELECT * FROM s.t WHERE id = $1 AND name = $2; EXECUTE q148(1)","expect":"error","ref":"sql-prepare","note":"error: EXECUTE with too few params (wrong count)"}
+{"id":"prxa0149","category":"prepare-execute","sql":"PREPARE q149 AS CALL s.p(1)","expect":"error","ref":"sql-prepare","note":"error: PREPARE with CALL statement not allowed"}
+{"id":"prxa0150","category":"prepare-execute","sql":"PREPARE q150 AS SELECT * FROM s.t; PREPARE q150 AS SELECT 1","expect":"error","ref":"sql-prepare","note":"error: PREPARE with duplicate name in same session"}

@@ -1,0 +1,100 @@
+{"id":"lcka0001","category":"lock-cmd","sql":"BEGIN; LOCK TABLE s.t; ROLLBACK;","expect":"ok","ref":"sql-lock","note":"basic LOCK TABLE with default mode (ACCESS EXCLUSIVE)"}
+{"id":"lcka0002","category":"lock-cmd","sql":"BEGIN; LOCK s.t; ROLLBACK;","expect":"ok","ref":"sql-lock","note":"LOCK without TABLE keyword"}
+{"id":"lcka0003","category":"lock-cmd","sql":"BEGIN; LOCK TABLE s.t IN ACCESS SHARE MODE; ROLLBACK;","expect":"ok","ref":"sql-lock","note":"ACCESS SHARE mode explicit"}
+{"id":"lcka0004","category":"lock-cmd","sql":"BEGIN; LOCK TABLE s.t IN ROW SHARE MODE; ROLLBACK;","expect":"ok","ref":"sql-lock","note":"ROW SHARE mode"}
+{"id":"lcka0005","category":"lock-cmd","sql":"BEGIN; LOCK TABLE s.t IN ROW EXCLUSIVE MODE; ROLLBACK;","expect":"ok","ref":"sql-lock","note":"ROW EXCLUSIVE mode"}
+{"id":"lcka0006","category":"lock-cmd","sql":"BEGIN; LOCK TABLE s.t IN SHARE UPDATE EXCLUSIVE MODE; ROLLBACK;","expect":"ok","ref":"sql-lock","note":"SHARE UPDATE EXCLUSIVE mode"}
+{"id":"lcka0007","category":"lock-cmd","sql":"BEGIN; LOCK TABLE s.t IN SHARE MODE; ROLLBACK;","expect":"ok","ref":"sql-lock","note":"SHARE mode"}
+{"id":"lcka0008","category":"lock-cmd","sql":"BEGIN; LOCK TABLE s.t IN SHARE ROW EXCLUSIVE MODE; ROLLBACK;","expect":"ok","ref":"sql-lock","note":"SHARE ROW EXCLUSIVE mode"}
+{"id":"lcka0009","category":"lock-cmd","sql":"BEGIN; LOCK TABLE s.t IN EXCLUSIVE MODE; ROLLBACK;","expect":"ok","ref":"sql-lock","note":"EXCLUSIVE mode"}
+{"id":"lcka0010","category":"lock-cmd","sql":"BEGIN; LOCK TABLE s.t IN ACCESS EXCLUSIVE MODE; ROLLBACK;","expect":"ok","ref":"sql-lock","note":"ACCESS EXCLUSIVE mode explicit"}
+{"id":"lcka0011","category":"lock-cmd","sql":"BEGIN; LOCK TABLE s.t NOWAIT; ROLLBACK;","expect":"ok","ref":"sql-lock","note":"LOCK with NOWAIT, default mode"}
+{"id":"lcka0012","category":"lock-cmd","sql":"BEGIN; LOCK TABLE s.t IN ACCESS SHARE MODE NOWAIT; ROLLBACK;","expect":"ok","ref":"sql-lock","note":"ACCESS SHARE with NOWAIT"}
+{"id":"lcka0013","category":"lock-cmd","sql":"BEGIN; LOCK TABLE s.t IN ROW SHARE MODE NOWAIT; ROLLBACK;","expect":"ok","ref":"sql-lock","note":"ROW SHARE with NOWAIT"}
+{"id":"lcka0014","category":"lock-cmd","sql":"BEGIN; LOCK TABLE s.t IN ROW EXCLUSIVE MODE NOWAIT; ROLLBACK;","expect":"ok","ref":"sql-lock","note":"ROW EXCLUSIVE with NOWAIT"}
+{"id":"lcka0015","category":"lock-cmd","sql":"BEGIN; LOCK TABLE s.t IN SHARE UPDATE EXCLUSIVE MODE NOWAIT; ROLLBACK;","expect":"ok","ref":"sql-lock","note":"SHARE UPDATE EXCLUSIVE with NOWAIT"}
+{"id":"lcka0016","category":"lock-cmd","sql":"BEGIN; LOCK TABLE s.t IN SHARE MODE NOWAIT; ROLLBACK;","expect":"ok","ref":"sql-lock","note":"SHARE mode with NOWAIT"}
+{"id":"lcka0017","category":"lock-cmd","sql":"BEGIN; LOCK TABLE s.t IN SHARE ROW EXCLUSIVE MODE NOWAIT; ROLLBACK;","expect":"ok","ref":"sql-lock","note":"SHARE ROW EXCLUSIVE with NOWAIT"}
+{"id":"lcka0018","category":"lock-cmd","sql":"BEGIN; LOCK TABLE s.t IN EXCLUSIVE MODE NOWAIT; ROLLBACK;","expect":"ok","ref":"sql-lock","note":"EXCLUSIVE with NOWAIT"}
+{"id":"lcka0019","category":"lock-cmd","sql":"BEGIN; LOCK TABLE s.t IN ACCESS EXCLUSIVE MODE NOWAIT; ROLLBACK;","expect":"ok","ref":"sql-lock","note":"ACCESS EXCLUSIVE with NOWAIT"}
+{"id":"lcka0020","category":"lock-cmd","sql":"BEGIN; LOCK TABLE ONLY s.t; ROLLBACK;","expect":"ok","ref":"sql-lock","note":"ONLY keyword excludes descendant tables"}
+{"id":"lcka0021","category":"lock-cmd","sql":"BEGIN; LOCK TABLE ONLY s.t IN ACCESS SHARE MODE; ROLLBACK;","expect":"ok","ref":"sql-lock","note":"ONLY with ACCESS SHARE"}
+{"id":"lcka0022","category":"lock-cmd","sql":"BEGIN; LOCK TABLE ONLY s.t IN ROW SHARE MODE; ROLLBACK;","expect":"ok","ref":"sql-lock","note":"ONLY with ROW SHARE"}
+{"id":"lcka0023","category":"lock-cmd","sql":"BEGIN; LOCK TABLE ONLY s.t IN ROW EXCLUSIVE MODE; ROLLBACK;","expect":"ok","ref":"sql-lock","note":"ONLY with ROW EXCLUSIVE"}
+{"id":"lcka0024","category":"lock-cmd","sql":"BEGIN; LOCK TABLE ONLY s.t IN SHARE UPDATE EXCLUSIVE MODE; ROLLBACK;","expect":"ok","ref":"sql-lock","note":"ONLY with SHARE UPDATE EXCLUSIVE"}
+{"id":"lcka0025","category":"lock-cmd","sql":"BEGIN; LOCK TABLE ONLY s.t IN SHARE MODE; ROLLBACK;","expect":"ok","ref":"sql-lock","note":"ONLY with SHARE"}
+{"id":"lcka0026","category":"lock-cmd","sql":"BEGIN; LOCK TABLE ONLY s.t IN SHARE ROW EXCLUSIVE MODE; ROLLBACK;","expect":"ok","ref":"sql-lock","note":"ONLY with SHARE ROW EXCLUSIVE"}
+{"id":"lcka0027","category":"lock-cmd","sql":"BEGIN; LOCK TABLE ONLY s.t IN EXCLUSIVE MODE; ROLLBACK;","expect":"ok","ref":"sql-lock","note":"ONLY with EXCLUSIVE"}
+{"id":"lcka0028","category":"lock-cmd","sql":"BEGIN; LOCK TABLE ONLY s.t IN ACCESS EXCLUSIVE MODE; ROLLBACK;","expect":"ok","ref":"sql-lock","note":"ONLY with ACCESS EXCLUSIVE"}
+{"id":"lcka0029","category":"lock-cmd","sql":"BEGIN; LOCK TABLE ONLY s.t NOWAIT; ROLLBACK;","expect":"ok","ref":"sql-lock","note":"ONLY with NOWAIT default mode"}
+{"id":"lcka0030","category":"lock-cmd","sql":"BEGIN; LOCK TABLE ONLY s.t IN SHARE MODE NOWAIT; ROLLBACK;","expect":"ok","ref":"sql-lock","note":"ONLY with SHARE and NOWAIT"}
+{"id":"lcka0031","category":"lock-cmd","sql":"BEGIN; LOCK TABLE s.t *; ROLLBACK;","expect":"ok","ref":"sql-lock","note":"star suffix explicitly includes descendants"}
+{"id":"lcka0032","category":"lock-cmd","sql":"BEGIN; LOCK TABLE s.t * IN ACCESS SHARE MODE; ROLLBACK;","expect":"ok","ref":"sql-lock","note":"star suffix with ACCESS SHARE"}
+{"id":"lcka0033","category":"lock-cmd","sql":"BEGIN; LOCK TABLE s.t * IN SHARE MODE NOWAIT; ROLLBACK;","expect":"ok","ref":"sql-lock","note":"star suffix with SHARE and NOWAIT"}
+{"id":"lcka0034","category":"lock-cmd","sql":"BEGIN; LOCK TABLE s.t, s.t2; ROLLBACK;","expect":"ok","ref":"sql-lock","note":"lock multiple tables in one statement"}
+{"id":"lcka0035","category":"lock-cmd","sql":"BEGIN; LOCK TABLE s.t, s.t2, s.parent; ROLLBACK;","expect":"ok","ref":"sql-lock","note":"lock three tables"}
+{"id":"lcka0036","category":"lock-cmd","sql":"BEGIN; LOCK TABLE s.t, s.t2 IN SHARE MODE; ROLLBACK;","expect":"ok","ref":"sql-lock","note":"multiple tables with SHARE mode"}
+{"id":"lcka0037","category":"lock-cmd","sql":"BEGIN; LOCK TABLE s.t, s.t2 IN ROW EXCLUSIVE MODE NOWAIT; ROLLBACK;","expect":"ok","ref":"sql-lock","note":"multiple tables with mode and NOWAIT"}
+{"id":"lcka0038","category":"lock-cmd","sql":"BEGIN; LOCK TABLE ONLY s.t, s.t2; ROLLBACK;","expect":"ok","ref":"sql-lock","note":"ONLY on first table, second inherits normally"}
+{"id":"lcka0039","category":"lock-cmd","sql":"BEGIN; LOCK TABLE ONLY s.t, ONLY s.t2; ROLLBACK;","expect":"ok","ref":"sql-lock","note":"ONLY on each table in list"}
+{"id":"lcka0040","category":"lock-cmd","sql":"BEGIN; LOCK s.t, s.t2 IN ACCESS EXCLUSIVE MODE; ROLLBACK;","expect":"ok","ref":"sql-lock","note":"no TABLE keyword, multiple tables, explicit mode"}
+{"id":"lcka0041","category":"lock-cmd","sql":"BEGIN; LOCK TABLE s.parent; ROLLBACK;","expect":"ok","ref":"sql-lock","note":"lock parent table (has child via INHERITS)"}
+{"id":"lcka0042","category":"lock-cmd","sql":"BEGIN; LOCK TABLE ONLY s.parent; ROLLBACK;","expect":"ok","ref":"sql-lock","note":"ONLY on parent excludes inherited child"}
+{"id":"lcka0043","category":"lock-cmd","sql":"BEGIN; LOCK TABLE s.child; ROLLBACK;","expect":"ok","ref":"sql-lock","note":"lock child table directly"}
+{"id":"lcka0044","category":"lock-cmd","sql":"BEGIN; LOCK TABLE s.events; ROLLBACK;","expect":"ok","ref":"sql-lock","note":"lock partitioned table"}
+{"id":"lcka0045","category":"lock-cmd","sql":"BEGIN; LOCK TABLE s.events_2024; ROLLBACK;","expect":"ok","ref":"sql-lock","note":"lock individual partition"}
+{"id":"lcka0046","category":"lock-cmd","sql":"BEGIN; LOCK TABLE s.v; ROLLBACK;","expect":"ok","ref":"sql-lock","note":"lock a view (recursively locks underlying tables)"}
+{"id":"lcka0047","category":"lock-cmd","sql":"BEGIN; LOCK TABLE s.mv; ROLLBACK;","expect":"error","ref":"sql-lock","note":"cannot lock a materialized view (semantic error 42809)"}
+{"id":"lcka0048","category":"lock-cmd","sql":"BEGIN; LOCK TABLE s.t IN ACCESS SHARE MODE; LOCK TABLE s.t2 IN ROW EXCLUSIVE MODE; ROLLBACK;","expect":"ok","ref":"sql-lock","note":"two sequential LOCK statements in one transaction"}
+{"id":"lcka0049","category":"lock-cmd","sql":"BEGIN; LOCK TABLE s.t IN access share mode; ROLLBACK;","expect":"ok","ref":"sql-lock","note":"lock mode keywords are case-insensitive"}
+{"id":"lcka0050","category":"lock-cmd","sql":"BEGIN; lock table s.t in share mode; ROLLBACK;","expect":"ok","ref":"sql-lock","note":"entire statement lowercase"}
+{"id":"lcka0051","category":"lock-cmd","sql":"BEGIN; LOCK TABLE s.t IN SHARE MODE; INSERT INTO s.t(name) VALUES ('x'); ROLLBACK;","expect":"ok","ref":"sql-lock","note":"LOCK then DML in same transaction"}
+{"id":"lcka0052","category":"lock-cmd","sql":"BEGIN; LOCK TABLE s.t2 IN ROW SHARE MODE; SELECT * FROM s.t2; ROLLBACK;","expect":"ok","ref":"sql-lock","note":"LOCK then SELECT in same transaction"}
+{"id":"lcka0053","category":"lock-cmd","sql":"BEGIN; LOCK TABLE s.t IN SHARE UPDATE EXCLUSIVE MODE; UPDATE s.t SET val = 1 WHERE id = 0; ROLLBACK;","expect":"ok","ref":"sql-lock","note":"SHARE UPDATE EXCLUSIVE then UPDATE"}
+{"id":"lcka0054","category":"lock-cmd","sql":"BEGIN; LOCK TABLE s.t, s.t2, s.parent, s.child IN SHARE MODE; ROLLBACK;","expect":"ok","ref":"sql-lock","note":"four tables locked with SHARE mode"}
+{"id":"lcka0055","category":"lock-cmd","sql":"BEGIN; LOCK TABLE s.t * IN ACCESS EXCLUSIVE MODE NOWAIT; ROLLBACK;","expect":"ok","ref":"sql-lock","note":"star with ACCESS EXCLUSIVE and NOWAIT"}
+{"id":"lcka0056","category":"lock-cmd","sql":"BEGIN; LOCK TABLE ONLY s.t IN ROW SHARE MODE NOWAIT; ROLLBACK;","expect":"ok","ref":"sql-lock","note":"ONLY with ROW SHARE and NOWAIT"}
+{"id":"lcka0057","category":"lock-cmd","sql":"BEGIN; LOCK TABLE ONLY s.t IN SHARE UPDATE EXCLUSIVE MODE NOWAIT; ROLLBACK;","expect":"ok","ref":"sql-lock","note":"ONLY with SHARE UPDATE EXCLUSIVE and NOWAIT"}
+{"id":"lcka0058","category":"lock-cmd","sql":"BEGIN; LOCK TABLE ONLY s.t IN SHARE ROW EXCLUSIVE MODE NOWAIT; ROLLBACK;","expect":"ok","ref":"sql-lock","note":"ONLY with SHARE ROW EXCLUSIVE and NOWAIT"}
+{"id":"lcka0059","category":"lock-cmd","sql":"BEGIN; LOCK TABLE ONLY s.t IN EXCLUSIVE MODE NOWAIT; ROLLBACK;","expect":"ok","ref":"sql-lock","note":"ONLY with EXCLUSIVE and NOWAIT"}
+{"id":"lcka0060","category":"lock-cmd","sql":"BEGIN; LOCK TABLE ONLY s.t IN ACCESS EXCLUSIVE MODE NOWAIT; ROLLBACK;","expect":"ok","ref":"sql-lock","note":"ONLY with ACCESS EXCLUSIVE and NOWAIT"}
+{"id":"lcka0061","category":"lock-cmd","sql":"BEGIN; LOCK TABLE ONLY s.events IN ACCESS SHARE MODE; ROLLBACK;","expect":"ok","ref":"sql-lock","note":"ONLY on partitioned table with ACCESS SHARE"}
+{"id":"lcka0062","category":"lock-cmd","sql":"BEGIN; LOCK TABLE s.events, s.events_2024 IN SHARE MODE; ROLLBACK;","expect":"ok","ref":"sql-lock","note":"lock partitioned table and partition together"}
+{"id":"lcka0063","category":"lock-cmd","sql":"BEGIN; LOCK TABLE s.t IN ROW EXCLUSIVE MODE; LOCK TABLE s.t2 IN ROW EXCLUSIVE MODE; LOCK TABLE s.parent IN ROW EXCLUSIVE MODE; ROLLBACK;","expect":"ok","ref":"sql-lock","note":"three sequential LOCK statements"}
+{"id":"lcka0064","category":"lock-cmd","sql":"BEGIN; LOCK TABLE s.t IN SHARE MODE; LOCK TABLE s.t IN ACCESS SHARE MODE; ROLLBACK;","expect":"ok","ref":"sql-lock","note":"lock same table twice with compatible modes"}
+{"id":"lcka0065","category":"lock-cmd","sql":"BEGIN; LOCK TABLE s.v IN ACCESS SHARE MODE; ROLLBACK;","expect":"ok","ref":"sql-lock","note":"lock view with ACCESS SHARE"}
+{"id":"lcka0066","category":"lock-cmd","sql":"BEGIN; LOCK TABLE s.t IN SHARE MODE; LOCK TABLE s.t2 IN SHARE MODE; LOCK TABLE s.parent IN SHARE MODE; LOCK TABLE s.child IN SHARE MODE; ROLLBACK;","expect":"ok","ref":"sql-lock","note":"four sequential SHARE locks"}
+{"id":"lcka0067","category":"lock-cmd","sql":"BEGIN; LOCK TABLE s.t IN SHARE ROW EXCLUSIVE MODE; LOCK TABLE s.t IN ACCESS EXCLUSIVE MODE; ROLLBACK;","expect":"ok","ref":"sql-lock","note":"lock same table twice with SHARE ROW EXCLUSIVE then ACCESS EXCLUSIVE in same session"}
+{"id":"lcka0068","category":"lock-cmd","sql":"BEGIN; LOCK TABLE s.t IN EXCLUSIVE; ROLLBACK;","expect":"error","ref":"sql-lock","note":"missing MODE keyword after lock mode name"}
+{"id":"lcka0069","category":"lock-cmd","sql":"BEGIN; LOCK TABLE s.t IN ACCESS; ROLLBACK;","expect":"error","ref":"sql-lock","note":"incomplete two-word lock mode ACCESS SHARE - missing second word"}
+{"id":"lcka0070","category":"lock-cmd","sql":"BEGIN; LOCK TABLE s.t IN ROW; ROLLBACK;","expect":"error","ref":"sql-lock","note":"incomplete two-word lock mode ROW SHARE - missing second word"}
+{"id":"lcka0071","category":"lock-cmd","sql":"BEGIN; LOCK TABLE s.t IN SHARE UPDATE; ROLLBACK;","expect":"error","ref":"sql-lock","note":"incomplete three-word lock mode SHARE UPDATE EXCLUSIVE - missing EXCLUSIVE"}
+{"id":"lcka0072","category":"lock-cmd","sql":"BEGIN; LOCK TABLE s.t IN SHARE ROW; ROLLBACK;","expect":"error","ref":"sql-lock","note":"incomplete three-word lock mode SHARE ROW EXCLUSIVE - missing EXCLUSIVE"}
+{"id":"lcka0073","category":"lock-cmd","sql":"BEGIN; LOCK TABLE s.t IN BOGUS MODE; ROLLBACK;","expect":"error","ref":"sql-lock","note":"invalid lock mode name"}
+{"id":"lcka0074","category":"lock-cmd","sql":"BEGIN; LOCK TABLE s.t NOWAIT IN SHARE MODE; ROLLBACK;","expect":"error","ref":"sql-lock","note":"NOWAIT before IN ... MODE is invalid syntax (must come after)"}
+{"id":"lcka0075","category":"lock-cmd","sql":"BEGIN; LOCK TABLE s.t MODE; ROLLBACK;","expect":"error","ref":"sql-lock","note":"MODE keyword without IN or mode name"}
+{"id":"lcka0076","category":"lock-cmd","sql":"BEGIN; LOCK TABLE s.t IN MODE; ROLLBACK;","expect":"error","ref":"sql-lock","note":"IN MODE with no lock mode name"}
+{"id":"lcka0077","category":"lock-cmd","sql":"BEGIN; LOCK TABLE s.no_such_table; ROLLBACK;","expect":"error","ref":"sql-lock","note":"semantic error: table does not exist"}
+{"id":"lcka0078","category":"lock-cmd","sql":"BEGIN; LOCK TABLE IN SHARE MODE; ROLLBACK;","expect":"error","ref":"sql-lock","note":"missing table name after TABLE"}
+{"id":"lcka0079","category":"lock-cmd","sql":"BEGIN; LOCK IN SHARE MODE; ROLLBACK;","expect":"error","ref":"sql-lock","note":"missing table name entirely (no TABLE keyword)"}
+{"id":"lcka0080","category":"lock-cmd","sql":"BEGIN; LOCK TABLE s.t IN ACCESS EXCLUSIVE MODE ACCESS EXCLUSIVE MODE; ROLLBACK;","expect":"error","ref":"sql-lock","note":"mode clause repeated"}
+{"id":"lcka0081","category":"lock-cmd","sql":"BEGIN; LOCK TABLE s.t NOWAIT NOWAIT; ROLLBACK;","expect":"error","ref":"sql-lock","note":"NOWAIT keyword repeated"}
+{"id":"lcka0082","category":"lock-cmd","sql":"BEGIN; LOCK TABLE s.t IN EXCLUSIVE SHARE MODE; ROLLBACK;","expect":"error","ref":"sql-lock","note":"invalid composite mode EXCLUSIVE SHARE"}
+{"id":"lcka0083","category":"lock-cmd","sql":"BEGIN; LOCK TABLE ONLY ONLY s.t; ROLLBACK;","expect":"error","ref":"sql-lock","note":"ONLY keyword repeated"}
+{"id":"lcka0084","category":"lock-cmd","sql":"BEGIN; LOCK TABLE s.t IN ACCESS SHARE MODE IN ROW EXCLUSIVE MODE; ROLLBACK;","expect":"error","ref":"sql-lock","note":"two IN ... MODE clauses"}
+{"id":"lcka0085","category":"lock-cmd","sql":"BEGIN; LOCK TABLE s.seq; ROLLBACK;","expect":"error","ref":"sql-lock","note":"cannot lock a sequence (not a table relation)"}
+{"id":"lcka0086","category":"lock-cmd","sql":"BEGIN; LOCK TABLE s.f; ROLLBACK;","expect":"error","ref":"sql-lock","note":"cannot lock a function"}
+{"id":"lcka0087","category":"lock-cmd","sql":"BEGIN; LOCK TABLE s.t IN SHARE ROW EXCLUSIVE MODE, s.t2 IN ACCESS SHARE MODE; ROLLBACK;","expect":"error","ref":"sql-lock","note":"per-table mode clauses not supported - one mode applies to all"}
+{"id":"lcka0088","category":"lock-cmd","sql":"BEGIN; LOCK TABLE s.t ONLY; ROLLBACK;","expect":"error","ref":"sql-lock","note":"ONLY after table name is invalid (must be before)"}
+{"id":"lcka0089","category":"lock-cmd","sql":"BEGIN; LOCK TABLE s.t IN SHARE MODE ONLY; ROLLBACK;","expect":"error","ref":"sql-lock","note":"ONLY after mode clause is invalid"}
+{"id":"lcka0090","category":"lock-cmd","sql":"BEGIN; LOCK TABLE (s.t); ROLLBACK;","expect":"error","ref":"sql-lock","note":"parentheses around table name not valid syntax"}
+{"id":"lcka0091","category":"lock-cmd","sql":"BEGIN; LOCK TABLE s.t IN 'SHARE' MODE; ROLLBACK;","expect":"error","ref":"sql-lock","note":"lock mode as string literal is invalid"}
+{"id":"lcka0092","category":"lock-cmd","sql":"BEGIN; LOCK TABLE s.t IN ACCESS SHARE; ROLLBACK;","expect":"error","ref":"sql-lock","note":"missing MODE keyword at end of mode clause"}
+{"id":"lcka0093","category":"lock-cmd","sql":"BEGIN; LOCK s.t, s.t2 IN ROW EXCLUSIVE MODE NOWAIT; LOCK TABLE s.parent IN SHARE MODE; ROLLBACK;","expect":"ok","ref":"sql-lock","note":"no-TABLE lock + TABLE lock in same transaction"}
+{"id":"lcka0094","category":"lock-cmd","sql":"BEGIN; LOCK TABLE s.t IN ROW SHARE MODE; LOCK TABLE s.t IN ROW EXCLUSIVE MODE; ROLLBACK;","expect":"ok","ref":"sql-lock","note":"upgrade lock on same table within same session"}
+{"id":"lcka0095","category":"lock-cmd","sql":"BEGIN; LOCK TABLE s.t * IN EXCLUSIVE MODE NOWAIT; LOCK TABLE s.t2 * IN SHARE MODE NOWAIT; ROLLBACK;","expect":"ok","ref":"sql-lock","note":"star suffix on two tables with different modes and NOWAIT"}
+{"id":"lcka0096","category":"lock-cmd","sql":"BEGIN; LOCK TABLE ONLY s.t, ONLY s.t2 IN SHARE MODE NOWAIT; ROLLBACK;","expect":"ok","ref":"sql-lock","note":"ONLY on each table in comma list with mode and NOWAIT"}
+{"id":"lcka0097","category":"lock-cmd","sql":"BEGIN; LOCK TABLE s.t IN ACCESS SHARE MODE; LOCK TABLE s.t IN ROW SHARE MODE; LOCK TABLE s.t IN ROW EXCLUSIVE MODE; LOCK TABLE s.t IN SHARE UPDATE EXCLUSIVE MODE; LOCK TABLE s.t IN SHARE MODE; ROLLBACK;","expect":"ok","ref":"sql-lock","note":"escalating lock modes on same table in same session"}
+{"id":"lcka0098","category":"lock-cmd","sql":"BEGIN; LOCK TABLE s.t IN ACCESS EXCLUSIVE MODE; INSERT INTO s.t(name, qty, flag, status) VALUES ('locked', 1, true, 'ok'); ROLLBACK;","expect":"ok","ref":"sql-lock","note":"ACCESS EXCLUSIVE then INSERT"}
+{"id":"lcka0099","category":"lock-cmd","sql":"BEGIN; LOCK TABLE s.t IN SHARE ROW EXCLUSIVE MODE; DELETE FROM s.t WHERE id = -1; ROLLBACK;","expect":"ok","ref":"sql-lock","note":"SHARE ROW EXCLUSIVE then DELETE"}
+{"id":"lcka0100","category":"lock-cmd","sql":"BEGIN; LOCK TABLE s.t IN SHARE MODE; LOCK TABLE s.t2 IN SHARE MODE; SELECT s.t.id FROM s.t JOIN s.t2 ON s.t2.t_id = s.t.id; ROLLBACK;","expect":"ok","ref":"sql-lock","note":"SHARE locks then JOIN query"}

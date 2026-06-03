@@ -1,0 +1,120 @@
+{"id":"vala0001","category":"values-table-cmd","sql":"VALUES (1)","expect":"ok","ref":"sql-values","note":"single row single column"}
+{"id":"vala0002","category":"values-table-cmd","sql":"VALUES (1, 2, 3)","expect":"ok","ref":"sql-values","note":"single row multiple columns"}
+{"id":"vala0003","category":"values-table-cmd","sql":"VALUES (1), (2), (3)","expect":"ok","ref":"sql-values","note":"multiple rows single column"}
+{"id":"vala0004","category":"values-table-cmd","sql":"VALUES (1, 'a'), (2, 'b'), (3, 'c')","expect":"ok","ref":"sql-values","note":"multiple rows multiple columns"}
+{"id":"vala0005","category":"values-table-cmd","sql":"VALUES ('hello', true, 3.14)","expect":"ok","ref":"sql-values","note":"mixed literal types in single row"}
+{"id":"vala0006","category":"values-table-cmd","sql":"VALUES (NULL)","expect":"ok","ref":"sql-values","note":"single NULL value"}
+{"id":"vala0007","category":"values-table-cmd","sql":"VALUES (NULL, NULL, NULL)","expect":"ok","ref":"sql-values","note":"all-NULL row"}
+{"id":"vala0008","category":"values-table-cmd","sql":"VALUES (1, NULL), (NULL, 2)","expect":"ok","ref":"sql-values","note":"NULLs mixed with values across rows"}
+{"id":"vala0009","category":"values-table-cmd","sql":"VALUES (1 + 2)","expect":"ok","ref":"sql-values","note":"expression in values row"}
+{"id":"vala0010","category":"values-table-cmd","sql":"VALUES (1 + 1, 2 * 3, 10 / 2)","expect":"ok","ref":"sql-values","note":"arithmetic expressions in row"}
+{"id":"vala0011","category":"values-table-cmd","sql":"VALUES (now())","expect":"ok","ref":"sql-values","note":"function call as value expression"}
+{"id":"vala0012","category":"values-table-cmd","sql":"VALUES (ARRAY[1,2,3])","expect":"ok","ref":"sql-values","note":"array literal expression"}
+{"id":"vala0013","category":"values-table-cmd","sql":"VALUES ('{\"a\":1}'::jsonb)","expect":"ok","ref":"sql-values","note":"cast expression in values"}
+{"id":"vala0014","category":"values-table-cmd","sql":"VALUES (CAST(42 AS bigint))","expect":"ok","ref":"sql-values","note":"CAST expression in values"}
+{"id":"vala0015","category":"values-table-cmd","sql":"VALUES (1, 2) ORDER BY 1","expect":"ok","ref":"sql-values","note":"ORDER BY column ordinal position"}
+{"id":"vala0016","category":"values-table-cmd","sql":"VALUES (3), (1), (2) ORDER BY 1","expect":"ok","ref":"sql-values","note":"ORDER BY column 1 sorts multiple rows"}
+{"id":"vala0017","category":"values-table-cmd","sql":"VALUES (3), (1), (2) ORDER BY 1 ASC","expect":"ok","ref":"sql-values","note":"ORDER BY column 1 explicit ASC"}
+{"id":"vala0018","category":"values-table-cmd","sql":"VALUES (3), (1), (2) ORDER BY 1 DESC","expect":"ok","ref":"sql-values","note":"ORDER BY column 1 explicit DESC"}
+{"id":"vala0019","category":"values-table-cmd","sql":"VALUES (1, 'b'), (2, 'a') ORDER BY 2","expect":"ok","ref":"sql-values","note":"ORDER BY second column"}
+{"id":"vala0020","category":"values-table-cmd","sql":"VALUES (1, 'b'), (2, 'a') ORDER BY 2 ASC","expect":"ok","ref":"sql-values","note":"ORDER BY second column ASC"}
+{"id":"vala0021","category":"values-table-cmd","sql":"VALUES (1, 'b'), (2, 'a') ORDER BY 2 DESC","expect":"ok","ref":"sql-values","note":"ORDER BY second column DESC"}
+{"id":"vala0022","category":"values-table-cmd","sql":"VALUES (1, 2), (3, 4) ORDER BY 1 ASC, 2 DESC","expect":"ok","ref":"sql-values","note":"ORDER BY multiple columns with different directions"}
+{"id":"vala0023","category":"values-table-cmd","sql":"VALUES (3), (1), (2) ORDER BY 1 LIMIT 2","expect":"ok","ref":"sql-values","note":"ORDER BY with LIMIT"}
+{"id":"vala0024","category":"values-table-cmd","sql":"VALUES (1), (2), (3) LIMIT 2","expect":"ok","ref":"sql-values","note":"LIMIT without ORDER BY"}
+{"id":"vala0025","category":"values-table-cmd","sql":"VALUES (1), (2), (3) LIMIT ALL","expect":"ok","ref":"sql-values","note":"LIMIT ALL returns all rows"}
+{"id":"vala0026","category":"values-table-cmd","sql":"VALUES (1), (2), (3) OFFSET 1","expect":"ok","ref":"sql-values","note":"OFFSET without ORDER BY"}
+{"id":"vala0027","category":"values-table-cmd","sql":"VALUES (1), (2), (3) OFFSET 1 ROW","expect":"ok","ref":"sql-values","note":"OFFSET with ROW keyword"}
+{"id":"vala0028","category":"values-table-cmd","sql":"VALUES (1), (2), (3) OFFSET 1 ROWS","expect":"ok","ref":"sql-values","note":"OFFSET with ROWS keyword"}
+{"id":"vala0029","category":"values-table-cmd","sql":"VALUES (1), (2), (3) LIMIT 2 OFFSET 1","expect":"ok","ref":"sql-values","note":"LIMIT and OFFSET combined"}
+{"id":"vala0030","category":"values-table-cmd","sql":"VALUES (3), (1), (2) ORDER BY 1 LIMIT 2 OFFSET 1","expect":"ok","ref":"sql-values","note":"ORDER BY, LIMIT, and OFFSET combined"}
+{"id":"vala0031","category":"values-table-cmd","sql":"VALUES (1), (2), (3) FETCH FIRST 2 ROWS ONLY","expect":"ok","ref":"sql-values","note":"FETCH FIRST ROWS ONLY clause"}
+{"id":"vala0032","category":"values-table-cmd","sql":"VALUES (1), (2), (3) FETCH NEXT 2 ROWS ONLY","expect":"ok","ref":"sql-values","note":"FETCH NEXT ROWS ONLY clause"}
+{"id":"vala0033","category":"values-table-cmd","sql":"VALUES (1), (2), (3) FETCH FIRST 1 ROW ONLY","expect":"ok","ref":"sql-values","note":"FETCH FIRST ROW ONLY singular"}
+{"id":"vala0034","category":"values-table-cmd","sql":"VALUES (1), (2), (3) FETCH NEXT 1 ROW ONLY","expect":"ok","ref":"sql-values","note":"FETCH NEXT ROW ONLY singular"}
+{"id":"vala0035","category":"values-table-cmd","sql":"VALUES (1), (2), (3) FETCH FIRST ROW ONLY","expect":"ok","ref":"sql-values","note":"FETCH FIRST ROW ONLY without count"}
+{"id":"vala0036","category":"values-table-cmd","sql":"VALUES (1), (2), (3) ORDER BY 1 FETCH FIRST 2 ROWS ONLY","expect":"ok","ref":"sql-values","note":"ORDER BY with FETCH FIRST"}
+{"id":"vala0037","category":"values-table-cmd","sql":"VALUES (1), (2), (3) OFFSET 1 ROWS FETCH NEXT 1 ROW ONLY","expect":"ok","ref":"sql-values","note":"OFFSET ROWS with FETCH NEXT ROW"}
+{"id":"vala0038","category":"values-table-cmd","sql":"SELECT * FROM (VALUES (1, 'a'), (2, 'b')) AS v(num, letter)","expect":"ok","ref":"sql-values","note":"VALUES as subquery in FROM with alias and column aliases"}
+{"id":"vala0039","category":"values-table-cmd","sql":"SELECT * FROM (VALUES (1, 'a'), (2, 'b')) AS v","expect":"ok","ref":"sql-values","note":"VALUES as subquery in FROM with table alias only"}
+{"id":"vala0040","category":"values-table-cmd","sql":"SELECT v.num FROM (VALUES (1), (2)) AS v(num)","expect":"ok","ref":"sql-values","note":"reference aliased column from VALUES subquery"}
+{"id":"vala0041","category":"values-table-cmd","sql":"SELECT v.num * 2 FROM (VALUES (3), (5)) AS v(num) ORDER BY 1","expect":"ok","ref":"sql-values","note":"expression on VALUES subquery column"}
+{"id":"vala0042","category":"values-table-cmd","sql":"INSERT INTO s.t(name, qty) VALUES ('x', 1)","expect":"ok","ref":"sql-values","note":"single-row VALUES in INSERT"}
+{"id":"vala0043","category":"values-table-cmd","sql":"INSERT INTO s.t(name, qty) VALUES ('x', 1), ('y', 2)","expect":"ok","ref":"sql-values","note":"multi-row VALUES in INSERT"}
+{"id":"vala0044","category":"values-table-cmd","sql":"INSERT INTO s.t2(label, amount) VALUES ('a', 9.99), ('b', 19.99), ('c', 0.50)","expect":"ok","ref":"sql-values","note":"multi-row INSERT into s.t2"}
+{"id":"vala0045","category":"values-table-cmd","sql":"INSERT INTO s.t(name, qty, flag) VALUES ('z', DEFAULT, DEFAULT)","expect":"ok","ref":"sql-values","note":"DEFAULT keyword in INSERT VALUES"}
+{"id":"vala0046","category":"values-table-cmd","sql":"SELECT column1, column2 FROM (VALUES (1, 'hello'), (2, 'world')) AS t","expect":"ok","ref":"sql-values","note":"default column names column1/column2 from VALUES subquery"}
+{"id":"vala0047","category":"values-table-cmd","sql":"WITH v AS (VALUES (1,'a'),(2,'b')) SELECT * FROM v","expect":"ok","ref":"sql-values","note":"VALUES in CTE (WITH clause)"}
+{"id":"vala0048","category":"values-table-cmd","sql":"WITH v(n,s) AS (VALUES (1,'a'),(2,'b')) SELECT n, s FROM v","expect":"ok","ref":"sql-values","note":"VALUES in named CTE with column aliases"}
+{"id":"vala0049","category":"values-table-cmd","sql":"VALUES (1) UNION VALUES (2)","expect":"ok","ref":"sql-values","note":"VALUES UNION VALUES"}
+{"id":"vala0050","category":"values-table-cmd","sql":"VALUES (1) UNION ALL VALUES (2)","expect":"ok","ref":"sql-values","note":"VALUES UNION ALL VALUES"}
+{"id":"vala0051","category":"values-table-cmd","sql":"VALUES (1) INTERSECT VALUES (1)","expect":"ok","ref":"sql-values","note":"VALUES INTERSECT VALUES"}
+{"id":"vala0052","category":"values-table-cmd","sql":"VALUES (1),(2),(3) EXCEPT VALUES (2)","expect":"ok","ref":"sql-values","note":"VALUES EXCEPT VALUES"}
+{"id":"vala0053","category":"values-table-cmd","sql":"SELECT id FROM s.t UNION VALUES (999)","expect":"ok","ref":"sql-values","note":"SELECT UNION VALUES"}
+{"id":"vala0054","category":"values-table-cmd","sql":"VALUES (1,'a') UNION SELECT id, name FROM s.t","expect":"ok","ref":"sql-values","note":"VALUES UNION SELECT"}
+{"id":"vala0055","category":"values-table-cmd","sql":"VALUES (1::integer, 'hello'::text)","expect":"ok","ref":"sql-values","note":"typed casts in VALUES"}
+{"id":"vala0056","category":"values-table-cmd","sql":"VALUES ('2024-01-15'::date)","expect":"ok","ref":"sql-values","note":"date cast in VALUES"}
+{"id":"vala0057","category":"values-table-cmd","sql":"VALUES (INTERVAL '1 day')","expect":"ok","ref":"sql-values","note":"interval literal in VALUES"}
+{"id":"vala0058","category":"values-table-cmd","sql":"VALUES (POINT(1.0, 2.0))","expect":"ok","ref":"sql-values","note":"geometric point constructor in VALUES"}
+{"id":"vala0059","category":"values-table-cmd","sql":"VALUES (ROW(1, 'hello'))","expect":"ok","ref":"sql-values","note":"ROW constructor as value"}
+{"id":"vala0060","category":"values-table-cmd","sql":"VALUES (ROW(1, 'foo')::s.addr)","expect":"error","ref":"sql-values","note":"ROW cast to composite type with wrong field count/types - semantic error"}
+{"id":"vala0061","category":"values-table-cmd","sql":"VALUES ('sad'::s.mood)","expect":"ok","ref":"sql-values","note":"enum cast in VALUES"}
+{"id":"vala0062","category":"values-table-cmd","sql":"VALUES (5::s.pos_int)","expect":"ok","ref":"sql-values","note":"domain cast in VALUES"}
+{"id":"vala0063","category":"values-table-cmd","sql":"SELECT * FROM s.t WHERE id IN (SELECT column1 FROM (VALUES (1::bigint),(2::bigint)) AS v)","expect":"ok","ref":"sql-values","note":"VALUES subquery in IN predicate"}
+{"id":"vala0064","category":"values-table-cmd","sql":"SELECT * FROM s.t JOIN (VALUES (0::numeric)) AS v(val) ON s.t.val = v.val","expect":"ok","ref":"sql-values","note":"VALUES subquery in JOIN condition"}
+{"id":"vala0065","category":"values-table-cmd","sql":"TABLE s.t","expect":"ok","ref":"sql-values","note":"TABLE command on regular table"}
+{"id":"vala0066","category":"values-table-cmd","sql":"TABLE s.t2","expect":"ok","ref":"sql-values","note":"TABLE command on table with FK"}
+{"id":"vala0067","category":"values-table-cmd","sql":"TABLE s.v","expect":"ok","ref":"sql-values","note":"TABLE command on a view"}
+{"id":"vala0068","category":"values-table-cmd","sql":"TABLE s.mv","expect":"ok","ref":"sql-values","note":"TABLE command on a materialized view"}
+{"id":"vala0069","category":"values-table-cmd","sql":"TABLE s.parent","expect":"ok","ref":"sql-values","note":"TABLE command on parent table with child"}
+{"id":"vala0070","category":"values-table-cmd","sql":"TABLE s.child","expect":"ok","ref":"sql-values","note":"TABLE command on child/inherited table"}
+{"id":"vala0071","category":"values-table-cmd","sql":"TABLE s.events","expect":"ok","ref":"sql-values","note":"TABLE command on partitioned table"}
+{"id":"vala0072","category":"values-table-cmd","sql":"TABLE s.events_2024","expect":"ok","ref":"sql-values","note":"TABLE command on partition"}
+{"id":"vala0073","category":"values-table-cmd","sql":"TABLE s.t ORDER BY id","expect":"ok","ref":"sql-values","note":"TABLE command with ORDER BY"}
+{"id":"vala0074","category":"values-table-cmd","sql":"TABLE s.t ORDER BY id DESC","expect":"ok","ref":"sql-values","note":"TABLE command with ORDER BY DESC"}
+{"id":"vala0075","category":"values-table-cmd","sql":"TABLE s.t ORDER BY name ASC, id DESC","expect":"ok","ref":"sql-values","note":"TABLE command with multi-column ORDER BY"}
+{"id":"vala0076","category":"values-table-cmd","sql":"TABLE s.t LIMIT 5","expect":"ok","ref":"sql-values","note":"TABLE command with LIMIT"}
+{"id":"vala0077","category":"values-table-cmd","sql":"TABLE s.t LIMIT ALL","expect":"ok","ref":"sql-values","note":"TABLE command with LIMIT ALL"}
+{"id":"vala0078","category":"values-table-cmd","sql":"TABLE s.t OFFSET 2","expect":"ok","ref":"sql-values","note":"TABLE command with OFFSET"}
+{"id":"vala0079","category":"values-table-cmd","sql":"TABLE s.t OFFSET 2 ROWS","expect":"ok","ref":"sql-values","note":"TABLE command with OFFSET ROWS"}
+{"id":"vala0080","category":"values-table-cmd","sql":"TABLE s.t LIMIT 5 OFFSET 2","expect":"ok","ref":"sql-values","note":"TABLE command with LIMIT and OFFSET"}
+{"id":"vala0081","category":"values-table-cmd","sql":"TABLE s.t ORDER BY id LIMIT 3 OFFSET 1","expect":"ok","ref":"sql-values","note":"TABLE command with ORDER BY, LIMIT, OFFSET"}
+{"id":"vala0082","category":"values-table-cmd","sql":"TABLE s.t FETCH FIRST 3 ROWS ONLY","expect":"ok","ref":"sql-values","note":"TABLE command with FETCH FIRST ROWS ONLY"}
+{"id":"vala0083","category":"values-table-cmd","sql":"TABLE s.t FETCH NEXT 1 ROW ONLY","expect":"ok","ref":"sql-values","note":"TABLE command with FETCH NEXT ROW ONLY"}
+{"id":"vala0084","category":"values-table-cmd","sql":"TABLE s.t ORDER BY id FETCH FIRST 5 ROWS ONLY","expect":"ok","ref":"sql-values","note":"TABLE command ORDER BY with FETCH FIRST"}
+{"id":"vala0085","category":"values-table-cmd","sql":"TABLE ONLY s.parent","expect":"ok","ref":"sql-values","note":"TABLE ONLY excludes inherited rows"}
+{"id":"vala0086","category":"values-table-cmd","sql":"TABLE ONLY s.child","expect":"ok","ref":"sql-values","note":"TABLE ONLY on child table"}
+{"id":"vala0087","category":"values-table-cmd","sql":"TABLE ONLY s.t","expect":"ok","ref":"sql-values","note":"TABLE ONLY on regular table (no children - still valid)"}
+{"id":"vala0088","category":"values-table-cmd","sql":"TABLE ONLY s.parent ORDER BY id LIMIT 10","expect":"ok","ref":"sql-values","note":"TABLE ONLY with ORDER BY and LIMIT"}
+{"id":"vala0089","category":"values-table-cmd","sql":"TABLE s.t UNION TABLE s.t2","expect":"error","ref":"sql-values","note":"TABLE UNION TABLE - different column counts/types is a semantic error"}
+{"id":"vala0090","category":"values-table-cmd","sql":"SELECT id, name, val FROM s.t UNION TABLE s.v","expect":"ok","ref":"sql-values","note":"SELECT UNION TABLE with matching columns (id,name,val)"}
+{"id":"vala0091","category":"values-table-cmd","sql":"TABLE s.v UNION SELECT id, name, val FROM s.t","expect":"ok","ref":"sql-values","note":"TABLE UNION SELECT with matching columns"}
+{"id":"vala0092","category":"values-table-cmd","sql":"SELECT * FROM (TABLE s.t) AS sub","expect":"ok","ref":"sql-values","note":"TABLE command as subquery in FROM"}
+{"id":"vala0093","category":"values-table-cmd","sql":"WITH cte AS (TABLE s.t) SELECT id FROM cte","expect":"ok","ref":"sql-values","note":"TABLE command in CTE"}
+{"id":"vala0094","category":"values-table-cmd","sql":"VALUES","expect":"error","ref":"sql-values","note":"VALUES with no row list - syntax error"}
+{"id":"vala0095","category":"values-table-cmd","sql":"VALUES ()","expect":"error","ref":"sql-values","note":"VALUES with empty row - syntax error"}
+{"id":"vala0096","category":"values-table-cmd","sql":"VALUES (1,), (2,)","expect":"error","ref":"sql-values","note":"trailing comma in row - syntax error"}
+{"id":"vala0097","category":"values-table-cmd","sql":"VALUES (1 2)","expect":"error","ref":"sql-values","note":"missing comma between expressions - syntax error"}
+{"id":"vala0098","category":"values-table-cmd","sql":"VALUES (1) ORDER BY name","expect":"error","ref":"sql-values","note":"ORDER BY non-integer expression in VALUES - semantic error"}
+{"id":"vala0099","category":"values-table-cmd","sql":"VALUES (1) ORDER BY 0","expect":"error","ref":"sql-values","note":"ORDER BY column index 0 is invalid"}
+{"id":"vala0100","category":"values-table-cmd","sql":"VALUES (1) ORDER BY 2","expect":"error","ref":"sql-values","note":"ORDER BY column index out of range - semantic error"}
+{"id":"vala0101","category":"values-table-cmd","sql":"VALUES (1) LIMIT -1","expect":"error","ref":"sql-values","note":"LIMIT with negative value - semantic error"}
+{"id":"vala0102","category":"values-table-cmd","sql":"VALUES (1) OFFSET -1","expect":"error","ref":"sql-values","note":"OFFSET with negative value - semantic error"}
+{"id":"vala0103","category":"values-table-cmd","sql":"TABLE","expect":"error","ref":"sql-values","note":"TABLE command with no table name - syntax error"}
+{"id":"vala0104","category":"values-table-cmd","sql":"TABLE s.nonexistent_table","expect":"error","ref":"sql-values","note":"TABLE command on nonexistent table - semantic error"}
+{"id":"vala0105","category":"values-table-cmd","sql":"TABLE s.t WHERE id = 1","expect":"error","ref":"sql-values","note":"TABLE command does not support WHERE clause - syntax error"}
+{"id":"vala0106","category":"values-table-cmd","sql":"VALUES (1) WHERE 1=1","expect":"error","ref":"sql-values","note":"VALUES does not support WHERE clause - syntax error"}
+{"id":"vala0107","category":"values-table-cmd","sql":"VALUES (1) HAVING 1=1","expect":"error","ref":"sql-values","note":"VALUES does not support HAVING clause - syntax error"}
+{"id":"vala0108","category":"values-table-cmd","sql":"VALUES (1) GROUP BY 1","expect":"error","ref":"sql-values","note":"VALUES does not support GROUP BY clause - syntax error"}
+{"id":"vala0109","category":"values-table-cmd","sql":"SELECT * FROM (VALUES (1,'a'),(2,'b')) AS v(x,y) WHERE v.x > 1","expect":"ok","ref":"sql-values","note":"filter on VALUES subquery columns via WHERE in outer SELECT"}
+{"id":"vala0110","category":"values-table-cmd","sql":"SELECT column1 FROM (VALUES (1),(2),(3)) AS v ORDER BY column1 DESC","expect":"ok","ref":"sql-values","note":"outer SELECT with ORDER BY on VALUES-derived column"}
+{"id":"vala0111","category":"values-table-cmd","sql":"INSERT INTO s.t(name) SELECT v.nm FROM (VALUES ('inserted_via_values')) AS v(nm)","expect":"ok","ref":"sql-values","note":"INSERT ... SELECT from VALUES subquery"}
+{"id":"vala0112","category":"values-table-cmd","sql":"INSERT INTO s.t(name) TABLE s.v","expect":"error","ref":"sql-values","note":"INSERT ... TABLE - not valid INSERT syntax for TABLE command"}
+{"id":"vala0113","category":"values-table-cmd","sql":"VALUES (1) USING operator","expect":"error","ref":"sql-values","note":"USING without ORDER BY - syntax error"}
+{"id":"vala0114","category":"values-table-cmd","sql":"VALUES (3),(1),(2) ORDER BY 1 USING <","expect":"ok","ref":"sql-values","note":"ORDER BY USING operator for ascending-like sort"}
+{"id":"vala0115","category":"values-table-cmd","sql":"VALUES (3),(1),(2) ORDER BY 1 USING >","expect":"ok","ref":"sql-values","note":"ORDER BY USING > operator for descending-like sort"}
+{"id":"vala0116","category":"values-table-cmd","sql":"VALUES (1),(2),(3) ORDER BY 1 NULLS FIRST","expect":"ok","ref":"sql-values","note":"ORDER BY with NULLS FIRST"}
+{"id":"vala0117","category":"values-table-cmd","sql":"VALUES (1),(NULL),(3) ORDER BY 1 DESC NULLS LAST","expect":"ok","ref":"sql-values","note":"ORDER BY DESC NULLS LAST with NULL value"}
+{"id":"vala0118","category":"values-table-cmd","sql":"VALUES (1),(NULL),(3) ORDER BY 1 ASC NULLS FIRST","expect":"ok","ref":"sql-values","note":"ORDER BY ASC NULLS FIRST with NULL value"}
+{"id":"vala0119","category":"values-table-cmd","sql":"SELECT count(*) FROM (VALUES (1),(2),(3)) AS v","expect":"ok","ref":"sql-values","note":"aggregate over VALUES subquery"}
+{"id":"vala0120","category":"values-table-cmd","sql":"VALUES (3),(1),(2) ORDER BY 1 FETCH FIRST 2 ROWS WITH TIES","expect":"ok","ref":"sql-values","note":"FETCH FIRST WITH TIES requires ORDER BY"}

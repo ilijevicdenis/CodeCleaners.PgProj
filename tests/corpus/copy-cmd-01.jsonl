@@ -1,0 +1,170 @@
+{"id":"cpya0001","category":"copy-cmd","sql":"COPY s.t TO STDOUT","expect":"ok","ref":"sql-copy","note":"basic COPY TO STDOUT no options"}
+{"id":"cpya0002","category":"copy-cmd","sql":"COPY s.t TO STDOUT WITH (FORMAT text)","expect":"ok","ref":"sql-copy","note":"FORMAT text explicit with WITH keyword"}
+{"id":"cpya0003","category":"copy-cmd","sql":"COPY s.t TO STDOUT WITH (FORMAT csv)","expect":"ok","ref":"sql-copy","note":"FORMAT csv with WITH keyword"}
+{"id":"cpya0004","category":"copy-cmd","sql":"COPY s.t TO STDOUT WITH (FORMAT binary)","expect":"ok","ref":"sql-copy","note":"FORMAT binary with WITH keyword"}
+{"id":"cpya0005","category":"copy-cmd","sql":"COPY s.t TO STDOUT (FORMAT text)","expect":"ok","ref":"sql-copy","note":"FORMAT text WITH keyword omitted"}
+{"id":"cpya0006","category":"copy-cmd","sql":"COPY s.t TO STDOUT (FORMAT csv)","expect":"ok","ref":"sql-copy","note":"FORMAT csv WITH keyword omitted"}
+{"id":"cpya0007","category":"copy-cmd","sql":"COPY s.t (id, name) TO STDOUT","expect":"ok","ref":"sql-copy","note":"column list with two columns"}
+{"id":"cpya0008","category":"copy-cmd","sql":"COPY s.t (id, name, val, qty) TO STDOUT","expect":"ok","ref":"sql-copy","note":"multiple columns in column list"}
+{"id":"cpya0009","category":"copy-cmd","sql":"COPY s.t (name) TO STDOUT (FORMAT csv)","expect":"ok","ref":"sql-copy","note":"single column with FORMAT csv"}
+{"id":"cpya0010","category":"copy-cmd","sql":"COPY (SELECT id, name FROM s.t) TO STDOUT","expect":"ok","ref":"sql-copy","note":"query form COPY TO STDOUT"}
+{"id":"cpya0011","category":"copy-cmd","sql":"COPY (SELECT * FROM s.t WHERE id > 0) TO STDOUT","expect":"ok","ref":"sql-copy","note":"query with WHERE clause"}
+{"id":"cpya0012","category":"copy-cmd","sql":"COPY (SELECT id, name FROM s.t ORDER BY id) TO STDOUT (FORMAT csv)","expect":"ok","ref":"sql-copy","note":"query with ORDER BY and FORMAT csv"}
+{"id":"cpya0013","category":"copy-cmd","sql":"COPY (SELECT count(*) FROM s.t) TO STDOUT","expect":"ok","ref":"sql-copy","note":"aggregate query form"}
+{"id":"cpya0014","category":"copy-cmd","sql":"COPY s.t TO STDOUT (FORMAT csv, DELIMITER ',')","expect":"ok","ref":"sql-copy","note":"csv with comma delimiter"}
+{"id":"cpya0015","category":"copy-cmd","sql":"COPY s.t TO STDOUT (FORMAT csv, DELIMITER '|')","expect":"ok","ref":"sql-copy","note":"csv with pipe delimiter"}
+{"id":"cpya0016","category":"copy-cmd","sql":"COPY s.t TO STDOUT (FORMAT csv, DELIMITER E'\\t')","expect":"ok","ref":"sql-copy","note":"csv with tab delimiter via E-escape"}
+{"id":"cpya0017","category":"copy-cmd","sql":"COPY s.t TO STDOUT (FORMAT text, DELIMITER '|')","expect":"ok","ref":"sql-copy","note":"text format with pipe delimiter"}
+{"id":"cpya0018","category":"copy-cmd","sql":"COPY s.t TO STDOUT (FORMAT csv, NULL '')","expect":"ok","ref":"sql-copy","note":"csv NULL as empty string"}
+{"id":"cpya0019","category":"copy-cmd","sql":"COPY s.t TO STDOUT (FORMAT text, NULL '\\N')","expect":"ok","ref":"sql-copy","note":"text NULL as backslash-N"}
+{"id":"cpya0020","category":"copy-cmd","sql":"COPY s.t TO STDOUT (FORMAT csv, NULL 'NULL')","expect":"ok","ref":"sql-copy","note":"csv NULL as literal NULL string"}
+{"id":"cpya0021","category":"copy-cmd","sql":"COPY s.t TO STDOUT (FORMAT csv, HEADER true)","expect":"ok","ref":"sql-copy","note":"csv HEADER true"}
+{"id":"cpya0022","category":"copy-cmd","sql":"COPY s.t TO STDOUT (FORMAT csv, HEADER false)","expect":"ok","ref":"sql-copy","note":"csv HEADER false"}
+{"id":"cpya0023","category":"copy-cmd","sql":"COPY s.t TO STDOUT (FORMAT csv, HEADER on)","expect":"ok","ref":"sql-copy","note":"csv HEADER on keyword"}
+{"id":"cpya0024","category":"copy-cmd","sql":"COPY s.t TO STDOUT (FORMAT csv, HEADER off)","expect":"ok","ref":"sql-copy","note":"csv HEADER off keyword"}
+{"id":"cpya0025","category":"copy-cmd","sql":"COPY s.t TO STDOUT (FORMAT csv, HEADER 1)","expect":"ok","ref":"sql-copy","note":"csv HEADER numeric 1"}
+{"id":"cpya0026","category":"copy-cmd","sql":"COPY s.t TO STDOUT (FORMAT csv, HEADER 0)","expect":"ok","ref":"sql-copy","note":"csv HEADER numeric 0"}
+{"id":"cpya0027","category":"copy-cmd","sql":"COPY s.t TO STDOUT (FORMAT csv, HEADER)","expect":"ok","ref":"sql-copy","note":"csv HEADER without value defaults true"}
+{"id":"cpya0028","category":"copy-cmd","sql":"COPY s.t TO STDOUT (FORMAT csv, QUOTE '\"')","expect":"ok","ref":"sql-copy","note":"csv QUOTE double-quote explicit"}
+{"id":"cpya0029","category":"copy-cmd","sql":"COPY s.t TO STDOUT (FORMAT csv, QUOTE '''')","expect":"ok","ref":"sql-copy","note":"csv QUOTE single-quote"}
+{"id":"cpya0030","category":"copy-cmd","sql":"COPY s.t TO STDOUT (FORMAT csv, ESCAPE '\\')","expect":"ok","ref":"sql-copy","note":"csv ESCAPE backslash"}
+{"id":"cpya0031","category":"copy-cmd","sql":"COPY s.t TO STDOUT (FORMAT csv, QUOTE '''', ESCAPE '''')","expect":"ok","ref":"sql-copy","note":"csv QUOTE and ESCAPE both single-quote"}
+{"id":"cpya0032","category":"copy-cmd","sql":"COPY s.t TO STDOUT (FORMAT csv, FORCE_QUOTE *)","expect":"ok","ref":"sql-copy","note":"csv FORCE_QUOTE wildcard star"}
+{"id":"cpya0033","category":"copy-cmd","sql":"COPY s.t (name, val) TO STDOUT (FORMAT csv, FORCE_QUOTE (name))","expect":"ok","ref":"sql-copy","note":"csv FORCE_QUOTE specific column"}
+{"id":"cpya0034","category":"copy-cmd","sql":"COPY s.t (name, val) TO STDOUT (FORMAT csv, FORCE_QUOTE (name, val))","expect":"ok","ref":"sql-copy","note":"csv FORCE_QUOTE multiple columns"}
+{"id":"cpya0035","category":"copy-cmd","sql":"COPY s.t TO STDOUT (FORMAT csv, ENCODING 'UTF8')","expect":"ok","ref":"sql-copy","note":"ENCODING option UTF8"}
+{"id":"cpya0036","category":"copy-cmd","sql":"COPY s.t TO STDOUT (FORMAT text, ENCODING 'SQL_ASCII')","expect":"ok","ref":"sql-copy","note":"ENCODING SQL_ASCII"}
+{"id":"cpya0037","category":"copy-cmd","sql":"COPY s.t TO STDOUT (FORMAT csv, ENCODING 'LATIN1')","expect":"ok","ref":"sql-copy","note":"ENCODING LATIN1"}
+{"id":"cpya0038","category":"copy-cmd","sql":"COPY s.t TO STDOUT (FORMAT csv, DELIMITER ',', NULL '', HEADER true, QUOTE '\"', ESCAPE '\"', ENCODING 'UTF8')","expect":"ok","ref":"sql-copy","note":"csv all common options combined"}
+{"id":"cpya0039","category":"copy-cmd","sql":"COPY s.t TO STDOUT (FORMAT csv, HEADER true, FORCE_QUOTE *, DELIMITER ',', NULL '', ENCODING 'UTF8')","expect":"ok","ref":"sql-copy","note":"csv full option set with FORCE_QUOTE *"}
+{"id":"cpya0040","category":"copy-cmd","sql":"COPY s.t2 TO STDOUT (FORMAT csv, HEADER true)","expect":"ok","ref":"sql-copy","note":"COPY from second fixture table s.t2"}
+{"id":"cpya0041","category":"copy-cmd","sql":"COPY s.parent TO STDOUT","expect":"ok","ref":"sql-copy","note":"COPY from parent table"}
+{"id":"cpya0042","category":"copy-cmd","sql":"COPY s.child TO STDOUT","expect":"ok","ref":"sql-copy","note":"COPY from child inherited table"}
+{"id":"cpya0043","category":"copy-cmd","sql":"COPY s.events_2024 TO STDOUT (FORMAT csv)","expect":"ok","ref":"sql-copy","note":"COPY from partition table"}
+{"id":"cpya0044","category":"copy-cmd","sql":"COPY s.v TO STDOUT","expect":"error","ref":"sql-copy","note":"cannot COPY TO from view - error 42809"}
+{"id":"cpya0045","category":"copy-cmd","sql":"COPY (SELECT s.t.id, s.t.name, s.t2.label FROM s.t JOIN s.t2 ON s.t.id = s.t2.t_id) TO STDOUT","expect":"ok","ref":"sql-copy","note":"query with JOIN using qualified column references"}
+{"id":"cpya0046","category":"copy-cmd","sql":"COPY (WITH cte AS (SELECT id, name FROM s.t) SELECT * FROM cte) TO STDOUT","expect":"ok","ref":"sql-copy","note":"query with CTE"}
+{"id":"cpya0047","category":"copy-cmd","sql":"COPY (SELECT id, name FROM s.t LIMIT 10) TO STDOUT (FORMAT csv, HEADER true)","expect":"ok","ref":"sql-copy","note":"query with LIMIT and csv header"}
+{"id":"cpya0048","category":"copy-cmd","sql":"COPY s.t TO STDOUT (FORMAT binary)","expect":"ok","ref":"sql-copy","note":"binary format TO STDOUT"}
+{"id":"cpya0049","category":"copy-cmd","sql":"COPY s.t (id, name) TO STDOUT (FORMAT binary)","expect":"ok","ref":"sql-copy","note":"binary format with column list"}
+{"id":"cpya0050","category":"copy-cmd","sql":"COPY s.t TO STDOUT (FORMAT text, DELIMITER E'\\t', NULL '\\N')","expect":"ok","ref":"sql-copy","note":"text format tab-delimited with backslash-N null"}
+{"id":"cpya0051","category":"copy-cmd","sql":"COPY s.t TO STDOUT (format text)","expect":"ok","ref":"sql-copy","note":"lowercase format keyword"}
+{"id":"cpya0052","category":"copy-cmd","sql":"COPY s.t TO STDOUT (FORMAT CSV)","expect":"ok","ref":"sql-copy","note":"uppercase CSV format value"}
+{"id":"cpya0053","category":"copy-cmd","sql":"COPY s.t TO STDOUT (FORMAT TEXT)","expect":"ok","ref":"sql-copy","note":"uppercase TEXT format value"}
+{"id":"cpya0054","category":"copy-cmd","sql":"COPY s.t TO STDOUT (FORMAT BINARY)","expect":"ok","ref":"sql-copy","note":"uppercase BINARY format value"}
+{"id":"cpya0055","category":"copy-cmd","sql":"COPY s.t TO STDOUT (FORMAT csv, delimiter ',')","expect":"ok","ref":"sql-copy","note":"lowercase delimiter keyword"}
+{"id":"cpya0056","category":"copy-cmd","sql":"COPY s.t TO STDOUT (FORMAT csv, encoding 'UTF8')","expect":"ok","ref":"sql-copy","note":"lowercase encoding keyword"}
+{"id":"cpya0057","category":"copy-cmd","sql":"COPY s.t TO STDOUT (FORMAT csv, HEADER TRUE, DELIMITER ';')","expect":"ok","ref":"sql-copy","note":"csv with semicolon delimiter and header"}
+{"id":"cpya0058","category":"copy-cmd","sql":"COPY s.t TO STDOUT (FORMAT csv, DELIMITER '\\')","expect":"ok","ref":"sql-copy","note":"csv with backslash delimiter"}
+{"id":"cpya0059","category":"copy-cmd","sql":"COPY s.t (id) TO STDOUT (FORMAT csv, FORCE_QUOTE (id))","expect":"ok","ref":"sql-copy","note":"FORCE_QUOTE on single id column"}
+{"id":"cpya0060","category":"copy-cmd","sql":"COPY s.t TO STDOUT (FORMAT csv, NULL 'na')","expect":"ok","ref":"sql-copy","note":"csv custom null string na"}
+{"id":"cpya0061","category":"copy-cmd","sql":"COPY (SELECT s.f(id::integer) FROM s.t) TO STDOUT","expect":"ok","ref":"sql-copy","note":"query calling fixture function with explicit cast"}
+{"id":"cpya0062","category":"copy-cmd","sql":"COPY (SELECT * FROM s.rows_f()) TO STDOUT","expect":"ok","ref":"sql-copy","note":"query from set-returning function"}
+{"id":"cpya0063","category":"copy-cmd","sql":"COPY s.t TO STDOUT (FORMAT csv, HEADER true, NULL 'NULL', DELIMITER ',', QUOTE '\"', ESCAPE '\"', FORCE_QUOTE *, ENCODING 'UTF8')","expect":"ok","ref":"sql-copy","note":"csv maximum options TO STDOUT"}
+{"id":"cpya0064","category":"copy-cmd","sql":"COPY s.t TO STDOUT (FORMAT text, NULL '', DELIMITER '|', ENCODING 'UTF8')","expect":"ok","ref":"sql-copy","note":"text format pipe delimited all options"}
+{"id":"cpya0065","category":"copy-cmd","sql":"COPY s.t TO STDOUT (FORMAT csv, QUOTE '`', ESCAPE '`')","expect":"ok","ref":"sql-copy","note":"csv backtick quote and escape"}
+{"id":"cpya0066","category":"copy-cmd","sql":"COPY (SELECT id, name FROM s.t WHERE flag = true) TO STDOUT (FORMAT csv)","expect":"ok","ref":"sql-copy","note":"query with boolean filter"}
+{"id":"cpya0067","category":"copy-cmd","sql":"COPY (SELECT id, status::text FROM s.t) TO STDOUT","expect":"ok","ref":"sql-copy","note":"query with cast of enum to text"}
+{"id":"cpya0068","category":"copy-cmd","sql":"COPY (SELECT id, (home).city FROM s.t) TO STDOUT","expect":"ok","ref":"sql-copy","note":"query with composite field access"}
+{"id":"cpya0069","category":"copy-cmd","sql":"COPY (SELECT t.id, t.name FROM s.t t WHERE t.qty > 0) TO STDOUT","expect":"ok","ref":"sql-copy","note":"query with table alias in WHERE"}
+{"id":"cpya0070","category":"copy-cmd","sql":"COPY s.t TO STDOUT (FORMAT csv, HEADER true, DELIMITER ',')","expect":"ok","ref":"sql-copy","note":"csv with header and delimiter combined"}
+{"id":"cpya0071","category":"copy-cmd","sql":"COPY s.t FROM STDIN","expect":"ok","ref":"sql-copy","note":"COPY FROM STDIN basic no options","txn":"none"}
+{"id":"cpya0072","category":"copy-cmd","sql":"COPY s.t (name, qty) FROM STDIN","expect":"ok","ref":"sql-copy","note":"COPY FROM STDIN with column list","txn":"none"}
+{"id":"cpya0073","category":"copy-cmd","sql":"COPY s.t FROM STDIN (FORMAT csv)","expect":"ok","ref":"sql-copy","note":"COPY FROM STDIN FORMAT csv","txn":"none"}
+{"id":"cpya0074","category":"copy-cmd","sql":"COPY s.t FROM STDIN (FORMAT text)","expect":"ok","ref":"sql-copy","note":"COPY FROM STDIN FORMAT text","txn":"none"}
+{"id":"cpya0075","category":"copy-cmd","sql":"COPY s.t FROM STDIN (FORMAT binary)","expect":"ok","ref":"sql-copy","note":"COPY FROM STDIN FORMAT binary","txn":"none"}
+{"id":"cpya0076","category":"copy-cmd","sql":"COPY s.t FROM STDIN (FORMAT csv, DELIMITER ',')","expect":"ok","ref":"sql-copy","note":"COPY FROM STDIN csv with delimiter","txn":"none"}
+{"id":"cpya0077","category":"copy-cmd","sql":"COPY s.t FROM STDIN (FORMAT csv, NULL '')","expect":"ok","ref":"sql-copy","note":"COPY FROM STDIN csv null empty string","txn":"none"}
+{"id":"cpya0078","category":"copy-cmd","sql":"COPY s.t FROM STDIN (FORMAT csv, HEADER true)","expect":"ok","ref":"sql-copy","note":"COPY FROM STDIN csv with header","txn":"none"}
+{"id":"cpya0079","category":"copy-cmd","sql":"COPY s.t FROM STDIN (FORMAT csv, FORCE_NOT_NULL (name))","expect":"ok","ref":"sql-copy","note":"COPY FROM STDIN FORCE_NOT_NULL single col","txn":"none"}
+{"id":"cpya0080","category":"copy-cmd","sql":"COPY s.t (name, val) FROM STDIN (FORMAT csv, FORCE_NOT_NULL (name, val))","expect":"ok","ref":"sql-copy","note":"COPY FROM STDIN FORCE_NOT_NULL multiple cols","txn":"none"}
+{"id":"cpya0081","category":"copy-cmd","sql":"COPY s.t FROM STDIN (FORMAT csv, FORCE_NOT_NULL *)","expect":"ok","ref":"sql-copy","note":"COPY FROM STDIN FORCE_NOT_NULL wildcard","txn":"none"}
+{"id":"cpya0082","category":"copy-cmd","sql":"COPY s.t FROM STDIN (FORMAT csv, FORCE_NULL (name))","expect":"ok","ref":"sql-copy","note":"COPY FROM STDIN FORCE_NULL single col","txn":"none"}
+{"id":"cpya0083","category":"copy-cmd","sql":"COPY s.t (name, val) FROM STDIN (FORMAT csv, FORCE_NULL (name, val))","expect":"ok","ref":"sql-copy","note":"COPY FROM STDIN FORCE_NULL multiple cols","txn":"none"}
+{"id":"cpya0084","category":"copy-cmd","sql":"COPY s.t FROM STDIN (FORMAT csv, FORCE_NULL *)","expect":"ok","ref":"sql-copy","note":"COPY FROM STDIN FORCE_NULL wildcard","txn":"none"}
+{"id":"cpya0085","category":"copy-cmd","sql":"COPY s.t FROM STDIN (FORMAT csv, ON_ERROR stop)","expect":"ok","ref":"sql-copy","note":"COPY FROM STDIN ON_ERROR stop explicit","txn":"none"}
+{"id":"cpya0086","category":"copy-cmd","sql":"COPY s.t FROM STDIN (FORMAT csv, ON_ERROR ignore)","expect":"ok","ref":"sql-copy","note":"COPY FROM STDIN ON_ERROR ignore","txn":"none"}
+{"id":"cpya0087","category":"copy-cmd","sql":"COPY s.t FROM STDIN (FORMAT text, ON_ERROR ignore)","expect":"ok","ref":"sql-copy","note":"COPY FROM STDIN text ON_ERROR ignore","txn":"none"}
+{"id":"cpya0088","category":"copy-cmd","sql":"COPY s.t FROM STDIN (FORMAT csv, ON_ERROR ignore, LOG_VERBOSITY default)","expect":"ok","ref":"sql-copy","note":"ON_ERROR ignore with LOG_VERBOSITY default","txn":"none"}
+{"id":"cpya0089","category":"copy-cmd","sql":"COPY s.t FROM STDIN (FORMAT csv, ON_ERROR ignore, LOG_VERBOSITY verbose)","expect":"ok","ref":"sql-copy","note":"ON_ERROR ignore with LOG_VERBOSITY verbose","txn":"none"}
+{"id":"cpya0090","category":"copy-cmd","sql":"COPY s.t FROM STDIN (FORMAT csv, ON_ERROR ignore, LOG_VERBOSITY silent)","expect":"ok","ref":"sql-copy","note":"ON_ERROR ignore with LOG_VERBOSITY silent","txn":"none"}
+{"id":"cpya0091","category":"copy-cmd","sql":"COPY s.t FROM STDIN (FORMAT csv, ON_ERROR ignore, REJECT_LIMIT 10)","expect":"ok","ref":"sql-copy","note":"ON_ERROR ignore with REJECT_LIMIT","txn":"none"}
+{"id":"cpya0092","category":"copy-cmd","sql":"COPY s.t FROM STDIN (FORMAT csv, ON_ERROR ignore, REJECT_LIMIT 100, LOG_VERBOSITY verbose)","expect":"ok","ref":"sql-copy","note":"ON_ERROR ignore REJECT_LIMIT and LOG_VERBOSITY combined","txn":"none"}
+{"id":"cpya0093","category":"copy-cmd","sql":"COPY s.t FROM STDIN (FORMAT csv, ENCODING 'UTF8')","expect":"ok","ref":"sql-copy","note":"COPY FROM STDIN ENCODING UTF8","txn":"none"}
+{"id":"cpya0094","category":"copy-cmd","sql":"COPY s.t FROM STDIN (FORMAT csv, QUOTE '''')","expect":"ok","ref":"sql-copy","note":"COPY FROM STDIN csv QUOTE single-quote","txn":"none"}
+{"id":"cpya0095","category":"copy-cmd","sql":"COPY s.t FROM STDIN (FORMAT csv, ESCAPE '\\')","expect":"ok","ref":"sql-copy","note":"COPY FROM STDIN csv ESCAPE backslash","txn":"none"}
+{"id":"cpya0096","category":"copy-cmd","sql":"COPY s.t FROM STDIN (FORMAT csv, HEADER true, DELIMITER ',', NULL '', QUOTE '\"', ESCAPE '\"', ENCODING 'UTF8')","expect":"ok","ref":"sql-copy","note":"COPY FROM STDIN csv all options","txn":"none"}
+{"id":"cpya0097","category":"copy-cmd","sql":"COPY s.t FROM STDIN (FORMAT csv, FORCE_NOT_NULL (name), FORCE_NULL (val))","expect":"ok","ref":"sql-copy","note":"FORCE_NOT_NULL and FORCE_NULL on different columns","txn":"none"}
+{"id":"cpya0098","category":"copy-cmd","sql":"COPY s.t FROM STDIN WHERE qty > 0","expect":"ok","ref":"sql-copy","note":"COPY FROM STDIN with WHERE clause","txn":"none"}
+{"id":"cpya0099","category":"copy-cmd","sql":"COPY s.t FROM STDIN (FORMAT csv) WHERE name IS NOT NULL","expect":"ok","ref":"sql-copy","note":"COPY FROM STDIN csv with WHERE IS NOT NULL","txn":"none"}
+{"id":"cpya0100","category":"copy-cmd","sql":"COPY s.t FROM STDIN (FORMAT csv, DEFAULT 'missing')","expect":"ok","ref":"sql-copy","note":"COPY FROM STDIN DEFAULT option","txn":"none"}
+{"id":"cpya0101","category":"copy-cmd","sql":"COPY s.t FROM STDIN (FORMAT text, DEFAULT 'placeholder')","expect":"ok","ref":"sql-copy","note":"COPY FROM STDIN text DEFAULT custom value","txn":"none"}
+{"id":"cpya0102","category":"copy-cmd","sql":"COPY s.t FROM '/dev/null' (FREEZE)","expect":"error","ref":"sql-copy","note":"FREEZE on pre-existing table via file - 55000 error no contamination"}
+{"id":"cpya0103","category":"copy-cmd","sql":"COPY s.t TO STDOUT (FORMAT csv, QUOTE '#', ESCAPE '#')","expect":"ok","ref":"sql-copy","note":"csv with hash as quote and escape character"}
+{"id":"cpya0104","category":"copy-cmd","sql":"CREATE TABLE cpya_freeze (id int, name text); COPY cpya_freeze FROM STDIN (FREEZE)","expect":"ok","ref":"sql-copy","note":"FREEZE on table created in same txn","txn":"none"}
+{"id":"cpya0105","category":"copy-cmd","sql":"CREATE TABLE cpya_freeze2 (id int, name text); COPY cpya_freeze2 FROM STDIN (FREEZE true)","expect":"ok","ref":"sql-copy","note":"FREEZE true on freshly created table","txn":"none"}
+{"id":"cpya0106","category":"copy-cmd","sql":"CREATE TABLE cpya_freeze3 (id int, name text); COPY cpya_freeze3 FROM STDIN (FREEZE false)","expect":"ok","ref":"sql-copy","note":"FREEZE false explicit","txn":"none"}
+{"id":"cpya0107","category":"copy-cmd","sql":"CREATE TABLE cpya_freeze4 (id int, name text); COPY cpya_freeze4 FROM STDIN (FREEZE on)","expect":"ok","ref":"sql-copy","note":"FREEZE on keyword","txn":"none"}
+{"id":"cpya0108","category":"copy-cmd","sql":"CREATE TABLE cpya_freeze5 (id int, name text); COPY cpya_freeze5 FROM STDIN (FREEZE 1)","expect":"ok","ref":"sql-copy","note":"FREEZE numeric 1","txn":"none"}
+{"id":"cpya0109","category":"copy-cmd","sql":"COPY s.t TO '/tmp/cpya_corpus_001.csv' (FORMAT csv)","expect":"ok","ref":"sql-copy","note":"COPY TO file superuser can write to /tmp"}
+{"id":"cpya0110","category":"copy-cmd","sql":"COPY s.t FROM '/dev/null'","expect":"ok","ref":"sql-copy","note":"COPY FROM /dev/null always-empty file"}
+{"id":"cpya0111","category":"copy-cmd","sql":"COPY s.t TO PROGRAM 'cat'","expect":"ok","ref":"sql-copy","note":"COPY TO PROGRAM cat superuser allowed"}
+{"id":"cpya0112","category":"copy-cmd","sql":"COPY s.t FROM PROGRAM 'cat /dev/null'","expect":"ok","ref":"sql-copy","note":"COPY FROM PROGRAM cat /dev/null superuser allowed"}
+{"id":"cpya0113","category":"copy-cmd","sql":"COPY TO STDOUT","expect":"error","ref":"sql-copy","note":"syntax error: missing table name or query before TO"}
+{"id":"cpya0114","category":"copy-cmd","sql":"COPY FROM STDIN","expect":"error","ref":"sql-copy","note":"syntax error: missing table name before FROM"}
+{"id":"cpya0115","category":"copy-cmd","sql":"COPY s.t STDOUT","expect":"error","ref":"sql-copy","note":"syntax error: missing TO keyword"}
+{"id":"cpya0116","category":"copy-cmd","sql":"COPY s.t TO","expect":"error","ref":"sql-copy","note":"syntax error: TO without destination"}
+{"id":"cpya0117","category":"copy-cmd","sql":"COPY s.t FROM","expect":"error","ref":"sql-copy","note":"syntax error: FROM without source"}
+{"id":"cpya0118","category":"copy-cmd","sql":"COPY s.t TO STDOUT (FORMAT)","expect":"error","ref":"sql-copy","note":"syntax error: FORMAT without value"}
+{"id":"cpya0119","category":"copy-cmd","sql":"COPY s.t TO STDOUT (FORMAT xml)","expect":"error","ref":"sql-copy","note":"invalid FORMAT value xml"}
+{"id":"cpya0120","category":"copy-cmd","sql":"COPY s.t TO STDOUT (FORMAT json)","expect":"error","ref":"sql-copy","note":"invalid FORMAT value json"}
+{"id":"cpya0121","category":"copy-cmd","sql":"COPY s.t TO STDOUT (FORMAT csv, DELIMITER ',,')","expect":"error","ref":"sql-copy","note":"DELIMITER must be single character - two chars error"}
+{"id":"cpya0122","category":"copy-cmd","sql":"COPY s.t TO STDOUT (FORMAT csv, QUOTE '\"\"')","expect":"error","ref":"sql-copy","note":"QUOTE must be single character - two chars error"}
+{"id":"cpya0123","category":"copy-cmd","sql":"COPY s.t TO STDOUT (FORMAT csv, ESCAPE '|!')","expect":"error","ref":"sql-copy","note":"ESCAPE must be single character - two chars error"}
+{"id":"cpya0124","category":"copy-cmd","sql":"COPY s.t TO STDOUT (FORMAT binary, DELIMITER ',')","expect":"error","ref":"sql-copy","note":"DELIMITER not allowed with binary format"}
+{"id":"cpya0125","category":"copy-cmd","sql":"COPY s.t TO STDOUT (FORMAT binary, NULL '\\N')","expect":"error","ref":"sql-copy","note":"NULL not allowed with binary format"}
+{"id":"cpya0126","category":"copy-cmd","sql":"COPY s.t TO STDOUT (FORMAT binary, HEADER true)","expect":"error","ref":"sql-copy","note":"HEADER not allowed with binary format"}
+{"id":"cpya0127","category":"copy-cmd","sql":"COPY s.t TO STDOUT (FORMAT text, FORCE_QUOTE *)","expect":"error","ref":"sql-copy","note":"FORCE_QUOTE only valid for csv format"}
+{"id":"cpya0128","category":"copy-cmd","sql":"COPY s.t TO STDOUT (FORMAT text, QUOTE '\"')","expect":"error","ref":"sql-copy","note":"QUOTE only valid for csv format"}
+{"id":"cpya0129","category":"copy-cmd","sql":"COPY s.t TO STDOUT (FORMAT text, ESCAPE '\\')","expect":"error","ref":"sql-copy","note":"ESCAPE only valid for csv format"}
+{"id":"cpya0130","category":"copy-cmd","sql":"COPY s.t TO STDOUT (FORMAT csv, FORCE_NOT_NULL (name))","expect":"error","ref":"sql-copy","note":"FORCE_NOT_NULL is FROM-only option error in TO"}
+{"id":"cpya0131","category":"copy-cmd","sql":"COPY s.t TO STDOUT (FORMAT csv, FORCE_NULL (name))","expect":"error","ref":"sql-copy","note":"FORCE_NULL is FROM-only option error in TO"}
+{"id":"cpya0132","category":"copy-cmd","sql":"COPY s.t TO STDOUT (FORMAT csv, ON_ERROR ignore)","expect":"error","ref":"sql-copy","note":"ON_ERROR is FROM-only option error in TO"}
+{"id":"cpya0133","category":"copy-cmd","sql":"COPY s.t TO STDOUT (FORMAT csv, DEFAULT '')","expect":"error","ref":"sql-copy","note":"DEFAULT is FROM-only option error in TO"}
+{"id":"cpya0134","category":"copy-cmd","sql":"COPY s.t FROM '/dev/null' (FORMAT csv, FORCE_QUOTE *)","expect":"error","ref":"sql-copy","note":"FORCE_QUOTE is TO-only option error in FROM"}
+{"id":"cpya0135","category":"copy-cmd","sql":"COPY (SELECT id FROM s.t) FROM '/dev/null'","expect":"error","ref":"sql-copy","note":"query form not allowed with FROM - syntax error"}
+{"id":"cpya0136","category":"copy-cmd","sql":"COPY s.t TO STDOUT (FORMAT csv, HEADER match)","expect":"error","ref":"sql-copy","note":"HEADER MATCH only valid for COPY FROM"}
+{"id":"cpya0137","category":"copy-cmd","sql":"COPY s.t FROM STDIN (FORMAT csv, LOG_VERBOSITY verbose)","expect":"ok","ref":"sql-copy","note":"LOG_VERBOSITY without ON_ERROR ok with zero rows - lazy validation","txn":"none"}
+{"id":"cpya0138","category":"copy-cmd","sql":"COPY s.t FROM '/dev/null' (FORMAT csv, REJECT_LIMIT 10)","expect":"error","ref":"sql-copy","note":"REJECT_LIMIT without ON_ERROR ignore is error - eager check with file source"}
+{"id":"cpya0139","category":"copy-cmd","sql":"COPY s.t FROM '/dev/null' (FORMAT binary, ON_ERROR ignore)","expect":"error","ref":"sql-copy","note":"ON_ERROR not allowed in BINARY mode - eager check"}
+{"id":"cpya0140","category":"copy-cmd","sql":"COPY s.t FROM '/dev/null' (FORMAT binary, DEFAULT 'x')","expect":"error","ref":"sql-copy","note":"DEFAULT not allowed in BINARY mode - eager check"}
+{"id":"cpya0141","category":"copy-cmd","sql":"COPY s.t TO STDOUT ()","expect":"error","ref":"sql-copy","note":"syntax error: empty option list"}
+{"id":"cpya0142","category":"copy-cmd","sql":"COPY s.t TO STDOUT (FORMAT csv FORMAT text)","expect":"error","ref":"sql-copy","note":"syntax error: duplicate FORMAT without comma separator"}
+{"id":"cpya0143","category":"copy-cmd","sql":"COPY s.nonexistent TO STDOUT","expect":"error","ref":"sql-copy","note":"semantic error: table does not exist"}
+{"id":"cpya0144","category":"copy-cmd","sql":"COPY s.t (nonexistent_col) TO STDOUT","expect":"error","ref":"sql-copy","note":"semantic error: column does not exist"}
+{"id":"cpya0145","category":"copy-cmd","sql":"COPY s.mv TO STDOUT","expect":"ok","ref":"sql-copy","note":"COPY from materialized view is allowed"}
+{"id":"cpya0146","category":"copy-cmd","sql":"COPY s.t TO STDOUT (FORMAT csv, ENCODING 'INVALID_ENC')","expect":"error","ref":"sql-copy","note":"semantic error: invalid encoding name"}
+{"id":"cpya0147","category":"copy-cmd","sql":"COPY s.t TO STDOUT (FORMAT csv, DELIMITER '')","expect":"error","ref":"sql-copy","note":"DELIMITER cannot be empty string"}
+{"id":"cpya0148","category":"copy-cmd","sql":"COPY s.t (id, name, val, qty, flag, tags, data) TO STDOUT (FORMAT csv, HEADER true)","expect":"ok","ref":"sql-copy","note":"many columns in column list with csv header"}
+{"id":"cpya0149","category":"copy-cmd","sql":"COPY s.t TO STDOUT (FORMAT csv, DELIMITER ';', HEADER true, NULL 'NULL', ENCODING 'UTF8')","expect":"ok","ref":"sql-copy","note":"European-style csv semicolon delimiter"}
+{"id":"cpya0150","category":"copy-cmd","sql":"COPY (SELECT id, name, val FROM s.t UNION ALL SELECT id, label, amount FROM s.t2) TO STDOUT","expect":"ok","ref":"sql-copy","note":"query with UNION ALL"}
+{"id":"cpya0151","category":"copy-cmd","sql":"COPY (SELECT t.id, t.name, t2.label FROM s.t t LEFT JOIN s.t2 t2 ON t.id = t2.t_id) TO STDOUT (FORMAT csv)","expect":"ok","ref":"sql-copy","note":"query with LEFT JOIN and table aliases"}
+{"id":"cpya0152","category":"copy-cmd","sql":"COPY (SELECT id, name FROM s.t WHERE status = 'ok') TO STDOUT (FORMAT csv)","expect":"ok","ref":"sql-copy","note":"query filtering by enum value"}
+{"id":"cpya0153","category":"copy-cmd","sql":"COPY (SELECT id, name FROM s.t WHERE data IS NOT NULL) TO STDOUT","expect":"ok","ref":"sql-copy","note":"query with JSONB IS NOT NULL filter"}
+{"id":"cpya0154","category":"copy-cmd","sql":"COPY s.t (id, name, val) TO STDOUT (FORMAT csv, FORCE_QUOTE (name, val))","expect":"ok","ref":"sql-copy","note":"FORCE_QUOTE on subset of columns"}
+{"id":"cpya0155","category":"copy-cmd","sql":"COPY s.t FROM STDIN (FORMAT csv, HEADER match)","expect":"ok","ref":"sql-copy","note":"HEADER MATCH for COPY FROM validates column names","txn":"none"}
+{"id":"cpya0156","category":"copy-cmd","sql":"COPY s.t FROM STDIN (FORMAT csv, FORCE_NOT_NULL *, FORCE_NULL (val))","expect":"ok","ref":"sql-copy","note":"FORCE_NOT_NULL wildcard and FORCE_NULL on specific column are compatible","txn":"none"}
+{"id":"cpya0157","category":"copy-cmd","sql":"COPY s.t TO STDOUT (FORMAT csv, FORCE_QUOTE (name), FORCE_QUOTE (val))","expect":"error","ref":"sql-copy","note":"duplicate FORCE_QUOTE option is error"}
+{"id":"cpya0158","category":"copy-cmd","sql":"COPY s.t TO STDOUT (FORMAT csv, DELIMITER ',', DELIMITER ';')","expect":"error","ref":"sql-copy","note":"duplicate DELIMITER option is error"}
+{"id":"cpya0159","category":"copy-cmd","sql":"COPY s.t TO STDOUT (FORMAT csv, NULL '', NULL 'na')","expect":"error","ref":"sql-copy","note":"duplicate NULL option is error"}
+{"id":"cpya0160","category":"copy-cmd","sql":"COPY s.t TO STDOUT (FORMAT csv, ENCODING 'UTF8', ENCODING 'LATIN1')","expect":"error","ref":"sql-copy","note":"duplicate ENCODING option is error"}
+{"id":"cpya0161","category":"copy-cmd","sql":"COPY s.t TO STDOUT (FORMAT csv, HEADER true, HEADER false)","expect":"error","ref":"sql-copy","note":"duplicate HEADER option is error"}
+{"id":"cpya0162","category":"copy-cmd","sql":"COPY s.t FROM '/dev/null' (FORMAT csv, ON_ERROR ignore, REJECT_LIMIT 0)","expect":"error","ref":"sql-copy","note":"REJECT_LIMIT 0 is invalid must be positive"}
+{"id":"cpya0163","category":"copy-cmd","sql":"COPY s.t FROM '/dev/null' (FORMAT csv, ON_ERROR invalid_option)","expect":"error","ref":"sql-copy","note":"ON_ERROR with unrecognized value"}
+{"id":"cpya0164","category":"copy-cmd","sql":"COPY s.t FROM '/dev/null' (FORMAT csv, LOG_VERBOSITY invalid_val)","expect":"error","ref":"sql-copy","note":"LOG_VERBOSITY with unrecognized value"}
+{"id":"cpya0165","category":"copy-cmd","sql":"COPY s.t FROM '/dev/null' (FORMAT csv, FREEZE, ON_ERROR ignore)","expect":"error","ref":"sql-copy","note":"FREEZE on pre-existing table with ON_ERROR - 55000 error"}
+{"id":"cpya0166","category":"copy-cmd","sql":"COPY s.t TO STDOUT (format csv, delimiter ',', null '', header true, quote '\"', escape '\"', encoding 'UTF8', force_quote *)","expect":"ok","ref":"sql-copy","note":"all options as lowercase keywords"}
+{"id":"cpya0167","category":"copy-cmd","sql":"COPY s.t FROM STDIN (FORMAT csv, ON_ERROR ignore, LOG_VERBOSITY verbose, REJECT_LIMIT 1000)","expect":"ok","ref":"sql-copy","note":"ON_ERROR ignore with verbose logging and high reject limit","txn":"none"}
+{"id":"cpya0168","category":"copy-cmd","sql":"COPY s.t FROM STDIN (FORMAT csv, HEADER true, DELIMITER ',', NULL '', QUOTE '\"', ESCAPE '\"', FORCE_NOT_NULL *, ENCODING 'UTF8', ON_ERROR ignore, LOG_VERBOSITY verbose)","expect":"ok","ref":"sql-copy","note":"COPY FROM STDIN maximum csv options","txn":"none"}
+{"id":"cpya0169","category":"copy-cmd","sql":"COPY s.t FROM STDIN (FORMAT csv, FORCE_NOT_NULL (name), FORCE_NULL (val), ON_ERROR ignore, LOG_VERBOSITY silent, REJECT_LIMIT 50)","expect":"ok","ref":"sql-copy","note":"COPY FROM STDIN combined FORCE_NOT_NULL FORCE_NULL with error handling","txn":"none"}
+{"id":"cpya0170","category":"copy-cmd","sql":"COPY (SELECT id, name, qty FROM s.t WHERE qty > 0 ORDER BY name) TO STDOUT (FORMAT csv, HEADER true, DELIMITER ',', NULL '', QUOTE '\"', ESCAPE '\"', ENCODING 'UTF8')","expect":"ok","ref":"sql-copy","note":"query form with full CSV options"}

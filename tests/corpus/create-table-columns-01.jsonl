@@ -1,0 +1,170 @@
+{"id":"ctcola0001","category":"create-table-columns","sql":"CREATE TABLE s.tc1 (a integer)","expect":"ok","ref":"sql-createtable","note":"simplest column: integer type"}
+{"id":"ctcola0002","category":"create-table-columns","sql":"CREATE TABLE s.tc2 (a smallint)","expect":"ok","ref":"sql-createtable","note":"smallint type"}
+{"id":"ctcola0003","category":"create-table-columns","sql":"CREATE TABLE s.tc3 (a bigint)","expect":"ok","ref":"sql-createtable","note":"bigint type"}
+{"id":"ctcola0004","category":"create-table-columns","sql":"CREATE TABLE s.tc4 (a numeric)","expect":"ok","ref":"sql-createtable","note":"numeric type no modifier"}
+{"id":"ctcola0005","category":"create-table-columns","sql":"CREATE TABLE s.tc5 (a numeric(10))","expect":"ok","ref":"sql-createtable","note":"numeric(p) precision only"}
+{"id":"ctcola0006","category":"create-table-columns","sql":"CREATE TABLE s.tc6 (a numeric(10,2))","expect":"ok","ref":"sql-createtable","note":"numeric(p,s) precision and scale"}
+{"id":"ctcola0007","category":"create-table-columns","sql":"CREATE TABLE s.tc7 (a decimal(12,4))","expect":"ok","ref":"sql-createtable","note":"decimal(p,s) alias for numeric"}
+{"id":"ctcola0008","category":"create-table-columns","sql":"CREATE TABLE s.tc8 (a real)","expect":"ok","ref":"sql-createtable","note":"real floating point"}
+{"id":"ctcola0009","category":"create-table-columns","sql":"CREATE TABLE s.tc9 (a double precision)","expect":"ok","ref":"sql-createtable","note":"double precision type"}
+{"id":"ctcola0010","category":"create-table-columns","sql":"CREATE TABLE s.tc10 (a float)","expect":"ok","ref":"sql-createtable","note":"float generic (maps to double precision)"}
+{"id":"ctcola0011","category":"create-table-columns","sql":"CREATE TABLE s.tc11 (a float(24))","expect":"ok","ref":"sql-createtable","note":"float(p) with precision"}
+{"id":"ctcola0012","category":"create-table-columns","sql":"CREATE TABLE s.tc12 (a text)","expect":"ok","ref":"sql-createtable","note":"text type"}
+{"id":"ctcola0013","category":"create-table-columns","sql":"CREATE TABLE s.tc13 (a varchar(50))","expect":"ok","ref":"sql-createtable","note":"varchar(n)"}
+{"id":"ctcola0014","category":"create-table-columns","sql":"CREATE TABLE s.tc14 (a character varying(100))","expect":"ok","ref":"sql-createtable","note":"character varying(n) full form"}
+{"id":"ctcola0015","category":"create-table-columns","sql":"CREATE TABLE s.tc15 (a char(10))","expect":"ok","ref":"sql-createtable","note":"char(n) fixed length"}
+{"id":"ctcola0016","category":"create-table-columns","sql":"CREATE TABLE s.tc16 (a character(5))","expect":"ok","ref":"sql-createtable","note":"character(n) full form"}
+{"id":"ctcola0017","category":"create-table-columns","sql":"CREATE TABLE s.tc17 (a boolean)","expect":"ok","ref":"sql-createtable","note":"boolean type"}
+{"id":"ctcola0018","category":"create-table-columns","sql":"CREATE TABLE s.tc18 (a bytea)","expect":"ok","ref":"sql-createtable","note":"bytea binary type"}
+{"id":"ctcola0019","category":"create-table-columns","sql":"CREATE TABLE s.tc19 (a date)","expect":"ok","ref":"sql-createtable","note":"date type"}
+{"id":"ctcola0020","category":"create-table-columns","sql":"CREATE TABLE s.tc20 (a time)","expect":"ok","ref":"sql-createtable","note":"time without time zone"}
+{"id":"ctcola0021","category":"create-table-columns","sql":"CREATE TABLE s.tc21 (a time(3))","expect":"ok","ref":"sql-createtable","note":"time(p) with fractional seconds precision"}
+{"id":"ctcola0022","category":"create-table-columns","sql":"CREATE TABLE s.tc22 (a time with time zone)","expect":"ok","ref":"sql-createtable","note":"time with time zone"}
+{"id":"ctcola0023","category":"create-table-columns","sql":"CREATE TABLE s.tc23 (a time(2) with time zone)","expect":"ok","ref":"sql-createtable","note":"time(p) with time zone"}
+{"id":"ctcola0024","category":"create-table-columns","sql":"CREATE TABLE s.tc24 (a timestamp)","expect":"ok","ref":"sql-createtable","note":"timestamp without time zone"}
+{"id":"ctcola0025","category":"create-table-columns","sql":"CREATE TABLE s.tc25 (a timestamp(0))","expect":"ok","ref":"sql-createtable","note":"timestamp(p) precision 0"}
+{"id":"ctcola0026","category":"create-table-columns","sql":"CREATE TABLE s.tc26 (a timestamp(6))","expect":"ok","ref":"sql-createtable","note":"timestamp(p) max precision"}
+{"id":"ctcola0027","category":"create-table-columns","sql":"CREATE TABLE s.tc27 (a timestamp with time zone)","expect":"ok","ref":"sql-createtable","note":"timestamptz"}
+{"id":"ctcola0028","category":"create-table-columns","sql":"CREATE TABLE s.tc28 (a timestamp(3) with time zone)","expect":"ok","ref":"sql-createtable","note":"timestamp(p) with time zone"}
+{"id":"ctcola0029","category":"create-table-columns","sql":"CREATE TABLE s.tc29 (a timestamptz)","expect":"ok","ref":"sql-createtable","note":"timestamptz short alias"}
+{"id":"ctcola0030","category":"create-table-columns","sql":"CREATE TABLE s.tc30 (a interval)","expect":"ok","ref":"sql-createtable","note":"interval no fields"}
+{"id":"ctcola0031","category":"create-table-columns","sql":"CREATE TABLE s.tc31 (a interval year)","expect":"ok","ref":"sql-createtable","note":"interval YEAR field"}
+{"id":"ctcola0032","category":"create-table-columns","sql":"CREATE TABLE s.tc32 (a interval month)","expect":"ok","ref":"sql-createtable","note":"interval MONTH field"}
+{"id":"ctcola0033","category":"create-table-columns","sql":"CREATE TABLE s.tc33 (a interval day)","expect":"ok","ref":"sql-createtable","note":"interval DAY field"}
+{"id":"ctcola0034","category":"create-table-columns","sql":"CREATE TABLE s.tc34 (a interval hour)","expect":"ok","ref":"sql-createtable","note":"interval HOUR field"}
+{"id":"ctcola0035","category":"create-table-columns","sql":"CREATE TABLE s.tc35 (a interval minute)","expect":"ok","ref":"sql-createtable","note":"interval MINUTE field"}
+{"id":"ctcola0036","category":"create-table-columns","sql":"CREATE TABLE s.tc36 (a interval second)","expect":"ok","ref":"sql-createtable","note":"interval SECOND field"}
+{"id":"ctcola0037","category":"create-table-columns","sql":"CREATE TABLE s.tc37 (a interval year to month)","expect":"ok","ref":"sql-createtable","note":"interval YEAR TO MONTH fields"}
+{"id":"ctcola0038","category":"create-table-columns","sql":"CREATE TABLE s.tc38 (a interval day to hour)","expect":"ok","ref":"sql-createtable","note":"interval DAY TO HOUR fields"}
+{"id":"ctcola0039","category":"create-table-columns","sql":"CREATE TABLE s.tc39 (a interval day to minute)","expect":"ok","ref":"sql-createtable","note":"interval DAY TO MINUTE fields"}
+{"id":"ctcola0040","category":"create-table-columns","sql":"CREATE TABLE s.tc40 (a interval day to second)","expect":"ok","ref":"sql-createtable","note":"interval DAY TO SECOND fields"}
+{"id":"ctcola0041","category":"create-table-columns","sql":"CREATE TABLE s.tc41 (a interval hour to minute)","expect":"ok","ref":"sql-createtable","note":"interval HOUR TO MINUTE fields"}
+{"id":"ctcola0042","category":"create-table-columns","sql":"CREATE TABLE s.tc42 (a interval hour to second)","expect":"ok","ref":"sql-createtable","note":"interval HOUR TO SECOND fields"}
+{"id":"ctcola0043","category":"create-table-columns","sql":"CREATE TABLE s.tc43 (a interval minute to second)","expect":"ok","ref":"sql-createtable","note":"interval MINUTE TO SECOND fields"}
+{"id":"ctcola0044","category":"create-table-columns","sql":"CREATE TABLE s.tc44 (a interval second(3))","expect":"ok","ref":"sql-createtable","note":"interval SECOND(p) with precision"}
+{"id":"ctcola0045","category":"create-table-columns","sql":"CREATE TABLE s.tc45 (a bit)","expect":"ok","ref":"sql-createtable","note":"bit type default length 1"}
+{"id":"ctcola0046","category":"create-table-columns","sql":"CREATE TABLE s.tc46 (a bit(8))","expect":"ok","ref":"sql-createtable","note":"bit(n) fixed length"}
+{"id":"ctcola0047","category":"create-table-columns","sql":"CREATE TABLE s.tc47 (a bit varying)","expect":"ok","ref":"sql-createtable","note":"bit varying unlimited"}
+{"id":"ctcola0048","category":"create-table-columns","sql":"CREATE TABLE s.tc48 (a bit varying(16))","expect":"ok","ref":"sql-createtable","note":"bit varying(n) with limit"}
+{"id":"ctcola0049","category":"create-table-columns","sql":"CREATE TABLE s.tc49 (a uuid)","expect":"ok","ref":"sql-createtable","note":"uuid type"}
+{"id":"ctcola0050","category":"create-table-columns","sql":"CREATE TABLE s.tc50 (a json)","expect":"ok","ref":"sql-createtable","note":"json type"}
+{"id":"ctcola0051","category":"create-table-columns","sql":"CREATE TABLE s.tc51 (a jsonb)","expect":"ok","ref":"sql-createtable","note":"jsonb type"}
+{"id":"ctcola0052","category":"create-table-columns","sql":"CREATE TABLE s.tc52 (a inet)","expect":"ok","ref":"sql-createtable","note":"inet network type"}
+{"id":"ctcola0053","category":"create-table-columns","sql":"CREATE TABLE s.tc53 (a cidr)","expect":"ok","ref":"sql-createtable","note":"cidr network type"}
+{"id":"ctcola0054","category":"create-table-columns","sql":"CREATE TABLE s.tc54 (a macaddr)","expect":"ok","ref":"sql-createtable","note":"macaddr type"}
+{"id":"ctcola0055","category":"create-table-columns","sql":"CREATE TABLE s.tc55 (a macaddr8)","expect":"ok","ref":"sql-createtable","note":"macaddr8 type"}
+{"id":"ctcola0056","category":"create-table-columns","sql":"CREATE TABLE s.tc56 (a xml)","expect":"ok","ref":"sql-createtable","note":"xml type"}
+{"id":"ctcola0057","category":"create-table-columns","sql":"CREATE TABLE s.tc57 (a point)","expect":"ok","ref":"sql-createtable","note":"geometric point type"}
+{"id":"ctcola0058","category":"create-table-columns","sql":"CREATE TABLE s.tc58 (a line)","expect":"ok","ref":"sql-createtable","note":"geometric line type"}
+{"id":"ctcola0059","category":"create-table-columns","sql":"CREATE TABLE s.tc59 (a lseg)","expect":"ok","ref":"sql-createtable","note":"geometric lseg type"}
+{"id":"ctcola0060","category":"create-table-columns","sql":"CREATE TABLE s.tc60 (a box)","expect":"ok","ref":"sql-createtable","note":"geometric box type"}
+{"id":"ctcola0061","category":"create-table-columns","sql":"CREATE TABLE s.tc61 (a path)","expect":"ok","ref":"sql-createtable","note":"geometric path type"}
+{"id":"ctcola0062","category":"create-table-columns","sql":"CREATE TABLE s.tc62 (a polygon)","expect":"ok","ref":"sql-createtable","note":"geometric polygon type"}
+{"id":"ctcola0063","category":"create-table-columns","sql":"CREATE TABLE s.tc63 (a circle)","expect":"ok","ref":"sql-createtable","note":"geometric circle type"}
+{"id":"ctcola0064","category":"create-table-columns","sql":"CREATE TABLE s.tc64 (a int4range)","expect":"ok","ref":"sql-createtable","note":"int4range range type"}
+{"id":"ctcola0065","category":"create-table-columns","sql":"CREATE TABLE s.tc65 (a int8range)","expect":"ok","ref":"sql-createtable","note":"int8range range type"}
+{"id":"ctcola0066","category":"create-table-columns","sql":"CREATE TABLE s.tc66 (a numrange)","expect":"ok","ref":"sql-createtable","note":"numrange range type"}
+{"id":"ctcola0067","category":"create-table-columns","sql":"CREATE TABLE s.tc67 (a tsrange)","expect":"ok","ref":"sql-createtable","note":"tsrange range type"}
+{"id":"ctcola0068","category":"create-table-columns","sql":"CREATE TABLE s.tc68 (a tstzrange)","expect":"ok","ref":"sql-createtable","note":"tstzrange range type"}
+{"id":"ctcola0069","category":"create-table-columns","sql":"CREATE TABLE s.tc69 (a daterange)","expect":"ok","ref":"sql-createtable","note":"daterange range type"}
+{"id":"ctcola0070","category":"create-table-columns","sql":"CREATE TABLE s.tc70 (a integer[])","expect":"ok","ref":"sql-createtable","note":"one-dimensional integer array"}
+{"id":"ctcola0071","category":"create-table-columns","sql":"CREATE TABLE s.tc71 (a integer[][])","expect":"ok","ref":"sql-createtable","note":"two-dimensional integer array"}
+{"id":"ctcola0072","category":"create-table-columns","sql":"CREATE TABLE s.tc72 (a integer[][][])","expect":"ok","ref":"sql-createtable","note":"three-dimensional integer array"}
+{"id":"ctcola0073","category":"create-table-columns","sql":"CREATE TABLE s.tc73 (a integer ARRAY)","expect":"ok","ref":"sql-createtable","note":"integer ARRAY keyword syntax"}
+{"id":"ctcola0074","category":"create-table-columns","sql":"CREATE TABLE s.tc74 (a integer ARRAY[10])","expect":"ok","ref":"sql-createtable","note":"integer ARRAY[n] with size hint"}
+{"id":"ctcola0075","category":"create-table-columns","sql":"CREATE TABLE s.tc75 (a text[])","expect":"ok","ref":"sql-createtable","note":"text array"}
+{"id":"ctcola0076","category":"create-table-columns","sql":"CREATE TABLE s.tc76 (a numeric(10,2)[])","expect":"ok","ref":"sql-createtable","note":"array of numeric with modifier"}
+{"id":"ctcola0077","category":"create-table-columns","sql":"CREATE TABLE s.tc77 (a s.mood)","expect":"ok","ref":"sql-createtable","note":"enum type column (user-defined)"}
+{"id":"ctcola0078","category":"create-table-columns","sql":"CREATE TABLE s.tc78 (a s.addr)","expect":"ok","ref":"sql-createtable","note":"composite type column (user-defined)"}
+{"id":"ctcola0079","category":"create-table-columns","sql":"CREATE TABLE s.tc79 (a s.pos_int)","expect":"ok","ref":"sql-createtable","note":"domain type column"}
+{"id":"ctcola0080","category":"create-table-columns","sql":"CREATE TABLE s.tc80 (a integer DEFAULT 42)","expect":"ok","ref":"sql-createtable","note":"DEFAULT with integer literal"}
+{"id":"ctcola0081","category":"create-table-columns","sql":"CREATE TABLE s.tc81 (a text DEFAULT 'hello')","expect":"ok","ref":"sql-createtable","note":"DEFAULT with string literal"}
+{"id":"ctcola0082","category":"create-table-columns","sql":"CREATE TABLE s.tc82 (a boolean DEFAULT true)","expect":"ok","ref":"sql-createtable","note":"DEFAULT with boolean literal"}
+{"id":"ctcola0083","category":"create-table-columns","sql":"CREATE TABLE s.tc83 (a boolean DEFAULT false)","expect":"ok","ref":"sql-createtable","note":"DEFAULT false"}
+{"id":"ctcola0084","category":"create-table-columns","sql":"CREATE TABLE s.tc84 (a timestamptz DEFAULT now())","expect":"ok","ref":"sql-createtable","note":"DEFAULT with function call"}
+{"id":"ctcola0085","category":"create-table-columns","sql":"CREATE TABLE s.tc85 (a timestamptz DEFAULT current_timestamp)","expect":"ok","ref":"sql-createtable","note":"DEFAULT CURRENT_TIMESTAMP"}
+{"id":"ctcola0086","category":"create-table-columns","sql":"CREATE TABLE s.tc86 (a date DEFAULT current_date)","expect":"ok","ref":"sql-createtable","note":"DEFAULT CURRENT_DATE"}
+{"id":"ctcola0087","category":"create-table-columns","sql":"CREATE TABLE s.tc87 (a time DEFAULT current_time)","expect":"ok","ref":"sql-createtable","note":"DEFAULT CURRENT_TIME"}
+{"id":"ctcola0088","category":"create-table-columns","sql":"CREATE TABLE s.tc88 (a integer DEFAULT nextval('s.seq'))","expect":"ok","ref":"sql-createtable","note":"DEFAULT nextval from sequence"}
+{"id":"ctcola0089","category":"create-table-columns","sql":"CREATE TABLE s.tc89 (a numeric DEFAULT 1.5 + 2.5)","expect":"ok","ref":"sql-createtable","note":"DEFAULT with arithmetic expression"}
+{"id":"ctcola0090","category":"create-table-columns","sql":"CREATE TABLE s.tc90 (a text DEFAULT NULL)","expect":"ok","ref":"sql-createtable","note":"DEFAULT NULL"}
+{"id":"ctcola0091","category":"create-table-columns","sql":"CREATE TABLE s.tc91 (a integer NOT NULL)","expect":"ok","ref":"sql-createtable","note":"NOT NULL constraint"}
+{"id":"ctcola0092","category":"create-table-columns","sql":"CREATE TABLE s.tc92 (a integer NULL)","expect":"ok","ref":"sql-createtable","note":"NULL explicit constraint (default)"}
+{"id":"ctcola0093","category":"create-table-columns","sql":"CREATE TABLE s.tc93 (a integer NOT NULL DEFAULT 0)","expect":"ok","ref":"sql-createtable","note":"NOT NULL combined with DEFAULT"}
+{"id":"ctcola0094","category":"create-table-columns","sql":"CREATE TABLE s.tc94 (a integer DEFAULT 0 NOT NULL)","expect":"ok","ref":"sql-createtable","note":"DEFAULT before NOT NULL (order swap)"}
+{"id":"ctcola0095","category":"create-table-columns","sql":"CREATE TABLE s.tc95 (a text COLLATE \"C\")","expect":"ok","ref":"sql-createtable","note":"COLLATE with C collation"}
+{"id":"ctcola0096","category":"create-table-columns","sql":"CREATE TABLE s.tc96 (a text COLLATE \"POSIX\")","expect":"ok","ref":"sql-createtable","note":"COLLATE POSIX"}
+{"id":"ctcola0097","category":"create-table-columns","sql":"CREATE TABLE s.tc97 (a varchar(100) COLLATE \"C\" NOT NULL)","expect":"ok","ref":"sql-createtable","note":"COLLATE combined with NOT NULL"}
+{"id":"ctcola0098","category":"create-table-columns","sql":"CREATE TABLE s.tc98 (a integer GENERATED ALWAYS AS (1 + 1) STORED)","expect":"ok","ref":"sql-createtable","note":"GENERATED ALWAYS AS expr STORED"}
+{"id":"ctcola0099","category":"create-table-columns","sql":"CREATE TABLE s.tc99 (x integer, y integer, z integer GENERATED ALWAYS AS (x + y) STORED)","expect":"ok","ref":"sql-createtable","note":"generated column referencing other columns"}
+{"id":"ctcola0100","category":"create-table-columns","sql":"CREATE TABLE s.tc100 (a integer GENERATED ALWAYS AS IDENTITY)","expect":"ok","ref":"sql-createtable","note":"GENERATED ALWAYS AS IDENTITY minimal"}
+{"id":"ctcola0101","category":"create-table-columns","sql":"CREATE TABLE s.tc101 (a bigint GENERATED ALWAYS AS IDENTITY)","expect":"ok","ref":"sql-createtable","note":"GENERATED ALWAYS AS IDENTITY bigint"}
+{"id":"ctcola0102","category":"create-table-columns","sql":"CREATE TABLE s.tc102 (a integer GENERATED BY DEFAULT AS IDENTITY)","expect":"ok","ref":"sql-createtable","note":"GENERATED BY DEFAULT AS IDENTITY"}
+{"id":"ctcola0103","category":"create-table-columns","sql":"CREATE TABLE s.tc103 (a integer GENERATED ALWAYS AS IDENTITY (START WITH 10))","expect":"ok","ref":"sql-createtable","note":"IDENTITY with START WITH option"}
+{"id":"ctcola0104","category":"create-table-columns","sql":"CREATE TABLE s.tc104 (a integer GENERATED ALWAYS AS IDENTITY (INCREMENT BY 5))","expect":"ok","ref":"sql-createtable","note":"IDENTITY with INCREMENT BY option"}
+{"id":"ctcola0105","category":"create-table-columns","sql":"CREATE TABLE s.tc105 (a integer GENERATED ALWAYS AS IDENTITY (START WITH 1 INCREMENT BY 1 MINVALUE 1 MAXVALUE 1000))","expect":"ok","ref":"sql-createtable","note":"IDENTITY with multiple sequence options"}
+{"id":"ctcola0106","category":"create-table-columns","sql":"CREATE TABLE s.tc106 (a integer GENERATED ALWAYS AS IDENTITY (CYCLE))","expect":"ok","ref":"sql-createtable","note":"IDENTITY with CYCLE option"}
+{"id":"ctcola0107","category":"create-table-columns","sql":"CREATE TABLE s.tc107 (a integer GENERATED ALWAYS AS IDENTITY (NO CYCLE))","expect":"ok","ref":"sql-createtable","note":"IDENTITY with NO CYCLE option"}
+{"id":"ctcola0108","category":"create-table-columns","sql":"CREATE TABLE s.tc108 (a integer GENERATED ALWAYS AS IDENTITY (CACHE 10))","expect":"ok","ref":"sql-createtable","note":"IDENTITY with CACHE option"}
+{"id":"ctcola0109","category":"create-table-columns","sql":"CREATE TABLE s.tc109 (a integer GENERATED ALWAYS AS IDENTITY (NO MINVALUE NO MAXVALUE))","expect":"ok","ref":"sql-createtable","note":"IDENTITY with NO MINVALUE NO MAXVALUE"}
+{"id":"ctcola0110","category":"create-table-columns","sql":"CREATE TABLE s.tc110 (a smallserial)","expect":"ok","ref":"sql-createtable","note":"smallserial pseudo-type"}
+{"id":"ctcola0111","category":"create-table-columns","sql":"CREATE TABLE s.tc111 (a serial)","expect":"ok","ref":"sql-createtable","note":"serial pseudo-type"}
+{"id":"ctcola0112","category":"create-table-columns","sql":"CREATE TABLE s.tc112 (a bigserial)","expect":"ok","ref":"sql-createtable","note":"bigserial pseudo-type"}
+{"id":"ctcola0113","category":"create-table-columns","sql":"CREATE TABLE s.tc113 (a text STORAGE PLAIN)","expect":"ok","ref":"sql-createtable","note":"STORAGE PLAIN hint"}
+{"id":"ctcola0114","category":"create-table-columns","sql":"CREATE TABLE s.tc114 (a text STORAGE EXTERNAL)","expect":"ok","ref":"sql-createtable","note":"STORAGE EXTERNAL hint"}
+{"id":"ctcola0115","category":"create-table-columns","sql":"CREATE TABLE s.tc115 (a text STORAGE EXTENDED)","expect":"ok","ref":"sql-createtable","note":"STORAGE EXTENDED hint"}
+{"id":"ctcola0116","category":"create-table-columns","sql":"CREATE TABLE s.tc116 (a text STORAGE MAIN)","expect":"ok","ref":"sql-createtable","note":"STORAGE MAIN hint"}
+{"id":"ctcola0117","category":"create-table-columns","sql":"CREATE TABLE s.tc117 (a text STORAGE DEFAULT)","expect":"ok","ref":"sql-createtable","note":"STORAGE DEFAULT hint"}
+{"id":"ctcola0118","category":"create-table-columns","sql":"CREATE TABLE s.tc118 (a text COMPRESSION pglz)","expect":"ok","ref":"sql-createtable","note":"COMPRESSION pglz method"}
+{"id":"ctcola0119","category":"create-table-columns","sql":"CREATE TABLE s.tc119 (a text COMPRESSION default)","expect":"ok","ref":"sql-createtable","note":"COMPRESSION default method"}
+{"id":"ctcola0120","category":"create-table-columns","sql":"CREATE TABLE s.tc120 (a text STORAGE EXTENDED COMPRESSION pglz)","expect":"ok","ref":"sql-createtable","note":"STORAGE and COMPRESSION together"}
+{"id":"ctcola0121","category":"create-table-columns","sql":"CREATE TABLE s.tc121 (a integer CONSTRAINT nn_a NOT NULL)","expect":"ok","ref":"sql-createtable","note":"named NOT NULL constraint"}
+{"id":"ctcola0122","category":"create-table-columns","sql":"CREATE TABLE s.tc122 (a integer CONSTRAINT chk_a CHECK (a > 0))","expect":"ok","ref":"sql-createtable","note":"named CHECK constraint"}
+{"id":"ctcola0123","category":"create-table-columns","sql":"CREATE TABLE s.tc123 (a integer CHECK (a > 0))","expect":"ok","ref":"sql-createtable","note":"anonymous inline CHECK constraint"}
+{"id":"ctcola0124","category":"create-table-columns","sql":"CREATE TABLE s.tc124 (a integer CHECK (a BETWEEN 1 AND 100))","expect":"ok","ref":"sql-createtable","note":"CHECK with BETWEEN expression"}
+{"id":"ctcola0125","category":"create-table-columns","sql":"CREATE TABLE s.tc125 (a integer PRIMARY KEY)","expect":"ok","ref":"sql-createtable","note":"inline PRIMARY KEY constraint"}
+{"id":"ctcola0126","category":"create-table-columns","sql":"CREATE TABLE s.tc126 (a integer UNIQUE)","expect":"ok","ref":"sql-createtable","note":"inline UNIQUE constraint"}
+{"id":"ctcola0127","category":"create-table-columns","sql":"CREATE TABLE s.tc127 (a integer UNIQUE NULLS NOT DISTINCT)","expect":"ok","ref":"sql-createtable","note":"UNIQUE NULLS NOT DISTINCT"}
+{"id":"ctcola0128","category":"create-table-columns","sql":"CREATE TABLE s.tc128 (a integer UNIQUE NULLS DISTINCT)","expect":"ok","ref":"sql-createtable","note":"UNIQUE NULLS DISTINCT explicit"}
+{"id":"ctcola0129","category":"create-table-columns","sql":"CREATE TABLE s.tc129 (a bigint REFERENCES s.t (id))","expect":"ok","ref":"sql-createtable","note":"inline REFERENCES foreign key"}
+{"id":"ctcola0130","category":"create-table-columns","sql":"CREATE TABLE s.tc130 (a bigint REFERENCES s.t (id) ON DELETE CASCADE)","expect":"ok","ref":"sql-createtable","note":"REFERENCES with ON DELETE CASCADE"}
+{"id":"ctcola0131","category":"create-table-columns","sql":"CREATE TABLE s.tc131 (a bigint REFERENCES s.t (id) ON DELETE SET NULL)","expect":"ok","ref":"sql-createtable","note":"REFERENCES with ON DELETE SET NULL"}
+{"id":"ctcola0132","category":"create-table-columns","sql":"CREATE TABLE s.tc132 (a bigint REFERENCES s.t (id) ON DELETE SET DEFAULT)","expect":"ok","ref":"sql-createtable","note":"REFERENCES with ON DELETE SET DEFAULT"}
+{"id":"ctcola0133","category":"create-table-columns","sql":"CREATE TABLE s.tc133 (a bigint REFERENCES s.t (id) ON DELETE RESTRICT)","expect":"ok","ref":"sql-createtable","note":"REFERENCES with ON DELETE RESTRICT"}
+{"id":"ctcola0134","category":"create-table-columns","sql":"CREATE TABLE s.tc134 (a bigint REFERENCES s.t (id) ON DELETE NO ACTION)","expect":"ok","ref":"sql-createtable","note":"REFERENCES with ON DELETE NO ACTION"}
+{"id":"ctcola0135","category":"create-table-columns","sql":"CREATE TABLE s.tc135 (a bigint REFERENCES s.t (id) ON UPDATE CASCADE)","expect":"ok","ref":"sql-createtable","note":"REFERENCES with ON UPDATE CASCADE"}
+{"id":"ctcola0136","category":"create-table-columns","sql":"CREATE TABLE s.tc136 (a bigint REFERENCES s.t (id) ON DELETE CASCADE ON UPDATE RESTRICT)","expect":"ok","ref":"sql-createtable","note":"REFERENCES with both ON DELETE and ON UPDATE"}
+{"id":"ctcola0137","category":"create-table-columns","sql":"CREATE TABLE s.tc137 (a bigint REFERENCES s.t (id) MATCH FULL)","expect":"ok","ref":"sql-createtable","note":"REFERENCES MATCH FULL"}
+{"id":"ctcola0138","category":"create-table-columns","sql":"CREATE TABLE s.tc138 (a bigint REFERENCES s.t (id) MATCH SIMPLE)","expect":"ok","ref":"sql-createtable","note":"REFERENCES MATCH SIMPLE"}
+{"id":"ctcola0139","category":"create-table-columns","sql":"CREATE TABLE s.tc139 (a bigint REFERENCES s.t (id) DEFERRABLE)","expect":"ok","ref":"sql-createtable","note":"REFERENCES DEFERRABLE constraint timing"}
+{"id":"ctcola0140","category":"create-table-columns","sql":"CREATE TABLE s.tc140 (a bigint REFERENCES s.t (id) DEFERRABLE INITIALLY DEFERRED)","expect":"ok","ref":"sql-createtable","note":"DEFERRABLE INITIALLY DEFERRED"}
+{"id":"ctcola0141","category":"create-table-columns","sql":"CREATE TABLE s.tc141 (a bigint REFERENCES s.t (id) NOT DEFERRABLE)","expect":"ok","ref":"sql-createtable","note":"NOT DEFERRABLE explicit"}
+{"id":"ctcola0142","category":"create-table-columns","sql":"CREATE TABLE s.tc142 (a bigint REFERENCES s.t (id) DEFERRABLE INITIALLY IMMEDIATE)","expect":"ok","ref":"sql-createtable","note":"DEFERRABLE INITIALLY IMMEDIATE"}
+{"id":"ctcola0143","category":"create-table-columns","sql":"CREATE TABLE s.tc143 (a integer CHECK (a > 0) NO INHERIT)","expect":"ok","ref":"sql-createtable","note":"CHECK constraint NO INHERIT"}
+{"id":"ctcola0144","category":"create-table-columns","sql":"CREATE TABLE s.tc144 (a integer NOT NULL NO INHERIT)","expect":"ok","ref":"sql-createtable","note":"NOT NULL NO INHERIT"}
+{"id":"ctcola0145","category":"create-table-columns","sql":"CREATE TABLE s.tc145 (a integer, b text, c boolean NOT NULL DEFAULT true, d bigint REFERENCES s.t (id))","expect":"ok","ref":"sql-createtable","note":"multiple columns with different types and constraints"}
+{"id":"ctcola0146","category":"create-table-columns","sql":"CREATE TABLE s.tc146 (a integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY, b text NOT NULL, c numeric(10,2) DEFAULT 0)","expect":"ok","ref":"sql-createtable","note":"identity PK with other columns"}
+{"id":"ctcola0147","category":"create-table-columns","sql":"CREATE TABLE s.tc147 (a text COLLATE \"C\" NOT NULL DEFAULT 'x')","expect":"ok","ref":"sql-createtable","note":"COLLATE, NOT NULL, DEFAULT all together"}
+{"id":"ctcola0148","category":"create-table-columns","sql":"CREATE TABLE s.tc148 (a text STORAGE EXTENDED COMPRESSION pglz COLLATE \"C\" NOT NULL DEFAULT 'x')","expect":"ok","ref":"sql-createtable","note":"STORAGE + COMPRESSION + COLLATE + NOT NULL + DEFAULT"}
+{"id":"ctcola0149","category":"create-table-columns","sql":"CREATE TABLE s.tc149 (x integer, y integer GENERATED ALWAYS AS (x * 2) STORED NOT NULL)","expect":"ok","ref":"sql-createtable","note":"generated column with NOT NULL"}
+{"id":"ctcola0150","category":"create-table-columns","sql":"CREATE TABLE s.tc150 (a integer GENERATED ALWAYS AS IDENTITY (START WITH 100 INCREMENT BY 10 CACHE 5 CYCLE))","expect":"ok","ref":"sql-createtable","note":"IDENTITY with full sequence options"}
+{"id":"ctcola0151","category":"create-table-columns","sql":"CREATE TABLE s.tc151 (a integer GENERATED BY DEFAULT AS IDENTITY (START WITH 1 INCREMENT BY 1))","expect":"ok","ref":"sql-createtable","note":"BY DEFAULT IDENTITY with sequence options"}
+{"id":"ctcola0152","category":"create-table-columns","sql":"CREATE TABLE s.tc152 (\"my col\" integer)","expect":"ok","ref":"sql-createtable","note":"quoted column name with space"}
+{"id":"ctcola0153","category":"create-table-columns","sql":"CREATE TABLE s.tc153 (\"SELECT\" integer)","expect":"ok","ref":"sql-createtable","note":"quoted reserved keyword as column name"}
+{"id":"ctcola0154","category":"create-table-columns","sql":"CREATE TABLE s.tc154 (a integer CONSTRAINT pk PRIMARY KEY CONSTRAINT chk CHECK (a > 0))","expect":"ok","ref":"sql-createtable","note":"multiple named constraints on one column"}
+{"id":"ctcola0155","category":"create-table-columns","sql":"CREATE TABLE s.tc155 (a integer CHECK (a > 0) ENFORCED)","expect":"ok","ref":"sql-createtable","note":"CHECK constraint with ENFORCED attribute (PG18)"}
+{"id":"ctcola0156","category":"create-table-columns","sql":"CREATE TABLE s.tc156 (a integer CHECK (a > 0) NOT ENFORCED)","expect":"ok","ref":"sql-createtable","note":"CHECK constraint NOT ENFORCED (PG18)"}
+{"id":"ctcola0157","category":"create-table-columns","sql":"CREATE TABLE s.tc157 (a integer GENERATED ALWAYS AS (1+1) STORED, b text DEFAULT 'y', c boolean NOT NULL)","expect":"ok","ref":"sql-createtable","note":"mix of generated, default, not-null columns"}
+{"id":"ctcola0158","category":"create-table-columns","sql":"CREATE TABLE (a integer)","expect":"error","ref":"sql-createtable","note":"syntax error: missing table name"}
+{"id":"ctcola0159","category":"create-table-columns","sql":"CREATE TABLE s.tc_err1 (a)","expect":"error","ref":"sql-createtable","note":"syntax error: column missing data type"}
+{"id":"ctcola0160","category":"create-table-columns","sql":"CREATE TABLE s.tc_err2 (a integer,)","expect":"error","ref":"sql-createtable","note":"syntax error: trailing comma in column list"}
+{"id":"ctcola0161","category":"create-table-columns","sql":"CREATE TABLE s.tc_err3 (a numeric(10,2,1))","expect":"error","ref":"sql-createtable","note":"error: too many modifiers for numeric"}
+{"id":"ctcola0162","category":"create-table-columns","sql":"CREATE TABLE s.tc_err4 (a varchar(-1))","expect":"error","ref":"sql-createtable","note":"error: negative length for varchar"}
+{"id":"ctcola0163","category":"create-table-columns","sql":"CREATE TABLE s.tc_err5 (a bit(0))","expect":"error","ref":"sql-createtable","note":"error: zero length for bit type"}
+{"id":"ctcola0164","category":"create-table-columns","sql":"CREATE TABLE s.tc_err6 (a integer NOT NULL NOT NULL)","expect":"ok","ref":"sql-createtable","note":"duplicate NOT NULL is accepted by PG18"}
+{"id":"ctcola0165","category":"create-table-columns","sql":"CREATE TABLE s.tc_err7 (a integer DEFAULT 1 DEFAULT 2)","expect":"error","ref":"sql-createtable","note":"error: duplicate DEFAULT clause"}
+{"id":"ctcola0166","category":"create-table-columns","sql":"CREATE TABLE s.tc_err8 (a integer GENERATED ALWAYS AS (1+1))","expect":"ok","ref":"sql-createtable","note":"GENERATED ALWAYS AS (expr) without STORED is valid in PG18 (VIRTUAL implied)"}
+{"id":"ctcola0167","category":"create-table-columns","sql":"CREATE TABLE s.tc_err9 (a text COLLATE \"nonexistent_collation_xyz\")","expect":"error","ref":"sql-createtable","note":"error: nonexistent collation (semantic)"}
+{"id":"ctcola0168","category":"create-table-columns","sql":"CREATE TABLE s.tc_err10 (a integer STORAGE INVALID_OPT)","expect":"error","ref":"sql-createtable","note":"error: invalid STORAGE option"}
+{"id":"ctcola0169","category":"create-table-columns","sql":"CREATE TABLE s.tc_err11 (a integer DEFAULT nextval('s.seq') GENERATED ALWAYS AS IDENTITY)","expect":"error","ref":"sql-createtable","note":"error: DEFAULT and GENERATED IDENTITY conflict"}
+{"id":"ctcola0170","category":"create-table-columns","sql":"CREATE TABLE s.tc_err12 (a integer GENERATED ALWAYS AS IDENTITY GENERATED BY DEFAULT AS IDENTITY)","expect":"error","ref":"sql-createtable","note":"error: duplicate GENERATED clause"}

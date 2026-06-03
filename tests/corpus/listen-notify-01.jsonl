@@ -1,0 +1,100 @@
+{"id":"lsna0001","category":"listen-notify","sql":"LISTEN mychannel","expect":"ok","ref":"sql-notify","note":"LISTEN basic unquoted channel name"}
+{"id":"lsna0002","category":"listen-notify","sql":"NOTIFY mychannel","expect":"ok","ref":"sql-notify","note":"NOTIFY basic unquoted channel name, no payload"}
+{"id":"lsna0003","category":"listen-notify","sql":"NOTIFY mychannel, 'hello world'","expect":"ok","ref":"sql-notify","note":"NOTIFY with string payload"}
+{"id":"lsna0004","category":"listen-notify","sql":"UNLISTEN mychannel","expect":"ok","ref":"sql-notify","note":"UNLISTEN specific channel"}
+{"id":"lsna0005","category":"listen-notify","sql":"UNLISTEN *","expect":"ok","ref":"sql-notify","note":"UNLISTEN wildcard all channels"}
+{"id":"lsna0006","category":"listen-notify","sql":"SELECT pg_notify('mychannel', 'payload text')","expect":"ok","ref":"sql-notify","note":"pg_notify function with channel and payload"}
+{"id":"lsna0007","category":"listen-notify","sql":"SELECT pg_notify('mychannel', NULL)","expect":"ok","ref":"sql-notify","note":"pg_notify with NULL payload"}
+{"id":"lsna0008","category":"listen-notify","sql":"LISTEN \"MyChannel\"","expect":"ok","ref":"sql-notify","note":"LISTEN with double-quoted mixed-case channel name"}
+{"id":"lsna0009","category":"listen-notify","sql":"NOTIFY \"MyChannel\"","expect":"ok","ref":"sql-notify","note":"NOTIFY with double-quoted mixed-case channel name"}
+{"id":"lsna0010","category":"listen-notify","sql":"NOTIFY \"MyChannel\", 'payload'","expect":"ok","ref":"sql-notify","note":"NOTIFY double-quoted channel with payload"}
+{"id":"lsna0011","category":"listen-notify","sql":"UNLISTEN \"MyChannel\"","expect":"ok","ref":"sql-notify","note":"UNLISTEN double-quoted channel name"}
+{"id":"lsna0012","category":"listen-notify","sql":"LISTEN a","expect":"ok","ref":"sql-notify","note":"LISTEN single-char channel name"}
+{"id":"lsna0013","category":"listen-notify","sql":"NOTIFY a","expect":"ok","ref":"sql-notify","note":"NOTIFY single-char channel name"}
+{"id":"lsna0014","category":"listen-notify","sql":"NOTIFY a, ''","expect":"ok","ref":"sql-notify","note":"NOTIFY with empty string payload"}
+{"id":"lsna0015","category":"listen-notify","sql":"LISTEN channel_with_underscores","expect":"ok","ref":"sql-notify","note":"LISTEN channel name with underscores"}
+{"id":"lsna0016","category":"listen-notify","sql":"NOTIFY channel_with_underscores, 'msg'","expect":"ok","ref":"sql-notify","note":"NOTIFY channel with underscores and payload"}
+{"id":"lsna0017","category":"listen-notify","sql":"LISTEN channel123","expect":"ok","ref":"sql-notify","note":"LISTEN channel name with digits"}
+{"id":"lsna0018","category":"listen-notify","sql":"NOTIFY channel123, 'data'","expect":"ok","ref":"sql-notify","note":"NOTIFY channel with digits in name"}
+{"id":"lsna0019","category":"listen-notify","sql":"LISTEN \"channel with spaces\"","expect":"ok","ref":"sql-notify","note":"LISTEN double-quoted channel with spaces"}
+{"id":"lsna0020","category":"listen-notify","sql":"NOTIFY \"channel with spaces\", 'payload'","expect":"ok","ref":"sql-notify","note":"NOTIFY double-quoted channel with spaces"}
+{"id":"lsna0021","category":"listen-notify","sql":"UNLISTEN \"channel with spaces\"","expect":"ok","ref":"sql-notify","note":"UNLISTEN double-quoted channel with spaces"}
+{"id":"lsna0022","category":"listen-notify","sql":"NOTIFY chan, 'line1\\nline2'","expect":"ok","ref":"sql-notify","note":"NOTIFY payload with escaped newline in SQL string"}
+{"id":"lsna0023","category":"listen-notify","sql":"NOTIFY chan, E'tab\\there'","expect":"ok","ref":"sql-notify","note":"NOTIFY payload with E-string escape syntax"}
+{"id":"lsna0024","category":"listen-notify","sql":"NOTIFY chan, $$dollar quoted payload$$","expect":"ok","ref":"sql-notify","note":"NOTIFY payload as dollar-quoted string"}
+{"id":"lsna0025","category":"listen-notify","sql":"NOTIFY chan, $tag$tagged dollar quote$tag$","expect":"ok","ref":"sql-notify","note":"NOTIFY payload as tagged dollar-quoted string"}
+{"id":"lsna0026","category":"listen-notify","sql":"SELECT pg_notify('chan', 'hello')","expect":"ok","ref":"sql-notify","note":"pg_notify returns void via SELECT"}
+{"id":"lsna0027","category":"listen-notify","sql":"SELECT pg_notify('chan', '')","expect":"ok","ref":"sql-notify","note":"pg_notify with empty payload"}
+{"id":"lsna0028","category":"listen-notify","sql":"LISTEN listen","expect":"ok","ref":"sql-notify","note":"LISTEN channel named same as keyword (unquoted, keyword is also valid ident)"}
+{"id":"lsna0029","category":"listen-notify","sql":"LISTEN notify","expect":"ok","ref":"sql-notify","note":"LISTEN channel named 'notify' (reserved word used as ident via channel name context)"}
+{"id":"lsna0030","category":"listen-notify","sql":"LISTEN unlisten","expect":"ok","ref":"sql-notify","note":"LISTEN channel named 'unlisten'"}
+{"id":"lsna0031","category":"listen-notify","sql":"NOTIFY mychan, 'it''s escaped'","expect":"ok","ref":"sql-notify","note":"NOTIFY payload with doubled single-quote escape"}
+{"id":"lsna0032","category":"listen-notify","sql":"LISTEN MYCHANNEL","expect":"ok","ref":"sql-notify","note":"LISTEN uppercase channel name (folded to lowercase)"}
+{"id":"lsna0033","category":"listen-notify","sql":"NOTIFY MYCHANNEL","expect":"ok","ref":"sql-notify","note":"NOTIFY uppercase channel name (folded to lowercase)"}
+{"id":"lsna0034","category":"listen-notify","sql":"NOTIFY MYCHANNEL, 'msg'","expect":"ok","ref":"sql-notify","note":"NOTIFY uppercase channel with payload"}
+{"id":"lsna0035","category":"listen-notify","sql":"LISTEN MixedCase","expect":"ok","ref":"sql-notify","note":"LISTEN mixed-case channel (folded to lowercase without quotes)"}
+{"id":"lsna0036","category":"listen-notify","sql":"listen mychannel","expect":"ok","ref":"sql-notify","note":"LISTEN keyword lowercase"}
+{"id":"lsna0037","category":"listen-notify","sql":"notify mychannel","expect":"ok","ref":"sql-notify","note":"NOTIFY keyword lowercase"}
+{"id":"lsna0038","category":"listen-notify","sql":"unlisten *","expect":"ok","ref":"sql-notify","note":"UNLISTEN * lowercase keyword"}
+{"id":"lsna0039","category":"listen-notify","sql":"LISTEN chan; UNLISTEN chan","expect":"ok","ref":"sql-notify","note":"LISTEN then UNLISTEN same channel in sequence"}
+{"id":"lsna0040","category":"listen-notify","sql":"LISTEN chan; LISTEN chan","expect":"ok","ref":"sql-notify","note":"LISTEN same channel twice is idempotent"}
+{"id":"lsna0041","category":"listen-notify","sql":"UNLISTEN nosuchchan","expect":"ok","ref":"sql-notify","note":"UNLISTEN channel not listened to is not an error"}
+{"id":"lsna0042","category":"listen-notify","sql":"SELECT pg_notify('a', 'b'), pg_notify('c', 'd')","expect":"ok","ref":"sql-notify","note":"multiple pg_notify calls in one SELECT"}
+{"id":"lsna0043","category":"listen-notify","sql":"DO $$ BEGIN PERFORM pg_notify('chan', 'from do block'); END $$","expect":"ok","ref":"sql-notify","note":"pg_notify inside anonymous DO block"}
+{"id":"lsna0044","category":"listen-notify","sql":"LISTEN \"\"","expect":"error","ref":"sql-notify","note":"LISTEN empty double-quoted channel name - zero-length identifier is a syntax error"}
+{"id":"lsna0045","category":"listen-notify","sql":"NOTIFY \"event.channel\"","expect":"ok","ref":"sql-notify","note":"NOTIFY quoted channel with dot in name"}
+{"id":"lsna0046","category":"listen-notify","sql":"NOTIFY \"event.channel\", 'data'","expect":"ok","ref":"sql-notify","note":"NOTIFY quoted channel with dot and payload"}
+{"id":"lsna0047","category":"listen-notify","sql":"LISTEN \"event.channel\"","expect":"ok","ref":"sql-notify","note":"LISTEN quoted channel with dot in name"}
+{"id":"lsna0048","category":"listen-notify","sql":"NOTIFY chan, U&'unicode \\0041'","expect":"ok","ref":"sql-notify","note":"NOTIFY payload as Unicode escape string"}
+{"id":"lsna0049","category":"listen-notify","sql":"SELECT pg_notify('ch', repeat('x', 100))","expect":"ok","ref":"sql-notify","note":"pg_notify with expression as payload"}
+{"id":"lsna0050","category":"listen-notify","sql":"SELECT pg_notify('ch', (SELECT 'computed'))","expect":"ok","ref":"sql-notify","note":"pg_notify with subquery as payload"}
+{"id":"lsna0051","category":"listen-notify","sql":"NOTIFY","expect":"error","ref":"sql-notify","note":"NOTIFY with no channel name - syntax error"}
+{"id":"lsna0052","category":"listen-notify","sql":"LISTEN","expect":"error","ref":"sql-notify","note":"LISTEN with no channel name - syntax error"}
+{"id":"lsna0053","category":"listen-notify","sql":"UNLISTEN","expect":"error","ref":"sql-notify","note":"UNLISTEN with no target - syntax error"}
+{"id":"lsna0054","category":"listen-notify","sql":"NOTIFY ,","expect":"error","ref":"sql-notify","note":"NOTIFY comma without channel name - syntax error"}
+{"id":"lsna0055","category":"listen-notify","sql":"NOTIFY chan 'payload'","expect":"error","ref":"sql-notify","note":"NOTIFY payload without comma separator - syntax error"}
+{"id":"lsna0056","category":"listen-notify","sql":"NOTIFY chan, 42","expect":"error","ref":"sql-notify","note":"NOTIFY with integer literal payload - must be string"}
+{"id":"lsna0057","category":"listen-notify","sql":"NOTIFY chan, 3.14","expect":"error","ref":"sql-notify","note":"NOTIFY with numeric literal payload - must be string"}
+{"id":"lsna0058","category":"listen-notify","sql":"NOTIFY chan, true","expect":"error","ref":"sql-notify","note":"NOTIFY with boolean literal payload - must be string"}
+{"id":"lsna0059","category":"listen-notify","sql":"NOTIFY chan, NULL","expect":"error","ref":"sql-notify","note":"NOTIFY with NULL keyword as payload - syntax error (NULL not a string literal)"}
+{"id":"lsna0060","category":"listen-notify","sql":"NOTIFY chan, chan","expect":"error","ref":"sql-notify","note":"NOTIFY payload as identifier not string - syntax error"}
+{"id":"lsna0061","category":"listen-notify","sql":"NOTIFY 'chan'","expect":"error","ref":"sql-notify","note":"NOTIFY with quoted string as channel name (must be identifier) - syntax error"}
+{"id":"lsna0062","category":"listen-notify","sql":"LISTEN 'chan'","expect":"error","ref":"sql-notify","note":"LISTEN with string literal as channel name - syntax error"}
+{"id":"lsna0063","category":"listen-notify","sql":"UNLISTEN 'chan'","expect":"error","ref":"sql-notify","note":"UNLISTEN with string literal - syntax error"}
+{"id":"lsna0064","category":"listen-notify","sql":"LISTEN *","expect":"error","ref":"sql-notify","note":"LISTEN wildcard * - only UNLISTEN accepts *"}
+{"id":"lsna0065","category":"listen-notify","sql":"NOTIFY *","expect":"error","ref":"sql-notify","note":"NOTIFY wildcard * - not valid syntax"}
+{"id":"lsna0066","category":"listen-notify","sql":"LISTEN chan1, chan2","expect":"error","ref":"sql-notify","note":"LISTEN multiple channels in one statement - not supported"}
+{"id":"lsna0067","category":"listen-notify","sql":"UNLISTEN chan1, chan2","expect":"error","ref":"sql-notify","note":"UNLISTEN multiple channels - not supported"}
+{"id":"lsna0068","category":"listen-notify","sql":"NOTIFY chan, 'p1', 'p2'","expect":"error","ref":"sql-notify","note":"NOTIFY with two payload strings - only one allowed"}
+{"id":"lsna0069","category":"listen-notify","sql":"NOTIFY chan,","expect":"error","ref":"sql-notify","note":"NOTIFY trailing comma without payload - syntax error"}
+{"id":"lsna0070","category":"listen-notify","sql":"LISTEN chan UNLISTEN chan","expect":"error","ref":"sql-notify","note":"LISTEN and UNLISTEN without semicolon - syntax error"}
+{"id":"lsna0071","category":"listen-notify","sql":"pg_notify('chan', 'msg')","expect":"error","ref":"sql-notify","note":"pg_notify without SELECT wrapper - not a statement"}
+{"id":"lsna0072","category":"listen-notify","sql":"NOTIFY s.chan","expect":"error","ref":"sql-notify","note":"NOTIFY schema-qualified channel name - not allowed"}
+{"id":"lsna0073","category":"listen-notify","sql":"LISTEN s.chan","expect":"error","ref":"sql-notify","note":"LISTEN schema-qualified channel name - not allowed"}
+{"id":"lsna0074","category":"listen-notify","sql":"UNLISTEN s.chan","expect":"error","ref":"sql-notify","note":"UNLISTEN schema-qualified channel name - not allowed"}
+{"id":"lsna0075","category":"listen-notify","sql":"NOTIFY chan, (SELECT 'sub')","expect":"error","ref":"sql-notify","note":"NOTIFY payload as subquery - syntax error (must be string literal)"}
+{"id":"lsna0076","category":"listen-notify","sql":"LISTEN chan; NOTIFY chan, 'msg'; UNLISTEN chan","expect":"ok","ref":"sql-notify","note":"LISTEN then NOTIFY with payload then UNLISTEN sequence"}
+{"id":"lsna0077","category":"listen-notify","sql":"NOTIFY mychan, 'payload with \"quotes\"'","expect":"ok","ref":"sql-notify","note":"NOTIFY payload containing double-quote characters"}
+{"id":"lsna0078","category":"listen-notify","sql":"NOTIFY a_b_c, 'msg'","expect":"ok","ref":"sql-notify","note":"NOTIFY channel with multiple underscores"}
+{"id":"lsna0079","category":"listen-notify","sql":"SELECT pg_notify('ch1', NULL::text)","expect":"ok","ref":"sql-notify","note":"pg_notify with explicit NULL cast to text"}
+{"id":"lsna0080","category":"listen-notify","sql":"SELECT pg_notify($$chan$$, $$msg$$)","expect":"ok","ref":"sql-notify","note":"pg_notify with dollar-quoted arguments"}
+{"id":"lsna0081","category":"listen-notify","sql":"NOTIFY \"123starts_with_digit\"","expect":"ok","ref":"sql-notify","note":"NOTIFY double-quoted channel starting with digit"}
+{"id":"lsna0082","category":"listen-notify","sql":"LISTEN \"123starts_with_digit\"","expect":"ok","ref":"sql-notify","note":"LISTEN double-quoted channel starting with digit"}
+{"id":"lsna0083","category":"listen-notify","sql":"NOTIFY chan, 'a'; NOTIFY chan, 'b'","expect":"ok","ref":"sql-notify","note":"multiple NOTIFY statements in sequence"}
+{"id":"lsna0084","category":"listen-notify","sql":"LISTEN c1; LISTEN c2; LISTEN c3","expect":"ok","ref":"sql-notify","note":"LISTEN multiple channels in separate statements"}
+{"id":"lsna0085","category":"listen-notify","sql":"LISTEN c1; LISTEN c2; UNLISTEN *","expect":"ok","ref":"sql-notify","note":"LISTEN multiple then UNLISTEN all"}
+{"id":"lsna0086","category":"listen-notify","sql":"NOTIFY \"special!chars\"","expect":"ok","ref":"sql-notify","note":"NOTIFY double-quoted channel with special chars"}
+{"id":"lsna0087","category":"listen-notify","sql":"NOTIFY \"special!chars\", 'payload'","expect":"ok","ref":"sql-notify","note":"NOTIFY double-quoted channel with special chars and payload"}
+{"id":"lsna0088","category":"listen-notify","sql":"SELECT pg_notify('c', 'x') FROM s.t LIMIT 1","expect":"ok","ref":"sql-notify","note":"pg_notify in SELECT FROM with LIMIT"}
+{"id":"lsna0089","category":"listen-notify","sql":"DO $$ DECLARE i int; BEGIN FOR i IN 1..3 LOOP PERFORM pg_notify('ch', i::text); END LOOP; END $$","expect":"ok","ref":"sql-notify","note":"pg_notify in PL/pgSQL loop with cast payload"}
+{"id":"lsna0090","category":"listen-notify","sql":"NOTIFY chan, ''''''","expect":"ok","ref":"sql-notify","note":"NOTIFY payload of three consecutive doubled single-quotes (two actual quotes)"}
+{"id":"lsna0091","category":"listen-notify","sql":"NOTIFY 123chan","expect":"error","ref":"sql-notify","note":"NOTIFY unquoted channel starting with digit - syntax error"}
+{"id":"lsna0092","category":"listen-notify","sql":"LISTEN 123chan","expect":"error","ref":"sql-notify","note":"LISTEN unquoted channel starting with digit - syntax error"}
+{"id":"lsna0093","category":"listen-notify","sql":"NOTIFY chan = 'x'","expect":"error","ref":"sql-notify","note":"NOTIFY with assignment syntax - not valid"}
+{"id":"lsna0094","category":"listen-notify","sql":"NOTIFY chan PAYLOAD 'msg'","expect":"error","ref":"sql-notify","note":"NOTIFY with PAYLOAD keyword instead of comma - syntax error"}
+{"id":"lsna0095","category":"listen-notify","sql":"SELECT pg_notify()","expect":"error","ref":"sql-notify","note":"pg_notify with no arguments - wrong arity"}
+{"id":"lsna0096","category":"listen-notify","sql":"SELECT pg_notify('chan')","expect":"error","ref":"sql-notify","note":"pg_notify with only one argument - wrong arity"}
+{"id":"lsna0097","category":"listen-notify","sql":"SELECT pg_notify('chan', 'msg', 'extra')","expect":"error","ref":"sql-notify","note":"pg_notify with three arguments - wrong arity"}
+{"id":"lsna0098","category":"listen-notify","sql":"NOTIFY chan, 'x'; NOTIFY chan, 'y'; NOTIFY chan, 'z'; UNLISTEN *","expect":"ok","ref":"sql-notify","note":"multiple NOTIFYs then UNLISTEN * chain"}
+{"id":"lsna0099","category":"listen-notify","sql":"LISTEN alpha; LISTEN beta; LISTEN gamma; UNLISTEN beta; UNLISTEN *","expect":"ok","ref":"sql-notify","note":"LISTEN multiple channels, UNLISTEN one, then UNLISTEN all"}
+{"id":"lsna0100","category":"listen-notify","sql":"SELECT pg_notify('chan', name) FROM s.t LIMIT 1","expect":"ok","ref":"sql-notify","note":"pg_notify with column value as payload from fixture table"}

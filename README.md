@@ -119,3 +119,30 @@ in `BEGIN`/`COMMIT` unless you pass `--no-transaction`, so a failed step rolls b
 gate. Because the MSBuild SDK's `Build` target invokes `pgproj build`, `dotnet build SampleDb.pgproj`
 (and a Visual Studio build) gets the gate automatically — a `publish` that fails analysis aborts
 **before** connecting to the server.
+
+## PostgreSQL language test corpus
+
+A handful of hand-written unit tests cannot prove the parser supports the PostgreSQL language, so
+the parser is measured against a large, **ground-truth-verified corpus** of the PG18 server-
+programming surface.
+
+- **`tests/corpus/<category>.jsonl`** — **21,743 cases** across **85 categories** (DDL, DML + full
+  query grammar, expressions/types/functions incl. json/xml/arrays/ranges/datetime/string/numeric/
+  aggregate/window, PL/pgSQL, and the session/procedural commands). Each case is one JSON object:
+  `{id, category, sql, expect:"ok"|"error", ref, note}`.
+- **`tools/pg-oracle.ps1`** — the ground-truth **oracle**: runs every case against a real
+  **postgres:18** (in a rolled-back transaction, isolated DB clone per run) and confirms PostgreSQL
+  agrees with each case's `expect`. The whole corpus is oracle-clean. See `tests/corpus/CORPUS.md`
+  for the authoring contract and `tests/corpus/_fixture.sql` for the shared fixture.
+- **`CorpusTests`** (docker-free) parses every case with the AST parser and reports a coverage
+  cross-tab + gates regressions against `tests/corpus/_baseline.json`. Current parser standing on
+  the 17,466 valid statements: **32.6 % parsed clean**, ~11,700 unmodeled (standalone DML/expr/
+  PL-pgSQL the DDL-focused parser skips), **71 mis-rejected** (the addressable gap list).
+
+## All-features sample (`sample/AllFeaturesDb`)
+
+A single self-consistent schema (58 one-object-per-file `.sql` files) exercising nearly every
+PostgreSQL DDL feature — a parser stress-test artifact. It **applies cleanly to postgres:18**
+(`_verify.ps1`); `pgproj build` parses it and surfaces exactly the two valid-PG18 forms the parser
+doesn't yet accept (`PRIMARY KEY … INCLUDE`, table-level `FOREIGN KEY … DEFERRABLE`). Files whose
+name starts with `_` (e.g. the generated `_full_create.sql`) are excluded from the build glob.

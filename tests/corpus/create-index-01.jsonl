@@ -1,0 +1,170 @@
+{"id":"idxa0001","category":"create-index","sql":"CREATE INDEX ON s.t (name)","expect":"ok","ref":"sql-createindex","note":"unnamed index, default btree"}
+{"id":"idxa0002","category":"create-index","sql":"CREATE INDEX idxa_basic ON s.t (name)","expect":"ok","ref":"sql-createindex","note":"named index, single column"}
+{"id":"idxa0003","category":"create-index","sql":"CREATE UNIQUE INDEX ON s.t (name)","expect":"ok","ref":"sql-createindex","note":"unique index unnamed"}
+{"id":"idxa0004","category":"create-index","sql":"CREATE UNIQUE INDEX idxa_uq ON s.t (name)","expect":"ok","ref":"sql-createindex","note":"unique index named"}
+{"id":"idxa0005","category":"create-index","sql":"CREATE INDEX IF NOT EXISTS t_name_idx ON s.t (name)","expect":"ok","ref":"sql-createindex","note":"IF NOT EXISTS when name already exists (no error, notice)"}
+{"id":"idxa0006","category":"create-index","sql":"CREATE INDEX IF NOT EXISTS idxa_new_ifne ON s.t (name)","expect":"ok","ref":"sql-createindex","note":"IF NOT EXISTS when name does not exist"}
+{"id":"idxa0007","category":"create-index","sql":"CREATE INDEX CONCURRENTLY idxa_conc ON s.t (name)","expect":"ok","ref":"sql-createindex","txn":"none","note":"CONCURRENTLY outside transaction block"}
+{"id":"idxa0008","category":"create-index","sql":"CREATE UNIQUE INDEX CONCURRENTLY idxa_conc_uq ON s.t (name)","expect":"ok","ref":"sql-createindex","txn":"none","note":"UNIQUE + CONCURRENTLY"}
+{"id":"idxa0009","category":"create-index","sql":"CREATE INDEX CONCURRENTLY IF NOT EXISTS idxa_conc_ifne ON s.t (name)","expect":"ok","ref":"sql-createindex","txn":"none","note":"CONCURRENTLY + IF NOT EXISTS"}
+{"id":"idxa0010","category":"create-index","sql":"CREATE INDEX ON s.t USING btree (name)","expect":"ok","ref":"sql-createindex","note":"explicit USING btree"}
+{"id":"idxa0011","category":"create-index","sql":"CREATE INDEX ON s.t USING hash (name)","expect":"ok","ref":"sql-createindex","note":"USING hash"}
+{"id":"idxa0012","category":"create-index","sql":"CREATE INDEX ON s.t USING gin (tags)","expect":"ok","ref":"sql-createindex","note":"USING gin on text[] column"}
+{"id":"idxa0013","category":"create-index","sql":"CREATE INDEX ON s.t USING gist (span)","expect":"ok","ref":"sql-createindex","note":"USING gist on int4range column"}
+{"id":"idxa0014","category":"create-index","sql":"CREATE INDEX ON s.t USING brin (created_at)","expect":"ok","ref":"sql-createindex","note":"USING brin on timestamptz column"}
+{"id":"idxa0015","category":"create-index","sql":"CREATE INDEX ON s.t USING spgist (span)","expect":"ok","ref":"sql-createindex","note":"USING spgist on int4range column"}
+{"id":"idxa0016","category":"create-index","sql":"CREATE INDEX ON s.t (name, val)","expect":"ok","ref":"sql-createindex","note":"multi-column index"}
+{"id":"idxa0017","category":"create-index","sql":"CREATE INDEX ON s.t (name, val, qty)","expect":"ok","ref":"sql-createindex","note":"three-column index"}
+{"id":"idxa0018","category":"create-index","sql":"CREATE INDEX ON s.t (name ASC)","expect":"ok","ref":"sql-createindex","note":"explicit ASC order"}
+{"id":"idxa0019","category":"create-index","sql":"CREATE INDEX ON s.t (name DESC)","expect":"ok","ref":"sql-createindex","note":"explicit DESC order"}
+{"id":"idxa0020","category":"create-index","sql":"CREATE INDEX ON s.t (name ASC NULLS FIRST)","expect":"ok","ref":"sql-createindex","note":"ASC NULLS FIRST"}
+{"id":"idxa0021","category":"create-index","sql":"CREATE INDEX ON s.t (name ASC NULLS LAST)","expect":"ok","ref":"sql-createindex","note":"ASC NULLS LAST"}
+{"id":"idxa0022","category":"create-index","sql":"CREATE INDEX ON s.t (name DESC NULLS FIRST)","expect":"ok","ref":"sql-createindex","note":"DESC NULLS FIRST"}
+{"id":"idxa0023","category":"create-index","sql":"CREATE INDEX ON s.t (name DESC NULLS LAST)","expect":"ok","ref":"sql-createindex","note":"DESC NULLS LAST"}
+{"id":"idxa0024","category":"create-index","sql":"CREATE INDEX ON s.t (name NULLS FIRST)","expect":"ok","ref":"sql-createindex","note":"NULLS FIRST without explicit ASC/DESC"}
+{"id":"idxa0025","category":"create-index","sql":"CREATE INDEX ON s.t (name NULLS LAST)","expect":"ok","ref":"sql-createindex","note":"NULLS LAST without explicit ASC/DESC"}
+{"id":"idxa0026","category":"create-index","sql":"CREATE INDEX ON s.t (name ASC, val DESC)","expect":"ok","ref":"sql-createindex","note":"mixed ASC/DESC multi-column"}
+{"id":"idxa0027","category":"create-index","sql":"CREATE INDEX ON s.t (name ASC NULLS LAST, val DESC NULLS FIRST)","expect":"ok","ref":"sql-createindex","note":"mixed ASC/DESC NULLS multi-column"}
+{"id":"idxa0028","category":"create-index","sql":"CREATE INDEX ON s.t ((lower(name)))","expect":"ok","ref":"sql-createindex","note":"expression index with lower()"}
+{"id":"idxa0029","category":"create-index","sql":"CREATE INDEX ON s.t ((upper(name)))","expect":"ok","ref":"sql-createindex","note":"expression index with upper()"}
+{"id":"idxa0030","category":"create-index","sql":"CREATE INDEX ON s.t ((val * 2))","expect":"ok","ref":"sql-createindex","note":"arithmetic expression index"}
+{"id":"idxa0031","category":"create-index","sql":"CREATE INDEX ON s.t ((name || ' suffix'))","expect":"ok","ref":"sql-createindex","note":"string concatenation expression index"}
+{"id":"idxa0032","category":"create-index","sql":"CREATE INDEX ON s.t ((data->>'key'))","expect":"ok","ref":"sql-createindex","note":"jsonb expression index"}
+{"id":"idxa0033","category":"create-index","sql":"CREATE INDEX ON s.t ((lower(name)), val)","expect":"ok","ref":"sql-createindex","note":"mixed expression and column"}
+{"id":"idxa0034","category":"create-index","sql":"CREATE INDEX ON s.t (name text_pattern_ops)","expect":"ok","ref":"sql-createindex","note":"opclass text_pattern_ops"}
+{"id":"idxa0035","category":"create-index","sql":"CREATE INDEX ON s.t (name varchar_pattern_ops)","expect":"ok","ref":"sql-createindex","note":"opclass varchar_pattern_ops on text column (error: column is text not varchar)"}
+{"id":"idxa0036","category":"create-index","sql":"CREATE INDEX ON s.t (name COLLATE \"C\")","expect":"ok","ref":"sql-createindex","note":"COLLATE clause on text column"}
+{"id":"idxa0037","category":"create-index","sql":"CREATE INDEX ON s.t (name COLLATE \"POSIX\")","expect":"ok","ref":"sql-createindex","note":"COLLATE POSIX"}
+{"id":"idxa0038","category":"create-index","sql":"CREATE INDEX ON s.t (name COLLATE \"C\" text_pattern_ops)","expect":"ok","ref":"sql-createindex","note":"COLLATE then opclass"}
+{"id":"idxa0039","category":"create-index","sql":"CREATE INDEX ON s.t (name COLLATE \"C\" ASC NULLS LAST)","expect":"ok","ref":"sql-createindex","note":"COLLATE with sort order"}
+{"id":"idxa0040","category":"create-index","sql":"CREATE INDEX ON s.t (name) INCLUDE (val)","expect":"ok","ref":"sql-createindex","note":"INCLUDE single column"}
+{"id":"idxa0041","category":"create-index","sql":"CREATE INDEX ON s.t (name) INCLUDE (val, qty)","expect":"ok","ref":"sql-createindex","note":"INCLUDE multiple columns"}
+{"id":"idxa0042","category":"create-index","sql":"CREATE INDEX ON s.t (name) INCLUDE (val, qty, flag)","expect":"ok","ref":"sql-createindex","note":"INCLUDE three columns"}
+{"id":"idxa0043","category":"create-index","sql":"CREATE UNIQUE INDEX ON s.t (name) INCLUDE (val)","expect":"ok","ref":"sql-createindex","note":"UNIQUE with INCLUDE"}
+{"id":"idxa0044","category":"create-index","sql":"CREATE UNIQUE INDEX ON s.t (name) NULLS DISTINCT","expect":"ok","ref":"sql-createindex","note":"NULLS DISTINCT (default for unique)"}
+{"id":"idxa0045","category":"create-index","sql":"CREATE UNIQUE INDEX ON s.t (name) NULLS NOT DISTINCT","expect":"ok","ref":"sql-createindex","note":"NULLS NOT DISTINCT"}
+{"id":"idxa0046","category":"create-index","sql":"CREATE INDEX ON s.t (name) WHERE flag = true","expect":"ok","ref":"sql-createindex","note":"partial index with WHERE clause"}
+{"id":"idxa0047","category":"create-index","sql":"CREATE INDEX ON s.t (name) WHERE qty > 0","expect":"ok","ref":"sql-createindex","note":"partial index numeric predicate"}
+{"id":"idxa0048","category":"create-index","sql":"CREATE INDEX ON s.t (name) WHERE status = 'ok'","expect":"ok","ref":"sql-createindex","note":"partial index enum predicate"}
+{"id":"idxa0049","category":"create-index","sql":"CREATE INDEX ON s.t (name) WHERE flag IS NOT NULL","expect":"ok","ref":"sql-createindex","note":"partial index IS NOT NULL predicate"}
+{"id":"idxa0050","category":"create-index","sql":"CREATE INDEX ON s.t (val) WHERE val IS NOT NULL AND qty > 0","expect":"ok","ref":"sql-createindex","note":"partial index compound predicate"}
+{"id":"idxa0051","category":"create-index","sql":"CREATE INDEX ON s.t (name) WITH (fillfactor = 90)","expect":"ok","ref":"sql-createindex","note":"WITH fillfactor=90"}
+{"id":"idxa0052","category":"create-index","sql":"CREATE INDEX ON s.t (name) WITH (fillfactor = 50)","expect":"ok","ref":"sql-createindex","note":"WITH fillfactor=50"}
+{"id":"idxa0053","category":"create-index","sql":"CREATE INDEX ON s.t (name) WITH (fillfactor = 10)","expect":"ok","ref":"sql-createindex","note":"WITH fillfactor minimum value 10"}
+{"id":"idxa0054","category":"create-index","sql":"CREATE INDEX ON s.t (name) WITH (fillfactor = 100)","expect":"ok","ref":"sql-createindex","note":"WITH fillfactor maximum 100"}
+{"id":"idxa0055","category":"create-index","sql":"CREATE INDEX ON s.t (name) WITH (deduplicate_items = on)","expect":"ok","ref":"sql-createindex","note":"btree deduplicate_items=on"}
+{"id":"idxa0056","category":"create-index","sql":"CREATE INDEX ON s.t (name) WITH (deduplicate_items = off)","expect":"ok","ref":"sql-createindex","note":"btree deduplicate_items=off"}
+{"id":"idxa0057","category":"create-index","sql":"CREATE INDEX ON s.t (name) WITH (fillfactor = 80, deduplicate_items = on)","expect":"ok","ref":"sql-createindex","note":"WITH multiple storage params"}
+{"id":"idxa0058","category":"create-index","sql":"CREATE INDEX ON s.t USING gin (tags) WITH (fastupdate = on)","expect":"ok","ref":"sql-createindex","note":"GIN fastupdate=on"}
+{"id":"idxa0059","category":"create-index","sql":"CREATE INDEX ON s.t USING gin (tags) WITH (fastupdate = off)","expect":"ok","ref":"sql-createindex","note":"GIN fastupdate=off"}
+{"id":"idxa0060","category":"create-index","sql":"CREATE INDEX ON s.t USING gin (tags) WITH (gin_pending_list_limit = 4096)","expect":"ok","ref":"sql-createindex","note":"GIN gin_pending_list_limit storage param"}
+{"id":"idxa0061","category":"create-index","sql":"CREATE INDEX ON s.t USING brin (created_at) WITH (pages_per_range = 64)","expect":"ok","ref":"sql-createindex","note":"BRIN pages_per_range storage param"}
+{"id":"idxa0062","category":"create-index","sql":"CREATE INDEX ON s.t USING brin (created_at) WITH (autosummarize = on)","expect":"ok","ref":"sql-createindex","note":"BRIN autosummarize=on"}
+{"id":"idxa0063","category":"create-index","sql":"CREATE INDEX ON s.t USING brin (created_at) WITH (pages_per_range = 128, autosummarize = off)","expect":"ok","ref":"sql-createindex","note":"BRIN multiple storage params"}
+{"id":"idxa0064","category":"create-index","sql":"CREATE INDEX ON s.t USING gist (span) WITH (buffering = on)","expect":"ok","ref":"sql-createindex","note":"GiST buffering=on storage param"}
+{"id":"idxa0065","category":"create-index","sql":"CREATE INDEX ON s.t USING gist (span) WITH (buffering = off)","expect":"ok","ref":"sql-createindex","note":"GiST buffering=off"}
+{"id":"idxa0066","category":"create-index","sql":"CREATE INDEX ON s.t USING gist (span) WITH (buffering = auto)","expect":"ok","ref":"sql-createindex","note":"GiST buffering=auto"}
+{"id":"idxa0067","category":"create-index","sql":"CREATE INDEX ON s.t (name) TABLESPACE pg_default","expect":"ok","ref":"sql-createindex","note":"TABLESPACE pg_default"}
+{"id":"idxa0068","category":"create-index","sql":"CREATE INDEX ON s.t (name) WITH (fillfactor = 70) WHERE qty > 0","expect":"ok","ref":"sql-createindex","note":"WITH + WHERE partial index"}
+{"id":"idxa0069","category":"create-index","sql":"CREATE INDEX ON s.t (name) INCLUDE (val) WHERE qty > 0","expect":"ok","ref":"sql-createindex","note":"INCLUDE + WHERE partial index"}
+{"id":"idxa0070","category":"create-index","sql":"CREATE UNIQUE INDEX ON s.t (name) INCLUDE (val) NULLS NOT DISTINCT WHERE qty > 0","expect":"ok","ref":"sql-createindex","note":"UNIQUE + INCLUDE + NULLS NOT DISTINCT + WHERE"}
+{"id":"idxa0071","category":"create-index","sql":"CREATE INDEX ON ONLY s.child (extra)","expect":"ok","ref":"sql-createindex","note":"ON ONLY on a non-partitioned inherited child table"}
+{"id":"idxa0072","category":"create-index","sql":"CREATE INDEX ON ONLY s.parent (kind)","expect":"ok","ref":"sql-createindex","note":"ON ONLY syntax for partitioned/inheritance tables"}
+{"id":"idxa0073","category":"create-index","sql":"CREATE INDEX ON s.t (id, name, val, qty, flag)","expect":"ok","ref":"sql-createindex","note":"five-column composite index"}
+{"id":"idxa0074","category":"create-index","sql":"CREATE INDEX ON s.t ((lower(name)) text_pattern_ops)","expect":"ok","ref":"sql-createindex","note":"expression index with opclass"}
+{"id":"idxa0075","category":"create-index","sql":"CREATE INDEX ON s.t ((lower(name)) COLLATE \"C\")","expect":"ok","ref":"sql-createindex","note":"expression index with COLLATE"}
+{"id":"idxa0076","category":"create-index","sql":"CREATE INDEX ON s.t ((lower(name)) COLLATE \"C\" text_pattern_ops)","expect":"ok","ref":"sql-createindex","note":"expression with COLLATE and opclass"}
+{"id":"idxa0077","category":"create-index","sql":"CREATE INDEX ON s.t ((lower(name)) DESC NULLS LAST)","expect":"ok","ref":"sql-createindex","note":"expression index with DESC NULLS LAST"}
+{"id":"idxa0078","category":"create-index","sql":"CREATE INDEX ON s.t USING hash (id)","expect":"ok","ref":"sql-createindex","note":"hash index on bigint column"}
+{"id":"idxa0079","category":"create-index","sql":"CREATE INDEX ON s.t USING hash (name)","expect":"ok","ref":"sql-createindex","note":"hash index on text column"}
+{"id":"idxa0080","category":"create-index","sql":"CREATE INDEX ON s.t USING hash (name) WITH (fillfactor = 75)","expect":"ok","ref":"sql-createindex","note":"hash index with fillfactor"}
+{"id":"idxa0081","category":"create-index","sql":"CREATE INDEX ON s.t USING gin (data)","expect":"ok","ref":"sql-createindex","note":"GIN index on jsonb column"}
+{"id":"idxa0082","category":"create-index","sql":"CREATE INDEX ON s.t USING gin (data jsonb_ops)","expect":"ok","ref":"sql-createindex","note":"GIN with jsonb_ops opclass"}
+{"id":"idxa0083","category":"create-index","sql":"CREATE INDEX ON s.t USING gin (data jsonb_path_ops)","expect":"ok","ref":"sql-createindex","note":"GIN with jsonb_path_ops opclass"}
+{"id":"idxa0084","category":"create-index","sql":"CREATE INDEX ON s.t USING gin (tags array_ops)","expect":"ok","ref":"sql-createindex","note":"GIN with array_ops opclass"}
+{"id":"idxa0085","category":"create-index","sql":"CREATE INDEX ON s.t (name text_pattern_ops) WHERE name IS NOT NULL","expect":"ok","ref":"sql-createindex","note":"opclass with partial index"}
+{"id":"idxa0086","category":"create-index","sql":"CREATE INDEX ON s.t (name text_pattern_ops) INCLUDE (val) WITH (fillfactor = 80)","expect":"ok","ref":"sql-createindex","note":"opclass + INCLUDE + WITH combined"}
+{"id":"idxa0087","category":"create-index","sql":"CREATE INDEX ON s.t2 (t_id, label)","expect":"ok","ref":"sql-createindex","note":"multi-column on s.t2"}
+{"id":"idxa0088","category":"create-index","sql":"CREATE UNIQUE INDEX ON s.t2 (t_id, label)","expect":"ok","ref":"sql-createindex","note":"unique multi-column on s.t2"}
+{"id":"idxa0089","category":"create-index","sql":"CREATE INDEX ON s.t2 (label) WHERE t_id IS NOT NULL","expect":"ok","ref":"sql-createindex","note":"partial index on s.t2"}
+{"id":"idxa0090","category":"create-index","sql":"CREATE INDEX ON s.events_2024 (occurred)","expect":"ok","ref":"sql-createindex","note":"index on partition table"}
+{"id":"idxa0091","category":"create-index","sql":"CREATE INDEX ON s.events (occurred)","expect":"ok","ref":"sql-createindex","note":"index on partitioned table (propagates to partitions)"}
+{"id":"idxa0092","category":"create-index","sql":"CREATE INDEX ON ONLY s.events (occurred)","expect":"ok","ref":"sql-createindex","note":"ON ONLY on partitioned table (marks invalid until partitions covered)"}
+{"id":"idxa0093","category":"create-index","sql":"CREATE INDEX ON s.t (name) WITH (fillfactor = 90) TABLESPACE pg_default","expect":"ok","ref":"sql-createindex","note":"WITH + TABLESPACE combined"}
+{"id":"idxa0094","category":"create-index","sql":"CREATE INDEX ON s.t (name) INCLUDE (val) WITH (fillfactor = 80) TABLESPACE pg_default WHERE qty > 0","expect":"ok","ref":"sql-createindex","note":"all clauses combined: INCLUDE + WITH + TABLESPACE + WHERE"}
+{"id":"idxa0095","category":"create-index","sql":"CREATE UNIQUE INDEX ON s.t (name) INCLUDE (qty) NULLS NOT DISTINCT WITH (fillfactor = 90) WHERE flag = false","expect":"ok","ref":"sql-createindex","note":"UNIQUE + INCLUDE + NULLS NOT DISTINCT + WITH + WHERE"}
+{"id":"idxa0096","category":"create-index","sql":"CREATE INDEX ON s.t (name) WITH (fillfactor = 90);\nDROP INDEX IF EXISTS idxa_to_drop_unused","expect":"ok","ref":"sql-createindex","note":"index followed by unrelated DROP IF EXISTS (ok since IF EXISTS)"}
+{"id":"idxa0097","category":"create-index","sql":"CREATE TABLE idxa_tbl (a int, b text, c numeric);\nCREATE INDEX ON idxa_tbl (b)","expect":"ok","ref":"sql-createindex","note":"create table then index in same transaction"}
+{"id":"idxa0098","category":"create-index","sql":"CREATE TABLE idxa_tbl2 (a int, b text);\nCREATE UNIQUE INDEX ON idxa_tbl2 (a);\nINSERT INTO idxa_tbl2 VALUES (1,'x'),(2,'y')","expect":"ok","ref":"sql-createindex","note":"unique index then insert non-duplicate rows"}
+{"id":"idxa0099","category":"create-index","sql":"CREATE INDEX ON s.t (qty int4_ops)","expect":"ok","ref":"sql-createindex","note":"explicit int4_ops opclass on integer column"}
+{"id":"idxa0100","category":"create-index","sql":"CREATE INDEX ON s.t (id int8_ops)","expect":"ok","ref":"sql-createindex","note":"explicit int8_ops opclass on bigint column"}
+{"id":"idxa0101","category":"create-index","sql":"CREATE INDEX ON s.t (name) WITH (fillfactor=70, deduplicate_items=off)","expect":"ok","ref":"sql-createindex","note":"WITH params without spaces around equals"}
+{"id":"idxa0102","category":"create-index","sql":"CREATE INDEX \"My Index\" ON s.t (name)","expect":"ok","ref":"sql-createindex","note":"quoted index name with spaces"}
+{"id":"idxa0103","category":"create-index","sql":"CREATE INDEX idx_lower_case ON s.t (name)","expect":"ok","ref":"sql-createindex","note":"lowercase index name identifier"}
+{"id":"idxa0104","category":"create-index","sql":"CREATE INDEX IDXA_UPPER ON s.t (name)","expect":"ok","ref":"sql-createindex","note":"uppercase index name (folded to lowercase)"}
+{"id":"idxa0105","category":"create-index","sql":"CREATE INDEX ON s.t ((s.f(qty)))","expect":"ok","ref":"sql-createindex","note":"expression using schema-qualified function"}
+{"id":"idxa0106","category":"create-index","sql":"CREATE INDEX ON s.t ((qty + 1))","expect":"ok","ref":"sql-createindex","note":"simple arithmetic expression"}
+{"id":"idxa0107","category":"create-index","sql":"CREATE INDEX ON s.t ((CASE WHEN flag THEN 1 ELSE 0 END))","expect":"ok","ref":"sql-createindex","note":"CASE expression index"}
+{"id":"idxa0108","category":"create-index","sql":"CREATE INDEX ON s.t ((COALESCE(val, 0)))","expect":"ok","ref":"sql-createindex","note":"COALESCE expression index"}
+{"id":"idxa0109","category":"create-index","sql":"CREATE INDEX ON s.t USING btree (name, val, qty, flag, id)","expect":"ok","ref":"sql-createindex","note":"five-column btree with explicit USING"}
+{"id":"idxa0110","category":"create-index","sql":"CREATE INDEX ON s.t USING btree (name ASC NULLS LAST) INCLUDE (val, qty) WHERE flag = true","expect":"ok","ref":"sql-createindex","note":"btree with sort, INCLUDE, partial"}
+{"id":"idxa0111","category":"create-index","sql":"CREATE INDEX ON s.t USING brin (id, created_at)","expect":"ok","ref":"sql-createindex","note":"multi-column BRIN index"}
+{"id":"idxa0112","category":"create-index","sql":"CREATE INDEX ON s.t USING gin (tags) WHERE tags IS NOT NULL","expect":"ok","ref":"sql-createindex","note":"GIN partial index"}
+{"id":"idxa0113","category":"create-index","sql":"CREATE INDEX ON s.t (val) WHERE val BETWEEN 0 AND 1000","expect":"ok","ref":"sql-createindex","note":"partial index with BETWEEN predicate"}
+{"id":"idxa0114","category":"create-index","sql":"CREATE INDEX ON s.t (name) WHERE name LIKE 'A%'","expect":"ok","ref":"sql-createindex","note":"partial index with LIKE predicate"}
+{"id":"idxa0115","category":"create-index","sql":"CREATE INDEX ON s.t (status) WHERE status <> 'ok'","expect":"ok","ref":"sql-createindex","note":"partial index with enum inequality"}
+{"id":"idxa0116","category":"create-index","sql":"CREATE INDEX IF NOT EXISTS idxa_cond ON s.t (name) WHERE qty > 0","expect":"ok","ref":"sql-createindex","note":"IF NOT EXISTS with partial index"}
+{"id":"idxa0117","category":"create-index","sql":"CREATE INDEX ON s.t (name text_pattern_ops) WITH (fillfactor = 80)","expect":"ok","ref":"sql-createindex","note":"opclass with storage param"}
+{"id":"idxa0118","category":"create-index","sql":"CREATE INDEX ON s.t USING spgist (span) WITH (fillfactor = 80)","expect":"ok","ref":"sql-createindex","note":"spgist with fillfactor"}
+{"id":"idxa0119","category":"create-index","sql":"CREATE INDEX ON s.t (name) WITH (fillfactor = 90)","expect":"ok","ref":"sql-createindex","note":"fillfactor storage param only"}
+{"id":"idxa0120","category":"create-index","sql":"CREATE INDEX ON s.t USING gist (span) WITH (fillfactor = 70)","expect":"ok","ref":"sql-createindex","note":"GiST with fillfactor"}
+{"id":"idxa0121","category":"create-index","sql":"CREATE INDEX ON s.t (name, val DESC, qty ASC NULLS FIRST)","expect":"ok","ref":"sql-createindex","note":"three-col mixed ordering with NULLS"}
+{"id":"idxa0122","category":"create-index","sql":"CREATE INDEX ON s.t ((data->>'key') text_pattern_ops)","expect":"ok","ref":"sql-createindex","note":"jsonb expression with text opclass"}
+{"id":"idxa0123","category":"create-index","sql":"CREATE INDEX ON s.t ((lower(name))) INCLUDE (id)","expect":"ok","ref":"sql-createindex","note":"expression index with INCLUDE"}
+{"id":"idxa0124","category":"create-index","sql":"CREATE INDEX ON s.t (name) INCLUDE (id, val, qty, flag, status)","expect":"ok","ref":"sql-createindex","note":"INCLUDE many columns"}
+{"id":"idxa0125","category":"create-index","sql":"CREATE UNIQUE INDEX ON s.t (id, name) NULLS DISTINCT","expect":"ok","ref":"sql-createindex","note":"multi-col unique NULLS DISTINCT"}
+{"id":"idxa0126","category":"create-index","sql":"CREATE UNIQUE INDEX ON s.t (id, name) NULLS NOT DISTINCT","expect":"ok","ref":"sql-createindex","note":"multi-col unique NULLS NOT DISTINCT"}
+{"id":"idxa0127","category":"create-index","sql":"CREATE INDEX ON s.t (name) WITH (fillfactor = 9)","expect":"error","ref":"sql-createindex","note":"fillfactor too low (below 10)"}
+{"id":"idxa0128","category":"create-index","sql":"CREATE INDEX ON s.t (name) WITH (fillfactor = 101)","expect":"error","ref":"sql-createindex","note":"fillfactor too high (above 100)"}
+{"id":"idxa0129","category":"create-index","sql":"CREATE INDEX ON s.t (name) WITH (fillfactor = 0)","expect":"error","ref":"sql-createindex","note":"fillfactor = 0 is invalid"}
+{"id":"idxa0130","category":"create-index","sql":"CREATE INDEX ON s.t","expect":"error","ref":"sql-createindex","note":"missing column list entirely (syntax error)"}
+{"id":"idxa0131","category":"create-index","sql":"CREATE INDEX ON s.t ()","expect":"error","ref":"sql-createindex","note":"empty column list (syntax error)"}
+{"id":"idxa0132","category":"create-index","sql":"CREATE INDEX (name) ON s.t","expect":"error","ref":"sql-createindex","note":"column list before ON (wrong order, syntax error)"}
+{"id":"idxa0133","category":"create-index","sql":"CREATE INDEX ON (name)","expect":"error","ref":"sql-createindex","note":"missing table name after ON"}
+{"id":"idxa0134","category":"create-index","sql":"CREATE INDEX USING btree ON s.t (name)","expect":"error","ref":"sql-createindex","note":"USING before ON (wrong order, syntax error)"}
+{"id":"idxa0135","category":"create-index","sql":"CREATE INDEX ON s.t (name) USING btree","expect":"error","ref":"sql-createindex","note":"USING after column list (wrong position)"}
+{"id":"idxa0136","category":"create-index","sql":"CREATE INDEX ON s.t USING badmethod (name)","expect":"error","ref":"sql-createindex","note":"nonexistent index method (semantic error)"}
+{"id":"idxa0137","category":"create-index","sql":"CREATE INDEX ON s.no_such_table (name)","expect":"error","ref":"sql-createindex","note":"table does not exist (semantic error)"}
+{"id":"idxa0138","category":"create-index","sql":"CREATE INDEX ON s.t (no_such_col)","expect":"error","ref":"sql-createindex","note":"column does not exist (semantic error)"}
+{"id":"idxa0139","category":"create-index","sql":"CREATE INDEX ON s.t (name) WHERE","expect":"error","ref":"sql-createindex","note":"WHERE with no predicate (syntax error)"}
+{"id":"idxa0140","category":"create-index","sql":"CREATE INDEX ON s.t (name) INCLUDE ()","expect":"error","ref":"sql-createindex","note":"INCLUDE empty list (syntax error)"}
+{"id":"idxa0141","category":"create-index","sql":"CREATE UNIQUE INDEX ON s.t USING hash (name)","expect":"error","ref":"sql-createindex","note":"UNIQUE not supported by hash index method"}
+{"id":"idxa0142","category":"create-index","sql":"CREATE UNIQUE INDEX ON s.t USING gin (tags)","expect":"error","ref":"sql-createindex","note":"UNIQUE not supported by GIN method"}
+{"id":"idxa0143","category":"create-index","sql":"CREATE UNIQUE INDEX ON s.t USING gist (span)","expect":"error","ref":"sql-createindex","note":"UNIQUE not supported by GiST method"}
+{"id":"idxa0144","category":"create-index","sql":"CREATE UNIQUE INDEX ON s.t USING brin (created_at)","expect":"error","ref":"sql-createindex","note":"UNIQUE not supported by BRIN method"}
+{"id":"idxa0145","category":"create-index","sql":"CREATE UNIQUE INDEX ON s.t USING spgist (span)","expect":"error","ref":"sql-createindex","note":"UNIQUE not supported by SP-GiST method"}
+{"id":"idxa0146","category":"create-index","sql":"CREATE INDEX ON s.t (name, )","expect":"error","ref":"sql-createindex","note":"trailing comma in column list (syntax error)"}
+{"id":"idxa0147","category":"create-index","sql":"CREATE INDEX ON s.t (name) INCLUDE (val,)","expect":"error","ref":"sql-createindex","note":"trailing comma in INCLUDE list (syntax error)"}
+{"id":"idxa0148","category":"create-index","sql":"CREATE INDEX ON s.t (name ASC DESC)","expect":"error","ref":"sql-createindex","note":"both ASC and DESC (syntax error)"}
+{"id":"idxa0149","category":"create-index","sql":"CREATE INDEX ON s.t (name NULLS FIRST NULLS LAST)","expect":"error","ref":"sql-createindex","note":"double NULLS specification (syntax error)"}
+{"id":"idxa0150","category":"create-index","sql":"CREATE INDEX ON s.t (name) WHERE qty > (SELECT max(qty) FROM s.t)","expect":"error","ref":"sql-createindex","note":"subquery in WHERE predicate not allowed"}
+{"id":"idxa0151","category":"create-index","sql":"CREATE INDEX (name)","expect":"error","ref":"sql-createindex","note":"missing ON keyword entirely"}
+{"id":"idxa0152","category":"create-index","sql":"CREATE INDEX ON s.t (name) WITH ()","expect":"error","ref":"sql-createindex","note":"empty WITH storage param list"}
+{"id":"idxa0153","category":"create-index","sql":"CREATE INDEX ON s.t (name) NULLS DISTINCT NULLS NOT DISTINCT","expect":"error","ref":"sql-createindex","note":"double NULLS DISTINCT specification (syntax error)"}
+{"id":"idxa0154","category":"create-index","sql":"CREATE INDEX ON s.t (name) INCLUDE NULLS NOT DISTINCT","expect":"error","ref":"sql-createindex","note":"INCLUDE missing parens followed by NULLS (syntax error)"}
+{"id":"idxa0155","category":"create-index","sql":"CREATE INDEX ON s.v (name)","expect":"error","ref":"sql-createindex","note":"cannot create index on a view (semantic error)"}
+{"id":"idxa0156","category":"create-index","sql":"CREATE INDEX ON s.t (name) WITH (fillfactor = 80) WITH (deduplicate_items = on)","expect":"error","ref":"sql-createindex","note":"duplicate WITH clause (syntax error)"}
+{"id":"idxa0157","category":"create-index","sql":"CREATE INDEX ON s.t USING btree (name) WITH (pages_per_range = 128)","expect":"error","ref":"sql-createindex","note":"BRIN-only storage param on btree index"}
+{"id":"idxa0158","category":"create-index","sql":"CREATE TABLE idxa_expr_tbl (a int, b text);\nCREATE UNIQUE INDEX ON idxa_expr_tbl (lower(b))","expect":"ok","ref":"sql-createindex","note":"unique expression index (lower without parens in col spec)"}
+{"id":"idxa0159","category":"create-index","sql":"CREATE TABLE idxa_inc_tbl (a int, b text, c numeric);\nCREATE INDEX ON idxa_inc_tbl (a) INCLUDE (b, c)","expect":"ok","ref":"sql-createindex","note":"INCLUDE on user-created table in same txn"}
+{"id":"idxa0160","category":"create-index","sql":"CREATE INDEX ON s.t USING btree (name) INCLUDE (val) WITH (fillfactor=85, deduplicate_items=on) WHERE qty >= 0","expect":"ok","ref":"sql-createindex","note":"btree comprehensive: USING + INCLUDE + WITH multiple + WHERE"}
+{"id":"idxa0161","category":"create-index","sql":"CREATE INDEX CONCURRENTLY idxa_conc2 ON s.t USING btree (name) INCLUDE (val) WHERE qty > 0","expect":"ok","ref":"sql-createindex","txn":"none","note":"CONCURRENTLY with USING btree, INCLUDE, WHERE"}
+{"id":"idxa0162","category":"create-index","sql":"CREATE UNIQUE INDEX IF NOT EXISTS idxa_uq_ifne ON s.t (name) NULLS NOT DISTINCT WITH (fillfactor=90)","expect":"ok","ref":"sql-createindex","note":"UNIQUE + IF NOT EXISTS + NULLS NOT DISTINCT + WITH"}
+{"id":"idxa0163","category":"create-index","sql":"CREATE INDEX ON s.t (name COLLATE \"C\" text_pattern_ops ASC NULLS LAST) INCLUDE (val) WHERE qty > 0","expect":"ok","ref":"sql-createindex","note":"full column spec: COLLATE + opclass + sort + INCLUDE + WHERE"}
+{"id":"idxa0164","category":"create-index","sql":"CREATE INDEX ON s.t (name) TABLESPACE pg_default WHERE name IS NOT NULL","expect":"ok","ref":"sql-createindex","note":"TABLESPACE + WHERE combined"}
+{"id":"idxa0165","category":"create-index","sql":"CREATE INDEX ON s.t USING hash (qty)","expect":"ok","ref":"sql-createindex","note":"hash index on integer column"}
+{"id":"idxa0166","category":"create-index","sql":"CREATE INDEX ON s.t USING btree (name, val) INCLUDE (id, qty, flag) WITH (fillfactor=70) TABLESPACE pg_default WHERE status = 'ok'","expect":"ok","ref":"sql-createindex","note":"maximum clause combination on btree"}
+{"id":"idxa0167","category":"create-index","sql":"CREATE INDEX ON s.t (name text_pattern_ops ASC NULLS LAST, val DESC NULLS FIRST)","expect":"ok","ref":"sql-createindex","note":"two columns with opclass on first and mixed sort"}
+{"id":"idxa0168","category":"create-index","sql":"CREATE INDEX ON s.t ((lower(name)) COLLATE \"C\" text_pattern_ops ASC NULLS LAST, val DESC)","expect":"ok","ref":"sql-createindex","note":"expression+COLLATE+opclass+sort then regular col with sort"}
+{"id":"idxa0169","category":"create-index","sql":"CREATE INDEX idxa_on_child ON s.child (kind)","expect":"ok","ref":"sql-createindex","note":"index on inherited child table"}
+{"id":"idxa0170","category":"create-index","sql":"CREATE INDEX ON s.t USING gin (name gin_trgm_ops)","expect":"error","ref":"sql-createindex","note":"gin_trgm_ops requires pg_trgm extension (not loaded)"}

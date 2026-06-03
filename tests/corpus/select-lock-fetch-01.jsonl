@@ -1,0 +1,170 @@
+{"id":"sellfa0001","category":"select-lock-fetch","sql":"SELECT id FROM s.t FOR UPDATE","expect":"ok","ref":"sql-select","note":"basic FOR UPDATE locking clause"}
+{"id":"sellfa0002","category":"select-lock-fetch","sql":"SELECT id FROM s.t FOR NO KEY UPDATE","expect":"ok","ref":"sql-select","note":"FOR NO KEY UPDATE locking strength"}
+{"id":"sellfa0003","category":"select-lock-fetch","sql":"SELECT id FROM s.t FOR SHARE","expect":"ok","ref":"sql-select","note":"FOR SHARE locking strength"}
+{"id":"sellfa0004","category":"select-lock-fetch","sql":"SELECT id FROM s.t FOR KEY SHARE","expect":"ok","ref":"sql-select","note":"FOR KEY SHARE locking strength"}
+{"id":"sellfa0005","category":"select-lock-fetch","sql":"SELECT id FROM s.t FOR UPDATE NOWAIT","expect":"ok","ref":"sql-select","note":"FOR UPDATE with NOWAIT option"}
+{"id":"sellfa0006","category":"select-lock-fetch","sql":"SELECT id FROM s.t FOR UPDATE SKIP LOCKED","expect":"ok","ref":"sql-select","note":"FOR UPDATE with SKIP LOCKED option"}
+{"id":"sellfa0007","category":"select-lock-fetch","sql":"SELECT id FROM s.t FOR NO KEY UPDATE NOWAIT","expect":"ok","ref":"sql-select","note":"FOR NO KEY UPDATE with NOWAIT"}
+{"id":"sellfa0008","category":"select-lock-fetch","sql":"SELECT id FROM s.t FOR NO KEY UPDATE SKIP LOCKED","expect":"ok","ref":"sql-select","note":"FOR NO KEY UPDATE with SKIP LOCKED"}
+{"id":"sellfa0009","category":"select-lock-fetch","sql":"SELECT id FROM s.t FOR SHARE NOWAIT","expect":"ok","ref":"sql-select","note":"FOR SHARE with NOWAIT"}
+{"id":"sellfa0010","category":"select-lock-fetch","sql":"SELECT id FROM s.t FOR SHARE SKIP LOCKED","expect":"ok","ref":"sql-select","note":"FOR SHARE with SKIP LOCKED"}
+{"id":"sellfa0011","category":"select-lock-fetch","sql":"SELECT id FROM s.t FOR KEY SHARE NOWAIT","expect":"ok","ref":"sql-select","note":"FOR KEY SHARE with NOWAIT"}
+{"id":"sellfa0012","category":"select-lock-fetch","sql":"SELECT id FROM s.t FOR KEY SHARE SKIP LOCKED","expect":"ok","ref":"sql-select","note":"FOR KEY SHARE with SKIP LOCKED"}
+{"id":"sellfa0013","category":"select-lock-fetch","sql":"SELECT id FROM s.t FOR UPDATE OF t","expect":"ok","ref":"sql-select","note":"FOR UPDATE OF table (unqualified alias name)"}
+{"id":"sellfa0014","category":"select-lock-fetch","sql":"SELECT id FROM s.t FOR NO KEY UPDATE OF t","expect":"ok","ref":"sql-select","note":"FOR NO KEY UPDATE OF table"}
+{"id":"sellfa0015","category":"select-lock-fetch","sql":"SELECT id FROM s.t FOR SHARE OF t","expect":"ok","ref":"sql-select","note":"FOR SHARE OF table"}
+{"id":"sellfa0016","category":"select-lock-fetch","sql":"SELECT id FROM s.t FOR KEY SHARE OF t","expect":"ok","ref":"sql-select","note":"FOR KEY SHARE OF table"}
+{"id":"sellfa0017","category":"select-lock-fetch","sql":"SELECT id FROM s.t FOR UPDATE OF t NOWAIT","expect":"ok","ref":"sql-select","note":"FOR UPDATE OF table NOWAIT"}
+{"id":"sellfa0018","category":"select-lock-fetch","sql":"SELECT id FROM s.t FOR UPDATE OF t SKIP LOCKED","expect":"ok","ref":"sql-select","note":"FOR UPDATE OF table SKIP LOCKED"}
+{"id":"sellfa0019","category":"select-lock-fetch","sql":"SELECT id FROM s.t FOR SHARE OF t NOWAIT","expect":"ok","ref":"sql-select","note":"FOR SHARE OF table NOWAIT"}
+{"id":"sellfa0020","category":"select-lock-fetch","sql":"SELECT id FROM s.t FOR SHARE OF t SKIP LOCKED","expect":"ok","ref":"sql-select","note":"FOR SHARE OF table SKIP LOCKED"}
+{"id":"sellfa0021","category":"select-lock-fetch","sql":"SELECT t.id, t2.label FROM s.t JOIN s.t2 ON t.id = t2.t_id FOR UPDATE OF t, t2","expect":"ok","ref":"sql-select","note":"FOR UPDATE OF multiple tables (comma-separated)"}
+{"id":"sellfa0022","category":"select-lock-fetch","sql":"SELECT t.id, t2.label FROM s.t JOIN s.t2 ON t.id = t2.t_id FOR SHARE OF t, t2","expect":"ok","ref":"sql-select","note":"FOR SHARE OF multiple tables"}
+{"id":"sellfa0023","category":"select-lock-fetch","sql":"SELECT t.id, t2.label FROM s.t JOIN s.t2 ON t.id = t2.t_id FOR UPDATE OF t FOR SHARE OF t2","expect":"ok","ref":"sql-select","note":"two locking clauses: FOR UPDATE on one table, FOR SHARE on another"}
+{"id":"sellfa0024","category":"select-lock-fetch","sql":"SELECT t.id, t2.label FROM s.t JOIN s.t2 ON t.id = t2.t_id FOR UPDATE FOR SHARE","expect":"ok","ref":"sql-select","note":"two locking clauses without OF: UPDATE+SHARE (UPDATE wins)"}
+{"id":"sellfa0025","category":"select-lock-fetch","sql":"SELECT t.id, t2.label FROM s.t JOIN s.t2 ON t.id = t2.t_id FOR NO KEY UPDATE OF t FOR KEY SHARE OF t2","expect":"ok","ref":"sql-select","note":"FOR NO KEY UPDATE on t, FOR KEY SHARE on t2"}
+{"id":"sellfa0026","category":"select-lock-fetch","sql":"SELECT t.id, t2.label FROM s.t JOIN s.t2 ON t.id = t2.t_id FOR UPDATE NOWAIT FOR SHARE SKIP LOCKED","expect":"ok","ref":"sql-select","note":"two locking clauses with different wait options"}
+{"id":"sellfa0027","category":"select-lock-fetch","sql":"SELECT t.id, t2.label FROM s.t JOIN s.t2 ON t.id = t2.t_id FOR UPDATE OF t NOWAIT FOR KEY SHARE OF t2 SKIP LOCKED","expect":"ok","ref":"sql-select","note":"two clauses: UPDATE+NOWAIT on t, KEY SHARE+SKIP LOCKED on t2"}
+{"id":"sellfa0028","category":"select-lock-fetch","sql":"SELECT id FROM s.t WHERE id > 0 FOR UPDATE","expect":"ok","ref":"sql-select","note":"FOR UPDATE after WHERE clause"}
+{"id":"sellfa0029","category":"select-lock-fetch","sql":"SELECT id FROM s.t ORDER BY id FOR UPDATE","expect":"ok","ref":"sql-select","note":"FOR UPDATE after ORDER BY clause"}
+{"id":"sellfa0030","category":"select-lock-fetch","sql":"SELECT id FROM s.t LIMIT 5 FOR UPDATE","expect":"ok","ref":"sql-select","note":"FOR UPDATE after LIMIT clause"}
+{"id":"sellfa0031","category":"select-lock-fetch","sql":"SELECT id FROM s.t OFFSET 2 FOR UPDATE","expect":"ok","ref":"sql-select","note":"FOR UPDATE after OFFSET clause"}
+{"id":"sellfa0032","category":"select-lock-fetch","sql":"SELECT id FROM s.t LIMIT 10 OFFSET 5 FOR UPDATE","expect":"ok","ref":"sql-select","note":"FOR UPDATE after LIMIT+OFFSET"}
+{"id":"sellfa0033","category":"select-lock-fetch","sql":"SELECT id FROM s.t ORDER BY id LIMIT 5 OFFSET 2 FOR UPDATE SKIP LOCKED","expect":"ok","ref":"sql-select","note":"ORDER BY + LIMIT + OFFSET + FOR UPDATE SKIP LOCKED"}
+{"id":"sellfa0034","category":"select-lock-fetch","sql":"SELECT id FROM s.t FETCH FIRST 5 ROWS ONLY FOR UPDATE","expect":"ok","ref":"sql-select","note":"FETCH FIRST + FOR UPDATE"}
+{"id":"sellfa0035","category":"select-lock-fetch","sql":"SELECT id FROM s.t FETCH FIRST 5 ROWS ONLY FOR SHARE","expect":"ok","ref":"sql-select","note":"FETCH FIRST + FOR SHARE"}
+{"id":"sellfa0036","category":"select-lock-fetch","sql":"SELECT id FROM s.t FETCH FIRST 5 ROWS ONLY FOR UPDATE NOWAIT","expect":"ok","ref":"sql-select","note":"FETCH FIRST + FOR UPDATE NOWAIT"}
+{"id":"sellfa0037","category":"select-lock-fetch","sql":"SELECT id FROM s.t FETCH FIRST 5 ROWS ONLY FOR UPDATE SKIP LOCKED","expect":"ok","ref":"sql-select","note":"FETCH FIRST + FOR UPDATE SKIP LOCKED"}
+{"id":"sellfa0038","category":"select-lock-fetch","sql":"SELECT id FROM s.t ORDER BY id FETCH FIRST 5 ROWS WITH TIES FOR UPDATE","expect":"ok","ref":"sql-select","note":"WITH TIES + FOR UPDATE is allowed (locking applies after tie evaluation)"}
+{"id":"sellfa0039","category":"select-lock-fetch","sql":"SELECT id FROM s.t LIMIT 10","expect":"ok","ref":"sql-select","note":"basic LIMIT with integer count"}
+{"id":"sellfa0040","category":"select-lock-fetch","sql":"SELECT id FROM s.t LIMIT 0","expect":"ok","ref":"sql-select","note":"LIMIT 0 returns no rows"}
+{"id":"sellfa0041","category":"select-lock-fetch","sql":"SELECT id FROM s.t LIMIT 1","expect":"ok","ref":"sql-select","note":"LIMIT 1 returns at most one row"}
+{"id":"sellfa0042","category":"select-lock-fetch","sql":"SELECT id FROM s.t LIMIT 100000","expect":"ok","ref":"sql-select","note":"LIMIT large number"}
+{"id":"sellfa0043","category":"select-lock-fetch","sql":"SELECT id FROM s.t LIMIT ALL","expect":"ok","ref":"sql-select","note":"LIMIT ALL (no limit)"}
+{"id":"sellfa0044","category":"select-lock-fetch","sql":"SELECT id FROM s.t LIMIT NULL","expect":"ok","ref":"sql-select","note":"LIMIT NULL treated as LIMIT ALL"}
+{"id":"sellfa0045","category":"select-lock-fetch","sql":"SELECT id FROM s.t LIMIT (2 + 3)","expect":"ok","ref":"sql-select","note":"LIMIT with parenthesized expression"}
+{"id":"sellfa0046","category":"select-lock-fetch","sql":"SELECT id FROM s.t LIMIT 5 + 5","expect":"ok","ref":"sql-select","note":"LIMIT with unparenthesized arithmetic expression (PostgreSQL accepts it)"}
+{"id":"sellfa0047","category":"select-lock-fetch","sql":"SELECT id FROM s.t OFFSET 0","expect":"ok","ref":"sql-select","note":"OFFSET 0 (start from beginning)"}
+{"id":"sellfa0048","category":"select-lock-fetch","sql":"SELECT id FROM s.t OFFSET 1","expect":"ok","ref":"sql-select","note":"OFFSET 1 skip one row"}
+{"id":"sellfa0049","category":"select-lock-fetch","sql":"SELECT id FROM s.t OFFSET 10","expect":"ok","ref":"sql-select","note":"OFFSET skip 10 rows"}
+{"id":"sellfa0050","category":"select-lock-fetch","sql":"SELECT id FROM s.t OFFSET NULL","expect":"ok","ref":"sql-select","note":"OFFSET NULL treated as OFFSET 0"}
+{"id":"sellfa0051","category":"select-lock-fetch","sql":"SELECT id FROM s.t OFFSET 5 ROW","expect":"ok","ref":"sql-select","note":"OFFSET n ROW (singular noise word, SQL standard)"}
+{"id":"sellfa0052","category":"select-lock-fetch","sql":"SELECT id FROM s.t OFFSET 5 ROWS","expect":"ok","ref":"sql-select","note":"OFFSET n ROWS (plural noise word, SQL standard)"}
+{"id":"sellfa0053","category":"select-lock-fetch","sql":"SELECT id FROM s.t LIMIT 10 OFFSET 5","expect":"ok","ref":"sql-select","note":"LIMIT + OFFSET together"}
+{"id":"sellfa0054","category":"select-lock-fetch","sql":"SELECT id FROM s.t OFFSET 5 LIMIT 10","expect":"ok","ref":"sql-select","note":"OFFSET before LIMIT (PostgreSQL allows either order)"}
+{"id":"sellfa0055","category":"select-lock-fetch","sql":"SELECT id FROM s.t LIMIT 10 OFFSET 0","expect":"ok","ref":"sql-select","note":"LIMIT + OFFSET 0 (no skip)"}
+{"id":"sellfa0056","category":"select-lock-fetch","sql":"SELECT id FROM s.t LIMIT ALL OFFSET 5","expect":"ok","ref":"sql-select","note":"LIMIT ALL + OFFSET 5"}
+{"id":"sellfa0057","category":"select-lock-fetch","sql":"SELECT id FROM s.t LIMIT (SELECT 5)","expect":"ok","ref":"sql-select","note":"LIMIT with scalar subquery expression"}
+{"id":"sellfa0058","category":"select-lock-fetch","sql":"SELECT id FROM s.t OFFSET (SELECT 2)","expect":"ok","ref":"sql-select","note":"OFFSET with scalar subquery expression"}
+{"id":"sellfa0059","category":"select-lock-fetch","sql":"SELECT id FROM s.t FETCH FIRST ROWS ONLY","expect":"ok","ref":"sql-select","note":"FETCH FIRST ROWS ONLY omitting count (defaults to 1)"}
+{"id":"sellfa0060","category":"select-lock-fetch","sql":"SELECT id FROM s.t FETCH FIRST ROW ONLY","expect":"ok","ref":"sql-select","note":"FETCH FIRST ROW ONLY omitting count (singular noise word)"}
+{"id":"sellfa0061","category":"select-lock-fetch","sql":"SELECT id FROM s.t FETCH FIRST 1 ROW ONLY","expect":"ok","ref":"sql-select","note":"FETCH FIRST 1 ROW ONLY (explicit count 1, singular)"}
+{"id":"sellfa0062","category":"select-lock-fetch","sql":"SELECT id FROM s.t FETCH FIRST 1 ROWS ONLY","expect":"ok","ref":"sql-select","note":"FETCH FIRST 1 ROWS ONLY (count 1, plural)"}
+{"id":"sellfa0063","category":"select-lock-fetch","sql":"SELECT id FROM s.t FETCH FIRST 5 ROW ONLY","expect":"ok","ref":"sql-select","note":"FETCH FIRST 5 ROW ONLY (singular noise word with count > 1)"}
+{"id":"sellfa0064","category":"select-lock-fetch","sql":"SELECT id FROM s.t FETCH FIRST 5 ROWS ONLY","expect":"ok","ref":"sql-select","note":"FETCH FIRST 5 ROWS ONLY (standard plural form)"}
+{"id":"sellfa0065","category":"select-lock-fetch","sql":"SELECT id FROM s.t FETCH NEXT ROWS ONLY","expect":"ok","ref":"sql-select","note":"FETCH NEXT ROWS ONLY omitting count"}
+{"id":"sellfa0066","category":"select-lock-fetch","sql":"SELECT id FROM s.t FETCH NEXT ROW ONLY","expect":"ok","ref":"sql-select","note":"FETCH NEXT ROW ONLY omitting count (singular)"}
+{"id":"sellfa0067","category":"select-lock-fetch","sql":"SELECT id FROM s.t FETCH NEXT 1 ROW ONLY","expect":"ok","ref":"sql-select","note":"FETCH NEXT 1 ROW ONLY"}
+{"id":"sellfa0068","category":"select-lock-fetch","sql":"SELECT id FROM s.t FETCH NEXT 5 ROWS ONLY","expect":"ok","ref":"sql-select","note":"FETCH NEXT 5 ROWS ONLY"}
+{"id":"sellfa0069","category":"select-lock-fetch","sql":"SELECT id FROM s.t FETCH NEXT 10 ROW ONLY","expect":"ok","ref":"sql-select","note":"FETCH NEXT with singular ROW noise word and count > 1"}
+{"id":"sellfa0070","category":"select-lock-fetch","sql":"SELECT id FROM s.t ORDER BY id FETCH FIRST 5 ROWS WITH TIES","expect":"ok","ref":"sql-select","note":"FETCH FIRST WITH TIES (requires ORDER BY)"}
+{"id":"sellfa0071","category":"select-lock-fetch","sql":"SELECT id FROM s.t ORDER BY id FETCH NEXT 5 ROWS WITH TIES","expect":"ok","ref":"sql-select","note":"FETCH NEXT WITH TIES"}
+{"id":"sellfa0072","category":"select-lock-fetch","sql":"SELECT id FROM s.t ORDER BY id FETCH FIRST 1 ROW WITH TIES","expect":"ok","ref":"sql-select","note":"FETCH FIRST 1 ROW WITH TIES (singular)"}
+{"id":"sellfa0073","category":"select-lock-fetch","sql":"SELECT id FROM s.t ORDER BY id FETCH FIRST ROW WITH TIES","expect":"ok","ref":"sql-select","note":"FETCH FIRST ROW WITH TIES omitting count"}
+{"id":"sellfa0074","category":"select-lock-fetch","sql":"SELECT id FROM s.t ORDER BY id FETCH NEXT ROW WITH TIES","expect":"ok","ref":"sql-select","note":"FETCH NEXT ROW WITH TIES omitting count"}
+{"id":"sellfa0075","category":"select-lock-fetch","sql":"SELECT id FROM s.t FETCH FIRST 5 ROWS WITH TIES","expect":"error","ref":"sql-select","note":"error: WITH TIES without ORDER BY"}
+{"id":"sellfa0076","category":"select-lock-fetch","sql":"SELECT id FROM s.t FETCH NEXT 5 ROWS WITH TIES","expect":"error","ref":"sql-select","note":"error: FETCH NEXT WITH TIES without ORDER BY"}
+{"id":"sellfa0077","category":"select-lock-fetch","sql":"SELECT id FROM s.t OFFSET 5 ROWS FETCH FIRST 10 ROWS ONLY","expect":"ok","ref":"sql-select","note":"OFFSET ROWS before FETCH FIRST ROWS ONLY (SQL standard order)"}
+{"id":"sellfa0078","category":"select-lock-fetch","sql":"SELECT id FROM s.t OFFSET 5 ROW FETCH NEXT 10 ROWS ONLY","expect":"ok","ref":"sql-select","note":"OFFSET ROW (singular) before FETCH NEXT"}
+{"id":"sellfa0079","category":"select-lock-fetch","sql":"SELECT id FROM s.t OFFSET 0 ROWS FETCH FIRST 1 ROW ONLY","expect":"ok","ref":"sql-select","note":"OFFSET 0 ROWS FETCH FIRST 1 ROW ONLY"}
+{"id":"sellfa0080","category":"select-lock-fetch","sql":"SELECT id FROM s.t OFFSET 10 ROWS FETCH NEXT 5 ROWS ONLY","expect":"ok","ref":"sql-select","note":"OFFSET 10 ROWS FETCH NEXT 5 ROWS ONLY"}
+{"id":"sellfa0081","category":"select-lock-fetch","sql":"SELECT id FROM s.t ORDER BY id OFFSET 5 ROWS FETCH FIRST 10 ROWS WITH TIES","expect":"ok","ref":"sql-select","note":"ORDER BY + OFFSET ROWS + FETCH WITH TIES"}
+{"id":"sellfa0082","category":"select-lock-fetch","sql":"SELECT id FROM s.t FETCH FIRST 5 ROWS ONLY FOR UPDATE SKIP LOCKED","expect":"ok","ref":"sql-select","note":"FETCH FIRST ROWS ONLY combined with FOR UPDATE SKIP LOCKED"}
+{"id":"sellfa0083","category":"select-lock-fetch","sql":"SELECT id FROM s.t FETCH FIRST 5 ROWS ONLY FOR KEY SHARE NOWAIT","expect":"ok","ref":"sql-select","note":"FETCH FIRST ROWS ONLY combined with FOR KEY SHARE NOWAIT"}
+{"id":"sellfa0084","category":"select-lock-fetch","sql":"SELECT id FROM s.t LIMIT -1","expect":"error","ref":"sql-select","note":"error: LIMIT with negative value"}
+{"id":"sellfa0085","category":"select-lock-fetch","sql":"SELECT id FROM s.t OFFSET -1","expect":"error","ref":"sql-select","note":"error: OFFSET with negative value"}
+{"id":"sellfa0086","category":"select-lock-fetch","sql":"SELECT id FROM s.t FETCH FIRST -1 ROWS ONLY","expect":"error","ref":"sql-select","note":"error: FETCH FIRST with negative count"}
+{"id":"sellfa0087","category":"select-lock-fetch","sql":"SELECT id FROM s.t FETCH FIRST 5 ROWS","expect":"error","ref":"sql-select","note":"error: FETCH FIRST without ONLY or WITH TIES"}
+{"id":"sellfa0088","category":"select-lock-fetch","sql":"SELECT id FROM s.t FETCH FIRST 5","expect":"error","ref":"sql-select","note":"error: FETCH FIRST without ROW/ROWS keyword"}
+{"id":"sellfa0089","category":"select-lock-fetch","sql":"SELECT id FROM s.t FETCH 5 ROWS ONLY","expect":"error","ref":"sql-select","note":"error: FETCH without FIRST or NEXT keyword"}
+{"id":"sellfa0090","category":"select-lock-fetch","sql":"SELECT id FROM s.t FOR","expect":"error","ref":"sql-select","note":"error: FOR without locking keyword"}
+{"id":"sellfa0091","category":"select-lock-fetch","sql":"SELECT id FROM s.t FOR UPDATE NOWAIT SKIP LOCKED","expect":"error","ref":"sql-select","note":"error: NOWAIT and SKIP LOCKED together"}
+{"id":"sellfa0092","category":"select-lock-fetch","sql":"SELECT id FROM s.t FOR UPDATE SKIP LOCKED NOWAIT","expect":"error","ref":"sql-select","note":"error: SKIP LOCKED then NOWAIT together"}
+{"id":"sellfa0093","category":"select-lock-fetch","sql":"SELECT id FROM s.t FOR NO UPDATE","expect":"error","ref":"sql-select","note":"error: FOR NO UPDATE (missing KEY keyword)"}
+{"id":"sellfa0094","category":"select-lock-fetch","sql":"SELECT id FROM s.t FOR KEY UPDATE","expect":"error","ref":"sql-select","note":"error: FOR KEY UPDATE (missing NO keyword)"}
+{"id":"sellfa0095","category":"select-lock-fetch","sql":"SELECT name, count(*) FROM s.t GROUP BY name FOR UPDATE","expect":"error","ref":"sql-select","note":"error: FOR UPDATE not allowed with GROUP BY"}
+{"id":"sellfa0096","category":"select-lock-fetch","sql":"SELECT DISTINCT id FROM s.t FOR UPDATE","expect":"error","ref":"sql-select","note":"error: FOR UPDATE not allowed with DISTINCT"}
+{"id":"sellfa0097","category":"select-lock-fetch","sql":"SELECT id FROM s.t UNION SELECT id FROM s.t2 FOR UPDATE","expect":"error","ref":"sql-select","note":"error: FOR UPDATE not allowed directly on UNION query"}
+{"id":"sellfa0098","category":"select-lock-fetch","sql":"SELECT id FROM s.t FOR UPDATE OF nonexistent_table","expect":"error","ref":"sql-select","note":"error: FOR UPDATE OF references non-existent table"}
+{"id":"sellfa0099","category":"select-lock-fetch","sql":"SELECT id FROM s.t ORDER BY id FETCH FIRST 5 ROWS WITH TIES FOR UPDATE SKIP LOCKED","expect":"error","ref":"sql-select","note":"error: WITH TIES combined with FOR UPDATE SKIP LOCKED"}
+{"id":"sellfa0100","category":"select-lock-fetch","sql":"SELECT id FROM s.t LIMIT 5 LIMIT 10","expect":"error","ref":"sql-select","note":"error: duplicate LIMIT clause"}
+{"id":"sellfa0101","category":"select-lock-fetch","sql":"SELECT id FROM s.t OFFSET 5 OFFSET 10","expect":"error","ref":"sql-select","note":"error: duplicate OFFSET clause"}
+{"id":"sellfa0102","category":"select-lock-fetch","sql":"SELECT id FROM s.t LIMIT ALL FETCH FIRST 5 ROWS ONLY","expect":"error","ref":"sql-select","note":"error: LIMIT and FETCH FIRST cannot coexist"}
+{"id":"sellfa0103","category":"select-lock-fetch","sql":"SELECT id FROM s.t WHERE id = 1 FOR UPDATE","expect":"ok","ref":"sql-select","note":"FOR UPDATE with WHERE clause (narrow result set)"}
+{"id":"sellfa0104","category":"select-lock-fetch","sql":"SELECT id FROM s.t WHERE id > 0 ORDER BY id LIMIT 5 FOR UPDATE","expect":"ok","ref":"sql-select","note":"WHERE + ORDER BY + LIMIT + FOR UPDATE combined"}
+{"id":"sellfa0105","category":"select-lock-fetch","sql":"SELECT id FROM s.t WHERE id > 0 ORDER BY id LIMIT 5 FOR UPDATE NOWAIT","expect":"ok","ref":"sql-select","note":"WHERE + ORDER BY + LIMIT + FOR UPDATE NOWAIT"}
+{"id":"sellfa0106","category":"select-lock-fetch","sql":"SELECT id FROM s.t WHERE id > 0 ORDER BY id LIMIT 5 FOR UPDATE SKIP LOCKED","expect":"ok","ref":"sql-select","note":"WHERE + ORDER BY + LIMIT + FOR UPDATE SKIP LOCKED"}
+{"id":"sellfa0107","category":"select-lock-fetch","sql":"SELECT id FROM s.t WHERE id > 0 ORDER BY id OFFSET 2 ROWS FETCH NEXT 5 ROWS ONLY FOR UPDATE","expect":"ok","ref":"sql-select","note":"WHERE + ORDER BY + OFFSET + FETCH + FOR UPDATE"}
+{"id":"sellfa0108","category":"select-lock-fetch","sql":"SELECT t.id FROM s.t AS t FOR UPDATE OF t","expect":"ok","ref":"sql-select","note":"FOR UPDATE OF alias from AS alias"}
+{"id":"sellfa0109","category":"select-lock-fetch","sql":"SELECT a.id FROM s.t AS a FOR UPDATE OF a","expect":"ok","ref":"sql-select","note":"FOR UPDATE OF custom alias (aliased table)"}
+{"id":"sellfa0110","category":"select-lock-fetch","sql":"SELECT a.id, b.label FROM s.t AS a JOIN s.t2 AS b ON a.id = b.t_id FOR UPDATE OF a FOR SHARE OF b","expect":"ok","ref":"sql-select","note":"FOR UPDATE OF alias a, FOR SHARE OF alias b"}
+{"id":"sellfa0111","category":"select-lock-fetch","sql":"SELECT a.id, b.label FROM s.t AS a JOIN s.t2 AS b ON a.id = b.t_id FOR NO KEY UPDATE OF a FOR KEY SHARE OF b","expect":"ok","ref":"sql-select","note":"FOR NO KEY UPDATE OF one alias, FOR KEY SHARE OF another"}
+{"id":"sellfa0112","category":"select-lock-fetch","sql":"SELECT a.id, b.label FROM s.t AS a JOIN s.t2 AS b ON a.id = b.t_id FOR UPDATE OF a, b NOWAIT","expect":"ok","ref":"sql-select","note":"FOR UPDATE OF two tables with NOWAIT"}
+{"id":"sellfa0113","category":"select-lock-fetch","sql":"SELECT a.id, b.label FROM s.t AS a JOIN s.t2 AS b ON a.id = b.t_id FOR SHARE OF a, b SKIP LOCKED","expect":"ok","ref":"sql-select","note":"FOR SHARE OF two tables with SKIP LOCKED"}
+{"id":"sellfa0114","category":"select-lock-fetch","sql":"SELECT id FROM s.t FOR UPDATE OF t FOR UPDATE","expect":"ok","ref":"sql-select","note":"two FOR UPDATE clauses (second applies to remaining tables)"}
+{"id":"sellfa0115","category":"select-lock-fetch","sql":"SELECT id FROM s.t FOR KEY SHARE FOR UPDATE","expect":"ok","ref":"sql-select","note":"FOR KEY SHARE then FOR UPDATE (UPDATE wins for t)"}
+{"id":"sellfa0116","category":"select-lock-fetch","sql":"SELECT id FROM s.t LIMIT (1+1)","expect":"ok","ref":"sql-select","note":"LIMIT with parenthesized addition expression"}
+{"id":"sellfa0117","category":"select-lock-fetch","sql":"SELECT id FROM s.t OFFSET (10-5)","expect":"ok","ref":"sql-select","note":"OFFSET with parenthesized subtraction expression"}
+{"id":"sellfa0118","category":"select-lock-fetch","sql":"SELECT id FROM s.t FETCH FIRST (2*3) ROWS ONLY","expect":"ok","ref":"sql-select","note":"FETCH FIRST with parenthesized multiplication"}
+{"id":"sellfa0119","category":"select-lock-fetch","sql":"SELECT id FROM s.t LIMIT 5::bigint","expect":"ok","ref":"sql-select","note":"LIMIT with cast expression"}
+{"id":"sellfa0120","category":"select-lock-fetch","sql":"SELECT id FROM s.t OFFSET 2::bigint","expect":"ok","ref":"sql-select","note":"OFFSET with cast expression"}
+{"id":"sellfa0121","category":"select-lock-fetch","sql":"SELECT id FROM s.t ORDER BY id ASC LIMIT 5","expect":"ok","ref":"sql-select","note":"ORDER BY ASC + LIMIT"}
+{"id":"sellfa0122","category":"select-lock-fetch","sql":"SELECT id FROM s.t ORDER BY id DESC LIMIT 5","expect":"ok","ref":"sql-select","note":"ORDER BY DESC + LIMIT"}
+{"id":"sellfa0123","category":"select-lock-fetch","sql":"SELECT id FROM s.t ORDER BY id NULLS FIRST LIMIT 5","expect":"ok","ref":"sql-select","note":"ORDER BY NULLS FIRST + LIMIT"}
+{"id":"sellfa0124","category":"select-lock-fetch","sql":"SELECT id FROM s.t ORDER BY id NULLS LAST LIMIT 5","expect":"ok","ref":"sql-select","note":"ORDER BY NULLS LAST + LIMIT"}
+{"id":"sellfa0125","category":"select-lock-fetch","sql":"SELECT id FROM s.t ORDER BY id LIMIT 5 OFFSET 10","expect":"ok","ref":"sql-select","note":"ORDER BY + LIMIT + OFFSET full combination"}
+{"id":"sellfa0126","category":"select-lock-fetch","sql":"SELECT id FROM s.t ORDER BY id OFFSET 0 ROW FETCH FIRST 5 ROWS ONLY","expect":"ok","ref":"sql-select","note":"ORDER BY + OFFSET ROW + FETCH FIRST ROWS ONLY"}
+{"id":"sellfa0127","category":"select-lock-fetch","sql":"SELECT id FROM s.t ORDER BY id OFFSET 0 ROWS FETCH NEXT 5 ROWS ONLY","expect":"ok","ref":"sql-select","note":"ORDER BY + OFFSET ROWS + FETCH NEXT ROWS ONLY"}
+{"id":"sellfa0128","category":"select-lock-fetch","sql":"SELECT id FROM s.t ORDER BY id DESC OFFSET 5 ROWS FETCH NEXT 3 ROWS ONLY","expect":"ok","ref":"sql-select","note":"ORDER BY DESC + OFFSET ROWS + FETCH NEXT"}
+{"id":"sellfa0129","category":"select-lock-fetch","sql":"SELECT id FROM s.t ORDER BY id FETCH FIRST 5 ROWS ONLY FOR UPDATE","expect":"ok","ref":"sql-select","note":"ORDER BY + FETCH ONLY + FOR UPDATE"}
+{"id":"sellfa0130","category":"select-lock-fetch","sql":"SELECT id FROM s.t ORDER BY id OFFSET 2 ROWS FETCH NEXT 3 ROWS ONLY FOR UPDATE SKIP LOCKED","expect":"ok","ref":"sql-select","note":"ORDER BY + OFFSET + FETCH + FOR UPDATE SKIP LOCKED"}
+{"id":"sellfa0131","category":"select-lock-fetch","sql":"SELECT id FROM s.t ORDER BY id OFFSET 2 ROWS FETCH NEXT 3 ROWS ONLY FOR KEY SHARE NOWAIT","expect":"ok","ref":"sql-select","note":"ORDER BY + OFFSET + FETCH + FOR KEY SHARE NOWAIT"}
+{"id":"sellfa0132","category":"select-lock-fetch","sql":"WITH cte AS (SELECT id FROM s.t FOR UPDATE) SELECT * FROM cte","expect":"ok","ref":"sql-select","note":"FOR UPDATE inside CTE subquery"}
+{"id":"sellfa0133","category":"select-lock-fetch","sql":"WITH cte AS (SELECT id FROM s.t LIMIT 5) SELECT * FROM cte FOR UPDATE","expect":"ok","ref":"sql-select","note":"LIMIT inside CTE; FOR UPDATE on outer query"}
+{"id":"sellfa0134","category":"select-lock-fetch","sql":"SELECT id FROM (SELECT id FROM s.t FOR UPDATE) sub","expect":"ok","ref":"sql-select","note":"FOR UPDATE inside subquery in FROM"}
+{"id":"sellfa0135","category":"select-lock-fetch","sql":"SELECT id FROM (SELECT id FROM s.t LIMIT 5 FOR UPDATE) sub","expect":"ok","ref":"sql-select","note":"LIMIT + FOR UPDATE inside subquery"}
+{"id":"sellfa0136","category":"select-lock-fetch","sql":"SELECT id FROM s.t FOR UPDATE OF t NOWAIT","expect":"ok","ref":"sql-select","note":"FOR UPDATE OF t NOWAIT full form"}
+{"id":"sellfa0137","category":"select-lock-fetch","sql":"SELECT id FROM s.t FOR NO KEY UPDATE OF t SKIP LOCKED","expect":"ok","ref":"sql-select","note":"FOR NO KEY UPDATE OF t SKIP LOCKED"}
+{"id":"sellfa0138","category":"select-lock-fetch","sql":"SELECT id FROM s.t FOR SHARE OF t NOWAIT","expect":"ok","ref":"sql-select","note":"FOR SHARE OF t NOWAIT"}
+{"id":"sellfa0139","category":"select-lock-fetch","sql":"SELECT id FROM s.t FOR KEY SHARE OF t SKIP LOCKED","expect":"ok","ref":"sql-select","note":"FOR KEY SHARE OF t SKIP LOCKED"}
+{"id":"sellfa0140","category":"select-lock-fetch","sql":"SELECT id FROM s.t FOR UPDATE OF t FOR KEY SHARE","expect":"ok","ref":"sql-select","note":"FOR UPDATE OF specific table + FOR KEY SHARE (no OF, covers remaining)"}
+{"id":"sellfa0141","category":"select-lock-fetch","sql":"SELECT id FROM s.t LIMIT 10 FOR KEY SHARE SKIP LOCKED","expect":"ok","ref":"sql-select","note":"LIMIT + FOR KEY SHARE SKIP LOCKED"}
+{"id":"sellfa0142","category":"select-lock-fetch","sql":"SELECT id FROM s.t LIMIT 10 FOR NO KEY UPDATE NOWAIT","expect":"ok","ref":"sql-select","note":"LIMIT + FOR NO KEY UPDATE NOWAIT"}
+{"id":"sellfa0143","category":"select-lock-fetch","sql":"SELECT count(*) FROM s.t","expect":"ok","ref":"sql-select","note":"aggregate without GROUP BY - baseline for locking restriction checks"}
+{"id":"sellfa0144","category":"select-lock-fetch","sql":"SELECT count(*) FROM s.t FOR UPDATE","expect":"error","ref":"sql-select","note":"error: FOR UPDATE with aggregate (implicit GROUP BY)"}
+{"id":"sellfa0145","category":"select-lock-fetch","sql":"SELECT id FROM s.t HAVING id > 0 FOR UPDATE","expect":"error","ref":"sql-select","note":"error: FOR UPDATE with HAVING clause (semantic: requires GROUP BY)"}
+{"id":"sellfa0146","category":"select-lock-fetch","sql":"SELECT id FROM s.t FETCH FIRST 5 ROWS ONLY FETCH NEXT 3 ROWS ONLY","expect":"error","ref":"sql-select","note":"error: duplicate FETCH clause"}
+{"id":"sellfa0147","category":"select-lock-fetch","sql":"SELECT id FROM s.t LIMIT","expect":"error","ref":"sql-select","note":"error: LIMIT without count"}
+{"id":"sellfa0148","category":"select-lock-fetch","sql":"SELECT id FROM s.t OFFSET","expect":"error","ref":"sql-select","note":"error: OFFSET without count"}
+{"id":"sellfa0149","category":"select-lock-fetch","sql":"SELECT id FROM s.t FETCH ONLY","expect":"error","ref":"sql-select","note":"error: FETCH without FIRST/NEXT keyword"}
+{"id":"sellfa0150","category":"select-lock-fetch","sql":"SELECT id FROM s.t FOR LOCK","expect":"error","ref":"sql-select","note":"error: FOR LOCK (invalid locking keyword)"}
+{"id":"sellfa0151","category":"select-lock-fetch","sql":"SELECT id FROM s.t FOR UPDATE NOWAIT NOWAIT","expect":"error","ref":"sql-select","note":"error: NOWAIT repeated twice in same locking clause"}
+{"id":"sellfa0152","category":"select-lock-fetch","sql":"SELECT id FROM s.t ORDER BY id FETCH FIRST 0 ROWS ONLY","expect":"ok","ref":"sql-select","note":"FETCH FIRST 0 ROWS ONLY (returns no rows)"}
+{"id":"sellfa0153","category":"select-lock-fetch","sql":"SELECT id FROM s.t ORDER BY id FETCH FIRST 1000000 ROWS ONLY","expect":"ok","ref":"sql-select","note":"FETCH FIRST with large count"}
+{"id":"sellfa0154","category":"select-lock-fetch","sql":"SELECT id FROM s.t OFFSET 0","expect":"ok","ref":"sql-select","note":"OFFSET 0 with no ROW/ROWS noise word"}
+{"id":"sellfa0155","category":"select-lock-fetch","sql":"SELECT id FROM s.t OFFSET 0 FETCH FIRST 5 ROWS ONLY","expect":"ok","ref":"sql-select","note":"OFFSET 0 (no ROW/ROWS) + FETCH FIRST 5 ROWS ONLY"}
+{"id":"sellfa0156","category":"select-lock-fetch","sql":"SELECT id FROM s.t FOR UPDATE;SELECT id FROM s.t FOR SHARE","expect":"ok","ref":"sql-select","note":"two separate SELECT statements with different locking in same transaction"}
+{"id":"sellfa0157","category":"select-lock-fetch","sql":"SELECT id FROM s.parent FOR UPDATE","expect":"ok","ref":"sql-select","note":"FOR UPDATE on table with inheritance (locks all child rows too)"}
+{"id":"sellfa0158","category":"select-lock-fetch","sql":"SELECT id FROM s.child FOR UPDATE","expect":"ok","ref":"sql-select","note":"FOR UPDATE on child table in inheritance hierarchy"}
+{"id":"sellfa0159","category":"select-lock-fetch","sql":"SELECT id FROM ONLY s.parent FOR UPDATE","expect":"ok","ref":"sql-select","note":"FOR UPDATE on ONLY parent (excludes inherited rows)"}
+{"id":"sellfa0160","category":"select-lock-fetch","sql":"SELECT id FROM s.v FOR UPDATE","expect":"ok","ref":"sql-select","note":"FOR UPDATE on a simple view (PostgreSQL resolves to underlying table rows)"}
+{"id":"sellfa0161","category":"select-lock-fetch","sql":"SELECT id FROM s.t OFFSET 5 ROWS FETCH FIRST 10 ROWS ONLY FOR UPDATE","expect":"ok","ref":"sql-select","note":"OFFSET ROWS + FETCH FIRST ROWS ONLY + FOR UPDATE all three"}
+{"id":"sellfa0162","category":"select-lock-fetch","sql":"SELECT id FROM s.t OFFSET 5 ROWS FETCH FIRST 10 ROWS ONLY FOR NO KEY UPDATE SKIP LOCKED","expect":"ok","ref":"sql-select","note":"OFFSET + FETCH + FOR NO KEY UPDATE SKIP LOCKED"}
+{"id":"sellfa0163","category":"select-lock-fetch","sql":"SELECT id FROM s.t ORDER BY id DESC LIMIT 3 OFFSET 2 FOR SHARE NOWAIT","expect":"ok","ref":"sql-select","note":"ORDER BY DESC + LIMIT + OFFSET + FOR SHARE NOWAIT"}
+{"id":"sellfa0164","category":"select-lock-fetch","sql":"SELECT t.id, t2.label FROM s.t JOIN s.t2 ON t.id = t2.t_id FOR UPDATE OF t NOWAIT FOR KEY SHARE OF t2 SKIP LOCKED","expect":"ok","ref":"sql-select","note":"two tables with different locking strengths and different wait modes"}
+{"id":"sellfa0165","category":"select-lock-fetch","sql":"SELECT id FROM s.t FOR UPDATE OF t, t","expect":"ok","ref":"sql-select","note":"FOR UPDATE OF same table listed twice (PostgreSQL deduplicates, no error)"}
+{"id":"sellfa0166","category":"select-lock-fetch","sql":"SELECT id FROM s.t FETCH FIRST 5 ROWS ONLY OFFSET 3","expect":"ok","ref":"sql-select","note":"OFFSET after FETCH (PostgreSQL allows either order despite SQL standard requiring OFFSET first)"}
+{"id":"sellfa0167","category":"select-lock-fetch","sql":"SELECT id FROM s.t ORDER BY id FETCH FIRST 10 ROWS WITH TIES FOR NO KEY UPDATE","expect":"ok","ref":"sql-select","note":"WITH TIES + FOR NO KEY UPDATE is allowed"}
+{"id":"sellfa0168","category":"select-lock-fetch","sql":"SELECT id FROM s.t ORDER BY id FETCH FIRST 10 ROWS WITH TIES FOR SHARE","expect":"ok","ref":"sql-select","note":"WITH TIES + FOR SHARE is allowed"}
+{"id":"sellfa0169","category":"select-lock-fetch","sql":"SELECT id FROM s.t ORDER BY id FETCH FIRST 10 ROWS WITH TIES FOR KEY SHARE","expect":"ok","ref":"sql-select","note":"WITH TIES + FOR KEY SHARE is allowed"}
+{"id":"sellfa0170","category":"select-lock-fetch","sql":"SELECT id FROM s.t LIMIT 5 FOR UPDATE OF t","expect":"ok","ref":"sql-select","note":"LIMIT + FOR UPDATE OF specific table on single-table query"}

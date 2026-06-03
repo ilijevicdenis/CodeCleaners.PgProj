@@ -70,4 +70,23 @@ public class ProjectLoaderTests : IDisposable
         var result = DatabaseProject.Load(proj).Build();
         Assert.Contains(result.Diagnostics, d => d.Contains("Duplicate table", StringComparison.OrdinalIgnoreCase));
     }
+
+    [Fact]
+    public void Underscore_prefixed_files_are_excluded_from_the_build()
+    {
+        var proj = Write("U.pgproj", """
+            <Project>
+              <PropertyGroup><Name>U</Name></PropertyGroup>
+              <ItemGroup><Build Include="**/*.sql" /></ItemGroup>
+            </Project>
+            """);
+        Write("Tables/t.sql", "CREATE TABLE public.t (id int);");
+        // A generated concatenation of the sources; must NOT be parsed again (no duplicate).
+        Write("_full_create.sql", "CREATE TABLE public.t (id int);");
+
+        var result = DatabaseProject.Load(proj).Build();
+        Assert.Single(result.Files);
+        Assert.Empty(result.Diagnostics);
+        Assert.Single(result.Model.Tables);
+    }
 }

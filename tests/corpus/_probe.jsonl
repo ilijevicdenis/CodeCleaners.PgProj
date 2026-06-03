@@ -1,0 +1,10 @@
+{"id":"p-001","category":"probe","sql":"CREATE TABLE tmp (a int, b text)","expect":"ok","ref":"sql-createtable"}
+{"id":"p-002","category":"probe","sql":"CREATE TABLE tmp (a int,)","expect":"error","ref":"sql-createtable"}
+{"id":"p-003","category":"probe","sql":"SELECT id, name FROM s.t WHERE qty > 0","expect":"ok","ref":"sql-select"}
+{"id":"p-004","category":"probe","sql":"SELECT FROM WHERE","expect":"error","ref":"sql-select"}
+{"id":"p-005","category":"probe","sql":"INSERT INTO s.t (name) VALUES ('x') ON CONFLICT DO NOTHING","expect":"ok","ref":"sql-insert"}
+{"id":"p-006","category":"probe","sql":"ALTER TABLE s.t ADD COLUMN extra text","expect":"ok","ref":"sql-altertable"}
+{"id":"p-007","category":"probe","sql":"SELECT * FROM s.no_such_table","expect":"error","ref":"sql-select"}
+{"id":"p-008","category":"probe","sql":"VACUUM s.t","expect":"ok","txn":"none","ref":"sql-vacuum"}
+{"id":"p-009","category":"probe","sql":"WITH RECURSIVE r(n) AS (SELECT 1 UNION ALL SELECT n+1 FROM r WHERE n < 5) SELECT n FROM r","expect":"ok","ref":"queries-with"}
+{"id":"p-010","category":"probe","sql":"MERGE INTO s.t USING s.t2 ON s.t.id = s.t2.t_id WHEN MATCHED THEN UPDATE SET name = s.t2.label","expect":"ok","ref":"sql-merge"}

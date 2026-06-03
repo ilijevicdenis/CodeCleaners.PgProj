@@ -1,0 +1,205 @@
+{"id":"ssra0001","category":"set-show-reset","sql":"SET work_mem = '64MB'","expect":"ok","ref":"sql-set","note":"SET param = string value"}
+{"id":"ssra0002","category":"set-show-reset","sql":"SET work_mem TO '128MB'","expect":"ok","ref":"sql-set","note":"SET param TO string value"}
+{"id":"ssra0003","category":"set-show-reset","sql":"SET SESSION work_mem = '64MB'","expect":"ok","ref":"sql-set","note":"SET SESSION param = value"}
+{"id":"ssra0004","category":"set-show-reset","sql":"SET LOCAL work_mem = '64MB'","expect":"ok","ref":"sql-set","note":"SET LOCAL param = value"}
+{"id":"ssra0005","category":"set-show-reset","sql":"SET SESSION work_mem TO '64MB'","expect":"ok","ref":"sql-set","note":"SET SESSION param TO value"}
+{"id":"ssra0006","category":"set-show-reset","sql":"SET LOCAL work_mem TO '64MB'","expect":"ok","ref":"sql-set","note":"SET LOCAL param TO value"}
+{"id":"ssra0007","category":"set-show-reset","sql":"SET work_mem TO DEFAULT","expect":"ok","ref":"sql-set","note":"SET param TO DEFAULT"}
+{"id":"ssra0008","category":"set-show-reset","sql":"SET work_mem = DEFAULT","expect":"ok","ref":"sql-set","note":"SET param = DEFAULT"}
+{"id":"ssra0009","category":"set-show-reset","sql":"SET SESSION work_mem TO DEFAULT","expect":"ok","ref":"sql-set","note":"SET SESSION param TO DEFAULT"}
+{"id":"ssra0010","category":"set-show-reset","sql":"SET LOCAL work_mem TO DEFAULT","expect":"ok","ref":"sql-set","note":"SET LOCAL param TO DEFAULT"}
+{"id":"ssra0011","category":"set-show-reset","sql":"RESET work_mem","expect":"ok","ref":"sql-reset","note":"RESET single parameter"}
+{"id":"ssra0012","category":"set-show-reset","sql":"RESET ALL","expect":"ok","ref":"sql-reset","note":"RESET ALL parameters"}
+{"id":"ssra0013","category":"set-show-reset","sql":"SHOW work_mem","expect":"ok","ref":"sql-show","note":"SHOW single parameter"}
+{"id":"ssra0014","category":"set-show-reset","sql":"SHOW ALL","expect":"ok","ref":"sql-show","note":"SHOW ALL parameters"}
+{"id":"ssra0015","category":"set-show-reset","sql":"SET TIME ZONE 'UTC'","expect":"ok","ref":"sql-set","note":"SET TIME ZONE string"}
+{"id":"ssra0016","category":"set-show-reset","sql":"SET TIME ZONE 'America/New_York'","expect":"ok","ref":"sql-set","note":"SET TIME ZONE IANA zone name"}
+{"id":"ssra0017","category":"set-show-reset","sql":"SET TIME ZONE 'Europe/London'","expect":"ok","ref":"sql-set","note":"SET TIME ZONE European zone"}
+{"id":"ssra0018","category":"set-show-reset","sql":"SET TIME ZONE LOCAL","expect":"ok","ref":"sql-set","note":"SET TIME ZONE LOCAL keyword"}
+{"id":"ssra0019","category":"set-show-reset","sql":"SET TIME ZONE DEFAULT","expect":"ok","ref":"sql-set","note":"SET TIME ZONE DEFAULT keyword"}
+{"id":"ssra0020","category":"set-show-reset","sql":"SET TIME ZONE -7","expect":"ok","ref":"sql-set","note":"SET TIME ZONE numeric offset"}
+{"id":"ssra0021","category":"set-show-reset","sql":"SET TIME ZONE 5.5","expect":"ok","ref":"sql-set","note":"SET TIME ZONE fractional numeric offset"}
+{"id":"ssra0022","category":"set-show-reset","sql":"SET TIME ZONE INTERVAL '-08:00' HOUR TO MINUTE","expect":"ok","ref":"sql-set","note":"SET TIME ZONE INTERVAL expression"}
+{"id":"ssra0023","category":"set-show-reset","sql":"SET TIME ZONE INTERVAL '+05:30'","expect":"ok","ref":"sql-set","note":"SET TIME ZONE INTERVAL string no qualifier"}
+{"id":"ssra0024","category":"set-show-reset","sql":"SET SESSION TIME ZONE 'UTC'","expect":"ok","ref":"sql-set","note":"SET SESSION TIME ZONE string"}
+{"id":"ssra0025","category":"set-show-reset","sql":"SET LOCAL TIME ZONE 'UTC'","expect":"ok","ref":"sql-set","note":"SET LOCAL TIME ZONE string"}
+{"id":"ssra0026","category":"set-show-reset","sql":"SHOW TIME ZONE","expect":"ok","ref":"sql-show","note":"SHOW TIME ZONE special form"}
+{"id":"ssra0027","category":"set-show-reset","sql":"RESET timezone","expect":"ok","ref":"sql-reset","note":"RESET timezone parameter"}
+{"id":"ssra0028","category":"set-show-reset","sql":"SET search_path TO public","expect":"ok","ref":"sql-set","note":"SET search_path single schema"}
+{"id":"ssra0029","category":"set-show-reset","sql":"SET search_path TO s, public","expect":"ok","ref":"sql-set","note":"SET search_path two schemas"}
+{"id":"ssra0030","category":"set-show-reset","sql":"SET search_path TO s, public, pg_catalog","expect":"ok","ref":"sql-set","note":"SET search_path three schemas"}
+{"id":"ssra0031","category":"set-show-reset","sql":"SET search_path = s, public","expect":"ok","ref":"sql-set","note":"SET search_path with = operator"}
+{"id":"ssra0032","category":"set-show-reset","sql":"SET search_path TO DEFAULT","expect":"ok","ref":"sql-set","note":"SET search_path TO DEFAULT"}
+{"id":"ssra0033","category":"set-show-reset","sql":"SHOW search_path","expect":"ok","ref":"sql-show","note":"SHOW search_path"}
+{"id":"ssra0034","category":"set-show-reset","sql":"RESET search_path","expect":"ok","ref":"sql-reset","note":"RESET search_path"}
+{"id":"ssra0035","category":"set-show-reset","sql":"SET datestyle TO 'ISO, MDY'","expect":"ok","ref":"sql-set","note":"SET datestyle string value"}
+{"id":"ssra0036","category":"set-show-reset","sql":"SET datestyle TO 'ISO, DMY'","expect":"ok","ref":"sql-set","note":"SET datestyle ISO DMY"}
+{"id":"ssra0037","category":"set-show-reset","sql":"SET datestyle TO 'SQL, MDY'","expect":"ok","ref":"sql-set","note":"SET datestyle SQL MDY"}
+{"id":"ssra0038","category":"set-show-reset","sql":"SET datestyle TO postgres, dmy","expect":"ok","ref":"sql-set","note":"SET datestyle bare keyword list"}
+{"id":"ssra0039","category":"set-show-reset","sql":"SHOW datestyle","expect":"ok","ref":"sql-show","note":"SHOW datestyle"}
+{"id":"ssra0040","category":"set-show-reset","sql":"RESET datestyle","expect":"ok","ref":"sql-reset","note":"RESET datestyle"}
+{"id":"ssra0041","category":"set-show-reset","sql":"SET intervalstyle TO 'postgres'","expect":"ok","ref":"sql-set","note":"SET intervalstyle postgres"}
+{"id":"ssra0042","category":"set-show-reset","sql":"SET intervalstyle TO 'sql_standard'","expect":"ok","ref":"sql-set","note":"SET intervalstyle sql_standard"}
+{"id":"ssra0043","category":"set-show-reset","sql":"SET intervalstyle TO 'iso_8601'","expect":"ok","ref":"sql-set","note":"SET intervalstyle iso_8601"}
+{"id":"ssra0044","category":"set-show-reset","sql":"SET intervalstyle TO 'postgres_verbose'","expect":"ok","ref":"sql-set","note":"SET intervalstyle postgres_verbose"}
+{"id":"ssra0045","category":"set-show-reset","sql":"SHOW intervalstyle","expect":"ok","ref":"sql-show","note":"SHOW intervalstyle"}
+{"id":"ssra0046","category":"set-show-reset","sql":"RESET intervalstyle","expect":"ok","ref":"sql-reset","note":"RESET intervalstyle"}
+{"id":"ssra0047","category":"set-show-reset","sql":"SET client_encoding TO 'UTF8'","expect":"ok","ref":"sql-set","note":"SET client_encoding UTF8"}
+{"id":"ssra0048","category":"set-show-reset","sql":"SET client_encoding = 'UTF8'","expect":"ok","ref":"sql-set","note":"SET client_encoding = UTF8"}
+{"id":"ssra0049","category":"set-show-reset","sql":"SET NAMES 'UTF8'","expect":"ok","ref":"sql-set","note":"SET NAMES alias for client_encoding"}
+{"id":"ssra0050","category":"set-show-reset","sql":"SHOW client_encoding","expect":"ok","ref":"sql-show","note":"SHOW client_encoding"}
+{"id":"ssra0051","category":"set-show-reset","sql":"RESET client_encoding","expect":"ok","ref":"sql-reset","note":"RESET client_encoding"}
+{"id":"ssra0052","category":"set-show-reset","sql":"SET SCHEMA 'public'","expect":"ok","ref":"sql-set","note":"SET SCHEMA alias for search_path"}
+{"id":"ssra0053","category":"set-show-reset","sql":"SET SCHEMA 's'","expect":"ok","ref":"sql-set","note":"SET SCHEMA to fixture schema s"}
+{"id":"ssra0054","category":"set-show-reset","sql":"SET lock_timeout TO '5s'","expect":"ok","ref":"sql-set","note":"SET lock_timeout time string"}
+{"id":"ssra0055","category":"set-show-reset","sql":"SET lock_timeout = 5000","expect":"ok","ref":"sql-set","note":"SET lock_timeout integer ms"}
+{"id":"ssra0056","category":"set-show-reset","sql":"SET lock_timeout TO 0","expect":"ok","ref":"sql-set","note":"SET lock_timeout zero disables it"}
+{"id":"ssra0057","category":"set-show-reset","sql":"SET statement_timeout TO '30s'","expect":"ok","ref":"sql-set","note":"SET statement_timeout time string"}
+{"id":"ssra0058","category":"set-show-reset","sql":"SET statement_timeout = 0","expect":"ok","ref":"sql-set","note":"SET statement_timeout disable"}
+{"id":"ssra0059","category":"set-show-reset","sql":"SET enable_seqscan TO on","expect":"ok","ref":"sql-set","note":"SET boolean param to on"}
+{"id":"ssra0060","category":"set-show-reset","sql":"SET enable_seqscan TO off","expect":"ok","ref":"sql-set","note":"SET boolean param to off"}
+{"id":"ssra0061","category":"set-show-reset","sql":"SET enable_seqscan TO true","expect":"ok","ref":"sql-set","note":"SET boolean param to true"}
+{"id":"ssra0062","category":"set-show-reset","sql":"SET enable_seqscan TO false","expect":"ok","ref":"sql-set","note":"SET boolean param to false"}
+{"id":"ssra0063","category":"set-show-reset","sql":"SET enable_seqscan TO 'on'","expect":"ok","ref":"sql-set","note":"SET boolean param quoted on"}
+{"id":"ssra0064","category":"set-show-reset","sql":"SET enable_seqscan TO 'off'","expect":"ok","ref":"sql-set","note":"SET boolean param quoted off"}
+{"id":"ssra0065","category":"set-show-reset","sql":"SET enable_seqscan = on","expect":"ok","ref":"sql-set","note":"SET boolean param = on"}
+{"id":"ssra0066","category":"set-show-reset","sql":"SHOW enable_seqscan","expect":"ok","ref":"sql-show","note":"SHOW boolean parameter"}
+{"id":"ssra0067","category":"set-show-reset","sql":"RESET enable_seqscan","expect":"ok","ref":"sql-reset","note":"RESET boolean parameter"}
+{"id":"ssra0068","category":"set-show-reset","sql":"SET geqo TO on","expect":"ok","ref":"sql-set","note":"SET geqo on"}
+{"id":"ssra0069","category":"set-show-reset","sql":"SET geqo_threshold TO 12","expect":"ok","ref":"sql-set","note":"SET integer parameter"}
+{"id":"ssra0070","category":"set-show-reset","sql":"SHOW geqo","expect":"ok","ref":"sql-show","note":"SHOW geqo"}
+{"id":"ssra0071","category":"set-show-reset","sql":"SET random_page_cost TO 1.1","expect":"ok","ref":"sql-set","note":"SET float parameter"}
+{"id":"ssra0072","category":"set-show-reset","sql":"SET cpu_tuple_cost TO 0.01","expect":"ok","ref":"sql-set","note":"SET small float parameter"}
+{"id":"ssra0073","category":"set-show-reset","sql":"SET max_parallel_workers TO 4","expect":"ok","ref":"sql-set","note":"SET integer GUC max_parallel_workers"}
+{"id":"ssra0074","category":"set-show-reset","sql":"SHOW max_parallel_workers","expect":"ok","ref":"sql-show","note":"SHOW max_parallel_workers"}
+{"id":"ssra0075","category":"set-show-reset","sql":"RESET random_page_cost","expect":"ok","ref":"sql-reset","note":"RESET float parameter"}
+{"id":"ssra0076","category":"set-show-reset","sql":"SET work_mem TO '256MB'; SHOW work_mem","expect":"ok","ref":"sql-set","note":"SET then SHOW in same txn"}
+{"id":"ssra0077","category":"set-show-reset","sql":"SET work_mem TO '256MB'; RESET work_mem; SHOW work_mem","expect":"ok","ref":"sql-set","note":"SET RESET SHOW sequence"}
+{"id":"ssra0078","category":"set-show-reset","sql":"SET LOCAL enable_seqscan TO off; SET LOCAL enable_seqscan TO on","expect":"ok","ref":"sql-set","note":"Double SET LOCAL same param"}
+{"id":"ssra0079","category":"set-show-reset","sql":"SET application_name TO 'myapp'","expect":"ok","ref":"sql-set","note":"SET application_name string"}
+{"id":"ssra0080","category":"set-show-reset","sql":"SET application_name = 'test app with spaces'","expect":"ok","ref":"sql-set","note":"SET application_name with spaces"}
+{"id":"ssra0081","category":"set-show-reset","sql":"SHOW application_name","expect":"ok","ref":"sql-show","note":"SHOW application_name"}
+{"id":"ssra0082","category":"set-show-reset","sql":"SET extra_float_digits TO 3","expect":"ok","ref":"sql-set","note":"SET extra_float_digits integer"}
+{"id":"ssra0083","category":"set-show-reset","sql":"SET extra_float_digits TO -1","expect":"ok","ref":"sql-set","note":"SET extra_float_digits negative"}
+{"id":"ssra0084","category":"set-show-reset","sql":"SHOW extra_float_digits","expect":"ok","ref":"sql-show","note":"SHOW extra_float_digits"}
+{"id":"ssra0085","category":"set-show-reset","sql":"SET standard_conforming_strings TO on","expect":"ok","ref":"sql-set","note":"SET standard_conforming_strings on"}
+{"id":"ssra0086","category":"set-show-reset","sql":"SET standard_conforming_strings TO off","expect":"ok","ref":"sql-set","note":"SET standard_conforming_strings off"}
+{"id":"ssra0087","category":"set-show-reset","sql":"SHOW standard_conforming_strings","expect":"ok","ref":"sql-show","note":"SHOW standard_conforming_strings"}
+{"id":"ssra0088","category":"set-show-reset","sql":"SET transaction_isolation TO 'read committed'","expect":"ok","ref":"sql-set","note":"SET transaction_isolation read committed"}
+{"id":"ssra0089","category":"set-show-reset","sql":"SET transaction_isolation TO 'repeatable read'","expect":"ok","ref":"sql-set","note":"SET transaction_isolation repeatable read"}
+{"id":"ssra0090","category":"set-show-reset","sql":"SET transaction_isolation TO 'serializable'","expect":"ok","ref":"sql-set","note":"SET transaction_isolation serializable"}
+{"id":"ssra0091","category":"set-show-reset","sql":"SET transaction_isolation TO 'read uncommitted'","expect":"ok","ref":"sql-set","note":"SET transaction_isolation read uncommitted"}
+{"id":"ssra0092","category":"set-show-reset","sql":"SHOW transaction_isolation","expect":"ok","ref":"sql-show","note":"SHOW transaction_isolation"}
+{"id":"ssra0093","category":"set-show-reset","sql":"SET transaction_read_only TO on","expect":"ok","ref":"sql-set","note":"SET transaction_read_only on"}
+{"id":"ssra0094","category":"set-show-reset","sql":"SET transaction_read_only TO off","expect":"ok","ref":"sql-set","note":"SET transaction_read_only off"}
+{"id":"ssra0095","category":"set-show-reset","sql":"SHOW transaction_read_only","expect":"ok","ref":"sql-show","note":"SHOW transaction_read_only"}
+{"id":"ssra0096","category":"set-show-reset","sql":"SET join_collapse_limit TO 1","expect":"ok","ref":"sql-set","note":"SET join_collapse_limit to 1 disables reorder"}
+{"id":"ssra0097","category":"set-show-reset","sql":"SET from_collapse_limit TO 8","expect":"ok","ref":"sql-set","note":"SET from_collapse_limit integer"}
+{"id":"ssra0098","category":"set-show-reset","sql":"SET default_transaction_isolation TO 'serializable'","expect":"ok","ref":"sql-set","note":"SET default_transaction_isolation"}
+{"id":"ssra0099","category":"set-show-reset","sql":"SHOW default_transaction_isolation","expect":"ok","ref":"sql-show","note":"SHOW default_transaction_isolation"}
+{"id":"ssra0100","category":"set-show-reset","sql":"SET xmlbinary TO 'base64'","expect":"ok","ref":"sql-set","note":"SET xmlbinary base64"}
+{"id":"ssra0101","category":"set-show-reset","sql":"SET xmlbinary TO 'hex'","expect":"ok","ref":"sql-set","note":"SET xmlbinary hex"}
+{"id":"ssra0102","category":"set-show-reset","sql":"SET xmloption TO 'document'","expect":"ok","ref":"sql-set","note":"SET xmloption document"}
+{"id":"ssra0103","category":"set-show-reset","sql":"SET xmloption TO 'content'","expect":"ok","ref":"sql-set","note":"SET xmloption content"}
+{"id":"ssra0104","category":"set-show-reset","sql":"SET lc_messages TO 'C'","expect":"ok","ref":"sql-set","note":"SET lc_messages to C locale"}
+{"id":"ssra0105","category":"set-show-reset","sql":"SHOW lc_messages","expect":"ok","ref":"sql-show","note":"SHOW lc_messages"}
+{"id":"ssra0106","category":"set-show-reset","sql":"SET lc_monetary TO 'C'","expect":"ok","ref":"sql-set","note":"SET lc_monetary"}
+{"id":"ssra0107","category":"set-show-reset","sql":"SET lc_numeric TO 'C'","expect":"ok","ref":"sql-set","note":"SET lc_numeric"}
+{"id":"ssra0108","category":"set-show-reset","sql":"SET lc_time TO 'C'","expect":"ok","ref":"sql-set","note":"SET lc_time"}
+{"id":"ssra0109","category":"set-show-reset","sql":"SHOW server_version","expect":"ok","ref":"sql-show","note":"SHOW read-only server_version"}
+{"id":"ssra0110","category":"set-show-reset","sql":"SHOW server_encoding","expect":"ok","ref":"sql-show","note":"SHOW read-only server_encoding"}
+{"id":"ssra0111","category":"set-show-reset","sql":"SHOW is_superuser","expect":"ok","ref":"sql-show","note":"SHOW read-only is_superuser"}
+{"id":"ssra0112","category":"set-show-reset","sql":"SHOW max_connections","expect":"ok","ref":"sql-show","note":"SHOW max_connections postmaster-only GUC"}
+{"id":"ssra0113","category":"set-show-reset","sql":"SET SESSION AUTHORIZATION DEFAULT","expect":"ok","ref":"sql-set","note":"SET SESSION AUTHORIZATION DEFAULT resets to current user"}
+{"id":"ssra0114","category":"set-show-reset","sql":"SHOW session_authorization","expect":"ok","ref":"sql-show","note":"SHOW session_authorization"}
+{"id":"ssra0115","category":"set-show-reset","sql":"SET ROLE NONE","expect":"ok","ref":"sql-set","note":"SET ROLE NONE resets role"}
+{"id":"ssra0116","category":"set-show-reset","sql":"SHOW role","expect":"ok","ref":"sql-show","note":"SHOW role"}
+{"id":"ssra0117","category":"set-show-reset","sql":"SET check_function_bodies TO on","expect":"ok","ref":"sql-set","note":"SET check_function_bodies on"}
+{"id":"ssra0118","category":"set-show-reset","sql":"SET check_function_bodies TO off","expect":"ok","ref":"sql-set","note":"SET check_function_bodies off"}
+{"id":"ssra0119","category":"set-show-reset","sql":"SET log_min_duration_statement TO -1","expect":"ok","ref":"sql-set","note":"SET log_min_duration_statement disable"}
+{"id":"ssra0120","category":"set-show-reset","sql":"SET log_min_duration_statement TO 0","expect":"ok","ref":"sql-set","note":"SET log_min_duration_statement log all"}
+{"id":"ssra0121","category":"set-show-reset","sql":"SET log_min_duration_statement TO '1s'","expect":"ok","ref":"sql-set","note":"SET log_min_duration_statement time string"}
+{"id":"ssra0122","category":"set-show-reset","sql":"SET seed TO 0.5","expect":"ok","ref":"sql-set","note":"SET seed float value"}
+{"id":"ssra0123","category":"set-show-reset","sql":"SET seed TO -0.5","expect":"ok","ref":"sql-set","note":"SET seed negative float"}
+{"id":"ssra0124","category":"set-show-reset","sql":"SET seed TO 1.0","expect":"ok","ref":"sql-set","note":"SET seed max value"}
+{"id":"ssra0125","category":"set-show-reset","sql":"SET TIME ZONE 'PST8PDT'","expect":"ok","ref":"sql-set","note":"SET TIME ZONE POSIX style zone"}
+{"id":"ssra0126","category":"set-show-reset","sql":"SET TIME ZONE 0","expect":"ok","ref":"sql-set","note":"SET TIME ZONE zero offset UTC"}
+{"id":"ssra0127","category":"set-show-reset","sql":"SET TIME ZONE INTERVAL '1:00' HOUR TO MINUTE","expect":"ok","ref":"sql-set","note":"SET TIME ZONE INTERVAL positive 1hr"}
+{"id":"ssra0128","category":"set-show-reset","sql":"SET SESSION TIME ZONE LOCAL","expect":"ok","ref":"sql-set","note":"SET SESSION TIME ZONE LOCAL"}
+{"id":"ssra0129","category":"set-show-reset","sql":"SET LOCAL TIME ZONE DEFAULT","expect":"ok","ref":"sql-set","note":"SET LOCAL TIME ZONE DEFAULT"}
+{"id":"ssra0130","category":"set-show-reset","sql":"set work_mem to '64MB'","expect":"ok","ref":"sql-set","note":"SET keyword case insensitive lowercase"}
+{"id":"ssra0131","category":"set-show-reset","sql":"Set Work_Mem To '64MB'","expect":"ok","ref":"sql-set","note":"SET keyword mixed case, GUC name case insensitive"}
+{"id":"ssra0132","category":"set-show-reset","sql":"SHOW DateStyle","expect":"ok","ref":"sql-show","note":"SHOW with mixed-case parameter name"}
+{"id":"ssra0133","category":"set-show-reset","sql":"SET maintenance_work_mem TO '512MB'","expect":"ok","ref":"sql-set","note":"SET maintenance_work_mem"}
+{"id":"ssra0134","category":"set-show-reset","sql":"SET maintenance_work_mem TO '1GB'","expect":"ok","ref":"sql-set","note":"SET maintenance_work_mem 1GB"}
+{"id":"ssra0135","category":"set-show-reset","sql":"SHOW maintenance_work_mem","expect":"ok","ref":"sql-show","note":"SHOW maintenance_work_mem"}
+{"id":"ssra0136","category":"set-show-reset","sql":"SET temp_buffers TO '32MB'","expect":"ok","ref":"sql-set","note":"SET temp_buffers"}
+{"id":"ssra0137","category":"set-show-reset","sql":"SET hash_mem_multiplier TO 1.0","expect":"ok","ref":"sql-set","note":"SET hash_mem_multiplier float"}
+{"id":"ssra0138","category":"set-show-reset","sql":"SET effective_cache_size TO '4GB'","expect":"ok","ref":"sql-set","note":"SET effective_cache_size"}
+{"id":"ssra0139","category":"set-show-reset","sql":"RESET ALL","expect":"ok","ref":"sql-reset","note":"RESET ALL second occurrence to confirm idempotent"}
+{"id":"ssra0140","category":"set-show-reset","sql":"SET search_path TO '\"$user\"', public","expect":"ok","ref":"sql-set","note":"SET search_path with quoted dollar-user token"}
+{"id":"ssra0141","category":"set-show-reset","sql":"SET search_path TO s","expect":"ok","ref":"sql-set","note":"SET search_path single schema no quotes"}
+{"id":"ssra0142","category":"set-show-reset","sql":"SET search_path TO DEFAULT; SHOW search_path","expect":"ok","ref":"sql-set","note":"SET DEFAULT then SHOW"}
+{"id":"ssra0143","category":"set-show-reset","sql":"SET row_security TO on","expect":"ok","ref":"sql-set","note":"SET row_security on"}
+{"id":"ssra0144","category":"set-show-reset","sql":"SET row_security TO off","expect":"ok","ref":"sql-set","note":"SET row_security off"}
+{"id":"ssra0145","category":"set-show-reset","sql":"SHOW row_security","expect":"ok","ref":"sql-show","note":"SHOW row_security"}
+{"id":"ssra0146","category":"set-show-reset","sql":"SET enable_hashjoin TO off","expect":"ok","ref":"sql-set","note":"SET enable_hashjoin off"}
+{"id":"ssra0147","category":"set-show-reset","sql":"SET enable_nestloop TO off","expect":"ok","ref":"sql-set","note":"SET enable_nestloop off"}
+{"id":"ssra0148","category":"set-show-reset","sql":"SET enable_mergejoin TO off","expect":"ok","ref":"sql-set","note":"SET enable_mergejoin off"}
+{"id":"ssra0149","category":"set-show-reset","sql":"SHOW enable_hashjoin","expect":"ok","ref":"sql-show","note":"SHOW enable_hashjoin"}
+{"id":"ssra0150","category":"set-show-reset","sql":"SET enable_parallel_hash TO on","expect":"ok","ref":"sql-set","note":"SET enable_parallel_hash on"}
+{"id":"ssra0151","category":"set-show-reset","sql":"SET session work_mem = '64MB'","expect":"ok","ref":"sql-set","note":"SET SESSION keyword lowercase works - session is keyword modifier not GUC name"}
+{"id":"ssra0152","category":"set-show-reset","sql":"SET","expect":"error","ref":"sql-set","note":"SET with no parameter name"}
+{"id":"ssra0153","category":"set-show-reset","sql":"SET work_mem","expect":"error","ref":"sql-set","note":"SET param with no = or TO or value"}
+{"id":"ssra0154","category":"set-show-reset","sql":"SET work_mem TO","expect":"error","ref":"sql-set","note":"SET param TO with no value"}
+{"id":"ssra0155","category":"set-show-reset","sql":"SET work_mem =","expect":"error","ref":"sql-set","note":"SET param = with no value"}
+{"id":"ssra0156","category":"set-show-reset","sql":"SET LOCAL LOCAL work_mem TO '64MB'","expect":"error","ref":"sql-set","note":"double LOCAL keyword"}
+{"id":"ssra0157","category":"set-show-reset","sql":"SET SESSION SESSION work_mem TO '64MB'","expect":"error","ref":"sql-set","note":"double SESSION keyword"}
+{"id":"ssra0158","category":"set-show-reset","sql":"SHOW","expect":"error","ref":"sql-show","note":"SHOW with no parameter"}
+{"id":"ssra0159","category":"set-show-reset","sql":"SHOW work_mem = '64MB'","expect":"error","ref":"sql-show","note":"SHOW with assignment is syntax error"}
+{"id":"ssra0160","category":"set-show-reset","sql":"SHOW work_mem TO '64MB'","expect":"error","ref":"sql-show","note":"SHOW with TO clause is syntax error"}
+{"id":"ssra0161","category":"set-show-reset","sql":"RESET","expect":"error","ref":"sql-reset","note":"RESET with no parameter name"}
+{"id":"ssra0162","category":"set-show-reset","sql":"RESET work_mem = DEFAULT","expect":"error","ref":"sql-reset","note":"RESET with assignment is syntax error"}
+{"id":"ssra0163","category":"set-show-reset","sql":"SET TIME ZONE","expect":"error","ref":"sql-set","note":"SET TIME ZONE with no value"}
+{"id":"ssra0164","category":"set-show-reset","sql":"SET TIME ZONE TO 'UTC'","expect":"error","ref":"sql-set","note":"SET TIME ZONE TO is invalid - no TO keyword for TIME ZONE"}
+{"id":"ssra0165","category":"set-show-reset","sql":"SET TIMEZONE TO 'UTC'","expect":"ok","ref":"sql-set","note":"SET TIMEZONE (as single word param) with TO"}
+{"id":"ssra0166","category":"set-show-reset","sql":"SET TIME TO '12:00'","expect":"error","ref":"sql-set","note":"SET TIME (not TIME ZONE) is invalid"}
+{"id":"ssra0167","category":"set-show-reset","sql":"SET = '64MB'","expect":"error","ref":"sql-set","note":"SET with missing param name before ="}
+{"id":"ssra0168","category":"set-show-reset","sql":"SET TO '64MB'","expect":"error","ref":"sql-set","note":"SET with missing param name before TO"}
+{"id":"ssra0169","category":"set-show-reset","sql":"SET work_mem TO '64MB', '128MB'","expect":"error","ref":"sql-set","note":"SET with comma-separated values for non-list param semantic error"}
+{"id":"ssra0170","category":"set-show-reset","sql":"SET server_version TO '18.0'","expect":"error","ref":"sql-set","note":"SET read-only GUC is error"}
+{"id":"ssra0171","category":"set-show-reset","sql":"SET NAMES TO 'UTF8'","expect":"error","ref":"sql-set","note":"SET NAMES does not use TO keyword"}
+{"id":"ssra0172","category":"set-show-reset","sql":"SET SCHEMA TO 'public'","expect":"error","ref":"sql-set","note":"SET SCHEMA does not use TO keyword"}
+{"id":"ssra0173","category":"set-show-reset","sql":"SET search_path TO s public","expect":"error","ref":"sql-set","note":"SET search_path missing comma between values is syntax error"}
+{"id":"ssra0174","category":"set-show-reset","sql":"SET work_mem TO ON","expect":"error","ref":"sql-set","note":"SET numeric param to boolean ON is error"}
+{"id":"ssra0175","category":"set-show-reset","sql":"SET LOCAL SESSION work_mem TO '64MB'","expect":"error","ref":"sql-set","note":"LOCAL followed by SESSION is syntax error"}
+{"id":"ssra0176","category":"set-show-reset","sql":"RESET TIME ZONE","expect":"ok","ref":"sql-reset","note":"RESET TIME ZONE two-word param form"}
+{"id":"ssra0177","category":"set-show-reset","sql":"SET work_mem DEFAULT","expect":"error","ref":"sql-set","note":"SET param DEFAULT without TO or = is syntax error"}
+{"id":"ssra0178","category":"set-show-reset","sql":"SET datestyle TO 'INVALID_STYLE'","expect":"error","ref":"sql-set","note":"SET datestyle invalid value semantic error"}
+{"id":"ssra0179","category":"set-show-reset","sql":"SET work_mem TO '64MB' '128MB'","expect":"error","ref":"sql-set","note":"SET with two adjacent string values no comma is syntax error"}
+{"id":"ssra0180","category":"set-show-reset","sql":"SET nonexistent_guc_param TO 'value'","expect":"error","ref":"sql-set","note":"SET unrecognized GUC name is error"}
+{"id":"ssra0181","category":"set-show-reset","sql":"SET intervalstyle TO 'invalid_style'","expect":"error","ref":"sql-set","note":"SET intervalstyle invalid value semantic error"}
+{"id":"ssra0182","category":"set-show-reset","sql":"SHOW ALL ALL","expect":"error","ref":"sql-show","note":"SHOW ALL ALL double keyword syntax error"}
+{"id":"ssra0183","category":"set-show-reset","sql":"SET work_mem TO 'not_a_memory_size'","expect":"error","ref":"sql-set","note":"SET memory param to non-memory string is error"}
+{"id":"ssra0184","category":"set-show-reset","sql":"SET TIME ZONE INTERVAL","expect":"error","ref":"sql-set","note":"SET TIME ZONE INTERVAL with no interval value is syntax error"}
+{"id":"ssra0185","category":"set-show-reset","sql":"SET TIME ZONE 'bad/timezone/name'","expect":"error","ref":"sql-set","note":"SET TIME ZONE invalid timezone name is error"}
+{"id":"ssra0186","category":"set-show-reset","sql":"RESET LOCAL work_mem","expect":"error","ref":"sql-reset","note":"RESET LOCAL is syntax error - RESET takes no scope modifier"}
+{"id":"ssra0187","category":"set-show-reset","sql":"RESET SESSION work_mem","expect":"error","ref":"sql-reset","note":"RESET SESSION is syntax error - RESET takes no scope modifier"}
+{"id":"ssra0188","category":"set-show-reset","sql":"SET seed TO 2.0","expect":"error","ref":"sql-set","note":"SET seed out of range above 1 is error"}
+{"id":"ssra0189","category":"set-show-reset","sql":"SET seed TO -2.0","expect":"error","ref":"sql-set","note":"SET seed out of range below -1 is error"}
+{"id":"ssra0190","category":"set-show-reset","sql":"SET max_connections TO 200","expect":"error","ref":"sql-set","note":"SET postmaster-only GUC requires server restart"}
+{"id":"ssra0191","category":"set-show-reset","sql":"SET client_encoding TO 'NOSUCHENCODING'","expect":"error","ref":"sql-set","note":"SET client_encoding to unknown encoding name is error"}
+{"id":"ssra0192","category":"set-show-reset","sql":"SET transaction_isolation TO 'dirty read'","expect":"error","ref":"sql-set","note":"SET transaction_isolation invalid level is error"}
+{"id":"ssra0193","category":"set-show-reset","sql":"SET enable_seqscan TO yes","expect":"ok","ref":"sql-set","note":"SET boolean param to yes keyword"}
+{"id":"ssra0194","category":"set-show-reset","sql":"SET enable_seqscan TO no","expect":"ok","ref":"sql-set","note":"SET boolean param to no keyword"}
+{"id":"ssra0195","category":"set-show-reset","sql":"SET enable_seqscan TO 1","expect":"ok","ref":"sql-set","note":"SET boolean param to integer 1"}
+{"id":"ssra0196","category":"set-show-reset","sql":"SET enable_seqscan TO 0","expect":"ok","ref":"sql-set","note":"SET boolean param to integer 0"}
+{"id":"ssra0197","category":"set-show-reset","sql":"SET xmlbinary TO 'invalid'","expect":"error","ref":"sql-set","note":"SET xmlbinary invalid value is error"}
+{"id":"ssra0198","category":"set-show-reset","sql":"SET lc_messages TO 'not_a_real_locale'","expect":"error","ref":"sql-set","note":"SET lc_messages to invalid locale is error"}
+{"id":"ssra0199","category":"set-show-reset","sql":"SET geqo_threshold TO -1","expect":"error","ref":"sql-set","note":"SET geqo_threshold below minimum is error"}
+{"id":"ssra0200","category":"set-show-reset","sql":"SET SESSION AUTHORIZATION 'invalid_user_that_does_not_exist'","expect":"error","ref":"sql-set","note":"SET SESSION AUTHORIZATION to non-existent role is error"}
+{"id":"ssra0201","category":"set-show-reset","sql":"SET ROLE 'invalid_role_xyz'","expect":"error","ref":"sql-set","note":"SET ROLE to non-existent role is error"}
+{"id":"ssra0202","category":"set-show-reset","sql":"SHOW ALL; SET work_mem TO '64MB'","expect":"ok","ref":"sql-show","note":"SHOW ALL followed by SET in same txn"}
+{"id":"ssra0203","category":"set-show-reset","sql":"SET transaction_deferrable TO on","expect":"ok","ref":"sql-set","note":"SET transaction_deferrable on"}
+{"id":"ssra0204","category":"set-show-reset","sql":"SET LOCAL SESSION AUTHORIZATION DEFAULT","expect":"ok","ref":"sql-set","note":"SET LOCAL SESSION AUTHORIZATION DEFAULT is valid"}
+{"id":"ssra0205","category":"set-show-reset","sql":"SET xmloption TO 'invalid_xmloption'","expect":"error","ref":"sql-set","note":"SET xmloption invalid value is error"}

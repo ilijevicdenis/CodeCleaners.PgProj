@@ -1,0 +1,170 @@
+{"id":"xmla0001","category":"xml","sql":"SELECT xmlelement(NAME foo)","expect":"ok","ref":"functions-xml","note":"xmlelement simplest form, no content"}
+{"id":"xmla0002","category":"xml","sql":"SELECT xmlelement(NAME foo, 'bar')","expect":"ok","ref":"functions-xml","note":"xmlelement with text content"}
+{"id":"xmla0003","category":"xml","sql":"SELECT xmlelement(NAME foo, 42)","expect":"ok","ref":"functions-xml","note":"xmlelement with integer content"}
+{"id":"xmla0004","category":"xml","sql":"SELECT xmlelement(NAME foo, xmlelement(NAME bar, 'baz'))","expect":"ok","ref":"functions-xml","note":"nested xmlelement"}
+{"id":"xmla0005","category":"xml","sql":"SELECT xmlelement(NAME foo, xmlattributes('v' AS a))","expect":"ok","ref":"functions-xml","note":"xmlelement with one xmlattribute"}
+{"id":"xmla0006","category":"xml","sql":"SELECT xmlelement(NAME foo, xmlattributes(1 AS n, 'x' AS val))","expect":"ok","ref":"functions-xml","note":"xmlelement with two xmlattributes"}
+{"id":"xmla0007","category":"xml","sql":"SELECT xmlelement(NAME foo, xmlattributes('a' AS x, 'b' AS y), 'content')","expect":"ok","ref":"functions-xml","note":"xmlelement with attributes and content"}
+{"id":"xmla0008","category":"xml","sql":"SELECT xmlelement(NAME foo, xmlattributes(name AS n), name) FROM s.t LIMIT 1","expect":"ok","ref":"functions-xml","note":"xmlelement referencing table column, column name as default attribute name"}
+{"id":"xmla0009","category":"xml","sql":"SELECT xmlelement(NAME row, xmlattributes(id AS id, name AS nm), val) FROM s.t LIMIT 1","expect":"ok","ref":"functions-xml","note":"xmlelement multiple attributes from columns"}
+{"id":"xmla0010","category":"xml","sql":"SELECT xmlelement(NAME \"my-element\", 'hi')","expect":"ok","ref":"functions-xml","note":"xmlelement with quoted name containing hyphen"}
+{"id":"xmla0011","category":"xml","sql":"SELECT xmlelement(NAME foo, NULL::text)","expect":"ok","ref":"functions-xml","note":"xmlelement with NULL content (omitted)"}
+{"id":"xmla0012","category":"xml","sql":"SELECT xmlelement(NAME foo, xmlattributes(NULL AS a))","expect":"ok","ref":"functions-xml","note":"xmlelement with NULL attribute value (attribute omitted)"}
+{"id":"xmla0013","category":"xml","sql":"SELECT xmlelement(NAME foo, 'a', 'b', 'c')","expect":"ok","ref":"functions-xml","note":"xmlelement with multiple content items"}
+{"id":"xmla0014","category":"xml","sql":"SELECT xmlelement(NAME foo, 1.5::numeric)","expect":"ok","ref":"functions-xml","note":"xmlelement with numeric content"}
+{"id":"xmla0015","category":"xml","sql":"SELECT xmlelement(NAME foo, true::boolean)","expect":"ok","ref":"functions-xml","note":"xmlelement with boolean content"}
+{"id":"xmla0016","category":"xml","sql":"SELECT xmlelement('foo')","expect":"error","ref":"functions-xml","note":"xmlelement missing NAME keyword - syntax error"}
+{"id":"xmla0017","category":"xml","sql":"SELECT xmlelement(NAME)","expect":"error","ref":"functions-xml","note":"xmlelement NAME without identifier - syntax error"}
+{"id":"xmla0018","category":"xml","sql":"SELECT xmlelement(NAME foo, xmlattributes('constant'))","expect":"error","ref":"functions-xml","note":"xmlattributes with constant but no AS alias - semantic error"}
+{"id":"xmla0019","category":"xml","sql":"SELECT xmlelement(NAME foo, xmlattributes())","expect":"error","ref":"functions-xml","note":"xmlattributes with empty list - syntax error"}
+{"id":"xmla0020","category":"xml","sql":"SELECT xmlforest('hello' AS greeting)","expect":"ok","ref":"functions-xml","note":"xmlforest simple single element"}
+{"id":"xmla0021","category":"xml","sql":"SELECT xmlforest(1 AS a, 2 AS b, 3 AS c)","expect":"ok","ref":"functions-xml","note":"xmlforest multiple elements"}
+{"id":"xmla0022","category":"xml","sql":"SELECT xmlforest(name, val, qty) FROM s.t LIMIT 1","expect":"ok","ref":"functions-xml","note":"xmlforest with column references, implicit names"}
+{"id":"xmla0023","category":"xml","sql":"SELECT xmlforest(name AS nm, val AS value) FROM s.t LIMIT 1","expect":"ok","ref":"functions-xml","note":"xmlforest with explicit aliases"}
+{"id":"xmla0024","category":"xml","sql":"SELECT xmlforest(NULL::text AS missing)","expect":"ok","ref":"functions-xml","note":"xmlforest with NULL value (element omitted)"}
+{"id":"xmla0025","category":"xml","sql":"SELECT xmlforest(id AS id, name AS name, created_at AS ts) FROM s.t LIMIT 1","expect":"ok","ref":"functions-xml","note":"xmlforest with timestamptz column"}
+{"id":"xmla0026","category":"xml","sql":"SELECT xmlforest()","expect":"error","ref":"functions-xml","note":"xmlforest with empty list - syntax error"}
+{"id":"xmla0027","category":"xml","sql":"SELECT xmlforest('hi')","expect":"error","ref":"functions-xml","note":"xmlforest constant without AS alias - semantic error"}
+{"id":"xmla0028","category":"xml","sql":"SELECT xmlconcat(xmlelement(NAME a, 'x'), xmlelement(NAME b, 'y'))","expect":"ok","ref":"functions-xml","note":"xmlconcat of two xmlelement values"}
+{"id":"xmla0029","category":"xml","sql":"SELECT xmlconcat(xmlelement(NAME a), xmlelement(NAME b), xmlelement(NAME c))","expect":"ok","ref":"functions-xml","note":"xmlconcat of three elements"}
+{"id":"xmla0030","category":"xml","sql":"SELECT xmlconcat(NULL::xml, xmlelement(NAME a))","expect":"ok","ref":"functions-xml","note":"xmlconcat with NULL argument (NULL omitted)"}
+{"id":"xmla0031","category":"xml","sql":"SELECT xmlconcat(NULL::xml, NULL::xml)","expect":"ok","ref":"functions-xml","note":"xmlconcat all NULL returns NULL"}
+{"id":"xmla0032","category":"xml","sql":"SELECT xmlconcat(xmlelement(NAME x, 1), xmlelement(NAME y, 2))","expect":"ok","ref":"functions-xml","note":"xmlconcat with integer content elements"}
+{"id":"xmla0033","category":"xml","sql":"SELECT xmlconcat(xmlelement(NAME p, 'a'), xmlelement(NAME p, 'b'))","expect":"ok","ref":"functions-xml","note":"xmlconcat same element name twice"}
+{"id":"xmla0034","category":"xml","sql":"SELECT xmlconcat()","expect":"error","ref":"functions-xml","note":"xmlconcat with no arguments - syntax error"}
+{"id":"xmla0035","category":"xml","sql":"SELECT xmlpi(NAME foo)","expect":"ok","ref":"functions-xml","note":"xmlpi without content"}
+{"id":"xmla0036","category":"xml","sql":"SELECT xmlpi(NAME foo, 'bar=1')","expect":"ok","ref":"functions-xml","note":"xmlpi with content string"}
+{"id":"xmla0037","category":"xml","sql":"SELECT xmlpi(NAME php, 'echo 1;')","expect":"ok","ref":"functions-xml","note":"xmlpi php-style processing instruction"}
+{"id":"xmla0038","category":"xml","sql":"SELECT xmlpi(NAME xml, 'version=\"1.0\"')","expect":"error","ref":"functions-xml","note":"xmlpi with reserved name 'xml' - error"}
+{"id":"xmla0039","category":"xml","sql":"SELECT xmlpi(NAME foo, 'contains ?> inside')","expect":"error","ref":"functions-xml","note":"xmlpi content containing ?> - error"}
+{"id":"xmla0040","category":"xml","sql":"SELECT xmlpi('foo')","expect":"error","ref":"functions-xml","note":"xmlpi missing NAME keyword - syntax error"}
+{"id":"xmla0041","category":"xml","sql":"SELECT xmlpi(NAME)","expect":"error","ref":"functions-xml","note":"xmlpi NAME without identifier - syntax error"}
+{"id":"xmla0042","category":"xml","sql":"SELECT xmlcomment('hello world')","expect":"ok","ref":"functions-xml","note":"xmlcomment basic usage"}
+{"id":"xmla0043","category":"xml","sql":"SELECT xmlcomment('no dashes here')","expect":"ok","ref":"functions-xml","note":"xmlcomment without double-dash"}
+{"id":"xmla0044","category":"xml","sql":"SELECT xmlcomment('')","expect":"ok","ref":"functions-xml","note":"xmlcomment empty string"}
+{"id":"xmla0045","category":"xml","sql":"SELECT xmlcomment(NULL)","expect":"ok","ref":"functions-xml","note":"xmlcomment with NULL returns NULL"}
+{"id":"xmla0046","category":"xml","sql":"SELECT xmlcomment('has -- double dash')","expect":"error","ref":"functions-xml","note":"xmlcomment with -- sequence - error"}
+{"id":"xmla0047","category":"xml","sql":"SELECT xmlcomment('ends with dash-')","expect":"error","ref":"functions-xml","note":"xmlcomment ending with dash - error"}
+{"id":"xmla0048","category":"xml","sql":"SELECT xmlroot(xmlelement(NAME doc, 'hi'), VERSION '1.0')","expect":"ok","ref":"functions-xml","note":"xmlroot with version string"}
+{"id":"xmla0049","category":"xml","sql":"SELECT xmlroot(xmlelement(NAME doc, 'x'), VERSION '1.0', STANDALONE YES)","expect":"ok","ref":"functions-xml","note":"xmlroot with version and standalone yes"}
+{"id":"xmla0050","category":"xml","sql":"SELECT xmlroot(xmlelement(NAME doc, 'x'), VERSION '1.0', STANDALONE NO)","expect":"ok","ref":"functions-xml","note":"xmlroot with version and standalone no"}
+{"id":"xmla0051","category":"xml","sql":"SELECT xmlroot(xmlelement(NAME doc, 'x'), VERSION '1.0', STANDALONE NO VALUE)","expect":"ok","ref":"functions-xml","note":"xmlroot with version and standalone omit (NO VALUE)"}
+{"id":"xmla0052","category":"xml","sql":"SELECT xmlroot(xmlelement(NAME doc), VERSION NO VALUE)","expect":"ok","ref":"functions-xml","note":"xmlroot removing version with NO VALUE"}
+{"id":"xmla0053","category":"xml","sql":"SELECT xmlroot(xmlelement(NAME doc), VERSION NO VALUE, STANDALONE YES)","expect":"ok","ref":"functions-xml","note":"xmlroot standalone yes with VERSION NO VALUE"}
+{"id":"xmla0054","category":"xml","sql":"SELECT xmlroot(xmlelement(NAME doc), VERSION NO VALUE, STANDALONE NO)","expect":"ok","ref":"functions-xml","note":"xmlroot standalone no with VERSION NO VALUE"}
+{"id":"xmla0055","category":"xml","sql":"SELECT xmlroot(xmlelement(NAME doc))","expect":"error","ref":"functions-xml","note":"xmlroot with no options - syntax error"}
+{"id":"xmla0056","category":"xml","sql":"SELECT xmlroot('bad')","expect":"error","ref":"functions-xml","note":"xmlroot with text argument, no option - syntax error"}
+{"id":"xmla0057","category":"xml","sql":"SELECT xmlparse(DOCUMENT '<foo>bar</foo>')","expect":"ok","ref":"functions-xml","note":"xmlparse DOCUMENT mode"}
+{"id":"xmla0058","category":"xml","sql":"SELECT xmlparse(CONTENT '<a>1</a><b>2</b>')","expect":"ok","ref":"functions-xml","note":"xmlparse CONTENT mode (fragment)"}
+{"id":"xmla0059","category":"xml","sql":"SELECT xmlparse(DOCUMENT '<?xml version=\"1.0\"?><root/>')","expect":"ok","ref":"functions-xml","note":"xmlparse DOCUMENT with XML declaration"}
+{"id":"xmla0060","category":"xml","sql":"SELECT xmlparse(CONTENT 'hello &amp; world')","expect":"ok","ref":"functions-xml","note":"xmlparse CONTENT with entity reference"}
+{"id":"xmla0061","category":"xml","sql":"SELECT xmlparse(DOCUMENT '<root><child/></root>')","expect":"ok","ref":"functions-xml","note":"xmlparse DOCUMENT with nested elements"}
+{"id":"xmla0062","category":"xml","sql":"SELECT xmlparse(DOCUMENT '<unclosed>')","expect":"error","ref":"functions-xml","note":"xmlparse DOCUMENT with unclosed tag - error"}
+{"id":"xmla0063","category":"xml","sql":"SELECT xmlparse(CONTENT '<a>1</a><b>2</b')","expect":"error","ref":"functions-xml","note":"xmlparse CONTENT malformed XML - error"}
+{"id":"xmla0064","category":"xml","sql":"SELECT xmlparse('<root/>')","expect":"error","ref":"functions-xml","note":"xmlparse without DOCUMENT/CONTENT keyword - syntax error"}
+{"id":"xmla0065","category":"xml","sql":"SELECT xmlparse(DOCUMENT)","expect":"error","ref":"functions-xml","note":"xmlparse DOCUMENT without value - syntax error"}
+{"id":"xmla0066","category":"xml","sql":"SELECT xmlparse(DOCUMENT NULL)","expect":"ok","ref":"functions-xml","note":"xmlparse DOCUMENT NULL returns NULL"}
+{"id":"xmla0067","category":"xml","sql":"SELECT xmlserialize(DOCUMENT xmlparse(DOCUMENT '<root/>') AS text)","expect":"ok","ref":"functions-xml","note":"xmlserialize DOCUMENT as text"}
+{"id":"xmla0068","category":"xml","sql":"SELECT xmlserialize(CONTENT xmlparse(CONTENT '<a/><b/>') AS text)","expect":"ok","ref":"functions-xml","note":"xmlserialize CONTENT as text"}
+{"id":"xmla0069","category":"xml","sql":"SELECT xmlserialize(DOCUMENT xmlparse(DOCUMENT '<root/>') AS varchar(100))","expect":"ok","ref":"functions-xml","note":"xmlserialize DOCUMENT as varchar"}
+{"id":"xmla0070","category":"xml","sql":"SELECT xmlserialize(CONTENT xmlelement(NAME x, 1) AS character varying)","expect":"ok","ref":"functions-xml","note":"xmlserialize CONTENT as character varying"}
+{"id":"xmla0071","category":"xml","sql":"SELECT xmlserialize(DOCUMENT xmlelement(NAME root) AS xml)","expect":"error","ref":"functions-xml","note":"xmlserialize target type xml not allowed - error"}
+{"id":"xmla0072","category":"xml","sql":"SELECT xmlserialize(xmlelement(NAME root) AS text)","expect":"error","ref":"functions-xml","note":"xmlserialize without DOCUMENT/CONTENT keyword - syntax error"}
+{"id":"xmla0073","category":"xml","sql":"SELECT xmlserialize(DOCUMENT xmlparse(DOCUMENT '<r/>') AS clob)","expect":"error","ref":"functions-xml","note":"xmlserialize with nonexistent type clob - error"}
+{"id":"xmla0074","category":"xml","sql":"SELECT xpath('/root/child', xmlparse(DOCUMENT '<root><child>val</child></root>'))","expect":"ok","ref":"functions-xml","note":"xpath basic path expression"}
+{"id":"xmla0075","category":"xml","sql":"SELECT xpath('/root/@attr', xmlparse(DOCUMENT '<root attr=\"v\"/>'))","expect":"ok","ref":"functions-xml","note":"xpath attribute selection"}
+{"id":"xmla0076","category":"xml","sql":"SELECT xpath('//item', xmlparse(DOCUMENT '<list><item>a</item><item>b</item></list>'))","expect":"ok","ref":"functions-xml","note":"xpath descendant axis"}
+{"id":"xmla0077","category":"xml","sql":"SELECT xpath('/root/child/text()', xmlparse(DOCUMENT '<root><child>val</child></root>'))","expect":"ok","ref":"functions-xml","note":"xpath text() node test"}
+{"id":"xmla0078","category":"xml","sql":"SELECT xpath('count(//item)', xmlparse(DOCUMENT '<list><item/><item/></list>'))","expect":"ok","ref":"functions-xml","note":"xpath count function returns scalar"}
+{"id":"xmla0079","category":"xml","sql":"SELECT xpath('/root', xmlparse(DOCUMENT '<root/>'), ARRAY[ARRAY['ns','http://example.com']])","expect":"ok","ref":"functions-xml","note":"xpath with namespace array"}
+{"id":"xmla0080","category":"xml","sql":"SELECT xpath('//ns:el', xmlparse(DOCUMENT '<root xmlns:ns=\"http://x.com\"><ns:el/></root>'), ARRAY[ARRAY['ns','http://x.com']])","expect":"ok","ref":"functions-xml","note":"xpath with namespace prefix mapping"}
+{"id":"xmla0081","category":"xml","sql":"SELECT xpath('/root', 'not xml')","expect":"error","ref":"functions-xml","note":"xpath with non-xml second argument - error"}
+{"id":"xmla0082","category":"xml","sql":"SELECT xpath('/root', xmlparse(DOCUMENT '<root/>'), ARRAY['ns','http://x.com'])","expect":"error","ref":"functions-xml","note":"xpath with 1D namespace array (must be 2D) - error"}
+{"id":"xmla0083","category":"xml","sql":"SELECT xpath_exists('/root', xmlparse(DOCUMENT '<root/>'))","expect":"ok","ref":"functions-xml","note":"xpath_exists matching path"}
+{"id":"xmla0084","category":"xml","sql":"SELECT xpath_exists('/missing', xmlparse(DOCUMENT '<root/>'))","expect":"ok","ref":"functions-xml","note":"xpath_exists non-matching path returns false"}
+{"id":"xmla0085","category":"xml","sql":"SELECT xpath_exists('//item', xmlparse(DOCUMENT '<list><item/></list>'))","expect":"ok","ref":"functions-xml","note":"xpath_exists descendant axis"}
+{"id":"xmla0086","category":"xml","sql":"SELECT xpath_exists('/root', xmlparse(DOCUMENT '<root/>'), ARRAY[ARRAY['ns','http://example.com']])","expect":"ok","ref":"functions-xml","note":"xpath_exists with namespace array"}
+{"id":"xmla0087","category":"xml","sql":"SELECT xpath_exists('/r', 'bad xml')","expect":"error","ref":"functions-xml","note":"xpath_exists with non-xml argument - error"}
+{"id":"xmla0088","category":"xml","sql":"SELECT xmlelement(NAME doc, 'hi') IS DOCUMENT","expect":"ok","ref":"functions-xml","note":"IS DOCUMENT predicate on xmlelement - false (fragment)"}
+{"id":"xmla0089","category":"xml","sql":"SELECT xmlparse(DOCUMENT '<root/>') IS DOCUMENT","expect":"ok","ref":"functions-xml","note":"IS DOCUMENT predicate on parsed document - true"}
+{"id":"xmla0090","category":"xml","sql":"SELECT xmlparse(CONTENT '<a/><b/>') IS DOCUMENT","expect":"ok","ref":"functions-xml","note":"IS DOCUMENT on content fragment - false"}
+{"id":"xmla0091","category":"xml","sql":"SELECT NULL::xml IS DOCUMENT","expect":"ok","ref":"functions-xml","note":"IS DOCUMENT on NULL returns NULL"}
+{"id":"xmla0092","category":"xml","sql":"SELECT xmlparse(DOCUMENT '<root/>') IS NOT DOCUMENT","expect":"ok","ref":"functions-xml","note":"IS NOT DOCUMENT on well-formed document - false"}
+{"id":"xmla0093","category":"xml","sql":"SELECT xmlparse(CONTENT '<a/><b/>') IS NOT DOCUMENT","expect":"ok","ref":"functions-xml","note":"IS NOT DOCUMENT on fragment - true"}
+{"id":"xmla0094","category":"xml","sql":"SELECT 42 IS DOCUMENT","expect":"error","ref":"functions-xml","note":"IS DOCUMENT on integer (no implicit cast to xml) - error"}
+{"id":"xmla0095","category":"xml","sql":"SELECT table_to_xml('s.t'::regclass, false, false, '')","expect":"ok","ref":"functions-xml","note":"table_to_xml basic call, nulls false, tableforest false"}
+{"id":"xmla0096","category":"xml","sql":"SELECT table_to_xml('s.t'::regclass, true, false, '')","expect":"ok","ref":"functions-xml","note":"table_to_xml with nulls=true"}
+{"id":"xmla0097","category":"xml","sql":"SELECT table_to_xml('s.t'::regclass, false, true, '')","expect":"ok","ref":"functions-xml","note":"table_to_xml with tableforest=true"}
+{"id":"xmla0098","category":"xml","sql":"SELECT table_to_xml('s.t'::regclass, true, true, 'http://example.com')","expect":"ok","ref":"functions-xml","note":"table_to_xml with all options set"}
+{"id":"xmla0099","category":"xml","sql":"SELECT table_to_xml('s.t2'::regclass, false, false, '')","expect":"ok","ref":"functions-xml","note":"table_to_xml on s.t2"}
+{"id":"xmla0100","category":"xml","sql":"SELECT table_to_xmlschema('s.t'::regclass, false, false, '')","expect":"ok","ref":"functions-xml","note":"table_to_xmlschema basic call"}
+{"id":"xmla0101","category":"xml","sql":"SELECT table_to_xml_and_xmlschema('s.t'::regclass, false, false, '')","expect":"ok","ref":"functions-xml","note":"table_to_xml_and_xmlschema combined output"}
+{"id":"xmla0102","category":"xml","sql":"SELECT query_to_xml('SELECT id, name FROM s.t', false, false, '')","expect":"ok","ref":"functions-xml","note":"query_to_xml basic usage"}
+{"id":"xmla0103","category":"xml","sql":"SELECT query_to_xml('SELECT id, name FROM s.t', true, true, 'http://ns.example.com')","expect":"ok","ref":"functions-xml","note":"query_to_xml with nulls and tableforest"}
+{"id":"xmla0104","category":"xml","sql":"SELECT schema_to_xml('s', false, false, '')","expect":"ok","ref":"functions-xml","note":"schema_to_xml for schema s"}
+{"id":"xmla0105","category":"xml","sql":"SELECT schema_to_xmlschema('s', false, false, '')","expect":"ok","ref":"functions-xml","note":"schema_to_xmlschema for schema s"}
+{"id":"xmla0106","category":"xml","sql":"SELECT xmlagg(xmlelement(NAME item, name)) FROM s.t","expect":"ok","ref":"functions-xml","note":"xmlagg basic aggregate"}
+{"id":"xmla0107","category":"xml","sql":"SELECT xmlagg(xmlelement(NAME row, id)) FROM s.t","expect":"ok","ref":"functions-xml","note":"xmlagg over integer column"}
+{"id":"xmla0108","category":"xml","sql":"SELECT xmlagg(xmlelement(NAME item, name) ORDER BY name) FROM s.t","expect":"ok","ref":"functions-xml","note":"xmlagg with ORDER BY"}
+{"id":"xmla0109","category":"xml","sql":"SELECT xmlagg(xmlelement(NAME item, name) ORDER BY name DESC) FROM s.t","expect":"ok","ref":"functions-xml","note":"xmlagg with ORDER BY DESC"}
+{"id":"xmla0110","category":"xml","sql":"SELECT xmlagg(xmlelement(NAME r, id, name) ORDER BY id ASC) FROM s.t","expect":"ok","ref":"functions-xml","note":"xmlagg with ORDER BY ASC explicit"}
+{"id":"xmla0111","category":"xml","sql":"SELECT xmlagg(xmlelement(NAME r, name) ORDER BY id, name) FROM s.t","expect":"ok","ref":"functions-xml","note":"xmlagg with multi-column ORDER BY"}
+{"id":"xmla0112","category":"xml","sql":"SELECT xmlagg(xmlelement(NAME item, name)) FILTER (WHERE val > 0) FROM s.t","expect":"ok","ref":"functions-xml","note":"xmlagg with FILTER clause"}
+{"id":"xmla0113","category":"xml","sql":"SELECT xmlelement(NAME root, xmlagg(xmlelement(NAME r, name))) FROM s.t","expect":"ok","ref":"functions-xml","note":"xmlagg nested inside xmlelement"}
+{"id":"xmla0114","category":"xml","sql":"SELECT * FROM xmltable('/rows/row' PASSING xmlparse(DOCUMENT '<rows><row><a>1</a></row><row><a>2</a></row></rows>') COLUMNS a text PATH 'a')","expect":"ok","ref":"functions-xml","note":"xmltable basic usage with PATH"}
+{"id":"xmla0115","category":"xml","sql":"SELECT * FROM xmltable('/root/item' PASSING xmlparse(DOCUMENT '<root><item><id>1</id><val>x</val></item></root>') COLUMNS id int PATH 'id', val text PATH 'val')","expect":"ok","ref":"functions-xml","note":"xmltable multiple columns"}
+{"id":"xmla0116","category":"xml","sql":"SELECT * FROM xmltable('/rows/row' PASSING xmlparse(DOCUMENT '<rows><row><n>1</n></row></rows>') COLUMNS rn FOR ORDINALITY, n int PATH 'n')","expect":"ok","ref":"functions-xml","note":"xmltable with FOR ORDINALITY column"}
+{"id":"xmla0117","category":"xml","sql":"SELECT * FROM xmltable('/rows/row' PASSING xmlparse(DOCUMENT '<rows><row/></rows>') COLUMNS x text PATH 'x' DEFAULT 'missing')","expect":"ok","ref":"functions-xml","note":"xmltable with DEFAULT for missing element"}
+{"id":"xmla0118","category":"xml","sql":"SELECT * FROM xmltable('/rows/row' PASSING xmlparse(DOCUMENT '<rows><row><a>1</a></row></rows>') COLUMNS a text NOT NULL PATH 'a')","expect":"ok","ref":"functions-xml","note":"xmltable with NOT NULL column"}
+{"id":"xmla0119","category":"xml","sql":"SELECT * FROM xmltable('/rows/row' PASSING xmlparse(DOCUMENT '<rows><row><a>1</a></row></rows>') COLUMNS a text PATH 'a' NOT NULL)","expect":"ok","ref":"functions-xml","note":"xmltable NOT NULL after PATH"}
+{"id":"xmla0120","category":"xml","sql":"SELECT * FROM xmltable('//item' PASSING xmlparse(DOCUMENT '<root><item>a</item><item>b</item></root>') COLUMNS val text PATH '.')","expect":"ok","ref":"functions-xml","note":"xmltable with dot path (self)"}
+{"id":"xmla0121","category":"xml","sql":"SELECT * FROM xmltable('/r/row' PASSING xmlparse(DOCUMENT '<r><row><x>1</x><y>2</y></row></r>') COLUMNS x numeric PATH 'x', y numeric PATH 'y')","expect":"ok","ref":"functions-xml","note":"xmltable with numeric columns"}
+{"id":"xmla0122","category":"xml","sql":"SELECT * FROM xmltable(XMLNAMESPACES('http://example.com' AS ns), '/ns:root/ns:row' PASSING xmlparse(DOCUMENT '<root xmlns=\"http://example.com\"><row><v>1</v></row></root>') COLUMNS v text PATH 'v')","expect":"ok","ref":"functions-xml","note":"xmltable with XMLNAMESPACES clause (comma before row-expr)"}
+{"id":"xmla0123","category":"xml","sql":"SELECT * FROM xmltable('/rows/row' PASSING xmlparse(DOCUMENT '<rows><row/></rows>') COLUMNS a text PATH 'a' NOT NULL)","expect":"error","ref":"functions-xml","note":"xmltable NOT NULL with no value and no DEFAULT - error"}
+{"id":"xmla0124","category":"xml","sql":"SELECT * FROM xmltable('/rows/row' PASSING xmlparse(DOCUMENT '<rows><row><n>1</n></row></rows>') COLUMNS rn FOR ORDINALITY, rn2 FOR ORDINALITY, n int PATH 'n')","expect":"error","ref":"functions-xml","note":"xmltable with two FOR ORDINALITY columns - error"}
+{"id":"xmla0125","category":"xml","sql":"SELECT * FROM xmltable('/rows/row' PASSING '<rows><row/></rows>' COLUMNS a text)","expect":"ok","ref":"functions-xml","note":"xmltable with implicit column path = column name"}
+{"id":"xmla0126","category":"xml","sql":"SELECT * FROM xmltable(PASSING xmlparse(DOCUMENT '<rows><row/></rows>') COLUMNS a text)","expect":"error","ref":"functions-xml","note":"xmltable missing row expression - syntax error"}
+{"id":"xmla0127","category":"xml","sql":"SELECT * FROM xmltable('/row' PASSING xmlparse(DOCUMENT '<rows><row/></rows>') COLUMNS)","expect":"error","ref":"functions-xml","note":"xmltable empty COLUMNS list - syntax error"}
+{"id":"xmla0128","category":"xml","sql":"SELECT XMLEXISTS('/root' PASSING BY VALUE xmlparse(DOCUMENT '<root/>'))","expect":"ok","ref":"functions-xml","note":"XMLEXISTS BY VALUE clause"}
+{"id":"xmla0129","category":"xml","sql":"SELECT XMLEXISTS('/root' PASSING BY REF xmlparse(DOCUMENT '<root/>'))","expect":"ok","ref":"functions-xml","note":"XMLEXISTS BY REF clause (accepted, ignored)"}
+{"id":"xmla0130","category":"xml","sql":"SELECT XMLEXISTS('/root' PASSING xmlparse(DOCUMENT '<root/>'))","expect":"ok","ref":"functions-xml","note":"XMLEXISTS without BY clause"}
+{"id":"xmla0131","category":"xml","sql":"SELECT XMLEXISTS('//missing' PASSING xmlparse(DOCUMENT '<root/>'))","expect":"ok","ref":"functions-xml","note":"XMLEXISTS no match returns false"}
+{"id":"xmla0132","category":"xml","sql":"SELECT XMLEXISTS('//item' PASSING xmlparse(DOCUMENT '<list><item/><item/></list>'))","expect":"ok","ref":"functions-xml","note":"XMLEXISTS matching multiple nodes returns true"}
+{"id":"xmla0133","category":"xml","sql":"SELECT XMLEXISTS('/r' PASSING 'bad xml')","expect":"error","ref":"functions-xml","note":"XMLEXISTS with non-xml text argument - error"}
+{"id":"xmla0134","category":"xml","sql":"SELECT XMLEXISTS('/r' xmlparse(DOCUMENT '<r/>'))","expect":"error","ref":"functions-xml","note":"XMLEXISTS missing PASSING keyword - syntax error"}
+{"id":"xmla0135","category":"xml","sql":"SELECT xml_is_well_formed('<root/>')","expect":"ok","ref":"functions-xml","note":"xml_is_well_formed with valid XML"}
+{"id":"xmla0136","category":"xml","sql":"SELECT xml_is_well_formed('<unclosed>')","expect":"ok","ref":"functions-xml","note":"xml_is_well_formed with invalid XML returns false"}
+{"id":"xmla0137","category":"xml","sql":"SELECT xml_is_well_formed_document('<root/>')","expect":"ok","ref":"functions-xml","note":"xml_is_well_formed_document with valid document"}
+{"id":"xmla0138","category":"xml","sql":"SELECT xml_is_well_formed_document('<a/><b/>')","expect":"ok","ref":"functions-xml","note":"xml_is_well_formed_document with fragment returns false"}
+{"id":"xmla0139","category":"xml","sql":"SELECT xml_is_well_formed_content('<a/><b/>')","expect":"ok","ref":"functions-xml","note":"xml_is_well_formed_content with fragment returns true"}
+{"id":"xmla0140","category":"xml","sql":"SELECT xml_is_well_formed_content('<bad')","expect":"ok","ref":"functions-xml","note":"xml_is_well_formed_content with bad XML returns false"}
+{"id":"xmla0141","category":"xml","sql":"SELECT xml_is_well_formed(NULL)","expect":"ok","ref":"functions-xml","note":"xml_is_well_formed with NULL returns NULL"}
+{"id":"xmla0142","category":"xml","sql":"SELECT xmltext('hello & world')","expect":"ok","ref":"functions-xml","note":"xmltext with ampersand - escapes to entity"}
+{"id":"xmla0143","category":"xml","sql":"SELECT xmltext('<b>bold</b>')","expect":"ok","ref":"functions-xml","note":"xmltext with angle brackets - escaped"}
+{"id":"xmla0144","category":"xml","sql":"SELECT xmltext('')","expect":"ok","ref":"functions-xml","note":"xmltext with empty string"}
+{"id":"xmla0145","category":"xml","sql":"SELECT xmltext(NULL)","expect":"ok","ref":"functions-xml","note":"xmltext with NULL returns NULL"}
+{"id":"xmla0146","category":"xml","sql":"SELECT xmlelement(NAME foo, xmlattributes(id AS id), xmlforest(name AS n, val AS v)) FROM s.t LIMIT 1","expect":"ok","ref":"functions-xml","note":"xmlelement combining attributes and xmlforest content"}
+{"id":"xmla0147","category":"xml","sql":"SELECT xmlconcat(xmlforest(1 AS a), xmlforest(2 AS b))","expect":"ok","ref":"functions-xml","note":"xmlconcat of xmlforest results"}
+{"id":"xmla0148","category":"xml","sql":"SELECT xmlelement(NAME root, xmlcomment('comment'), xmlelement(NAME child, 'text'))","expect":"ok","ref":"functions-xml","note":"xmlelement with xmlcomment child"}
+{"id":"xmla0149","category":"xml","sql":"SELECT xmlelement(NAME root, xmlpi(NAME target, 'data'), xmlelement(NAME body, 'x'))","expect":"ok","ref":"functions-xml","note":"xmlelement with xmlpi child"}
+{"id":"xmla0150","category":"xml","sql":"SELECT xmlroot(xmlparse(DOCUMENT '<?xml version=\"1.0\"?><root/>'), VERSION '1.1', STANDALONE YES)","expect":"ok","ref":"functions-xml","note":"xmlroot overriding existing declaration"}
+{"id":"xmla0151","category":"xml","sql":"SELECT xmlserialize(DOCUMENT xmlroot(xmlelement(NAME root), VERSION '1.0') AS text)","expect":"ok","ref":"functions-xml","note":"xmlserialize of xmlroot result"}
+{"id":"xmla0152","category":"xml","sql":"SELECT (xpath('/root/child/text()', xmlparse(DOCUMENT '<root><child>hello</child></root>')))[1]","expect":"ok","ref":"functions-xml","note":"xpath result subscript access"}
+{"id":"xmla0153","category":"xml","sql":"SELECT array_length(xpath('//item', xmlparse(DOCUMENT '<list><item/><item/><item/></list>')), 1)","expect":"ok","ref":"functions-xml","note":"xpath result count via array_length"}
+{"id":"xmla0154","category":"xml","sql":"SELECT xmlelement(NAME r, id, name, val) FROM s.t ORDER BY id LIMIT 3","expect":"ok","ref":"functions-xml","note":"xmlelement in SELECT with ORDER BY and LIMIT"}
+{"id":"xmla0155","category":"xml","sql":"SELECT xmlelement(NAME root, (SELECT xmlagg(xmlelement(NAME item, name)) FROM s.t))","expect":"ok","ref":"functions-xml","note":"xmlelement with subquery xmlagg content"}
+{"id":"xmla0156","category":"xml","sql":"SELECT * FROM xmltable('/rows/row' PASSING xmlparse(DOCUMENT '<rows><row><a>1</a></row><row><a>2</a></row><row><a>3</a></row></rows>') COLUMNS rn FOR ORDINALITY, a int PATH 'a') WHERE a > 1","expect":"ok","ref":"functions-xml","note":"xmltable in FROM with WHERE filter"}
+{"id":"xmla0157","category":"xml","sql":"SELECT x.rn, x.a FROM xmltable('/rows/row' PASSING xmlparse(DOCUMENT '<rows><row><a>10</a></row></rows>') COLUMNS rn FOR ORDINALITY, a int PATH 'a') AS x","expect":"ok","ref":"functions-xml","note":"xmltable with alias and column references"}
+{"id":"xmla0158","category":"xml","sql":"SELECT xmlparse(DOCUMENT '<r xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:nil=\"true\"/>') IS DOCUMENT","expect":"ok","ref":"functions-xml","note":"IS DOCUMENT with namespace-aware document"}
+{"id":"xmla0159","category":"xml","sql":"SELECT xmlelement(NAME foo, xmlattributes('v1' AS a1, 'v2' AS a2, 'v3' AS a3), xmlelement(NAME bar, xmlattributes('x' AS bx), 'inner'))","expect":"ok","ref":"functions-xml","note":"deeply nested xmlelement with multiple attributes"}
+{"id":"xmla0160","category":"xml","sql":"SELECT xmlagg(xmlelement(NAME r, id)) OVER () FROM s.t LIMIT 1","expect":"ok","ref":"functions-xml","note":"xmlagg with empty OVER clause (window aggregate)"}
+{"id":"xmla0161","category":"xml","sql":"SELECT xmlelement(NAME root, VARIADIC ARRAY['a','b','c'])","expect":"error","ref":"functions-xml","note":"xmlelement with VARIADIC - not valid syntax"}
+{"id":"xmla0162","category":"xml","sql":"SELECT xmlparse(DOCUMENT '<root>' || '</root>')","expect":"ok","ref":"functions-xml","note":"xmlparse with concatenated string argument"}
+{"id":"xmla0163","category":"xml","sql":"SELECT xmlserialize(CONTENT xmlconcat(xmlelement(NAME a), xmlelement(NAME b)) AS text)","expect":"ok","ref":"functions-xml","note":"xmlserialize CONTENT of xmlconcat"}
+{"id":"xmla0164","category":"xml","sql":"SELECT xmlelement(NAME foo, xmlattributes(CURRENT_DATE AS today))","expect":"ok","ref":"functions-xml","note":"xmlattributes with CURRENT_DATE expression"}
+{"id":"xmla0165","category":"xml","sql":"SELECT xmlelement(NAME foo, xmlattributes(42::text AS n))","expect":"ok","ref":"functions-xml","note":"xmlattributes with cast expression"}
+{"id":"xmla0166","category":"xml","sql":"SELECT xmlelement(NAME foo, xmlattributes(s.f(1) AS result))","expect":"ok","ref":"functions-xml","note":"xmlattributes with function call - needs explicit alias"}
+{"id":"xmla0167","category":"xml","sql":"SELECT xpath('/root', xmlparse(DOCUMENT '<root/>'), ARRAY[ARRAY['a','http://a.com'],ARRAY['b','http://b.com']])","expect":"ok","ref":"functions-xml","note":"xpath with multiple namespace mappings"}
+{"id":"xmla0168","category":"xml","sql":"SELECT * FROM xmltable('/rows/row' PASSING xmlparse(DOCUMENT '<rows><row><v>hello</v></row></rows>') COLUMNS v text PATH 'v', vx xml PATH 'v')","expect":"ok","ref":"functions-xml","note":"xmltable with text and xml typed columns"}
+{"id":"xmla0169","category":"xml","sql":"SELECT xmlelement(NAME root, xmlforest(name AS n, val AS v), xmlcomment('end')) FROM s.t LIMIT 1","expect":"ok","ref":"functions-xml","note":"xmlelement mixing xmlforest and xmlcomment children"}
+{"id":"xmla0170","category":"xml","sql":"SELECT xmlserialize(DOCUMENT xmlparse(DOCUMENT '<root><child>text &amp; more</child></root>') AS text)","expect":"ok","ref":"functions-xml","note":"xmlserialize round-trip with entity references"}

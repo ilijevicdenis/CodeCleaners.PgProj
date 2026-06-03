@@ -1,0 +1,170 @@
+{"id":"txpa0001","category":"text-pattern","sql":"SELECT 'foobar' LIKE 'foo%'","expect":"ok","ref":"functions-matching","note":"LIKE with percent wildcard"}
+{"id":"txpa0002","category":"text-pattern","sql":"SELECT 'foobar' LIKE 'foo_ar'","expect":"ok","ref":"functions-matching","note":"LIKE with underscore wildcard"}
+{"id":"txpa0003","category":"text-pattern","sql":"SELECT 'foobar' NOT LIKE 'baz%'","expect":"ok","ref":"functions-matching","note":"NOT LIKE basic"}
+{"id":"txpa0004","category":"text-pattern","sql":"SELECT 'foobar' LIKE '%'","expect":"ok","ref":"functions-matching","note":"LIKE percent matches everything"}
+{"id":"txpa0005","category":"text-pattern","sql":"SELECT 'foobar' LIKE '_____'","expect":"ok","ref":"functions-matching","note":"LIKE six underscores (wrong count) still valid syntax"}
+{"id":"txpa0006","category":"text-pattern","sql":"SELECT 'foo' LIKE 'foo' ESCAPE '\\'","expect":"ok","ref":"functions-matching","note":"LIKE with explicit default escape character"}
+{"id":"txpa0007","category":"text-pattern","sql":"SELECT 'foo%bar' LIKE 'foo\\%bar' ESCAPE '\\'","expect":"ok","ref":"functions-matching","note":"LIKE escaping percent with backslash"}
+{"id":"txpa0008","category":"text-pattern","sql":"SELECT 'foo_bar' LIKE 'foo\\_bar' ESCAPE '\\'","expect":"ok","ref":"functions-matching","note":"LIKE escaping underscore with backslash"}
+{"id":"txpa0009","category":"text-pattern","sql":"SELECT 'foo%bar' LIKE 'foo!%bar' ESCAPE '!'","expect":"ok","ref":"functions-matching","note":"LIKE with custom escape character !"}
+{"id":"txpa0010","category":"text-pattern","sql":"SELECT 'foo' LIKE 'foo' ESCAPE ''","expect":"ok","ref":"functions-matching","note":"LIKE with empty escape disables escaping"}
+{"id":"txpa0011","category":"text-pattern","sql":"SELECT 'FooBar' ILIKE 'foo%'","expect":"ok","ref":"functions-matching","note":"ILIKE case-insensitive match"}
+{"id":"txpa0012","category":"text-pattern","sql":"SELECT 'FooBar' ILIKE 'FOO%'","expect":"ok","ref":"functions-matching","note":"ILIKE uppercase pattern"}
+{"id":"txpa0013","category":"text-pattern","sql":"SELECT 'FooBar' NOT ILIKE 'baz%'","expect":"ok","ref":"functions-matching","note":"NOT ILIKE basic"}
+{"id":"txpa0014","category":"text-pattern","sql":"SELECT 'FooBar' ILIKE 'foo%' ESCAPE '\\'","expect":"ok","ref":"functions-matching","note":"ILIKE with ESCAPE clause"}
+{"id":"txpa0015","category":"text-pattern","sql":"SELECT 'foobar' ~~ 'foo%'","expect":"ok","ref":"functions-matching","note":"~~ operator equivalent to LIKE"}
+{"id":"txpa0016","category":"text-pattern","sql":"SELECT 'foobar' ~~* 'FOO%'","expect":"ok","ref":"functions-matching","note":"~~* operator equivalent to ILIKE"}
+{"id":"txpa0017","category":"text-pattern","sql":"SELECT 'foobar' !~~ 'baz%'","expect":"ok","ref":"functions-matching","note":"!~~ operator equivalent to NOT LIKE"}
+{"id":"txpa0018","category":"text-pattern","sql":"SELECT 'foobar' !~~* 'BAZ%'","expect":"ok","ref":"functions-matching","note":"!~~* operator equivalent to NOT ILIKE"}
+{"id":"txpa0019","category":"text-pattern","sql":"SELECT name FROM s.t WHERE name LIKE 'A%'","expect":"ok","ref":"functions-matching","note":"LIKE in WHERE clause on table column"}
+{"id":"txpa0020","category":"text-pattern","sql":"SELECT name FROM s.t WHERE name ILIKE 'a%'","expect":"ok","ref":"functions-matching","note":"ILIKE in WHERE clause on table column"}
+{"id":"txpa0021","category":"text-pattern","sql":"SELECT 'foobar' LIKE ESCAPE '\\'","expect":"error","ref":"functions-matching","note":"LIKE missing pattern (syntax error)"}
+{"id":"txpa0022","category":"text-pattern","sql":"SELECT 'foobar' LIKE 'foo%' ESCAPE '!!'","expect":"error","ref":"functions-matching","note":"LIKE ESCAPE with multi-char string (semantic error)"}
+{"id":"txpa0023","category":"text-pattern","sql":"SELECT LIKE 'foo%'","expect":"error","ref":"functions-matching","note":"LIKE missing left operand"}
+{"id":"txpa0024","category":"text-pattern","sql":"SELECT 'foobar' SIMILAR TO 'foo%'","expect":"ok","ref":"functions-matching","note":"SIMILAR TO with percent wildcard"}
+{"id":"txpa0025","category":"text-pattern","sql":"SELECT 'foobar' SIMILAR TO 'foo(bar|baz)'","expect":"ok","ref":"functions-matching","note":"SIMILAR TO with alternation"}
+{"id":"txpa0026","category":"text-pattern","sql":"SELECT 'foobar' SIMILAR TO 'f[o]+'","expect":"ok","ref":"functions-matching","note":"SIMILAR TO with bracket expression and +"}
+{"id":"txpa0027","category":"text-pattern","sql":"SELECT 'foobar' SIMILAR TO '(foo|baz)bar'","expect":"ok","ref":"functions-matching","note":"SIMILAR TO with grouped alternation at start"}
+{"id":"txpa0028","category":"text-pattern","sql":"SELECT 'foobar' SIMILAR TO 'fo{2}bar'","expect":"ok","ref":"functions-matching","note":"SIMILAR TO with {m} quantifier"}
+{"id":"txpa0029","category":"text-pattern","sql":"SELECT 'foobar' SIMILAR TO 'fo{1,3}bar'","expect":"ok","ref":"functions-matching","note":"SIMILAR TO with {m,n} quantifier"}
+{"id":"txpa0030","category":"text-pattern","sql":"SELECT 'foobar' SIMILAR TO 'fo+bar'","expect":"ok","ref":"functions-matching","note":"SIMILAR TO with + quantifier"}
+{"id":"txpa0031","category":"text-pattern","sql":"SELECT 'fbar' SIMILAR TO 'fo?bar'","expect":"ok","ref":"functions-matching","note":"SIMILAR TO with ? quantifier"}
+{"id":"txpa0032","category":"text-pattern","sql":"SELECT 'foobar' NOT SIMILAR TO 'baz%'","expect":"ok","ref":"functions-matching","note":"NOT SIMILAR TO basic"}
+{"id":"txpa0033","category":"text-pattern","sql":"SELECT 'foo%bar' SIMILAR TO 'foo!%bar' ESCAPE '!'","expect":"ok","ref":"functions-matching","note":"SIMILAR TO with custom ESCAPE"}
+{"id":"txpa0034","category":"text-pattern","sql":"SELECT 'foobar' SIMILAR TO 'foo_bar'","expect":"ok","ref":"functions-matching","note":"SIMILAR TO with underscore wildcard"}
+{"id":"txpa0035","category":"text-pattern","sql":"SELECT 'foobar' SIMILAR TO '%'","expect":"ok","ref":"functions-matching","note":"SIMILAR TO percent matches all"}
+{"id":"txpa0036","category":"text-pattern","sql":"SELECT 'foobar' SIMILAR 'foo%'","expect":"error","ref":"functions-matching","note":"SIMILAR without TO (syntax error)"}
+{"id":"txpa0037","category":"text-pattern","sql":"SELECT 'foobar' SIMILAR TO 'foo%' ESCAPE '!!'","expect":"error","ref":"functions-matching","note":"SIMILAR TO ESCAPE with multi-char string (semantic error)"}
+{"id":"txpa0038","category":"text-pattern","sql":"SELECT 'foobar' ~ 'foo'","expect":"ok","ref":"functions-matching","note":"POSIX ~ operator case-sensitive match"}
+{"id":"txpa0039","category":"text-pattern","sql":"SELECT 'foobar' ~ '^foo'","expect":"ok","ref":"functions-matching","note":"POSIX ~ with start anchor"}
+{"id":"txpa0040","category":"text-pattern","sql":"SELECT 'foobar' ~ 'bar$'","expect":"ok","ref":"functions-matching","note":"POSIX ~ with end anchor"}
+{"id":"txpa0041","category":"text-pattern","sql":"SELECT 'foobar' ~ 'o.b'","expect":"ok","ref":"functions-matching","note":"POSIX ~ with dot metacharacter"}
+{"id":"txpa0042","category":"text-pattern","sql":"SELECT 'FooBar' ~* 'foo'","expect":"ok","ref":"functions-matching","note":"POSIX ~* case-insensitive match"}
+{"id":"txpa0043","category":"text-pattern","sql":"SELECT 'foobar' !~ 'baz'","expect":"ok","ref":"functions-matching","note":"POSIX !~ does not match"}
+{"id":"txpa0044","category":"text-pattern","sql":"SELECT 'FooBar' !~* 'baz'","expect":"ok","ref":"functions-matching","note":"POSIX !~* case-insensitive does not match"}
+{"id":"txpa0045","category":"text-pattern","sql":"SELECT 'foobar' ~ '[a-z]+'","expect":"ok","ref":"functions-matching","note":"POSIX ~ with character class range"}
+{"id":"txpa0046","category":"text-pattern","sql":"SELECT 'foobar' ~ '[[:alpha:]]+'","expect":"ok","ref":"functions-matching","note":"POSIX ~ with POSIX character class alpha"}
+{"id":"txpa0047","category":"text-pattern","sql":"SELECT 'foo123' ~ '[[:digit:]]+'","expect":"ok","ref":"functions-matching","note":"POSIX ~ with POSIX character class digit"}
+{"id":"txpa0048","category":"text-pattern","sql":"SELECT 'foo bar' ~ '\\s+'","expect":"ok","ref":"functions-matching","note":"POSIX ~ with shorthand whitespace escape"}
+{"id":"txpa0049","category":"text-pattern","sql":"SELECT 'foobar' ~ '(?i)FOO'","expect":"ok","ref":"functions-matching","note":"POSIX ~ with embedded case-insensitive option"}
+{"id":"txpa0050","category":"text-pattern","sql":"SELECT 'foo\\nbar' ~ '(?n)foo'","expect":"ok","ref":"functions-matching","note":"POSIX ~ with embedded newline-sensitive option"}
+{"id":"txpa0051","category":"text-pattern","sql":"SELECT 'foobar' ~ '(foo)(bar)'","expect":"ok","ref":"functions-matching","note":"POSIX ~ with capturing groups"}
+{"id":"txpa0052","category":"text-pattern","sql":"SELECT 'foobar' ~ '(?:foo)bar'","expect":"ok","ref":"functions-matching","note":"POSIX ~ with non-capturing group"}
+{"id":"txpa0053","category":"text-pattern","sql":"SELECT regexp_match('foobar', 'foo')","expect":"ok","ref":"functions-matching","note":"regexp_match basic"}
+{"id":"txpa0054","category":"text-pattern","sql":"SELECT regexp_match('foobarbequebaz', 'bar.*que')","expect":"ok","ref":"functions-matching","note":"regexp_match with greedy quantifier"}
+{"id":"txpa0055","category":"text-pattern","sql":"SELECT regexp_match('foobarbequebaz', '(bar)(beque)')","expect":"ok","ref":"functions-matching","note":"regexp_match with capturing groups returns array"}
+{"id":"txpa0056","category":"text-pattern","sql":"SELECT regexp_match('FooBar', 'foo', 'i')","expect":"ok","ref":"functions-matching","note":"regexp_match with case-insensitive flag i"}
+{"id":"txpa0057","category":"text-pattern","sql":"SELECT regexp_match('foobar', 'baz')","expect":"ok","ref":"functions-matching","note":"regexp_match returns NULL on no match"}
+{"id":"txpa0058","category":"text-pattern","sql":"SELECT regexp_match('foo' || 'bar', '[a-z]+')","expect":"ok","ref":"functions-matching","note":"regexp_match with concatenated input"}
+{"id":"txpa0059","category":"text-pattern","sql":"SELECT regexp_match('foobar', '[z')","expect":"error","ref":"functions-matching","note":"regexp_match with invalid regex (unclosed bracket)"}
+{"id":"txpa0060","category":"text-pattern","sql":"SELECT regexp_match('foobar', 'foo', 'z')","expect":"error","ref":"functions-matching","note":"regexp_match with invalid flag z"}
+{"id":"txpa0061","category":"text-pattern","sql":"SELECT regexp_matches('foobarbequebazilbarfbonk', '(b[^b]+)(b[^b]+)', 'g')","expect":"ok","ref":"functions-matching","note":"regexp_matches with g flag returns all matches"}
+{"id":"txpa0062","category":"text-pattern","sql":"SELECT regexp_matches('foobar', 'o+')","expect":"ok","ref":"functions-matching","note":"regexp_matches without g flag returns first match"}
+{"id":"txpa0063","category":"text-pattern","sql":"SELECT regexp_matches('FooBarBaz', '[A-Z][a-z]+', 'g')","expect":"ok","ref":"functions-matching","note":"regexp_matches with g flag multiple matches"}
+{"id":"txpa0064","category":"text-pattern","sql":"SELECT regexp_matches('foobar', 'baz', 'g')","expect":"ok","ref":"functions-matching","note":"regexp_matches with g flag no matches returns empty set"}
+{"id":"txpa0065","category":"text-pattern","sql":"SELECT regexp_matches('foobar', '(f)(o+)', 'ig')","expect":"ok","ref":"functions-matching","note":"regexp_matches with i and g flags combined"}
+{"id":"txpa0066","category":"text-pattern","sql":"SELECT regexp_replace('foobarbaz', 'b..', 'X')","expect":"ok","ref":"functions-matching","note":"regexp_replace replaces first match"}
+{"id":"txpa0067","category":"text-pattern","sql":"SELECT regexp_replace('foobarbaz', 'b..', 'X', 'g')","expect":"ok","ref":"functions-matching","note":"regexp_replace with g flag replaces all matches"}
+{"id":"txpa0068","category":"text-pattern","sql":"SELECT regexp_replace('foobarbaz', 'b(..)', 'X\\1Y', 'g')","expect":"ok","ref":"functions-matching","note":"regexp_replace with backreference \\1"}
+{"id":"txpa0069","category":"text-pattern","sql":"SELECT regexp_replace('Hello World', 'world', 'PostgreSQL', 'i')","expect":"ok","ref":"functions-matching","note":"regexp_replace with case-insensitive flag"}
+{"id":"txpa0070","category":"text-pattern","sql":"SELECT regexp_replace('foobar', 'o', 'X', 2)","expect":"ok","ref":"functions-matching","note":"regexp_replace with start position parameter"}
+{"id":"txpa0071","category":"text-pattern","sql":"SELECT regexp_replace('foobarbaz', 'b..', 'X', 1, 2)","expect":"ok","ref":"functions-matching","note":"regexp_replace with start and N (replace 2nd match)"}
+{"id":"txpa0072","category":"text-pattern","sql":"SELECT regexp_replace('foobarbaz', 'b..', 'X', 1, 0, 'g')","expect":"ok","ref":"functions-matching","note":"regexp_replace with start N=0 and g flag"}
+{"id":"txpa0073","category":"text-pattern","sql":"SELECT regexp_replace('foobar', 'o+', '\\&!')","expect":"ok","ref":"functions-matching","note":"regexp_replace with \\& whole match backreference"}
+{"id":"txpa0074","category":"text-pattern","sql":"SELECT regexp_replace('foo', '[z', 'X')","expect":"error","ref":"functions-matching","note":"regexp_replace with invalid regex"}
+{"id":"txpa0075","category":"text-pattern","sql":"SELECT regexp_split_to_table('the quick brown fox', '\\s+')","expect":"ok","ref":"functions-matching","note":"regexp_split_to_table splits on whitespace"}
+{"id":"txpa0076","category":"text-pattern","sql":"SELECT regexp_split_to_table('a,b,,c', ',')","expect":"ok","ref":"functions-matching","note":"regexp_split_to_table with comma delimiter"}
+{"id":"txpa0077","category":"text-pattern","sql":"SELECT regexp_split_to_table('foobar', 'baz')","expect":"ok","ref":"functions-matching","note":"regexp_split_to_table no match returns whole string"}
+{"id":"txpa0078","category":"text-pattern","sql":"SELECT regexp_split_to_table('FooBARbaz', '[A-Z]+', 'i')","expect":"ok","ref":"functions-matching","note":"regexp_split_to_table with case-insensitive flag"}
+{"id":"txpa0079","category":"text-pattern","sql":"SELECT regexp_split_to_array('the quick brown fox', '\\s+')","expect":"ok","ref":"functions-matching","note":"regexp_split_to_array splits on whitespace"}
+{"id":"txpa0080","category":"text-pattern","sql":"SELECT regexp_split_to_array('a,b,,c', ',')","expect":"ok","ref":"functions-matching","note":"regexp_split_to_array with comma delimiter"}
+{"id":"txpa0081","category":"text-pattern","sql":"SELECT regexp_split_to_array('foobar', 'baz')","expect":"ok","ref":"functions-matching","note":"regexp_split_to_array no match returns single-element array"}
+{"id":"txpa0082","category":"text-pattern","sql":"SELECT regexp_split_to_array('FooBARbaz', '[A-Z]+', 'i')","expect":"ok","ref":"functions-matching","note":"regexp_split_to_array with case-insensitive flag"}
+{"id":"txpa0083","category":"text-pattern","sql":"SELECT regexp_count('ABCABCAXYaxy', 'A.')","expect":"ok","ref":"functions-matching","note":"regexp_count basic count"}
+{"id":"txpa0084","category":"text-pattern","sql":"SELECT regexp_count('ABCABCAXYaxy', 'A.', 1, 'i')","expect":"ok","ref":"functions-matching","note":"regexp_count with start and case-insensitive flag"}
+{"id":"txpa0085","category":"text-pattern","sql":"SELECT regexp_count('foobarfoo', 'foo')","expect":"ok","ref":"functions-matching","note":"regexp_count counts all non-overlapping matches"}
+{"id":"txpa0086","category":"text-pattern","sql":"SELECT regexp_count('foobar', 'baz')","expect":"ok","ref":"functions-matching","note":"regexp_count returns 0 when no match"}
+{"id":"txpa0087","category":"text-pattern","sql":"SELECT regexp_count('foobar', 'o', 3)","expect":"ok","ref":"functions-matching","note":"regexp_count with start position"}
+{"id":"txpa0088","category":"text-pattern","sql":"SELECT regexp_instr('number of your street, town zip, FR', '[^,]+', 1, 2)","expect":"ok","ref":"functions-matching","note":"regexp_instr finds position of 2nd match"}
+{"id":"txpa0089","category":"text-pattern","sql":"SELECT regexp_instr('foobarfoo', 'foo')","expect":"ok","ref":"functions-matching","note":"regexp_instr basic position of first match"}
+{"id":"txpa0090","category":"text-pattern","sql":"SELECT regexp_instr('foobarfoo', 'foo', 1, 2)","expect":"ok","ref":"functions-matching","note":"regexp_instr position of 2nd match"}
+{"id":"txpa0091","category":"text-pattern","sql":"SELECT regexp_instr('foobarfoo', 'foo', 1, 1, 1)","expect":"ok","ref":"functions-matching","note":"regexp_instr with endoption=1 returns end position"}
+{"id":"txpa0092","category":"text-pattern","sql":"SELECT regexp_instr('foobarfoo', 'baz')","expect":"ok","ref":"functions-matching","note":"regexp_instr returns 0 when no match"}
+{"id":"txpa0093","category":"text-pattern","sql":"SELECT regexp_instr('FooBarBaz', 'foo', 1, 1, 0, 'i')","expect":"ok","ref":"functions-matching","note":"regexp_instr with case-insensitive flag"}
+{"id":"txpa0094","category":"text-pattern","sql":"SELECT regexp_instr('ABCDEFGHI', '(c..)(...)' , 1, 1, 0, 'i', 2)","expect":"ok","ref":"functions-matching","note":"regexp_instr with subexpr parameter"}
+{"id":"txpa0095","category":"text-pattern","sql":"SELECT regexp_substr('number of your street, town zip, FR', '[^,]+', 1, 2)","expect":"ok","ref":"functions-matching","note":"regexp_substr returns 2nd matching substring"}
+{"id":"txpa0096","category":"text-pattern","sql":"SELECT regexp_substr('foobar', 'o+')","expect":"ok","ref":"functions-matching","note":"regexp_substr basic"}
+{"id":"txpa0097","category":"text-pattern","sql":"SELECT regexp_substr('foobar', 'baz')","expect":"ok","ref":"functions-matching","note":"regexp_substr returns NULL when no match"}
+{"id":"txpa0098","category":"text-pattern","sql":"SELECT regexp_substr('ABCDEFGHI', '(c...)(...)' , 1, 1, 'i', 2)","expect":"ok","ref":"functions-matching","note":"regexp_substr with subexpr parameter"}
+{"id":"txpa0099","category":"text-pattern","sql":"SELECT regexp_substr('foobarfoo', 'foo', 1, 2)","expect":"ok","ref":"functions-matching","note":"regexp_substr with N parameter for 2nd match"}
+{"id":"txpa0100","category":"text-pattern","sql":"SELECT regexp_like('Hello World', 'world')","expect":"ok","ref":"functions-matching","note":"regexp_like case-sensitive no match returns false"}
+{"id":"txpa0101","category":"text-pattern","sql":"SELECT regexp_like('Hello World', 'world', 'i')","expect":"ok","ref":"functions-matching","note":"regexp_like with case-insensitive flag returns true"}
+{"id":"txpa0102","category":"text-pattern","sql":"SELECT regexp_like('foobar', 'foo')","expect":"ok","ref":"functions-matching","note":"regexp_like returns true on match"}
+{"id":"txpa0103","category":"text-pattern","sql":"SELECT regexp_like('foobar', 'baz')","expect":"ok","ref":"functions-matching","note":"regexp_like returns false on no match"}
+{"id":"txpa0104","category":"text-pattern","sql":"SELECT regexp_like('foobar', '^foo$')","expect":"ok","ref":"functions-matching","note":"regexp_like with anchors"}
+{"id":"txpa0105","category":"text-pattern","sql":"SELECT regexp_like('foo bar', '\\s+')","expect":"ok","ref":"functions-matching","note":"regexp_like with whitespace shorthand"}
+{"id":"txpa0106","category":"text-pattern","sql":"SELECT regexp_like('foobar', '[z')","expect":"error","ref":"functions-matching","note":"regexp_like with invalid regex pattern"}
+{"id":"txpa0107","category":"text-pattern","sql":"SELECT substring('foobar' FROM 'o.b')","expect":"ok","ref":"functions-matching","note":"substring FROM regex returns matching portion"}
+{"id":"txpa0108","category":"text-pattern","sql":"SELECT substring('foobar' FROM 'o(.)b')","expect":"ok","ref":"functions-matching","note":"substring FROM regex with capturing group"}
+{"id":"txpa0109","category":"text-pattern","sql":"SELECT substring('foobar' FROM 'baz')","expect":"ok","ref":"functions-matching","note":"substring FROM regex no match returns NULL"}
+{"id":"txpa0110","category":"text-pattern","sql":"SELECT substring('foobar' FROM '^f..b')","expect":"ok","ref":"functions-matching","note":"substring FROM regex with anchor"}
+{"id":"txpa0111","category":"text-pattern","sql":"SELECT substring('foobar' SIMILAR '%#\"o_b#\"%' ESCAPE '#')","expect":"ok","ref":"functions-matching","note":"substring SIMILAR ESCAPE with double-quote delimiters"}
+{"id":"txpa0112","category":"text-pattern","sql":"SELECT substring('foobar' SIMILAR 'f%' ESCAPE '#')","expect":"ok","ref":"functions-matching","note":"substring SIMILAR ESCAPE no delimiter returns whole match or NULL"}
+{"id":"txpa0113","category":"text-pattern","sql":"SELECT substring('foobar' FROM '%' FOR '\\')","expect":"ok","ref":"functions-matching","note":"substring FROM pattern FOR escape (SQL:1999 syntax)"}
+{"id":"txpa0114","category":"text-pattern","sql":"SELECT substring('foobar', 'o.b')","expect":"ok","ref":"functions-matching","note":"substring with two args as function (regex)"}
+{"id":"txpa0115","category":"text-pattern","sql":"SELECT substring('foobar', '%#\"o_b#\"%', '#')","expect":"ok","ref":"functions-matching","note":"substring as function with three args (SIMILAR style)"}
+{"id":"txpa0116","category":"text-pattern","sql":"SELECT substring('foobar' SIMILAR)","expect":"error","ref":"functions-matching","note":"substring SIMILAR missing pattern (syntax error)"}
+{"id":"txpa0117","category":"text-pattern","sql":"SELECT position('bar' IN 'foobar')","expect":"ok","ref":"functions-matching","note":"position function returns 1-based index"}
+{"id":"txpa0118","category":"text-pattern","sql":"SELECT position('baz' IN 'foobar')","expect":"ok","ref":"functions-matching","note":"position returns 0 when not found"}
+{"id":"txpa0119","category":"text-pattern","sql":"SELECT position('' IN 'foobar')","expect":"ok","ref":"functions-matching","note":"position with empty search string returns 1"}
+{"id":"txpa0120","category":"text-pattern","sql":"SELECT position('foo' IN '')","expect":"ok","ref":"functions-matching","note":"position in empty string returns 0"}
+{"id":"txpa0121","category":"text-pattern","sql":"SELECT strpos('foobar', 'bar')","expect":"ok","ref":"functions-matching","note":"strpos function equivalent to position"}
+{"id":"txpa0122","category":"text-pattern","sql":"SELECT strpos('foobar', 'baz')","expect":"ok","ref":"functions-matching","note":"strpos returns 0 when not found"}
+{"id":"txpa0123","category":"text-pattern","sql":"SELECT strpos('', 'foo')","expect":"ok","ref":"functions-matching","note":"strpos on empty string"}
+{"id":"txpa0124","category":"text-pattern","sql":"SELECT overlay('foobar' PLACING 'xyz' FROM 2)","expect":"ok","ref":"functions-matching","note":"overlay PLACING FROM without FOR"}
+{"id":"txpa0125","category":"text-pattern","sql":"SELECT overlay('foobar' PLACING 'xyz' FROM 2 FOR 3)","expect":"ok","ref":"functions-matching","note":"overlay PLACING FROM FOR replaces substring"}
+{"id":"txpa0126","category":"text-pattern","sql":"SELECT overlay('Txxxxas' PLACING 'hom' FROM 2 FOR 4)","expect":"ok","ref":"functions-matching","note":"overlay replaces middle characters"}
+{"id":"txpa0127","category":"text-pattern","sql":"SELECT overlay('foobar' PLACING '' FROM 2 FOR 0)","expect":"ok","ref":"functions-matching","note":"overlay with empty replacement and zero length"}
+{"id":"txpa0128","category":"text-pattern","sql":"SELECT overlay('foobar' PLACING 'X' FROM 1 FOR 0)","expect":"ok","ref":"functions-matching","note":"overlay inserts at position with FOR 0"}
+{"id":"txpa0129","category":"text-pattern","sql":"SELECT overlay('foobar' PLACING 'X')","expect":"error","ref":"functions-matching","note":"overlay missing FROM clause (syntax error)"}
+{"id":"txpa0130","category":"text-pattern","sql":"SELECT trim('  hello  ')","expect":"ok","ref":"functions-matching","note":"trim both sides by default (spaces)"}
+{"id":"txpa0131","category":"text-pattern","sql":"SELECT trim(BOTH ' ' FROM '  hello  ')","expect":"ok","ref":"functions-matching","note":"trim BOTH explicit"}
+{"id":"txpa0132","category":"text-pattern","sql":"SELECT trim(LEADING ' ' FROM '  hello  ')","expect":"ok","ref":"functions-matching","note":"trim LEADING removes leading chars"}
+{"id":"txpa0133","category":"text-pattern","sql":"SELECT trim(TRAILING ' ' FROM '  hello  ')","expect":"ok","ref":"functions-matching","note":"trim TRAILING removes trailing chars"}
+{"id":"txpa0134","category":"text-pattern","sql":"SELECT trim('xyz' FROM 'xyzHelloxyz')","expect":"ok","ref":"functions-matching","note":"trim with non-space characters"}
+{"id":"txpa0135","category":"text-pattern","sql":"SELECT ltrim('  hello  ')","expect":"ok","ref":"functions-matching","note":"ltrim removes leading spaces"}
+{"id":"txpa0136","category":"text-pattern","sql":"SELECT ltrim('xxxhelloxxx', 'x')","expect":"ok","ref":"functions-matching","note":"ltrim with explicit character set"}
+{"id":"txpa0137","category":"text-pattern","sql":"SELECT rtrim('  hello  ')","expect":"ok","ref":"functions-matching","note":"rtrim removes trailing spaces"}
+{"id":"txpa0138","category":"text-pattern","sql":"SELECT rtrim('xxxhelloxxx', 'x')","expect":"ok","ref":"functions-matching","note":"rtrim with explicit character set"}
+{"id":"txpa0139","category":"text-pattern","sql":"SELECT btrim('  hello  ')","expect":"ok","ref":"functions-matching","note":"btrim removes both sides spaces"}
+{"id":"txpa0140","category":"text-pattern","sql":"SELECT btrim('xxxhelloxxx', 'x')","expect":"ok","ref":"functions-matching","note":"btrim with explicit character set"}
+{"id":"txpa0141","category":"text-pattern","sql":"SELECT 'foobar' LIKE 'FOO%' COLLATE \"C\"","expect":"ok","ref":"functions-matching","note":"LIKE with COLLATE C (deterministic)"}
+{"id":"txpa0142","category":"text-pattern","sql":"SELECT name FROM s.t WHERE name LIKE 'A%' COLLATE \"C\"","expect":"ok","ref":"functions-matching","note":"LIKE with COLLATE on column"}
+{"id":"txpa0143","category":"text-pattern","sql":"SELECT 'foobar' LIKE 'foo%' COLLATE \"POSIX\"","expect":"ok","ref":"functions-matching","note":"LIKE with POSIX collation"}
+{"id":"txpa0144","category":"text-pattern","sql":"SELECT regexp_match('foo' , '\\d+')","expect":"ok","ref":"functions-matching","note":"regexp_match with \\d digit shorthand"}
+{"id":"txpa0145","category":"text-pattern","sql":"SELECT regexp_match('foo123', '\\d+')","expect":"ok","ref":"functions-matching","note":"regexp_match \\d matches digits"}
+{"id":"txpa0146","category":"text-pattern","sql":"SELECT regexp_match('foo bar', '\\w+')","expect":"ok","ref":"functions-matching","note":"regexp_match with \\w word character shorthand"}
+{"id":"txpa0147","category":"text-pattern","sql":"SELECT regexp_match('foobar', '\\A foo', 'x')","expect":"ok","ref":"functions-matching","note":"regexp_match with x flag (expanded syntax ignores whitespace)"}
+{"id":"txpa0148","category":"text-pattern","sql":"SELECT regexp_match('foo' || chr(10) || 'bar', 'foo.bar', 'n')","expect":"ok","ref":"functions-matching","note":"regexp_match with n flag (newline sensitive, dot does not match newline)"}
+{"id":"txpa0149","category":"text-pattern","sql":"SELECT regexp_replace('foobar', 'o*', 'X')","expect":"ok","ref":"functions-matching","note":"regexp_replace with zero-width match"}
+{"id":"txpa0150","category":"text-pattern","sql":"SELECT 'foobar' ~ '\\m[a-z]'","expect":"ok","ref":"functions-matching","note":"POSIX ~ with \\m word-beginning constraint"}
+{"id":"txpa0151","category":"text-pattern","sql":"SELECT 'foobar' ~ '\\y'","expect":"ok","ref":"functions-matching","note":"POSIX ~ with \\y word boundary constraint"}
+{"id":"txpa0152","category":"text-pattern","sql":"SELECT 'foobar' ~ '(.)\\1'","expect":"ok","ref":"functions-matching","note":"POSIX ~ with backreference \\1"}
+{"id":"txpa0153","category":"text-pattern","sql":"SELECT 'hello' ~ '(?=hel)'","expect":"ok","ref":"functions-matching","note":"POSIX ~ with positive lookahead"}
+{"id":"txpa0154","category":"text-pattern","sql":"SELECT 'hello' ~ '(?!xyz)'","expect":"ok","ref":"functions-matching","note":"POSIX ~ with negative lookahead"}
+{"id":"txpa0155","category":"text-pattern","sql":"SELECT regexp_match('foobar', 'o+?')","expect":"ok","ref":"functions-matching","note":"regexp_match with non-greedy quantifier +?"}
+{"id":"txpa0156","category":"text-pattern","sql":"SELECT regexp_match('foobar', 'o*?')","expect":"ok","ref":"functions-matching","note":"regexp_match with non-greedy quantifier *?"}
+{"id":"txpa0157","category":"text-pattern","sql":"SELECT regexp_match('foobar', 'o{1,3}?')","expect":"ok","ref":"functions-matching","note":"regexp_match with non-greedy {m,n}? quantifier"}
+{"id":"txpa0158","category":"text-pattern","sql":"SELECT 'foobar' ~ '[[:upper:]]'","expect":"ok","ref":"functions-matching","note":"POSIX ~ with upper character class"}
+{"id":"txpa0159","category":"text-pattern","sql":"SELECT 'foobar' ~ '[[:lower:]]'","expect":"ok","ref":"functions-matching","note":"POSIX ~ with lower character class"}
+{"id":"txpa0160","category":"text-pattern","sql":"SELECT 'foo bar' ~ '[[:space:]]'","expect":"ok","ref":"functions-matching","note":"POSIX ~ with space character class"}
+{"id":"txpa0161","category":"text-pattern","sql":"SELECT 'foo!bar' ~ '[[:punct:]]'","expect":"ok","ref":"functions-matching","note":"POSIX ~ with punct character class"}
+{"id":"txpa0162","category":"text-pattern","sql":"SELECT regexp_match('foobar', '(?q)o+')","expect":"ok","ref":"functions-matching","note":"regexp_match with embedded q flag (literal string mode)"}
+{"id":"txpa0163","category":"text-pattern","sql":"SELECT 'foobar' NOT LIKE '%baz%'","expect":"ok","ref":"functions-matching","note":"NOT LIKE with surrounding wildcards"}
+{"id":"txpa0164","category":"text-pattern","sql":"SELECT '' LIKE ''","expect":"ok","ref":"functions-matching","note":"LIKE both sides empty strings"}
+{"id":"txpa0165","category":"text-pattern","sql":"SELECT '' LIKE '%'","expect":"ok","ref":"functions-matching","note":"LIKE empty string against percent wildcard matches"}
+{"id":"txpa0166","category":"text-pattern","sql":"SELECT NULL::text LIKE 'foo%'","expect":"ok","ref":"functions-matching","note":"LIKE with NULL input returns NULL (not error)"}
+{"id":"txpa0167","category":"text-pattern","sql":"SELECT 'foobar' SIMILAR TO '[invalid'","expect":"error","ref":"functions-matching","note":"SIMILAR TO with invalid regex bracket"}
+{"id":"txpa0168","category":"text-pattern","sql":"SELECT position('bar')","expect":"error","ref":"functions-matching","note":"position missing IN keyword (syntax error)"}
+{"id":"txpa0169","category":"text-pattern","sql":"SELECT overlay('foobar' PLACING 'X' FOR 2)","expect":"error","ref":"functions-matching","note":"overlay PLACING FOR without FROM (syntax error)"}
+{"id":"txpa0170","category":"text-pattern","sql":"SELECT regexp_count('foobar', 'o', 1, 'g')","expect":"error","ref":"functions-matching","note":"regexp_count with g flag (not supported for count)"}

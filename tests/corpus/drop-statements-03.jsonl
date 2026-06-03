@@ -1,0 +1,64 @@
+{"id":"drpc0001","category":"drop-statements","sql":"CREATE TABLE drop_t1 (a int); DROP TABLE drop_t1;","expect":"ok","ref":"sql-droptable","note":"basic DROP TABLE"}
+{"id":"drpc0002","category":"drop-statements","sql":"CREATE TABLE drop_t2 (a int); DROP TABLE IF EXISTS drop_t2;","expect":"ok","ref":"sql-droptable","note":"DROP TABLE IF EXISTS — table exists"}
+{"id":"drpc0003","category":"drop-statements","sql":"DROP TABLE IF EXISTS no_such_table_xyz;","expect":"ok","ref":"sql-droptable","note":"DROP TABLE IF EXISTS — table absent (no error)"}
+{"id":"drpc0004","category":"drop-statements","sql":"DROP TABLE no_such_table_xyz;","expect":"error","ref":"sql-droptable","note":"DROP TABLE missing name — semantic error"}
+{"id":"drpc0005","category":"drop-statements","sql":"CREATE TABLE drop_t5 (a int); DROP TABLE drop_t5 RESTRICT;","expect":"ok","ref":"sql-droptable","note":"DROP TABLE RESTRICT (explicit default)"}
+{"id":"drpc0006","category":"drop-statements","sql":"CREATE TABLE drop_t6 (a int); DROP TABLE drop_t6 CASCADE;","expect":"ok","ref":"sql-droptable","note":"DROP TABLE CASCADE"}
+{"id":"drpc0007","category":"drop-statements","sql":"CREATE TABLE drop_t7a (a int); CREATE TABLE drop_t7b (a int); DROP TABLE drop_t7a, drop_t7b;","expect":"ok","ref":"sql-droptable","note":"DROP TABLE multiple names"}
+{"id":"drpc0008","category":"drop-statements","sql":"CREATE TABLE drop_t8a (a int); CREATE TABLE drop_t8b (a int); DROP TABLE IF EXISTS drop_t8a, drop_t8b;","expect":"ok","ref":"sql-droptable","note":"DROP TABLE IF EXISTS multiple names"}
+{"id":"drpc0009","category":"drop-statements","sql":"CREATE TABLE drop_t9a (a int); CREATE TABLE drop_t9b (a int); DROP TABLE drop_t9a, drop_t9b CASCADE;","expect":"ok","ref":"sql-droptable","note":"DROP TABLE multiple names CASCADE"}
+{"id":"drpc0010","category":"drop-statements","sql":"CREATE SCHEMA drop_s; CREATE TABLE drop_s.tbl (a int); DROP TABLE drop_s.tbl;","expect":"ok","ref":"sql-droptable","note":"DROP TABLE schema-qualified name"}
+{"id":"drpc0011","category":"drop-statements","sql":"DROP TABLE;","expect":"error","ref":"sql-droptable","note":"syntax error — no name after DROP TABLE"}
+{"id":"drpc0012","category":"drop-statements","sql":"DROP TABLE drop_t1 CASCADE RESTRICT;","expect":"error","ref":"sql-droptable","note":"syntax error — CASCADE and RESTRICT together"}
+{"id":"drpc0013","category":"drop-statements","sql":"DROP TABLE IF no_such_table_xyz;","expect":"error","ref":"sql-droptable","note":"syntax error — IF without EXISTS"}
+{"id":"drpc0014","category":"drop-statements","sql":"CREATE TABLE drop_dep (a int); CREATE VIEW drop_dep_v AS SELECT a FROM drop_dep; DROP TABLE drop_dep CASCADE;","expect":"ok","ref":"sql-droptable","note":"DROP TABLE CASCADE removes dependent view"}
+{"id":"drpc0015","category":"drop-statements","sql":"DROP VIEW s.v;","expect":"ok","ref":"sql-dropview","note":"basic DROP VIEW of fixture view"}
+{"id":"drpc0016","category":"drop-statements","sql":"DROP VIEW IF EXISTS s.v;","expect":"ok","ref":"sql-dropview","note":"DROP VIEW IF EXISTS — view exists"}
+{"id":"drpc0017","category":"drop-statements","sql":"DROP VIEW IF EXISTS no_such_view_xyz;","expect":"ok","ref":"sql-dropview","note":"DROP VIEW IF EXISTS — view absent"}
+{"id":"drpc0018","category":"drop-statements","sql":"DROP VIEW no_such_view_xyz;","expect":"error","ref":"sql-dropview","note":"DROP VIEW missing object — semantic error"}
+{"id":"drpc0019","category":"drop-statements","sql":"CREATE VIEW drop_v2 AS SELECT 1 AS x; DROP VIEW drop_v2 CASCADE;","expect":"ok","ref":"sql-dropview","note":"DROP VIEW CASCADE"}
+{"id":"drpc0020","category":"drop-statements","sql":"CREATE VIEW drop_v3 AS SELECT 1 AS x; DROP VIEW drop_v3 RESTRICT;","expect":"ok","ref":"sql-dropview","note":"DROP VIEW RESTRICT"}
+{"id":"drpc0021","category":"drop-statements","sql":"DROP MATERIALIZED VIEW s.mv;","expect":"ok","ref":"sql-dropmaterializedview","note":"basic DROP MATERIALIZED VIEW of fixture matview"}
+{"id":"drpc0022","category":"drop-statements","sql":"DROP MATERIALIZED VIEW IF EXISTS s.mv;","expect":"ok","ref":"sql-dropmaterializedview","note":"DROP MATERIALIZED VIEW IF EXISTS — exists"}
+{"id":"drpc0023","category":"drop-statements","sql":"DROP MATERIALIZED VIEW IF EXISTS no_such_mv_xyz;","expect":"ok","ref":"sql-dropmaterializedview","note":"DROP MATERIALIZED VIEW IF EXISTS — absent"}
+{"id":"drpc0024","category":"drop-statements","sql":"CREATE MATERIALIZED VIEW drop_mv2 AS SELECT 1 AS x; DROP MATERIALIZED VIEW drop_mv2 CASCADE;","expect":"ok","ref":"sql-dropmaterializedview","note":"DROP MATERIALIZED VIEW CASCADE"}
+{"id":"drpc0025","category":"drop-statements","sql":"DROP MATERIALIZED VIEW;","expect":"error","ref":"sql-dropmaterializedview","note":"syntax error — no name after DROP MATERIALIZED VIEW"}
+{"id":"drpc0026","category":"drop-statements","sql":"DROP INDEX s.t_name_idx;","expect":"ok","ref":"sql-dropindex","note":"basic DROP INDEX schema-qualified fixture index"}
+{"id":"drpc0027","category":"drop-statements","sql":"DROP INDEX IF EXISTS s.t_name_idx;","expect":"ok","ref":"sql-dropindex","note":"DROP INDEX IF EXISTS — index exists"}
+{"id":"drpc0028","category":"drop-statements","sql":"DROP INDEX IF EXISTS no_such_idx_xyz;","expect":"ok","ref":"sql-dropindex","note":"DROP INDEX IF EXISTS — index absent"}
+{"id":"drpc0029","category":"drop-statements","sql":"CREATE INDEX drop_idx1 ON s.t (val); DROP INDEX s.drop_idx1 CASCADE;","expect":"ok","ref":"sql-dropindex","note":"DROP INDEX CASCADE schema-qualified"}
+{"id":"drpc0030","category":"drop-statements","sql":"CREATE INDEX drop_idx2 ON s.t (val); DROP INDEX CONCURRENTLY s.drop_idx2;","expect":"ok","ref":"sql-dropindex","txn":"none","note":"DROP INDEX CONCURRENTLY — cannot run inside transaction"}
+{"id":"drpc0031","category":"drop-statements","sql":"DROP INDEX CONCURRENTLY IF EXISTS no_such_idx_xyz;","expect":"ok","ref":"sql-dropindex","txn":"none","note":"DROP INDEX CONCURRENTLY IF EXISTS — absent index"}
+{"id":"drpc0032","category":"drop-statements","sql":"DROP SEQUENCE s.seq;","expect":"ok","ref":"sql-dropsequence","note":"basic DROP SEQUENCE of fixture sequence"}
+{"id":"drpc0033","category":"drop-statements","sql":"DROP SEQUENCE IF EXISTS s.seq;","expect":"ok","ref":"sql-dropsequence","note":"DROP SEQUENCE IF EXISTS — exists"}
+{"id":"drpc0034","category":"drop-statements","sql":"DROP SEQUENCE IF EXISTS no_such_seq_xyz;","expect":"ok","ref":"sql-dropsequence","note":"DROP SEQUENCE IF EXISTS — absent"}
+{"id":"drpc0035","category":"drop-statements","sql":"CREATE SEQUENCE drop_seq1; DROP SEQUENCE drop_seq1 CASCADE;","expect":"ok","ref":"sql-dropsequence","note":"DROP SEQUENCE CASCADE"}
+{"id":"drpc0036","category":"drop-statements","sql":"DROP SCHEMA IF EXISTS no_such_schema_xyz;","expect":"ok","ref":"sql-dropschema","note":"DROP SCHEMA IF EXISTS — absent"}
+{"id":"drpc0037","category":"drop-statements","sql":"CREATE SCHEMA drop_sc1; DROP SCHEMA drop_sc1;","expect":"ok","ref":"sql-dropschema","note":"basic DROP SCHEMA of newly created schema"}
+{"id":"drpc0038","category":"drop-statements","sql":"CREATE SCHEMA drop_sc2; DROP SCHEMA drop_sc2 RESTRICT;","expect":"ok","ref":"sql-dropschema","note":"DROP SCHEMA RESTRICT explicit"}
+{"id":"drpc0039","category":"drop-statements","sql":"CREATE SCHEMA drop_sc3; CREATE TABLE drop_sc3.x (a int); DROP SCHEMA drop_sc3 CASCADE;","expect":"ok","ref":"sql-dropschema","note":"DROP SCHEMA CASCADE removes contained objects"}
+{"id":"drpc0040","category":"drop-statements","sql":"DROP FUNCTION s.f(integer);","expect":"ok","ref":"sql-dropfunction","note":"DROP FUNCTION with explicit arg type"}
+{"id":"drpc0041","category":"drop-statements","sql":"DROP FUNCTION IF EXISTS s.f(integer);","expect":"ok","ref":"sql-dropfunction","note":"DROP FUNCTION IF EXISTS — function exists"}
+{"id":"drpc0042","category":"drop-statements","sql":"DROP FUNCTION IF EXISTS no_such_fn_xyz(integer);","expect":"ok","ref":"sql-dropfunction","note":"DROP FUNCTION IF EXISTS — absent function"}
+{"id":"drpc0043","category":"drop-statements","sql":"DROP FUNCTION s.g(integer, integer);","expect":"ok","ref":"sql-dropfunction","note":"DROP FUNCTION multi-arg"}
+{"id":"drpc0044","category":"drop-statements","sql":"DROP FUNCTION s.rows_f();","expect":"ok","ref":"sql-dropfunction","note":"DROP FUNCTION with empty arg list"}
+{"id":"drpc0045","category":"drop-statements","sql":"DROP FUNCTION s.f(integer) CASCADE;","expect":"ok","ref":"sql-dropfunction","note":"DROP FUNCTION CASCADE"}
+{"id":"drpc0046","category":"drop-statements","sql":"DROP FUNCTION s.f(integer) RESTRICT;","expect":"ok","ref":"sql-dropfunction","note":"DROP FUNCTION RESTRICT"}
+{"id":"drpc0047","category":"drop-statements","sql":"CREATE FUNCTION drop_fn1(x int) RETURNS int LANGUAGE sql AS $$ SELECT x $$; CREATE FUNCTION drop_fn1(x text) RETURNS text LANGUAGE sql AS $$ SELECT x $$; DROP FUNCTION drop_fn1(int), drop_fn1(text);","expect":"ok","ref":"sql-dropfunction","note":"DROP FUNCTION multiple overloads in one statement"}
+{"id":"drpc0048","category":"drop-statements","sql":"DROP FUNCTION;","expect":"error","ref":"sql-dropfunction","note":"syntax error — no name after DROP FUNCTION"}
+{"id":"drpc0049","category":"drop-statements","sql":"DROP PROCEDURE s.p(integer);","expect":"ok","ref":"sql-dropprocedure","note":"DROP PROCEDURE with arg type"}
+{"id":"drpc0050","category":"drop-statements","sql":"DROP PROCEDURE IF EXISTS s.p(integer);","expect":"ok","ref":"sql-dropprocedure","note":"DROP PROCEDURE IF EXISTS — exists"}
+{"id":"drpc0051","category":"drop-statements","sql":"DROP PROCEDURE IF EXISTS no_such_proc_xyz(integer);","expect":"ok","ref":"sql-dropprocedure","note":"DROP PROCEDURE IF EXISTS — absent"}
+{"id":"drpc0052","category":"drop-statements","sql":"DROP PROCEDURE s.p(integer) CASCADE;","expect":"ok","ref":"sql-dropprocedure","note":"DROP PROCEDURE CASCADE"}
+{"id":"drpc0053","category":"drop-statements","sql":"DROP TYPE s.mood CASCADE;","expect":"ok","ref":"sql-droptype","note":"DROP TYPE CASCADE for enum type"}
+{"id":"drpc0054","category":"drop-statements","sql":"DROP TYPE IF EXISTS s.mood CASCADE;","expect":"ok","ref":"sql-droptype","note":"DROP TYPE IF EXISTS with CASCADE"}
+{"id":"drpc0055","category":"drop-statements","sql":"DROP TYPE IF EXISTS no_such_type_xyz;","expect":"ok","ref":"sql-droptype","note":"DROP TYPE IF EXISTS — absent"}
+{"id":"drpc0056","category":"drop-statements","sql":"DROP TYPE s.addr CASCADE;","expect":"ok","ref":"sql-droptype","note":"DROP TYPE CASCADE for composite type"}
+{"id":"drpc0057","category":"drop-statements","sql":"DROP DOMAIN s.pos_int;","expect":"ok","ref":"sql-dropdomain","note":"basic DROP DOMAIN of fixture domain"}
+{"id":"drpc0058","category":"drop-statements","sql":"DROP DOMAIN IF EXISTS s.pos_int;","expect":"ok","ref":"sql-dropdomain","note":"DROP DOMAIN IF EXISTS — exists"}
+{"id":"drpc0059","category":"drop-statements","sql":"DROP DOMAIN IF EXISTS no_such_domain_xyz;","expect":"ok","ref":"sql-dropdomain","note":"DROP DOMAIN IF EXISTS — absent"}
+{"id":"drpc0060","category":"drop-statements","sql":"DROP TRIGGER t_touch ON s.t;","expect":"ok","ref":"sql-droptrigger","note":"basic DROP TRIGGER of fixture trigger"}
+{"id":"drpc0061","category":"drop-statements","sql":"DROP TRIGGER IF EXISTS t_touch ON s.t;","expect":"ok","ref":"sql-droptrigger","note":"DROP TRIGGER IF EXISTS — trigger exists"}
+{"id":"drpc0062","category":"drop-statements","sql":"DROP TRIGGER IF EXISTS no_such_trg_xyz ON s.t;","expect":"ok","ref":"sql-droptrigger","note":"DROP TRIGGER IF EXISTS — absent"}
+{"id":"drpc0063","category":"drop-statements","sql":"DROP TRIGGER t_touch ON s.t CASCADE;","expect":"ok","ref":"sql-droptrigger","note":"DROP TRIGGER CASCADE"}
+{"id":"drpc0064","category":"drop-statements","sql":"DROP TRIGGER t_touch;","expect":"error","ref":"sql-droptrigger","note":"syntax error — DROP TRIGGER missing ON table_name"}

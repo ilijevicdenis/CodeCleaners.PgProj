@@ -1,0 +1,200 @@
+{"id":"strfa0001","category":"string-funcs","sql":"SELECT length('hello')","expect":"ok","ref":"functions-string","note":"length of text literal"}
+{"id":"strfa0002","category":"string-funcs","sql":"SELECT char_length('hello')","expect":"ok","ref":"functions-string","note":"char_length of text literal"}
+{"id":"strfa0003","category":"string-funcs","sql":"SELECT character_length('hello')","expect":"ok","ref":"functions-string","note":"character_length synonym"}
+{"id":"strfa0004","category":"string-funcs","sql":"SELECT bit_length('hello')","expect":"ok","ref":"functions-string","note":"bit_length returns bits (8x octets)"}
+{"id":"strfa0005","category":"string-funcs","sql":"SELECT octet_length('hello')","expect":"ok","ref":"functions-string","note":"octet_length returns bytes"}
+{"id":"strfa0006","category":"string-funcs","sql":"SELECT char_length(name) FROM s.t WHERE id = 1","expect":"ok","ref":"functions-string","note":"char_length on column reference"}
+{"id":"strfa0007","category":"string-funcs","sql":"SELECT octet_length(name) FROM s.t","expect":"ok","ref":"functions-string","note":"octet_length on table column"}
+{"id":"strfa0008","category":"string-funcs","sql":"SELECT bit_length(name) FROM s.t","expect":"ok","ref":"functions-string","note":"bit_length on table column"}
+{"id":"strfa0009","category":"string-funcs","sql":"SELECT length()","expect":"error","ref":"functions-string","note":"length requires at least one argument"}
+{"id":"strfa0010","category":"string-funcs","sql":"SELECT char_length()","expect":"error","ref":"functions-string","note":"char_length requires argument"}
+{"id":"strfa0011","category":"string-funcs","sql":"SELECT upper('hello')","expect":"ok","ref":"functions-string","note":"upper converts to uppercase"}
+{"id":"strfa0012","category":"string-funcs","sql":"SELECT lower('HELLO')","expect":"ok","ref":"functions-string","note":"lower converts to lowercase"}
+{"id":"strfa0013","category":"string-funcs","sql":"SELECT initcap('hello world')","expect":"ok","ref":"functions-string","note":"initcap capitalizes each word"}
+{"id":"strfa0014","category":"string-funcs","sql":"SELECT upper(name) FROM s.t","expect":"ok","ref":"functions-string","note":"upper on table column"}
+{"id":"strfa0015","category":"string-funcs","sql":"SELECT lower(name) FROM s.t","expect":"ok","ref":"functions-string","note":"lower on table column"}
+{"id":"strfa0016","category":"string-funcs","sql":"SELECT initcap(name) FROM s.t","expect":"ok","ref":"functions-string","note":"initcap on table column"}
+{"id":"strfa0017","category":"string-funcs","sql":"SELECT upper()","expect":"error","ref":"functions-string","note":"upper requires argument"}
+{"id":"strfa0018","category":"string-funcs","sql":"SELECT lower()","expect":"error","ref":"functions-string","note":"lower requires argument"}
+{"id":"strfa0019","category":"string-funcs","sql":"SELECT substr('hello world', 1, 5)","expect":"ok","ref":"functions-string","note":"substr with start and count"}
+{"id":"strfa0020","category":"string-funcs","sql":"SELECT substr('hello world', 7)","expect":"ok","ref":"functions-string","note":"substr with start only"}
+{"id":"strfa0021","category":"string-funcs","sql":"SELECT substring('hello world' FROM 1 FOR 5)","expect":"ok","ref":"functions-string","note":"SQL-standard substring FROM FOR"}
+{"id":"strfa0022","category":"string-funcs","sql":"SELECT substring('hello world' FROM 7)","expect":"ok","ref":"functions-string","note":"SQL-standard substring FROM only"}
+{"id":"strfa0023","category":"string-funcs","sql":"SELECT substring('hello world' FOR 5)","expect":"ok","ref":"functions-string","note":"SQL-standard substring FOR only"}
+{"id":"strfa0024","category":"string-funcs","sql":"SELECT substring('hello' FROM 2 FOR 3)","expect":"ok","ref":"functions-string","note":"substring extract middle portion"}
+{"id":"strfa0025","category":"string-funcs","sql":"SELECT substring('hello world' FROM '[a-z]+')","expect":"ok","ref":"functions-string","note":"substring with POSIX regex pattern"}
+{"id":"strfa0026","category":"string-funcs","sql":"SELECT substring('hello world' SIMILAR '%#\"world#\"%' ESCAPE '#')","expect":"ok","ref":"functions-string","note":"substring SIMILAR ESCAPE SQL regex"}
+{"id":"strfa0027","category":"string-funcs","sql":"SELECT substr()","expect":"error","ref":"functions-string","note":"substr requires arguments"}
+{"id":"strfa0028","category":"string-funcs","sql":"SELECT concat('hello', ' ', 'world')","expect":"ok","ref":"functions-string","note":"concat multiple text args"}
+{"id":"strfa0029","category":"string-funcs","sql":"SELECT concat('hello', NULL, 'world')","expect":"ok","ref":"functions-string","note":"concat ignores NULL arguments"}
+{"id":"strfa0030","category":"string-funcs","sql":"SELECT concat('a', 'b')","expect":"ok","ref":"functions-string","note":"concat two arguments"}
+{"id":"strfa0031","category":"string-funcs","sql":"SELECT concat_ws(', ', 'a', 'b', 'c')","expect":"ok","ref":"functions-string","note":"concat_ws with separator"}
+{"id":"strfa0032","category":"string-funcs","sql":"SELECT concat_ws(', ', 'a', NULL, 'c')","expect":"ok","ref":"functions-string","note":"concat_ws skips NULL values"}
+{"id":"strfa0033","category":"string-funcs","sql":"SELECT concat_ws()","expect":"error","ref":"functions-string","note":"concat_ws requires separator argument"}
+{"id":"strfa0034","category":"string-funcs","sql":"SELECT concat_ws(',', 'a')","expect":"ok","ref":"functions-string","note":"concat_ws with separator and single value"}
+{"id":"strfa0035","category":"string-funcs","sql":"SELECT format('%s %s', 'hello', 'world')","expect":"ok","ref":"functions-string","note":"format with %s specifiers"}
+{"id":"strfa0036","category":"string-funcs","sql":"SELECT format('%I', 'my_table')","expect":"ok","ref":"functions-string","note":"format %I quotes identifier"}
+{"id":"strfa0037","category":"string-funcs","sql":"SELECT format('%L', 'it''s a value')","expect":"ok","ref":"functions-string","note":"format %L quotes string literal"}
+{"id":"strfa0038","category":"string-funcs","sql":"SELECT format('%%')","expect":"ok","ref":"functions-string","note":"format %% literal percent sign"}
+{"id":"strfa0039","category":"string-funcs","sql":"SELECT format('%1$s %1$s', 'hello')","expect":"ok","ref":"functions-string","note":"format positional argument reference"}
+{"id":"strfa0040","category":"string-funcs","sql":"SELECT format('%3$s %2$s %1$s', 'one', 'two', 'three')","expect":"ok","ref":"functions-string","note":"format reverse positional arguments"}
+{"id":"strfa0041","category":"string-funcs","sql":"SELECT format('|%10s|', 'foo')","expect":"ok","ref":"functions-string","note":"format width right-justify"}
+{"id":"strfa0042","category":"string-funcs","sql":"SELECT format('|%-10s|', 'foo')","expect":"ok","ref":"functions-string","note":"format width left-justify with flag"}
+{"id":"strfa0043","category":"string-funcs","sql":"SELECT format('%*s', 10, 'foo')","expect":"ok","ref":"functions-string","note":"format dynamic width via argument"}
+{"id":"strfa0044","category":"string-funcs","sql":"SELECT format()","expect":"error","ref":"functions-string","note":"format requires format string argument"}
+{"id":"strfa0045","category":"string-funcs","sql":"SELECT lpad('hello', 10)","expect":"ok","ref":"functions-string","note":"lpad with space fill default"}
+{"id":"strfa0046","category":"string-funcs","sql":"SELECT lpad('hello', 10, '*')","expect":"ok","ref":"functions-string","note":"lpad with custom fill character"}
+{"id":"strfa0047","category":"string-funcs","sql":"SELECT rpad('hello', 10)","expect":"ok","ref":"functions-string","note":"rpad with space fill default"}
+{"id":"strfa0048","category":"string-funcs","sql":"SELECT rpad('hello', 10, '-')","expect":"ok","ref":"functions-string","note":"rpad with custom fill character"}
+{"id":"strfa0049","category":"string-funcs","sql":"SELECT lpad('hello', 3)","expect":"ok","ref":"functions-string","note":"lpad truncates if length smaller than string"}
+{"id":"strfa0050","category":"string-funcs","sql":"SELECT lpad()","expect":"error","ref":"functions-string","note":"lpad requires at least two arguments"}
+{"id":"strfa0051","category":"string-funcs","sql":"SELECT rpad()","expect":"error","ref":"functions-string","note":"rpad requires at least two arguments"}
+{"id":"strfa0052","category":"string-funcs","sql":"SELECT left('hello world', 5)","expect":"ok","ref":"functions-string","note":"left returns first n characters"}
+{"id":"strfa0053","category":"string-funcs","sql":"SELECT right('hello world', 5)","expect":"ok","ref":"functions-string","note":"right returns last n characters"}
+{"id":"strfa0054","category":"string-funcs","sql":"SELECT left('hello', -2)","expect":"ok","ref":"functions-string","note":"left with negative n excludes last n chars"}
+{"id":"strfa0055","category":"string-funcs","sql":"SELECT right('hello', -2)","expect":"ok","ref":"functions-string","note":"right with negative n excludes first n chars"}
+{"id":"strfa0056","category":"string-funcs","sql":"SELECT left()","expect":"error","ref":"functions-string","note":"left requires two arguments"}
+{"id":"strfa0057","category":"string-funcs","sql":"SELECT right()","expect":"error","ref":"functions-string","note":"right requires two arguments"}
+{"id":"strfa0058","category":"string-funcs","sql":"SELECT repeat('ha', 3)","expect":"ok","ref":"functions-string","note":"repeat string n times"}
+{"id":"strfa0059","category":"string-funcs","sql":"SELECT repeat('x', 0)","expect":"ok","ref":"functions-string","note":"repeat zero times returns empty string"}
+{"id":"strfa0060","category":"string-funcs","sql":"SELECT repeat()","expect":"error","ref":"functions-string","note":"repeat requires two arguments"}
+{"id":"strfa0061","category":"string-funcs","sql":"SELECT reverse('hello')","expect":"ok","ref":"functions-string","note":"reverse reverses character order"}
+{"id":"strfa0062","category":"string-funcs","sql":"SELECT reverse()","expect":"error","ref":"functions-string","note":"reverse requires one argument"}
+{"id":"strfa0063","category":"string-funcs","sql":"SELECT replace('hello world', 'world', 'PostgreSQL')","expect":"ok","ref":"functions-string","note":"replace all occurrences of substring"}
+{"id":"strfa0064","category":"string-funcs","sql":"SELECT replace('aabbcc', 'b', 'x')","expect":"ok","ref":"functions-string","note":"replace replaces all instances"}
+{"id":"strfa0065","category":"string-funcs","sql":"SELECT replace()","expect":"error","ref":"functions-string","note":"replace requires three arguments"}
+{"id":"strfa0066","category":"string-funcs","sql":"SELECT translate('hello', 'aeiou', '12345')","expect":"ok","ref":"functions-string","note":"translate character-by-character replacement"}
+{"id":"strfa0067","category":"string-funcs","sql":"SELECT translate('hello', 'el', '')","expect":"ok","ref":"functions-string","note":"translate with shorter to string deletes chars"}
+{"id":"strfa0068","category":"string-funcs","sql":"SELECT translate()","expect":"error","ref":"functions-string","note":"translate requires three arguments"}
+{"id":"strfa0069","category":"string-funcs","sql":"SELECT split_part('a,b,c,d', ',', 2)","expect":"ok","ref":"functions-string","note":"split_part returns nth field"}
+{"id":"strfa0070","category":"string-funcs","sql":"SELECT split_part('a,b,c', ',', 1)","expect":"ok","ref":"functions-string","note":"split_part first field"}
+{"id":"strfa0071","category":"string-funcs","sql":"SELECT split_part('a,b,c', ',', -1)","expect":"ok","ref":"functions-string","note":"split_part negative index counts from end"}
+{"id":"strfa0072","category":"string-funcs","sql":"SELECT split_part('hello', ',', 5)","expect":"ok","ref":"functions-string","note":"split_part returns empty string if field out of range"}
+{"id":"strfa0073","category":"string-funcs","sql":"SELECT split_part()","expect":"error","ref":"functions-string","note":"split_part requires three arguments"}
+{"id":"strfa0074","category":"string-funcs","sql":"SELECT string_to_array('a,b,c', ',')","expect":"ok","ref":"functions-string","note":"string_to_array basic split"}
+{"id":"strfa0075","category":"string-funcs","sql":"SELECT string_to_array('a,,b', ',', '')","expect":"ok","ref":"functions-string","note":"string_to_array with null_string converts empty to NULL"}
+{"id":"strfa0076","category":"string-funcs","sql":"SELECT string_to_array('hello', NULL)","expect":"ok","ref":"functions-string","note":"string_to_array with NULL delimiter splits each char"}
+{"id":"strfa0077","category":"string-funcs","sql":"SELECT string_to_array()","expect":"error","ref":"functions-string","note":"string_to_array requires at least two arguments"}
+{"id":"strfa0078","category":"string-funcs","sql":"SELECT * FROM string_to_table('a,b,c', ',')","expect":"ok","ref":"functions-string","note":"string_to_table returns set of text"}
+{"id":"strfa0079","category":"string-funcs","sql":"SELECT * FROM string_to_table('a,,b', ',', '')","expect":"ok","ref":"functions-string","note":"string_to_table with null_string"}
+{"id":"strfa0080","category":"string-funcs","sql":"SELECT * FROM string_to_table('hello', NULL)","expect":"ok","ref":"functions-string","note":"string_to_table NULL delimiter splits each char"}
+{"id":"strfa0081","category":"string-funcs","sql":"SELECT encode('hello'::bytea, 'base64')","expect":"ok","ref":"functions-string","note":"encode to base64"}
+{"id":"strfa0082","category":"string-funcs","sql":"SELECT encode('hello'::bytea, 'hex')","expect":"ok","ref":"functions-string","note":"encode to hex"}
+{"id":"strfa0083","category":"string-funcs","sql":"SELECT encode('hello'::bytea, 'escape')","expect":"ok","ref":"functions-string","note":"encode to escape format"}
+{"id":"strfa0084","category":"string-funcs","sql":"SELECT decode('aGVsbG8=', 'base64')","expect":"ok","ref":"functions-string","note":"decode from base64"}
+{"id":"strfa0085","category":"string-funcs","sql":"SELECT decode('68656c6c6f', 'hex')","expect":"ok","ref":"functions-string","note":"decode from hex"}
+{"id":"strfa0086","category":"string-funcs","sql":"SELECT decode('hello', 'escape')","expect":"ok","ref":"functions-string","note":"decode from escape format"}
+{"id":"strfa0087","category":"string-funcs","sql":"SELECT encode('hello'::bytea, 'invalid_format')","expect":"error","ref":"functions-string","note":"encode with unknown format is error"}
+{"id":"strfa0088","category":"string-funcs","sql":"SELECT encode()","expect":"error","ref":"functions-string","note":"encode requires two arguments"}
+{"id":"strfa0089","category":"string-funcs","sql":"SELECT md5('hello')","expect":"ok","ref":"functions-string","note":"md5 of text returns hex string"}
+{"id":"strfa0090","category":"string-funcs","sql":"SELECT md5('hello'::bytea)","expect":"ok","ref":"functions-string","note":"md5 of bytea returns hex string"}
+{"id":"strfa0091","category":"string-funcs","sql":"SELECT md5()","expect":"error","ref":"functions-string","note":"md5 requires one argument"}
+{"id":"strfa0092","category":"string-funcs","sql":"SELECT sha256('hello'::bytea)","expect":"ok","ref":"functions-string","note":"sha256 of bytea"}
+{"id":"strfa0093","category":"string-funcs","sql":"SELECT sha224('hello'::bytea)","expect":"ok","ref":"functions-string","note":"sha224 of bytea"}
+{"id":"strfa0094","category":"string-funcs","sql":"SELECT sha384('hello'::bytea)","expect":"ok","ref":"functions-string","note":"sha384 of bytea"}
+{"id":"strfa0095","category":"string-funcs","sql":"SELECT sha512('hello'::bytea)","expect":"ok","ref":"functions-string","note":"sha512 of bytea"}
+{"id":"strfa0096","category":"string-funcs","sql":"SELECT sha256('hello')","expect":"ok","ref":"functions-string","note":"sha256 with text literal (implicitly cast to bytea)"}
+{"id":"strfa0097","category":"string-funcs","sql":"SELECT ascii('A')","expect":"ok","ref":"functions-string","note":"ascii returns code point of first char"}
+{"id":"strfa0098","category":"string-funcs","sql":"SELECT ascii('')","expect":"ok","ref":"functions-string","note":"ascii of empty string returns 0"}
+{"id":"strfa0099","category":"string-funcs","sql":"SELECT chr(65)","expect":"ok","ref":"functions-string","note":"chr returns character for code point"}
+{"id":"strfa0100","category":"string-funcs","sql":"SELECT chr(0)","expect":"error","ref":"functions-string","note":"chr(0) not permitted - null character"}
+{"id":"strfa0101","category":"string-funcs","sql":"SELECT ascii()","expect":"error","ref":"functions-string","note":"ascii requires one argument"}
+{"id":"strfa0102","category":"string-funcs","sql":"SELECT chr()","expect":"error","ref":"functions-string","note":"chr requires one argument"}
+{"id":"strfa0103","category":"string-funcs","sql":"SELECT starts_with('hello world', 'hello')","expect":"ok","ref":"functions-string","note":"starts_with returns true when prefix matches"}
+{"id":"strfa0104","category":"string-funcs","sql":"SELECT starts_with('hello world', 'world')","expect":"ok","ref":"functions-string","note":"starts_with returns false when no prefix match"}
+{"id":"strfa0105","category":"string-funcs","sql":"SELECT 'hello world' ^@ 'hello'","expect":"ok","ref":"functions-string","note":"^@ operator equivalent to starts_with"}
+{"id":"strfa0106","category":"string-funcs","sql":"SELECT starts_with()","expect":"error","ref":"functions-string","note":"starts_with requires two arguments"}
+{"id":"strfa0107","category":"string-funcs","sql":"SELECT btrim('  hello  ')","expect":"ok","ref":"functions-string","note":"btrim removes leading and trailing spaces"}
+{"id":"strfa0108","category":"string-funcs","sql":"SELECT btrim('xxhelloxx', 'x')","expect":"ok","ref":"functions-string","note":"btrim with custom trim characters"}
+{"id":"strfa0109","category":"string-funcs","sql":"SELECT ltrim('  hello  ')","expect":"ok","ref":"functions-string","note":"ltrim removes leading spaces"}
+{"id":"strfa0110","category":"string-funcs","sql":"SELECT rtrim('  hello  ')","expect":"ok","ref":"functions-string","note":"rtrim removes trailing spaces"}
+{"id":"strfa0111","category":"string-funcs","sql":"SELECT ltrim('xxhello', 'x')","expect":"ok","ref":"functions-string","note":"ltrim with custom trim set"}
+{"id":"strfa0112","category":"string-funcs","sql":"SELECT rtrim('helloxx', 'x')","expect":"ok","ref":"functions-string","note":"rtrim with custom trim set"}
+{"id":"strfa0113","category":"string-funcs","sql":"SELECT trim(LEADING FROM '  hello  ')","expect":"ok","ref":"functions-string","note":"SQL TRIM LEADING syntax"}
+{"id":"strfa0114","category":"string-funcs","sql":"SELECT trim(TRAILING FROM '  hello  ')","expect":"ok","ref":"functions-string","note":"SQL TRIM TRAILING syntax"}
+{"id":"strfa0115","category":"string-funcs","sql":"SELECT trim(BOTH FROM '  hello  ')","expect":"ok","ref":"functions-string","note":"SQL TRIM BOTH syntax"}
+{"id":"strfa0116","category":"string-funcs","sql":"SELECT trim(BOTH 'x' FROM 'xxhelloxx')","expect":"ok","ref":"functions-string","note":"SQL TRIM BOTH with chars FROM string"}
+{"id":"strfa0117","category":"string-funcs","sql":"SELECT trim(LEADING 'x' FROM 'xxhello')","expect":"ok","ref":"functions-string","note":"SQL TRIM LEADING with chars"}
+{"id":"strfa0118","category":"string-funcs","sql":"SELECT trim(TRAILING 'x' FROM 'helloxx')","expect":"ok","ref":"functions-string","note":"SQL TRIM TRAILING with chars"}
+{"id":"strfa0119","category":"string-funcs","sql":"SELECT trim('  hello  ')","expect":"ok","ref":"functions-string","note":"trim without direction defaults to BOTH spaces"}
+{"id":"strfa0120","category":"string-funcs","sql":"SELECT 'hello' || ' ' || 'world'","expect":"ok","ref":"functions-string","note":"|| text concatenation operator"}
+{"id":"strfa0121","category":"string-funcs","sql":"SELECT 'hello' || 42","expect":"ok","ref":"functions-string","note":"|| operator with text and non-array non-text"}
+{"id":"strfa0122","category":"string-funcs","sql":"SELECT 42 || ' world'","expect":"ok","ref":"functions-string","note":"|| operator with int and text"}
+{"id":"strfa0123","category":"string-funcs","sql":"SELECT NULL || 'hello'","expect":"ok","ref":"functions-string","note":"|| with NULL returns NULL"}
+{"id":"strfa0124","category":"string-funcs","sql":"SELECT quote_ident('hello')","expect":"ok","ref":"functions-string","note":"quote_ident simple identifier"}
+{"id":"strfa0125","category":"string-funcs","sql":"SELECT quote_ident('Hello World')","expect":"ok","ref":"functions-string","note":"quote_ident with spaces requires quoting"}
+{"id":"strfa0126","category":"string-funcs","sql":"SELECT quote_ident('select')","expect":"ok","ref":"functions-string","note":"quote_ident with reserved keyword"}
+{"id":"strfa0127","category":"string-funcs","sql":"SELECT quote_literal('it''s a test')","expect":"ok","ref":"functions-string","note":"quote_literal escapes single quotes"}
+{"id":"strfa0128","category":"string-funcs","sql":"SELECT quote_literal(42)","expect":"ok","ref":"functions-string","note":"quote_literal on integer converts to text"}
+{"id":"strfa0129","category":"string-funcs","sql":"SELECT quote_nullable(NULL)","expect":"ok","ref":"functions-string","note":"quote_nullable returns NULL literal for NULL"}
+{"id":"strfa0130","category":"string-funcs","sql":"SELECT quote_nullable('hello')","expect":"ok","ref":"functions-string","note":"quote_nullable quotes non-null value"}
+{"id":"strfa0131","category":"string-funcs","sql":"SELECT quote_ident()","expect":"error","ref":"functions-string","note":"quote_ident requires one argument"}
+{"id":"strfa0132","category":"string-funcs","sql":"SELECT quote_literal()","expect":"error","ref":"functions-string","note":"quote_literal requires one argument"}
+{"id":"strfa0133","category":"string-funcs","sql":"SELECT parse_ident('foo.bar')","expect":"ok","ref":"functions-string","note":"parse_ident splits qualified identifier"}
+{"id":"strfa0134","category":"string-funcs","sql":"SELECT parse_ident('\"My Schema\".\"My Table\"')","expect":"ok","ref":"functions-string","note":"parse_ident with quoted identifiers"}
+{"id":"strfa0135","category":"string-funcs","sql":"SELECT parse_ident('foo.bar', false)","expect":"ok","ref":"functions-string","note":"parse_ident non-strict mode"}
+{"id":"strfa0136","category":"string-funcs","sql":"SELECT parse_ident('foo.bar.baz')","expect":"ok","ref":"functions-string","note":"parse_ident three-part identifier"}
+{"id":"strfa0137","category":"string-funcs","sql":"SELECT parse_ident('invalid..ident')","expect":"error","ref":"functions-string","note":"parse_ident rejects double dot in strict mode"}
+{"id":"strfa0138","category":"string-funcs","sql":"SELECT normalize('café')","expect":"ok","ref":"functions-string","note":"normalize with default NFC form"}
+{"id":"strfa0139","category":"string-funcs","sql":"SELECT normalize('café', NFC)","expect":"ok","ref":"functions-string","note":"normalize explicit NFC form"}
+{"id":"strfa0140","category":"string-funcs","sql":"SELECT normalize('café', NFD)","expect":"ok","ref":"functions-string","note":"normalize NFD form"}
+{"id":"strfa0141","category":"string-funcs","sql":"SELECT normalize('café', NFKC)","expect":"ok","ref":"functions-string","note":"normalize NFKC form"}
+{"id":"strfa0142","category":"string-funcs","sql":"SELECT normalize('café', NFKD)","expect":"ok","ref":"functions-string","note":"normalize NFKD form"}
+{"id":"strfa0143","category":"string-funcs","sql":"SELECT normalize('hello', INVALID_FORM)","expect":"error","ref":"functions-string","note":"normalize with invalid form is syntax error"}
+{"id":"strfa0144","category":"string-funcs","sql":"SELECT 'café' IS NORMALIZED","expect":"ok","ref":"functions-string","note":"IS NORMALIZED predicate"}
+{"id":"strfa0145","category":"string-funcs","sql":"SELECT 'café' IS NFC NORMALIZED","expect":"ok","ref":"functions-string","note":"IS NFC NORMALIZED predicate"}
+{"id":"strfa0146","category":"string-funcs","sql":"SELECT 'hello' IS NOT NORMALIZED","expect":"ok","ref":"functions-string","note":"IS NOT NORMALIZED predicate"}
+{"id":"strfa0147","category":"string-funcs","sql":"SELECT to_hex(255)","expect":"ok","ref":"functions-string","note":"to_hex integer to hex string"}
+{"id":"strfa0148","category":"string-funcs","sql":"SELECT to_hex(0)","expect":"ok","ref":"functions-string","note":"to_hex zero"}
+{"id":"strfa0149","category":"string-funcs","sql":"SELECT to_hex(-1::bigint)","expect":"ok","ref":"functions-string","note":"to_hex bigint with negative value"}
+{"id":"strfa0150","category":"string-funcs","sql":"SELECT to_hex()","expect":"error","ref":"functions-string","note":"to_hex requires one argument"}
+{"id":"strfa0151","category":"string-funcs","sql":"SELECT gen_random_uuid()","expect":"ok","ref":"functions-string","note":"gen_random_uuid returns a new UUID"}
+{"id":"strfa0152","category":"string-funcs","sql":"SELECT unistr('\\0041')","expect":"ok","ref":"functions-string","note":"unistr with 4-digit Unicode escape"}
+{"id":"strfa0153","category":"string-funcs","sql":"SELECT unistr('hello \\+01F600')","expect":"ok","ref":"functions-string","note":"unistr with 6-digit Unicode escape for emoji"}
+{"id":"strfa0154","category":"string-funcs","sql":"SELECT unistr('hello world')","expect":"ok","ref":"functions-string","note":"unistr with no escapes returns literal string"}
+{"id":"strfa0155","category":"string-funcs","sql":"SELECT unistr()","expect":"error","ref":"functions-string","note":"unistr requires one argument"}
+{"id":"strfa0156","category":"string-funcs","sql":"SELECT convert('hello'::bytea, 'UTF8', 'LATIN1')","expect":"ok","ref":"functions-string","note":"convert bytea between encodings"}
+{"id":"strfa0157","category":"string-funcs","sql":"SELECT convert_from('hello'::bytea, 'UTF8')","expect":"ok","ref":"functions-string","note":"convert_from bytea to text using encoding"}
+{"id":"strfa0158","category":"string-funcs","sql":"SELECT convert_to('hello', 'UTF8')","expect":"ok","ref":"functions-string","note":"convert_to text to bytea using encoding"}
+{"id":"strfa0159","category":"string-funcs","sql":"SELECT convert_from()","expect":"error","ref":"functions-string","note":"convert_from requires two arguments"}
+{"id":"strfa0160","category":"string-funcs","sql":"SELECT convert_to()","expect":"error","ref":"functions-string","note":"convert_to requires two arguments"}
+{"id":"strfa0161","category":"string-funcs","sql":"SELECT position('world' IN 'hello world')","expect":"ok","ref":"functions-string","note":"SQL-standard POSITION IN syntax"}
+{"id":"strfa0162","category":"string-funcs","sql":"SELECT position('xyz' IN 'hello world')","expect":"ok","ref":"functions-string","note":"position returns 0 when not found"}
+{"id":"strfa0163","category":"string-funcs","sql":"SELECT strpos('hello world', 'world')","expect":"ok","ref":"functions-string","note":"strpos function form of position"}
+{"id":"strfa0164","category":"string-funcs","sql":"SELECT overlay('hello world' PLACING 'there' FROM 7)","expect":"ok","ref":"functions-string","note":"overlay PLACING FROM without FOR"}
+{"id":"strfa0165","category":"string-funcs","sql":"SELECT overlay('hello world' PLACING 'there' FROM 7 FOR 5)","expect":"ok","ref":"functions-string","note":"overlay PLACING FROM FOR"}
+{"id":"strfa0166","category":"string-funcs","sql":"SELECT overlay('Txxxxas' PLACING 'hom' FROM 2 FOR 4)","expect":"ok","ref":"functions-string","note":"overlay replacing middle portion"}
+{"id":"strfa0167","category":"string-funcs","sql":"SELECT overlay()","expect":"error","ref":"functions-string","note":"overlay requires arguments"}
+{"id":"strfa0168","category":"string-funcs","sql":"SELECT to_ascii(convert_to('hello', 'LATIN1')::text, 'LATIN1')","expect":"ok","ref":"functions-string","note":"to_ascii text with encoding name from LATIN1 source"}
+{"id":"strfa0169","category":"string-funcs","sql":"SELECT to_ascii(convert_to('caf', 'LATIN1')::text, 'LATIN1')","expect":"ok","ref":"functions-string","note":"to_ascii converts LATIN1-encoded text to ASCII"}
+{"id":"strfa0170","category":"string-funcs","sql":"SELECT pg_client_encoding()","expect":"ok","ref":"functions-string","note":"pg_client_encoding returns current client encoding"}
+{"id":"strfa0171","category":"string-funcs","sql":"SELECT length(name), upper(name), lower(name) FROM s.t","expect":"ok","ref":"functions-string","note":"multiple string functions in same SELECT"}
+{"id":"strfa0172","category":"string-funcs","sql":"SELECT concat(name, ' (id=', id::text, ')') FROM s.t","expect":"ok","ref":"functions-string","note":"concat with column references and cast"}
+{"id":"strfa0173","category":"string-funcs","sql":"SELECT format('%I has %s rows', 'my_table', count(*)) FROM s.t","expect":"ok","ref":"functions-string","note":"format in aggregate query context"}
+{"id":"strfa0174","category":"string-funcs","sql":"SELECT split_part(name, ' ', 1) FROM s.t","expect":"ok","ref":"functions-string","note":"split_part on table column"}
+{"id":"strfa0175","category":"string-funcs","sql":"SELECT string_to_array(name, ' ') FROM s.t","expect":"ok","ref":"functions-string","note":"string_to_array on column"}
+{"id":"strfa0176","category":"string-funcs","sql":"SELECT name FROM s.t WHERE starts_with(name, 'A')","expect":"ok","ref":"functions-string","note":"starts_with in WHERE clause"}
+{"id":"strfa0177","category":"string-funcs","sql":"SELECT casefold('Hello WORLD')","expect":"ok","ref":"functions-string","note":"casefold Unicode case folding"}
+{"id":"strfa0178","category":"string-funcs","sql":"SELECT 'abc' || NULL || 'def'","expect":"ok","ref":"functions-string","note":"|| concatenation with NULL in chain"}
+{"id":"strfa0179","category":"string-funcs","sql":"SELECT repeat(name, 2) FROM s.t","expect":"ok","ref":"functions-string","note":"repeat on table column"}
+{"id":"strfa0180","category":"string-funcs","sql":"SELECT reverse(name) FROM s.t","expect":"ok","ref":"functions-string","note":"reverse on table column"}
+{"id":"strfa0181","category":"string-funcs","sql":"SELECT replace(name, 'a', 'A') FROM s.t","expect":"ok","ref":"functions-string","note":"replace on table column"}
+{"id":"strfa0182","category":"string-funcs","sql":"SELECT translate(name, 'aeiou', 'AEIOU') FROM s.t","expect":"ok","ref":"functions-string","note":"translate on table column"}
+{"id":"strfa0183","category":"string-funcs","sql":"SELECT md5(name) FROM s.t","expect":"ok","ref":"functions-string","note":"md5 on table column"}
+{"id":"strfa0184","category":"string-funcs","sql":"SELECT substring('hello' FROM 2 FOR 3), left('world', 3), right('world', 3)","expect":"ok","ref":"functions-string","note":"substring left right in one query"}
+{"id":"strfa0185","category":"string-funcs","sql":"SELECT lpad(name, 20, '.') FROM s.t","expect":"ok","ref":"functions-string","note":"lpad on table column"}
+{"id":"strfa0186","category":"string-funcs","sql":"SELECT rpad(name, 20) FROM s.t","expect":"ok","ref":"functions-string","note":"rpad on table column with default fill"}
+{"id":"strfa0187","category":"string-funcs","sql":"SELECT btrim(name) FROM s.t","expect":"ok","ref":"functions-string","note":"btrim on table column"}
+{"id":"strfa0188","category":"string-funcs","sql":"SELECT name FROM s.t WHERE name ^@ 'test'","expect":"ok","ref":"functions-string","note":"^@ operator in WHERE clause"}
+{"id":"strfa0189","category":"string-funcs","sql":"SELECT quote_literal(val::text) FROM s.t","expect":"ok","ref":"functions-string","note":"quote_literal on numeric cast to text"}
+{"id":"strfa0190","category":"string-funcs","sql":"SELECT to_hex(qty) FROM s.t","expect":"ok","ref":"functions-string","note":"to_hex on integer column"}
+{"id":"strfa0191","category":"string-funcs","sql":"SELECT substr('hello', 1, 100)","expect":"ok","ref":"functions-string","note":"substr with count beyond string length"}
+{"id":"strfa0192","category":"string-funcs","sql":"SELECT chr(65) || chr(66) || chr(67)","expect":"ok","ref":"functions-string","note":"chr results concatenated"}
+{"id":"strfa0193","category":"string-funcs","sql":"SELECT ascii(upper('a'))","expect":"ok","ref":"functions-string","note":"ascii of upper result"}
+{"id":"strfa0194","category":"string-funcs","sql":"SELECT length(repeat('x', 100))","expect":"ok","ref":"functions-string","note":"length of repeated string"}
+{"id":"strfa0195","category":"string-funcs","sql":"SELECT encode(convert_to('hello', 'UTF8'), 'base64')","expect":"ok","ref":"functions-string","note":"encode convert_to pipeline"}
+{"id":"strfa0196","category":"string-funcs","sql":"SELECT convert_from(decode('68656c6c6f', 'hex'), 'UTF8')","expect":"ok","ref":"functions-string","note":"convert_from decode pipeline"}
+{"id":"strfa0197","category":"string-funcs","sql":"SELECT format('%s', NULL)","expect":"ok","ref":"functions-string","note":"format %s with NULL argument renders empty"}
+{"id":"strfa0198","category":"string-funcs","sql":"SELECT format('%L', NULL)","expect":"ok","ref":"functions-string","note":"format %L with NULL renders NULL literal"}
+{"id":"strfa0199","category":"string-funcs","sql":"SELECT length(NULL)","expect":"ok","ref":"functions-string","note":"length of NULL returns NULL"}
+{"id":"strfa0200","category":"string-funcs","sql":"SELECT upper(NULL)","expect":"ok","ref":"functions-string","note":"upper of NULL returns NULL"}

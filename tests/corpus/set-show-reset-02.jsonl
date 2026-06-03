@@ -1,0 +1,35 @@
+{"id":"ssrb0001","category":"set-show-reset","sql":"SET work_mem = '4MB'","expect":"ok","ref":"sql-set","note":"SET param = string value"}
+{"id":"ssrb0002","category":"set-show-reset","sql":"SET work_mem TO '8MB'","expect":"ok","ref":"sql-set","note":"SET param TO string value"}
+{"id":"ssrb0003","category":"set-show-reset","sql":"SET SESSION work_mem TO '16MB'","expect":"ok","ref":"sql-set","note":"SET SESSION param TO value"}
+{"id":"ssrb0004","category":"set-show-reset","sql":"SET LOCAL work_mem TO '32MB'","expect":"ok","ref":"sql-set","note":"SET LOCAL param TO value"}
+{"id":"ssrb0005","category":"set-show-reset","sql":"SET work_mem TO DEFAULT","expect":"ok","ref":"sql-set","note":"SET param TO DEFAULT"}
+{"id":"ssrb0006","category":"set-show-reset","sql":"SET SESSION work_mem TO DEFAULT","expect":"ok","ref":"sql-set","note":"SET SESSION param TO DEFAULT"}
+{"id":"ssrb0007","category":"set-show-reset","sql":"SET LOCAL work_mem TO DEFAULT","expect":"ok","ref":"sql-set","note":"SET LOCAL param TO DEFAULT"}
+{"id":"ssrb0008","category":"set-show-reset","sql":"RESET work_mem","expect":"ok","ref":"sql-set","note":"RESET single parameter"}
+{"id":"ssrb0009","category":"set-show-reset","sql":"RESET ALL","expect":"ok","ref":"sql-set","note":"RESET ALL parameters"}
+{"id":"ssrb0010","category":"set-show-reset","sql":"SHOW work_mem","expect":"ok","ref":"sql-set","note":"SHOW single parameter"}
+{"id":"ssrb0011","category":"set-show-reset","sql":"SHOW ALL","expect":"ok","ref":"sql-set","note":"SHOW ALL parameters"}
+{"id":"ssrb0012","category":"set-show-reset","sql":"SET search_path TO s, public","expect":"ok","ref":"sql-set","note":"SET search_path with comma-separated list"}
+{"id":"ssrb0013","category":"set-show-reset","sql":"SET search_path TO 's', 'public'","expect":"ok","ref":"sql-set","note":"SET search_path with quoted schema names"}
+{"id":"ssrb0014","category":"set-show-reset","sql":"SET TIME ZONE 'America/New_York'","expect":"ok","ref":"sql-set","note":"SET TIME ZONE to named timezone"}
+{"id":"ssrb0015","category":"set-show-reset","sql":"SET TIME ZONE LOCAL","expect":"ok","ref":"sql-set","note":"SET TIME ZONE LOCAL"}
+{"id":"ssrb0016","category":"set-show-reset","sql":"SET TIME ZONE DEFAULT","expect":"ok","ref":"sql-set","note":"SET TIME ZONE DEFAULT"}
+{"id":"ssrb0017","category":"set-show-reset","sql":"SET TIME ZONE 'UTC'","expect":"ok","ref":"sql-set","note":"SET TIME ZONE to UTC string"}
+{"id":"ssrb0018","category":"set-show-reset","sql":"SET TIME ZONE INTERVAL '+05:30' HOUR TO MINUTE","expect":"ok","ref":"sql-set","note":"SET TIME ZONE INTERVAL with fields"}
+{"id":"ssrb0019","category":"set-show-reset","sql":"SET datestyle TO 'ISO, MDY'","expect":"ok","ref":"sql-set","note":"SET datestyle to ISO MDY"}
+{"id":"ssrb0020","category":"set-show-reset","sql":"SET intervalstyle TO 'sql_standard'","expect":"ok","ref":"sql-set","note":"SET intervalstyle to sql_standard"}
+{"id":"ssrb0021","category":"set-show-reset","sql":"SET client_encoding TO 'UTF8'","expect":"ok","ref":"sql-set","note":"SET client_encoding to UTF8"}
+{"id":"ssrb0022","category":"set-show-reset","sql":"SET enable_seqscan TO on","expect":"ok","ref":"sql-set","note":"SET boolean param to unquoted on"}
+{"id":"ssrb0023","category":"set-show-reset","sql":"SET enable_seqscan TO off","expect":"ok","ref":"sql-set","note":"SET boolean param to unquoted off"}
+{"id":"ssrb0024","category":"set-show-reset","sql":"SET enable_seqscan = true","expect":"ok","ref":"sql-set","note":"SET boolean param using = with true"}
+{"id":"ssrb0025","category":"set-show-reset","sql":"SET statement_timeout TO 5000","expect":"ok","ref":"sql-set","note":"SET param to numeric literal"}
+{"id":"ssrb0026","category":"set-show-reset","sql":"SET standard_conforming_strings TO on; SHOW standard_conforming_strings","expect":"ok","ref":"sql-set","note":"SET then SHOW in same transaction"}
+{"id":"ssrb0027","category":"set-show-reset","sql":"SET SESSION AUTHORIZATION DEFAULT","expect":"ok","ref":"sql-set","note":"SET SESSION AUTHORIZATION DEFAULT"}
+{"id":"ssrb0028","category":"set-show-reset","sql":"SET ROLE NONE","expect":"ok","ref":"sql-set","note":"SET ROLE NONE resets role"}
+{"id":"ssrb0029","category":"set-show-reset","sql":"SET","expect":"error","ref":"sql-set","note":"error: SET without parameter name or value"}
+{"id":"ssrb0030","category":"set-show-reset","sql":"SHOW work_mem = '4MB'","expect":"error","ref":"sql-set","note":"error: SHOW with assignment is not valid syntax"}
+{"id":"ssrb0031","category":"set-show-reset","sql":"SET work_mem TO","expect":"error","ref":"sql-set","note":"error: SET without value after TO"}
+{"id":"ssrb0032","category":"set-show-reset","sql":"SET LOCAL LOCAL work_mem TO '4MB'","expect":"error","ref":"sql-set","note":"error: duplicate LOCAL keyword"}
+{"id":"ssrb0033","category":"set-show-reset","sql":"RESET","expect":"error","ref":"sql-set","note":"error: RESET without parameter name"}
+{"id":"ssrb0034","category":"set-show-reset","sql":"SET TIME ZONE","expect":"error","ref":"sql-set","note":"error: SET TIME ZONE without value"}
+{"id":"ssrb0035","category":"set-show-reset","sql":"SET work_mem TO '4MB', '8MB'","expect":"error","ref":"sql-set","note":"error: work_mem does not accept multiple values"}

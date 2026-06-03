@@ -1,0 +1,130 @@
+{"id":"grvb0001","category":"grant-revoke","sql":"GRANT SELECT ON TABLE s.t TO PUBLIC","expect":"ok","ref":"sql-grant","note":"GRANT SELECT ON TABLE explicit keyword TO PUBLIC"}
+{"id":"grvb0002","category":"grant-revoke","sql":"GRANT SELECT ON s.t TO PUBLIC","expect":"ok","ref":"sql-grant","note":"GRANT SELECT ON table (no TABLE keyword) TO PUBLIC"}
+{"id":"grvb0003","category":"grant-revoke","sql":"GRANT INSERT ON s.t TO PUBLIC","expect":"ok","ref":"sql-grant","note":"GRANT INSERT ON table TO PUBLIC"}
+{"id":"grvb0004","category":"grant-revoke","sql":"GRANT UPDATE ON s.t TO PUBLIC","expect":"ok","ref":"sql-grant","note":"GRANT UPDATE ON table TO PUBLIC"}
+{"id":"grvb0005","category":"grant-revoke","sql":"GRANT DELETE ON s.t TO PUBLIC","expect":"ok","ref":"sql-grant","note":"GRANT DELETE ON table TO PUBLIC"}
+{"id":"grvb0006","category":"grant-revoke","sql":"GRANT TRUNCATE ON s.t TO PUBLIC","expect":"ok","ref":"sql-grant","note":"GRANT TRUNCATE ON table TO PUBLIC"}
+{"id":"grvb0007","category":"grant-revoke","sql":"GRANT REFERENCES ON s.t TO PUBLIC","expect":"ok","ref":"sql-grant","note":"GRANT REFERENCES ON table TO PUBLIC"}
+{"id":"grvb0008","category":"grant-revoke","sql":"GRANT TRIGGER ON s.t TO PUBLIC","expect":"ok","ref":"sql-grant","note":"GRANT TRIGGER ON table TO PUBLIC"}
+{"id":"grvb0009","category":"grant-revoke","sql":"GRANT ALL ON s.t TO PUBLIC","expect":"ok","ref":"sql-grant","note":"GRANT ALL (no PRIVILEGES) ON table TO PUBLIC"}
+{"id":"grvb0010","category":"grant-revoke","sql":"GRANT ALL PRIVILEGES ON s.t TO PUBLIC","expect":"ok","ref":"sql-grant","note":"GRANT ALL PRIVILEGES ON table TO PUBLIC"}
+{"id":"grvb0011","category":"grant-revoke","sql":"GRANT SELECT, INSERT ON s.t TO PUBLIC","expect":"ok","ref":"sql-grant","note":"GRANT multiple privileges comma-separated"}
+{"id":"grvb0012","category":"grant-revoke","sql":"GRANT SELECT, INSERT, UPDATE, DELETE ON s.t TO PUBLIC","expect":"ok","ref":"sql-grant","note":"GRANT four privileges on table TO PUBLIC"}
+{"id":"grvb0013","category":"grant-revoke","sql":"GRANT SELECT, INSERT, UPDATE, DELETE, TRUNCATE, REFERENCES, TRIGGER ON s.t TO PUBLIC","expect":"ok","ref":"sql-grant","note":"GRANT all explicit table privileges TO PUBLIC"}
+{"id":"grvb0014","category":"grant-revoke","sql":"CREATE ROLE grvb_wgo1;\nGRANT SELECT ON s.t TO grvb_wgo1 WITH GRANT OPTION","expect":"ok","ref":"sql-grant","note":"GRANT SELECT WITH GRANT OPTION to named role (not PUBLIC)"}
+{"id":"grvb0015","category":"grant-revoke","sql":"CREATE ROLE grvb_wgo2;\nGRANT ALL ON s.t TO grvb_wgo2 WITH GRANT OPTION","expect":"ok","ref":"sql-grant","note":"GRANT ALL WITH GRANT OPTION to named role"}
+{"id":"grvb0016","category":"grant-revoke","sql":"GRANT SELECT ON s.t2 TO PUBLIC","expect":"ok","ref":"sql-grant","note":"GRANT SELECT on second fixture table s.t2"}
+{"id":"grvb0017","category":"grant-revoke","sql":"GRANT SELECT ON s.v TO PUBLIC","expect":"ok","ref":"sql-grant","note":"GRANT SELECT ON view"}
+{"id":"grvb0018","category":"grant-revoke","sql":"GRANT ALL ON s.v TO PUBLIC","expect":"ok","ref":"sql-grant","note":"GRANT ALL ON view TO PUBLIC"}
+{"id":"grvb0019","category":"grant-revoke","sql":"GRANT SELECT ON s.mv TO PUBLIC","expect":"ok","ref":"sql-grant","note":"GRANT SELECT on materialized view"}
+{"id":"grvb0020","category":"grant-revoke","sql":"GRANT ALL ON s.mv TO PUBLIC","expect":"ok","ref":"sql-grant","note":"GRANT ALL ON materialized view TO PUBLIC"}
+{"id":"grvb0021","category":"grant-revoke","sql":"GRANT SELECT(name) ON s.t TO PUBLIC","expect":"ok","ref":"sql-grant","note":"column-level SELECT privilege"}
+{"id":"grvb0022","category":"grant-revoke","sql":"GRANT SELECT(id, name, val) ON s.t TO PUBLIC","expect":"ok","ref":"sql-grant","note":"column-level SELECT on multiple columns"}
+{"id":"grvb0023","category":"grant-revoke","sql":"GRANT UPDATE(val, qty) ON s.t TO PUBLIC","expect":"ok","ref":"sql-grant","note":"column-level UPDATE privilege on two columns"}
+{"id":"grvb0024","category":"grant-revoke","sql":"GRANT INSERT(name, qty) ON s.t TO PUBLIC","expect":"ok","ref":"sql-grant","note":"column-level INSERT privilege"}
+{"id":"grvb0025","category":"grant-revoke","sql":"GRANT REFERENCES(id) ON s.t TO PUBLIC","expect":"ok","ref":"sql-grant","note":"column-level REFERENCES privilege"}
+{"id":"grvb0026","category":"grant-revoke","sql":"GRANT SELECT(name), UPDATE(val) ON s.t TO PUBLIC","expect":"ok","ref":"sql-grant","note":"mixed column privileges in one GRANT"}
+{"id":"grvb0027","category":"grant-revoke","sql":"GRANT USAGE ON SEQUENCE s.seq TO PUBLIC","expect":"ok","ref":"sql-grant","note":"GRANT USAGE ON SEQUENCE"}
+{"id":"grvb0028","category":"grant-revoke","sql":"GRANT SELECT ON SEQUENCE s.seq TO PUBLIC","expect":"ok","ref":"sql-grant","note":"GRANT SELECT ON SEQUENCE"}
+{"id":"grvb0029","category":"grant-revoke","sql":"GRANT UPDATE ON SEQUENCE s.seq TO PUBLIC","expect":"ok","ref":"sql-grant","note":"GRANT UPDATE ON SEQUENCE"}
+{"id":"grvb0030","category":"grant-revoke","sql":"GRANT ALL ON SEQUENCE s.seq TO PUBLIC","expect":"ok","ref":"sql-grant","note":"GRANT ALL ON SEQUENCE"}
+{"id":"grvb0031","category":"grant-revoke","sql":"GRANT USAGE ON SCHEMA s TO PUBLIC","expect":"ok","ref":"sql-grant","note":"GRANT USAGE ON SCHEMA"}
+{"id":"grvb0032","category":"grant-revoke","sql":"GRANT CREATE ON SCHEMA s TO PUBLIC","expect":"ok","ref":"sql-grant","note":"GRANT CREATE ON SCHEMA"}
+{"id":"grvb0033","category":"grant-revoke","sql":"GRANT USAGE, CREATE ON SCHEMA s TO PUBLIC","expect":"ok","ref":"sql-grant","note":"GRANT USAGE and CREATE ON SCHEMA"}
+{"id":"grvb0034","category":"grant-revoke","sql":"GRANT ALL ON SCHEMA s TO PUBLIC","expect":"ok","ref":"sql-grant","note":"GRANT ALL PRIVILEGES ON SCHEMA"}
+{"id":"grvb0035","category":"grant-revoke","sql":"GRANT CONNECT ON DATABASE postgres TO PUBLIC","expect":"ok","ref":"sql-grant","note":"GRANT CONNECT ON DATABASE"}
+{"id":"grvb0036","category":"grant-revoke","sql":"GRANT CREATE ON DATABASE postgres TO PUBLIC","expect":"ok","ref":"sql-grant","note":"GRANT CREATE ON DATABASE"}
+{"id":"grvb0037","category":"grant-revoke","sql":"GRANT TEMPORARY ON DATABASE postgres TO PUBLIC","expect":"ok","ref":"sql-grant","note":"GRANT TEMPORARY ON DATABASE"}
+{"id":"grvb0038","category":"grant-revoke","sql":"GRANT TEMP ON DATABASE postgres TO PUBLIC","expect":"ok","ref":"sql-grant","note":"GRANT TEMP (alias for TEMPORARY) ON DATABASE"}
+{"id":"grvb0039","category":"grant-revoke","sql":"GRANT ALL ON DATABASE postgres TO PUBLIC","expect":"ok","ref":"sql-grant","note":"GRANT ALL PRIVILEGES ON DATABASE"}
+{"id":"grvb0040","category":"grant-revoke","sql":"GRANT ALL PRIVILEGES ON DATABASE postgres TO PUBLIC","expect":"ok","ref":"sql-grant","note":"GRANT ALL PRIVILEGES ON DATABASE explicit keyword"}
+{"id":"grvb0041","category":"grant-revoke","sql":"GRANT EXECUTE ON FUNCTION s.f(integer) TO PUBLIC","expect":"ok","ref":"sql-grant","note":"GRANT EXECUTE ON FUNCTION with signature"}
+{"id":"grvb0042","category":"grant-revoke","sql":"GRANT EXECUTE ON FUNCTION s.g(integer, integer) TO PUBLIC","expect":"ok","ref":"sql-grant","note":"GRANT EXECUTE ON FUNCTION two-arg signature"}
+{"id":"grvb0043","category":"grant-revoke","sql":"GRANT ALL ON FUNCTION s.f(integer) TO PUBLIC","expect":"ok","ref":"sql-grant","note":"GRANT ALL ON FUNCTION"}
+{"id":"grvb0044","category":"grant-revoke","sql":"GRANT EXECUTE ON PROCEDURE s.p(integer) TO PUBLIC","expect":"ok","ref":"sql-grant","note":"GRANT EXECUTE ON PROCEDURE"}
+{"id":"grvb0045","category":"grant-revoke","sql":"GRANT ALL ON PROCEDURE s.p(integer) TO PUBLIC","expect":"ok","ref":"sql-grant","note":"GRANT ALL ON PROCEDURE"}
+{"id":"grvb0046","category":"grant-revoke","sql":"GRANT EXECUTE ON ROUTINE s.f(integer) TO PUBLIC","expect":"ok","ref":"sql-grant","note":"GRANT EXECUTE ON ROUTINE (covers function and procedure)"}
+{"id":"grvb0047","category":"grant-revoke","sql":"GRANT USAGE ON TYPE s.mood TO PUBLIC","expect":"ok","ref":"sql-grant","note":"GRANT USAGE ON TYPE (enum)"}
+{"id":"grvb0048","category":"grant-revoke","sql":"GRANT USAGE ON TYPE s.addr TO PUBLIC","expect":"ok","ref":"sql-grant","note":"GRANT USAGE ON TYPE (composite)"}
+{"id":"grvb0049","category":"grant-revoke","sql":"GRANT ALL ON TYPE s.mood TO PUBLIC","expect":"ok","ref":"sql-grant","note":"GRANT ALL ON TYPE"}
+{"id":"grvb0050","category":"grant-revoke","sql":"GRANT USAGE ON DOMAIN s.pos_int TO PUBLIC","expect":"ok","ref":"sql-grant","note":"GRANT USAGE ON DOMAIN"}
+{"id":"grvb0051","category":"grant-revoke","sql":"GRANT ALL ON DOMAIN s.pos_int TO PUBLIC","expect":"ok","ref":"sql-grant","note":"GRANT ALL ON DOMAIN"}
+{"id":"grvb0052","category":"grant-revoke","sql":"GRANT USAGE ON LANGUAGE plpgsql TO PUBLIC","expect":"ok","ref":"sql-grant","note":"GRANT USAGE ON LANGUAGE plpgsql"}
+{"id":"grvb0053","category":"grant-revoke","sql":"GRANT ALL ON LANGUAGE plpgsql TO PUBLIC","expect":"ok","ref":"sql-grant","note":"GRANT ALL ON LANGUAGE"}
+{"id":"grvb0054","category":"grant-revoke","sql":"GRANT ALL ON TABLESPACE pg_default TO PUBLIC","expect":"ok","ref":"sql-grant","note":"GRANT ALL ON TABLESPACE pg_default"}
+{"id":"grvb0055","category":"grant-revoke","sql":"GRANT CREATE ON TABLESPACE pg_default TO PUBLIC","expect":"ok","ref":"sql-grant","note":"GRANT CREATE ON TABLESPACE"}
+{"id":"grvb0056","category":"grant-revoke","sql":"GRANT ALL ON ALL TABLES IN SCHEMA s TO PUBLIC","expect":"ok","ref":"sql-grant","note":"GRANT ALL ON ALL TABLES IN SCHEMA (bulk)"}
+{"id":"grvb0057","category":"grant-revoke","sql":"GRANT SELECT ON ALL TABLES IN SCHEMA s TO PUBLIC","expect":"ok","ref":"sql-grant","note":"GRANT SELECT ON ALL TABLES IN SCHEMA"}
+{"id":"grvb0058","category":"grant-revoke","sql":"GRANT INSERT, UPDATE ON ALL TABLES IN SCHEMA s TO PUBLIC","expect":"ok","ref":"sql-grant","note":"GRANT INSERT, UPDATE ON ALL TABLES IN SCHEMA"}
+{"id":"grvb0059","category":"grant-revoke","sql":"GRANT SELECT ON ALL SEQUENCES IN SCHEMA s TO PUBLIC","expect":"ok","ref":"sql-grant","note":"GRANT SELECT ON ALL SEQUENCES IN SCHEMA"}
+{"id":"grvb0060","category":"grant-revoke","sql":"GRANT USAGE ON ALL SEQUENCES IN SCHEMA s TO PUBLIC","expect":"ok","ref":"sql-grant","note":"GRANT USAGE ON ALL SEQUENCES IN SCHEMA"}
+{"id":"grvb0061","category":"grant-revoke","sql":"GRANT ALL ON ALL SEQUENCES IN SCHEMA s TO PUBLIC","expect":"ok","ref":"sql-grant","note":"GRANT ALL ON ALL SEQUENCES IN SCHEMA"}
+{"id":"grvb0062","category":"grant-revoke","sql":"GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA s TO PUBLIC","expect":"ok","ref":"sql-grant","note":"GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA"}
+{"id":"grvb0063","category":"grant-revoke","sql":"GRANT ALL ON ALL FUNCTIONS IN SCHEMA s TO PUBLIC","expect":"ok","ref":"sql-grant","note":"GRANT ALL ON ALL FUNCTIONS IN SCHEMA"}
+{"id":"grvb0064","category":"grant-revoke","sql":"GRANT EXECUTE ON ALL PROCEDURES IN SCHEMA s TO PUBLIC","expect":"ok","ref":"sql-grant","note":"GRANT EXECUTE ON ALL PROCEDURES IN SCHEMA"}
+{"id":"grvb0065","category":"grant-revoke","sql":"GRANT EXECUTE ON ALL ROUTINES IN SCHEMA s TO PUBLIC","expect":"ok","ref":"sql-grant","note":"GRANT EXECUTE ON ALL ROUTINES IN SCHEMA"}
+{"id":"grvb0066","category":"grant-revoke","sql":"CREATE ROLE grvb_r1;\nGRANT SELECT ON s.t TO grvb_r1","expect":"ok","ref":"sql-grant","note":"GRANT to named role created in same txn"}
+{"id":"grvb0067","category":"grant-revoke","sql":"CREATE ROLE grvb_r2;\nGRANT ALL ON s.t TO grvb_r2 WITH GRANT OPTION","expect":"ok","ref":"sql-grant","note":"GRANT ALL WITH GRANT OPTION to named role"}
+{"id":"grvb0068","category":"grant-revoke","sql":"CREATE ROLE grvb_r3;\nGRANT SELECT ON s.t TO GROUP grvb_r3","expect":"ok","ref":"sql-grant","note":"GRANT to GROUP role_name syntax"}
+{"id":"grvb0069","category":"grant-revoke","sql":"CREATE ROLE grvb_r4;\nCREATE ROLE grvb_r5;\nGRANT SELECT ON s.t TO grvb_r4, grvb_r5","expect":"ok","ref":"sql-grant","note":"GRANT to multiple roles in one statement"}
+{"id":"grvb0070","category":"grant-revoke","sql":"CREATE ROLE grvb_r6;\nGRANT SELECT ON s.t TO PUBLIC, grvb_r6","expect":"ok","ref":"sql-grant","note":"GRANT to PUBLIC and named role simultaneously"}
+{"id":"grvb0071","category":"grant-revoke","sql":"CREATE ROLE grvb_r7;\nGRANT grvb_r7 TO PUBLIC","expect":"error","ref":"sql-grant","note":"GRANT role TO PUBLIC is rejected (PG18 disallows role grant to PUBLIC)"}
+{"id":"grvb0072","category":"grant-revoke","sql":"CREATE ROLE grvb_r8;\nCREATE ROLE grvb_r9;\nGRANT grvb_r8 TO grvb_r9","expect":"ok","ref":"sql-grant","note":"GRANT role TO role (role membership)"}
+{"id":"grvb0073","category":"grant-revoke","sql":"CREATE ROLE grvb_ra;\nCREATE ROLE grvb_rb;\nGRANT grvb_ra TO grvb_rb WITH ADMIN OPTION","expect":"ok","ref":"sql-grant","note":"GRANT role TO role WITH ADMIN OPTION"}
+{"id":"grvb0074","category":"grant-revoke","sql":"CREATE ROLE grvb_rc;\nCREATE ROLE grvb_rd;\nGRANT grvb_rc TO grvb_rd WITH INHERIT TRUE","expect":"ok","ref":"sql-grant","note":"GRANT role TO role WITH INHERIT TRUE (PG16+ option)"}
+{"id":"grvb0075","category":"grant-revoke","sql":"CREATE ROLE grvb_re;\nCREATE ROLE grvb_rf;\nGRANT grvb_re TO grvb_rf WITH INHERIT FALSE","expect":"ok","ref":"sql-grant","note":"GRANT role TO role WITH INHERIT FALSE"}
+{"id":"grvb0076","category":"grant-revoke","sql":"CREATE ROLE grvb_rg;\nCREATE ROLE grvb_rh;\nGRANT grvb_rg TO grvb_rh WITH SET TRUE","expect":"ok","ref":"sql-grant","note":"GRANT role TO role WITH SET TRUE (PG16+)"}
+{"id":"grvb0077","category":"grant-revoke","sql":"CREATE ROLE grvb_ri;\nCREATE ROLE grvb_rj;\nGRANT grvb_ri TO grvb_rj WITH SET FALSE","expect":"ok","ref":"sql-grant","note":"GRANT role TO role WITH SET FALSE"}
+{"id":"grvb0078","category":"grant-revoke","sql":"REVOKE SELECT ON s.t FROM PUBLIC","expect":"ok","ref":"sql-grant","note":"REVOKE SELECT ON table FROM PUBLIC"}
+{"id":"grvb0079","category":"grant-revoke","sql":"REVOKE ALL ON s.t FROM PUBLIC","expect":"ok","ref":"sql-grant","note":"REVOKE ALL ON table FROM PUBLIC"}
+{"id":"grvb0080","category":"grant-revoke","sql":"REVOKE ALL PRIVILEGES ON s.t FROM PUBLIC","expect":"ok","ref":"sql-grant","note":"REVOKE ALL PRIVILEGES ON table FROM PUBLIC"}
+{"id":"grvb0081","category":"grant-revoke","sql":"REVOKE INSERT, UPDATE ON s.t FROM PUBLIC","expect":"ok","ref":"sql-grant","note":"REVOKE multiple privileges FROM PUBLIC"}
+{"id":"grvb0082","category":"grant-revoke","sql":"REVOKE GRANT OPTION FOR SELECT ON s.t FROM PUBLIC","expect":"ok","ref":"sql-grant","note":"REVOKE GRANT OPTION FOR priv FROM PUBLIC"}
+{"id":"grvb0083","category":"grant-revoke","sql":"REVOKE GRANT OPTION FOR ALL ON s.t FROM PUBLIC","expect":"ok","ref":"sql-grant","note":"REVOKE GRANT OPTION FOR ALL FROM PUBLIC"}
+{"id":"grvb0084","category":"grant-revoke","sql":"REVOKE SELECT ON s.t FROM PUBLIC CASCADE","expect":"ok","ref":"sql-grant","note":"REVOKE with CASCADE option"}
+{"id":"grvb0085","category":"grant-revoke","sql":"REVOKE SELECT ON s.t FROM PUBLIC RESTRICT","expect":"ok","ref":"sql-grant","note":"REVOKE with RESTRICT option"}
+{"id":"grvb0086","category":"grant-revoke","sql":"REVOKE GRANT OPTION FOR SELECT ON s.t FROM PUBLIC CASCADE","expect":"ok","ref":"sql-grant","note":"REVOKE GRANT OPTION FOR with CASCADE"}
+{"id":"grvb0087","category":"grant-revoke","sql":"REVOKE USAGE ON SCHEMA s FROM PUBLIC","expect":"ok","ref":"sql-grant","note":"REVOKE USAGE ON SCHEMA FROM PUBLIC"}
+{"id":"grvb0088","category":"grant-revoke","sql":"REVOKE CREATE ON SCHEMA s FROM PUBLIC","expect":"ok","ref":"sql-grant","note":"REVOKE CREATE ON SCHEMA FROM PUBLIC"}
+{"id":"grvb0089","category":"grant-revoke","sql":"REVOKE ALL ON SCHEMA s FROM PUBLIC","expect":"ok","ref":"sql-grant","note":"REVOKE ALL ON SCHEMA FROM PUBLIC"}
+{"id":"grvb0090","category":"grant-revoke","sql":"REVOKE USAGE ON SEQUENCE s.seq FROM PUBLIC","expect":"ok","ref":"sql-grant","note":"REVOKE USAGE ON SEQUENCE FROM PUBLIC"}
+{"id":"grvb0091","category":"grant-revoke","sql":"REVOKE EXECUTE ON FUNCTION s.f(integer) FROM PUBLIC","expect":"ok","ref":"sql-grant","note":"REVOKE EXECUTE ON FUNCTION FROM PUBLIC"}
+{"id":"grvb0092","category":"grant-revoke","sql":"REVOKE EXECUTE ON PROCEDURE s.p(integer) FROM PUBLIC","expect":"ok","ref":"sql-grant","note":"REVOKE EXECUTE ON PROCEDURE FROM PUBLIC"}
+{"id":"grvb0093","category":"grant-revoke","sql":"REVOKE EXECUTE ON ROUTINE s.f(integer) FROM PUBLIC","expect":"ok","ref":"sql-grant","note":"REVOKE EXECUTE ON ROUTINE FROM PUBLIC"}
+{"id":"grvb0094","category":"grant-revoke","sql":"REVOKE USAGE ON TYPE s.mood FROM PUBLIC","expect":"ok","ref":"sql-grant","note":"REVOKE USAGE ON TYPE FROM PUBLIC"}
+{"id":"grvb0095","category":"grant-revoke","sql":"REVOKE USAGE ON DOMAIN s.pos_int FROM PUBLIC","expect":"ok","ref":"sql-grant","note":"REVOKE USAGE ON DOMAIN FROM PUBLIC"}
+{"id":"grvb0096","category":"grant-revoke","sql":"REVOKE CONNECT ON DATABASE postgres FROM PUBLIC","expect":"ok","ref":"sql-grant","note":"REVOKE CONNECT ON DATABASE FROM PUBLIC"}
+{"id":"grvb0097","category":"grant-revoke","sql":"REVOKE ALL ON DATABASE postgres FROM PUBLIC","expect":"ok","ref":"sql-grant","note":"REVOKE ALL ON DATABASE FROM PUBLIC"}
+{"id":"grvb0098","category":"grant-revoke","sql":"REVOKE USAGE ON LANGUAGE plpgsql FROM PUBLIC","expect":"ok","ref":"sql-grant","note":"REVOKE USAGE ON LANGUAGE FROM PUBLIC"}
+{"id":"grvb0099","category":"grant-revoke","sql":"CREATE ROLE grvb_rk;\nGRANT grvb_rk TO CURRENT_USER;\nREVOKE grvb_rk FROM CURRENT_USER","expect":"ok","ref":"sql-grant","note":"REVOKE role membership FROM user"}
+{"id":"grvb0100","category":"grant-revoke","sql":"CREATE ROLE grvb_rl;\nCREATE ROLE grvb_rm;\nGRANT grvb_rl TO grvb_rm;\nREVOKE grvb_rl FROM grvb_rm","expect":"ok","ref":"sql-grant","note":"REVOKE role FROM role (membership revoke)"}
+{"id":"grvb0101","category":"grant-revoke","sql":"CREATE ROLE grvb_rn;\nCREATE ROLE grvb_ro;\nGRANT grvb_rn TO grvb_ro WITH ADMIN OPTION;\nREVOKE ADMIN OPTION FOR grvb_rn FROM grvb_ro","expect":"ok","ref":"sql-grant","note":"REVOKE ADMIN OPTION FOR role FROM role"}
+{"id":"grvb0102","category":"grant-revoke","sql":"REVOKE SELECT ON ALL TABLES IN SCHEMA s FROM PUBLIC","expect":"ok","ref":"sql-grant","note":"REVOKE SELECT ON ALL TABLES IN SCHEMA FROM PUBLIC"}
+{"id":"grvb0103","category":"grant-revoke","sql":"REVOKE ALL ON ALL TABLES IN SCHEMA s FROM PUBLIC","expect":"ok","ref":"sql-grant","note":"REVOKE ALL ON ALL TABLES IN SCHEMA FROM PUBLIC"}
+{"id":"grvb0104","category":"grant-revoke","sql":"REVOKE ALL ON ALL SEQUENCES IN SCHEMA s FROM PUBLIC","expect":"ok","ref":"sql-grant","note":"REVOKE ALL ON ALL SEQUENCES IN SCHEMA FROM PUBLIC"}
+{"id":"grvb0105","category":"grant-revoke","sql":"REVOKE EXECUTE ON ALL FUNCTIONS IN SCHEMA s FROM PUBLIC","expect":"ok","ref":"sql-grant","note":"REVOKE EXECUTE ON ALL FUNCTIONS IN SCHEMA FROM PUBLIC"}
+{"id":"grvb0106","category":"grant-revoke","sql":"REVOKE EXECUTE ON ALL PROCEDURES IN SCHEMA s FROM PUBLIC","expect":"ok","ref":"sql-grant","note":"REVOKE EXECUTE ON ALL PROCEDURES IN SCHEMA FROM PUBLIC"}
+{"id":"grvb0107","category":"grant-revoke","sql":"REVOKE EXECUTE ON ALL ROUTINES IN SCHEMA s FROM PUBLIC","expect":"ok","ref":"sql-grant","note":"REVOKE EXECUTE ON ALL ROUTINES IN SCHEMA FROM PUBLIC"}
+{"id":"grvb0108","category":"grant-revoke","sql":"ALTER DEFAULT PRIVILEGES GRANT SELECT ON TABLES TO PUBLIC","expect":"ok","ref":"sql-grant","note":"ALTER DEFAULT PRIVILEGES GRANT SELECT ON TABLES TO PUBLIC"}
+{"id":"grvb0109","category":"grant-revoke","sql":"ALTER DEFAULT PRIVILEGES GRANT INSERT ON TABLES TO PUBLIC","expect":"ok","ref":"sql-grant","note":"ALTER DEFAULT PRIVILEGES GRANT INSERT ON TABLES TO PUBLIC"}
+{"id":"grvb0110","category":"grant-revoke","sql":"ALTER DEFAULT PRIVILEGES GRANT ALL ON TABLES TO PUBLIC","expect":"ok","ref":"sql-grant","note":"ALTER DEFAULT PRIVILEGES GRANT ALL ON TABLES TO PUBLIC"}
+{"id":"grvb0111","category":"grant-revoke","sql":"ALTER DEFAULT PRIVILEGES GRANT USAGE ON SEQUENCES TO PUBLIC","expect":"ok","ref":"sql-grant","note":"ALTER DEFAULT PRIVILEGES GRANT USAGE ON SEQUENCES TO PUBLIC"}
+{"id":"grvb0112","category":"grant-revoke","sql":"ALTER DEFAULT PRIVILEGES GRANT EXECUTE ON FUNCTIONS TO PUBLIC","expect":"ok","ref":"sql-grant","note":"ALTER DEFAULT PRIVILEGES GRANT EXECUTE ON FUNCTIONS TO PUBLIC"}
+{"id":"grvb0113","category":"grant-revoke","sql":"ALTER DEFAULT PRIVILEGES GRANT EXECUTE ON ROUTINES TO PUBLIC","expect":"ok","ref":"sql-grant","note":"ALTER DEFAULT PRIVILEGES GRANT EXECUTE ON ROUTINES TO PUBLIC"}
+{"id":"grvb0114","category":"grant-revoke","sql":"ALTER DEFAULT PRIVILEGES GRANT USAGE ON TYPES TO PUBLIC","expect":"ok","ref":"sql-grant","note":"ALTER DEFAULT PRIVILEGES GRANT USAGE ON TYPES TO PUBLIC"}
+{"id":"grvb0115","category":"grant-revoke","sql":"ALTER DEFAULT PRIVILEGES IN SCHEMA s GRANT SELECT ON TABLES TO PUBLIC","expect":"ok","ref":"sql-grant","note":"ALTER DEFAULT PRIVILEGES IN SCHEMA s GRANT SELECT ON TABLES"}
+{"id":"grvb0116","category":"grant-revoke","sql":"ALTER DEFAULT PRIVILEGES IN SCHEMA s GRANT EXECUTE ON FUNCTIONS TO PUBLIC","expect":"ok","ref":"sql-grant","note":"ALTER DEFAULT PRIVILEGES IN SCHEMA s GRANT EXECUTE ON FUNCTIONS"}
+{"id":"grvb0117","category":"grant-revoke","sql":"ALTER DEFAULT PRIVILEGES FOR ROLE CURRENT_USER GRANT SELECT ON TABLES TO PUBLIC","expect":"ok","ref":"sql-grant","note":"ALTER DEFAULT PRIVILEGES FOR ROLE CURRENT_USER GRANT SELECT ON TABLES"}
+{"id":"grvb0118","category":"grant-revoke","sql":"ALTER DEFAULT PRIVILEGES FOR ROLE CURRENT_USER IN SCHEMA s GRANT ALL ON TABLES TO PUBLIC","expect":"ok","ref":"sql-grant","note":"ALTER DEFAULT PRIVILEGES FOR ROLE ... IN SCHEMA ... GRANT ALL ON TABLES"}
+{"id":"grvb0119","category":"grant-revoke","sql":"ALTER DEFAULT PRIVILEGES REVOKE SELECT ON TABLES FROM PUBLIC","expect":"ok","ref":"sql-grant","note":"ALTER DEFAULT PRIVILEGES REVOKE SELECT ON TABLES FROM PUBLIC"}
+{"id":"grvb0120","category":"grant-revoke","sql":"ALTER DEFAULT PRIVILEGES REVOKE ALL ON TABLES FROM PUBLIC","expect":"ok","ref":"sql-grant","note":"ALTER DEFAULT PRIVILEGES REVOKE ALL ON TABLES FROM PUBLIC"}
+{"id":"grvb0121","category":"grant-revoke","sql":"ALTER DEFAULT PRIVILEGES REVOKE EXECUTE ON FUNCTIONS FROM PUBLIC","expect":"ok","ref":"sql-grant","note":"ALTER DEFAULT PRIVILEGES REVOKE EXECUTE ON FUNCTIONS FROM PUBLIC"}
+{"id":"grvb0122","category":"grant-revoke","sql":"ALTER DEFAULT PRIVILEGES IN SCHEMA s REVOKE SELECT ON TABLES FROM PUBLIC","expect":"ok","ref":"sql-grant","note":"ALTER DEFAULT PRIVILEGES IN SCHEMA s REVOKE SELECT ON TABLES FROM PUBLIC"}
+{"id":"grvb0123","category":"grant-revoke","sql":"ALTER DEFAULT PRIVILEGES REVOKE GRANT OPTION FOR SELECT ON TABLES FROM PUBLIC","expect":"ok","ref":"sql-grant","note":"ALTER DEFAULT PRIVILEGES REVOKE GRANT OPTION FOR SELECT ON TABLES FROM PUBLIC"}
+{"id":"grvb0124","category":"grant-revoke","sql":"GRANT BOGUSPRIVILEGE ON s.t TO PUBLIC","expect":"error","ref":"sql-grant","note":"invalid privilege name (syntax error)"}
+{"id":"grvb0125","category":"grant-revoke","sql":"GRANT SELECT ON s.t","expect":"error","ref":"sql-grant","note":"GRANT missing TO clause (syntax error)"}
+{"id":"grvb0126","category":"grant-revoke","sql":"GRANT ON s.t TO PUBLIC","expect":"error","ref":"sql-grant","note":"GRANT missing privilege list (syntax error)"}
+{"id":"grvb0127","category":"grant-revoke","sql":"GRANT SELECT s.t TO PUBLIC","expect":"error","ref":"sql-grant","note":"GRANT missing ON keyword (syntax error)"}
+{"id":"grvb0128","category":"grant-revoke","sql":"REVOKE SELECT ON s.t","expect":"error","ref":"sql-grant","note":"REVOKE missing FROM clause (syntax error)"}
+{"id":"grvb0129","category":"grant-revoke","sql":"GRANT SELECT ON NONEXISTENT_TABLE TO PUBLIC","expect":"error","ref":"sql-grant","note":"GRANT on non-existent table (semantic error)"}
+{"id":"grvb0130","category":"grant-revoke","sql":"REVOKE SELECT ON NONEXISTENT_TABLE FROM PUBLIC","expect":"error","ref":"sql-grant","note":"REVOKE from non-existent table (semantic error)"}
