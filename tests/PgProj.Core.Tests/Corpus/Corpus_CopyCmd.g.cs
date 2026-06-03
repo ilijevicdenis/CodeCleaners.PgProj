@@ -239,17 +239,17 @@ public class Corpus_CopyCmd
     public void cpya0116() => CorpusAssert.Parses(@"COPY s.t TO", "error");
     [Fact]
     public void cpya0117() => CorpusAssert.Parses(@"COPY s.t FROM", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void cpya0118() => CorpusAssert.Parses(@"COPY s.t TO STDOUT (FORMAT)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void cpya0119() => CorpusAssert.Parses(@"COPY s.t TO STDOUT (FORMAT xml)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void cpya0120() => CorpusAssert.Parses(@"COPY s.t TO STDOUT (FORMAT json)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void cpya0121() => CorpusAssert.Parses(@"COPY s.t TO STDOUT (FORMAT csv, DELIMITER ',,')", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void cpya0122() => CorpusAssert.Parses(@"COPY s.t TO STDOUT (FORMAT csv, QUOTE '""""')", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void cpya0123() => CorpusAssert.Parses(@"COPY s.t TO STDOUT (FORMAT csv, ESCAPE '|!')", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void cpya0124() => CorpusAssert.Parses(@"COPY s.t TO STDOUT (FORMAT binary, DELIMITER ',')", "error");
@@ -287,7 +287,7 @@ public class Corpus_CopyCmd
     public void cpya0140() => CorpusAssert.Parses(@"COPY s.t FROM '/dev/null' (FORMAT binary, DEFAULT 'x')", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void cpya0141() => CorpusAssert.Parses(@"COPY s.t TO STDOUT ()", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void cpya0142() => CorpusAssert.Parses(@"COPY s.t TO STDOUT (FORMAT csv FORMAT text)", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void cpya0143() => CorpusAssert.Parses(@"COPY s.nonexistent TO STDOUT", "error");
@@ -297,7 +297,7 @@ public class Corpus_CopyCmd
     public void cpya0145() => CorpusAssert.Parses(@"COPY s.mv TO STDOUT", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void cpya0146() => CorpusAssert.Parses(@"COPY s.t TO STDOUT (FORMAT csv, ENCODING 'INVALID_ENC')", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void cpya0147() => CorpusAssert.Parses(@"COPY s.t TO STDOUT (FORMAT csv, DELIMITER '')", "error");
     [Fact]
     public void cpya0148() => CorpusAssert.Parses(@"COPY s.t (id, name, val, qty, flag, tags, data) TO STDOUT (FORMAT csv, HEADER true)", "ok");
@@ -421,9 +421,9 @@ public class Corpus_CopyCmd
     [Fact]
     public void cpyb0032() => CorpusAssert.Parses(@"COPY s.t (name, qty, flag) FROM STDIN (FORMAT csv, ON_ERROR ignore, LOG_VERBOSITY verbose, ENCODING 'UTF8');
 \.", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void cpyb0033() => CorpusAssert.Parses(@"COPY s.t TO STDOUT (FORMAT badformat)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void cpyb0034() => CorpusAssert.Parses(@"COPY s.t TO STDOUT (FORMAT csv, DELIMITER '||')", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void cpyb0035() => CorpusAssert.Parses(@"COPY s.t TO STDOUT (FORMAT text, FORCE_QUOTE *)", "error");

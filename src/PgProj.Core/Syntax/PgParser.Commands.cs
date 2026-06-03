@@ -271,8 +271,46 @@ public sealed partial class PgParser
             if (c.Current is not { Kind: TokenKind.String }) throw new ParseException("expected STDIN/STDOUT/PROGRAM or a file path", c.Here);
             c.Advance();
         }
-        ConsumeRest(c);                                          // [WITH] (options) / old-style
+        c.MatchWord("WITH");
+        if (c.AtSymbol('(')) ParseCopyOptions(c);                // new-style ( option [value] , … ) — validated
+        ConsumeRest(c);                                          // trailing WHERE (COPY FROM) / old-style options — left lenient
         return new CommandStatement { Kind = "COPY" };
+    }
+
+    private static readonly HashSet<string> CopyFormats = new(StringComparer.OrdinalIgnoreCase) { "text", "csv", "binary" };
+
+    private void ParseCopyOptions(TokenCursor c)
+    {
+        c.ExpectSymbol('(');
+        if (c.AtSymbol(')')) { c.Advance(); return; }
+        do
+        {
+            if (c.Current is not { Kind: TokenKind.Word }) break;          // unexpected — bail leniently
+            var opt = c.Advance().Value.ToUpperInvariant();
+            if (opt == "FORMAT")
+            {
+                if (c.Current is { Kind: TokenKind.Word } fmt) { c.Advance(); if (!CopyFormats.Contains(fmt.Value)) throw new ParseException($"COPY format \"{fmt.Value}\" not recognized", c.Here); }
+                else throw new ParseException("COPY FORMAT requires a format name", c.Here);
+            }
+            else if (opt is "DELIMITER" or "QUOTE" or "ESCAPE" && c.Current is { Kind: TokenKind.String } sv)
+            {
+                c.Advance();
+                if (sv.Value.Length != 1) throw new ParseException($"COPY {opt} must be a single one-byte character", c.Here);
+            }
+            else { ConsumeCopyValue(c); }                                  // other options (incl. E'\t' delimiters) — consume leniently
+        } while (c.MatchSymbol(','));
+        c.ExpectSymbol(')');
+    }
+
+    private static void ConsumeCopyValue(TokenCursor c)
+    {
+        int depth = 0;
+        while (!c.AtEnd)
+        {
+            if (depth == 0 && (c.AtSymbol(',') || c.AtSymbol(')'))) return;
+            if (c.AtSymbol('(')) depth++; else if (c.AtSymbol(')')) depth--;
+            c.Advance();
+        }
     }
 
     private CommandStatement ParseGrantRevoke(TokenCursor c)

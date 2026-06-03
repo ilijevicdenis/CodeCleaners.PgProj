@@ -335,12 +335,6 @@ cola0126
 cola0127
 cpya0044
 cpya0102
-cpya0118
-cpya0119
-cpya0120
-cpya0121
-cpya0122
-cpya0123
 cpya0124
 cpya0125
 cpya0126
@@ -358,11 +352,9 @@ cpya0138
 cpya0139
 cpya0140
 cpya0141
-cpya0142
 cpya0143
 cpya0144
 cpya0146
-cpya0147
 cpya0157
 cpya0158
 cpya0159
@@ -372,8 +364,6 @@ cpya0162
 cpya0163
 cpya0164
 cpya0165
-cpyb0033
-cpyb0034
 cpyb0035
 cpyb0036
 cpyb0039
