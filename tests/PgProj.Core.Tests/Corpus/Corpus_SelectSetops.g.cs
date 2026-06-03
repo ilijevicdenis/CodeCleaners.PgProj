@@ -333,7 +333,7 @@ public class Corpus_SelectSetops
     public void selsa0163() => CorpusAssert.Parses(@"SELECT id FROM s.t UNION SELECT id FROM s.t2 FOR SHARE", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void selsa0164() => CorpusAssert.Parses(@"SELECT id FROM s.t INTERSECT SELECT id FROM s.t2 FOR KEY SHARE", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selsa0165() => CorpusAssert.Parses(@"SELECT 1 UNION SELECT 2 FROM s.nonexistent_xyz", "error");
     [Fact]
     public void selsa0166() => CorpusAssert.Parses(@"SELECT id FROM s.t UNION ALL SELECT id FROM s.t UNION ALL SELECT id FROM s.t UNION ALL SELECT id FROM s.t UNION ALL SELECT id FROM s.t", "ok");

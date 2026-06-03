@@ -3,20 +3,18 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
-using PgProj.Core.Parsing;
+using PgProj.Core.Semantics;
+using PgProj.Core.Syntax;
 
 namespace PgProj.Core.Tests;
-
-/// <summary>How the parser handled a statement.</summary>
-public enum CorpusVerdict { Parsed, Error, Empty }
 
 /// <summary>One corpus case (mirrors the JSONL schema in tests/corpus/CORPUS.md).</summary>
 public sealed record CorpusCase(string Id, string Category, string Sql, string Expect,
                                 string? Ref, string? Note, string? Txn);
 
 /// <summary>
-/// Shared access to the PostgreSQL test corpus (tests/corpus/*.jsonl) and the parser verdict.
-/// Used by the per-case generated tests, the aggregate CorpusTests, and the test generator.
+/// Shared access to the corpus and the toolchain's accept/reject decision. Greenfield: the only
+/// engine is the hand-written <see cref="PgParser"/> + <see cref="SemanticAnalyzer"/> — no legacy parser.
 /// </summary>
 public static class CorpusData
 {
@@ -31,6 +29,12 @@ public static class CorpusData
     });
 
     public static string CorpusDir => Path.Combine(RepoRoot, "tests", "corpus");
+
+    private static readonly Lazy<Catalog> _fixtureCatalog = new(() =>
+    {
+        var fixture = Path.Combine(CorpusDir, "_fixture.sql");
+        return CatalogBuilder.Build(File.Exists(fixture) ? File.ReadAllText(fixture) : "");
+    });
 
     public static IReadOnlyList<CorpusCase> LoadAll()
     {
@@ -49,12 +53,8 @@ public static class CorpusData
                 if (line.Length == 0 || line.StartsWith('#') || line.StartsWith("//")) continue;
                 CorpusCase? c;
                 try { c = JsonSerializer.Deserialize<CorpusCase>(line, opts); }
-                catch (JsonException ex)
-                {
-                    throw new FormatException($"{Path.GetFileName(file)}:{n}: invalid JSON: {ex.Message}");
-                }
-                if (c is null || string.IsNullOrWhiteSpace(c.Id) || string.IsNullOrWhiteSpace(c.Sql)
-                    || string.IsNullOrWhiteSpace(c.Expect))
+                catch (JsonException ex) { throw new FormatException($"{Path.GetFileName(file)}:{n}: invalid JSON: {ex.Message}"); }
+                if (c is null || string.IsNullOrWhiteSpace(c.Id) || string.IsNullOrWhiteSpace(c.Sql) || string.IsNullOrWhiteSpace(c.Expect))
                     throw new FormatException($"{Path.GetFileName(file)}:{n}: case needs id, sql, expect");
                 if (c.Expect is not ("ok" or "error"))
                     throw new FormatException($"{Path.GetFileName(file)}:{n}: expect must be ok|error (got {c.Expect})");
@@ -64,35 +64,34 @@ public static class CorpusData
         return cases;
     }
 
-    /// <summary>Legacy-parser 3-way classification (used by the informational coverage report).</summary>
-    public static CorpusVerdict Verdict(string sql)
+    /// <summary>
+    /// The accept/reject decision: PgParser parses the statement, then (if syntactically clean) the
+    /// semantic analyzer checks it against the fixture catalog. ParsedClean = "valid, would deploy";
+    /// HasError = a syntactic OR semantic problem was found.
+    /// </summary>
+    public static (bool ParsedClean, bool HasError) Evaluate(string sql)
     {
-        var p = new AstParser();
-        var script = p.Parse(sql);
-        if (p.Diagnostics.Count > 0) return CorpusVerdict.Error;
-        return script.Statements.Count > 0 ? CorpusVerdict.Parsed : CorpusVerdict.Empty;
+        var res = new PgParser().Parse(sql);
+        bool parsedClean = res.Diagnostics.Count == 0 && res.Statements.Count > 0;
+        bool hasError = res.Diagnostics.Count > 0;
+
+        if (res.Diagnostics.Count == 0)
+        {
+            try
+            {
+                var caseCatalog = _fixtureCatalog.Value.Extend(CatalogBuilder.Build(res));
+                if (new SemanticAnalyzer(caseCatalog, _fixtureCatalog.Value).Analyze(res).Count > 0)
+                { hasError = true; parsedClean = false; }
+            }
+            catch { /* the analyzer must never break the build */ }
+        }
+        return (parsedClean, hasError);
     }
 
-    /// <summary>
-    /// True when the active parser already does the right thing for this case — mirrors CorpusAssert:
-    /// the new PgParser is authoritative for kinds it owns, otherwise the legacy parser decides.
-    /// </summary>
+    /// <summary>True when the toolchain does the PostgreSQL-correct thing for this case.</summary>
     public static bool Passes(CorpusCase c)
     {
-        var res = new Syntax.PgParser().Parse(c.Sql);
-        bool parsedClean, hasError;
-        if (res.FullyRecognized)
-        {
-            parsedClean = res.Diagnostics.Count == 0 && res.Statements.Count > 0;
-            hasError = res.Diagnostics.Count > 0;
-        }
-        else
-        {
-            var p = new AstParser();
-            var script = p.Parse(c.Sql);
-            parsedClean = p.Diagnostics.Count == 0 && script.Statements.Count > 0;
-            hasError = p.Diagnostics.Count > 0;
-        }
+        var (parsedClean, hasError) = Evaluate(c.Sql);
         return c.Expect == "ok" ? parsedClean : hasError;
     }
 }

@@ -303,7 +303,7 @@ public class Corpus_OperatorsExpr
     public void oexa0148() => CorpusAssert.Parses(@"SELECT 2 + 3 BETWEEN 1 AND 10", "ok");
     [Fact]
     public void oexa0149() => CorpusAssert.Parses(@"SELECT 5 IN (1+1, 2+3, 7-2)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void oexa0150() => CorpusAssert.Parses(@"SELECT 1 / 0", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void oexa0151() => CorpusAssert.Parses(@"SELECT 'a' + 'b'", "error");
@@ -687,9 +687,9 @@ public class Corpus_OperatorsExpr
     public void oexb0140() => CorpusAssert.Parses(@"SELECT 1 = ANY()", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void oexb0141() => CorpusAssert.Parses(@"SELECT ANY(ARRAY[1,2,3]) = 1", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void oexb0142() => CorpusAssert.Parses(@"SELECT 1 / 0", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void oexb0143() => CorpusAssert.Parses(@"SELECT 1 % 0", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void oexb0144() => CorpusAssert.Parses(@"SELECT 1 + 'abc'", "error");
@@ -931,7 +931,7 @@ public class Corpus_OperatorsExpr
     public void oexc0088() => CorpusAssert.Parses(@"SELECT 1 SYMMETRIC BETWEEN 5 AND 10", "error");
     [Fact]
     public void oexc0089() => CorpusAssert.Parses(@"SELECT 1 NOT IN", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void oexc0090() => CorpusAssert.Parses(@"SELECT 1 / 0", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void oexc0091() => CorpusAssert.Parses(@"SELECT 'abc' + 1", "error");

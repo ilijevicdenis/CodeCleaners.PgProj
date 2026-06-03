@@ -31,6 +31,15 @@ public abstract class SqlStatement { public int Position { get; init; } }
 /// <summary>A statement kind PgParser does not implement yet (caller falls back to legacy).</summary>
 public sealed class UnsupportedStatement : SqlStatement { public string LeadingKeyword { get; init; } = ""; }
 
+/// <summary>A CREATE of a kind not finely modelled (VIEW/SEQUENCE/FUNCTION/TYPE/INDEX/TRIGGER/…);
+/// the object's kind + schema-qualified name are captured so the catalog can record it.</summary>
+public sealed class RawCreateStatement : SqlStatement
+{
+    public string ObjectKind { get; init; } = "";
+    public string? Schema { get; set; }
+    public string? Name { get; set; }
+}
+
 // ---- CREATE TABLE -----------------------------------------------------------
 
 public sealed class CreateTableStatement : SqlStatement

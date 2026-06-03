@@ -293,7 +293,7 @@ public class Corpus_SelectJoins
     public void selja0143() => CorpusAssert.Parses(@"SELECT t.id FROM s.t JOIN s.t2 ON t.id = t2.t_id ON t.id = t2.t_id", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void selja0144() => CorpusAssert.Parses(@"SELECT t.id FROM s.t JOIN s.t2 USING (nonexistent_col)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0145() => CorpusAssert.Parses(@"SELECT t.id FROM s.t JOIN s.nonexistent ON t.id = s.nonexistent.id", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void selja0146() => CorpusAssert.Parses(@"SELECT t.id FROM s.t JOIN s.t2 ON t.id = t2.nonexistent_col", "error");

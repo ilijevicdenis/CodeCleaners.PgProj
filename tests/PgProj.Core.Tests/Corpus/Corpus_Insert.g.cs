@@ -119,7 +119,7 @@ public class Corpus_Insert
     public void insa0056() => CorpusAssert.Parses(@"INSERT INTO s.events_2024 (occurred, payload) VALUES ('2024-07-04', NULL)", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void insa0057() => CorpusAssert.Parses(@"INSERT INTO s.events (occurred, payload) VALUES ('2023-01-01', NULL)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void insa0058() => CorpusAssert.Parses(@"INSERT INTO s.t (name) VALUES ('SubExpr', (SELECT max(qty) FROM s.t))", "error");
     [Fact]
     public void insa0059() => CorpusAssert.Parses(@"INSERT INTO s.t (name, qty) VALUES ('SubExpr2', (SELECT coalesce(max(qty),0) FROM s.t))", "ok");
@@ -127,9 +127,9 @@ public class Corpus_Insert
     public void insa0060() => CorpusAssert.Parses(@"INSERT INTO s.t (name) VALUES ()", "error");
     [Fact]
     public void insa0061() => CorpusAssert.Parses(@"INSERT INTO s.t (name, val, qty, flag) VALUES ('NoColList', 1.0, 5, true)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void insa0062() => CorpusAssert.Parses(@"INSERT INTO s.t (name, val) VALUES ('TooFew')", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void insa0063() => CorpusAssert.Parses(@"INSERT INTO s.t (name) VALUES ('TooMany', 99)", "error");
     [Fact]
     public void insa0064() => CorpusAssert.Parses(@"INSERT s.t (name) VALUES ('MissingInto')", "error");
@@ -243,7 +243,7 @@ public class Corpus_Insert
     public void insa0118() => CorpusAssert.Parses(@"INSERT INTO s.t (name) RETURNING *", "error");
     [Fact]
     public void insa0119() => CorpusAssert.Parses(@"INSERT INTO s.t (name) VALUES ('ColAlias') AS new_row (new_name)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void insa0120() => CorpusAssert.Parses(@"INSERT INTO s.nonexistent (name) VALUES ('x')", "error");
     [Fact]
     public void insa0121() => CorpusAssert.Parses(@"INSERT INTO s.v (name, val) VALUES ('View', 1.0)", "ok");
@@ -251,7 +251,7 @@ public class Corpus_Insert
     public void insa0122() => CorpusAssert.Parses(@"INSERT INTO s.mv (status, n) VALUES ('ok', 1)", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void insa0123() => CorpusAssert.Parses(@"INSERT INTO s.t (name) VALUES ('x') ON CONFLICT (name, id) DO NOTHING", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void insa0124() => CorpusAssert.Parses(@"INSERT INTO s.t (name, val) VALUES ('Concat', 'hello' || ' world', 1.0)", "error");
     [Fact]
     public void insa0125() => CorpusAssert.Parses(@"INSERT INTO s.t (name, val) VALUES ('Concat2' || '_x', 1.0)", "ok");
@@ -291,7 +291,7 @@ public class Corpus_Insert
     public void insa0142() => CorpusAssert.Parses(@"INSERT INTO s.t (id, name) OVERRIDING SYSTEM VALUE VALUES (986, 'WithConf') ON CONFLICT (id) DO UPDATE SET name = EXCLUDED.name, qty = EXCLUDED.qty, val = EXCLUDED.val, flag = EXCLUDED.flag", "ok");
     [Fact]
     public void insa0143() => CorpusAssert.Parses(@"INSERT INTO s.t2 (t_id, label, amount) SELECT id, name, val FROM s.t WHERE val IS NOT NULL", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void insa0144() => CorpusAssert.Parses(@"INSERT INTO s.t (name) VALUES ('NullExpr', NULL::text)", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void insa0145() => CorpusAssert.Parses(@"INSERT INTO s.t (name) VALUES (NULL::text)", "error");
@@ -331,7 +331,7 @@ public class Corpus_Insert
     public void insa0162() => CorpusAssert.Parses(@"INSERT INTO s.t (name) VALUES ('OnConf_noTarget') ON CONFLICT DO UPDATE SET name = EXCLUDED.name", "error");
     [Fact]
     public void insa0163() => CorpusAssert.Parses(@"INSERT INTO s.t (name, qty, val) VALUES ('Multi1', 1, 1.0), ('Multi2', 2, 2.0), ('Multi3', 3, 3.0) RETURNING id, name", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void insa0164() => CorpusAssert.Parses(@"INSERT INTO s.t (name) VALUES ('TypeMismatch', 42)", "error");
     [Fact]
     public void insa0165() => CorpusAssert.Parses(@"INSERT INTO s.t (name, qty) VALUES ('TypeCoerce', '5')", "ok");
@@ -483,9 +483,9 @@ public class Corpus_Insert
     public void insb0068() => CorpusAssert.Parses(@"INSERT INTO s.t (name) VALUES ('it''s a test')", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void insb0069() => CorpusAssert.Parses(@"INSERT INTO s.t (val) VALUES (1 + 2)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void insb0070() => CorpusAssert.Parses(@"INSERT INTO s.t (name, qty) VALUES ('mismatch', 1, 2)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void insb0071() => CorpusAssert.Parses(@"INSERT INTO s.t (name, qty, val) VALUES ('short', 1)", "error");
     [Fact]
     public void insb0072() => CorpusAssert.Parses(@"INSERT s.t (name) VALUES ('no-into')", "error");
@@ -509,7 +509,7 @@ public class Corpus_Insert
     public void insb0081() => CorpusAssert.Parses(@"INSERT INTO s.t (name) RETURNING", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void insb0082() => CorpusAssert.Parses(@"INSERT INTO s.t (name) VALUES ('a') RETURNING nonexistent_col", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void insb0083() => CorpusAssert.Parses(@"INSERT INTO s.nonexistent (name) VALUES ('a')", "error");
     [Fact]
     public void insb0084() => CorpusAssert.Parses(@"INSERT INTO s.v (name) VALUES ('view-insert')", "ok");
@@ -801,7 +801,7 @@ SELECT currval('s.seq')", "ok");
     public void insc0056() => CorpusAssert.Parses(@"INSERT s.t (name) VALUES ('no_into')", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void insc0057() => CorpusAssert.Parses(@"INSERT INTO s.t VALUES ('wrong_col_count', 999, 'extra')", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void insc0058() => CorpusAssert.Parses(@"INSERT INTO s.t (name, qty) VALUES ('mismatch')", "error");
     [Fact]
     public void insc0059() => CorpusAssert.Parses(@"INSERT INTO s.t (name, qty) VALUES ()", "error");

@@ -178,7 +178,7 @@ CREATE TYPE myrange49 AS RANGE (SUBTYPE = int4);", "ok");
     public void tyrba0083() => CorpusAssert.Parses(@"CREATE TYPE mybadb2 (INPUT = myinput);", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void tyrba0084() => CorpusAssert.Parses(@"CREATE TYPE mybadb3 (OUTPUT = myoutput);", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tyrba0085() => CorpusAssert.Parses(@"CREATE TYPE (INPUT = myinput, OUTPUT = myoutput);", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void tyrba0086() => CorpusAssert.Parses(@"CREATE TYPE mybadb4 (INPUT = myinput, OUTPUT = myoutput, INTERNALLENGTH = 4);", "error");
@@ -496,7 +496,7 @@ SELECT lower('(1,5)'::s.r50), upper('(1,5)'::s.r50)", "ok");
     [Fact]
     public void tyrbb0056() => CorpusAssert.Parses(@"CREATE TYPE s.r51 AS RANGE (SUBTYPE = date);
 SELECT isempty('empty'::s.r51)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tyrbb0057() => CorpusAssert.Parses(@"CREATE TYPE (INPUT = myin, OUTPUT = myout)", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void tyrbb0058() => CorpusAssert.Parses(@"CREATE TYPE s.bt1 (INPUT = int4in, OUTPUT = int4out)", "error");

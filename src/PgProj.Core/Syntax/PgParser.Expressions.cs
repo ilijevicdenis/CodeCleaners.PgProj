@@ -262,7 +262,7 @@ public sealed partial class PgParser
         // prefixed string literals: E'…', B'…', X'…'  (prefix immediately precedes the quote)
         if (t.Kind == TokenKind.Word && t.Value.Length == 1 && "EBXebx".IndexOf(t.Value[0]) >= 0
             && c.Peek() is { Kind: TokenKind.String } ps && ps.Position == t.Position + 1)
-        { c.Advance(); var sv = c.Advance(); return new LiteralExpr { Kind = "string", Text = $"{t.Value}'{sv.Value}'" }; }
+        { c.Advance(); var sv = c.Advance(); return new LiteralExpr { Kind = "prefixed", Text = $"{t.Value}'{sv.Value}'" }; }
 
         if (c.Peek()?.IsSymbol('(') == true && c.AtAnyWord(
                 "XMLELEMENT", "XMLFOREST", "XMLPI", "XMLROOT", "XMLPARSE", "XMLSERIALIZE",

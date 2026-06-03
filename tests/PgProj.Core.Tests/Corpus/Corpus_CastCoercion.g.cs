@@ -203,11 +203,11 @@ public class Corpus_CastCoercion
     public void cst2a0098() => CorpusAssert.Parses(@"SELECT ::integer", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void cst2a0099() => CorpusAssert.Parses(@"SELECT 42::nonexistent_type_xyz", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void cst2a0100() => CorpusAssert.Parses(@"SELECT CAST('not_a_number' AS integer)", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void cst2a0101() => CorpusAssert.Parses(@"SELECT CAST('not_a_date' AS date)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void cst2a0102() => CorpusAssert.Parses(@"SELECT CAST('not_bool' AS boolean)", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void cst2a0103() => CorpusAssert.Parses(@"SELECT CAST(99999 AS smallint)", "error");
@@ -497,11 +497,11 @@ public class Corpus_CastCoercion
     public void cst2b0075() => CorpusAssert.Parses(@"SELECT NULL::s.mood", "ok");
     [Fact]
     public void cst2b0076() => CorpusAssert.Parses(@"SELECT NULL::s.addr", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void cst2b0077() => CorpusAssert.Parses(@"SELECT 'not a number'::integer", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void cst2b0078() => CorpusAssert.Parses(@"SELECT 'notabool'::boolean", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void cst2b0079() => CorpusAssert.Parses(@"SELECT CAST('hello' AS integer)", "error");
     [Fact]
     public void cst2b0080() => CorpusAssert.Parses(@"SELECT CAST(integer)", "error");

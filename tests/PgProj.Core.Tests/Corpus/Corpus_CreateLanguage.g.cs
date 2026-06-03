@@ -53,9 +53,9 @@ public class Corpus_CreateLanguage
     public void lnga0023() => CorpusAssert.Parses(@"ALTER LANGUAGE no_such_language_xyz RENAME TO foo", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void lnga0024() => CorpusAssert.Parses(@"ALTER LANGUAGE no_such_language_xyz OWNER TO CURRENT_USER", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lnga0025() => CorpusAssert.Parses(@"CREATE LANGUAGE", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lnga0026() => CorpusAssert.Parses(@"CREATE OR REPLACE LANGUAGE", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void lnga0027() => CorpusAssert.Parses(@"CREATE LANGUAGE 'plpgsql'", "error");

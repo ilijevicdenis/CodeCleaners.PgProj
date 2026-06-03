@@ -344,7 +344,7 @@ E'def'", "error");
     public void lita0166() => CorpusAssert.Parses(@"SELECT U&'\ZZZZ'", "error");
     [Fact]
     public void lita0167() => CorpusAssert.Parses(@"SELECT '\x00'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lita0168() => CorpusAssert.Parses(@"SELECT 'hello'::integer", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void lita0169() => CorpusAssert.Parses(@"SELECT INTERVAL '99' YEAR(2)", "error");
@@ -639,7 +639,7 @@ E'def'", "error");
     public void litb0142() => CorpusAssert.Parses(@"SELECT NULL::integer", "ok");
     [Fact]
     public void litb0143() => CorpusAssert.Parses(@"SELECT NULL::text", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void litb0144() => CorpusAssert.Parses(@"SELECT 'not a number'::integer", "error");
     [Fact]
     public void litb0145() => CorpusAssert.Parses(@"SELECT integer 'not a number'", "error");

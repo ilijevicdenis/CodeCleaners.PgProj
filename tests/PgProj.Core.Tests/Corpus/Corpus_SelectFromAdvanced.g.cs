@@ -333,7 +333,7 @@ public class Corpus_SelectFromAdvanced
     public void selfa0163() => CorpusAssert.Parses(@"SELECT * FROM generate_series(1, 1000000) AS gs(n) LIMIT 3", "ok");
     [Fact]
     public void selfa0164() => CorpusAssert.Parses(@"SELECT * FROM LATERAL (SELECT id, name FROM s.t WHERE id = 1) AS lat(a, b)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selfa0165() => CorpusAssert.Parses(@"SELECT * FROM s.t1", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void selfa0166() => CorpusAssert.Parses(@"SELECT * FROM (SELECT id FROM s.t) AS sub WHERE nonexistent_col = 1", "error");

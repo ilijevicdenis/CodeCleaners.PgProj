@@ -104,26 +104,6 @@ public class CorpusTestGenerator
     }
 
     [Fact]
-    public void Dump_false_rejections()
-    {
-        if (Environment.GetEnvironmentVariable("PGPROJ_DUMP_REJECTIONS") != "1") return;
-        var rej = CorpusData.LoadAll()
-            .Where(c => c.Expect == "ok" && CorpusData.Verdict(c.Sql) == CorpusVerdict.Error)
-            .ToList();
-        _out.WriteLine($"false rejections (expect=ok, parser=error): {rej.Count}");
-        File.WriteAllLines(Path.Combine(CorpusData.CorpusDir, "_phase1_targets.txt"),
-            rej.Select(c => c.Id).OrderBy(x => x, StringComparer.Ordinal));
-        foreach (var c in rej.OrderBy(c => c.Category, StringComparer.Ordinal).ThenBy(c => c.Id, StringComparer.Ordinal))
-        {
-            var p = new PgProj.Core.Parsing.AstParser();
-            p.Parse(c.Sql);
-            _out.WriteLine($"[{c.Id}] {c.Category}");
-            _out.WriteLine($"    sql: {c.Sql.Replace("\n", " ")}");
-            _out.WriteLine($"    diag: {string.Join(" | ", p.Diagnostics)}");
-        }
-    }
-
-    [Fact]
     public void Dump_pending_positives()
     {
         var cat = Environment.GetEnvironmentVariable("PGPROJ_DUMP_CAT");
@@ -134,6 +114,21 @@ public class CorpusTestGenerator
             _out.WriteLine($"[{c.Id}] {c.Sql.Replace("\n", " ")}");
             _out.WriteLine($"   recognized={p.FullyRecognized} stmts={p.Statements.Count} diag={string.Join(" | ", p.Diagnostics)}");
         }
+    }
+
+    [Fact]
+    public void Dump_semantic_false_positives()
+    {
+        if (Environment.GetEnvironmentVariable("PGPROJ_DUMP_FP") != "1") return;
+        int n = 0;
+        foreach (var c in CorpusData.LoadAll().Where(c => c.Expect == "ok"))
+        {
+            var res = new Syntax.PgParser().Parse(c.Sql);
+            if (!res.FullyRecognized || res.Diagnostics.Count > 0) continue;   // parser already handles
+            var (clean, _) = CorpusData.Evaluate(c.Sql);
+            if (!clean) { _out.WriteLine($"[{c.Id}] {c.Category}: {c.Sql.Replace("\n", " ")}"); if (++n >= 40) break; }
+        }
+        _out.WriteLine($"semantic false positives: {n}");
     }
 
     private static string Pascal(string kebab) =>

@@ -93,7 +93,7 @@ public class Corpus_CreateExtension
     public void exta0043() => CorpusAssert.Parses(@"CREATE EXTENSION nonexistent_xyz_abc_ext", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void exta0044() => CorpusAssert.Parses(@"CREATE EXTENSION IF NOT EXISTS nonexistent_xyz_abc_ext", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void exta0045() => CorpusAssert.Parses(@"CREATE EXTENSION", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void exta0046() => CorpusAssert.Parses(@"CREATE EXTENSION IF plpgsql", "error");
@@ -286,7 +286,7 @@ ALTER EXTENSION hstore ADD LANGUAGE plperlu", "error");
     public void exta0111() => CorpusAssert.Parses(@"ALTER EXTENSION plpgsql UPDATE TO '1.0'", "ok");
     [Fact]
     public void exta0112() => CorpusAssert.Parses(@"ALTER EXTENSION plpgsql SET SCHEMA pg_catalog", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void exta0113() => CorpusAssert.Parses(@"CREATE EXTENSION", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void exta0114() => CorpusAssert.Parses(@"CREATE EXTENSION 'hstore'", "error");

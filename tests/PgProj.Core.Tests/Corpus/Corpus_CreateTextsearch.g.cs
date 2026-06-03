@@ -63,7 +63,7 @@ ALTER TEXT SEARCH CONFIGURATION s.cfg10 DROP MAPPING FOR asciiword, word", "erro
     [Fact(Skip = "pending: parser not yet complete")]
     public void tsa0021() => CorpusAssert.Parses(@"CREATE TEXT SEARCH CONFIGURATION s.cfg11 (PARSER = pg_catalog.default);
 ALTER TEXT SEARCH CONFIGURATION s.cfg11 DROP MAPPING FOR asciiword", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tsa0022() => CorpusAssert.Parses(@"CREATE TEXT SEARCH CONFIGURATION s.rencfg (PARSER = pg_catalog.default);
 ALTER TEXT SEARCH CONFIGURATION s.rencfg RENAME TO s.rencfg2", "error");
     [Fact]

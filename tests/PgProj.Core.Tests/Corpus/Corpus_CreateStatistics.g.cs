@@ -163,7 +163,7 @@ ALTER STATISTICS s.st67 SET STATISTICS 10001", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void staa0069() => CorpusAssert.Parses(@"CREATE STATISTICS s.st69 ON qty, flag FROM s.t;
 ALTER STATISTICS s.st69 SET STATISTIC 100", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void staa0070() => CorpusAssert.Parses(@"CREATE STATISTICS s.st70 ON qty, flag FROM s.t;
 ALTER STATISTICS s.st70 RENAME st70_new", "error");
     [Fact]
@@ -279,7 +279,7 @@ ALTER STATISTICS s.st108 SET SCHEMA s", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void staa0116() => CorpusAssert.Parses(@"CREATE STATISTICS s.st116 ON name, val FROM s.t;
 ALTER STATISTICS s.st116 SET STATISTICS 'abc'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void staa0117() => CorpusAssert.Parses(@"CREATE STATISTICS s.st117 ON name, val FROM s.t;
 ALTER STATISTICS s.st117 OWNER TO 'nonexistent_role_xyz'", "error");
     [Fact(Skip = "pending: parser not yet complete")]

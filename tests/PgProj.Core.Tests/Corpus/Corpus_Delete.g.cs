@@ -163,7 +163,7 @@ public class Corpus_Delete
     public void dela0078() => CorpusAssert.Parses(@"DELETE FROM s.t WHERE id = 1 WHERE name = 'x'", "error");
     [Fact]
     public void dela0079() => CorpusAssert.Parses(@"DELETE FROM s.t USING s.t2 USING s.mv WHERE id = 1", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dela0080() => CorpusAssert.Parses(@"DELETE FROM s.nonexistent WHERE id = 1", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void dela0081() => CorpusAssert.Parses(@"DELETE FROM s.t WHERE nosuchcol = 1", "error");

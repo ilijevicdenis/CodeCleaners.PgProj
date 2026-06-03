@@ -118,7 +118,7 @@ CREATE AGGREGATE agga0024_myagg (integer, integer) (SFUNC = agga0024_sfunc, STYP
     public void agga0055() => CorpusAssert.Parses(@"CREATE AGGREGATE agga0055_old (BASETYPE = integer, SFUNC = int4pl, STYPE = integer, COMBINEFUNC = int4pl)", "ok");
     [Fact]
     public void agga0056() => CorpusAssert.Parses(@"CREATE AGGREGATE agga0056_myagg (integer) (SFUNC = int4pl, STYPE = integer, FINALFUNC_MODIFY = READ_ONLY, FINALFUNC_EXTRA)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void agga0057() => CorpusAssert.Parses(@"CREATE AGGREGATE (integer) (SFUNC = int4pl, STYPE = integer)", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void agga0058() => CorpusAssert.Parses(@"CREATE AGGREGATE agga0058_myagg (integer) (STYPE = integer)", "error");

@@ -230,11 +230,11 @@ CREATE EVENT TRIGGER evta_trg68 ON ddl_command_start WHEN TAG IN ('CREATE TABLE'
 CREATE EVENT TRIGGER evta_trg69 ON ddl_command_start WHEN TAG IN (CREATE TABLE) EXECUTE FUNCTION evta_fn69();", "error");
     [Fact]
     public void evta0070() => CorpusAssert.Parses(@"ALTER EVENT TRIGGER DISABLE;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void evta0071() => CorpusAssert.Parses(@"CREATE FUNCTION evta_fn71() RETURNS event_trigger LANGUAGE plpgsql AS $$ BEGIN END $$;
 CREATE EVENT TRIGGER evta_trg71 ON ddl_command_start EXECUTE FUNCTION evta_fn71();
 ALTER EVENT TRIGGER evta_trg71;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void evta0072() => CorpusAssert.Parses(@"CREATE FUNCTION evta_fn72() RETURNS event_trigger LANGUAGE plpgsql AS $$ BEGIN END $$;
 CREATE EVENT TRIGGER evta_trg72 ON ddl_command_start EXECUTE FUNCTION evta_fn72();
 ALTER EVENT TRIGGER evta_trg72 RENAME;", "error");
@@ -244,7 +244,7 @@ CREATE EVENT TRIGGER evta_trg73 ON ddl_command_start EXECUTE FUNCTION evta_fn73(
 ALTER EVENT TRIGGER evta_trg73 OWNER;", "error");
     [Fact]
     public void evta0074() => CorpusAssert.Parses(@"DROP EVENT TRIGGER;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void evta0075() => CorpusAssert.Parses(@"CREATE FUNCTION evta_fn75() RETURNS event_trigger LANGUAGE plpgsql AS $$ BEGIN END $$;
 CREATE EVENT TRIGGER evta_trg75 ON ddl_command_start EXECUTE FUNCTION evta_fn75();
 DROP EVENT TRIGGER evta_trg75 CASCADE RESTRICT;", "error");

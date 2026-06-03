@@ -203,7 +203,7 @@ public class Corpus_Update
     public void upda0098() => CorpusAssert.Parses(@"UPDATE s.t SET name = 'X' SET val = 1", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void upda0099() => CorpusAssert.Parses(@"UPDATE s.t SET nonexistent_col = 1", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void upda0100() => CorpusAssert.Parses(@"UPDATE s.nonexistent SET name = 'X'", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void upda0101() => CorpusAssert.Parses(@"UPDATE s.mv SET name = 'X'", "error");
@@ -568,7 +568,7 @@ name = 'comment_ok'", "ok");
     public void updb0107() => CorpusAssert.Parses(@"UPDATE s.t SET name = 'x' RETURNING", "error");
     [Fact]
     public void updb0108() => CorpusAssert.Parses(@"UPDATE s.t SET name = 'x' FROM", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void updb0109() => CorpusAssert.Parses(@"UPDATE s.nonexistent SET name = 'x'", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void updb0110() => CorpusAssert.Parses(@"UPDATE s.t SET nonexistent_col = 'x'", "error");
@@ -680,7 +680,7 @@ name = 'comment_ok'", "ok");
     public void updb0163() => CorpusAssert.Parses(@"UPDATE s.t SET name = 'x' ORDER BY id", "error");
     [Fact]
     public void updb0164() => CorpusAssert.Parses(@"UPDATE s.t SET name = 'x' FROM s.t2 WHERE s.t2.t_id = s.t.id WHERE s.t.id = 1", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void updb0165() => CorpusAssert.Parses(@"UPDATE s.t SET val = 1 / 0", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void updb0166() => CorpusAssert.Parses(@"UPDATE s.t SET name = 'x' RETURNING WITH () *", "error");

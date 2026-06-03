@@ -199,7 +199,7 @@ public class Corpus_CreateConversion
     public void cnva0096() => CorpusAssert.Parses(@"CREATE CONVERSION myconv FOR 'LATIN1' TO 'UTF8' FROM iso8859_1_to_utf8; CREATE CONVERSION myconv2 FOR 'UTF8' TO 'LATIN1' FROM utf8_to_iso8859_1", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void cnva0097() => CorpusAssert.Parses(@"CREATE CONVERSION myconv FOR 'LATIN1' TO 'UTF8' FROM iso8859_1_to_utf8; CREATE CONVERSION myconv FOR 'UTF8' TO 'LATIN1' FROM utf8_to_iso8859_1", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void cnva0098() => CorpusAssert.Parses(@"CREATE DEFAULT CONVERSION mydefconv FOR 'LATIN1' TO 'UTF8' FROM iso8859_1_to_utf8", "ok");
     [Fact]
     public void cnva0099() => CorpusAssert.Parses(@"CREATE CONVERSION myconv FOR 'EUC_JIS_2004' TO 'UTF8' FROM euc_jis_2004_to_utf8", "ok");

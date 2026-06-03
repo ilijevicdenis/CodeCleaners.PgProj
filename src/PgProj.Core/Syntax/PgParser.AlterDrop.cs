@@ -183,6 +183,42 @@ public sealed partial class PgParser
 
     // ---- shared helpers -----------------------------------------------------
 
+    /// <summary>CREATE of a kind not finely modelled — validate the skeleton, capture name for the catalog.</summary>
+    private SqlStatement ParseCreateGeneric(TokenCursor c)
+    {
+        c.MatchWord("UNIQUE");        // CREATE UNIQUE INDEX
+        c.MatchWord("CONSTRAINT");    // CREATE CONSTRAINT TRIGGER
+        var kind = ParseObjectKind(c);
+        var node = new RawCreateStatement { ObjectKind = kind };
+
+        switch (kind)
+        {
+            case "VIEW" or "MATERIALIZED VIEW" or "SEQUENCE" or "FOREIGN TABLE" or "TYPE" or "DOMAIN":
+                c.MatchWords("IF", "NOT", "EXISTS");
+                (node.Schema, node.Name) = ParseQualifiedName(c);
+                ConsumeRest(c);
+                return node;
+            case "FUNCTION" or "PROCEDURE" or "AGGREGATE":
+                c.MatchWords("IF", "NOT", "EXISTS");
+                (node.Schema, node.Name) = ParseQualifiedName(c);
+                if (c.AtSymbol('(')) CaptureBalancedParens(c);
+                ConsumeRest(c);
+                return node;
+            case "INDEX":
+                c.MatchWord("CONCURRENTLY");
+                c.MatchWords("IF", "NOT", "EXISTS");
+                if (!c.AtWord("ON")) c.ExpectIdentifier();          // optional index name
+                c.ExpectWord("ON");
+                if (c.AtEnd) throw new ParseException("incomplete CREATE INDEX", c.Here);
+                ConsumeRest(c);
+                return node;
+            default:
+                if (c.AtEnd) throw new ParseException($"incomplete CREATE {kind}", c.Here);
+                ConsumeRest(c);
+                return node;
+        }
+    }
+
     /// <summary>Reads the (possibly multi-word) object kind after ALTER/DROP.</summary>
     private static string ParseObjectKind(TokenCursor c)
     {

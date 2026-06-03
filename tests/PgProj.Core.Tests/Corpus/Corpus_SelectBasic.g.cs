@@ -385,7 +385,7 @@ public class Corpus_SelectBasic
     public void selba0189() => CorpusAssert.Parses(@"SELECT id FROM s.t WHERE BETWEEN 1 AND 10", "error");
     [Fact]
     public void selba0190() => CorpusAssert.Parses(@"SELECT id FROM s.t OFFSET -1", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0191() => CorpusAssert.Parses(@"SELECT id FROM s.nonexistent_table", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void selba0192() => CorpusAssert.Parses(@"SELECT no_col FROM s.t", "error");
@@ -701,7 +701,7 @@ public class Corpus_SelectBasic
     public void selbb0147() => CorpusAssert.Parses(@"SELECT id FROM s.t ORDER BY nonexistent_column", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void selbb0148() => CorpusAssert.Parses(@"SELECT no_such_col FROM s.t", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0149() => CorpusAssert.Parses(@"SELECT id FROM s.no_such_table", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void selbb0150() => CorpusAssert.Parses(@"SELECT id FROM s.t WHERE id = 'not_a_number'", "error");

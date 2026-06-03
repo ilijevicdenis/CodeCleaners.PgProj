@@ -61,7 +61,7 @@ public class Corpus_CreateCollation
     public void cola0027() => CorpusAssert.Parses(@"CREATE COLLATION s.mycoll (LOCALE = 'C'); DROP COLLATION s.mycoll", "ok");
     [Fact]
     public void cola0028() => CorpusAssert.Parses(@"CREATE COLLATION s.mycoll (LOCALE = 'C')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void cola0029() => CorpusAssert.Parses(@"CREATE COLLATION s.mycoll (LOCALE = 'C'); ALTER COLLATION s.mycoll RENAME TO s.mycoll2", "error");
     [Fact]
     public void cola0030() => CorpusAssert.Parses(@"CREATE COLLATION s.mycoll (LOCALE = 'C'); ALTER COLLATION s.mycoll RENAME TO mycoll_renamed", "ok");

@@ -21,7 +21,7 @@ public class Corpus_CreateView
     public void vwa0007() => CorpusAssert.Parses(@"CREATE TEMP VIEW vwa_temp AS SELECT id, name FROM s.t", "ok");
     [Fact]
     public void vwa0008() => CorpusAssert.Parses(@"CREATE TEMPORARY VIEW vwa_temporary AS SELECT id FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vwa0009() => CorpusAssert.Parses(@"CREATE RECURSIVE VIEW vwa_rec (n) AS VALUES (1) UNION ALL SELECT n+1 FROM vwa_rec WHERE n < 5", "ok");
     [Fact]
     public void vwa0010() => CorpusAssert.Parses(@"CREATE VIEW vwa_schema AS SELECT id FROM s.t", "ok");
@@ -103,11 +103,11 @@ public class Corpus_CreateView
     public void vwa0048() => CorpusAssert.Parses(@"CREATE OR REPLACE TEMP VIEW vwa_orep_temp AS SELECT id FROM s.t", "ok");
     [Fact]
     public void vwa0049() => CorpusAssert.Parses(@"CREATE OR REPLACE TEMPORARY VIEW vwa_orep_temporary AS SELECT id, name FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vwa0050() => CorpusAssert.Parses(@"CREATE RECURSIVE VIEW vwa_rec2 (n, total) AS SELECT 1, 0 UNION ALL SELECT n+1, total+n FROM vwa_rec2 WHERE n < 10", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vwa0051() => CorpusAssert.Parses(@"CREATE TEMP RECURSIVE VIEW vwa_temp_rec (x) AS VALUES (1) UNION ALL SELECT x+1 FROM vwa_temp_rec WHERE x < 3", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vwa0052() => CorpusAssert.Parses(@"CREATE OR REPLACE RECURSIVE VIEW vwa_orep_rec (n) AS VALUES (1) UNION ALL SELECT n+1 FROM vwa_orep_rec WHERE n < 3", "ok");
     [Fact]
     public void vwa0053() => CorpusAssert.Parses(@"CREATE VIEW vwa_multi_from AS SELECT t.id, t.name, t2.label FROM s.t, s.t2 WHERE t.id = t2.t_id", "ok");
@@ -246,7 +246,7 @@ WHERE qty > 0", "ok");
     public void vwa0117() => CorpusAssert.Parses(@"CREATE VIEW vwa_distinct_on AS SELECT DISTINCT ON (status) id, status FROM s.t ORDER BY status", "ok");
     [Fact]
     public void vwa0118() => CorpusAssert.Parses(@"CREATE VIEW vwa_returning AS SELECT id FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vwa0119() => CorpusAssert.Parses(@"CREATE RECURSIVE VIEW vwa_recursive_ok (n) AS VALUES(1) UNION ALL SELECT n+1 FROM vwa_recursive_ok WHERE n < 3", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void vwa0120() => CorpusAssert.Parses(@"CREATE VIEW vwa_collist_mismatch (a, b, c) AS SELECT id, name FROM s.t", "error");
@@ -383,7 +383,7 @@ ALTER VIEW s.v2 RENAME TO v3", "ok");
     public void vwb0015() => CorpusAssert.Parses(@"CREATE VIEW s.v2 AS SELECT id, name FROM s.t WHERE id > 0 WITH LOCAL CHECK OPTION", "ok");
     [Fact]
     public void vwb0016() => CorpusAssert.Parses(@"CREATE VIEW s.v2 AS SELECT id, name FROM s.t WHERE id > 0 WITH CASCADED CHECK OPTION", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vwb0017() => CorpusAssert.Parses(@"CREATE RECURSIVE VIEW s.v2 (n) AS VALUES (1) UNION ALL SELECT n+1 FROM v2 WHERE n < 5", "ok");
     [Fact]
     public void vwb0018() => CorpusAssert.Parses(@"CREATE VIEW s.v2 WITH (security_barrier, security_invoker) AS SELECT id FROM s.t", "ok");

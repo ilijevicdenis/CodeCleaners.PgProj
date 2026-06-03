@@ -72,16 +72,7 @@ public sealed partial class PgParser
         if (c.AtSymbol('(')) return "QUERY";   // parenthesised set-op query
         if (c.Current is { Kind: TokenKind.Word } cw && CommandKeywords.Contains(cw.Value)) return "QUERY";
         if (c.AtAnyWord("ALTER", "DROP")) return "QUERY";
-        if (!c.AtWord("CREATE")) return null;
-        int k = 1;
-        while (c.Peek(k) is { } t && t.Kind == TokenKind.Word
-               && Persistence.Any(p => string.Equals(p, t.Value, StringComparison.OrdinalIgnoreCase))) k++;
-        var head = c.Peek(k);
-        if (head?.IsWord("TABLE") == true) return "CREATE TABLE";
-        if (head?.IsWord("SCHEMA") == true) return "CREATE SCHEMA";
-        if (head?.IsWord("PUBLICATION") == true || head?.IsWord("SUBSCRIPTION") == true) return "CREATE";
-        if (head is { } h2 && (h2.IsWord("ROLE") || h2.IsWord("USER") || h2.IsWord("GROUP"))) return "CREATE";
-        return null;
+        return c.AtWord("CREATE") ? "CREATE" : null;   // PgParser owns every CREATE
     }
 
     private SqlStatement ParseStatement(TokenCursor c)
@@ -109,6 +100,7 @@ public sealed partial class PgParser
         if (c.AtWord("DROP")) return ParseDrop(c);
 
         c.ExpectWord("CREATE");
+        c.MatchWords("OR", "REPLACE");
         string? persistence = null;
         while (true)
         {
@@ -117,6 +109,7 @@ public sealed partial class PgParser
             if (c.MatchWord("UNLOGGED")) { persistence = "UNLOGGED"; continue; }
             break;
         }
+        c.MatchWord("RECURSIVE");                       // CREATE [OR REPLACE] RECURSIVE VIEW
         if (c.MatchWord("TABLE")) return ParseCreateTable(c, persistence);
         if (c.MatchWord("SCHEMA")) return ParseCreateSchema(c);
         if (c.AtAnyWord("ROLE", "USER", "GROUP")) { var k = c.Advance().Value.ToUpperInvariant(); c.ExpectIdentifier(); ConsumeRest(c); return new CommandStatement { Kind = "CREATE " + k }; }
@@ -132,7 +125,7 @@ public sealed partial class PgParser
             ConsumeRest(c);
             return new CommandStatement { Kind = "CREATE SUBSCRIPTION" };
         }
-        throw new ParseException("expected TABLE or SCHEMA", c.Here);
+        return ParseCreateGeneric(c);
     }
 
     // ---- CREATE TABLE -------------------------------------------------------

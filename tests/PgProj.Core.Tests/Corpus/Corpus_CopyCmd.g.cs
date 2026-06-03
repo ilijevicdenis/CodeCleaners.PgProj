@@ -385,40 +385,40 @@ public class Corpus_CopyCmd
     public void cpyb0019() => CorpusAssert.Parses(@"COPY (SELECT id, name FROM s.t ORDER BY id LIMIT 10) TO STDOUT (FORMAT csv, HEADER true)", "ok");
     [Fact]
     public void cpyb0020() => CorpusAssert.Parses(@"COPY (SELECT * FROM s.v) TO STDOUT (FORMAT text)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void cpyb0021() => CorpusAssert.Parses(@"COPY s.t (name, qty, flag) FROM STDIN (FORMAT text);
 \.", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void cpyb0022() => CorpusAssert.Parses(@"COPY s.t (name, qty, flag) FROM STDIN (FORMAT csv, HEADER false);
 \.", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void cpyb0023() => CorpusAssert.Parses(@"COPY s.t (name, qty, flag) FROM STDIN (FORMAT csv, ON_ERROR ignore);
 \.", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void cpyb0024() => CorpusAssert.Parses(@"COPY s.t (name, qty, flag) FROM STDIN (FORMAT csv, ON_ERROR stop);
 \.", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void cpyb0025() => CorpusAssert.Parses(@"COPY s.t (name, qty, flag) FROM STDIN (FORMAT csv, ON_ERROR ignore, REJECT_LIMIT 100);
 \.", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void cpyb0026() => CorpusAssert.Parses(@"COPY s.t (name, qty, flag) FROM STDIN (FORMAT csv, LOG_VERBOSITY verbose);
 \.", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void cpyb0027() => CorpusAssert.Parses(@"COPY s.t (name, qty, flag) FROM STDIN (FORMAT csv, LOG_VERBOSITY silent);
 \.", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void cpyb0028() => CorpusAssert.Parses(@"COPY s.t (name, qty, flag) FROM STDIN (FORMAT csv, LOG_VERBOSITY default);
 \.", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void cpyb0029() => CorpusAssert.Parses(@"COPY s.t (name, qty, flag) FROM STDIN (FORMAT text, FREEZE false);
 \.", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void cpyb0030() => CorpusAssert.Parses(@"COPY s.t (name, qty, flag) FROM STDIN (FORMAT csv, FORCE_NOT_NULL (name));
 \.", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void cpyb0031() => CorpusAssert.Parses(@"COPY s.t (name, val) FROM STDIN (FORMAT csv, FORCE_NULL (val));
 \.", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void cpyb0032() => CorpusAssert.Parses(@"COPY s.t (name, qty, flag) FROM STDIN (FORMAT csv, ON_ERROR ignore, LOG_VERBOSITY verbose, ENCODING 'UTF8');
 \.", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
