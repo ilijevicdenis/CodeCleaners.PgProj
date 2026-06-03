@@ -71,7 +71,8 @@ public static class SqlEmitter
         foreach (var other in t.OtherConstraints)
             lines.Add($"    {other}");
 
-        return $"CREATE TABLE {Qualified(t.Schema, t.Name)} (\n{string.Join(",\n", lines)}\n);";
+        var trailing = string.IsNullOrWhiteSpace(t.TrailingOptions) ? "" : " " + t.TrailingOptions.Trim();
+        return $"CREATE TABLE {Qualified(t.Schema, t.Name)} (\n{string.Join(",\n", lines)}\n){trailing};";
     }
 
     public static string ForeignKey(string schema, string table, ForeignKeyDefinition fk)

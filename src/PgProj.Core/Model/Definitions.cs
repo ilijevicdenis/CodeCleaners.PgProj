@@ -48,6 +48,9 @@ public sealed record TableDefinition
     /// <summary>Constraint clauses captured verbatim (EXCLUDE and anything not finely modelled).</summary>
     public List<string> OtherConstraints { get; init; } = new();
 
+    /// <summary>Clauses after the column list, captured verbatim: INHERITS / PARTITION BY / WITH / ON COMMIT.</summary>
+    public string? TrailingOptions { get; set; }
+
     public string QualifiedName => $"{Schema}.{Name}";
 
     public ColumnDefinition? FindColumn(string name) =>

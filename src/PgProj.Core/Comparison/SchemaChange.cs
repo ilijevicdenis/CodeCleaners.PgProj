@@ -88,7 +88,14 @@ public sealed record AlterColumnChange(string Schema, string Table, ColumnDefini
         var sb = new StringBuilder();
 
         if (Old.DataType != New.DataType)
-            sb.AppendLine($"ALTER TABLE {qn} ALTER COLUMN {col} TYPE {New.DataType};");
+        {
+            // When the base type changes (not just length/precision) the cast may not be implicit,
+            // so add a USING clause; Postgres needs it for e.g. text -> integer.
+            var usingClause = BaseType(Old.DataType) != BaseType(New.DataType)
+                ? $" USING {col}::{New.DataType}"
+                : "";
+            sb.AppendLine($"ALTER TABLE {qn} ALTER COLUMN {col} TYPE {New.DataType}{usingClause};");
+        }
 
         if (Old.IsNullable && !New.IsNullable)
             sb.AppendLine($"ALTER TABLE {qn} ALTER COLUMN {col} SET NOT NULL;");
@@ -105,6 +112,13 @@ public sealed record AlterColumnChange(string Schema, string Table, ColumnDefini
         }
 
         return sb.ToString().TrimEnd();
+    }
+
+    private static string BaseType(string t)
+    {
+        var paren = t.IndexOf('(');
+        var s = paren >= 0 ? t[..paren] : t;
+        return s.Replace("[]", "").Trim();
     }
 }
 

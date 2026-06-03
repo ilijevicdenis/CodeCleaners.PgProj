@@ -38,13 +38,14 @@ public static class RawObjectMeta
         ObjectKind.Rule => 86,
         ObjectKind.Policy => 87,
         ObjectKind.EventTrigger => 88,
+        ObjectKind.Table => 43, // after base tables (40), before foreign keys (70)
         ObjectKind.Comment => 99, // last — every referenced object exists by now
         _ => 50,
     };
 
     /// <summary>Recreating these drops dependent data/columns, so it requires --allow-drops.</summary>
     public static bool IsDestructiveRecreate(ObjectKind kind) =>
-        kind is ObjectKind.Type or ObjectKind.Domain or ObjectKind.ForeignTable;
+        kind is ObjectKind.Type or ObjectKind.Domain or ObjectKind.ForeignTable or ObjectKind.Table;
 
     private static string DropKeyword(ObjectKind kind) => kind switch
     {
@@ -75,7 +76,7 @@ public static class RawObjectMeta
             $"{SqlEmitter.Quote(def.Name)} ON {QualifyString(def.OnObject ?? "")}",
         // schema-qualified
         ObjectKind.Type or ObjectKind.Domain or ObjectKind.Collation or ObjectKind.Conversion
-            or ObjectKind.Statistics or ObjectKind.ForeignTable or ObjectKind.TextSearchConfiguration
+            or ObjectKind.Statistics or ObjectKind.ForeignTable or ObjectKind.Table or ObjectKind.TextSearchConfiguration
             or ObjectKind.TextSearchDictionary or ObjectKind.TextSearchParser or ObjectKind.TextSearchTemplate =>
             SqlEmitter.Qualified(def.Schema, def.Name),
         // global name
@@ -115,6 +116,7 @@ public static class RawObjectMeta
             or ObjectKind.TextSearchParser or ObjectKind.TextSearchTemplate => "TextSearch",
         ObjectKind.Transform => "Transforms",
         ObjectKind.Comment => "Comments",
+        ObjectKind.Table => "Tables",
         _ => "Other",
     };
 

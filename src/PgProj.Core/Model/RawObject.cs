@@ -33,6 +33,7 @@ public enum ObjectKind
     TextSearchTemplate,
     Transform,
     Comment,
+    Table, // partition/typed tables that have no plain column list to model finely
 }
 
 /// <summary>

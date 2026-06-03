@@ -100,7 +100,7 @@ public sealed class SqlParser
         switch (kindTok.Value.ToUpperInvariant())
         {
             case "SCHEMA": r.Next(); ParseSchema(model, r); return;
-            case "TABLE": r.Next(); ParseTable(model, r); return;
+            case "TABLE": r.Next(); ParseTable(model, r, tokens); return;
             case "INDEX": r.Next(); ParseIndex(model, r, unique); return;
             case "VIEW": r.Next(); ParseView(model, r, materialized); return;
             case "SEQUENCE": r.Next(); ParseSequence(model, r); return;
@@ -127,12 +127,22 @@ public sealed class SqlParser
 
     // ---- CREATE TABLE --------------------------------------------------------------------
 
-    private void ParseTable(DatabaseModel model, TokenReader r)
+    private void ParseTable(DatabaseModel model, TokenReader r, IReadOnlyList<Token> rawStatement)
     {
         SkipIfNotExists(r);
         var (schema, name) = ParseQualifiedName(r);
-        var table = new TableDefinition { Schema = schema, Name = name };
 
+        // Forms without a plain column list — CREATE TABLE x PARTITION OF p ... / OF some_type ... —
+        // have no finely-diffable column set, so capture them verbatim as a raw table object.
+        if (!r.IsSymbol('('))
+        {
+            model.Objects.Add(new RawObjectDefinition(ObjectKind.Table, schema, name,
+                $"table:{schema}.{name}", Token.Render(rawStatement)));
+            EnsureSchema(model, schema);
+            return;
+        }
+
+        var table = new TableDefinition { Schema = schema, Name = name };
         r.ExpectSymbol('(');
         while (!r.Eof && !r.IsSymbol(')'))
         {
@@ -140,6 +150,11 @@ public sealed class SqlParser
             if (!r.MatchSymbol(',')) break;
         }
         r.ExpectSymbol(')');
+
+        // Trailing clauses after the column list: INHERITS / PARTITION BY / WITH / ON COMMIT / etc.
+        var trailing = new List<Token>();
+        while (!r.Eof) trailing.Add(r.Next());
+        if (trailing.Count > 0) table.TrailingOptions = Token.Render(trailing);
 
         EnsureSchema(model, schema);
         model.Tables.Add(table);
