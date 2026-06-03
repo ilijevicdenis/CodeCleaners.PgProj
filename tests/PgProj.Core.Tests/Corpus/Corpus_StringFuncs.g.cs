@@ -177,7 +177,7 @@ public class Corpus_StringFuncs
     public void strfa0085() => CorpusAssert.Parses(@"SELECT decode('68656c6c6f', 'hex')", "ok");
     [Fact]
     public void strfa0086() => CorpusAssert.Parses(@"SELECT decode('hello', 'escape')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void strfa0087() => CorpusAssert.Parses(@"SELECT encode('hello'::bytea, 'invalid_format')", "error");
     [Fact]
     public void strfa0088() => CorpusAssert.Parses(@"SELECT encode()", "error");
@@ -591,7 +591,7 @@ public class Corpus_StringFuncs
     public void strfb0092() => CorpusAssert.Parses(@"SELECT decode('68656c6c6f', 'hex')", "ok");
     [Fact]
     public void strfb0093() => CorpusAssert.Parses(@"SELECT decode('hello', 'escape')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void strfb0094() => CorpusAssert.Parses(@"SELECT encode('hello'::bytea, 'bad_format')", "error");
     [Fact]
     public void strfb0095() => CorpusAssert.Parses(@"SELECT encode()", "error");

@@ -220,11 +220,31 @@ public sealed class SemanticAnalyzer
                 case "asin" or "asind" or "acos" or "acosd" when a < -1 || a > 1: Report($"input is out of range for {name}"); break;
             }
         }
-        else if (f.Args.Count == 2 && name is "div" or "mod" && Fold(f.Args[1]) is 0.0)
+        else if (f.Args.Count == 2)
         {
-            Report("division by zero");
+            switch (name)
+            {
+                case "div" or "mod" when Fold(f.Args[1]) is 0.0: Report("division by zero"); break;
+                case "encode" when StrLit(f.Args[1]) is { } fmt && !EncodeFormats.Contains(fmt): Report($"unrecognized encoding format \"{fmt}\""); break;
+                case "date_trunc" when StrLit(f.Args[0]) is { } unit && !DateTruncUnits.Contains(unit): Report($"unrecognized date_trunc field \"{unit}\""); break;
+            }
+        }
+        else if (f.Args.Count == 3 && name == "make_date")
+        {
+            if (Fold(f.Args[1]) is { } mo && (mo < 1 || mo > 12)) Report("month must be between 1 and 12 in make_date");
+            else if (Fold(f.Args[2]) is { } d && (d < 1 || d > 31)) Report("day must be between 1 and 31 in make_date");
+        }
+        else if (f.Args.Count == 3 && name == "make_time")
+        {
+            if (Fold(f.Args[0]) is { } h && (h < 0 || h > 23)) Report("hour must be between 0 and 23 in make_time");
+            else if (Fold(f.Args[1]) is { } mi && (mi < 0 || mi > 59)) Report("minute must be between 0 and 59 in make_time");
         }
     }
+
+    private static string? StrLit(Expr e) => e is LiteralExpr { Kind: "string", Text: var t } ? t : null;
+    private static readonly HashSet<string> EncodeFormats = new(StringComparer.OrdinalIgnoreCase) { "base64", "hex", "escape" };
+    private static readonly HashSet<string> DateTruncUnits = new(StringComparer.OrdinalIgnoreCase)
+    { "microseconds", "milliseconds", "second", "minute", "hour", "day", "week", "month", "quarter", "year", "decade", "century", "millennium" };
 
     // Built-in scalar/aggregate functions whose argument count is fixed and unambiguous, as (min, max).
     // Used to catch arity mistakes (abs(), round(1,2,3), sum(a,b)). Only applied to an UNQUALIFIED call
@@ -254,7 +274,7 @@ public sealed class SemanticAnalyzer
         ["concat_ws"] = (1, Unbounded), ["format"] = (1, Unbounded),
         ["string_to_array"] = (2, 3), ["encode"] = (2, 2), ["decode"] = (2, 2), ["convert_from"] = (2, 2),
         ["convert_to"] = (2, 2), ["convert"] = (3, 3), ["unistr"] = (1, 1), ["sha224"] = (1, 1),
-        ["sha256"] = (1, 1), ["sha384"] = (1, 1), ["sha512"] = (1, 1),
+        ["sha256"] = (1, 1), ["sha384"] = (1, 1), ["sha512"] = (1, 1), ["make_date"] = (3, 3), ["make_time"] = (3, 3),
         // ordinary aggregates
         ["sum"] = (1, 1), ["avg"] = (1, 1), ["min"] = (1, 1), ["max"] = (1, 1), ["array_agg"] = (1, 1),
         ["bool_and"] = (1, 1), ["bool_or"] = (1, 1), ["every"] = (1, 1), ["bit_and"] = (1, 1), ["bit_or"] = (1, 1),

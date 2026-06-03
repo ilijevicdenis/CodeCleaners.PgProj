@@ -464,6 +464,13 @@ public sealed partial class PgParser
         return call;
     }
 
+    private static readonly HashSet<string> ExtractFields = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "century", "day", "decade", "dow", "doy", "epoch", "hour", "isodow", "isoyear", "julian",
+        "microseconds", "millennium", "milliseconds", "minute", "month", "quarter", "second",
+        "timezone", "timezone_hour", "timezone_minute", "week", "year",
+    };
+
     private Expr ParseSpecialFunction(TokenCursor c)
     {
         var fn = c.Advance().Value.ToUpperInvariant();
@@ -473,7 +480,10 @@ public sealed partial class PgParser
         switch (fn)
         {
             case "EXTRACT":
-                c.Advance();                                  // field (word or string)
+                var fld = c.Advance();                         // field (word or string)
+                var fldName = fld.Value;
+                if (fld.Kind is TokenKind.Word or TokenKind.String && !ExtractFields.Contains(fldName))
+                    throw new ParseException($"unrecognized EXTRACT field: \"{fldName}\"", c.Here);
                 c.ExpectWord("FROM");
                 call.Args.Add(ParseExpression(c));
                 break;
