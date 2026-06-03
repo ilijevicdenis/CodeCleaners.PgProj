@@ -106,14 +106,16 @@ public sealed partial class PgParser
 
         c.ExpectWord("CREATE");
         c.MatchWords("OR", "REPLACE");
-        string? persistence = null;
+        bool temp = false, unlogged = false;
         while (true)
         {
             if (c.MatchWord("GLOBAL") || c.MatchWord("LOCAL")) continue;
-            if (c.MatchWord("TEMP") || c.MatchWord("TEMPORARY")) { persistence = "TEMP"; continue; }
-            if (c.MatchWord("UNLOGGED")) { persistence = "UNLOGGED"; continue; }
+            if (c.MatchWord("TEMP") || c.MatchWord("TEMPORARY")) { temp = true; continue; }
+            if (c.MatchWord("UNLOGGED")) { unlogged = true; continue; }
             break;
         }
+        if (temp && unlogged) throw new ParseException("a table cannot be both UNLOGGED and TEMPORARY", c.Here);
+        string? persistence = temp ? "TEMP" : unlogged ? "UNLOGGED" : null;
         c.MatchWord("RECURSIVE");                       // CREATE [OR REPLACE] RECURSIVE VIEW
         bool constraintTrigger = c.AtWord("CONSTRAINT") && c.Peek()?.IsWord("TRIGGER") == true;
         if (constraintTrigger) c.Advance();             // CREATE CONSTRAINT TRIGGER
@@ -193,7 +195,7 @@ public sealed partial class PgParser
         List<Token> toks;
         try { toks = OperatorLexer.Merge(Tokenizer.Tokenize(tail)); } catch { return; }
         var t = new TokenCursor(toks);
-        bool hasPartitionBy = false, hasInherits = false, hasOf = false, hasTablespace = false;
+        bool hasPartitionBy = false, hasInherits = false, hasOf = false;
 
         void EmptyParensError(string what) { if (t.AtSymbol('(') && t.Peek()?.IsSymbol(')') == true) throw new ParseException($"{what} cannot be empty", here); }
 
@@ -222,7 +224,7 @@ public sealed partial class PgParser
                 continue;
             }
             if (t.MatchWord("INHERITS")) { hasInherits = true; EmptyParensError("INHERITS parent list"); continue; }
-            if (t.MatchWord("TABLESPACE")) { hasTablespace = true; continue; }
+            if (t.AtWord("UNLOGGED") || t.AtWord("TEMP") || t.AtWord("TEMPORARY")) throw new ParseException($"{t.Current!.Value} must appear before TABLE, not after the definition", here);
             if (t.MatchWord("OF")) { hasOf = true; continue; }
             if (t.MatchWord("WITH") && t.AtSymbol('(')) { EmptyParensError("storage parameter list"); continue; }
             if (t.MatchWord("fillfactor") && t.MatchOperator("=") && t.Current is { Kind: TokenKind.Number } n

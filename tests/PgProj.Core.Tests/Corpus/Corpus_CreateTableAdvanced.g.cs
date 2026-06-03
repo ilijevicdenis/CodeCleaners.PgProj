@@ -213,7 +213,7 @@ CREATE INDEX ON s.ctaa_part_with_idx (payload)", "ok");
     public void ctaa0095() => CorpusAssert.Parses(@"CREATE TABLE s.ctaa_like_t2 (LIKE s.t2 INCLUDING ALL)", "ok");
     [Fact]
     public void ctaa0096() => CorpusAssert.Parses(@"CREATE TABLE s.ctaa_like_view (LIKE s.v)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ctaa0097() => CorpusAssert.Parses(@"CREATE TABLE s.ctaa_unlog_part (id int, region text) UNLOGGED PARTITION BY LIST (region)", "error");
     [Fact]
     public void ctaa0098() => CorpusAssert.Parses(@"CREATE UNLOGGED TABLE s.ctaa_unlog_part2 (id int, region text) PARTITION BY LIST (region)", "error");
@@ -225,7 +225,7 @@ CREATE INDEX ON s.ctaa_part_with_idx (payload)", "ok");
     public void ctaa0101() => CorpusAssert.Parses(@"CREATE TABLE s.ctaa_of_part OF s.addr PARTITION BY LIST (city)", "ok");
     [Fact]
     public void ctaa0102() => CorpusAssert.Parses(@"CREATE TEMP TABLE ctaa_temp_unlog (id int) ", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ctaa0103() => CorpusAssert.Parses(@"CREATE UNLOGGED TEMP TABLE ctaa_unlog_temp (id int)", "error");
     [Fact]
     public void ctaa0104() => CorpusAssert.Parses(@"CREATE TABLE s.ctaa_colstore (extra_a text, extra_b numeric, LIKE s.t INCLUDING STORAGE)", "ok");
@@ -680,7 +680,7 @@ CREATE TABLE s.ctab_partnotpartitioned_p PARTITION OF s.ctab_partnotpartitioned 
     [Fact]
     public void ctab0113() => CorpusAssert.Parses(@"CREATE TABLE s.ctab_list_expr (id int, name text) PARTITION BY LIST ((lower(name)));
 CREATE TABLE s.ctab_list_expr_p1 PARTITION OF s.ctab_list_expr FOR VALUES IN ('alice', 'bob')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ctab0114() => CorpusAssert.Parses(@"CREATE TABLE s.ctab_ulog_with (id int) UNLOGGED WITH (fillfactor = 80)", "error");
     [Fact]
     public void ctab0115() => CorpusAssert.Parses(@"CREATE TABLE IF NOT EXISTS s.ctab_ifne1 (id int, name text)", "ok");
