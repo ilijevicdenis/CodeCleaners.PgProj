@@ -1,0 +1,12 @@
+<Project DefaultTargets="Build">
+  <Import Project="..\..\src\PgProj.Sdk\Sdk\Sdk.props" />
+  <PropertyGroup>
+    <Name>AllFeaturesDb</Name>
+    <DefaultSchema>afd</DefaultSchema>
+    <TargetPostgresVersion>18</TargetPostgresVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <Build Include="**/*.sql" />
+  </ItemGroup>
+  <Import Project="..\..\src\PgProj.Sdk\Sdk\Sdk.targets" />
+</Project>

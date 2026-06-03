@@ -86,6 +86,10 @@ public sealed class DatabaseProject
 
         return files
             .Select(Path.GetFullPath)
+            // Files whose name starts with '_' are treated as non-source (generated artifacts,
+            // scratch, dependency-order manifests). Lets a project keep e.g. a generated
+            // _full_create.sql concatenation in-tree without it being parsed twice.
+            .Where(f => !Path.GetFileName(f).StartsWith('_'))
             .Distinct(StringComparer.OrdinalIgnoreCase)
             .OrderBy(f => f, StringComparer.OrdinalIgnoreCase)
             .ToList();
