@@ -4,11 +4,9 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using PgProj.Core.Analysis;
-using PgProj.Core.Ast;
 using PgProj.Core.Comparison;
 using PgProj.Core.Introspection;
 using PgProj.Core.Model;
-using PgProj.Core.Parsing;
 using PgProj.Core.Project;
 
 namespace PgProj.Cli;
@@ -195,14 +193,12 @@ public static class Program
 
     private static IReadOnlyList<Diagnostic> RunAnalysis(DatabaseProject project, out int ruleCount)
     {
-        var parser = new AstParser(project.DefaultSchema);
-        var statements = new List<SqlStatement>();
+        ruleCount = PgAnalyzer.RuleCount;
+        var analyzer = new PgAnalyzer();
+        var findings = new List<Diagnostic>();
         foreach (var file in project.ResolveSqlFiles())
-            statements.AddRange(parser.Parse(File.ReadAllText(file)).Statements);
-
-        var analyzer = SqlAnalyzer.Default();
-        ruleCount = analyzer.Rules.Count;
-        return analyzer.Analyze(new SqlScript { Statements = statements });
+            findings.AddRange(analyzer.Analyze(new PgProj.Core.Syntax.PgParser().Parse(File.ReadAllText(file))));
+        return findings;
     }
 
     /// <summary>Prints findings and returns true if the gate should block (errors, or warnings under --strict).</summary>
