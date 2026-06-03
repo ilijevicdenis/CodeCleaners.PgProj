@@ -136,9 +136,9 @@ public sealed class LiveDatabaseReader
             var schema = r.GetString(0);
             var table = r.GetString(1);
             var name = r.GetString(2);
-            var type = r.GetString(3);
+            var type = ReadChar(r, 3); // contype is the single-byte internal "char" type
             var col = r.GetString(4);
-            var bucket = type == "p" ? pk : uq;
+            var bucket = type == 'p' ? pk : uq;
             var keyTuple = (schema, table, name);
             if (!bucket.TryGetValue(keyTuple, out var list)) bucket[keyTuple] = list = new List<string>();
             list.Add(col);
@@ -379,7 +379,45 @@ public sealed class LiveDatabaseReader
         await ReadRulesAsync(conn, model, ct);
         await ReadPoliciesAsync(conn, model, ct);
         await ReadEventTriggersAsync(conn, model, ct);
+        await ReadCommentsAsync(conn, model, ct);
         await ReadExistenceObjectsAsync(conn, model, ct);
+    }
+
+    private async Task ReadCommentsAsync(NpgsqlConnection conn, DatabaseModel model, CancellationToken ct)
+    {
+        // Table/view comments (objsubid = 0) and column comments (objsubid > 0).
+        const string sql = @"
+            SELECT n.nspname, c.relname, a.attname, d.description
+            FROM pg_description d
+            JOIN pg_class c ON c.oid = d.objoid
+            JOIN pg_namespace n ON n.oid = c.relnamespace
+            LEFT JOIN pg_attribute a ON a.attrelid = c.oid AND a.attnum = d.objsubid
+            WHERE c.relkind IN ('r','p','v','m','f')
+              AND n.nspname NOT IN ('pg_catalog','information_schema') AND n.nspname NOT LIKE 'pg_%'
+            ORDER BY n.nspname, c.relname, d.objsubid;";
+
+        await using var cmd = new NpgsqlCommand(sql, conn);
+        await using var r = await cmd.ExecuteReaderAsync(ct);
+        while (await r.ReadAsync(ct))
+        {
+            var schema = r.GetString(0);
+            var rel = r.GetString(1);
+            var col = r.IsDBNull(2) ? null : r.GetString(2);
+            var desc = r.GetString(3).Replace("'", "''");
+
+            string target, identity;
+            if (col is null)
+            {
+                target = $"TABLE {schema}.{rel}";
+                identity = $"comment:table {schema}.{rel}";
+            }
+            else
+            {
+                target = $"COLUMN {schema}.{rel}.{col}";
+                identity = $"comment:column {schema}.{rel}.{col}";
+            }
+            AddRaw(model, ObjectKind.Comment, "", "", identity, $"COMMENT ON {target} IS '{desc}';");
+        }
     }
 
     private static void AddRaw(DatabaseModel model, ObjectKind kind, string schema, string name, string identity, string body, string? on = null, bool bodyComparable = true) =>

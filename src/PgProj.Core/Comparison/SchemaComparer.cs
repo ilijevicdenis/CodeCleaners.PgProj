@@ -212,7 +212,7 @@ public sealed class SchemaComparer
         {
             var tgt = target.Views.FirstOrDefault(v =>
                 DatabaseModel.NameEquals(v.Schema, src.Schema) && DatabaseModel.NameEquals(v.Name, src.Name));
-            if (tgt is null || NormalizeText(src.Body) != NormalizeText(tgt.Body))
+            if (tgt is null || NormalizeBody(src.Body) != NormalizeBody(tgt.Body))
                 changes.Add(new CreateOrReplaceViewChange(src));
         }
 
@@ -237,7 +237,7 @@ public sealed class SchemaComparer
                 ? candidates.FirstOrDefault()
                 : candidates.FirstOrDefault(c => NormalizeText(c.ArgTypes) == NormalizeText(src.ArgTypes));
 
-            if (tgt is null || NormalizeText(src.Body) != NormalizeText(tgt.Body))
+            if (tgt is null || NormalizeBody(src.Body) != NormalizeBody(tgt.Body))
                 changes.Add(new CreateOrReplaceFunctionChange(src));
         }
     }
@@ -251,7 +251,7 @@ public sealed class SchemaComparer
             {
                 changes.Add(new CreateRawObjectChange(src));
             }
-            else if (src.BodyComparable && tgt.BodyComparable && NormalizeText(src.Body) != NormalizeText(tgt.Body))
+            else if (src.BodyComparable && tgt.BodyComparable && NormalizeBody(src.Body) != NormalizeBody(tgt.Body))
             {
                 // A destructive recreate (type/domain/foreign table can cascade-drop columns) is
                 // only emitted when drops are allowed; in-place redefinitions always proceed.
@@ -285,8 +285,19 @@ public sealed class SchemaComparer
         return na == nb;
     }
 
+    // Strip explicit casts so a project default ('active') matches the catalog's
+    // ('active'::character varying), and collapse to a canonical form.
+    private static readonly Regex CastSuffix = new(@"::\s*""?[A-Za-z][A-Za-z0-9_ ]*""?(\[\])?", RegexOptions.Compiled);
+
     private string NormalizeDefault(string? d) =>
-        string.IsNullOrWhiteSpace(d) ? string.Empty : NormalizeText(d);
+        string.IsNullOrWhiteSpace(d) ? string.Empty : NormalizeText(CastSuffix.Replace(d, string.Empty));
+
+    // Canonicalize dollar-quote tags ($function$ -> $$) so a hand-written function body matches the
+    // catalog's pg_get_functiondef rendering, which picks its own tag.
+    private static readonly Regex DollarTag = new(@"\$[A-Za-z0-9_]*\$", RegexOptions.Compiled);
+
+    /// <summary>Body comparison for verbatim objects: case/whitespace-insensitive, dollar-tag- and trailing-`;`-agnostic.</summary>
+    private static string NormalizeBody(string s) => NormalizeText(DollarTag.Replace(s, "$$$$")).TrimEnd(';', ' ');
 
     private static bool IndexesEqual(IndexDefinition a, IndexDefinition b) =>
         a.IsUnique == b.IsUnique
