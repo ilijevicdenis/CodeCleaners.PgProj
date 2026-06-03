@@ -159,7 +159,7 @@ public class Corpus_Insert
     public void insa0076() => CorpusAssert.Parses(@"insert into s.t (name) values ('lowercase')", "ok");
     [Fact]
     public void insa0077() => CorpusAssert.Parses(@"INSERT INTO s.t (""name"") VALUES ('QuotedCol')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void insa0078() => CorpusAssert.Parses(@"INSERT INTO s.t (name) VALUES (E'escape\nnewline')", "ok");
     [Fact]
     public void insa0079() => CorpusAssert.Parses(@"INSERT INTO s.t (name) VALUES (U&'unicode \0041')", "ok");
@@ -175,7 +175,7 @@ public class Corpus_Insert
     public void insa0084() => CorpusAssert.Parses(@"INSERT INTO s.t (name, val) VALUES ('FloatLit', 3.14159)", "ok");
     [Fact]
     public void insa0085() => CorpusAssert.Parses(@"INSERT INTO s.t (name, val) VALUES ('SciNotation', 1.5e2)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void insa0086() => CorpusAssert.Parses(@"INSERT INTO s.t (name, val) VALUES ('HexInt', x'1F'::integer)", "ok");
     [Fact]
     public void insa0087() => CorpusAssert.Parses(@"INSERT INTO s.t (name, flag) VALUES ('Bool_t', TRUE), ('Bool_f', FALSE)", "ok");
@@ -471,7 +471,7 @@ public class Corpus_Insert
     public void insb0062() => CorpusAssert.Parses(@"INSERT INTO s.t (name, val) VALUES ('e1', 1.0); INSERT INTO s.t (name, val) VALUES ('e2', 2.0)", "ok");
     [Fact]
     public void insb0063() => CorpusAssert.Parses(@"INSERT INTO s.t (name, qty, val, flag, tags, data, status) VALUES ('full', 7, 3.14, true, ARRAY['x'], '{""a"":1}', 'happy')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void insb0064() => CorpusAssert.Parses(@"INSERT INTO s.t (name) VALUES (E'tab\there')", "ok");
     [Fact]
     public void insb0065() => CorpusAssert.Parses(@"INSERT INTO s.t (name) VALUES (U&'caf\00E9')", "ok");
@@ -773,7 +773,7 @@ SELECT currval('s.seq')", "ok");
     public void insc0042() => CorpusAssert.Parses(@"INSERT INTO s.t (name, qty) VALUES ('neg', -5)", "ok");
     [Fact]
     public void insc0043() => CorpusAssert.Parses(@"INSERT INTO s.t (name, val) VALUES ('null_val', NULL)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void insc0044() => CorpusAssert.Parses(@"INSERT INTO s.t (name) VALUES (E'escape\nnewline')", "ok");
     [Fact]
     public void insc0045() => CorpusAssert.Parses(@"INSERT INTO s.t (name) VALUES (U&'uni\0063ode')", "ok");

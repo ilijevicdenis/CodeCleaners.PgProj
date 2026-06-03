@@ -224,7 +224,12 @@ public sealed partial class PgParser
         {
             rel.Only = c.MatchWord("ONLY");
             var (s, n) = ParseQualifiedName(c);
-            if (c.AtSymbol('(')) { rel.Function = ParseCallTail(c, s is null ? new List<string> { n } : new List<string> { s, n }); }
+            if (c.AtSymbol('('))
+            {
+                if (n.Equals("xmltable", StringComparison.OrdinalIgnoreCase) || n.Equals("json_table", StringComparison.OrdinalIgnoreCase))
+                { var f = new FuncCallExpr(); f.Name.Add(n); CaptureBalancedParens(c); rel.Function = f; }
+                else rel.Function = ParseCallTail(c, s is null ? new List<string> { n } : new List<string> { s, n });
+            }
             else { rel.Schema = s; rel.TableName = n; c.MatchSymbol('*'); }
         }
 
@@ -238,12 +243,20 @@ public sealed partial class PgParser
         }
 
         // alias
-        if (c.MatchWord("AS")) { rel.Alias = c.ExpectIdentifier(); if (c.AtSymbol('(')) rel.ColumnAliases.AddRange(ParseColumnNameList(c)); }
-        else if (c.Current is { Kind: TokenKind.Word } w && !IsFromBoundary(w.Value))
-        { rel.Alias = c.Advance().Value; if (c.AtSymbol('(')) rel.ColumnAliases.AddRange(ParseColumnNameList(c)); }
-        else if (c.Current is { Kind: TokenKind.QuotedIdent }) { rel.Alias = c.Advance().Value; if (c.AtSymbol('(')) rel.ColumnAliases.AddRange(ParseColumnNameList(c)); }
+        if (c.MatchWord("AS")) { rel.Alias = c.ExpectIdentifier(); ParseRelAliasCols(c, rel); }
+        else if (c.Current is { Kind: TokenKind.Word } w && !IsFromBoundary(w.Value)) { rel.Alias = c.Advance().Value; ParseRelAliasCols(c, rel); }
+        else if (c.Current is { Kind: TokenKind.QuotedIdent }) { rel.Alias = c.Advance().Value; ParseRelAliasCols(c, rel); }
 
         return rel;
+    }
+
+    // A relation's alias column list: plain names for tables/subqueries, but a column-DEFINITION
+    // list (name type, …) for set-returning functions — capture that leniently.
+    private void ParseRelAliasCols(TokenCursor c, TableRef rel)
+    {
+        if (!c.AtSymbol('(')) return;
+        if (rel.Function is not null) CaptureBalancedParens(c);
+        else rel.ColumnAliases.AddRange(ParseColumnNameList(c));
     }
 
     private static bool IsFromBoundary(string w) =>

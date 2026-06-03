@@ -305,9 +305,9 @@ public class Corpus_SrfSetreturning
     public void srfa0149() => CorpusAssert.Parses(@"SELECT key, value FROM json_each('{""a"":1}'::json)", "ok");
     [Fact]
     public void srfa0150() => CorpusAssert.Parses(@"SELECT key, value FROM json_each_text('{""a"":""hello""}'::json)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void srfa0151() => CorpusAssert.Parses(@"SELECT * FROM json_to_recordset('[{""a"":1,""b"":""x""},{""a"":2,""b"":""y""}]'::json) AS t(a int, b text)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void srfa0152() => CorpusAssert.Parses(@"SELECT * FROM jsonb_to_recordset('[{""a"":1,""b"":""x""},{""a"":2,""b"":""y""}]'::jsonb) AS t(a int, b text)", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void srfa0153() => CorpusAssert.Parses(@"SELECT * FROM json_to_recordset('[{""a"":1}]'::json)", "error");

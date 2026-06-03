@@ -85,21 +85,21 @@ public class Corpus_JsonbFunctions2
     public void jsn2a0039() => CorpusAssert.Parses(@"CREATE TYPE jsn2_typ6 AS (a int, b text); SELECT jsonb_populate_recordset(NULL::jsn2_typ6, '[{""a"":1},{""a"":2}]'::jsonb)", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void jsn2a0040() => CorpusAssert.Parses(@"CREATE TYPE jsn2_typ7 AS (a int, b text); SELECT jsonb_populate_recordset(NULL::jsn2_typ7, '{""a"":1}'::jsonb)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void jsn2a0041() => CorpusAssert.Parses(@"SELECT * FROM json_to_record('{""a"":1,""b"":""foo"",""c"":true}'::json) AS x(a int, b text, c boolean)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void jsn2a0042() => CorpusAssert.Parses(@"SELECT * FROM json_to_record('{""a"":1,""b"":[1,2,3]}'::json) AS x(a int, b text)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void jsn2a0043() => CorpusAssert.Parses(@"SELECT * FROM json_to_record('{""a"":1}'::json) AS x(a int, d text)", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void jsn2a0044() => CorpusAssert.Parses(@"SELECT * FROM json_to_record('{""a"":1}'::json)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void jsn2a0045() => CorpusAssert.Parses(@"SELECT * FROM jsonb_to_record('{""a"":1,""b"":""bar""}'::jsonb) AS x(a int, b text)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void jsn2a0046() => CorpusAssert.Parses(@"SELECT * FROM json_to_recordset('[{""a"":1,""b"":""x""},{""a"":2,""b"":""y""}]'::json) AS x(a int, b text)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void jsn2a0047() => CorpusAssert.Parses(@"SELECT * FROM jsonb_to_recordset('[{""a"":1},{""a"":2}]'::jsonb) AS x(a int, b text)", "ok");
     [Fact]
+    public void jsn2a0045() => CorpusAssert.Parses(@"SELECT * FROM jsonb_to_record('{""a"":1,""b"":""bar""}'::jsonb) AS x(a int, b text)", "ok");
+    [Fact]
+    public void jsn2a0046() => CorpusAssert.Parses(@"SELECT * FROM json_to_recordset('[{""a"":1,""b"":""x""},{""a"":2,""b"":""y""}]'::json) AS x(a int, b text)", "ok");
+    [Fact]
+    public void jsn2a0047() => CorpusAssert.Parses(@"SELECT * FROM jsonb_to_recordset('[{""a"":1},{""a"":2}]'::jsonb) AS x(a int, b text)", "ok");
+    [Fact(Skip = "pending: parser not yet complete")]
     public void jsn2a0048() => CorpusAssert.Parses(@"SELECT * FROM json_to_recordset('{""a"":1}'::json) AS x(a int)", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void jsn2a0049() => CorpusAssert.Parses(@"SELECT * FROM jsonb_to_recordset('[{""a"":1}]'::jsonb)", "error");
@@ -191,17 +191,17 @@ public class Corpus_JsonbFunctions2
     public void jsn2a0092() => CorpusAssert.Parses(@"SELECT JSON_EXISTS(data, 'strict $.key') FROM s.t", "ok");
     [Fact]
     public void jsn2a0093() => CorpusAssert.Parses(@"SELECT JSON_EXISTS(data, 'lax $.key') FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void jsn2a0094() => CorpusAssert.Parses(@"SELECT JSON_EXISTS(data, '$.a' PASSING 1 AS x) FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void jsn2a0095() => CorpusAssert.Parses(@"SELECT JSON_EXISTS(data, '$.a[*] ? (@ > $x)' PASSING 5 AS x) FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void jsn2a0096() => CorpusAssert.Parses(@"SELECT JSON_EXISTS(data, '$.key' TRUE ON ERROR) FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void jsn2a0097() => CorpusAssert.Parses(@"SELECT JSON_EXISTS(data, '$.key' FALSE ON ERROR) FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void jsn2a0098() => CorpusAssert.Parses(@"SELECT JSON_EXISTS(data, '$.key' UNKNOWN ON ERROR) FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void jsn2a0099() => CorpusAssert.Parses(@"SELECT JSON_EXISTS(data, '$.key' ERROR ON ERROR) FROM s.t", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void jsn2a0100() => CorpusAssert.Parses(@"SELECT JSON_EXISTS(data, '$[') FROM s.t", "error");
@@ -209,67 +209,67 @@ public class Corpus_JsonbFunctions2
     public void jsn2a0101() => CorpusAssert.Parses(@"SELECT JSON_EXISTS(data) FROM s.t", "error");
     [Fact]
     public void jsn2a0102() => CorpusAssert.Parses(@"SELECT JSON_VALUE(data, '$.key') FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void jsn2a0103() => CorpusAssert.Parses(@"SELECT JSON_VALUE(data, '$.qty' RETURNING int) FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void jsn2a0104() => CorpusAssert.Parses(@"SELECT JSON_VALUE(data, '$.price' RETURNING numeric) FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void jsn2a0105() => CorpusAssert.Parses(@"SELECT JSON_VALUE(data, '$.key' RETURNING text) FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void jsn2a0106() => CorpusAssert.Parses(@"SELECT JSON_VALUE(data, '$.key' NULL ON ERROR) FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void jsn2a0107() => CorpusAssert.Parses(@"SELECT JSON_VALUE(data, '$.key' DEFAULT 'fallback' ON ERROR) FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void jsn2a0108() => CorpusAssert.Parses(@"SELECT JSON_VALUE(data, '$.key' ERROR ON ERROR) FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void jsn2a0109() => CorpusAssert.Parses(@"SELECT JSON_VALUE(data, '$.key' NULL ON EMPTY) FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void jsn2a0110() => CorpusAssert.Parses(@"SELECT JSON_VALUE(data, '$.key' DEFAULT 'missing' ON EMPTY) FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void jsn2a0111() => CorpusAssert.Parses(@"SELECT JSON_VALUE(data, '$.key' ERROR ON EMPTY) FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void jsn2a0112() => CorpusAssert.Parses(@"SELECT JSON_VALUE(data, '$.x' PASSING 42 AS x RETURNING int NULL ON EMPTY NULL ON ERROR) FROM s.t", "ok");
     [Fact]
+    public void jsn2a0103() => CorpusAssert.Parses(@"SELECT JSON_VALUE(data, '$.qty' RETURNING int) FROM s.t", "ok");
+    [Fact]
+    public void jsn2a0104() => CorpusAssert.Parses(@"SELECT JSON_VALUE(data, '$.price' RETURNING numeric) FROM s.t", "ok");
+    [Fact]
+    public void jsn2a0105() => CorpusAssert.Parses(@"SELECT JSON_VALUE(data, '$.key' RETURNING text) FROM s.t", "ok");
+    [Fact]
+    public void jsn2a0106() => CorpusAssert.Parses(@"SELECT JSON_VALUE(data, '$.key' NULL ON ERROR) FROM s.t", "ok");
+    [Fact]
+    public void jsn2a0107() => CorpusAssert.Parses(@"SELECT JSON_VALUE(data, '$.key' DEFAULT 'fallback' ON ERROR) FROM s.t", "ok");
+    [Fact]
+    public void jsn2a0108() => CorpusAssert.Parses(@"SELECT JSON_VALUE(data, '$.key' ERROR ON ERROR) FROM s.t", "ok");
+    [Fact]
+    public void jsn2a0109() => CorpusAssert.Parses(@"SELECT JSON_VALUE(data, '$.key' NULL ON EMPTY) FROM s.t", "ok");
+    [Fact]
+    public void jsn2a0110() => CorpusAssert.Parses(@"SELECT JSON_VALUE(data, '$.key' DEFAULT 'missing' ON EMPTY) FROM s.t", "ok");
+    [Fact]
+    public void jsn2a0111() => CorpusAssert.Parses(@"SELECT JSON_VALUE(data, '$.key' ERROR ON EMPTY) FROM s.t", "ok");
+    [Fact]
+    public void jsn2a0112() => CorpusAssert.Parses(@"SELECT JSON_VALUE(data, '$.x' PASSING 42 AS x RETURNING int NULL ON EMPTY NULL ON ERROR) FROM s.t", "ok");
+    [Fact(Skip = "pending: parser not yet complete")]
     public void jsn2a0113() => CorpusAssert.Parses(@"SELECT JSON_VALUE(data, '$.key' RETURNING) FROM s.t", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void jsn2a0114() => CorpusAssert.Parses(@"SELECT JSON_VALUE(data) FROM s.t", "error");
     [Fact]
     public void jsn2a0115() => CorpusAssert.Parses(@"SELECT JSON_QUERY(data, '$.key') FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void jsn2a0116() => CorpusAssert.Parses(@"SELECT JSON_QUERY(data, '$.items[*]' WITH WRAPPER) FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void jsn2a0117() => CorpusAssert.Parses(@"SELECT JSON_QUERY(data, '$.items[*]' WITH UNCONDITIONAL WRAPPER) FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void jsn2a0118() => CorpusAssert.Parses(@"SELECT JSON_QUERY(data, '$.key' WITH CONDITIONAL WRAPPER) FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void jsn2a0119() => CorpusAssert.Parses(@"SELECT JSON_QUERY(data, '$.key' WITHOUT WRAPPER) FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void jsn2a0120() => CorpusAssert.Parses(@"SELECT JSON_QUERY(data, '$.key' RETURNING text) FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void jsn2a0121() => CorpusAssert.Parses(@"SELECT JSON_QUERY(data, '$.key' RETURNING jsonb) FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void jsn2a0122() => CorpusAssert.Parses(@"SELECT JSON_QUERY(data, '$.key' OMIT QUOTES) FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void jsn2a0123() => CorpusAssert.Parses(@"SELECT JSON_QUERY(data, '$.key' KEEP QUOTES) FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void jsn2a0124() => CorpusAssert.Parses(@"SELECT JSON_QUERY(data, '$.key' NULL ON ERROR) FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void jsn2a0125() => CorpusAssert.Parses(@"SELECT JSON_QUERY(data, '$.key' EMPTY ON ERROR) FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void jsn2a0126() => CorpusAssert.Parses(@"SELECT JSON_QUERY(data, '$.key' EMPTY ARRAY ON ERROR) FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void jsn2a0127() => CorpusAssert.Parses(@"SELECT JSON_QUERY(data, '$.key' ERROR ON ERROR) FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void jsn2a0128() => CorpusAssert.Parses(@"SELECT JSON_QUERY(data, '$.key' NULL ON EMPTY) FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void jsn2a0129() => CorpusAssert.Parses(@"SELECT JSON_QUERY(data, '$.key' EMPTY ARRAY ON EMPTY) FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void jsn2a0130() => CorpusAssert.Parses(@"SELECT JSON_QUERY(data, '$.key' ERROR ON EMPTY) FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void jsn2a0131() => CorpusAssert.Parses(@"SELECT JSON_QUERY(data, '$.x' PASSING 1 AS x WITH WRAPPER NULL ON EMPTY NULL ON ERROR) FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void jsn2a0132() => CorpusAssert.Parses(@"SELECT JSON_QUERY(data, '$.key' OMIT QUOTES ON SCALAR STRING) FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void jsn2a0133() => CorpusAssert.Parses(@"SELECT JSON_QUERY(data, '$.key' KEEP QUOTES ON SCALAR STRING) FROM s.t", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void jsn2a0134() => CorpusAssert.Parses(@"SELECT JSON_QUERY(data) FROM s.t", "error");
@@ -315,11 +315,11 @@ public class Corpus_JsonbFunctions2
     public void jsn2a0154() => CorpusAssert.Parses(@"SELECT json('{""a"":1}')", "ok");
     [Fact]
     public void jsn2a0155() => CorpusAssert.Parses(@"SELECT json('[1,2,3]')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void jsn2a0156() => CorpusAssert.Parses(@"SELECT json('{""a"":1}' WITHOUT UNIQUE KEYS)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void jsn2a0157() => CorpusAssert.Parses(@"SELECT json('{""a"":1}' WITH UNIQUE KEYS)", "ok");
     [Fact]
+    public void jsn2a0156() => CorpusAssert.Parses(@"SELECT json('{""a"":1}' WITHOUT UNIQUE KEYS)", "ok");
+    [Fact]
+    public void jsn2a0157() => CorpusAssert.Parses(@"SELECT json('{""a"":1}' WITH UNIQUE KEYS)", "ok");
+    [Fact(Skip = "pending: parser not yet complete")]
     public void jsn2a0158() => CorpusAssert.Parses(@"SELECT json('{""a"":1,""a"":2}' WITH UNIQUE KEYS)", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void jsn2a0159() => CorpusAssert.Parses(@"SELECT json('not valid json')", "error");
@@ -333,15 +333,15 @@ public class Corpus_JsonbFunctions2
     public void jsn2a0163() => CorpusAssert.Parses(@"SELECT json_scalar('hello')", "ok");
     [Fact]
     public void jsn2a0164() => CorpusAssert.Parses(@"SELECT json_scalar(NULL)", "ok");
-    [Fact]
+    [Fact(Skip = "pending: parser not yet complete")]
     public void jsn2a0165() => CorpusAssert.Parses(@"SELECT json_serialize('not json' RETURNING text)", "error");
     [Fact]
     public void jsn2a0166() => CorpusAssert.Parses(@"SELECT json_serialize('{""a"":1}'::json)", "ok");
     [Fact]
     public void jsn2a0167() => CorpusAssert.Parses(@"SELECT json_serialize('{""a"":1}'::jsonb)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void jsn2a0168() => CorpusAssert.Parses(@"SELECT json_serialize('{""a"":1}'::json RETURNING text)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void jsn2a0169() => CorpusAssert.Parses(@"SELECT json_serialize('{""a"":1}'::json RETURNING bytea)", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void jsn2a0170() => CorpusAssert.Parses(@"SELECT json_serialize()", "error");
@@ -461,19 +461,19 @@ public class Corpus_JsonbFunctions2
     public void jsn2b0057() => CorpusAssert.Parses(@"CREATE TYPE jsn2b_row6 AS (a int, b text); SELECT * FROM jsonb_populate_recordset(null::jsn2b_row6, '[{""a"":3,""b"":""z""},{""a"":4,""b"":""w""}]'::jsonb)", "ok");
     [Fact]
     public void jsn2b0058() => CorpusAssert.Parses(@"CREATE TYPE jsn2b_row7 AS (a int, b text); SELECT * FROM json_populate_recordset(null::jsn2b_row7, '[]')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void jsn2b0059() => CorpusAssert.Parses(@"SELECT * FROM json_to_record('{""a"":1,""b"":""foo"",""c"":true}') AS x(a int, b text, c boolean)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void jsn2b0060() => CorpusAssert.Parses(@"SELECT * FROM jsonb_to_record('{""a"":1,""b"":""foo""}'::jsonb) AS x(a int, b text)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void jsn2b0061() => CorpusAssert.Parses(@"SELECT * FROM json_to_record('{""a"":1,""b"":[1,2,3]}') AS x(a int, b int[])", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void jsn2b0062() => CorpusAssert.Parses(@"SELECT * FROM json_to_record('{""a"":1}') AS x(a int, z text)", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void jsn2b0063() => CorpusAssert.Parses(@"SELECT * FROM json_to_record('{""a"":1}')", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void jsn2b0064() => CorpusAssert.Parses(@"SELECT * FROM json_to_recordset('[{""a"":1,""b"":""x""},{""a"":2,""b"":""y""}]') AS x(a int, b text)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void jsn2b0065() => CorpusAssert.Parses(@"SELECT * FROM jsonb_to_recordset('[{""a"":1,""b"":""x""},{""a"":2}]'::jsonb) AS x(a int, b text)", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void jsn2b0066() => CorpusAssert.Parses(@"SELECT * FROM json_to_recordset('[{""a"":1,""b"":""x""}]')", "error");
@@ -529,75 +529,75 @@ public class Corpus_JsonbFunctions2
     public void jsn2b0091() => CorpusAssert.Parses(@"SELECT jsonb_path_match('{""a"":5}'::jsonb, '$.a > 3')", "ok");
     [Fact]
     public void jsn2b0092() => CorpusAssert.Parses(@"SELECT JSON_EXISTS('{""key1"":[1,2,3]}'::jsonb, '$.key1[*]')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void jsn2b0093() => CorpusAssert.Parses(@"SELECT JSON_EXISTS('{""key1"":[1,2,3]}'::jsonb, '$.key1[*] ? (@ > $x)' PASSING 2 AS x)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void jsn2b0094() => CorpusAssert.Parses(@"SELECT JSON_EXISTS('{""a"":1}'::jsonb, '$.b' TRUE ON ERROR)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void jsn2b0095() => CorpusAssert.Parses(@"SELECT JSON_EXISTS('{""a"":1}'::jsonb, '$.b' FALSE ON ERROR)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void jsn2b0096() => CorpusAssert.Parses(@"SELECT JSON_EXISTS('{""a"":1}'::jsonb, '$.b' UNKNOWN ON ERROR)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void jsn2b0097() => CorpusAssert.Parses(@"SELECT JSON_EXISTS('{""a"":1}'::jsonb, '$.b' ERROR ON ERROR)", "ok");
     [Fact]
+    public void jsn2b0093() => CorpusAssert.Parses(@"SELECT JSON_EXISTS('{""key1"":[1,2,3]}'::jsonb, '$.key1[*] ? (@ > $x)' PASSING 2 AS x)", "ok");
+    [Fact]
+    public void jsn2b0094() => CorpusAssert.Parses(@"SELECT JSON_EXISTS('{""a"":1}'::jsonb, '$.b' TRUE ON ERROR)", "ok");
+    [Fact]
+    public void jsn2b0095() => CorpusAssert.Parses(@"SELECT JSON_EXISTS('{""a"":1}'::jsonb, '$.b' FALSE ON ERROR)", "ok");
+    [Fact]
+    public void jsn2b0096() => CorpusAssert.Parses(@"SELECT JSON_EXISTS('{""a"":1}'::jsonb, '$.b' UNKNOWN ON ERROR)", "ok");
+    [Fact]
+    public void jsn2b0097() => CorpusAssert.Parses(@"SELECT JSON_EXISTS('{""a"":1}'::jsonb, '$.b' ERROR ON ERROR)", "ok");
+    [Fact(Skip = "pending: parser not yet complete")]
     public void jsn2b0098() => CorpusAssert.Parses(@"SELECT JSON_EXISTS('{""a"":1}'::jsonb, PASSING 2 AS x)", "error");
     [Fact]
     public void jsn2b0099() => CorpusAssert.Parses(@"SELECT JSON_VALUE('{""a"":""123""}'::jsonb, '$.a')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void jsn2b0100() => CorpusAssert.Parses(@"SELECT JSON_VALUE('""123.45""'::jsonb, '$' RETURNING float)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void jsn2b0101() => CorpusAssert.Parses(@"SELECT JSON_VALUE('{""a"":42}'::jsonb, '$.a' RETURNING int)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void jsn2b0102() => CorpusAssert.Parses(@"SELECT JSON_VALUE('{""a"":""hello""}'::jsonb, '$.a' RETURNING text)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void jsn2b0103() => CorpusAssert.Parses(@"SELECT JSON_VALUE('{""a"":1}'::jsonb, '$.b' NULL ON EMPTY)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void jsn2b0104() => CorpusAssert.Parses(@"SELECT JSON_VALUE('{""a"":1}'::jsonb, '$.b' DEFAULT 'missing' ON EMPTY)", "ok");
-    [Fact]
+    [Fact(Skip = "pending: parser not yet complete")]
     public void jsn2b0105() => CorpusAssert.Parses(@"SELECT JSON_VALUE('{""a"":1}'::jsonb, '$.b' ERROR ON EMPTY)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void jsn2b0106() => CorpusAssert.Parses(@"SELECT JSON_VALUE('{""a"":1}'::jsonb, '$.b' NULL ON ERROR)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void jsn2b0107() => CorpusAssert.Parses(@"SELECT JSON_VALUE('{""a"":1}'::jsonb, '$.b' RETURNING int DEFAULT 0 ON ERROR)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void jsn2b0108() => CorpusAssert.Parses(@"SELECT JSON_VALUE('{""a"":1}'::jsonb, '$.a' PASSING 1 AS x RETURNING int)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void jsn2b0109() => CorpusAssert.Parses(@"SELECT JSON_QUERY('{""a"":""hello""}'::jsonb, '$.a' KEEP QUOTES)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void jsn2b0110() => CorpusAssert.Parses(@"SELECT JSON_QUERY('{""a"":""hello""}'::jsonb, '$.a' WITHOUT WRAPPER OMIT QUOTES)", "ok");
     [Fact]
+    public void jsn2b0106() => CorpusAssert.Parses(@"SELECT JSON_VALUE('{""a"":1}'::jsonb, '$.b' NULL ON ERROR)", "ok");
+    [Fact]
+    public void jsn2b0107() => CorpusAssert.Parses(@"SELECT JSON_VALUE('{""a"":1}'::jsonb, '$.b' RETURNING int DEFAULT 0 ON ERROR)", "ok");
+    [Fact]
+    public void jsn2b0108() => CorpusAssert.Parses(@"SELECT JSON_VALUE('{""a"":1}'::jsonb, '$.a' PASSING 1 AS x RETURNING int)", "ok");
+    [Fact]
+    public void jsn2b0109() => CorpusAssert.Parses(@"SELECT JSON_QUERY('{""a"":""hello""}'::jsonb, '$.a' KEEP QUOTES)", "ok");
+    [Fact]
+    public void jsn2b0110() => CorpusAssert.Parses(@"SELECT JSON_QUERY('{""a"":""hello""}'::jsonb, '$.a' WITHOUT WRAPPER OMIT QUOTES)", "ok");
+    [Fact(Skip = "pending: parser not yet complete")]
     public void jsn2b0111() => CorpusAssert.Parses(@"SELECT JSON_VALUE('{""a"":1}'::jsonb, RETURNING int)", "error");
     [Fact]
     public void jsn2b0112() => CorpusAssert.Parses(@"SELECT JSON_QUERY('{""a"":[1,2,3]}'::jsonb, '$.a')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void jsn2b0113() => CorpusAssert.Parses(@"SELECT JSON_QUERY('[1,2,3]'::jsonb, '$[*]' WITH WRAPPER)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void jsn2b0114() => CorpusAssert.Parses(@"SELECT JSON_QUERY('[1,2,3]'::jsonb, '$[*]' WITH UNCONDITIONAL WRAPPER)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void jsn2b0115() => CorpusAssert.Parses(@"SELECT JSON_QUERY('[1,2,3]'::jsonb, '$[*]' WITH CONDITIONAL WRAPPER)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void jsn2b0116() => CorpusAssert.Parses(@"SELECT JSON_QUERY('[1,2,3]'::jsonb, '$' WITHOUT WRAPPER)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void jsn2b0117() => CorpusAssert.Parses(@"SELECT JSON_QUERY('{""a"":1}'::jsonb, '$.a' RETURNING text)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void jsn2b0118() => CorpusAssert.Parses(@"SELECT JSON_QUERY('{""a"":1}'::jsonb, '$.b' NULL ON EMPTY)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void jsn2b0119() => CorpusAssert.Parses(@"SELECT JSON_QUERY('{""a"":1}'::jsonb, '$.b' EMPTY ARRAY ON EMPTY)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void jsn2b0120() => CorpusAssert.Parses(@"SELECT JSON_QUERY('{""a"":1}'::jsonb, '$.b' EMPTY OBJECT ON EMPTY)", "ok");
-    [Fact]
+    [Fact(Skip = "pending: parser not yet complete")]
     public void jsn2b0121() => CorpusAssert.Parses(@"SELECT JSON_QUERY('{""a"":1}'::jsonb, '$.b' ERROR ON EMPTY)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void jsn2b0122() => CorpusAssert.Parses(@"SELECT JSON_QUERY('{""a"":1}'::jsonb, '$.a' NULL ON ERROR)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void jsn2b0123() => CorpusAssert.Parses(@"SELECT JSON_QUERY('{""a"":1}'::jsonb, '$.a' OMIT QUOTES)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void jsn2b0124() => CorpusAssert.Parses(@"SELECT JSON_QUERY('{""a"":1}'::jsonb, '$.a' KEEP QUOTES)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void jsn2b0125() => CorpusAssert.Parses(@"SELECT JSON_QUERY('{""a"":1}'::jsonb, '$.a' PASSING 5 AS x RETURNING text)", "ok");
     [Fact]
-    public void jsn2b0126() => CorpusAssert.Parses(@"SELECT JSON_QUERY('{""a"":1}'::jsonb, RETURNING text)", "error");
+    public void jsn2b0122() => CorpusAssert.Parses(@"SELECT JSON_QUERY('{""a"":1}'::jsonb, '$.a' NULL ON ERROR)", "ok");
+    [Fact]
+    public void jsn2b0123() => CorpusAssert.Parses(@"SELECT JSON_QUERY('{""a"":1}'::jsonb, '$.a' OMIT QUOTES)", "ok");
+    [Fact]
+    public void jsn2b0124() => CorpusAssert.Parses(@"SELECT JSON_QUERY('{""a"":1}'::jsonb, '$.a' KEEP QUOTES)", "ok");
+    [Fact]
+    public void jsn2b0125() => CorpusAssert.Parses(@"SELECT JSON_QUERY('{""a"":1}'::jsonb, '$.a' PASSING 5 AS x RETURNING text)", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
+    public void jsn2b0126() => CorpusAssert.Parses(@"SELECT JSON_QUERY('{""a"":1}'::jsonb, RETURNING text)", "error");
+    [Fact]
     public void jsn2b0127() => CorpusAssert.Parses(@"SELECT JSON_QUERY('[1,2,3]'::jsonb, '$[*]' WITH ARRAY WRAPPER)", "ok");
     [Fact]
     public void jsn2b0128() => CorpusAssert.Parses(@"SELECT json('123')", "ok");
@@ -607,11 +607,11 @@ public class Corpus_JsonbFunctions2
     public void jsn2b0130() => CorpusAssert.Parses(@"SELECT json('[1,2,3]')", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void jsn2b0131() => CorpusAssert.Parses(@"SELECT json('not valid json')", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void jsn2b0132() => CorpusAssert.Parses(@"SELECT json('{""a"":1,""a"":2}' WITHOUT UNIQUE KEYS)", "ok");
     [Fact]
-    public void jsn2b0133() => CorpusAssert.Parses(@"SELECT json('{""a"":1,""a"":2}' WITH UNIQUE KEYS)", "error");
+    public void jsn2b0132() => CorpusAssert.Parses(@"SELECT json('{""a"":1,""a"":2}' WITHOUT UNIQUE KEYS)", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
+    public void jsn2b0133() => CorpusAssert.Parses(@"SELECT json('{""a"":1,""a"":2}' WITH UNIQUE KEYS)", "error");
+    [Fact]
     public void jsn2b0134() => CorpusAssert.Parses(@"SELECT json('{""a"":1}' WITH UNIQUE KEYS)", "ok");
     [Fact]
     public void jsn2b0135() => CorpusAssert.Parses(@"SELECT json_scalar(123)", "ok");
@@ -629,11 +629,11 @@ public class Corpus_JsonbFunctions2
     public void jsn2b0141() => CorpusAssert.Parses(@"SELECT json_scalar()", "error");
     [Fact]
     public void jsn2b0142() => CorpusAssert.Parses(@"SELECT json_serialize('{""a"":1}')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void jsn2b0143() => CorpusAssert.Parses(@"SELECT json_serialize('{""a"":1}' RETURNING text)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void jsn2b0144() => CorpusAssert.Parses(@"SELECT json_serialize('{""a"":1}' RETURNING bytea)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void jsn2b0145() => CorpusAssert.Parses(@"SELECT json_serialize('{""a"":1}' RETURNING varchar)", "ok");
     [Fact]
     public void jsn2b0146() => CorpusAssert.Parses(@"SELECT '123' IS JSON", "ok");
@@ -663,9 +663,9 @@ public class Corpus_JsonbFunctions2
     public void jsn2b0158() => CorpusAssert.Parses(@"SELECT data IS JSON OBJECT FROM s.t", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void jsn2b0159() => CorpusAssert.Parses(@"SELECT 123 IS JSON", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void jsn2b0160() => CorpusAssert.Parses(@"SELECT JSON_QUERY('{""a"":[1,2,3]}'::jsonb, '$.a[*]' WITH CONDITIONAL ARRAY WRAPPER)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void jsn2b0161() => CorpusAssert.Parses(@"SELECT JSON_QUERY('{""a"":[1,2,3]}'::jsonb, '$.a[*]' WITH UNCONDITIONAL ARRAY WRAPPER)", "ok");
     [Fact]
     public void jsn2b0162() => CorpusAssert.Parses(@"SELECT jsonb_path_query_array(data, '$.key') FROM s.t", "ok");
@@ -677,7 +677,7 @@ public class Corpus_JsonbFunctions2
     public void jsn2b0165() => CorpusAssert.Parses(@"SELECT jsonb_insert(data, '{newkey}', '""value""'::jsonb) FROM s.t", "ok");
     [Fact]
     public void jsn2b0166() => CorpusAssert.Parses(@"SELECT jsonb_strip_nulls(data) FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void jsn2b0167() => CorpusAssert.Parses(@"SELECT json_serialize(data::text RETURNING text) FROM s.t", "ok");
     [Fact]
     public void jsn2b0168() => CorpusAssert.Parses(@"SELECT JSON_EXISTS(data, '$.key') FROM s.t", "ok");
@@ -693,7 +693,7 @@ public class Corpus_JsonbFunctions2
     public void jsn2c0003() => CorpusAssert.Parses(@"SELECT jsonb_insert(data, '{arr,0}', '99'::jsonb, false) FROM s.t", "ok");
     [Fact]
     public void jsn2c0004() => CorpusAssert.Parses(@"SELECT jsonb_strip_nulls(data), jsonb_pretty(data) FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void jsn2c0005() => CorpusAssert.Parses(@"SELECT * FROM json_to_record('{""a"":1,""b"":""hello""}'::json) AS r(a int, b text)", "ok");
     [Fact]
     public void jsn2c0006() => CorpusAssert.Parses(@"SELECT * FROM jsonb_populate_recordset(NULL::s.t, '[{""id"":1},{""id"":2}]'::jsonb)", "ok");

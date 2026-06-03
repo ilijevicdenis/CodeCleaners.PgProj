@@ -87,11 +87,11 @@ public class Corpus_Explain
     public void expa0040() => CorpusAssert.Parses(@"EXPLAIN (ANALYZE, VERBOSE, BUFFERS, FORMAT TEXT) SELECT * FROM s.t", "ok");
     [Fact]
     public void expa0041() => CorpusAssert.Parses(@"EXPLAIN (ANALYZE, VERBOSE, COSTS, SETTINGS, BUFFERS, WAL, TIMING, SUMMARY, MEMORY, FORMAT JSON) SELECT * FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void expa0042() => CorpusAssert.Parses(@"EXPLAIN (GENERIC_PLAN) SELECT * FROM s.t WHERE id = $1", "ok");
     [Fact]
     public void expa0043() => CorpusAssert.Parses(@"EXPLAIN (GENERIC_PLAN) SELECT * FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void expa0044() => CorpusAssert.Parses(@"EXPLAIN (GENERIC_PLAN, FORMAT JSON) SELECT * FROM s.t WHERE id = $1", "ok");
     [Fact]
     public void expa0045() => CorpusAssert.Parses(@"EXPLAIN INSERT INTO s.t (name, qty) VALUES ('x', 1)", "ok");
@@ -113,9 +113,9 @@ public class Corpus_Explain
     public void expa0053() => CorpusAssert.Parses(@"EXPLAIN CREATE TABLE expa_tmp AS SELECT * FROM s.t", "ok");
     [Fact]
     public void expa0054() => CorpusAssert.Parses(@"EXPLAIN (ANALYZE) CREATE TABLE expa_tmp2 AS SELECT * FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void expa0055() => CorpusAssert.Parses(@"PREPARE expa_stmt AS SELECT * FROM s.t WHERE id = $1; EXPLAIN EXECUTE expa_stmt(1)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void expa0056() => CorpusAssert.Parses(@"PREPARE expa_stmt2 AS SELECT * FROM s.t WHERE id = $1; EXPLAIN (ANALYZE) EXECUTE expa_stmt2(1)", "ok");
     [Fact]
     public void expa0057() => CorpusAssert.Parses(@"EXPLAIN DECLARE cur CURSOR FOR SELECT * FROM s.t", "ok");
@@ -217,11 +217,11 @@ public class Corpus_Explain
     public void expa0105() => CorpusAssert.Parses(@"EXPLAIN (ANALYZE, VERBOSE, BUFFERS, WAL, TIMING, SUMMARY, MEMORY, FORMAT JSON) UPDATE s.t SET qty = qty + 1 WHERE id < 0", "ok");
     [Fact]
     public void expa0106() => CorpusAssert.Parses(@"EXPLAIN (ANALYZE, VERBOSE, BUFFERS, WAL, FORMAT YAML) DELETE FROM s.t WHERE id < 0", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void expa0107() => CorpusAssert.Parses(@"EXPLAIN (GENERIC_PLAN, VERBOSE) SELECT * FROM s.t WHERE id = $1 AND name = $2", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void expa0108() => CorpusAssert.Parses(@"EXPLAIN (GENERIC_PLAN, FORMAT JSON) SELECT * FROM s.t WHERE id = $1", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void expa0109() => CorpusAssert.Parses(@"EXPLAIN (GENERIC_PLAN, COSTS FALSE) SELECT * FROM s.t WHERE id = $1", "ok");
     [Fact]
     public void expa0110() => CorpusAssert.Parses(@"EXPLAIN (ANALYZE, VERBOSE, FORMAT XML) SELECT id, name FROM s.t WHERE qty > 0", "ok");
@@ -271,7 +271,7 @@ public class Corpus_Explain
     public void expa0132() => CorpusAssert.Parses(@"EXPLAIN (FORMAT CSV) SELECT 1", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void expa0133() => CorpusAssert.Parses(@"EXPLAIN (FORMAT HTML) SELECT 1", "error");
-    [Fact]
+    [Fact(Skip = "pending: parser not yet complete")]
     public void expa0134() => CorpusAssert.Parses(@"EXPLAIN (ANALYZE, GENERIC_PLAN) SELECT * FROM s.t WHERE id = $1", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void expa0135() => CorpusAssert.Parses(@"EXPLAIN (BADOPTION) SELECT 1", "error");

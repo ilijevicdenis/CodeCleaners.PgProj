@@ -333,9 +333,9 @@ public class Corpus_CastCoercion
     public void cst2a0163() => CorpusAssert.Parses(@"SELECT CAST(42 AS bit(8))", "ok");
     [Fact]
     public void cst2a0164() => CorpusAssert.Parses(@"SELECT 42::bit(8)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void cst2a0165() => CorpusAssert.Parses(@"SELECT CAST(B'1010' AS integer)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void cst2a0166() => CorpusAssert.Parses(@"SELECT B'1010'::integer", "ok");
     [Fact]
     public void cst2a0167() => CorpusAssert.Parses(@"SELECT CAST(42.5 AS money)", "ok");

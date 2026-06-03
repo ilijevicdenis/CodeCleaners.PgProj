@@ -75,7 +75,7 @@ public class Corpus_AggregateFuncs
     public void aggfa0034() => CorpusAssert.Parses(@"SELECT string_agg(name, ', ' ORDER BY name) FROM s.t", "ok");
     [Fact]
     public void aggfa0035() => CorpusAssert.Parses(@"SELECT string_agg(name, '|' ORDER BY val DESC) FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void aggfa0036() => CorpusAssert.Parses(@"SELECT string_agg(name, E'\n' ORDER BY name ASC NULLS LAST) FROM s.t", "ok");
     [Fact]
     public void aggfa0037() => CorpusAssert.Parses(@"SELECT string_agg(name, ',') FILTER (WHERE val IS NOT NULL) FROM s.t", "ok");

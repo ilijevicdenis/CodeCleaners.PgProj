@@ -235,6 +235,8 @@ public sealed partial class PgParser
         {
             if (t.IsSymbol('(')) return ParseParenOrSubquery(c);
             if (t.IsSymbol('*')) { c.Advance(); return new StarExpr(); }   // leading * is the star, not multiply
+            if (t.IsSymbol('$') && c.Peek() is { Kind: TokenKind.Number } pn)   // positional parameter $1
+            { c.Advance(); c.Advance(); return new ParamExpr { Text = "$" + pn.Value }; }
             // prefix general operator (e.g. @, |/, ~)
             if (IsOperatorSymbol(t.Value))
             {
@@ -255,6 +257,18 @@ public sealed partial class PgParser
         if (c.AtWord("ROW") && c.Peek()?.IsSymbol('(') == true) { c.Advance(); return ParseRow(c, explicitRow: true); }
         if (c.AtAnyWord("INTERVAL")) return ParseTypedLiteralWord(c);
         if (c.AtAnyWord("EXTRACT", "POSITION", "OVERLAY", "SUBSTRING", "TRIM")) return ParseSpecialFunction(c);
+
+        // prefixed string literals: E'…', B'…', X'…'  (prefix immediately precedes the quote)
+        if (t.Kind == TokenKind.Word && t.Value.Length == 1 && "EBXebx".IndexOf(t.Value[0]) >= 0
+            && c.Peek() is { Kind: TokenKind.String } ps && ps.Position == t.Position + 1)
+        { c.Advance(); var sv = c.Advance(); return new LiteralExpr { Kind = "string", Text = $"{t.Value}'{sv.Value}'" }; }
+
+        if (c.Peek()?.IsSymbol('(') == true && c.AtAnyWord(
+                "XMLELEMENT", "XMLFOREST", "XMLPI", "XMLROOT", "XMLPARSE", "XMLSERIALIZE",
+                "XMLEXISTS", "XMLTABLE", "XMLCONCAT", "XMLAGG", "XMLCOMMENT",
+                "JSON_OBJECT", "JSON_ARRAY", "JSON_OBJECTAGG", "JSON_ARRAYAGG", "JSON_QUERY",
+                "JSON_VALUE", "JSON_EXISTS", "JSON_SCALAR", "JSON_SERIALIZE", "JSON_TABLE", "JSON"))
+            return ParseKeywordCall(c);
 
         // a bare type keyword immediately before a string is a typed literal: timestamp '…'
         if (t.Kind == TokenKind.Word && c.Peek() is { Kind: TokenKind.String } && IsTypeKeyword(t.Value))
@@ -407,6 +421,16 @@ public sealed partial class PgParser
             else tail.Add(c.Advance());
         }
         return new LiteralExpr { Kind = "typed", Text = $"{kw} '{s.Value}'" };
+    }
+
+    // XML and SQL/JSON functions have keyword-laden, irregular argument syntax (NAME, XMLATTRIBUTES,
+    // PASSING, COLUMNS, RETURNING, ON ERROR …). Accept any balanced argument list.
+    private Expr ParseKeywordCall(TokenCursor c)
+    {
+        var call = new FuncCallExpr();
+        call.Name.Add(c.Advance().Value);
+        CaptureBalancedParens(c);
+        return call;
     }
 
     private Expr ParseSpecialFunction(TokenCursor c)

@@ -560,7 +560,7 @@ HAVING -- comment
     public void selgb0103() => CorpusAssert.Parses(@"SELECT flag, status, count(*) FROM s.t GROUP BY flag, status HAVING bool_and(flag)", "ok");
     [Fact]
     public void selgb0104() => CorpusAssert.Parses(@"SELECT flag, count(*) FROM s.t GROUP BY flag HAVING bool_or(flag)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selgb0105() => CorpusAssert.Parses(@"SELECT name, xmlagg(xmlelement(name item, name)) FROM s.t GROUP BY name", "ok");
     [Fact]
     public void selgb0106() => CorpusAssert.Parses(@"SELECT name, json_agg(val) FROM s.t GROUP BY name", "ok");

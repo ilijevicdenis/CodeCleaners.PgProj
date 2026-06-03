@@ -261,11 +261,11 @@ public class Corpus_NumericFuncs
     public void numfa0127() => CorpusAssert.Parses(@"SELECT factorial()", "error");
     [Fact]
     public void numfa0128() => CorpusAssert.Parses(@"SELECT bit_count(44::bit(8))", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void numfa0129() => CorpusAssert.Parses(@"SELECT bit_count(B'10111')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void numfa0130() => CorpusAssert.Parses(@"SELECT bit_count(B'00000000')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void numfa0131() => CorpusAssert.Parses(@"SELECT bit_count(B'11111111')", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void numfa0132() => CorpusAssert.Parses(@"SELECT bit_count()", "error");
@@ -629,9 +629,9 @@ public class Corpus_NumericFuncs
     public void numfb0061() => CorpusAssert.Parses(@"SELECT factorial(5)", "ok");
     [Fact]
     public void numfb0062() => CorpusAssert.Parses(@"SELECT factorial(0)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void numfb0063() => CorpusAssert.Parses(@"SELECT bit_count(B'10110111')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void numfb0064() => CorpusAssert.Parses(@"SELECT bit_count(B'00000000')", "ok");
     [Fact]
     public void numfb0065() => CorpusAssert.Parses(@"SELECT width_bucket(5.35::numeric, 0.024::numeric, 10.06::numeric, 5)", "ok");

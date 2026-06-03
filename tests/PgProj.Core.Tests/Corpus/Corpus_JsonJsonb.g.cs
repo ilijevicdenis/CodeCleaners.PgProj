@@ -81,7 +81,7 @@ public class Corpus_JsonJsonb
     public void jsn0037() => CorpusAssert.Parses(@"SELECT '[1,2]' IS JSON ARRAY FROM s.t", "ok");
     [Fact]
     public void jsn0038() => CorpusAssert.Parses(@"SELECT '1' IS JSON SCALAR FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void jsn0039() => CorpusAssert.Parses(@"SELECT jt.* FROM s.t, JSON_TABLE(data, '$' COLUMNS (jval text PATH '$.key')) AS jt", "ok");
     [Fact]
     public void jsn0040() => CorpusAssert.Parses(@"SELECT data -> FROM s.t", "error");

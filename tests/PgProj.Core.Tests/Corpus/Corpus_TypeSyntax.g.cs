@@ -471,11 +471,11 @@ public class Corpus_TypeSyntax
     public void tysb0062() => CorpusAssert.Parses(@"SELECT CAST('08:00:2b:01:02:03' AS macaddr)", "ok");
     [Fact]
     public void tysb0063() => CorpusAssert.Parses(@"SELECT CAST('08:00:2b:01:02:03:04:05' AS macaddr8)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tysb0064() => CorpusAssert.Parses(@"SELECT CAST(B'101' AS bit(3))", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tysb0065() => CorpusAssert.Parses(@"SELECT CAST(B'101' AS bit varying(10))", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tysb0066() => CorpusAssert.Parses(@"SELECT CAST(B'101' AS varbit(10))", "ok");
     [Fact]
     public void tysb0067() => CorpusAssert.Parses(@"SELECT CAST('hello world' AS tsvector)", "ok");

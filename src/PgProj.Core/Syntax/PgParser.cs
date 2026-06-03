@@ -78,6 +78,7 @@ public sealed partial class PgParser
         var head = c.Peek(k);
         if (head?.IsWord("TABLE") == true) return "CREATE TABLE";
         if (head?.IsWord("SCHEMA") == true) return "CREATE SCHEMA";
+        if (head?.IsWord("PUBLICATION") == true || head?.IsWord("SUBSCRIPTION") == true) return "CREATE";
         return null;
     }
 
@@ -116,6 +117,18 @@ public sealed partial class PgParser
         }
         if (c.MatchWord("TABLE")) return ParseCreateTable(c, persistence);
         if (c.MatchWord("SCHEMA")) return ParseCreateSchema(c);
+        if (c.MatchWord("PUBLICATION")) { c.ExpectIdentifier(); ConsumeRest(c); return new CommandStatement { Kind = "CREATE PUBLICATION" }; }
+        if (c.MatchWord("SUBSCRIPTION"))
+        {
+            c.ExpectIdentifier();
+            c.ExpectWord("CONNECTION");
+            if (c.Current is not { Kind: TokenKind.String }) throw new ParseException("expected a connection string", c.Here);
+            c.Advance();
+            c.ExpectWord("PUBLICATION");
+            do { c.ExpectIdentifier(); } while (c.MatchSymbol(','));
+            ConsumeRest(c);
+            return new CommandStatement { Kind = "CREATE SUBSCRIPTION" };
+        }
         throw new ParseException("expected TABLE or SCHEMA", c.Here);
     }
 
