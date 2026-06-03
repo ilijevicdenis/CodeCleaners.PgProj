@@ -48,6 +48,7 @@ public sealed class SemanticAnalyzer
         switch (stmt)
         {
             case QueryStatement q: AnalyzeQuery(q.Query); break;
+            case CreateTableAsStatement ctas: AnalyzeQuery(ctas.Source); break;
             case DropStatement drop: AnalyzeDrop(drop); break;
             case CommandStatement { Kind: "DO" } doBlock: AnalyzePlpgsql(doBlock.Body, doBlock.Detail, defaultIsPlpgsql: true, new PlpgsqlContext(IsDo: true, false, false, false, false)); break;
             case CreateFunctionStatement fn: AnalyzePlpgsql(fn.Body, fn.Language, defaultIsPlpgsql: false, new PlpgsqlContext(false, fn.IsProcedure, fn.ReturnsVoid, fn.ReturnsSetof, fn.HasOutParams)); break;

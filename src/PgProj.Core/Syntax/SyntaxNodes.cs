@@ -109,6 +109,7 @@ public sealed class CreateTableAsStatement : SqlStatement
     public List<string> ColumnAliases { get; } = new();
     public string QueryText { get; set; } = "";
     public bool? WithData { get; set; }                  // WITH DATA / WITH NO DATA
+    public SelectQuery? Source { get; set; }             // parsed query (SELECT/VALUES/TABLE/WITH), for analysis
 }
 
 public sealed class CreateSchemaStatement : SqlStatement

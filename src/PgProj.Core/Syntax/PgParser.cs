@@ -254,10 +254,23 @@ public sealed partial class PgParser
             throw new ParseException($"CREATE TABLE AS source must be SELECT/VALUES/TABLE/EXECUTE, not \"{qw.Value}\"", c.Here);
         var stmt = new CreateTableAsStatement { Schema = schema, Name = name, IfNotExists = ifNotExists };
         stmt.ColumnAliases.AddRange(aliases);
-        stmt.QueryText = CaptureRest(c);   // SELECT / VALUES / TABLE / EXECUTE (+ optional WITH [NO] DATA)
-        var q = stmt.QueryText.TrimEnd();
-        if (q.EndsWith("NO DATA", StringComparison.OrdinalIgnoreCase)) stmt.WithData = false;
-        else if (q.EndsWith("WITH DATA", StringComparison.OrdinalIgnoreCase)) stmt.WithData = true;
+
+        if (c.AtAnyWord("SELECT", "VALUES", "TABLE", "WITH"))
+        {
+            int mark = c.Mark();
+            stmt.Source = ParseSelectStatement(c);                 // parse the query → surfaces its syntax errors
+            if (c.MatchWord("WITH")) { if (c.MatchWord("NO")) { c.ExpectWord("DATA"); stmt.WithData = false; } else { c.ExpectWord("DATA"); stmt.WithData = true; } }
+            if (!c.AtEnd) throw new ParseException($"unexpected '{c.Current!.Value}' after the CREATE TABLE AS query", c.Here);
+            c.Reset(mark);
+            stmt.QueryText = CaptureRest(c);                       // preserve the original verbatim capture
+        }
+        else
+        {
+            stmt.QueryText = CaptureRest(c);   // EXECUTE plan … (+ optional WITH [NO] DATA) — kept lenient
+            var q = stmt.QueryText.TrimEnd();
+            if (q.EndsWith("NO DATA", StringComparison.OrdinalIgnoreCase)) stmt.WithData = false;
+            else if (q.EndsWith("WITH DATA", StringComparison.OrdinalIgnoreCase)) stmt.WithData = true;
+        }
         return stmt;
     }
 
