@@ -121,6 +121,7 @@ public sealed partial class PgParser
         if (c.MatchWord("SEQUENCE")) return ParseCreateSequence(c);
         if (c.MatchWord("TYPE")) return ParseCreateType(c);
         if (c.MatchWord("AGGREGATE")) return ParseCreateAggregate(c);
+        if (c.MatchWord("COLLATION")) return ParseCreateCollation(c);
         if (c.MatchWords("TEXT", "SEARCH")) return ParseCreateTextSearch(c);
         if (c.AtWord("UNIQUE") || c.AtWord("INDEX")) return ParseCreateIndex(c);
         if (c.AtAnyWord("FUNCTION", "PROCEDURE")) return ParseCreateFunction(c);

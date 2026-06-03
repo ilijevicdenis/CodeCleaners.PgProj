@@ -32,6 +32,21 @@ public sealed partial class PgParser
         throw new ParseException("expected AS or '(' after the type name in CREATE TYPE", c.Here);
     }
 
+    // CREATE COLLATION name { ( option = value, … ) | FROM existing } — validates the option-list shape and
+    // that LOCALE is not combined with LC_COLLATE / LC_CTYPE. Provider/determinism semantics are left for later.
+    private SqlStatement ParseCreateCollation(TokenCursor c)
+    {
+        c.MatchWords("IF", "NOT", "EXISTS");
+        var (s, n) = ParseQualifiedName(c);                       // a name is required
+        var node = new RawCreateStatement { ObjectKind = "COLLATION", Schema = s, Name = n };
+        if (c.MatchWord("FROM")) { ParseQualifiedName(c); return node; }   // CREATE COLLATION name FROM existing
+        if (!c.AtSymbol('(')) throw new ParseException("expected '(' or FROM in CREATE COLLATION", c.Here);
+        var keys = ParseKeyValueOptions(c, null, "collation option", rejectDuplicates: true);
+        if (keys.Contains("LOCALE") && (keys.Contains("LC_COLLATE") || keys.Contains("LC_CTYPE")))
+            throw new ParseException("LOCALE cannot be combined with LC_COLLATE / LC_CTYPE", c.Here);
+        return node;
+    }
+
     // AS ENUM ( 'label' [, 'label'] … )  — labels are string literals, unique, no trailing comma. Empty is legal.
     private void ParseEnumBody(TokenCursor c)
     {

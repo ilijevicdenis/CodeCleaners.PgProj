@@ -89,27 +89,27 @@ public class Corpus_CreateCollation
     public void cola0041() => CorpusAssert.Parses(@"DROP COLLATION IF EXISTS s.nonexistent_coll CASCADE", "ok");
     [Fact]
     public void cola0042() => CorpusAssert.Parses(@"DROP COLLATION IF EXISTS s.nonexistent_coll RESTRICT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void cola0043() => CorpusAssert.Parses(@"CREATE COLLATION (LOCALE = 'C')", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void cola0044() => CorpusAssert.Parses(@"CREATE COLLATION s.mycoll LOCALE = 'C'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void cola0045() => CorpusAssert.Parses(@"CREATE COLLATION s.mycoll (LOCALE = 'C',)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void cola0046() => CorpusAssert.Parses(@"CREATE COLLATION s.mycoll (LOCALE 'C')", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void cola0047() => CorpusAssert.Parses(@"CREATE COLLATION s.mycoll (LOCALE = 'C', LC_COLLATE = 'C')", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void cola0048() => CorpusAssert.Parses(@"CREATE COLLATION s.mycoll (LOCALE = 'C', LC_CTYPE = 'C')", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void cola0049() => CorpusAssert.Parses(@"CREATE COLLATION s.mycoll ()", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void cola0050() => CorpusAssert.Parses(@"CREATE COLLATION s.mycoll (PROVIDER = libc)", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void cola0051() => CorpusAssert.Parses(@"CREATE COLLATION s.mycoll (PROVIDER = badprovider, LOCALE = 'C')", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void cola0052() => CorpusAssert.Parses(@"CREATE COLLATION s.mycoll FROM", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void cola0053() => CorpusAssert.Parses(@"CREATE COLLATION s.mycoll FROM (LOCALE = 'C')", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void cola0054() => CorpusAssert.Parses(@"CREATE COLLATION s.mycoll FROM C", "error");
@@ -160,9 +160,9 @@ public class Corpus_CreateCollation
   LOCALE = 'C',
   PROVIDER = libc
 )", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void cola0077() => CorpusAssert.Parses(@"CREATE COLLATION s.mycoll (LOCALE = 'C', LOCALE = 'POSIX')", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void cola0078() => CorpusAssert.Parses(@"CREATE COLLATION s.mycoll (LC_COLLATE = 'C', LC_COLLATE = 'POSIX', LC_CTYPE = 'C')", "error");
     [Fact]
     public void cola0079() => CorpusAssert.Parses(@"CREATE COLLATION s.mycoll (PROVIDER = icu, LOCALE = 'und'); ALTER COLLATION s.mycoll REFRESH VERSION", "ok");
@@ -214,21 +214,21 @@ public class Corpus_CreateCollation
     public void cola0102() => CorpusAssert.Parses(@"CREATE COLLATION s.mycoll (LOCALE = 'C', PROVIDER = libc, VERSION = '999', DETERMINISTIC = true)", "error");
     [Fact]
     public void cola0103() => CorpusAssert.Parses(@"CREATE COLLATION s.mycoll (LOCALE = '')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void cola0104() => CorpusAssert.Parses(@"CREATE COLLATION s.mycoll LOCALE = 'C' PROVIDER = libc", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void cola0105() => CorpusAssert.Parses(@"CREATE COLLATION s.mycoll (LOCALE = 'C' PROVIDER = libc)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void cola0106() => CorpusAssert.Parses(@"CREATE COLLATION (LC_COLLATE = 'C', LC_CTYPE = 'C')", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void cola0107() => CorpusAssert.Parses(@"COLLATION s.mycoll (LOCALE = 'C')", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void cola0108() => CorpusAssert.Parses(@"CREATE s.mycoll (LOCALE = 'C')", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void cola0109() => CorpusAssert.Parses(@"CREATE COLLATION IF s.mycoll (LOCALE = 'C')", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void cola0110() => CorpusAssert.Parses(@"CREATE COLLATION IF NOT s.mycoll (LOCALE = 'C')", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void cola0111() => CorpusAssert.Parses(@"CREATE COLLATION IF EXISTS s.mycoll (LOCALE = 'C')", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void cola0112() => CorpusAssert.Parses(@"ALTER COLLATION s.mycoll OWNER SESSION_USER", "error");
