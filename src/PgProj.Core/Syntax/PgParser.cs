@@ -262,7 +262,60 @@ public sealed partial class PgParser
             toks.Add(b.Advance());
         }
         if (toks.Count == 0) throw new ParseException("expected a column data type", b.Here);
-        return new TypeName { Text = Token.Render(toks) };
+        var tn = new TypeName { Text = Token.Render(toks) };
+        ValidateTypeModifiers(tn.Text, b);
+        return tn;
+    }
+
+    private static readonly HashSet<string> NoModifierTypes = new(StringComparer.OrdinalIgnoreCase)
+    { "int", "integer", "int4", "int2", "smallint", "bigint", "int8", "serial", "serial4", "serial2", "smallserial", "bigserial", "serial8" };
+    private static readonly HashSet<string> IntervalRanges = new(StringComparer.OrdinalIgnoreCase)
+    { "year to month", "day to hour", "day to minute", "day to second", "hour to minute", "hour to second", "minute to second" };
+
+    // Validate the numeric type modifiers PostgreSQL rejects at parse time. Conservative: only known type
+    // families are checked, and any non-integer / unparseable modifier is left alone (no false positives).
+    private static void ValidateTypeModifiers(string typeText, TokenCursor at)
+    {
+        var s = typeText.Trim();
+        int lp = s.IndexOf('(');
+        var baseName = (lp >= 0 ? s[..lp] : s).Trim().ToLowerInvariant();
+
+        if (lp >= 0 && NoModifierTypes.Contains(baseName))
+            throw new ParseException($"type \"{baseName}\" does not accept a length/precision modifier", at.Here);
+
+        // INTERVAL field-range qualifier (e.g. INTERVAL MONTH TO DAY is invalid)
+        if (baseName.StartsWith("interval", StringComparison.OrdinalIgnoreCase) && baseName.Contains(" to "))
+        {
+            var q = baseName["interval".Length..].Trim();
+            if (!IntervalRanges.Contains(q)) throw new ParseException($"invalid INTERVAL field qualifier: {q}", at.Here);
+        }
+
+        if (lp < 0) return;
+        int rp = s.IndexOf(')', lp);
+        if (rp <= lp) return;
+        var parts = s[(lp + 1)..rp].Split(',');
+        var nums = new List<long>();
+        foreach (var p in parts) { if (!long.TryParse(p.Trim(), out var v)) return; nums.Add(v); }   // non-integer modifier → not ours to judge
+        if (nums.Count == 0) return;
+
+        switch (baseName)
+        {
+            case "numeric" or "decimal":
+                if (nums.Count > 2) throw new ParseException("NUMERIC takes at most precision and scale", at.Here);
+                if (nums[0] < 1 || nums[0] > 1000) throw new ParseException($"NUMERIC precision {nums[0]} must be between 1 and 1000", at.Here);
+                if (nums.Count == 2 && (nums[1] < -1000 || nums[1] > 1000)) throw new ParseException($"NUMERIC scale {nums[1]} must be between -1000 and 1000", at.Here);
+                break;
+            case "varchar" or "character varying" or "char" or "character" or "bpchar" or "bit" or "varbit" or "bit varying":
+                if (nums.Count == 1 && nums[0] < 1) throw new ParseException($"length for type {baseName} must be at least 1", at.Here);
+                break;
+            case "float":
+                if (nums.Count == 1 && (nums[0] < 1 || nums[0] > 53)) throw new ParseException($"FLOAT precision {nums[0]} must be between 1 and 53", at.Here);
+                break;
+            case "timestamp" or "timestamptz" or "time" or "timetz" or "interval":
+                // precision > 6 is only a warning in PostgreSQL (clamped); a negative precision is an error.
+                if (nums.Count == 1 && nums[0] < 0) throw new ParseException($"{baseName} precision must not be negative", at.Here);
+                break;
+        }
     }
 
     private void ParseColumnConstraints(TokenCursor b, ColumnDef col)
