@@ -457,17 +457,17 @@ public class Corpus_TransactionControl
     public void txcb0055() => CorpusAssert.Parses(@"SET TRANSACTION ISOLATION LEVEL SERIALIZABLE READ ONLY DEFERRABLE", "ok");
     [Fact]
     public void txcb0056() => CorpusAssert.Parses(@"SET TRANSACTION ISOLATION LEVEL READ COMMITTED READ WRITE NOT DEFERRABLE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txcb0057() => CorpusAssert.Parses(@"SET SESSION CHARACTERISTICS AS TRANSACTION ISOLATION LEVEL SERIALIZABLE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txcb0058() => CorpusAssert.Parses(@"SET SESSION CHARACTERISTICS AS TRANSACTION READ ONLY", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txcb0059() => CorpusAssert.Parses(@"SET SESSION CHARACTERISTICS AS TRANSACTION READ WRITE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txcb0060() => CorpusAssert.Parses(@"SET SESSION CHARACTERISTICS AS TRANSACTION DEFERRABLE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txcb0061() => CorpusAssert.Parses(@"SET SESSION CHARACTERISTICS AS TRANSACTION NOT DEFERRABLE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txcb0062() => CorpusAssert.Parses(@"SET SESSION CHARACTERISTICS AS TRANSACTION ISOLATION LEVEL REPEATABLE READ READ ONLY DEFERRABLE", "ok");
     [Fact]
     public void txcb0063() => CorpusAssert.Parses(@"SET CONSTRAINTS ALL DEFERRED", "ok");

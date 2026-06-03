@@ -67,13 +67,16 @@ public sealed partial class PgParser
     private CommandStatement ParseSet(TokenCursor c)
     {
         c.ExpectWord("SET");
-        c.MatchWord("SESSION"); c.MatchWord("LOCAL");
+        bool session = c.MatchWord("SESSION"); c.MatchWord("LOCAL");
 
+        if (session && c.MatchWord("CHARACTERISTICS")) { ConsumeRest(c); return new CommandStatement { Kind = "SET" }; }  // SET SESSION CHARACTERISTICS AS …
+        if (c.MatchWord("AUTHORIZATION")) { ConsumeRest(c); return new CommandStatement { Kind = "SET" }; }
         if (c.MatchWords("TIME", "ZONE")) { ConsumeRest(c); return new CommandStatement { Kind = "SET" }; }
         if (c.MatchWord("CONSTRAINTS")) { ConsumeRest(c); return new CommandStatement { Kind = "SET CONSTRAINTS" }; }
         if (c.MatchWord("TRANSACTION")) { ConsumeRest(c); return new CommandStatement { Kind = "SET TRANSACTION" }; }
         if (c.MatchWord("ROLE")) { c.ExpectIdentifier(); return new CommandStatement { Kind = "SET ROLE" }; }
-        if (c.MatchWords("SESSION", "AUTHORIZATION")) { ConsumeRest(c); return new CommandStatement { Kind = "SET" }; }
+        if (c.MatchWord("NAMES")) { ConsumeRest(c); return new CommandStatement { Kind = "SET" }; }            // SET NAMES ['encoding']
+        if (c.MatchWord("SCHEMA")) { if (c.AtEnd) throw new ParseException("expected a schema value", c.Here); ConsumeRest(c); return new CommandStatement { Kind = "SET SCHEMA" }; }
 
         var name = ParseDottedName(c);
         if (!(c.MatchWord("TO") || c.MatchOperator("=")))
@@ -87,9 +90,18 @@ public sealed partial class PgParser
     {
         c.ExpectWord("SHOW");
         if (c.MatchWord("ALL")) return new CommandStatement { Kind = "SHOW", Detail = "ALL" };
+        if (c.MatchWords("TIME", "ZONE")) { RejectShowValue(c); return new CommandStatement { Kind = "SHOW", Detail = "TIME ZONE" }; }
+        if (c.MatchWords("TRANSACTION", "ISOLATION", "LEVEL")) { RejectShowValue(c); return new CommandStatement { Kind = "SHOW", Detail = "TRANSACTION ISOLATION LEVEL" }; }
+        if (c.MatchWords("SESSION", "AUTHORIZATION")) { RejectShowValue(c); return new CommandStatement { Kind = "SHOW", Detail = "SESSION AUTHORIZATION" }; }
         var name = ParseDottedName(c);
-        if (!c.AtEnd) throw new ParseException($"unexpected '{c.Current!.Value}' after SHOW {name}", c.Here);
+        RejectShowValue(c);
         return new CommandStatement { Kind = "SHOW", Detail = name };
+    }
+
+    // SHOW takes only a name — never a value. Reject any `=`/`TO`/leftover token.
+    private static void RejectShowValue(TokenCursor c)
+    {
+        if (!c.AtEnd) throw new ParseException($"unexpected '{c.Current!.Value}' — SHOW does not take a value", c.Here);
     }
 
     private CommandStatement ParseReset(TokenCursor c)
@@ -215,7 +227,7 @@ public sealed partial class PgParser
         var kw = c.Advance().Value.ToUpperInvariant();           // FETCH / MOVE
         // optional direction
         if (c.AtAnyWord("NEXT", "PRIOR", "FIRST", "LAST", "ALL")) c.Advance();
-        else if (c.AtAnyWord("ABSOLUTE", "RELATIVE")) { c.Advance(); c.Advance(); }
+        else if (c.AtAnyWord("ABSOLUTE", "RELATIVE")) { c.Advance(); c.MatchOperator("-"); c.MatchOperator("+"); if (c.Current is { Kind: TokenKind.Number }) c.Advance(); }
         else if (c.AtAnyWord("FORWARD", "BACKWARD")) { c.Advance(); if (c.AtWord("ALL")) c.Advance(); else if (c.Current is { Kind: TokenKind.Number }) c.Advance(); }
         else if (c.Current is { Kind: TokenKind.Number }) c.Advance();
         else if (c.AtOperator("-") && c.Peek() is { Kind: TokenKind.Number }) { c.Advance(); c.Advance(); }

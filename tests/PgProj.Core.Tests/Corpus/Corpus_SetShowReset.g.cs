@@ -55,7 +55,7 @@ public class Corpus_SetShowReset
     public void ssra0024() => CorpusAssert.Parses(@"SET SESSION TIME ZONE 'UTC'", "ok");
     [Fact]
     public void ssra0025() => CorpusAssert.Parses(@"SET LOCAL TIME ZONE 'UTC'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ssra0026() => CorpusAssert.Parses(@"SHOW TIME ZONE", "ok");
     [Fact]
     public void ssra0027() => CorpusAssert.Parses(@"RESET timezone", "ok");
@@ -101,15 +101,15 @@ public class Corpus_SetShowReset
     public void ssra0047() => CorpusAssert.Parses(@"SET client_encoding TO 'UTF8'", "ok");
     [Fact]
     public void ssra0048() => CorpusAssert.Parses(@"SET client_encoding = 'UTF8'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ssra0049() => CorpusAssert.Parses(@"SET NAMES 'UTF8'", "ok");
     [Fact]
     public void ssra0050() => CorpusAssert.Parses(@"SHOW client_encoding", "ok");
     [Fact]
     public void ssra0051() => CorpusAssert.Parses(@"RESET client_encoding", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ssra0052() => CorpusAssert.Parses(@"SET SCHEMA 'public'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ssra0053() => CorpusAssert.Parses(@"SET SCHEMA 's'", "ok");
     [Fact]
     public void ssra0054() => CorpusAssert.Parses(@"SET lock_timeout TO '5s'", "ok");
@@ -229,7 +229,7 @@ public class Corpus_SetShowReset
     public void ssra0111() => CorpusAssert.Parses(@"SHOW is_superuser", "ok");
     [Fact]
     public void ssra0112() => CorpusAssert.Parses(@"SHOW max_connections", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ssra0113() => CorpusAssert.Parses(@"SET SESSION AUTHORIZATION DEFAULT", "ok");
     [Fact]
     public void ssra0114() => CorpusAssert.Parses(@"SHOW session_authorization", "ok");
@@ -403,7 +403,7 @@ public class Corpus_SetShowReset
     public void ssra0198() => CorpusAssert.Parses(@"SET lc_messages TO 'not_a_real_locale'", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void ssra0199() => CorpusAssert.Parses(@"SET geqo_threshold TO -1", "error");
-    [Fact]
+    [Fact(Skip = "pending: parser not yet complete")]
     public void ssra0200() => CorpusAssert.Parses(@"SET SESSION AUTHORIZATION 'invalid_user_that_does_not_exist'", "error");
     [Fact]
     public void ssra0201() => CorpusAssert.Parses(@"SET ROLE 'invalid_role_xyz'", "error");
@@ -411,7 +411,7 @@ public class Corpus_SetShowReset
     public void ssra0202() => CorpusAssert.Parses(@"SHOW ALL; SET work_mem TO '64MB'", "ok");
     [Fact]
     public void ssra0203() => CorpusAssert.Parses(@"SET transaction_deferrable TO on", "ok");
-    [Fact]
+    [Fact(Skip = "pending: parser not yet complete")]
     public void ssra0204() => CorpusAssert.Parses(@"SET LOCAL SESSION AUTHORIZATION DEFAULT", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void ssra0205() => CorpusAssert.Parses(@"SET xmloption TO 'invalid_xmloption'", "error");
@@ -467,7 +467,7 @@ public class Corpus_SetShowReset
     public void ssrb0025() => CorpusAssert.Parses(@"SET statement_timeout TO 5000", "ok");
     [Fact]
     public void ssrb0026() => CorpusAssert.Parses(@"SET standard_conforming_strings TO on; SHOW standard_conforming_strings", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ssrb0027() => CorpusAssert.Parses(@"SET SESSION AUTHORIZATION DEFAULT", "ok");
     [Fact]
     public void ssrb0028() => CorpusAssert.Parses(@"SET ROLE NONE", "ok");

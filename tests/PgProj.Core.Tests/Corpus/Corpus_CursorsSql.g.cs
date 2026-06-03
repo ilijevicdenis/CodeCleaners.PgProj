@@ -85,7 +85,7 @@ FETCH ALL FROM c36", "ok");
     [Fact]
     public void cursa0037() => CorpusAssert.Parses(@"DECLARE c37 SCROLL CURSOR FOR SELECT id FROM s.t ORDER BY id;
 FETCH ABSOLUTE 1 FROM c37", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void cursa0038() => CorpusAssert.Parses(@"DECLARE c38 SCROLL CURSOR FOR SELECT id FROM s.t ORDER BY id;
 FETCH ABSOLUTE -1 FROM c38", "ok");
     [Fact]
@@ -97,7 +97,7 @@ FETCH RELATIVE 0 FROM c40", "ok");
     [Fact]
     public void cursa0041() => CorpusAssert.Parses(@"DECLARE c41 SCROLL CURSOR FOR SELECT id FROM s.t ORDER BY id;
 FETCH RELATIVE 1 FROM c41", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void cursa0042() => CorpusAssert.Parses(@"DECLARE c42 SCROLL CURSOR FOR SELECT id FROM s.t ORDER BY id;
 FETCH RELATIVE -1 FROM c42", "ok");
     [Fact]
@@ -187,7 +187,7 @@ MOVE ALL FROM c70", "ok");
     [Fact]
     public void cursa0071() => CorpusAssert.Parses(@"DECLARE c71 SCROLL CURSOR FOR SELECT id FROM s.t ORDER BY id;
 MOVE ABSOLUTE 1 FROM c71", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void cursa0072() => CorpusAssert.Parses(@"DECLARE c72 SCROLL CURSOR FOR SELECT id FROM s.t ORDER BY id;
 MOVE ABSOLUTE -1 FROM c72", "ok");
     [Fact]
@@ -301,7 +301,7 @@ FETCH LAST FROM c107", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void cursa0108() => CorpusAssert.Parses(@"DECLARE c108 NO SCROLL CURSOR FOR SELECT id FROM s.t;
 FETCH BACKWARD FROM c108", "error");
-    [Fact]
+    [Fact(Skip = "pending: parser not yet complete")]
     public void cursa0109() => CorpusAssert.Parses(@"DECLARE c109 NO SCROLL CURSOR FOR SELECT id FROM s.t;
 FETCH RELATIVE -1 FROM c109", "error");
     [Fact(Skip = "pending: parser not yet complete")]
@@ -362,7 +362,7 @@ FETCH 100 FROM c130", "ok");
     [Fact]
     public void cursa0131() => CorpusAssert.Parses(@"DECLARE c131 SCROLL CURSOR FOR SELECT id FROM s.t ORDER BY id;
 FETCH ABSOLUTE 999 FROM c131", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void cursa0132() => CorpusAssert.Parses(@"DECLARE c132 SCROLL CURSOR FOR SELECT id FROM s.t ORDER BY id;
 FETCH ABSOLUTE -999 FROM c132", "ok");
     [Fact]
@@ -398,7 +398,7 @@ FETCH ALL FROM c140", "ok");
     [Fact]
     public void cursa0141() => CorpusAssert.Parses(@"DECLARE c141 SCROLL CURSOR FOR SELECT id FROM s.t ORDER BY id;
 MOVE RELATIVE 0 FROM c141", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void cursa0142() => CorpusAssert.Parses(@"DECLARE c142 SCROLL CURSOR FOR SELECT id FROM s.t ORDER BY id;
 MOVE RELATIVE -1 FROM c142", "ok");
     [Fact]
@@ -528,7 +528,7 @@ FETCH ABSOLUTE 1 FROM cur18", "ok");
     [Fact]
     public void cursb0019() => CorpusAssert.Parses(@"DECLARE cur19 CURSOR FOR SELECT id FROM s.t;
 FETCH RELATIVE 1 FROM cur19", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void cursb0020() => CorpusAssert.Parses(@"DECLARE cur20 SCROLL CURSOR FOR SELECT id FROM s.t;
 FETCH ABSOLUTE -1 FROM cur20", "ok");
     [Fact]

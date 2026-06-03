@@ -181,21 +181,15 @@ public sealed partial class PgParser
     private void ParseGroupBy(TokenCursor c, SelectQuery q)
     {
         c.MatchWord("ALL"); c.MatchWord("DISTINCT");
-        if (c.AtAnyWord("ROLLUP", "CUBE"))
-        {
-            q.GroupByKind = c.Advance().Value.ToUpperInvariant();
-            c.ExpectSymbol('('); q.GroupBy.Add(ParseExpression(c)); while (c.MatchSymbol(',')) q.GroupBy.Add(ParseExpression(c)); c.ExpectSymbol(')');
-            return;
-        }
-        if (c.MatchWords("GROUPING", "SETS"))
-        {
-            q.GroupByKind = "GROUPING SETS";
-            c.ExpectSymbol('(');
-            int depth = 1; while (!c.AtEnd && depth > 0) { var t = c.Advance(); if (t.IsSymbol('(')) depth++; else if (t.IsSymbol(')')) depth--; }
-            return;
-        }
+        do { ParseGroupingElement(c, q); } while (c.MatchSymbol(','));
+    }
+
+    private void ParseGroupingElement(TokenCursor c, SelectQuery q)
+    {
+        if (c.AtAnyWord("ROLLUP", "CUBE")) { q.GroupByKind = c.Advance().Value.ToUpperInvariant(); CaptureBalancedParens(c); return; }
+        if (c.MatchWords("GROUPING", "SETS")) { q.GroupByKind = "GROUPING SETS"; CaptureBalancedParens(c); return; }
+        if (c.AtSymbol('(') && c.Peek()?.IsSymbol(')') == true) { c.Advance(); c.Advance(); return; }   // GROUP BY () — grand total
         q.GroupBy.Add(ParseExpression(c));
-        while (c.MatchSymbol(',')) q.GroupBy.Add(ParseExpression(c));
     }
 
     private FromClause ParseFromClause(TokenCursor c)
@@ -266,17 +260,18 @@ public sealed partial class PgParser
 
         if (c.MatchWords("WITH", "ORDINALITY")) rel.WithOrdinality = true;
 
+        // alias
+        if (c.MatchWord("AS")) { rel.Alias = c.ExpectIdentifier(); ParseRelAliasCols(c, rel); }
+        else if (c.Current is { Kind: TokenKind.Word } w && !IsFromBoundary(w.Value)) { rel.Alias = c.Advance().Value; ParseRelAliasCols(c, rel); }
+        else if (c.Current is { Kind: TokenKind.QuotedIdent }) { rel.Alias = c.Advance().Value; ParseRelAliasCols(c, rel); }
+
+        // TABLESAMPLE may follow the alias (FROM t AS x TABLESAMPLE SYSTEM (10) REPEATABLE (1))
         if (c.MatchWord("TABLESAMPLE"))
         {
             c.ExpectIdentifier();
             if (c.AtSymbol('(')) CaptureBalancedParens(c);
             if (c.MatchWord("REPEATABLE")) { c.ExpectSymbol('('); ParseExpression(c); c.ExpectSymbol(')'); }
         }
-
-        // alias
-        if (c.MatchWord("AS")) { rel.Alias = c.ExpectIdentifier(); ParseRelAliasCols(c, rel); }
-        else if (c.Current is { Kind: TokenKind.Word } w && !IsFromBoundary(w.Value)) { rel.Alias = c.Advance().Value; ParseRelAliasCols(c, rel); }
-        else if (c.Current is { Kind: TokenKind.QuotedIdent }) { rel.Alias = c.Advance().Value; ParseRelAliasCols(c, rel); }
 
         return rel;
     }

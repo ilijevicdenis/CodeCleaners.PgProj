@@ -35,8 +35,8 @@ public sealed partial class PgParser
         if (c.MatchWord("RENAME"))
         {
             c.MatchWord("COLUMN"); c.MatchWord("CONSTRAINT"); c.MatchWord("ATTRIBUTE"); c.MatchWord("VALUE");
-            if (!c.AtWord("TO")) c.ExpectIdentifier();
-            c.ExpectWord("TO"); c.ExpectIdentifier();
+            if (!c.AtWord("TO")) ConsumeNameOrString(c);   // enum RENAME VALUE 'old' uses a string
+            c.ExpectWord("TO"); ConsumeNameOrString(c);
             alter.Actions.Add("RENAME");
         }
         else if (c.MatchWords("OWNER", "TO")) { ParseRoleSpec(c); alter.Actions.Add("OWNER"); }
@@ -261,6 +261,12 @@ public sealed partial class PgParser
 
     private static string? MatchCascadeRestrict(TokenCursor c)
         => c.MatchWord("CASCADE") ? "CASCADE" : (c.MatchWord("RESTRICT") ? "RESTRICT" : null);
+
+    private static void ConsumeNameOrString(TokenCursor c)
+    {
+        if (c.Current is { Kind: TokenKind.String }) c.Advance();
+        else c.ExpectIdentifier();
+    }
 
     private static void ConsumeActionRest(TokenCursor c)
     {

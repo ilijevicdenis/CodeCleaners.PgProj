@@ -73,9 +73,9 @@ public class Corpus_SelectGroupHaving
     public void selga0033() => CorpusAssert.Parses(@"SELECT name, status, count(*) FROM s.t GROUP BY name, ROLLUP (status)", "ok");
     [Fact]
     public void selga0034() => CorpusAssert.Parses(@"SELECT name, status, count(*) FROM s.t GROUP BY name, CUBE (status)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selga0035() => CorpusAssert.Parses(@"SELECT name, status, count(*) FROM s.t GROUP BY ROLLUP (name), CUBE (status)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selga0036() => CorpusAssert.Parses(@"SELECT name, status, count(*) FROM s.t GROUP BY GROUPING SETS ((name)), ROLLUP (status)", "ok");
     [Fact]
     public void selga0037() => CorpusAssert.Parses(@"SELECT grouping(name) FROM s.t GROUP BY name", "ok");
@@ -123,7 +123,7 @@ public class Corpus_SelectGroupHaving
     public void selga0058() => CorpusAssert.Parses(@"SELECT name, val FROM s.t GROUP BY name, val", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void selga0059() => CorpusAssert.Parses(@"SELECT name FROM s.t GROUP BY name HAVING qty > 0", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selga0060() => CorpusAssert.Parses(@"SELECT count(*) FROM s.t GROUP BY ()", "ok");
     [Fact]
     public void selga0061() => CorpusAssert.Parses(@"SELECT name, count(*) FROM s.t GROUP BY GROUPING SETS ((name), ())", "ok");
@@ -177,7 +177,7 @@ public class Corpus_SelectGroupHaving
     public void selga0085() => CorpusAssert.Parses(@"SELECT name FROM s.t HAVING", "error");
     [Fact]
     public void selga0086() => CorpusAssert.Parses(@"SELECT name FROM s.t GROUP BY name HAVING count(*) > 0 GROUP BY name", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selga0087() => CorpusAssert.Parses(@"SELECT name, count(*) FROM s.t GROUP BY name, GROUPING SETS ((status))", "ok");
     [Fact]
     public void selga0088() => CorpusAssert.Parses(@"SELECT name, status, count(*) FROM s.t GROUP BY GROUPING SETS ((name, status), (name))", "ok");
@@ -404,9 +404,9 @@ HAVING -- comment
     public void selgb0025() => CorpusAssert.Parses(@"SELECT name, qty, sum(val) FROM s.t GROUP BY name, ROLLUP (qty)", "ok");
     [Fact]
     public void selgb0026() => CorpusAssert.Parses(@"SELECT name, qty, sum(val) FROM s.t GROUP BY name, CUBE (qty)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selgb0027() => CorpusAssert.Parses(@"SELECT name, qty, flag, sum(val) FROM s.t GROUP BY ROLLUP (name), CUBE (qty, flag)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selgb0028() => CorpusAssert.Parses(@"SELECT name, qty, sum(val) FROM s.t GROUP BY GROUPING SETS ((name), (qty)), name", "ok");
     [Fact]
     public void selgb0029() => CorpusAssert.Parses(@"SELECT name, grouping(name) FROM s.t GROUP BY name", "ok");
@@ -506,7 +506,7 @@ HAVING -- comment
     public void selgb0076() => CorpusAssert.Parses(@"SELECT name, qty, sum(val) FROM s.t GROUP BY ROLLUP (name, qty) HAVING count(*) > 0", "ok");
     [Fact]
     public void selgb0077() => CorpusAssert.Parses(@"SELECT name, grouping(name), sum(val) FROM s.t GROUP BY GROUPING SETS ((name), ()) HAVING grouping(name) = 0", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selgb0078() => CorpusAssert.Parses(@"SELECT count(*) FROM s.t GROUP BY ()", "ok");
     [Fact]
     public void selgb0079() => CorpusAssert.Parses(@"SELECT name, sum(val) FROM s.t GROUP BY name UNION SELECT name, sum(val) FROM s.t2 JOIN s.t ON s.t2.t_id = s.t.id GROUP BY name", "ok");
@@ -532,7 +532,7 @@ HAVING -- comment
     public void selgb0089() => CorpusAssert.Parses(@"SELECT name, count(*) FROM s.t GROUP BY name HAVING count(*) > GROUP BY", "error");
     [Fact]
     public void selgb0090() => CorpusAssert.Parses(@"SELECT name, sum(val) FROM s.t GROUP BY name, ROLLUP (qty), CUBE (flag)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selgb0091() => CorpusAssert.Parses(@"SELECT name, qty, sum(val) FROM s.t GROUP BY name, GROUPING SETS ((qty), ())", "ok");
     [Fact]
     public void selgb0092() => CorpusAssert.Parses(@"SELECT name, sum(val) FROM s.t GROUP BY name ORDER BY 2 DESC", "ok");
