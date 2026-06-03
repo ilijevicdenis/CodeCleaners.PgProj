@@ -344,19 +344,90 @@ public sealed class SelectQuery : SqlNode
 {
     public bool Recursive { get; init; }
     public IReadOnlyList<CommonTableExpression> With { get; init; } = new List<CommonTableExpression>();
-    public string ProjectionText { get; init; } = "";
-    public string? FromText { get; init; }
+    public bool Distinct { get; init; }
+    public IReadOnlyList<SelectItem> Items { get; init; } = new List<SelectItem>();
+    public FromClause? From { get; init; }
     public Expression? Where { get; init; }
-    public string? Tail { get; init; } // GROUP BY / HAVING / ORDER BY / LIMIT, captured raw
+    public IReadOnlyList<Expression> GroupBy { get; init; } = new List<Expression>();
+    public Expression? Having { get; init; }
+    public IReadOnlyList<OrderByItem> OrderBy { get; init; } = new List<OrderByItem>();
+    public Expression? Limit { get; init; }
+    public Expression? Offset { get; init; }
+    public SetOperation? SetOp { get; set; }
+    public string RawText { get; init; } = ""; // populated only when parsing fell back
+
     public override IEnumerable<SqlNode> Children
     {
         get
         {
-            var nodes = new List<SqlNode>(With);
-            if (Where is not null) nodes.Add(Where);
-            return nodes;
+            var n = new List<SqlNode>(With);
+            n.AddRange(Items);
+            if (From is not null) n.Add(From);
+            if (Where is not null) n.Add(Where);
+            n.AddRange(GroupBy);
+            if (Having is not null) n.Add(Having);
+            n.AddRange(OrderBy);
+            if (Limit is not null) n.Add(Limit);
+            if (Offset is not null) n.Add(Offset);
+            if (SetOp is not null) n.Add(SetOp);
+            return n;
         }
     }
+}
+
+public sealed class SelectItem : SqlNode
+{
+    public Expression? Expr { get; init; }
+    public string? Alias { get; init; }
+    public bool IsStar { get; init; }
+    public override IEnumerable<SqlNode> Children => Expr is null ? base.Children : new[] { Expr };
+}
+
+public sealed class FromClause : SqlNode
+{
+    public IReadOnlyList<TableReference> Relations { get; init; } = new List<TableReference>();
+    public override IEnumerable<SqlNode> Children => Relations;
+}
+
+public sealed class TableReference : SqlNode
+{
+    public string? TableName { get; init; }   // schema.name when a base table
+    public SelectQuery? Subquery { get; init; }
+    public string? Alias { get; init; }
+    public IReadOnlyList<JoinClause> Joins { get; init; } = new List<JoinClause>();
+    public override IEnumerable<SqlNode> Children
+    {
+        get
+        {
+            var n = new List<SqlNode>();
+            if (Subquery is not null) n.Add(Subquery);
+            n.AddRange(Joins);
+            return n;
+        }
+    }
+}
+
+public sealed class JoinClause : SqlNode
+{
+    public required string JoinType { get; init; }   // INNER | LEFT | RIGHT | FULL | CROSS
+    public required TableReference Right { get; init; }
+    public Expression? On { get; init; }
+    public IReadOnlyList<string> Using { get; init; } = new List<string>();
+    public override IEnumerable<SqlNode> Children => On is null ? new SqlNode[] { Right } : new SqlNode[] { Right, On };
+}
+
+public sealed class OrderByItem : SqlNode
+{
+    public required Expression Expr { get; init; }
+    public string? Direction { get; init; } // ASC | DESC
+    public override IEnumerable<SqlNode> Children => new[] { Expr };
+}
+
+public sealed class SetOperation : SqlNode
+{
+    public required string Op { get; init; }      // UNION | UNION ALL | INTERSECT | EXCEPT
+    public required SelectQuery Right { get; init; }
+    public override IEnumerable<SqlNode> Children => new[] { Right };
 }
 
 public sealed class CommonTableExpression : SqlNode

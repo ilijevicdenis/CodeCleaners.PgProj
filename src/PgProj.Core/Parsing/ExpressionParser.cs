@@ -90,6 +90,8 @@ public static class ExpressionParser
                 }
                 case TokenKind.QuotedIdent:
                     return ParseIdentifierOrCall(t.Value);
+                case TokenKind.Symbol when t.Value == "*":
+                    return new IdentifierExpr { Parts = new[] { "*" } }; // count(*), SELECT *
                 case TokenKind.Symbol when t.Value is "-" or "+":
                     return new UnaryExpr { Op = t.Value, Operand = ParseExpr(25) };
                 case TokenKind.Symbol when t.Value == "(":

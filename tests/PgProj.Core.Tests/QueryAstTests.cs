@@ -46,7 +46,7 @@ public class QueryAstTests
             Parse("CREATE VIEW app.v AS SELECT id FROM app.t WHERE id IN (SELECT id FROM app.u);")).Single();
         var inExpr = Assert.IsType<InExpr>(view.Query!.Where);
         Assert.NotNull(inExpr.Subquery);
-        Assert.Equal("app.u", inExpr.Subquery!.Query.FromText);
+        Assert.Equal("app.u", inExpr.Subquery!.Query.From!.Relations.Single().TableName);
     }
 
     [Fact]
