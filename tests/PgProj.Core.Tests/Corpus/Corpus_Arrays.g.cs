@@ -633,7 +633,7 @@ public class Corpus_Arrays
     public void arrb0138() => CorpusAssert.Parses(@"SELECT ARRAY[1, 'hello']", "error");
     [Fact]
     public void arrb0139() => CorpusAssert.Parses(@"SELECT 1 ANY(ARRAY[1,2,3])", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void arrb0140() => CorpusAssert.Parses(@"SELECT string_to_array()", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void arrb0141() => CorpusAssert.Parses(@"SELECT ARRAY[1,2,3] @@ ARRAY[1,2]", "error");

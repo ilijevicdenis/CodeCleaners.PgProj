@@ -337,7 +337,7 @@ public class Corpus_DatetimeOps
     public void dta0165() => CorpusAssert.Parses(@"SELECT make_date(2024, 6, 32)", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void dta0166() => CorpusAssert.Parses(@"SELECT make_time(25, 0, 0.0)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0167() => CorpusAssert.Parses(@"SELECT age()", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void dta0168() => CorpusAssert.Parses(@"SELECT DATE '2024-13-01'", "error");

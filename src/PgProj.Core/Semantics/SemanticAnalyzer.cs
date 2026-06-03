@@ -202,15 +202,27 @@ public sealed class SemanticAnalyzer
 
     private void CheckFuncDomain(FuncCallExpr f)
     {
-        if (f.Args.Count != 1 || f.Name.Count != 1) return;
+        if (f.Name.Count != 1) return;
         var name = f.Name[0].ToLowerInvariant();
-        var a = Fold(f.Args[0]);
-        if (a is null) return;
-        switch (name)
+        if (_catalog.HasFunction(name)) return;              // a user-defined function may have a wider domain
+
+        if (f.Args.Count == 1)
         {
-            case "sqrt" when a < 0: Report("cannot take square root of a negative number"); break;
-            case "ln" when a <= 0: Report("argument of ln must be positive"); break;
-            case "log" when a <= 0: Report("argument of log must be positive"); break;
+            if (Fold(f.Args[0]) is not { } a) return;
+            switch (name)
+            {
+                case "sqrt" when a < 0: Report("cannot take square root of a negative number"); break;
+                case "ln" when a <= 0: Report("argument of ln must be positive"); break;
+                case "log" or "log10" when a <= 0: Report("argument of log must be positive"); break;
+                case "factorial" when a < 0: Report("factorial of a negative number is undefined"); break;
+                case "chr" when a <= 0: Report("chr() argument must be a positive integer"); break;
+                case "setseed" when a < -1 || a > 1: Report("setseed() parameter must be between -1 and 1"); break;
+                case "asin" or "asind" or "acos" or "acosd" when a < -1 || a > 1: Report($"input is out of range for {name}"); break;
+            }
+        }
+        else if (f.Args.Count == 2 && name is "div" or "mod" && Fold(f.Args[1]) is 0.0)
+        {
+            Report("division by zero");
         }
     }
 
@@ -228,6 +240,9 @@ public sealed class SemanticAnalyzer
         ["sin"] = (1, 1), ["cos"] = (1, 1), ["tan"] = (1, 1), ["cot"] = (1, 1), ["asin"] = (1, 1), ["acos"] = (1, 1),
         ["atan"] = (1, 1), ["sinh"] = (1, 1), ["cosh"] = (1, 1), ["tanh"] = (1, 1), ["asinh"] = (1, 1),
         ["acosh"] = (1, 1), ["atanh"] = (1, 1), ["pi"] = (0, 0),
+        ["sind"] = (1, 1), ["cosd"] = (1, 1), ["tand"] = (1, 1), ["cotd"] = (1, 1), ["asind"] = (1, 1),
+        ["acosd"] = (1, 1), ["atand"] = (1, 1), ["log10"] = (1, 1), ["scale"] = (1, 1), ["min_scale"] = (1, 1),
+        ["trim_scale"] = (1, 1), ["bit_count"] = (1, 1), ["setseed"] = (1, 1), ["age"] = (1, 2), ["width_bucket"] = (2, 4),
         // string
         ["length"] = (1, 1), ["char_length"] = (1, 1), ["character_length"] = (1, 1), ["octet_length"] = (1, 1),
         ["bit_length"] = (1, 1), ["upper"] = (1, 1), ["lower"] = (1, 1), ["initcap"] = (1, 1), ["reverse"] = (1, 1),
@@ -237,6 +252,9 @@ public sealed class SemanticAnalyzer
         ["repeat"] = (2, 2), ["strpos"] = (2, 2), ["starts_with"] = (2, 2), ["substr"] = (2, 3),
         ["replace"] = (3, 3), ["translate"] = (3, 3), ["split_part"] = (3, 3),
         ["concat_ws"] = (1, Unbounded), ["format"] = (1, Unbounded),
+        ["string_to_array"] = (2, 3), ["encode"] = (2, 2), ["decode"] = (2, 2), ["convert_from"] = (2, 2),
+        ["convert_to"] = (2, 2), ["convert"] = (3, 3), ["unistr"] = (1, 1), ["sha224"] = (1, 1),
+        ["sha256"] = (1, 1), ["sha384"] = (1, 1), ["sha512"] = (1, 1),
         // ordinary aggregates
         ["sum"] = (1, 1), ["avg"] = (1, 1), ["min"] = (1, 1), ["max"] = (1, 1), ["array_agg"] = (1, 1),
         ["bool_and"] = (1, 1), ["bool_or"] = (1, 1), ["every"] = (1, 1), ["bit_and"] = (1, 1), ["bit_or"] = (1, 1),
