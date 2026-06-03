@@ -51,6 +51,7 @@ public static class DdlExporter
 
         foreach (var o in model.Objects)
         {
+            if (string.IsNullOrWhiteSpace(o.Body)) continue; // identity-only (existence) records
             var body = o.Body.TrimEnd();
             if (!body.EndsWith(";", StringComparison.Ordinal)) body += ";";
             files[$"{RawObjectMeta.Folder(o.Kind)}/{RawObjectMeta.FileName(o)}"] = body + "\n";

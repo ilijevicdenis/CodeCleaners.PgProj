@@ -96,13 +96,18 @@ public sealed class LiveDatabaseReader
             var identityKind = idChar switch { 'a' => "ALWAYS", 'd' => "BY DEFAULT", _ => (string?)null };
             var isGenerated = genChar == 's';
             var generatedExpr = isGenerated && !string.IsNullOrEmpty(defExpr) ? $"({defExpr})" : null;
+            // A nextval(...) default is the signature of a serial column; treat it as such so it
+            // matches a project's `serial`/`bigserial` rather than churning a default diff.
+            var isSerial = !isIdentity && !isGenerated && defExpr is not null
+                           && defExpr.StartsWith("nextval(", StringComparison.OrdinalIgnoreCase);
 
             def.Columns.Add(new ColumnDefinition(
                 r.GetString(2), dataType, !notNull,
-                Default: isGenerated ? null : defExpr,
+                Default: isGenerated || isSerial ? null : defExpr,
                 IsIdentity: isIdentity,
                 IdentityKind: identityKind,
-                GeneratedExpression: generatedExpr));
+                GeneratedExpression: generatedExpr,
+                IsSerial: isSerial));
         }
         return byKey;
     }
@@ -354,7 +359,11 @@ public sealed class LiveDatabaseReader
             var name = r.GetString(1);
             var args = r.IsDBNull(2) ? string.Empty : r.GetString(2);
             var def = r.GetString(3);
-            model.Functions.Add(new FunctionDefinition(schema, name, $"{schema}.{name}({args})", def));
+            // pg_get_function_identity_arguments already yields types only; normalize each so it
+            // lines up with the parser's ExtractArgTypes output.
+            var argTypes = string.Join(", ", args.Split(',', StringSplitOptions.RemoveEmptyEntries)
+                .Select(a => TypeNormalizer.Normalize(a.Trim())));
+            model.Functions.Add(new FunctionDefinition(schema, name, $"{schema}.{name}({argTypes})", def, argTypes));
         }
     }
 
@@ -367,10 +376,14 @@ public sealed class LiveDatabaseReader
         await ReadCompositeTypesAsync(conn, model, ct);
         await ReadDomainsAsync(conn, model, ct);
         await ReadTriggersAsync(conn, model, ct);
+        await ReadRulesAsync(conn, model, ct);
+        await ReadPoliciesAsync(conn, model, ct);
+        await ReadEventTriggersAsync(conn, model, ct);
+        await ReadExistenceObjectsAsync(conn, model, ct);
     }
 
-    private static void AddRaw(DatabaseModel model, ObjectKind kind, string schema, string name, string identity, string body, string? on = null) =>
-        model.Objects.Add(new RawObjectDefinition(kind, schema, name, identity.ToLowerInvariant(), body, on));
+    private static void AddRaw(DatabaseModel model, ObjectKind kind, string schema, string name, string identity, string body, string? on = null, bool bodyComparable = true) =>
+        model.Objects.Add(new RawObjectDefinition(kind, schema, name, identity.ToLowerInvariant(), body, on, bodyComparable));
 
     private async Task ReadExtensionsAsync(NpgsqlConnection conn, DatabaseModel model, CancellationToken ct)
     {
@@ -492,6 +505,131 @@ public sealed class LiveDatabaseReader
             var def = r.GetString(3);
             var on = $"{schema}.{table}";
             AddRaw(model, ObjectKind.Trigger, schema, name, $"trigger:{name} on {on}", def, on);
+        }
+    }
+
+    private async Task ReadRulesAsync(NpgsqlConnection conn, DatabaseModel model, CancellationToken ct)
+    {
+        const string sql = @"
+            SELECT n.nspname, c.relname, r.rulename, pg_get_ruledef(r.oid, true) AS def
+            FROM pg_rewrite r
+            JOIN pg_class c ON c.oid = r.ev_class
+            JOIN pg_namespace n ON n.oid = c.relnamespace
+            WHERE r.rulename <> '_RETURN'
+              AND n.nspname NOT IN ('pg_catalog','information_schema') AND n.nspname NOT LIKE 'pg_%'
+            ORDER BY n.nspname, c.relname, r.rulename;";
+
+        await using var cmd = new NpgsqlCommand(sql, conn);
+        await using var r = await cmd.ExecuteReaderAsync(ct);
+        while (await r.ReadAsync(ct))
+        {
+            var schema = r.GetString(0);
+            var on = $"{schema}.{r.GetString(1)}";
+            var name = r.GetString(2);
+            AddRaw(model, ObjectKind.Rule, schema, name, $"rule:{name} on {on}", r.GetString(3), on);
+        }
+    }
+
+    private async Task ReadPoliciesAsync(NpgsqlConnection conn, DatabaseModel model, CancellationToken ct)
+    {
+        const string sql = @"
+            SELECT n.nspname, c.relname, pol.polname, pol.polcmd, pol.polpermissive,
+                   pg_get_expr(pol.polqual, pol.polrelid) AS using_expr,
+                   pg_get_expr(pol.polwithcheck, pol.polrelid) AS check_expr
+            FROM pg_policy pol
+            JOIN pg_class c ON c.oid = pol.polrelid
+            JOIN pg_namespace n ON n.oid = c.relnamespace
+            WHERE n.nspname NOT IN ('pg_catalog','information_schema') AND n.nspname NOT LIKE 'pg_%'
+            ORDER BY n.nspname, c.relname, pol.polname;";
+
+        await using var cmd = new NpgsqlCommand(sql, conn);
+        await using var r = await cmd.ExecuteReaderAsync(ct);
+        while (await r.ReadAsync(ct))
+        {
+            var schema = r.GetString(0);
+            var on = $"{schema}.{r.GetString(1)}";
+            var name = r.GetString(2);
+            var cmdLetter = ReadChar(r, 3, '*');
+            var permissive = !r.IsDBNull(4) && r.GetBoolean(4);
+            var usingExpr = r.IsDBNull(5) ? null : r.GetString(5);
+            var checkExpr = r.IsDBNull(6) ? null : r.GetString(6);
+
+            var forCmd = cmdLetter switch { 'r' => "SELECT", 'a' => "INSERT", 'w' => "UPDATE", 'd' => "DELETE", _ => "ALL" };
+            var body = $"CREATE POLICY {name} ON {on} AS {(permissive ? "PERMISSIVE" : "RESTRICTIVE")} FOR {forCmd}";
+            if (!string.IsNullOrWhiteSpace(usingExpr)) body += $" USING ({usingExpr})";
+            if (!string.IsNullOrWhiteSpace(checkExpr)) body += $" WITH CHECK ({checkExpr})";
+            // Roles (TO ...) are omitted from this reconstruction, so don't body-compare.
+            AddRaw(model, ObjectKind.Policy, schema, name, $"policy:{name} on {on}", body + ";", on, bodyComparable: false);
+        }
+    }
+
+    private async Task ReadEventTriggersAsync(NpgsqlConnection conn, DatabaseModel model, CancellationToken ct)
+    {
+        const string sql = @"
+            SELECT e.evtname, e.evtevent, np.nspname, p.proname
+            FROM pg_event_trigger e
+            JOIN pg_proc p ON p.oid = e.evtfoid
+            JOIN pg_namespace np ON np.oid = p.pronamespace
+            ORDER BY e.evtname;";
+
+        await using var cmd = new NpgsqlCommand(sql, conn);
+        await using var r = await cmd.ExecuteReaderAsync(ct);
+        while (await r.ReadAsync(ct))
+        {
+            var name = r.GetString(0);
+            var ev = r.GetString(1);
+            var fn = $"{r.GetString(2)}.{r.GetString(3)}";
+            var body = $"CREATE EVENT TRIGGER {name} ON {ev} EXECUTE FUNCTION {fn}();";
+            AddRaw(model, ObjectKind.EventTrigger, "", name, $"eventtrigger:{name}", body, bodyComparable: false);
+        }
+    }
+
+    // Existence-only introspection for kinds without a clean reconstruction: record the identity
+    // (so live compare/extract know they exist) with no body, so they are never spuriously
+    // recreated or body-diffed. Faithful bodies for these are tracked in BUGS.md.
+    private async Task ReadExistenceObjectsAsync(NpgsqlConnection conn, DatabaseModel model, CancellationToken ct)
+    {
+        await SchemaQualified(conn, model, ObjectKind.Collation, "collation",
+            "SELECT n.nspname, c.collname FROM pg_collation c JOIN pg_namespace n ON n.oid=c.collnamespace", ct);
+        await SchemaQualified(conn, model, ObjectKind.Conversion, "conversion",
+            "SELECT n.nspname, c.conname FROM pg_conversion c JOIN pg_namespace n ON n.oid=c.connamespace", ct);
+        await SchemaQualified(conn, model, ObjectKind.Statistics, "statistics",
+            "SELECT n.nspname, s.stxname FROM pg_statistic_ext s JOIN pg_namespace n ON n.oid=s.stxnamespace", ct);
+        await SchemaQualified(conn, model, ObjectKind.ForeignTable, "foreigntable",
+            "SELECT n.nspname, c.relname FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE c.relkind='f'", ct);
+        await SchemaQualified(conn, model, ObjectKind.TextSearchConfiguration, "textsearchconfiguration",
+            "SELECT n.nspname, t.cfgname FROM pg_ts_config t JOIN pg_namespace n ON n.oid=t.cfgnamespace", ct);
+        await SchemaQualified(conn, model, ObjectKind.TextSearchDictionary, "textsearchdictionary",
+            "SELECT n.nspname, d.dictname FROM pg_ts_dict d JOIN pg_namespace n ON n.oid=d.dictnamespace", ct);
+
+        await GlobalName(conn, model, ObjectKind.ForeignDataWrapper, "foreigndatawrapper",
+            "SELECT fdwname FROM pg_foreign_data_wrapper", ct);
+        await GlobalName(conn, model, ObjectKind.Server, "server",
+            "SELECT srvname FROM pg_foreign_server", ct);
+    }
+
+    private async Task SchemaQualified(NpgsqlConnection conn, DatabaseModel model, ObjectKind kind, string tag, string baseSql, CancellationToken ct)
+    {
+        var sql = baseSql + (baseSql.Contains("WHERE", StringComparison.OrdinalIgnoreCase) ? " AND" : " WHERE")
+                  + " n.nspname NOT IN ('pg_catalog','information_schema') AND n.nspname NOT LIKE 'pg_%'";
+        await using var cmd = new NpgsqlCommand(sql, conn);
+        await using var r = await cmd.ExecuteReaderAsync(ct);
+        while (await r.ReadAsync(ct))
+        {
+            var schema = r.GetString(0);
+            var name = r.GetString(1);
+            AddRaw(model, kind, schema, name, $"{tag}:{schema}.{name}", string.Empty, bodyComparable: false);
+        }
+    }
+
+    private async Task GlobalName(NpgsqlConnection conn, DatabaseModel model, ObjectKind kind, string tag, string sql, CancellationToken ct)
+    {
+        await using var cmd = new NpgsqlCommand(sql, conn);
+        await using var r = await cmd.ExecuteReaderAsync(ct);
+        while (await r.ReadAsync(ct))
+        {
+            var name = r.GetString(0);
+            AddRaw(model, kind, "", name, $"{tag}:{name}", string.Empty, bodyComparable: false);
         }
     }
 }

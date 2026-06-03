@@ -47,4 +47,5 @@ public sealed record RawObjectDefinition(
     string Name,
     string Identity,
     string Body,
-    string? OnObject = null);
+    string? OnObject = null,
+    bool BodyComparable = true);

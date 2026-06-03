@@ -116,6 +116,21 @@ public class RawObjectTests
     }
 
     [Fact]
+    public void Identity_only_target_prevents_create_and_recreate()
+    {
+        // Simulates an introspected existence-only record (no body): the policy already exists,
+        // so it must be neither created nor recreated.
+        var source = Parse("CREATE POLICY p ON app.t FOR SELECT USING (true);");
+        var target = new DatabaseModel();
+        target.Objects.Add(new RawObjectDefinition(
+            ObjectKind.Policy, "app", "p", "policy:p on app.t", Body: "", OnObject: "app.t", BodyComparable: false));
+
+        var changes = new SchemaComparer().Compare(source, target);
+        Assert.Empty(changes.OfType<CreateRawObjectChange>());
+        Assert.Empty(changes.OfType<RecreateRawObjectChange>());
+    }
+
+    [Fact]
     public void Extensions_precede_tables_and_comments_come_last()
     {
         var source = Parse("""

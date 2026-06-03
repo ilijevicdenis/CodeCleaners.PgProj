@@ -21,10 +21,26 @@ public static class SqlEmitter
     private static string ConstraintPrefix(string? name) =>
         string.IsNullOrEmpty(name) ? string.Empty : $"CONSTRAINT {Quote(name)} ";
 
+    private static string SerialType(string canonical) => canonical switch
+    {
+        "bigint" => "bigserial",
+        "smallint" => "smallserial",
+        _ => "serial",
+    };
+
     public static string Column(ColumnDefinition c)
     {
         var sb = new StringBuilder();
-        sb.Append(Quote(c.Name)).Append(' ').Append(c.DataType);
+        sb.Append(Quote(c.Name)).Append(' ');
+
+        // serial carries its own NOT NULL + owned sequence; emit the pseudo-type and stop.
+        if (c.IsSerial)
+        {
+            sb.Append(SerialType(c.DataType));
+            return sb.ToString();
+        }
+
+        sb.Append(c.DataType);
         if (!string.IsNullOrWhiteSpace(c.GeneratedExpression))
             sb.Append(" GENERATED ALWAYS AS ").Append(c.GeneratedExpression).Append(" STORED");
         else if (c.IsIdentity)

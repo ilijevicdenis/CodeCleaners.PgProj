@@ -228,12 +228,15 @@ public sealed class SchemaComparer
     {
         foreach (var src in source.Functions)
         {
-            // Match on schema.name rather than full signature: the project signature carries
-            // argument names while the catalog reports identity arguments (types only), so a
-            // signature match would never succeed against a live DB. (Overloads collapse here —
-            // tracked in BUGS.md.) CREATE OR REPLACE is idempotent, so re-emitting is safe.
-            var tgt = target.Functions.FirstOrDefault(f =>
-                DatabaseModel.NameEquals(f.Schema, src.Schema) && DatabaseModel.NameEquals(f.Name, src.Name));
+            // Match by schema.name (reliable for the common, non-overloaded case); when a name has
+            // multiple overloads, disambiguate by normalized argument types.
+            var candidates = target.Functions
+                .Where(f => DatabaseModel.NameEquals(f.Schema, src.Schema) && DatabaseModel.NameEquals(f.Name, src.Name))
+                .ToList();
+            var tgt = candidates.Count <= 1
+                ? candidates.FirstOrDefault()
+                : candidates.FirstOrDefault(c => NormalizeText(c.ArgTypes) == NormalizeText(src.ArgTypes));
+
             if (tgt is null || NormalizeText(src.Body) != NormalizeText(tgt.Body))
                 changes.Add(new CreateOrReplaceFunctionChange(src));
         }
@@ -248,7 +251,7 @@ public sealed class SchemaComparer
             {
                 changes.Add(new CreateRawObjectChange(src));
             }
-            else if (NormalizeText(src.Body) != NormalizeText(tgt.Body))
+            else if (src.BodyComparable && tgt.BodyComparable && NormalizeText(src.Body) != NormalizeText(tgt.Body))
             {
                 // A destructive recreate (type/domain/foreign table can cascade-drop columns) is
                 // only emitted when drops are allowed; in-place redefinitions always proceed.
@@ -270,7 +273,8 @@ public sealed class SchemaComparer
     private bool ColumnsEqual(ColumnDefinition a, ColumnDefinition b) =>
         string.Equals(a.DataType, b.DataType, StringComparison.OrdinalIgnoreCase)
         && a.IsNullable == b.IsNullable
-        && DefaultsEqual(a.Default, b.Default)
+        && a.IsSerial == b.IsSerial
+        && (a.IsSerial || DefaultsEqual(a.Default, b.Default)) // serial's nextval default is implicit
         && a.IsIdentity == b.IsIdentity
         && NormalizeText(a.GeneratedExpression ?? "") == NormalizeText(b.GeneratedExpression ?? "");
 

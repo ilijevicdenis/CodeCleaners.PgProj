@@ -206,8 +206,11 @@ public sealed class SqlParser
     private void ParseColumn(TokenReader r, TableDefinition table)
     {
         var colName = r.ParseIdentifier();
-        var dataType = ParseDataType(r);
-        var nullable = true;
+        var rawType = ParseRawDataType(r);
+        var lowerType = rawType.Trim().ToLowerInvariant();
+        var isSerial = lowerType is "serial" or "serial4" or "bigserial" or "serial8" or "smallserial" or "serial2";
+        var dataType = TypeNormalizer.Normalize(rawType);
+        var nullable = !isSerial; // serial implies NOT NULL
         string? def = null;
         var identity = false;
         string? identityKind = null;
@@ -252,10 +255,10 @@ public sealed class SqlParser
             r.Next();
         }
 
-        table.Columns.Add(new ColumnDefinition(colName, dataType, nullable, def, identity, identityKind, generated));
+        table.Columns.Add(new ColumnDefinition(colName, dataType, nullable, def, identity, identityKind, generated, isSerial));
     }
 
-    private static string ParseDataType(TokenReader r)
+    private static string ParseRawDataType(TokenReader r)
     {
         var collected = new List<Token>();
         var depth = 0;
@@ -278,7 +281,7 @@ public sealed class SqlParser
         }
         if (collected.Count == 0)
             throw new ParseException("Expected a column data type.");
-        return TypeNormalizer.Normalize(Token.Render(collected));
+        return Token.Render(collected); // raw; caller normalizes (and inspects for serial)
     }
 
     private static string ParseDefaultExpression(TokenReader r)
@@ -414,10 +417,62 @@ public sealed class SqlParser
     {
         var (schema, name) = ParseQualifiedName(r);
         var argList = r.IsSymbol('(') ? CaptureBalancedParens(r) : "()";
-        var signature = $"{schema}.{name}{argList}";
+        var argTypes = ExtractArgTypes(argList);
+        var signature = $"{schema}.{name}({argTypes})";
         var body = Token.Render(rawStatement);
-        model.Functions.Add(new FunctionDefinition(schema, name, signature, body));
+        model.Functions.Add(new FunctionDefinition(schema, name, signature, body, argTypes));
         EnsureSchema(model, schema);
+    }
+
+    /// <summary>
+    /// Reduces a function arg list "(p_id integer, p_name text DEFAULT 'x', VARIADIC opts text[])"
+    /// to its identity argument types "integer, text, text[]" — matching what
+    /// pg_get_function_identity_arguments() reports, so overloads can be told apart.
+    /// </summary>
+    private static string ExtractArgTypes(string argListWithParens)
+    {
+        var inner = argListWithParens.Trim();
+        if (inner.StartsWith("(")) inner = inner[1..];
+        if (inner.EndsWith(")")) inner = inner[..^1];
+        inner = inner.Trim();
+        if (inner.Length == 0) return string.Empty;
+
+        var types = new List<string>();
+        foreach (var arg in SplitTopLevel(inner))
+        {
+            var a = arg.Trim();
+            // strip a leading argument mode
+            foreach (var mode in new[] { "INOUT ", "IN ", "OUT ", "VARIADIC " })
+                if (a.StartsWith(mode, StringComparison.OrdinalIgnoreCase)) { a = a[mode.Length..].Trim(); break; }
+            // drop a DEFAULT / = expression
+            var def = a.IndexOf(" DEFAULT ", StringComparison.OrdinalIgnoreCase);
+            if (def >= 0) a = a[..def].Trim();
+            var eq = a.IndexOf('=');
+            if (eq >= 0) a = a[..eq].Trim();
+            // an optional argument name precedes the type; if there are >=2 whitespace-separated
+            // leading words and the first isn't itself a known type word, drop it as the name.
+            var sp = a.IndexOf(' ');
+            if (sp > 0)
+            {
+                var firstWord = a[..sp];
+                if (!firstWord.Contains('.') && !firstWord.Contains('(')) a = a[(sp + 1)..].Trim();
+            }
+            types.Add(TypeNormalizer.Normalize(a));
+        }
+        return string.Join(", ", types);
+    }
+
+    private static IEnumerable<string> SplitTopLevel(string s)
+    {
+        var depth = 0; var start = 0;
+        for (var i = 0; i < s.Length; i++)
+        {
+            var c = s[i];
+            if (c is '(' or '[') depth++;
+            else if (c is ')' or ']') depth--;
+            else if (c == ',' && depth == 0) { yield return s[start..i]; start = i + 1; }
+        }
+        if (start < s.Length) yield return s[start..];
     }
 
     // ---- generic raw objects (extension/type/domain/trigger/policy/…) --------------------

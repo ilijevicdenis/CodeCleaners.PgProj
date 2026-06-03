@@ -17,7 +17,8 @@ public sealed record ColumnDefinition(
     string? Default = null,
     bool IsIdentity = false,
     string? IdentityKind = null,        // "ALWAYS" | "BY DEFAULT" when IsIdentity
-    string? GeneratedExpression = null); // the (expr) for GENERATED ALWAYS AS (expr) STORED
+    string? GeneratedExpression = null,  // the (expr) for GENERATED ALWAYS AS (expr) STORED
+    bool IsSerial = false);              // serial/bigserial/smallserial (auto-sequence pseudo-type)
 
 public sealed record PrimaryKeyDefinition(string? Name, IReadOnlyList<string> Columns);
 
@@ -80,4 +81,4 @@ public sealed record SequenceDefinition(
 /// types (the identity Postgres uses for overload resolution); <see cref="Body"/> is the full
 /// CREATE statement, replayed verbatim with CREATE OR REPLACE on deploy.
 /// </summary>
-public sealed record FunctionDefinition(string Schema, string Name, string Signature, string Body);
+public sealed record FunctionDefinition(string Schema, string Name, string Signature, string Body, string ArgTypes = "");
