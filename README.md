@@ -33,7 +33,10 @@ source, let the tool compute the migration.
 | Full DDL language surface (types, domains, triggers, policies, …) via raw-object mechanism | ✅ |
 | serial, generated columns, CHECK/EXCLUDE, identity ALWAYS/BY DEFAULT, sequence options | ✅ |
 | **MSBuild SDK** — `dotnet build SampleDb.pgproj` builds the model (`src/PgProj.Sdk`) | ✅ |
-| 65 unit tests (parser / comparer / generator / normalizer / loader / constraints / raw objects) | ✅ |
+| **AST + tree-walker** (`PgProj.Core.Ast`) — real node tree, visitor, expression Pratt parser | ✅ |
+| **Static analysis** (`pgproj analyze`) — function safety rules PG001–PG005 | ✅ |
+| **Parallel read** (`BuildAsync`) + **phased parallel deploy** (`publish --parallel`) | ✅ |
+| 77 unit tests (parser / comparer / generator / loader / constraints / raw / AST / analysis / concurrency) | ✅ |
 
 See [`BUGS.md`](./BUGS.md) for the live defect/limitation tracker and the roadmap beyond v0.1
 (triggers, types/domains, materialized-view diffing, a Visual Studio project-system/VSIX
@@ -75,6 +78,12 @@ dotnet run --project src/PgProj.Cli -- publish sample/SampleDb/SampleDb.pgproj -
 
 # Reverse-engineer a live database into a new project
 dotnet run --project src/PgProj.Cli -- extract --connection "..." -o ./Extracted
+
+# Static safety analysis over the AST (no database required)
+dotnet run --project src/PgProj.Cli -- analyze sample/SampleDb/SampleDb.pgproj
+
+# Publish with intra-phase parallelism (phase-level atomicity)
+dotnet run --project src/PgProj.Cli -- publish sample/SampleDb/SampleDb.pgproj --connection "..." --parallel
 ```
 
 The connection string can also be supplied via the `PGPROJ_CONNECTION` environment variable.
