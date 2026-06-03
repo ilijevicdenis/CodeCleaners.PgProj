@@ -49,6 +49,7 @@ public sealed partial class PgParser
                 var stmt = ParseStatement(c);
                 if (!c.AtEnd)
                     throw new ParseException($"unexpected '{c.Current!.Value}' after statement", c.Here);
+                stmt.SourceText = Token.Render(segment);
                 result.Statements.Add(stmt);
             }
             catch (ParseException pe)
@@ -112,6 +113,11 @@ public sealed partial class PgParser
         c.MatchWord("RECURSIVE");                       // CREATE [OR REPLACE] RECURSIVE VIEW
         if (c.MatchWord("TABLE")) return ParseCreateTable(c, persistence);
         if (c.MatchWord("SCHEMA")) return ParseCreateSchema(c);
+        if (c.MatchWords("MATERIALIZED", "VIEW")) return ParseCreateView(c, materialized: true);
+        if (c.MatchWord("VIEW")) return ParseCreateView(c, materialized: false);
+        if (c.MatchWord("SEQUENCE")) return ParseCreateSequence(c);
+        if (c.AtWord("UNIQUE") || c.AtWord("INDEX")) return ParseCreateIndex(c);
+        if (c.AtAnyWord("FUNCTION", "PROCEDURE")) return ParseCreateFunction(c);
         if (c.AtAnyWord("ROLE", "USER", "GROUP")) { var k = c.Advance().Value.ToUpperInvariant(); c.ExpectIdentifier(); ConsumeRest(c); return new CommandStatement { Kind = "CREATE " + k }; }
         if (c.MatchWord("PUBLICATION")) { c.ExpectIdentifier(); ConsumeRest(c); return new CommandStatement { Kind = "CREATE PUBLICATION" }; }
         if (c.MatchWord("SUBSCRIPTION"))

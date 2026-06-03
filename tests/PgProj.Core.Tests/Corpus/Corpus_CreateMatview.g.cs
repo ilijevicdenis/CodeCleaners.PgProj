@@ -249,13 +249,13 @@ DROP MATERIALIZED VIEW mvwa_mv96_renamed", "ok");
     [Fact]
     public void mvwa0100() => CorpusAssert.Parses(@"CREATE MATERIALIZED VIEW mvwa_mv100 AS SELECT id FROM s.t -- line comment
 ", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void mvwa0101() => CorpusAssert.Parses(@"CREATE MATERIALIZED VIEW AS SELECT id FROM s.t", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void mvwa0102() => CorpusAssert.Parses(@"CREATE MATERIALIZED VIEW mvwa_e02 SELECT id FROM s.t", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void mvwa0103() => CorpusAssert.Parses(@"CREATE MATERIALIZED VIEW mvwa_e03 AS", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void mvwa0104() => CorpusAssert.Parses(@"CREATE MATERIALIZED VIEW mvwa_e04 AS WITH DATA SELECT id FROM s.t", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void mvwa0105() => CorpusAssert.Parses(@"CREATE MATERIALIZED VIEW mvwa_e05 AS SELECT id FROM s.t WITH", "error");

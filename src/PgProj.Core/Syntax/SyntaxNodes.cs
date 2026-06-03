@@ -26,18 +26,59 @@ public sealed class ParseResult
     public bool FullyRecognized { get; set; } = true;
 }
 
-public abstract class SqlStatement { public int Position { get; init; } }
+public abstract class SqlStatement { public int Position { get; init; } public string? SourceText { get; set; } }
 
 /// <summary>A statement kind PgParser does not implement yet (caller falls back to legacy).</summary>
 public sealed class UnsupportedStatement : SqlStatement { public string LeadingKeyword { get; init; } = ""; }
 
-/// <summary>A CREATE of a kind not finely modelled (VIEW/SEQUENCE/FUNCTION/TYPE/INDEX/TRIGGER/…);
-/// the object's kind + schema-qualified name are captured so the catalog can record it.</summary>
+/// <summary>A CREATE of a kind not finely modelled (TYPE/DOMAIN/TRIGGER/RULE/POLICY/EXTENSION/…);
+/// kind + schema-qualified name (+ ON-table for trigger/rule/policy) captured for catalog + model.</summary>
 public sealed class RawCreateStatement : SqlStatement
 {
     public string ObjectKind { get; init; } = "";
     public string? Schema { get; set; }
     public string? Name { get; set; }
+    public string? OnObject { get; set; }   // "schema.table" for trigger/rule/policy
+}
+
+public sealed class CreateViewStatement : SqlStatement
+{
+    public string? Schema { get; set; }
+    public string Name { get; set; } = "";
+    public bool Materialized { get; init; }
+    public string BodyText { get; set; } = "";
+}
+
+public sealed class CreateSequenceStatement : SqlStatement
+{
+    public string? Schema { get; set; }
+    public string Name { get; set; } = "";
+    public string? DataType { get; set; }
+    public long? Increment { get; set; }
+    public long? MinValue { get; set; }
+    public long? MaxValue { get; set; }
+    public long? Start { get; set; }
+    public long? Cache { get; set; }
+    public bool Cycle { get; set; }
+}
+
+public sealed class CreateIndexStatement : SqlStatement
+{
+    public string? Name { get; set; }
+    public string? Schema { get; set; }
+    public string Table { get; set; } = "";
+    public bool Unique { get; init; }
+    public string? Method { get; set; }
+    public List<string> Columns { get; } = new();
+    public string? Where { get; set; }
+}
+
+public sealed class CreateFunctionStatement : SqlStatement
+{
+    public string? Schema { get; set; }
+    public string Name { get; set; } = "";
+    public string ArgTypes { get; set; } = "";
+    public bool IsProcedure { get; init; }
 }
 
 // ---- CREATE TABLE -----------------------------------------------------------

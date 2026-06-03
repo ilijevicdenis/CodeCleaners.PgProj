@@ -250,11 +250,11 @@ WHERE qty > 0", "ok");
     public void vwa0119() => CorpusAssert.Parses(@"CREATE RECURSIVE VIEW vwa_recursive_ok (n) AS VALUES(1) UNION ALL SELECT n+1 FROM vwa_recursive_ok WHERE n < 3", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void vwa0120() => CorpusAssert.Parses(@"CREATE VIEW vwa_collist_mismatch (a, b, c) AS SELECT id, name FROM s.t", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vwa0121() => CorpusAssert.Parses(@"CREATE VIEW AS SELECT 1", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vwa0122() => CorpusAssert.Parses(@"CREATE VIEW vwa_noas SELECT id FROM s.t", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vwa0123() => CorpusAssert.Parses(@"CREATE VIEW vwa_empty AS", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void vwa0124() => CorpusAssert.Parses(@"CREATE VIEW vwa_bad_option WITH (bad_option = true) AS SELECT 1", "error");
@@ -278,7 +278,7 @@ WHERE qty > 0", "ok");
     public void vwa0133() => CorpusAssert.Parses(@"CREATE VIEW vwa_double_check AS SELECT id FROM s.t WITH LOCAL CHECK OPTION WITH CASCADED CHECK OPTION", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void vwa0134() => CorpusAssert.Parses(@"CREATE VIEW vwa_check_union AS SELECT id FROM s.t UNION SELECT id FROM s.t2 WITH CHECK OPTION", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vwa0135() => CorpusAssert.Parses(@"CREATE VIEW vwa_or_as SELECT 1", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void vwa0136() => CorpusAssert.Parses(@"CREATE OR VIEW vwa_bad AS SELECT 1", "error");
@@ -442,11 +442,11 @@ ALTER VIEW s.v2 ALTER name DROP DEFAULT", "ok");
     [Fact]
     public void vwb0040() => CorpusAssert.Parses(@"CREATE VIEW s.v2 AS SELECT id, name FROM s.t;
 ALTER VIEW IF EXISTS s.v2 SET (security_invoker = true)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vwb0041() => CorpusAssert.Parses(@"CREATE VIEW SELECT id FROM s.t", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vwb0042() => CorpusAssert.Parses(@"CREATE VIEW s.v2 SELECT id FROM s.t", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vwb0043() => CorpusAssert.Parses(@"CREATE VIEW s.v2 AS", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void vwb0044() => CorpusAssert.Parses(@"CREATE VIEW s.v2 WITH (bad_option = true) AS SELECT id FROM s.t", "error");
@@ -458,7 +458,7 @@ ALTER VIEW IF EXISTS s.v2 SET (security_invoker = true)", "ok");
     public void vwb0047() => CorpusAssert.Parses(@"CREATE VIEW s.v2 (a, b) AS SELECT id FROM s.t", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void vwb0048() => CorpusAssert.Parses(@"CREATE TEMP VIEW s.v2 AS SELECT id FROM s.t", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vwb0049() => CorpusAssert.Parses(@"CREATE VIEW AS SELECT 1", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void vwb0050() => CorpusAssert.Parses(@"CREATE VIEW s.v2 AS SELECT id FROM s.t WITH CASCADED LOCAL CHECK OPTION", "error");
