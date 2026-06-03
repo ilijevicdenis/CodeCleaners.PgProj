@@ -72,6 +72,7 @@ public sealed class LiveDatabaseReader
             Read(c => ReadServersAsync(c, ct)),
             Read(c => ReadStatisticsAsync(c, ct)),
             Read(c => ReadCastsAsync(c, ct)),
+            Read(c => ReadForeignTablesAsync(c, ct)),
             Read(c => ReadExistenceObjectsAsync(c, ct)),
         };
 
@@ -827,8 +828,6 @@ public sealed class LiveDatabaseReader
         // Expression statistics (stxexprs set) we don't reconstruct yet → keep existence-only.
         await Schema(ObjectKind.Statistics, "statistics",
             "SELECT n.nspname, s.stxname FROM pg_statistic_ext s JOIN pg_namespace n ON n.oid=s.stxnamespace WHERE s.stxexprs IS NOT NULL");
-        await Schema(ObjectKind.ForeignTable, "foreigntable",
-            "SELECT n.nspname, c.relname FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE c.relkind='f'");
         await Schema(ObjectKind.TextSearchConfiguration, "textsearchconfiguration",
             "SELECT n.nspname, t.cfgname FROM pg_ts_config t JOIN pg_namespace n ON n.oid=t.cfgnamespace");
         await Schema(ObjectKind.TextSearchDictionary, "textsearchdictionary",
@@ -990,6 +989,39 @@ public sealed class LiveDatabaseReader
             var name = $"({src} AS {tgt})";   // also the DROP CAST target shape
             var body = $"CREATE CAST {name} {with}{context};";
             list.Add(MakeRaw(ObjectKind.Cast, "", name, $"cast:{src}->{tgt}", body));
+        }
+        return list;
+    }
+
+    private async Task<List<RawObjectDefinition>> ReadForeignTablesAsync(NpgsqlConnection conn, CancellationToken ct)
+    {
+        const string sql = @"
+            SELECT n.nspname, c.relname, s.srvname, ft.ftoptions,
+                   (SELECT string_agg(
+                              a.attname || ' ' || format_type(a.atttypid, a.atttypmod)
+                              || CASE WHEN a.attnotnull THEN ' NOT NULL' ELSE '' END,
+                              ', ' ORDER BY a.attnum)
+                      FROM pg_attribute a
+                      WHERE a.attrelid = c.oid AND a.attnum > 0 AND NOT a.attisdropped) AS cols
+            FROM pg_foreign_table ft
+            JOIN pg_class c ON c.oid = ft.ftrelid
+            JOIN pg_namespace n ON n.oid = c.relnamespace
+            JOIN pg_foreign_server s ON s.oid = ft.ftserver
+            WHERE n.nspname NOT IN ('pg_catalog','information_schema') AND n.nspname NOT LIKE 'pg_%'
+            ORDER BY n.nspname, c.relname;";
+
+        var list = new List<RawObjectDefinition>();
+        await using var cmd = new NpgsqlCommand(sql, conn);
+        await using var r = await cmd.ExecuteReaderAsync(ct);
+        while (await r.ReadAsync(ct))
+        {
+            var schema = r.GetString(0);
+            var name = r.GetString(1);
+            var server = r.GetString(2);
+            var cols = r.IsDBNull(4) ? "" : r.GetString(4);
+            var body = $"CREATE FOREIGN TABLE {schema}.{name} ({cols}) SERVER {server}"
+                       + OptionsClause(r.IsDBNull(3) ? null : r.GetFieldValue<string[]>(3)) + ";";
+            list.Add(MakeRaw(ObjectKind.ForeignTable, schema, name, $"foreigntable:{schema}.{name}", body));
         }
         return list;
     }
