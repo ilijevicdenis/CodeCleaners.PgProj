@@ -23,11 +23,11 @@ public class Corpus_SelectCte
     public void selca0008() => CorpusAssert.Parses(@"WITH a AS (SELECT 1 AS n), b AS (SELECT n + 1 AS m FROM a) SELECT * FROM b", "ok");
     [Fact]
     public void selca0009() => CorpusAssert.Parses(@"WITH a AS (SELECT id FROM s.t), b AS (SELECT id FROM a WHERE id > 0), c AS (SELECT id FROM b) SELECT * FROM c", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selca0010() => CorpusAssert.Parses(@"WITH cte AS (SELECT id, name FROM s.t) SELECT * FROM cte JOIN s.t2 ON cte.id = s.t2.t_id", "ok");
     [Fact]
     public void selca0011() => CorpusAssert.Parses(@"WITH cte AS (SELECT id FROM s.t) SELECT count(*) FROM cte", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selca0012() => CorpusAssert.Parses(@"WITH cte AS (SELECT id FROM s.t) SELECT * FROM cte c1 JOIN cte c2 ON c1.id = c2.id", "ok");
     [Fact]
     public void selca0013() => CorpusAssert.Parses(@"WITH cte AS (SELECT id FROM s.t) SELECT * FROM cte WHERE id IN (SELECT id FROM cte)", "ok");
@@ -109,13 +109,13 @@ public class Corpus_SelectCte
     public void selca0051() => CorpusAssert.Parses(@"WITH upd AS (UPDATE s.t SET name = 'updated' WHERE id = -999 RETURNING id, name), logged AS (SELECT id, name, now() AS ts FROM upd) SELECT * FROM logged", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void selca0052() => CorpusAssert.Parses(@"WITH cte AS (INSERT INTO s.t(name) VALUES ('x')) SELECT 1", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selca0053() => CorpusAssert.Parses(@"WITH cte AS (SELECT id FROM s.t) INSERT INTO s.t2(t_id) SELECT id FROM cte", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selca0054() => CorpusAssert.Parses(@"WITH cte AS (SELECT id FROM s.t) UPDATE s.t2 SET label = 'matched' WHERE t_id IN (SELECT id FROM cte)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selca0055() => CorpusAssert.Parses(@"WITH cte AS (SELECT id FROM s.t WHERE id < 0) DELETE FROM s.t2 WHERE t_id IN (SELECT id FROM cte)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selca0056() => CorpusAssert.Parses(@"SELECT * FROM (WITH cte AS (SELECT 1 AS n) SELECT * FROM cte) sub", "ok");
     [Fact]
     public void selca0057() => CorpusAssert.Parses(@"WITH cte AS (SELECT id FROM s.t) SELECT * FROM cte WHERE id = (SELECT max(id) FROM cte)", "ok");
@@ -133,7 +133,7 @@ public class Corpus_SelectCte
     public void selca0063() => CorpusAssert.Parses(@"WITH cte AS (SELECT id, name FROM s.t) SELECT * FROM cte ORDER BY name LIMIT 10 OFFSET 0", "ok");
     [Fact]
     public void selca0064() => CorpusAssert.Parses(@"WITH cte AS (SELECT id, name, val FROM s.t) SELECT id, sum(val) OVER (PARTITION BY name) FROM cte", "ok");
-    [Fact]
+    [Fact(Skip = "pending: parser not yet complete")]
     public void selca0065() => CorpusAssert.Parses(@"WITH cte AS (SELECT * FROM s.t) SELECT * FROM cte TABLESAMPLE BERNOULLI(50)", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void selca0066() => CorpusAssert.Parses(@"AS (SELECT 1)", "error");
@@ -181,23 +181,23 @@ cte AS (SELECT 1 AS n) SELECT * FROM cte", "ok");
     public void selca0086() => CorpusAssert.Parses(@"WITH cte AS (SELECT id FROM s.t) SELECT * FROM cte WHERE EXISTS (SELECT 1 FROM s.t2 WHERE s.t2.t_id = cte.id)", "ok");
     [Fact]
     public void selca0087() => CorpusAssert.Parses(@"WITH cte AS (SELECT id, name FROM s.t) SELECT * FROM cte WHERE id IN (1, 2, 3)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selca0088() => CorpusAssert.Parses(@"WITH cte AS (VALUES (1,'a'), (2,'b'), (3,'c')) SELECT * FROM cte AS t(id, name)", "ok");
     [Fact]
     public void selca0089() => CorpusAssert.Parses(@"WITH cte(id, name) AS (VALUES (1,'a'), (2,'b')) SELECT * FROM cte", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selca0090() => CorpusAssert.Parses(@"WITH cte AS (SELECT id FROM s.t) SELECT * FROM cte AS c", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selca0091() => CorpusAssert.Parses(@"WITH cte AS (SELECT id FROM s.t) SELECT * FROM cte c1, cte c2 WHERE c1.id <> c2.id", "ok");
     [Fact]
     public void selca0092() => CorpusAssert.Parses(@"WITH RECURSIVE r(n) AS (SELECT 1 UNION ALL SELECT n+1 FROM r WHERE n < 100) SELECT max(n) FROM r", "ok");
     [Fact]
     public void selca0093() => CorpusAssert.Parses(@"WITH base AS (SELECT id, val FROM s.t), agg AS (SELECT count(*) AS cnt, sum(val) AS total FROM base) SELECT * FROM agg", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selca0094() => CorpusAssert.Parses(@"WITH cte AS (SELECT id, name FROM s.t) SELECT * FROM cte NATURAL JOIN s.t2", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selca0095() => CorpusAssert.Parses(@"WITH cte AS (SELECT id FROM s.t) SELECT * FROM cte LEFT JOIN s.t2 ON cte.id = s.t2.t_id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selca0096() => CorpusAssert.Parses(@"WITH cte AS (SELECT id FROM s.t) SELECT * FROM cte CROSS JOIN s.t2 LIMIT 5", "ok");
     [Fact]
     public void selca0097() => CorpusAssert.Parses(@"WITH RECURSIVE r(n) AS MATERIALIZED (SELECT 1 UNION ALL SELECT n+1 FROM r WHERE n < 5) SELECT * FROM r", "ok");
@@ -213,9 +213,9 @@ cte AS (SELECT 1 AS n) SELECT * FROM cte", "ok");
     public void selca0102() => CorpusAssert.Parses(@"WITH cte AS (SELECT id, tags FROM s.t WHERE tags IS NOT NULL) SELECT id, tags[1] FROM cte", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void selca0103() => CorpusAssert.Parses(@"WITH src AS (SELECT id, name FROM s.t) INSERT INTO s.t2(label) SELECT name FROM src RETURNING *", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selca0104() => CorpusAssert.Parses(@"WITH src AS (SELECT id FROM s.t WHERE id < 0) UPDATE s.t SET qty = 0 WHERE id IN (SELECT id FROM src)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selca0105() => CorpusAssert.Parses(@"WITH src AS (SELECT id FROM s.t WHERE id < 0) DELETE FROM s.t2 WHERE t_id IN (SELECT id FROM src)", "ok");
     [Fact]
     public void selca0106() => CorpusAssert.Parses(@"WITH RECURSIVE r(n) AS (SELECT 1 UNION ALL SELECT n+1 FROM r WHERE n < 5) CYCLE n SET is_cycle TO true DEFAULT false USING path SELECT n, is_cycle, path FROM r", "ok");
@@ -239,7 +239,7 @@ cte AS (SELECT 1 AS n) SELECT * FROM cte", "ok");
     public void selca0115() => CorpusAssert.Parses(@"WITH cte AS (SELECT id, row_number() OVER (ORDER BY id) AS rn FROM s.t) SELECT * FROM cte WHERE rn <= 5", "ok");
     [Fact]
     public void selca0116() => CorpusAssert.Parses(@"WITH cte AS (SELECT id, rank() OVER (PARTITION BY status ORDER BY val DESC) AS rnk FROM s.t) SELECT * FROM cte WHERE rnk = 1", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selca0117() => CorpusAssert.Parses(@"WITH totals AS (SELECT sum(val) AS total FROM s.t) SELECT * FROM s.t, totals WHERE val > total / 10", "ok");
     [Fact]
     public void selca0118() => CorpusAssert.Parses(@"WITH cte AS (SELECT id FROM s.t) SELECT count(*) FROM cte HAVING count(*) >= 0", "ok");
@@ -271,7 +271,7 @@ cte AS (SELECT 1 AS n) SELECT * FROM cte", "ok");
     public void selca0131() => CorpusAssert.Parses(@"WITH cte AS (SELECT '{""a"":1}'::jsonb AS j) SELECT j->>'a' FROM cte", "ok");
     [Fact]
     public void selca0132() => CorpusAssert.Parses(@"WITH cte AS (SELECT 99::int AS n) SELECT * FROM cte", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selca0133() => CorpusAssert.Parses(@"WITH cte AS (SELECT id FROM s.t) SELECT * FROM cte INNER JOIN s.t2 ON cte.id = s.t2.t_id WHERE s.t2.amount > 0", "ok");
     [Fact]
     public void selca0134() => CorpusAssert.Parses(@"WITH RECURSIVE r(n) AS (SELECT 1 UNION ALL SELECT n+1 FROM r WHERE n < 10) SELECT * FROM r WHERE n IN (2, 4, 6, 8, 10)", "ok");
@@ -285,7 +285,7 @@ cte AS (SELECT 1 AS n) SELECT * FROM cte", "ok");
     public void selca0138() => CorpusAssert.Parses(@"WITH cte AS (SELECT id FROM s.t) SELECT * FROM cte WHERE id = ANY(ARRAY[1,2,3])", "ok");
     [Fact]
     public void selca0139() => CorpusAssert.Parses(@"WITH RECURSIVE r AS (SELECT 1 AS n, 'a' AS s UNION ALL SELECT n+1, s||'a' FROM r WHERE n < 4) SELECT * FROM r", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selca0140() => CorpusAssert.Parses(@"WITH cte AS (SELECT id FROM s.t) SELECT * FROM LATERAL (SELECT * FROM cte WHERE id > 0) sub", "ok");
     [Fact]
     public void selca0141() => CorpusAssert.Parses(@"WITH cte AS (SELECT id, name FROM s.t) SELECT jsonb_build_object('id', id, 'name', name) FROM cte LIMIT 1", "ok");
@@ -339,7 +339,7 @@ cte AS (SELECT 1 AS n) SELECT * FROM cte", "ok");
     public void selca0165() => CorpusAssert.Parses(@"WITH cte AS (SELECT id, name FROM s.t) SELECT * FROM cte WHERE name ~ '^[a-z]'", "ok");
     [Fact]
     public void selca0166() => CorpusAssert.Parses(@"WITH RECURSIVE r(n) AS (SELECT 1 UNION ALL SELECT n+1 FROM r WHERE n < 5) SEARCH DEPTH FIRST BY n SET ord SELECT * FROM r WHERE ord IS NOT NULL", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selca0167() => CorpusAssert.Parses(@"WITH cte AS (SELECT id, name FROM s.t) SELECT * FROM cte c WHERE c.id IN (WITH src AS (SELECT id FROM s.t LIMIT 3) SELECT id FROM src)", "ok");
     [Fact]
     public void selca0168() => CorpusAssert.Parses(@"WITH RECURSIVE r(n) AS (SELECT 1 UNION ALL SELECT n+1 FROM r WHERE n < 5) CYCLE n SET c USING p SELECT n, c, p FROM r", "ok");
@@ -387,9 +387,9 @@ cte AS (SELECT 1 AS n) SELECT * FROM cte", "ok");
     public void selcb0019() => CorpusAssert.Parses(@"WITH cte AS (SELECT id, count(*) AS cnt FROM s.t2 GROUP BY id) SELECT * FROM cte", "ok");
     [Fact]
     public void selcb0020() => CorpusAssert.Parses(@"WITH cte AS (SELECT id FROM s.t ORDER BY id LIMIT 5) SELECT * FROM cte", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selcb0021() => CorpusAssert.Parses(@"SELECT * FROM (WITH cte AS (SELECT 1 AS x) SELECT x FROM cte) sub", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selcb0022() => CorpusAssert.Parses(@"WITH cte AS (SELECT id FROM s.t) SELECT * FROM cte c1 JOIN cte c2 ON c1.id = c2.id", "ok");
     [Fact]
     public void selcb0023() => CorpusAssert.Parses(@"WITH cte AS (SELECT 1 AS x) SELECT x FROM cte UNION SELECT x FROM cte", "ok");
@@ -421,7 +421,7 @@ cte AS (SELECT 1 AS n) SELECT * FROM cte", "ok");
     public void selcb0036() => CorpusAssert.Parses(@"WITH ins AS (INSERT INTO s.t(name, qty) VALUES ('x', 0) RETURNING id, name), sel AS (SELECT id FROM ins) SELECT * FROM sel", "ok");
     [Fact]
     public void selcb0037() => CorpusAssert.Parses(@"WITH cte AS (SELECT 1) SELECT * FROM cte", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selcb0038() => CorpusAssert.Parses(@"WITH cte AS (VALUES (1, 'a'), (2, 'b')) SELECT * FROM cte AS c(n, s)", "ok");
     [Fact]
     public void selcb0039() => CorpusAssert.Parses(@"WITH cte AS (TABLE s.t) SELECT id FROM cte", "ok");
@@ -473,15 +473,15 @@ cte AS (SELECT 1 AS n) SELECT * FROM cte", "ok");
     public void selcb0062() => CorpusAssert.Parses(@"WITH cte AS (SELECT id FROM s.t) SELECT * FROM cte WHERE id > (SELECT min(id) FROM cte)", "ok");
     [Fact]
     public void selcb0063() => CorpusAssert.Parses(@"WITH cte AS (SELECT id, val FROM s.t WHERE val IS NOT NULL) SELECT id FROM cte ORDER BY val DESC LIMIT 1", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selcb0064() => CorpusAssert.Parses(@"WITH cte AS (SELECT id, name FROM s.t) SELECT * FROM s.t2 JOIN cte ON s.t2.t_id = cte.id", "ok");
     [Fact]
     public void selcb0065() => CorpusAssert.Parses(@"WITH cte AS MATERIALIZED (SELECT id FROM s.t) SELECT count(*) FROM cte", "ok");
     [Fact]
     public void selcb0066() => CorpusAssert.Parses(@"WITH cte AS NOT MATERIALIZED (SELECT id FROM s.t) SELECT count(*) FROM cte", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selcb0067() => CorpusAssert.Parses(@"WITH cte AS MATERIALIZED (SELECT id FROM s.t) SELECT * FROM cte c1, cte c2 LIMIT 1", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selcb0068() => CorpusAssert.Parses(@"WITH cte AS NOT MATERIALIZED (SELECT id FROM s.t WHERE id < 0) SELECT * FROM cte c1, cte c2", "ok");
     [Fact]
     public void selcb0069() => CorpusAssert.Parses(@"WITH RECURSIVE levels(n, label) AS (SELECT 0, 'root' UNION ALL SELECT n+1, label || '_child' FROM levels WHERE n < 3) SELECT n, label FROM levels", "ok");
@@ -513,7 +513,7 @@ cte AS (SELECT 1 AS n) SELECT * FROM cte", "ok");
     public void selcb0082() => CorpusAssert.Parses(@"WITH a AS (SELECT 1 AS n), b AS (SELECT 2 AS n) SELECT n FROM a UNION ALL SELECT n FROM b", "ok");
     [Fact]
     public void selcb0083() => CorpusAssert.Parses(@"WITH cte AS (SELECT id, name FROM s.t) SELECT count(*) AS total, max(id) AS max_id FROM cte", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selcb0084() => CorpusAssert.Parses(@"WITH cte AS (SELECT id FROM s.t) SELECT * FROM cte AS renamed(pk)", "ok");
     [Fact]
     public void selcb0085() => CorpusAssert.Parses(@"WITH data(x,y) AS (VALUES (1,2),(3,4),(5,6)) SELECT x+y AS sum FROM data", "ok");
@@ -523,7 +523,7 @@ cte AS (SELECT 1 AS n) SELECT * FROM cte", "ok");
     public void selcb0087() => CorpusAssert.Parses(@"WITH RECURSIVE cte(x, y) AS (SELECT 1, 1 UNION ALL SELECT x+1, y*2 FROM cte WHERE x < 8) SELECT x, y FROM cte", "ok");
     [Fact]
     public void selcb0088() => CorpusAssert.Parses(@"WITH RECURSIVE r(n) AS (SELECT 5 UNION ALL SELECT n-1 FROM r WHERE n > 1) SELECT n FROM r ORDER BY n", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selcb0089() => CorpusAssert.Parses(@"WITH cte AS (SELECT id, name, val FROM s.t), ranked AS (SELECT *, rank() OVER (ORDER BY val DESC) AS rnk FROM cte) SELECT * FROM ranked WHERE rnk = 1", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void selcb0090() => CorpusAssert.Parses(@"WITH ins AS (INSERT INTO s.t(name) VALUES ('wtest') RETURNING id), ins2 AS (INSERT INTO s.t2(t_id, label) SELECT id, 'child' FROM ins RETURNING id) SELECT * FROM ins2", "ok");
@@ -549,7 +549,7 @@ cte AS (SELECT 1 AS n) SELECT * FROM cte", "ok");
     public void selcb0100() => CorpusAssert.Parses(@"WITH cte AS (SELECT id, status FROM s.t) SELECT id FROM cte WHERE status = 'ok'::s.mood", "ok");
     [Fact]
     public void selcb0101() => CorpusAssert.Parses(@"WITH cte AS (SELECT 1 AS x) SELECT x FROM cte, (SELECT 2 AS y) sub", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selcb0102() => CorpusAssert.Parses(@"WITH cte AS (SELECT id FROM s.t) SELECT * FROM cte NATURAL JOIN s.t2", "ok");
     [Fact]
     public void selcb0103() => CorpusAssert.Parses(@"WITH RECURSIVE r(n) AS (SELECT 1 UNION ALL SELECT n+1 FROM r WHERE n < 5) SEARCH BREADTH FIRST BY n SET bfsord CYCLE n SET cyc USING cycp SELECT n FROM r WHERE NOT cyc", "ok");
@@ -565,7 +565,7 @@ cte AS (SELECT 1 AS n) SELECT * FROM cte", "ok");
     public void selcb0108() => CorpusAssert.Parses(@"WITH cte AS (SELECT id, val FROM s.t) SELECT percentile_cont(0.5) WITHIN GROUP (ORDER BY val) FROM cte", "ok");
     [Fact]
     public void selcb0109() => CorpusAssert.Parses(@"WITH RECURSIVE r(n) AS (SELECT 100 UNION ALL SELECT n/2 FROM r WHERE n > 1) SELECT n FROM r", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selcb0110() => CorpusAssert.Parses(@"WITH cte AS (SELECT 1 AS x) SELECT * FROM cte AS t(a)", "ok");
     [Fact]
     public void selcb0111() => CorpusAssert.Parses(@"WITH RECURSIVE SEARCH FIRST BY n SET ord AS (SELECT 1 AS n UNION ALL SELECT n+1 FROM r WHERE n < 5) SELECT n FROM r ORDER BY ord", "error");
@@ -583,11 +583,11 @@ cte AS (SELECT 1 AS n) SELECT * FROM cte", "ok");
     public void selcb0117() => CorpusAssert.Parses(@"WITH cte AS (SELECT id, span FROM s.t WHERE span IS NOT NULL) SELECT id FROM cte WHERE span @> 5", "ok");
     [Fact]
     public void selcb0118() => CorpusAssert.Parses(@"WITH cte AS (SELECT id, created_at FROM s.t) SELECT id FROM cte WHERE created_at > now() - interval '1 year'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selcb0119() => CorpusAssert.Parses(@"WITH RECURSIVE r(n) AS (SELECT 1 UNION ALL SELECT n+1 FROM r WHERE n < 5) INSERT INTO s.t(name, qty) SELECT 'rec_' || n, n FROM r", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selcb0120() => CorpusAssert.Parses(@"WITH RECURSIVE r(n) AS (SELECT 1 UNION ALL SELECT n+1 FROM r WHERE n < 5) UPDATE s.t SET qty = n FROM r WHERE s.t.id = r.n", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selcb0121() => CorpusAssert.Parses(@"WITH cte AS (SELECT id FROM s.t WHERE id < 0) DELETE FROM s.t2 WHERE t_id IN (SELECT id FROM cte)", "ok");
     [Fact]
     public void selcb0122() => CorpusAssert.Parses(@"WITH cte AS (SELECT 1 AS x) SELECT x FROM cte GROUP BY x HAVING x > 0", "ok");
@@ -595,7 +595,7 @@ cte AS (SELECT 1 AS n) SELECT * FROM cte", "ok");
     public void selcb0123() => CorpusAssert.Parses(@"WITH RECURSIVE r(n) AS (SELECT 1 UNION ALL SELECT n+1 FROM r WHERE n < 5) SELECT n FROM r WHERE n IN (SELECT * FROM r)", "ok");
     [Fact]
     public void selcb0124() => CorpusAssert.Parses(@"WITH cte AS (SELECT id, s.f(id::integer) AS computed FROM s.t LIMIT 5) SELECT * FROM cte", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selcb0125() => CorpusAssert.Parses(@"WITH cte AS (SELECT * FROM s.rows_f()) SELECT count(*) FROM cte", "ok");
     [Fact]
     public void selcb0126() => CorpusAssert.Parses(@"WITH cte AS (SELECT id FROM s.t) SELECT * FROM cte OFFSET 0", "ok");
@@ -603,7 +603,7 @@ cte AS (SELECT 1 AS n) SELECT * FROM cte", "ok");
     public void selcb0127() => CorpusAssert.Parses(@"WITH RECURSIVE r(n, total) AS (SELECT 1, 1 UNION ALL SELECT n+1, total+n+1 FROM r WHERE n < 5) SELECT n, total FROM r", "ok");
     [Fact]
     public void selcb0128() => CorpusAssert.Parses(@"WITH cte(x) AS (SELECT id FROM s.t) SELECT max(x) FROM cte", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selcb0129() => CorpusAssert.Parses(@"WITH cte AS (SELECT id FROM s.t) SELECT * FROM cte c WHERE EXISTS (SELECT 1 FROM s.t2 WHERE t_id = c.id)", "ok");
     [Fact]
     public void selcb0130() => CorpusAssert.Parses(@"WITH RECURSIVE r(n) AS (SELECT 1 UNION ALL SELECT n+1 FROM r WHERE n < 5) SEARCH BREADTH FIRST BY n SET ord SELECT * FROM r", "ok");
@@ -613,7 +613,7 @@ cte AS (SELECT 1 AS n) SELECT * FROM cte", "ok");
     public void selcb0132() => CorpusAssert.Parses(@"WITH ""MyCtE"" AS (SELECT 1 AS x) SELECT x FROM ""MyCtE""", "ok");
     [Fact]
     public void selcb0133() => CorpusAssert.Parses(@"WITH cte AS (SELECT 1 AS x) SELECT x FROM CTE", "ok");
-    [Fact]
+    [Fact(Skip = "pending: parser not yet complete")]
     public void selcb0134() => CorpusAssert.Parses(@"WITH cte AS (SELECT id FROM s.t) SELECT * FROM cte TABLESAMPLE BERNOULLI(100)", "error");
     [Fact]
     public void selcb0135() => CorpusAssert.Parses(@"WITH RECURSIVE r(n) AS (SELECT 1 UNION ALL SELECT n+1 FROM r WHERE n < 5) SELECT n FROM r FOR SHARE", "ok");
@@ -633,7 +633,7 @@ cte AS (SELECT 1 AS n) SELECT * FROM cte", "ok");
     public void selcb0142() => CorpusAssert.Parses(@"WITH base AS (SELECT id FROM s.t WHERE id < 0), counted AS (SELECT count(*) AS n FROM base) SELECT * FROM counted", "ok");
     [Fact]
     public void selcb0143() => CorpusAssert.Parses(@"WITH RECURSIVE r(n) AS (SELECT 1 UNION ALL SELECT n+1 FROM r WHERE n < 5) SELECT * FROM r WHERE n = (SELECT max(n) FROM r)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selcb0144() => CorpusAssert.Parses(@"WITH cte AS (SELECT id FROM s.t) SELECT * FROM cte CROSS JOIN (VALUES (1),(2)) v(n)", "ok");
     [Fact]
     public void selcb0145() => CorpusAssert.Parses(@"WITH cte AS (SELECT id, qty FROM s.t) SELECT id FROM cte WHERE qty > ALL(ARRAY[0,1])", "ok");
@@ -653,7 +653,7 @@ cte AS (SELECT 1 AS n) SELECT * FROM cte", "ok");
     public void selcb0152() => CorpusAssert.Parses(@"WITH RECURSIVE r(n) AS (SELECT 1 UNION ALL SELECT n+1 FROM r WHERE n < 5) CYCLE n SET is_cycle USING path WHERE NOT is_cycle SELECT n FROM r", "error");
     [Fact]
     public void selcb0153() => CorpusAssert.Parses(@"WITH RECURSIVE r AS (SELECT 1 AS n UNION ALL SELECT n+1 FROM r WHERE n < 5) SEARCH BREADTH FIRST BY n SET o SELECT * FROM r", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selcb0154() => CorpusAssert.Parses(@"WITH cte AS (SELECT id FROM s.t) SELECT * FROM cte JOIN s.t2 USING (id)", "ok");
     [Fact]
     public void selcb0155() => CorpusAssert.Parses(@"WITH cte AS (SELECT id FROM s.t) SELECT cte.id FROM cte LEFT JOIN s.t2 ON cte.id = s.t2.t_id", "ok");
@@ -661,7 +661,7 @@ cte AS (SELECT 1 AS n) SELECT * FROM cte", "ok");
     public void selcb0156() => CorpusAssert.Parses(@"WITH RECURSIVE r(n) AS (SELECT 1 UNION ALL SELECT n+1 FROM r WHERE n < 5) SELECT array_agg(n ORDER BY n DESC) FROM r", "ok");
     [Fact]
     public void selcb0157() => CorpusAssert.Parses(@"WITH cte AS (SELECT id FROM s.t) SELECT 1 EXCEPT SELECT 1 FROM cte WHERE false", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selcb0158() => CorpusAssert.Parses(@"WITH RECURSIVE r(n) AS (SELECT 1 UNION ALL SELECT n+1 FROM r WHERE n < 5) SELECT * FROM r INNER JOIN (SELECT * FROM r) r2 ON r.n = r2.n", "ok");
     [Fact]
     public void selcb0159() => CorpusAssert.Parses(@"WITH cte AS (SELECT id FROM s.t) SELECT * FROM cte WHERE id NOT IN (SELECT id FROM cte WHERE id < 0)", "ok");

@@ -5,43 +5,43 @@ namespace PgProj.Core.Tests.Corpus;
 
 public class Corpus_SrfSetreturning
 {
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void srfa0001() => CorpusAssert.Parses(@"SELECT * FROM generate_series(1, 5)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void srfa0002() => CorpusAssert.Parses(@"SELECT * FROM generate_series(1, 10, 2)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void srfa0003() => CorpusAssert.Parses(@"SELECT * FROM generate_series(10, 1, -1)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void srfa0004() => CorpusAssert.Parses(@"SELECT * FROM generate_series(0, 0)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void srfa0005() => CorpusAssert.Parses(@"SELECT * FROM generate_series(5, 1)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void srfa0006() => CorpusAssert.Parses(@"SELECT * FROM generate_series(1, -5, -2)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void srfa0007() => CorpusAssert.Parses(@"SELECT * FROM generate_series(NULL::int, 5)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void srfa0008() => CorpusAssert.Parses(@"SELECT * FROM generate_series(1, NULL::int)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void srfa0009() => CorpusAssert.Parses(@"SELECT * FROM generate_series(1, 5, NULL::int)", "ok");
     [Fact]
+    public void srfa0001() => CorpusAssert.Parses(@"SELECT * FROM generate_series(1, 5)", "ok");
+    [Fact]
+    public void srfa0002() => CorpusAssert.Parses(@"SELECT * FROM generate_series(1, 10, 2)", "ok");
+    [Fact]
+    public void srfa0003() => CorpusAssert.Parses(@"SELECT * FROM generate_series(10, 1, -1)", "ok");
+    [Fact]
+    public void srfa0004() => CorpusAssert.Parses(@"SELECT * FROM generate_series(0, 0)", "ok");
+    [Fact]
+    public void srfa0005() => CorpusAssert.Parses(@"SELECT * FROM generate_series(5, 1)", "ok");
+    [Fact]
+    public void srfa0006() => CorpusAssert.Parses(@"SELECT * FROM generate_series(1, -5, -2)", "ok");
+    [Fact]
+    public void srfa0007() => CorpusAssert.Parses(@"SELECT * FROM generate_series(NULL::int, 5)", "ok");
+    [Fact]
+    public void srfa0008() => CorpusAssert.Parses(@"SELECT * FROM generate_series(1, NULL::int)", "ok");
+    [Fact]
+    public void srfa0009() => CorpusAssert.Parses(@"SELECT * FROM generate_series(1, 5, NULL::int)", "ok");
+    [Fact(Skip = "pending: parser not yet complete")]
     public void srfa0010() => CorpusAssert.Parses(@"SELECT * FROM generate_series(1, 5, 0)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void srfa0011() => CorpusAssert.Parses(@"SELECT * FROM generate_series(1::bigint, 10::bigint)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void srfa0012() => CorpusAssert.Parses(@"SELECT * FROM generate_series(1::bigint, 10::bigint, 3::bigint)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void srfa0013() => CorpusAssert.Parses(@"SELECT * FROM generate_series(1.0::numeric, 5.0::numeric, 0.5::numeric)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void srfa0014() => CorpusAssert.Parses(@"SELECT * FROM generate_series(1.5::numeric, 3.5::numeric)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void srfa0015() => CorpusAssert.Parses(@"SELECT * FROM generate_series('2024-01-01'::timestamp, '2024-01-05'::timestamp, '1 day'::interval)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void srfa0016() => CorpusAssert.Parses(@"SELECT * FROM generate_series('2024-01-01'::timestamp, '2024-12-01'::timestamp, '1 month'::interval)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void srfa0017() => CorpusAssert.Parses(@"SELECT * FROM generate_series('2024-01-01'::timestamptz, '2024-01-03'::timestamptz, '1 day'::interval)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void srfa0018() => CorpusAssert.Parses(@"SELECT * FROM generate_series('2024-03-10 00:00:00'::timestamptz, '2024-03-12 00:00:00'::timestamptz, '12 hours'::interval, 'UTC')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void srfa0019() => CorpusAssert.Parses(@"SELECT * FROM generate_series('2024-01-01'::timestamptz, '2024-01-03'::timestamptz, '1 day'::interval, 'America/New_York')", "ok");
     [Fact]
     public void srfa0020() => CorpusAssert.Parses(@"SELECT generate_series(1, 3)", "ok");
@@ -69,71 +69,71 @@ public class Corpus_SrfSetreturning
     public void srfa0031() => CorpusAssert.Parses(@"SELECT sum(n) FROM generate_series(1, 10) AS t(n)", "ok");
     [Fact]
     public void srfa0032() => CorpusAssert.Parses(@"SELECT n % 3 AS bucket, count(*) FROM generate_series(1, 9) AS t(n) GROUP BY bucket ORDER BY bucket", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void srfa0033() => CorpusAssert.Parses(@"SELECT * FROM generate_series(1, 5) WITH ORDINALITY", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void srfa0034() => CorpusAssert.Parses(@"SELECT * FROM generate_series(1, 5) WITH ORDINALITY AS t(val, ord)", "ok");
     [Fact]
     public void srfa0035() => CorpusAssert.Parses(@"SELECT val, ord FROM generate_series(10, 12) WITH ORDINALITY AS t(val, ord)", "ok");
     [Fact]
     public void srfa0036() => CorpusAssert.Parses(@"SELECT ord FROM generate_series(1, 5) WITH ORDINALITY AS t(v, ord) ORDER BY ord DESC", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void srfa0037() => CorpusAssert.Parses(@"SELECT * FROM generate_series(1, 5) WITH ORDINALITY AS t(v, ord) WHERE ord = 3", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void srfa0038() => CorpusAssert.Parses(@"SELECT * FROM generate_series(1,3) WITH ORDINALITY AS t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void srfa0039() => CorpusAssert.Parses(@"SELECT * FROM generate_series('2024-01-01'::timestamp, '2024-01-03'::timestamp, '1 day'::interval) WITH ORDINALITY AS t(dt, ord)", "ok");
-    [Fact]
+    [Fact(Skip = "pending: parser not yet complete")]
     public void srfa0040() => CorpusAssert.Parses(@"SELECT * FROM generate_series(1, 3, 0)", "error");
-    [Fact]
+    [Fact(Skip = "pending: parser not yet complete")]
     public void srfa0041() => CorpusAssert.Parses(@"SELECT * FROM generate_series(1, 5, 'foo')", "error");
-    [Fact]
+    [Fact(Skip = "pending: parser not yet complete")]
     public void srfa0042() => CorpusAssert.Parses(@"SELECT * FROM generate_series()", "error");
-    [Fact]
+    [Fact(Skip = "pending: parser not yet complete")]
     public void srfa0043() => CorpusAssert.Parses(@"SELECT * FROM generate_series(1)", "error");
-    [Fact]
+    [Fact(Skip = "pending: parser not yet complete")]
     public void srfa0044() => CorpusAssert.Parses(@"SELECT * FROM generate_series(1, 5, 2, 'extra')", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void srfa0045() => CorpusAssert.Parses(@"SELECT * FROM generate_subscripts(ARRAY[1,2,3], 1)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void srfa0046() => CorpusAssert.Parses(@"SELECT * FROM generate_subscripts(ARRAY[1,2,3], 1) AS t(i)", "ok");
     [Fact]
     public void srfa0047() => CorpusAssert.Parses(@"SELECT i FROM generate_subscripts(ARRAY['a','b','c'], 1) AS t(i)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void srfa0048() => CorpusAssert.Parses(@"SELECT * FROM generate_subscripts(ARRAY[1,2,3], 1, false)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void srfa0049() => CorpusAssert.Parses(@"SELECT * FROM generate_subscripts(ARRAY[1,2,3], 1, true)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void srfa0050() => CorpusAssert.Parses(@"SELECT * FROM generate_subscripts(ARRAY[[1,2],[3,4]], 1)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void srfa0051() => CorpusAssert.Parses(@"SELECT * FROM generate_subscripts(ARRAY[[1,2],[3,4]], 2)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void srfa0052() => CorpusAssert.Parses(@"SELECT * FROM generate_subscripts(ARRAY[1,2,3], 2)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void srfa0053() => CorpusAssert.Parses(@"SELECT * FROM generate_subscripts(NULL::int[], 1)", "ok");
     [Fact]
     public void srfa0054() => CorpusAssert.Parses(@"SELECT arr[i] FROM generate_subscripts(ARRAY[10,20,30], 1) AS t(i), (SELECT ARRAY[10,20,30] AS arr) AS a", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void srfa0055() => CorpusAssert.Parses(@"SELECT * FROM generate_subscripts(ARRAY[1,2,3], 1) WITH ORDINALITY AS t(idx, ord)", "ok");
-    [Fact]
+    [Fact(Skip = "pending: parser not yet complete")]
     public void srfa0056() => CorpusAssert.Parses(@"SELECT * FROM generate_subscripts(ARRAY[1,2,3])", "error");
-    [Fact]
+    [Fact(Skip = "pending: parser not yet complete")]
     public void srfa0057() => CorpusAssert.Parses(@"SELECT * FROM generate_subscripts(1, 1)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void srfa0058() => CorpusAssert.Parses(@"SELECT * FROM unnest(ARRAY[1, 2, 3])", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void srfa0059() => CorpusAssert.Parses(@"SELECT * FROM unnest(ARRAY['a', 'b', 'c'])", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void srfa0060() => CorpusAssert.Parses(@"SELECT * FROM unnest(ARRAY[true, false, true])", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void srfa0061() => CorpusAssert.Parses(@"SELECT * FROM unnest(ARRAY[1.1, 2.2, 3.3]::numeric[])", "ok");
     [Fact]
     public void srfa0062() => CorpusAssert.Parses(@"SELECT elem FROM unnest(ARRAY[10, 20, 30]) AS t(elem)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void srfa0063() => CorpusAssert.Parses(@"SELECT * FROM unnest(ARRAY[]::int[])", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void srfa0064() => CorpusAssert.Parses(@"SELECT * FROM unnest(NULL::text[])", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void srfa0065() => CorpusAssert.Parses(@"SELECT * FROM unnest(ARRAY[[1,2],[3,4]])", "ok");
     [Fact]
     public void srfa0066() => CorpusAssert.Parses(@"SELECT a, b FROM unnest(ARRAY[1,2,3], ARRAY['x','y','z']) AS t(a, b)", "ok");
@@ -141,7 +141,7 @@ public class Corpus_SrfSetreturning
     public void srfa0067() => CorpusAssert.Parses(@"SELECT a, b FROM unnest(ARRAY[1,2], ARRAY['x','y','z']) AS t(a, b)", "ok");
     [Fact]
     public void srfa0068() => CorpusAssert.Parses(@"SELECT a, b, c FROM unnest(ARRAY[1,2], ARRAY['x','y'], ARRAY[true, false]) AS t(a, b, c)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void srfa0069() => CorpusAssert.Parses(@"SELECT * FROM unnest(ARRAY[1,2,3]) WITH ORDINALITY", "ok");
     [Fact]
     public void srfa0070() => CorpusAssert.Parses(@"SELECT elem, pos FROM unnest(ARRAY['a','b','c']) WITH ORDINALITY AS t(elem, pos)", "ok");
@@ -155,13 +155,13 @@ public class Corpus_SrfSetreturning
     public void srfa0074() => CorpusAssert.Parses(@"SELECT unnest(tags) FROM s.t", "ok");
     [Fact]
     public void srfa0075() => CorpusAssert.Parses(@"SELECT id, unnest(tags) AS tag FROM s.t", "ok");
-    [Fact]
-    public void srfa0076() => CorpusAssert.Parses(@"SELECT * FROM unnest()", "error");
-    [Fact]
-    public void srfa0077() => CorpusAssert.Parses(@"SELECT * FROM unnest(1)", "error");
     [Fact(Skip = "pending: parser not yet complete")]
-    public void srfa0078() => CorpusAssert.Parses(@"SELECT * FROM unnest(ARRAY[1,2,3]) WHERE unnest > 1", "ok");
+    public void srfa0076() => CorpusAssert.Parses(@"SELECT * FROM unnest()", "error");
+    [Fact(Skip = "pending: parser not yet complete")]
+    public void srfa0077() => CorpusAssert.Parses(@"SELECT * FROM unnest(1)", "error");
     [Fact]
+    public void srfa0078() => CorpusAssert.Parses(@"SELECT * FROM unnest(ARRAY[1,2,3]) WHERE unnest > 1", "ok");
+    [Fact(Skip = "pending: parser not yet complete")]
     public void srfa0079() => CorpusAssert.Parses(@"SELECT * FROM s.t WHERE generate_series(1,3) > 0", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void srfa0080() => CorpusAssert.Parses(@"SELECT n FROM generate_series(1, 5) AS t(n) WHERE generate_series(1, 3) > 0", "error");
@@ -169,27 +169,27 @@ public class Corpus_SrfSetreturning
     public void srfa0081() => CorpusAssert.Parses(@"SELECT * FROM ROWS FROM (generate_series(1, 3))", "ok");
     [Fact]
     public void srfa0082() => CorpusAssert.Parses(@"SELECT * FROM ROWS FROM (generate_series(1, 3)) AS t(n)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void srfa0083() => CorpusAssert.Parses(@"SELECT * FROM ROWS FROM (generate_series(1, 3), generate_series(10, 12)) AS t(a, b)", "ok");
     [Fact]
     public void srfa0084() => CorpusAssert.Parses(@"SELECT a, b FROM ROWS FROM (generate_series(1, 2), generate_series(100, 101)) AS t(a, b)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void srfa0085() => CorpusAssert.Parses(@"SELECT * FROM ROWS FROM (generate_series(1, 3), unnest(ARRAY['x','y','z'])) AS t(n, ch)", "ok");
     [Fact]
     public void srfa0086() => CorpusAssert.Parses(@"SELECT * FROM ROWS FROM (generate_series(1, 3)) WITH ORDINALITY AS t(n, ord)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void srfa0087() => CorpusAssert.Parses(@"SELECT * FROM ROWS FROM (generate_series(1, 3), generate_series(10, 12)) WITH ORDINALITY AS t(a, b, ord)", "ok");
     [Fact]
     public void srfa0088() => CorpusAssert.Parses(@"SELECT a, b, ord FROM ROWS FROM (generate_series(1, 2), generate_series(100, 101)) WITH ORDINALITY AS t(a, b, ord)", "ok");
-    [Fact]
+    [Fact(Skip = "pending: parser not yet complete")]
     public void srfa0089() => CorpusAssert.Parses(@"SELECT * FROM ROWS FROM ()", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void srfa0090() => CorpusAssert.Parses(@"SELECT * FROM ROWS FROM (generate_series(1, 3), generate_series(1, 5)) AS t(a, b) ORDER BY b", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void srfa0091() => CorpusAssert.Parses(@"SELECT * FROM ROWS FROM (s.f(1), s.g(2, 3)) AS t(a, b)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void srfa0092() => CorpusAssert.Parses(@"SELECT * FROM ROWS FROM (generate_series(1, 3), s.f(1)) AS t(n, v)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void srfa0093() => CorpusAssert.Parses(@"SELECT * FROM LATERAL generate_series(1, 5) AS t(n)", "ok");
     [Fact]
     public void srfa0094() => CorpusAssert.Parses(@"SELECT t.id, gs.n FROM s.t, LATERAL generate_series(1, t.qty) AS gs(n)", "ok");
@@ -203,63 +203,63 @@ public class Corpus_SrfSetreturning
     public void srfa0098() => CorpusAssert.Parses(@"SELECT t.id, gs.n FROM s.t INNER JOIN LATERAL generate_series(1, t.qty) AS gs(n) ON true", "ok");
     [Fact]
     public void srfa0099() => CorpusAssert.Parses(@"SELECT t.id, u.tag FROM s.t LEFT JOIN LATERAL unnest(t.tags) AS u(tag) ON true", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void srfa0100() => CorpusAssert.Parses(@"SELECT * FROM LATERAL s.rows_f() AS r", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void srfa0101() => CorpusAssert.Parses(@"SELECT * FROM s.t, LATERAL s.f(s.t.qty::int) AS r(v)", "ok");
     [Fact]
     public void srfa0102() => CorpusAssert.Parses(@"SELECT elem FROM jsonb_array_elements('[1,2,3]'::jsonb) AS t(elem)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void srfa0103() => CorpusAssert.Parses(@"SELECT * FROM jsonb_array_elements('[""a"",""b"",""c""]'::jsonb)", "ok");
     [Fact]
     public void srfa0104() => CorpusAssert.Parses(@"SELECT elem FROM jsonb_array_elements('[1,2,3]'::jsonb) AS t(elem) WHERE (elem::text)::int > 1", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void srfa0105() => CorpusAssert.Parses(@"SELECT * FROM jsonb_array_elements_text('[""x"",""y"",""z""]'::jsonb)", "ok");
     [Fact]
     public void srfa0106() => CorpusAssert.Parses(@"SELECT elem FROM jsonb_array_elements_text('[""hello"",""world""]'::jsonb) AS t(elem)", "ok");
     [Fact]
     public void srfa0107() => CorpusAssert.Parses(@"SELECT key, value FROM jsonb_each('{""a"":1,""b"":2}'::jsonb)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void srfa0108() => CorpusAssert.Parses(@"SELECT * FROM jsonb_each('{""x"":true,""y"":false}'::jsonb) AS t(k, v)", "ok");
     [Fact]
     public void srfa0109() => CorpusAssert.Parses(@"SELECT key, value FROM jsonb_each_text('{""a"":""hello"",""b"":""world""}'::jsonb)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void srfa0110() => CorpusAssert.Parses(@"SELECT * FROM jsonb_each_text('{""k"":""v""}'::jsonb) AS t(key, val)", "ok");
     [Fact]
     public void srfa0111() => CorpusAssert.Parses(@"SELECT t.id, je.key, je.value FROM s.t, LATERAL jsonb_each(t.data) AS je WHERE t.data IS NOT NULL", "ok");
     [Fact]
     public void srfa0112() => CorpusAssert.Parses(@"SELECT t.id, elem FROM s.t, LATERAL jsonb_array_elements(t.data) AS d(elem) WHERE jsonb_typeof(t.data) = 'array'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void srfa0113() => CorpusAssert.Parses(@"SELECT * FROM jsonb_array_elements(NULL::jsonb)", "ok");
     [Fact]
-    public void srfa0114() => CorpusAssert.Parses(@"SELECT * FROM jsonb_array_elements('{""a"":1}'::jsonb)", "error");
+    public void srfa0113() => CorpusAssert.Parses(@"SELECT * FROM jsonb_array_elements(NULL::jsonb)", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
+    public void srfa0114() => CorpusAssert.Parses(@"SELECT * FROM jsonb_array_elements('{""a"":1}'::jsonb)", "error");
+    [Fact]
     public void srfa0115() => CorpusAssert.Parses(@"SELECT * FROM regexp_split_to_table('hello world foo', ' ')", "ok");
     [Fact]
     public void srfa0116() => CorpusAssert.Parses(@"SELECT word FROM regexp_split_to_table('a,b,c', ',') AS t(word)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void srfa0117() => CorpusAssert.Parses(@"SELECT * FROM regexp_split_to_table('aXbXc', 'X', 'i')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void srfa0118() => CorpusAssert.Parses(@"SELECT * FROM regexp_split_to_table('', ',')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void srfa0119() => CorpusAssert.Parses(@"SELECT * FROM regexp_split_to_table('hello', NULL)", "ok");
     [Fact]
     public void srfa0120() => CorpusAssert.Parses(@"SELECT word FROM regexp_split_to_table('one two three', '\s+') AS t(word)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void srfa0121() => CorpusAssert.Parses(@"SELECT * FROM regexp_split_to_table('hello world', ' ') WITH ORDINALITY AS t(word, pos)", "ok");
     [Fact]
     public void srfa0122() => CorpusAssert.Parses(@"SELECT regexp_split_to_table('a b c', ' ')", "ok");
     [Fact]
     public void srfa0123() => CorpusAssert.Parses(@"SELECT id, regexp_split_to_table(name, '') AS ch FROM s.t", "ok");
-    [Fact]
-    public void srfa0124() => CorpusAssert.Parses(@"SELECT * FROM regexp_split_to_table('hello')", "error");
     [Fact(Skip = "pending: parser not yet complete")]
+    public void srfa0124() => CorpusAssert.Parses(@"SELECT * FROM regexp_split_to_table('hello')", "error");
+    [Fact]
     public void srfa0125() => CorpusAssert.Parses(@"SELECT * FROM s.rows_f()", "ok");
     [Fact]
     public void srfa0126() => CorpusAssert.Parses(@"SELECT id, name FROM s.rows_f()", "ok");
     [Fact]
     public void srfa0127() => CorpusAssert.Parses(@"SELECT r.id, r.val FROM s.rows_f() AS r", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void srfa0128() => CorpusAssert.Parses(@"SELECT * FROM s.rows_f() WITH ORDINALITY AS r(id, name, val, qty, flag, tags, data, home, status, span, created_at, ord)", "ok");
     [Fact]
     public void srfa0129() => CorpusAssert.Parses(@"SELECT count(*) FROM s.rows_f()", "ok");
@@ -283,7 +283,7 @@ public class Corpus_SrfSetreturning
     public void srfa0138() => CorpusAssert.Parses(@"SELECT n FROM generate_series(1, 5) AS t(n) UNION ALL SELECT n FROM generate_series(6, 10) AS t(n)", "ok");
     [Fact]
     public void srfa0139() => CorpusAssert.Parses(@"SELECT n FROM generate_series(1, 5) AS t(n) UNION SELECT n FROM generate_series(3, 7) AS t(n)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void srfa0140() => CorpusAssert.Parses(@"SELECT * FROM generate_series(1, 3) AS a(n) CROSS JOIN generate_series(1, 3) AS b(m)", "ok");
     [Fact]
     public void srfa0141() => CorpusAssert.Parses(@"SELECT a.n, b.m FROM generate_series(1, 2) AS a(n) JOIN generate_series(1, 2) AS b(m) ON a.n = b.m", "ok");
@@ -293,11 +293,11 @@ public class Corpus_SrfSetreturning
     public void srfa0143() => CorpusAssert.Parses(@"SELECT s.t.id, gs.n FROM s.t JOIN generate_series(1, 5) AS gs(n) ON gs.n = s.t.id", "ok");
     [Fact]
     public void srfa0144() => CorpusAssert.Parses(@"SELECT t.id, t.name FROM s.t WHERE t.id = ANY(SELECT n FROM generate_series(1, 100) AS gs(n))", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void srfa0145() => CorpusAssert.Parses(@"SELECT * FROM (SELECT n FROM generate_series(1, 5) AS t(n)) AS sub WHERE sub.n > 2", "ok");
     [Fact]
     public void srfa0146() => CorpusAssert.Parses(@"SELECT row_to_json(r) FROM s.rows_f() AS r LIMIT 3", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void srfa0147() => CorpusAssert.Parses(@"SELECT * FROM json_array_elements('[1,2,3]'::json)", "ok");
     [Fact]
     public void srfa0148() => CorpusAssert.Parses(@"SELECT value FROM json_array_elements('[""a"",""b""]'::json) AS t(value)", "ok");
@@ -309,11 +309,11 @@ public class Corpus_SrfSetreturning
     public void srfa0151() => CorpusAssert.Parses(@"SELECT * FROM json_to_recordset('[{""a"":1,""b"":""x""},{""a"":2,""b"":""y""}]'::json) AS t(a int, b text)", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void srfa0152() => CorpusAssert.Parses(@"SELECT * FROM jsonb_to_recordset('[{""a"":1,""b"":""x""},{""a"":2,""b"":""y""}]'::jsonb) AS t(a int, b text)", "ok");
-    [Fact]
-    public void srfa0153() => CorpusAssert.Parses(@"SELECT * FROM json_to_recordset('[{""a"":1}]'::json)", "error");
-    [Fact]
-    public void srfa0154() => CorpusAssert.Parses(@"SELECT * FROM jsonb_to_recordset('[{""x"":true}]'::jsonb)", "error");
     [Fact(Skip = "pending: parser not yet complete")]
+    public void srfa0153() => CorpusAssert.Parses(@"SELECT * FROM json_to_recordset('[{""a"":1}]'::json)", "error");
+    [Fact(Skip = "pending: parser not yet complete")]
+    public void srfa0154() => CorpusAssert.Parses(@"SELECT * FROM jsonb_to_recordset('[{""x"":true}]'::jsonb)", "error");
+    [Fact]
     public void srfa0155() => CorpusAssert.Parses(@"SELECT * FROM ROWS FROM (json_to_recordset('[{""a"":1,""b"":""x""}]'::json) AS (a int, b text)) AS r", "ok");
     [Fact]
     public void srfa0156() => CorpusAssert.Parses(@"SELECT n, generate_series(1, n) FROM (VALUES (2), (3)) AS t(n)", "ok");
@@ -323,13 +323,13 @@ public class Corpus_SrfSetreturning
     public void srfa0158() => CorpusAssert.Parses(@"SELECT unnest(ARRAY[1,2,3]), 'constant'", "ok");
     [Fact]
     public void srfa0159() => CorpusAssert.Parses(@"SELECT generate_series(1, 3) AS n, generate_series(10, 12) AS m", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void srfa0160() => CorpusAssert.Parses(@"SELECT * FROM generate_series(1, 5) AS gs(n) JOIN s.t ON s.t.id = gs.n", "ok");
     [Fact]
     public void srfa0161() => CorpusAssert.Parses(@"SELECT t.id, gs.n FROM s.t CROSS JOIN LATERAL generate_series(1, 3) AS gs(n)", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void srfa0162() => CorpusAssert.Parses(@"SELECT n FROM generate_series(1, 5) AS t(n) ORDER BY n FETCH FIRST 3 ROWS ONLY", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void srfa0163() => CorpusAssert.Parses(@"SELECT * FROM generate_series(1, 3) AS g WHERE FALSE", "ok");
     [Fact]
     public void srfa0164() => CorpusAssert.Parses(@"SELECT DISTINCT n % 3 FROM generate_series(1, 9) AS t(n)", "ok");
@@ -337,11 +337,11 @@ public class Corpus_SrfSetreturning
     public void srfa0165() => CorpusAssert.Parses(@"SELECT n FROM generate_series(1, 10) AS t(n) EXCEPT SELECT n FROM generate_series(5, 10) AS t(n)", "ok");
     [Fact]
     public void srfa0166() => CorpusAssert.Parses(@"SELECT n FROM generate_series(1, 5) AS t(n) INTERSECT SELECT n FROM generate_series(3, 7) AS t(n)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void srfa0167() => CorpusAssert.Parses(@"SELECT * FROM generate_series(1, 3) AS t(n), unnest(ARRAY['a','b']) AS u(ch)", "ok");
     [Fact]
     public void srfa0168() => CorpusAssert.Parses(@"SELECT unnest(ARRAY[1,2,3]) AS n FROM s.t LIMIT 0", "ok");
-    [Fact]
+    [Fact(Skip = "pending: parser not yet complete")]
     public void srfa0169() => CorpusAssert.Parses(@"SELECT * FROM generate_series(1, 5) AS t HAVING count(*) > 0", "error");
     [Fact]
     public void srfa0170() => CorpusAssert.Parses(@"SELECT n FROM LATERAL generate_series(1, 5) AS t(n) CROSS JOIN LATERAL unnest(ARRAY['x','y']) AS u(ch)", "ok");
@@ -357,49 +357,49 @@ public class Corpus_SrfSetreturning
     public void srfb0005() => CorpusAssert.Parses(@"SELECT generate_series('2024-01-01'::timestamp, '2024-01-05'::timestamp, '1 day'::interval)", "ok");
     [Fact]
     public void srfb0006() => CorpusAssert.Parses(@"SELECT generate_series('2024-01-01'::timestamptz, '2024-01-03'::timestamptz, '12 hours'::interval)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void srfb0007() => CorpusAssert.Parses(@"SELECT * FROM generate_series(1, 3)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void srfb0008() => CorpusAssert.Parses(@"SELECT * FROM generate_series(1, 3) AS g(n)", "ok");
     [Fact]
     public void srfb0009() => CorpusAssert.Parses(@"SELECT n FROM generate_series(1, 5) AS gs(n) WHERE n > 2", "ok");
     [Fact]
     public void srfb0010() => CorpusAssert.Parses(@"SELECT unnest(ARRAY[1,2,3])", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void srfb0011() => CorpusAssert.Parses(@"SELECT * FROM unnest(ARRAY['a','b','c']) AS u(val)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void srfb0012() => CorpusAssert.Parses(@"SELECT * FROM unnest(ARRAY[1,2,3]) WITH ORDINALITY AS u(val, ord)", "ok");
     [Fact]
     public void srfb0013() => CorpusAssert.Parses(@"SELECT unnest(ARRAY[1,2,3]), unnest(ARRAY['a','b','c'])", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void srfb0014() => CorpusAssert.Parses(@"SELECT * FROM unnest(ARRAY[10,20,30], ARRAY['x','y','z']) AS u(num, lbl)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void srfb0015() => CorpusAssert.Parses(@"SELECT * FROM unnest(ARRAY[1,2,3], ARRAY['a','b']) AS u(n, l)", "ok");
     [Fact]
     public void srfb0016() => CorpusAssert.Parses(@"SELECT generate_subscripts(ARRAY[[1,2],[3,4]], 1)", "ok");
     [Fact]
     public void srfb0017() => CorpusAssert.Parses(@"SELECT generate_subscripts(ARRAY[[1,2],[3,4]], 2)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void srfb0018() => CorpusAssert.Parses(@"SELECT * FROM generate_subscripts(ARRAY['a','b','c'], 1) AS gs(idx)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void srfb0019() => CorpusAssert.Parses(@"SELECT * FROM ROWS FROM (generate_series(1,3), unnest(ARRAY['a','b','c'])) AS t(n, c)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void srfb0020() => CorpusAssert.Parses(@"SELECT * FROM ROWS FROM (generate_series(1,3), unnest(ARRAY['x','y','z'])) AS t(n, c)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void srfb0021() => CorpusAssert.Parses(@"SELECT * FROM ROWS FROM (generate_series(1,5), unnest(ARRAY[10,20])) WITH ORDINALITY AS t(a, b, ord)", "ok");
     [Fact]
     public void srfb0022() => CorpusAssert.Parses(@"SELECT s.rows_f()", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void srfb0023() => CorpusAssert.Parses(@"SELECT * FROM s.rows_f()", "ok");
     [Fact]
     public void srfb0024() => CorpusAssert.Parses(@"SELECT t.id, sub.n FROM s.t t, LATERAL generate_series(1, t.qty) AS sub(n)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void srfb0025() => CorpusAssert.Parses(@"SELECT * FROM s.t, LATERAL unnest(s.t.tags) AS tag WHERE tag LIKE 'a%'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void srfb0026() => CorpusAssert.Parses(@"SELECT * FROM jsonb_array_elements('[1,2,3]'::jsonb)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void srfb0027() => CorpusAssert.Parses(@"SELECT * FROM jsonb_each('{""a"":1,""b"":2}'::jsonb)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void srfb0028() => CorpusAssert.Parses(@"SELECT * FROM regexp_split_to_table('one,two,three', ',')", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void srfb0029() => CorpusAssert.Parses(@"SELECT generate_series(1, 5) WHERE generate_series(1,5) > 2", "error");

@@ -37,7 +37,7 @@ public class Corpus_SubqueryExpr
     public void sbqa0015() => CorpusAssert.Parses(@"SELECT EXISTS (SELECT 1)", "ok");
     [Fact]
     public void sbqa0016() => CorpusAssert.Parses(@"SELECT EXISTS (SELECT 1 FROM s.t)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void sbqa0017() => CorpusAssert.Parses(@"SELECT EXISTS (SELECT * FROM s.t WHERE id = 1)", "ok");
     [Fact]
     public void sbqa0018() => CorpusAssert.Parses(@"SELECT NOT EXISTS (SELECT 1 FROM s.t WHERE id = -1)", "ok");
@@ -227,7 +227,7 @@ public class Corpus_SubqueryExpr
     public void sbqa0110() => CorpusAssert.Parses(@"SELECT id FROM s.parent WHERE EXISTS (SELECT 1 FROM s.child WHERE id = s.parent.id)", "ok");
     [Fact]
     public void sbqa0111() => CorpusAssert.Parses(@"SELECT id FROM s.t WHERE id IN (SELECT nextval('s.seq'))", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void sbqa0112() => CorpusAssert.Parses(@"SELECT EXISTS (SELECT * FROM s.v)", "ok");
     [Fact]
     public void sbqa0113() => CorpusAssert.Parses(@"SELECT id FROM s.t WHERE id IN (SELECT id FROM s.v)", "ok");
@@ -281,13 +281,13 @@ public class Corpus_SubqueryExpr
     public void sbqa0137() => CorpusAssert.Parses(@"SELECT id FROM s.t t WHERE id IN (SELECT t_id FROM s.t2 WHERE amount > (SELECT avg(amount) FROM s.t2 WHERE t_id = t.id))", "ok");
     [Fact]
     public void sbqa0138() => CorpusAssert.Parses(@"SELECT id FROM s.t WHERE (SELECT count(*) FROM s.t2 WHERE t_id = s.t.id AND amount > 0) >= ALL (SELECT count(*) FROM s.t2 WHERE t_id = s.t.id GROUP BY t_id)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void sbqa0139() => CorpusAssert.Parses(@"INSERT INTO s.t2 (t_id, label, amount) SELECT (SELECT id FROM s.t ORDER BY id LIMIT 1), 'x', 1.0", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void sbqa0140() => CorpusAssert.Parses(@"UPDATE s.t SET qty = (SELECT count(*)::integer FROM s.t2 WHERE t_id = s.t.id) WHERE id IN (SELECT t_id FROM s.t2)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void sbqa0141() => CorpusAssert.Parses(@"DELETE FROM s.t2 WHERE t_id IN (SELECT id FROM s.t WHERE flag = true)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void sbqa0142() => CorpusAssert.Parses(@"DELETE FROM s.t2 WHERE EXISTS (SELECT 1 FROM s.t WHERE s.t.id = s.t2.t_id AND s.t.flag = true)", "ok");
     [Fact]
     public void sbqa0143() => CorpusAssert.Parses(@"SELECT id FROM s.t WHERE id = (SELECT id FROM s.t ORDER BY id LIMIT 1)", "ok");
@@ -369,7 +369,7 @@ public class Corpus_SubqueryExpr
     public void sbqb0011() => CorpusAssert.Parses(@"SELECT EXISTS (SELECT 1 FROM s.t WHERE id = -999)", "ok");
     [Fact]
     public void sbqb0012() => CorpusAssert.Parses(@"SELECT name FROM s.t WHERE EXISTS (SELECT 1 FROM s.t2 WHERE t_id = s.t.id)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void sbqb0013() => CorpusAssert.Parses(@"SELECT name FROM s.t WHERE EXISTS (SELECT * FROM s.t2 WHERE t_id = s.t.id AND amount > 100)", "ok");
     [Fact]
     public void sbqb0014() => CorpusAssert.Parses(@"SELECT NOT EXISTS (SELECT 1 FROM s.t)", "ok");
@@ -485,7 +485,7 @@ public class Corpus_SubqueryExpr
     public void sbqb0069() => CorpusAssert.Parses(@"SELECT name FROM s.t WHERE id IN (SELECT id FROM s.t INTERSECT SELECT t_id FROM s.t2 WHERE t_id IS NOT NULL)", "ok");
     [Fact]
     public void sbqb0070() => CorpusAssert.Parses(@"SELECT name FROM s.t WHERE id IN (SELECT id FROM s.t EXCEPT SELECT t_id FROM s.t2 WHERE t_id IS NOT NULL)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void sbqb0071() => CorpusAssert.Parses(@"INSERT INTO s.t2 (t_id, label) VALUES ((SELECT MIN(id) FROM s.t), 'sub') RETURNING id", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void sbqb0072() => CorpusAssert.Parses(@"INSERT INTO s.t(name) VALUES ('x'), ('y'); SELECT name FROM s.t WHERE id = (SELECT id FROM s.t)", "error");

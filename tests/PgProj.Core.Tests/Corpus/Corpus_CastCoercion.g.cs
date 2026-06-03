@@ -257,9 +257,9 @@ public class Corpus_CastCoercion
     public void cst2a0125() => CorpusAssert.Parses(@"SELECT LEAST(1,2,3)::bigint", "ok");
     [Fact]
     public void cst2a0126() => CorpusAssert.Parses(@"SELECT CAST(name AS text) FROM s.t WHERE id::integer > 0", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void cst2a0127() => CorpusAssert.Parses(@"SELECT * FROM s.t WHERE CAST(qty AS bigint) > 0", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void cst2a0128() => CorpusAssert.Parses(@"SELECT * FROM s.t ORDER BY val::text", "ok");
     [Fact]
     public void cst2a0129() => CorpusAssert.Parses(@"SELECT CAST(val AS text) FROM s.t GROUP BY CAST(val AS text)", "ok");

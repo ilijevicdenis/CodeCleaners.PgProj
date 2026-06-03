@@ -16,19 +16,26 @@ public sealed partial class PgParser
 
     private SelectQuery ParseSelectStatement(TokenCursor c)
     {
-        SelectQuery q;
         List<CommonTableExpr>? ctes = null;
         bool recursive = false;
-        if (c.AtWord("WITH"))
-        {
-            c.Advance();
-            recursive = c.MatchWord("RECURSIVE");
-            ctes = new List<CommonTableExpr> { ParseCte(c) };
-            while (c.MatchSymbol(',')) ctes.Add(ParseCte(c));
-        }
-
-        q = ParseSetOpChain(c);
+        if (c.AtWord("WITH")) (ctes, recursive) = ParseCteList(c);
+        var q = ParseSelectBody(c);
         if (ctes is not null) { q.With.AddRange(ctes); q.WithRecursive = recursive; }
+        return q;
+    }
+
+    private (List<CommonTableExpr>, bool) ParseCteList(TokenCursor c)
+    {
+        c.ExpectWord("WITH");
+        bool recursive = c.MatchWord("RECURSIVE");
+        var ctes = new List<CommonTableExpr> { ParseCte(c) };
+        while (c.MatchSymbol(',')) ctes.Add(ParseCte(c));
+        return (ctes, recursive);
+    }
+
+    private SelectQuery ParseSelectBody(TokenCursor c)
+    {
+        var q = ParseSetOpChain(c);
         ParseSelectTail(c, q);
         return q;
     }
@@ -192,6 +199,7 @@ public sealed partial class PgParser
             {
                 if (c.MatchWord("ON")) join.On = ParseExpression(c);
                 else if (c.MatchWord("USING")) join.Using.AddRange(ParseColumnNameList(c));
+                else throw new ParseException("JOIN requires ON or USING (unless CROSS/NATURAL)", c.Here);
             }
             rel.Joins.Add(join);
         }

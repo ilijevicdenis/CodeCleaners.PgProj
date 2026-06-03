@@ -234,6 +234,7 @@ public sealed partial class PgParser
         if (t.Kind == TokenKind.Symbol)
         {
             if (t.IsSymbol('(')) return ParseParenOrSubquery(c);
+            if (t.IsSymbol('*')) { c.Advance(); return new StarExpr(); }   // leading * is the star, not multiply
             // prefix general operator (e.g. @, |/, ~)
             if (IsOperatorSymbol(t.Value))
             {

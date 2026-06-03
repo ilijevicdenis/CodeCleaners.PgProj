@@ -293,7 +293,7 @@ public class Corpus_SelectWindow
     public void selwa0143() => CorpusAssert.Parses(@"SELECT rank() OVER (PARTITION BY status) FROM s.t", "ok");
     [Fact]
     public void selwa0144() => CorpusAssert.Parses(@"WITH cte AS (SELECT id, val, row_number() OVER (ORDER BY id) AS rn FROM s.t) SELECT * FROM cte", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selwa0145() => CorpusAssert.Parses(@"SELECT * FROM (SELECT id, row_number() OVER (ORDER BY id) AS rn FROM s.t) sub WHERE rn = 1", "ok");
     [Fact]
     public void selwa0146() => CorpusAssert.Parses(@"SELECT id, val, row_number() OVER (ORDER BY id) FROM s.t ORDER BY val DESC", "ok");
@@ -557,7 +557,7 @@ public class Corpus_SelectWindow
     public void selwb0105() => CorpusAssert.Parses(@"SELECT id, row_number() OVER (ORDER BY id) FROM s.t FETCH FIRST 3 ROWS ONLY", "ok");
     [Fact]
     public void selwb0106() => CorpusAssert.Parses(@"WITH cte AS (SELECT id, val, status FROM s.t) SELECT id, sum(val) OVER (PARTITION BY status) FROM cte", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selwb0107() => CorpusAssert.Parses(@"SELECT * FROM (SELECT id, row_number() OVER (ORDER BY id) AS rn FROM s.t) sub WHERE rn <= 3", "ok");
     [Fact]
     public void selwb0108() => CorpusAssert.Parses(@"SELECT id, val, sum(val) OVER (ORDER BY id RANGE BETWEEN 1 PRECEDING AND 1 FOLLOWING) FROM s.t", "ok");

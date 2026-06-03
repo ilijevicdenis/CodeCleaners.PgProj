@@ -68,7 +68,7 @@ public sealed partial class PgParser
 
     private static string? ClassifyLeading(TokenCursor c)
     {
-        if (c.AtAnyWord("SELECT", "WITH", "VALUES", "TABLE")) return "QUERY";
+        if (c.AtAnyWord("SELECT", "WITH", "VALUES", "TABLE", "INSERT", "UPDATE", "DELETE", "MERGE", "TRUNCATE")) return "QUERY";
         if (!c.AtWord("CREATE")) return null;
         int k = 1;
         while (c.Peek(k) is { } t && t.Kind == TokenKind.Word
@@ -81,8 +81,24 @@ public sealed partial class PgParser
 
     private SqlStatement ParseStatement(TokenCursor c)
     {
-        if (c.AtAnyWord("SELECT", "WITH", "VALUES", "TABLE"))
+        if (c.AtWord("WITH"))
+        {
+            var (ctes, recursive) = ParseCteList(c);
+            if (c.AtWord("INSERT")) return ParseInsert(c, ctes, recursive);
+            if (c.AtWord("UPDATE")) return ParseUpdate(c, ctes, recursive);
+            if (c.AtWord("DELETE")) return ParseDelete(c, ctes, recursive);
+            if (c.AtWord("MERGE")) return ParseMerge(c, ctes, recursive);
+            var q = ParseSelectBody(c);
+            q.With.AddRange(ctes); q.WithRecursive = recursive;
+            return new QueryStatement { Query = q };
+        }
+        if (c.AtAnyWord("SELECT", "VALUES", "TABLE"))
             return new QueryStatement { Query = ParseSelectStatement(c) };
+        if (c.AtWord("INSERT")) return ParseInsert(c, null, false);
+        if (c.AtWord("UPDATE")) return ParseUpdate(c, null, false);
+        if (c.AtWord("DELETE")) return ParseDelete(c, null, false);
+        if (c.AtWord("MERGE")) return ParseMerge(c, null, false);
+        if (c.AtWord("TRUNCATE")) return ParseTruncate(c);
 
         c.ExpectWord("CREATE");
         string? persistence = null;

@@ -239,7 +239,7 @@ public class Corpus_OperatorsExpr
     public void oexa0116() => CorpusAssert.Parses(@"SELECT -(3 + 4)", "ok");
     [Fact]
     public void oexa0117() => CorpusAssert.Parses(@"SELECT (1 AND)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void oexa0118() => CorpusAssert.Parses(@"SELECT * 2", "error");
     [Fact]
     public void oexa0119() => CorpusAssert.Parses(@"SELECT 1 IS IS NULL", "error");
@@ -659,7 +659,7 @@ public class Corpus_OperatorsExpr
     public void oexb0126() => CorpusAssert.Parses(@"SELECT 5 BETWEEN 10 AND", "error");
     [Fact]
     public void oexb0127() => CorpusAssert.Parses(@"SELECT 1 +", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void oexb0128() => CorpusAssert.Parses(@"SELECT * 2", "error");
     [Fact]
     public void oexb0129() => CorpusAssert.Parses(@"SELECT 1 + 2)", "error");
@@ -885,7 +885,7 @@ public class Corpus_OperatorsExpr
     public void oexc0065() => CorpusAssert.Parses(@"SELECT 1 IS DISTINCT 2", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void oexc0066() => CorpusAssert.Parses(@"SELECT 1 = = 1", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void oexc0067() => CorpusAssert.Parses(@"SELECT * 5", "error");
     [Fact]
     public void oexc0068() => CorpusAssert.Parses(@"SELECT 5 NOT DISTINCT FROM 3", "error");

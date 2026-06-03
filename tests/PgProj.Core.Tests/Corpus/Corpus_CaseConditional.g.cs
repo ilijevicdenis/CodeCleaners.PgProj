@@ -39,9 +39,9 @@ public class Corpus_CaseConditional
     public void csea0016() => CorpusAssert.Parses(@"SELECT CASE WHEN val > 0 THEN 'pos' WHEN val < 0 THEN 'neg' ELSE 'zero' END FROM s.t", "ok");
     [Fact]
     public void csea0017() => CorpusAssert.Parses(@"SELECT CASE WHEN qty > 100 THEN 'big' ELSE 'small' END FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void csea0018() => CorpusAssert.Parses(@"SELECT * FROM s.t WHERE CASE WHEN qty > 0 THEN true ELSE false END", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void csea0019() => CorpusAssert.Parses(@"SELECT * FROM s.t ORDER BY CASE WHEN qty > 0 THEN 1 ELSE 2 END", "ok");
     [Fact]
     public void csea0020() => CorpusAssert.Parses(@"SELECT CASE WHEN qty > 0 THEN qty ELSE 0 END AS abs_qty FROM s.t", "ok");
@@ -237,19 +237,19 @@ public class Corpus_CaseConditional
     public void csea0115() => CorpusAssert.Parses(@"SELECT GREATEST(1, 'text')", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void csea0116() => CorpusAssert.Parses(@"SELECT LEAST(1, 'text')", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void csea0117() => CorpusAssert.Parses(@"UPDATE s.t SET qty = CASE WHEN qty < 0 THEN 0 ELSE qty END", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void csea0118() => CorpusAssert.Parses(@"UPDATE s.t SET name = COALESCE(name, 'unknown')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void csea0119() => CorpusAssert.Parses(@"INSERT INTO s.t (name, qty) VALUES (COALESCE(null, 'default'), GREATEST(0, -1))", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void csea0120() => CorpusAssert.Parses(@"SELECT * FROM s.t WHERE COALESCE(val, 0) > 5", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void csea0121() => CorpusAssert.Parses(@"SELECT * FROM s.t WHERE NULLIF(qty, 0) IS NOT NULL", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void csea0122() => CorpusAssert.Parses(@"SELECT * FROM s.t ORDER BY GREATEST(qty, 0) DESC", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void csea0123() => CorpusAssert.Parses(@"SELECT * FROM s.t ORDER BY LEAST(qty, 100)", "ok");
     [Fact]
     public void csea0124() => CorpusAssert.Parses(@"SELECT CASE WHEN 1=1 THEN 'x' END, CASE WHEN 2=2 THEN 'y' END", "ok");
@@ -371,7 +371,7 @@ public class Corpus_CaseConditional
     public void cseb0011() => CorpusAssert.Parses(@"SELECT id, CASE status WHEN 'ok' THEN 1 WHEN 'happy' THEN 2 ELSE 0 END FROM s.t", "ok");
     [Fact]
     public void cseb0012() => CorpusAssert.Parses(@"SELECT CASE WHEN qty > 10 THEN 'high' WHEN qty > 0 THEN 'low' ELSE 'zero' END FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void cseb0013() => CorpusAssert.Parses(@"SELECT * FROM s.t WHERE CASE WHEN val IS NOT NULL THEN val > 0 ELSE false END", "ok");
     [Fact]
     public void cseb0014() => CorpusAssert.Parses(@"SELECT CASE WHEN flag THEN 'yes' END AS flag_label FROM s.t", "ok");

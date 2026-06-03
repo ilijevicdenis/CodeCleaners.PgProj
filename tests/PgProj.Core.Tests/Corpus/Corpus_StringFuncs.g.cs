@@ -159,11 +159,11 @@ public class Corpus_StringFuncs
     public void strfa0076() => CorpusAssert.Parses(@"SELECT string_to_array('hello', NULL)", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void strfa0077() => CorpusAssert.Parses(@"SELECT string_to_array()", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void strfa0078() => CorpusAssert.Parses(@"SELECT * FROM string_to_table('a,b,c', ',')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void strfa0079() => CorpusAssert.Parses(@"SELECT * FROM string_to_table('a,,b', ',', '')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void strfa0080() => CorpusAssert.Parses(@"SELECT * FROM string_to_table('hello', NULL)", "ok");
     [Fact]
     public void strfa0081() => CorpusAssert.Parses(@"SELECT encode('hello'::bytea, 'base64')", "ok");
@@ -573,11 +573,11 @@ public class Corpus_StringFuncs
     public void strfb0083() => CorpusAssert.Parses(@"SELECT string_to_array('hello', NULL)", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void strfb0084() => CorpusAssert.Parses(@"SELECT string_to_array()", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void strfb0085() => CorpusAssert.Parses(@"SELECT * FROM string_to_table('a,b,c', ',')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void strfb0086() => CorpusAssert.Parses(@"SELECT * FROM string_to_table('a,null,c', ',', 'null')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void strfb0087() => CorpusAssert.Parses(@"SELECT * FROM string_to_table('hello', NULL)", "ok");
     [Fact]
     public void strfb0088() => CorpusAssert.Parses(@"SELECT encode('hello'::bytea, 'base64')", "ok");

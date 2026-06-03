@@ -425,11 +425,11 @@ public class Corpus_TextPattern
     public void txpb0039() => CorpusAssert.Parses(@"SELECT regexp_match('HELLO', 'h(e)llo', 'i')", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void txpb0040() => CorpusAssert.Parses(@"SELECT regexp_match('hello', 'h(e)llo', 'g')", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txpb0041() => CorpusAssert.Parses(@"SELECT * FROM regexp_matches('hello world', '(\w+)', 'g')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txpb0042() => CorpusAssert.Parses(@"SELECT * FROM regexp_matches('hello', '(h)(e)', 'g')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txpb0043() => CorpusAssert.Parses(@"SELECT * FROM regexp_matches('HELLO', '(\w+)', 'gi')", "ok");
     [Fact]
     public void txpb0044() => CorpusAssert.Parses(@"SELECT regexp_replace('hello world', 'world', 'earth')", "ok");
@@ -441,11 +441,11 @@ public class Corpus_TextPattern
     public void txpb0047() => CorpusAssert.Parses(@"SELECT regexp_replace('hello world', '(\w+)', '[\1]', 'g')", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void txpb0048() => CorpusAssert.Parses(@"SELECT regexp_replace('hello', 'l+', 'L', 'z')", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txpb0049() => CorpusAssert.Parses(@"SELECT * FROM regexp_split_to_table('one two three', '\s+')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txpb0050() => CorpusAssert.Parses(@"SELECT * FROM regexp_split_to_table('one,two,three', ',')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txpb0051() => CorpusAssert.Parses(@"SELECT * FROM regexp_split_to_table('HELLO WORLD', '\s+', 'i')", "ok");
     [Fact]
     public void txpb0052() => CorpusAssert.Parses(@"SELECT regexp_split_to_array('one two three', '\s+')", "ok");
@@ -595,9 +595,9 @@ public class Corpus_TextPattern
     public void txpb0124() => CorpusAssert.Parses(@"SELECT regexp_replace('abc123', '[0-9]+', '#')", "ok");
     [Fact]
     public void txpb0125() => CorpusAssert.Parses(@"SELECT regexp_replace('ABC', '[a-z]+', 'x', 'gi')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txpb0126() => CorpusAssert.Parses(@"SELECT * FROM regexp_split_to_table('a::b::c', '::')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txpb0127() => CorpusAssert.Parses(@"SELECT * FROM regexp_split_to_table('hello', '')", "ok");
     [Fact]
     public void txpb0128() => CorpusAssert.Parses(@"SELECT array_length(regexp_split_to_array('one two three', '\s+'), 1)", "ok");
