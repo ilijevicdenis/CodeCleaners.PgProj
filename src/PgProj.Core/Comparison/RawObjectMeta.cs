@@ -38,6 +38,7 @@ public static class RawObjectMeta
         ObjectKind.Rule => 86,
         ObjectKind.Policy => 87,
         ObjectKind.EventTrigger => 88,
+        ObjectKind.Publication => 84, // after the tables it lists (FOR TABLE …)
         ObjectKind.Table => 43, // after base tables (40), before foreign keys (70)
         ObjectKind.Comment => 99, // last — every referenced object exists by now
         _ => 50,
@@ -81,7 +82,7 @@ public static class RawObjectMeta
             SqlEmitter.Qualified(def.Schema, def.Name),
         // global name
         ObjectKind.Extension or ObjectKind.Language or ObjectKind.Server
-            or ObjectKind.ForeignDataWrapper or ObjectKind.EventTrigger =>
+            or ObjectKind.ForeignDataWrapper or ObjectKind.EventTrigger or ObjectKind.Publication =>
             SqlEmitter.Quote(def.Name),
         // signature / verbatim (aggregate, operator, cast, opclass/family, transform, user mapping)
         _ => def.Name,
@@ -115,6 +116,7 @@ public static class RawObjectMeta
         ObjectKind.TextSearchConfiguration or ObjectKind.TextSearchDictionary
             or ObjectKind.TextSearchParser or ObjectKind.TextSearchTemplate => "TextSearch",
         ObjectKind.Transform => "Transforms",
+        ObjectKind.Publication => "Publications",
         ObjectKind.Comment => "Comments",
         ObjectKind.Table => "Tables",
         _ => "Other",

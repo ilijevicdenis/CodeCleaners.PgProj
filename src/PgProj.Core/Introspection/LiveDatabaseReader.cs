@@ -78,6 +78,7 @@ public sealed class LiveDatabaseReader
             Read(c => ReadOperatorClassesAsync(c, ct)),
             Read(c => ReadTextSearchDictionariesAsync(c, ct)),
             Read(c => ReadTextSearchConfigurationsAsync(c, ct)),
+            Read(c => ReadPublicationsAsync(c, ct)),
             Read(c => ReadExistenceObjectsAsync(c, ct)),
         };
 
@@ -1256,6 +1257,57 @@ public sealed class LiveDatabaseReader
             var body = $"CREATE FOREIGN TABLE {schema}.{name} ({cols}) SERVER {server}"
                        + OptionsClause(r.IsDBNull(3) ? null : r.GetFieldValue<string[]>(3)) + ";";
             list.Add(MakeRaw(ObjectKind.ForeignTable, schema, name, $"foreigntable:{schema}.{name}", body));
+        }
+        return list;
+    }
+
+    private async Task<List<RawObjectDefinition>> ReadPublicationsAsync(NpgsqlConnection conn, CancellationToken ct)
+    {
+        const string sql = @"
+            SELECT p.pubname, p.puballtables, p.pubinsert, p.pubupdate, p.pubdelete, p.pubtruncate, p.pubviaroot,
+                   (SELECT string_agg(quote_ident(n.nspname)||'.'||quote_ident(c.relname), ', '
+                                      ORDER BY n.nspname, c.relname)
+                      FROM pg_publication_rel pr
+                      JOIN pg_class c ON c.oid = pr.prrelid
+                      JOIN pg_namespace n ON n.oid = c.relnamespace
+                      WHERE pr.prpubid = p.oid) AS tables,
+                   (SELECT string_agg(quote_ident(n.nspname), ', ' ORDER BY n.nspname)
+                      FROM pg_publication_namespace pn
+                      JOIN pg_namespace n ON n.oid = pn.pnnspid
+                      WHERE pn.pnpubid = p.oid) AS schemas
+            FROM pg_publication p
+            ORDER BY p.pubname;";
+
+        var list = new List<RawObjectDefinition>();
+        await using var cmd = new NpgsqlCommand(sql, conn);
+        await using var r = await cmd.ExecuteReaderAsync(ct);
+        while (await r.ReadAsync(ct))
+        {
+            var name = r.GetString(0);
+            var body = new System.Text.StringBuilder($"CREATE PUBLICATION {name}");
+
+            if (r.GetBoolean(1))
+            {
+                body.Append(" FOR ALL TABLES");
+            }
+            else
+            {
+                var fors = new List<string>();
+                if (!r.IsDBNull(7)) fors.Add($"TABLE {r.GetString(7)}");
+                if (!r.IsDBNull(8)) fors.Add($"TABLES IN SCHEMA {r.GetString(8)}");
+                if (fors.Count > 0) body.Append(" FOR ").Append(string.Join(", ", fors));
+            }
+
+            var ops = new List<string>();
+            if (r.GetBoolean(2)) ops.Add("insert");
+            if (r.GetBoolean(3)) ops.Add("update");
+            if (r.GetBoolean(4)) ops.Add("delete");
+            if (r.GetBoolean(5)) ops.Add("truncate");
+            var with = new List<string> { $"publish = '{string.Join(", ", ops)}'" };
+            if (r.GetBoolean(6)) with.Add("publish_via_partition_root = true");
+            body.Append($" WITH ({string.Join(", ", with)});");
+
+            list.Add(MakeRaw(ObjectKind.Publication, "", name, $"publication:{name}".ToLowerInvariant(), body.ToString()));
         }
         return list;
     }

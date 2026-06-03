@@ -132,7 +132,8 @@ public sealed partial class PgParser
         if (c.AtWord("UNIQUE") || c.AtWord("INDEX")) return ParseCreateIndex(c);
         if (c.AtAnyWord("FUNCTION", "PROCEDURE")) return ParseCreateFunction(c);
         if (c.AtAnyWord("ROLE", "USER", "GROUP")) { var k = c.Advance().Value.ToUpperInvariant(); c.ExpectIdentifier(); ConsumeRest(c); return new CommandStatement { Kind = "CREATE " + k }; }
-        if (c.MatchWord("PUBLICATION")) { c.ExpectIdentifier(); ConsumeRest(c); return new CommandStatement { Kind = "CREATE PUBLICATION" }; }
+        // PUBLICATION falls through to ParseCreateGeneric → RawCreateStatement → modelled as a raw object
+        // (so it deploys + extracts), not discarded as a CommandStatement.
         if (c.MatchWord("SUBSCRIPTION"))
         {
             c.ExpectIdentifier();

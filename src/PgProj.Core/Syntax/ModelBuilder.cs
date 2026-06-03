@@ -136,7 +136,7 @@ public sealed class ModelBuilder
                     or ObjectKind.TextSearchDictionary or ObjectKind.TextSearchParser or ObjectKind.TextSearchTemplate:
                     SkipIfNotExists(cur); (schema, name) = Qual(cur); break;
                 case ObjectKind.Extension or ObjectKind.Language or ObjectKind.Server
-                    or ObjectKind.ForeignDataWrapper or ObjectKind.EventTrigger:
+                    or ObjectKind.ForeignDataWrapper or ObjectKind.EventTrigger or ObjectKind.Publication:
                     SkipIfNotExists(cur); name = cur.ExpectIdentifier(); break;
                 case ObjectKind.Trigger or ObjectKind.Policy:
                     name = cur.ExpectIdentifier(); onObject = ScanThenQual(cur, "ON"); schema = SchemaOf(onObject); break;
@@ -182,6 +182,7 @@ public sealed class ModelBuilder
             case "TRIGGER": return ObjectKind.Trigger;
             case "RULE": return ObjectKind.Rule;
             case "POLICY": return ObjectKind.Policy;
+            case "PUBLICATION": return ObjectKind.Publication;
             case "STATISTICS": return ObjectKind.Statistics;
             case "SERVER": return ObjectKind.Server;
             case "TRANSFORM": return ObjectKind.Transform;

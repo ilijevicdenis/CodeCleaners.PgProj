@@ -35,7 +35,7 @@ public sealed class LiveReaderIntegrationTests
         var script = new DeployScriptGenerator().Generate(create, new DeployOptions { WrapInTransaction = true });
 
         var deployer = new DatabaseDeployer();
-        await deployer.ExecuteAsync(conn, "DROP SCHEMA IF EXISTS afd CASCADE; DROP SCHEMA IF EXISTS reporting CASCADE; DROP FOREIGN DATA WRAPPER IF EXISTS dummy_fdw CASCADE;");
+        await deployer.ExecuteAsync(conn, "DROP PUBLICATION IF EXISTS customer_pub; DROP SCHEMA IF EXISTS afd CASCADE; DROP SCHEMA IF EXISTS reporting CASCADE; DROP FOREIGN DATA WRAPPER IF EXISTS dummy_fdw CASCADE;");
         await deployer.ExecuteAsync(conn, script);
 
         // Read it back with the parallel reader and sanity-check the shape.
@@ -56,6 +56,7 @@ public sealed class LiveReaderIntegrationTests
         Assert.Contains(live.Objects, o => o.Kind == ObjectKind.TextSearchDictionary && o.Body.Contains("CREATE TEXT SEARCH DICTIONARY"));
         Assert.Contains(live.Objects, o => o.Kind == ObjectKind.TextSearchConfiguration && o.Body.Contains("ADD MAPPING"));
         Assert.Contains(live.Objects, o => o.Kind == ObjectKind.OperatorClass && o.Body.Contains("CREATE OPERATOR CLASS"));
+        Assert.Contains(live.Objects, o => o.Kind == ObjectKind.Publication && o.Body.Contains("CREATE PUBLICATION") && o.Body.Contains("FOR TABLE"));
 
         // Every exported object's DDL must re-parse cleanly — this is the "complete the parser" check.
         var unparseable = DdlExporter.ExportFiles(live)
@@ -73,7 +74,7 @@ public sealed class LiveReaderIntegrationTests
         // valid and correctly ordered, not just parseable.
         var recreate = new SchemaComparer().Compare(live, new DatabaseModel());
         var script2 = new DeployScriptGenerator().Generate(recreate, new DeployOptions { WrapInTransaction = true });
-        await deployer.ExecuteAsync(conn, "DROP SCHEMA IF EXISTS afd CASCADE; DROP SCHEMA IF EXISTS reporting CASCADE; DROP FOREIGN DATA WRAPPER IF EXISTS dummy_fdw CASCADE;");
+        await deployer.ExecuteAsync(conn, "DROP PUBLICATION IF EXISTS customer_pub; DROP SCHEMA IF EXISTS afd CASCADE; DROP SCHEMA IF EXISTS reporting CASCADE; DROP FOREIGN DATA WRAPPER IF EXISTS dummy_fdw CASCADE;");
         await deployer.ExecuteAsync(conn, script2);
     }
 
