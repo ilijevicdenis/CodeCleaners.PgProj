@@ -641,7 +641,7 @@ public class Corpus_SelectWindow
     public void selwb0147() => CorpusAssert.Parses(@"SELECT row_number() OVER (ORDER BY s.t.id) FROM s.t JOIN s.t2 ON s.t.id = s.t2.t_id", "ok");
     [Fact]
     public void selwb0148() => CorpusAssert.Parses(@"SELECT t.id, sum(t2.amount) OVER (PARTITION BY t.status ORDER BY t.id) FROM s.t JOIN s.t2 ON s.t.id = s.t2.t_id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selwb0149() => CorpusAssert.Parses(@"SELECT row_number() OVER (ORDER BY id) FROM s.v", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void selwb0150() => CorpusAssert.Parses(@"SELECT id, row_number() OVER (ORDER BY id) FROM s.t HAVING row_number() OVER (ORDER BY id) > 1", "error");

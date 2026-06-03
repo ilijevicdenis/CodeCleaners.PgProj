@@ -25,6 +25,7 @@ public sealed class SemanticAnalyzer
     private readonly Catalog _preExisting;   // objects that existed before this script (for duplicate detection)
     private readonly List<SemanticDiagnostic> _diags = new();
     private bool _scriptRenames;             // a RENAME in the script changes names we cannot track — skip relation checks
+    private bool _scriptAlters;              // an ALTER may add/rename columns we don't track — skip column checks
 
     public SemanticAnalyzer(Catalog catalog, Catalog? preExisting = null)
     {
@@ -35,6 +36,7 @@ public sealed class SemanticAnalyzer
     public IReadOnlyList<SemanticDiagnostic> Analyze(ParseResult result)
     {
         _scriptRenames = result.Statements.OfType<AlterStatement>().Any(a => a.Actions.Contains("RENAME"));
+        _scriptAlters = result.Statements.OfType<AlterStatement>().Any();
         foreach (var stmt in result.Statements) AnalyzeStatement(stmt);
         return _diags;
     }
@@ -47,7 +49,14 @@ public sealed class SemanticAnalyzer
         {
             case QueryStatement q: AnalyzeQuery(q.Query); break;
             case InsertStatement ins: AnalyzeInsert(ins); break;
-            case UpdateStatement up: ResolveTable(up.Schema, up.Table); if (up.From is not null) AnalyzeFrom(up.From); CheckExpr(up.Where); foreach (var s in up.Set) CheckExpr(s.Value); break;
+            case UpdateStatement up:
+                ResolveTable(up.Schema, up.Table);
+                if (up.From is null)   // with a FROM, a SET target could be ambiguous to attribute — only check simple updates
+                    CheckColumnsExist(up.Schema, up.Table, up.Set.Where(s => !s.Multi).SelectMany(s => s.Columns));
+                if (up.From is not null) AnalyzeFrom(up.From);
+                CheckExpr(up.Where);
+                foreach (var s in up.Set) CheckExpr(s.Value);
+                break;
             case DeleteStatement del: ResolveTable(del.Schema, del.Table); if (del.Using is not null) AnalyzeFrom(del.Using); CheckExpr(del.Where); break;
             case MergeStatement m: ResolveTable(m.Schema, m.Table); AnalyzeTableRef(m.Source); CheckExpr(m.On); break;
             case CreateTableStatement ct:
@@ -64,8 +73,21 @@ public sealed class SemanticAnalyzer
             foreach (var row in v.ValuesRows)
                 if (row.Count != ins.Columns.Count)
                 { Report($"INSERT has {ins.Columns.Count} columns but {row.Count} values"); break; }
+        CheckColumnsExist(ins.Schema, ins.Table, ins.Columns);
         if (ins.Source is not null) AnalyzeQuery(ins.Source);
         foreach (var r in ins.Returning) CheckExpr(r.Expr);
+    }
+
+    /// <summary>Flag a referenced column that does not exist on a known table (high-confidence: explicit targets).</summary>
+    private void CheckColumnsExist(string? schema, string table, IEnumerable<string> columns)
+    {
+        if (_scriptAlters) return;                         // an ALTER may have added/renamed columns
+        var known = _catalog.Columns(schema, table);
+        if (known is null || known.Count == 0) return;     // table or its columns not known — don't guess
+        var set = new HashSet<string>(known, StringComparer.OrdinalIgnoreCase);
+        foreach (var c in columns)
+            if (!set.Contains(c))
+                Report($"column \"{c}\" of relation \"{Qual(schema, table)}\" does not exist");
     }
 
     private void AnalyzeQuery(SelectQuery? q)

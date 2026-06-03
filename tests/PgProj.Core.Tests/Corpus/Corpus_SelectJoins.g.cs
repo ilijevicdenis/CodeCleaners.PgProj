@@ -113,9 +113,9 @@ public class Corpus_SelectJoins
     public void selja0053() => CorpusAssert.Parses(@"SELECT t.id FROM s.t JOIN s.t2 ON t.id = t2.t_id JOIN s.parent ON t.id = s.parent.id JOIN s.child ON s.parent.id = s.child.id", "ok");
     [Fact]
     public void selja0054() => CorpusAssert.Parses(@"SELECT p.id, c.extra FROM s.parent p JOIN s.child c ON p.id = c.id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0055() => CorpusAssert.Parses(@"SELECT t.id, v.name FROM s.t JOIN s.v ON t.id = v.id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0056() => CorpusAssert.Parses(@"SELECT t.id, mv.n FROM s.t JOIN s.mv ON t.status = mv.status", "ok");
     [Fact]
     public void selja0057() => CorpusAssert.Parses(@"SELECT e.id, t.name FROM s.events e JOIN s.t ON t.id = e.id", "ok");
@@ -479,9 +479,9 @@ public class Corpus_SelectJoins
     public void seljb0066() => CorpusAssert.Parses(@"SELECT * FROM s.t RIGHT JOIN s.t2 ON s.t.id = s.t2.t_id WHERE s.t.id IS NULL", "ok");
     [Fact]
     public void seljb0067() => CorpusAssert.Parses(@"SELECT coalesce(a.id, b.id) AS id FROM s.t a FULL JOIN s.t2 b ON a.id = b.t_id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljb0068() => CorpusAssert.Parses(@"SELECT t.name, v.name FROM s.t JOIN s.v ON s.t.id = s.v.id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljb0069() => CorpusAssert.Parses(@"SELECT t.name FROM s.t JOIN s.mv ON s.t.status = s.mv.status", "ok");
     [Fact]
     public void seljb0070() => CorpusAssert.Parses(@"SELECT * FROM s.t JOIN s.t2 ON s.t.id = s.t2.t_id FOR UPDATE", "ok");

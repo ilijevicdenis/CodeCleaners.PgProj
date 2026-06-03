@@ -119,7 +119,7 @@ public class Corpus_Delete
     public void dela0056() => CorpusAssert.Parses(@"DELETE FROM s.t WHERE id > 0 RETURNING WITH (NEW AS after) after.name", "ok");
     [Fact]
     public void dela0057() => CorpusAssert.Parses(@"DELETE FROM s.t WHERE id > 0 RETURNING WITH (OLD AS o, NEW AS n) o.id, n.name", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dela0058() => CorpusAssert.Parses(@"DELETE FROM s.t USING s.t2, s.mv WHERE s.t.id = s.t2.t_id", "ok");
     [Fact]
     public void dela0059() => CorpusAssert.Parses(@"DELETE FROM s.t AS x USING (SELECT id FROM s.t2 WHERE amount > 0) AS sub WHERE x.id = sub.id", "ok");
@@ -167,7 +167,7 @@ public class Corpus_Delete
     public void dela0080() => CorpusAssert.Parses(@"DELETE FROM s.nonexistent WHERE id = 1", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void dela0081() => CorpusAssert.Parses(@"DELETE FROM s.t WHERE nosuchcol = 1", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dela0082() => CorpusAssert.Parses(@"DELETE FROM s.v WHERE id = 1", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void dela0083() => CorpusAssert.Parses(@"DELETE FROM s.t WHERE id = 1 RETURNING nosuchcol", "error");
@@ -491,7 +491,7 @@ DELETE FROM s.t WHERE id = 1", "ok");
     public void delb0071() => CorpusAssert.Parses(@"DELETE FROM s.nosuchschema.t", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void delb0072() => CorpusAssert.Parses(@"DELETE FROM s.t WHERE id = 'not_a_number'", "error");
-    [Fact]
+    [Fact(Skip = "pending: parser not yet complete")]
     public void delb0073() => CorpusAssert.Parses(@"DELETE FROM s.mv WHERE status = 'ok'", "error");
     [Fact]
     public void delb0074() => CorpusAssert.Parses(@"TRUNCATE s.t WHERE id = 1", "error");

@@ -20,12 +20,17 @@ public static class CatalogBuilder
     {
         switch (stmt)
         {
+            // partition/typed/inheriting tables have columns we cannot fully enumerate here → leave columns unknown
+            case CreateTableStatement { IsPartitionOrTyped: true } t: c.AddRelation(t.Schema, t.Name); break;
+            case CreateTableStatement t when t.TrailingText is { } tr && tr.Contains("inherits", System.StringComparison.OrdinalIgnoreCase):
+                c.AddRelation(t.Schema, t.Name); break;
             case CreateTableStatement t:
                 c.AddRelation(t.Schema, t.Name, t.Columns.Select(col => col.Name));
                 break;
-            case CreateTableAsStatement ctas:
-                c.AddRelation(ctas.Schema, ctas.Name);
-                break;
+            case CreateTableAsStatement ctas: c.AddRelation(ctas.Schema, ctas.Name); break;
+            case CreateViewStatement v: c.AddRelation(v.Schema, v.Name); break;
+            case CreateSequenceStatement sq: c.AddRelation(sq.Schema, sq.Name); break;
+            case CreateFunctionStatement f: c.AddFunction(f.Name); break;
             case CreateSchemaStatement s when s.Name is not null:
                 c.AddSchema(s.Name);
                 break;

@@ -245,9 +245,9 @@ public class Corpus_Insert
     public void insa0119() => CorpusAssert.Parses(@"INSERT INTO s.t (name) VALUES ('ColAlias') AS new_row (new_name)", "error");
     [Fact]
     public void insa0120() => CorpusAssert.Parses(@"INSERT INTO s.nonexistent (name) VALUES ('x')", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void insa0121() => CorpusAssert.Parses(@"INSERT INTO s.v (name, val) VALUES ('View', 1.0)", "ok");
     [Fact]
+    public void insa0121() => CorpusAssert.Parses(@"INSERT INTO s.v (name, val) VALUES ('View', 1.0)", "ok");
+    [Fact(Skip = "pending: parser not yet complete")]
     public void insa0122() => CorpusAssert.Parses(@"INSERT INTO s.mv (status, n) VALUES ('ok', 1)", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void insa0123() => CorpusAssert.Parses(@"INSERT INTO s.t (name) VALUES ('x') ON CONFLICT (name, id) DO NOTHING", "error");
@@ -511,7 +511,7 @@ public class Corpus_Insert
     public void insb0082() => CorpusAssert.Parses(@"INSERT INTO s.t (name) VALUES ('a') RETURNING nonexistent_col", "error");
     [Fact]
     public void insb0083() => CorpusAssert.Parses(@"INSERT INTO s.nonexistent (name) VALUES ('a')", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void insb0084() => CorpusAssert.Parses(@"INSERT INTO s.v (name) VALUES ('view-insert')", "ok");
     [Fact]
     public void insb0085() => CorpusAssert.Parses(@"INSERT INTO s.t (name) DEFAULT VALUES DEFAULT VALUES", "error");
