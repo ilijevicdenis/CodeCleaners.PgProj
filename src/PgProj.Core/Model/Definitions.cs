@@ -15,11 +15,15 @@ public sealed record ColumnDefinition(
     string DataType,
     bool IsNullable,
     string? Default = null,
-    bool IsIdentity = false);
+    bool IsIdentity = false,
+    string? IdentityKind = null,        // "ALWAYS" | "BY DEFAULT" when IsIdentity
+    string? GeneratedExpression = null); // the (expr) for GENERATED ALWAYS AS (expr) STORED
 
 public sealed record PrimaryKeyDefinition(string? Name, IReadOnlyList<string> Columns);
 
 public sealed record UniqueConstraintDefinition(string? Name, IReadOnlyList<string> Columns);
+
+public sealed record CheckConstraintDefinition(string? Name, string Expression);
 
 public sealed record ForeignKeyDefinition(
     string? Name,
@@ -38,6 +42,10 @@ public sealed record TableDefinition
     public PrimaryKeyDefinition? PrimaryKey { get; set; }
     public List<UniqueConstraintDefinition> Unique { get; init; } = new();
     public List<ForeignKeyDefinition> ForeignKeys { get; init; } = new();
+    public List<CheckConstraintDefinition> Checks { get; init; } = new();
+
+    /// <summary>Constraint clauses captured verbatim (EXCLUDE and anything not finely modelled).</summary>
+    public List<string> OtherConstraints { get; init; } = new();
 
     public string QualifiedName => $"{Schema}.{Name}";
 
@@ -56,7 +64,16 @@ public sealed record IndexDefinition(
 
 public sealed record ViewDefinition(string Schema, string Name, string Body, bool IsMaterialized = false);
 
-public sealed record SequenceDefinition(string Schema, string Name);
+public sealed record SequenceDefinition(
+    string Schema,
+    string Name,
+    string? DataType = null,
+    long? Increment = null,
+    long? MinValue = null,
+    long? MaxValue = null,
+    long? Start = null,
+    long? Cache = null,
+    bool Cycle = false);
 
 /// <summary>
 /// A function/procedure. <see cref="Signature"/> is the schema-qualified name plus argument

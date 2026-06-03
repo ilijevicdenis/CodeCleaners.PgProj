@@ -184,9 +184,21 @@ public sealed class SqlParser
             var (onDelete, onUpdate) = ParseReferentialActions(r);
             table.ForeignKeys.Add(new ForeignKeyDefinition(name, cols, rs, rt, refCols, onDelete, onUpdate));
         }
+        else if (r.MatchWord("CHECK"))
+        {
+            var expr = r.IsSymbol('(') ? CaptureBalancedParens(r) : string.Empty;
+            table.Checks.Add(new CheckConstraintDefinition(name, expr));
+            SkipToElementEnd(r); // e.g. NO INHERIT
+        }
+        else if (r.MatchWord("EXCLUDE"))
+        {
+            var clause = CaptureToElementEnd(r);
+            var prefix = string.IsNullOrEmpty(name) ? string.Empty : $"CONSTRAINT {name} ";
+            table.OtherConstraints.Add($"{prefix}EXCLUDE {clause}".Trim());
+        }
         else
         {
-            // CHECK / EXCLUDE / LIKE — skip the whole element body.
+            // LIKE / anything else — skip the whole element body.
             SkipToElementEnd(r);
         }
     }
@@ -198,6 +210,8 @@ public sealed class SqlParser
         var nullable = true;
         string? def = null;
         var identity = false;
+        string? identityKind = null;
+        string? generated = null;
 
         while (!r.Eof && !r.IsSymbol(',') && !r.IsSymbol(')'))
         {
@@ -219,18 +233,26 @@ public sealed class SqlParser
             {
                 // GENERATED { ALWAYS | BY DEFAULT } AS IDENTITY [ ( options ) ]
                 // GENERATED ALWAYS AS ( expr ) STORED
-                r.MatchWord("ALWAYS"); r.MatchWord("BY"); r.MatchWord("DEFAULT"); r.MatchWord("AS");
-                if (r.MatchWord("IDENTITY")) { identity = true; if (r.IsSymbol('(')) SkipBalancedParens(r); }
-                else if (r.IsSymbol('(')) { SkipBalancedParens(r); r.MatchWord("STORED"); }
+                string? idKind = null;
+                if (r.MatchWord("ALWAYS")) idKind = "ALWAYS";
+                else if (r.MatchWord("BY")) { r.MatchWord("DEFAULT"); idKind = "BY DEFAULT"; }
+                r.MatchWord("AS");
+                if (r.MatchWord("IDENTITY")) { identity = true; identityKind = idKind ?? "BY DEFAULT"; if (r.IsSymbol('(')) SkipBalancedParens(r); }
+                else if (r.IsSymbol('(')) { generated = CaptureBalancedParens(r); r.MatchWord("STORED"); }
                 continue;
             }
-            if (r.MatchWord("CHECK")) { if (r.IsSymbol('(')) SkipBalancedParens(r); continue; }
+            if (r.MatchWord("CHECK"))
+            {
+                var expr = r.IsSymbol('(') ? CaptureBalancedParens(r) : string.Empty;
+                table.Checks.Add(new CheckConstraintDefinition(null, expr));
+                continue;
+            }
             if (r.MatchWord("COLLATE")) { r.ParseIdentifier(); continue; }
             // Unknown column modifier — consume one token to make progress.
             r.Next();
         }
 
-        table.Columns.Add(new ColumnDefinition(colName, dataType, nullable, def, identity));
+        table.Columns.Add(new ColumnDefinition(colName, dataType, nullable, def, identity, identityKind, generated));
     }
 
     private static string ParseDataType(TokenReader r)
@@ -345,8 +367,45 @@ public sealed class SqlParser
     {
         SkipIfNotExists(r);
         var (schema, name) = ParseQualifiedName(r);
-        model.Sequences.Add(new SequenceDefinition(schema, name));
+
+        string? dataType = null;
+        long? increment = null, min = null, max = null, start = null, cache = null;
+        var cycle = false;
+
+        while (!r.Eof)
+        {
+            // Sequence AS takes a single simple integer type (smallint/integer/bigint), not the
+            // full column-type grammar — read exactly one word.
+            if (r.MatchWord("AS")) { dataType = TypeNormalizer.Normalize(r.ParseIdentifier()); continue; }
+            if (r.MatchWord("INCREMENT")) { r.MatchWord("BY"); increment = ParseSignedLong(r); continue; }
+            if (r.MatchWord("MINVALUE")) { min = ParseSignedLong(r); continue; }
+            if (r.MatchWord("MAXVALUE")) { max = ParseSignedLong(r); continue; }
+            if (r.MatchWord("START")) { r.MatchWord("WITH"); start = ParseSignedLong(r); continue; }
+            if (r.MatchWord("CACHE")) { cache = ParseSignedLong(r); continue; }
+            if (r.MatchWord("CYCLE")) { cycle = true; continue; }
+            if (r.MatchWord("NO"))
+            {
+                if (r.MatchWord("CYCLE")) cycle = false;
+                else r.Next(); // NO MINVALUE / NO MAXVALUE → leave unset
+                continue;
+            }
+            if (r.MatchWord("OWNED")) { r.MatchWord("BY"); break; } // ownership — not modelled
+            r.Next(); // unknown token; keep progressing
+        }
+
+        model.Sequences.Add(new SequenceDefinition(schema, name, dataType, increment, min, max, start, cache, cycle));
         EnsureSchema(model, schema);
+    }
+
+    private static long? ParseSignedLong(TokenReader r)
+    {
+        var negative = r.MatchSymbol('-');
+        if (r.Cur is { Kind: TokenKind.Number } t && long.TryParse(t.Value, out var v))
+        {
+            r.Next();
+            return negative ? -v : v;
+        }
+        return null;
     }
 
     // ---- CREATE FUNCTION / PROCEDURE -----------------------------------------------------
@@ -677,6 +736,21 @@ public sealed class SqlParser
             if (depth == 0 && t.IsSymbol(',')) break;
             r.Next();
         }
+    }
+
+    private static string CaptureToElementEnd(TokenReader r)
+    {
+        var toks = new List<Token>();
+        var depth = 0;
+        while (!r.Eof)
+        {
+            var t = r.Cur!;
+            if (t.IsSymbol('(')) { depth++; toks.Add(r.Next()); continue; }
+            if (t.IsSymbol(')')) { if (depth == 0) break; depth--; toks.Add(r.Next()); continue; }
+            if (depth == 0 && t.IsSymbol(',')) break;
+            toks.Add(r.Next());
+        }
+        return Token.Render(toks);
     }
 
     private static void EnsureSchema(DatabaseModel model, string schema)

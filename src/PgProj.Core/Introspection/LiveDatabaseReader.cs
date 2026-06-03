@@ -30,6 +30,7 @@ public sealed class LiveDatabaseReader
         await ReadSchemasAsync(conn, model, ct);
         var tablesByKey = await ReadTablesAndColumnsAsync(conn, model, ct);
         await ReadConstraintsAsync(conn, tablesByKey, ct);
+        await ReadChecksAsync(conn, tablesByKey, ct);
         await ReadForeignKeysAsync(conn, tablesByKey, ct);
         await ReadIndexesAsync(conn, model, ct);
         await ReadViewsAsync(conn, model, ct);
@@ -61,7 +62,7 @@ public sealed class LiveDatabaseReader
             SELECT n.nspname, c.relname, a.attname,
                    format_type(a.atttypid, a.atttypmod) AS datatype,
                    a.attnotnull, pg_get_expr(d.adbin, d.adrelid) AS default_expr,
-                   a.attidentity
+                   a.attidentity, a.attgenerated
             FROM pg_attribute a
             JOIN pg_class c ON c.oid = a.attrelid
             JOIN pg_namespace n ON n.oid = c.relnamespace
@@ -88,9 +89,20 @@ public sealed class LiveDatabaseReader
             var dataType = TypeNormalizer.Normalize(r.GetString(3));
             var notNull = r.GetBoolean(4);
             var defExpr = r.IsDBNull(5) ? null : r.GetString(5);
-            var identity = !r.IsDBNull(6) && r.GetString(6) is { Length: > 0 } s && s != "\0";
+            var idChar = ReadChar(r, 6, fallback: '\0');
+            var genChar = ReadChar(r, 7, fallback: '\0');
 
-            def.Columns.Add(new ColumnDefinition(r.GetString(2), dataType, !notNull, defExpr, identity));
+            var isIdentity = idChar is 'a' or 'd';
+            var identityKind = idChar switch { 'a' => "ALWAYS", 'd' => "BY DEFAULT", _ => (string?)null };
+            var isGenerated = genChar == 's';
+            var generatedExpr = isGenerated && !string.IsNullOrEmpty(defExpr) ? $"({defExpr})" : null;
+
+            def.Columns.Add(new ColumnDefinition(
+                r.GetString(2), dataType, !notNull,
+                Default: isGenerated ? null : defExpr,
+                IsIdentity: isIdentity,
+                IdentityKind: identityKind,
+                GeneratedExpression: generatedExpr));
         }
         return byKey;
     }
@@ -134,6 +146,32 @@ public sealed class LiveDatabaseReader
         foreach (var ((schema, table, name), cols) in uq)
             if (tables.TryGetValue($"{schema}.{table}", out var def))
                 def.Unique.Add(new UniqueConstraintDefinition(name, cols));
+    }
+
+    private async Task ReadChecksAsync(NpgsqlConnection conn, Dictionary<string, TableDefinition> tables, CancellationToken ct)
+    {
+        const string sql = @"
+            SELECT n.nspname, c.relname, con.conname, pg_get_constraintdef(con.oid) AS def
+            FROM pg_constraint con
+            JOIN pg_class c ON c.oid = con.conrelid
+            JOIN pg_namespace n ON n.oid = c.relnamespace
+            WHERE con.contype = 'c'
+              AND n.nspname NOT IN ('pg_catalog','information_schema') AND n.nspname NOT LIKE 'pg_%'
+            ORDER BY n.nspname, c.relname, con.conname;";
+
+        await using var cmd = new NpgsqlCommand(sql, conn);
+        await using var r = await cmd.ExecuteReaderAsync(ct);
+        while (await r.ReadAsync(ct))
+        {
+            var key = $"{r.GetString(0)}.{r.GetString(1)}";
+            if (!tables.TryGetValue(key, out var def)) continue;
+            var name = r.GetString(2);
+            var constraintDef = r.GetString(3); // e.g. "CHECK ((value > 0))"
+            var expr = constraintDef.StartsWith("CHECK ", StringComparison.OrdinalIgnoreCase)
+                ? constraintDef["CHECK ".Length..].Trim()
+                : constraintDef;
+            def.Checks.Add(new CheckConstraintDefinition(name, expr));
+        }
     }
 
     private async Task ReadForeignKeysAsync(NpgsqlConnection conn, Dictionary<string, TableDefinition> tables, CancellationToken ct)
@@ -180,15 +218,15 @@ public sealed class LiveDatabaseReader
 
     // The catalog's confdeltype/confupdtype are the single-byte internal "char" type; read
     // defensively so a provider that surfaces it as a string doesn't blow up.
-    private static char ReadChar(NpgsqlDataReader r, int ordinal)
+    private static char ReadChar(NpgsqlDataReader r, int ordinal, char fallback = 'a')
     {
-        if (r.IsDBNull(ordinal)) return 'a';
+        if (r.IsDBNull(ordinal)) return fallback;
         var v = r.GetValue(ordinal);
         return v switch
         {
             char c => c,
-            string s => s.Length > 0 ? s[0] : 'a',
-            _ => 'a',
+            string s => s.Length > 0 ? s[0] : fallback,
+            _ => fallback,
         };
     }
 
@@ -272,17 +310,28 @@ public sealed class LiveDatabaseReader
 
     private async Task ReadSequencesAsync(NpgsqlConnection conn, DatabaseModel model, CancellationToken ct)
     {
+        // pg_sequences (PG 10+) exposes every configured option directly.
         const string sql = @"
-            SELECT n.nspname, c.relname
-            FROM pg_class c
-            JOIN pg_namespace n ON n.oid = c.relnamespace
-            WHERE c.relkind = 'S' AND n.nspname NOT IN ('pg_catalog','information_schema') AND n.nspname NOT LIKE 'pg_%'
-            ORDER BY n.nspname, c.relname;";
+            SELECT schemaname, sequencename, data_type::text,
+                   increment_by, min_value, max_value, start_value, cache_size, cycle
+            FROM pg_sequences
+            WHERE schemaname NOT IN ('pg_catalog','information_schema') AND schemaname NOT LIKE 'pg_%'
+            ORDER BY schemaname, sequencename;";
 
         await using var cmd = new NpgsqlCommand(sql, conn);
         await using var r = await cmd.ExecuteReaderAsync(ct);
         while (await r.ReadAsync(ct))
-            model.Sequences.Add(new SequenceDefinition(r.GetString(0), r.GetString(1)));
+        {
+            model.Sequences.Add(new SequenceDefinition(
+                r.GetString(0), r.GetString(1),
+                DataType: r.IsDBNull(2) ? null : TypeNormalizer.Normalize(r.GetString(2)),
+                Increment: r.IsDBNull(3) ? null : r.GetInt64(3),
+                MinValue: r.IsDBNull(4) ? null : r.GetInt64(4),
+                MaxValue: r.IsDBNull(5) ? null : r.GetInt64(5),
+                Start: r.IsDBNull(6) ? null : r.GetInt64(6),
+                Cache: r.IsDBNull(7) ? null : r.GetInt64(7),
+                Cycle: !r.IsDBNull(8) && r.GetBoolean(8)));
+        }
     }
 
     private async Task ReadFunctionsAsync(NpgsqlConnection conn, DatabaseModel model, CancellationToken ct)

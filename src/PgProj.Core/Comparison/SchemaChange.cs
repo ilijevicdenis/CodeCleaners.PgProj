@@ -31,7 +31,16 @@ public sealed record CreateSequenceChange(SequenceDefinition Sequence) : SchemaC
     public override int Phase => 20;
     public override bool IsDestructive => false;
     public override string Describe() => $"Create sequence {Sequence.Schema}.{Sequence.Name}";
-    public override string ToSql() => $"CREATE SEQUENCE IF NOT EXISTS {SqlEmitter.Qualified(Sequence.Schema, Sequence.Name)};";
+    public override string ToSql() => SqlEmitter.CreateSequence(Sequence);
+}
+
+public sealed record AlterSequenceChange(SequenceDefinition Sequence) : SchemaChange
+{
+    public override int Phase => 21;
+    public override bool IsDestructive => false;
+    public override string Describe() => $"Alter sequence {Sequence.Schema}.{Sequence.Name}";
+    public override string ToSql() =>
+        $"ALTER SEQUENCE {SqlEmitter.Qualified(Sequence.Schema, Sequence.Name)}{SqlEmitter.SequenceOptions(Sequence)};";
 }
 
 public sealed record DropForeignKeyChange(string Schema, string Table, string Name) : SchemaChange
@@ -97,6 +106,32 @@ public sealed record AlterColumnChange(string Schema, string Table, ColumnDefini
 
         return sb.ToString().TrimEnd();
     }
+}
+
+public sealed record AddCheckConstraintChange(string Schema, string Table, CheckConstraintDefinition Check) : SchemaChange
+{
+    public override int Phase => 48;
+    public override bool IsDestructive => false;
+    public override string Describe() => $"Add check constraint on {Schema}.{Table}";
+    public override string ToSql() =>
+        $"ALTER TABLE {SqlEmitter.Qualified(Schema, Table)} ADD {SqlEmitter.Check(Check)};";
+}
+
+public sealed record AddRawTableConstraintChange(string Schema, string Table, string Clause) : SchemaChange
+{
+    public override int Phase => 49;
+    public override bool IsDestructive => false;
+    public override string Describe() => $"Add constraint on {Schema}.{Table}";
+    public override string ToSql() => $"ALTER TABLE {SqlEmitter.Qualified(Schema, Table)} ADD {Clause};";
+}
+
+public sealed record DropConstraintChange(string Schema, string Table, string Name) : SchemaChange
+{
+    public override int Phase => 31;
+    public override bool IsDestructive => true;
+    public override string Describe() => $"Drop constraint {Name} on {Schema}.{Table}";
+    public override string ToSql() =>
+        $"ALTER TABLE {SqlEmitter.Qualified(Schema, Table)} DROP CONSTRAINT {SqlEmitter.Quote(Name)};";
 }
 
 public sealed record DropPrimaryKeyChange(string Schema, string Table, string Name) : SchemaChange

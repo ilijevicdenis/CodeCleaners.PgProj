@@ -55,9 +55,26 @@ public sealed class SchemaComparer
     {
         foreach (var s in source.Sequences)
         {
-            var exists = target.Sequences.Any(t => DatabaseModel.NameEquals(t.Schema, s.Schema) && DatabaseModel.NameEquals(t.Name, s.Name));
-            if (!exists) changes.Add(new CreateSequenceChange(s));
+            var tgt = target.Sequences.FirstOrDefault(t =>
+                DatabaseModel.NameEquals(t.Schema, s.Schema) && DatabaseModel.NameEquals(t.Name, s.Name));
+            if (tgt is null)
+                changes.Add(new CreateSequenceChange(s));
+            else if (SequenceOptionsDiffer(s, tgt) && SqlEmitter.SequenceOptions(s).Length > 0)
+                changes.Add(new AlterSequenceChange(s));
         }
+    }
+
+    // Only options the source explicitly set are compared, so an introspected sequence (which
+    // reports every option with its default) doesn't churn an ALTER on every deploy.
+    private static bool SequenceOptionsDiffer(SequenceDefinition s, SequenceDefinition t)
+    {
+        if (s.DataType is not null && !string.Equals(s.DataType, t.DataType, StringComparison.OrdinalIgnoreCase)) return true;
+        if (s.Increment is not null && s.Increment != t.Increment) return true;
+        if (s.MinValue is not null && s.MinValue != t.MinValue) return true;
+        if (s.MaxValue is not null && s.MaxValue != t.MaxValue) return true;
+        if (s.Start is not null && s.Start != t.Start) return true;
+        if (s.Cache is not null && s.Cache != t.Cache) return true;
+        return s.Cycle != t.Cycle;
     }
 
     private void CompareTables(DatabaseModel source, DatabaseModel target, List<SchemaChange> changes, ComparerOptions options)
@@ -92,6 +109,7 @@ public sealed class SchemaComparer
 
             CompareForeignKeys(src, tgt, changes, options);
             ComparePrimaryKey(src, tgt, changes, options);
+            CompareChecks(src, tgt, changes, options);
         }
 
         if (options.DropObjectsNotInSource)
@@ -123,6 +141,26 @@ public sealed class SchemaComparer
         {
             changes.Add(new DropPrimaryKeyChange(src.Schema, src.Name, tgtPk.Name ?? $"{src.Name}_pkey"));
             changes.Add(new AddPrimaryKeyChange(src.Schema, src.Name, srcPk));
+        }
+    }
+
+    private void CompareChecks(TableDefinition src, TableDefinition tgt, List<SchemaChange> changes, ComparerOptions options)
+    {
+        var targetExprs = tgt.Checks.Select(c => NormalizeText(c.Expression)).ToHashSet();
+        foreach (var c in src.Checks)
+            if (!targetExprs.Contains(NormalizeText(c.Expression)))
+                changes.Add(new AddCheckConstraintChange(src.Schema, src.Name, c));
+
+        var targetOther = tgt.OtherConstraints.Select(NormalizeText).ToHashSet();
+        foreach (var clause in src.OtherConstraints)
+            if (!targetOther.Contains(NormalizeText(clause)))
+                changes.Add(new AddRawTableConstraintChange(src.Schema, src.Name, clause));
+
+        if (options.DropObjectsNotInSource)
+        {
+            var sourceExprs = src.Checks.Select(c => NormalizeText(c.Expression)).ToHashSet();
+            foreach (var c in tgt.Checks.Where(c => c.Name is not null && !sourceExprs.Contains(NormalizeText(c.Expression))))
+                changes.Add(new DropConstraintChange(src.Schema, src.Name, c.Name!));
         }
     }
 
@@ -232,7 +270,9 @@ public sealed class SchemaComparer
     private bool ColumnsEqual(ColumnDefinition a, ColumnDefinition b) =>
         string.Equals(a.DataType, b.DataType, StringComparison.OrdinalIgnoreCase)
         && a.IsNullable == b.IsNullable
-        && DefaultsEqual(a.Default, b.Default);
+        && DefaultsEqual(a.Default, b.Default)
+        && a.IsIdentity == b.IsIdentity
+        && NormalizeText(a.GeneratedExpression ?? "") == NormalizeText(b.GeneratedExpression ?? "");
 
     private bool DefaultsEqual(string? a, string? b)
     {
