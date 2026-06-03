@@ -117,6 +117,16 @@ public class CorpusTestGenerator
     }
 
     [Fact]
+    public void Dump_pending_negatives()
+    {
+        var cat = Environment.GetEnvironmentVariable("PGPROJ_DUMP_NEG");
+        if (cat is null) return;
+        var take = int.TryParse(Environment.GetEnvironmentVariable("PGPROJ_DUMP_N"), out var n) ? n : 20;
+        foreach (var c in CorpusData.LoadAll().Where(c => c.Category == cat && c.Expect == "error" && !CorpusData.Passes(c)).Take(take))
+            _out.WriteLine($"[{c.Id}] {c.Sql.Replace("\n", " ")}");
+    }
+
+    [Fact]
     public void Dump_semantic_false_positives()
     {
         if (Environment.GetEnvironmentVariable("PGPROJ_DUMP_FP") != "1") return;

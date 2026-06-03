@@ -68,17 +68,69 @@ public sealed partial class PgParser
         node.Schema = ts; node.Table = table;
         if (c.MatchWord("USING")) node.Method = c.ExpectIdentifier();
 
+        // key column list — reject an empty list or a trailing/leading comma
         c.ExpectSymbol('(');
-        if (!c.AtSymbol(')'))
-            do { node.Columns.Add(CaptureIndexItem(c)); } while (c.MatchSymbol(','));
+        if (c.AtSymbol(')')) throw new ParseException("index column list cannot be empty", c.Here);
+        do
+        {
+            if (c.AtSymbol(')')) throw new ParseException("trailing comma in index column list", c.Here);
+            node.Columns.Add(ParseIndexItem(c));
+        } while (c.MatchSymbol(','));
         c.ExpectSymbol(')');
 
-        if (c.MatchWord("INCLUDE") && c.AtSymbol('(')) CaptureBalancedParens(c);
+        if (c.MatchWord("INCLUDE"))
+        {
+            c.ExpectSymbol('(');
+            if (c.AtSymbol(')')) throw new ParseException("INCLUDE column list cannot be empty", c.Here);
+            do { if (c.AtSymbol(')')) throw new ParseException("trailing comma in INCLUDE list", c.Here); c.ExpectIdentifier(); } while (c.MatchSymbol(','));
+            c.ExpectSymbol(')');
+        }
         if (c.MatchWord("NULLS")) { c.MatchWord("NOT"); c.ExpectWord("DISTINCT"); }   // INCLUDE precedes NULLS [NOT] DISTINCT
-        if (c.MatchWord("WITH") && c.AtSymbol('(')) CaptureBalancedParens(c);
+        if (c.MatchWord("WITH")) ParseRelOptions(c);
         if (c.MatchWord("TABLESPACE")) c.ExpectIdentifier();
-        if (c.MatchWord("WHERE")) node.Where = Token.Render(CaptureToEndTokens(c));
+        if (c.MatchWord("WHERE")) { int m = c.Mark(); ParseExpression(c); node.Where = Token.Render(c.Range(m, c.Mark())); }   // a real predicate is required
+
+        // Only btree supports UNIQUE among the built-in access methods.
+        if (unique && node.Method is { } am && NonUniqueBuiltinAm.Contains(am))
+            throw new ParseException($"access method \"{am}\" does not support unique indexes", c.Here);
         return node;
+    }
+
+    private static readonly System.Collections.Generic.HashSet<string> NonUniqueBuiltinAm =
+        new(System.StringComparer.OrdinalIgnoreCase) { "hash", "gin", "gist", "spgist", "brin" };
+
+    // One index element: an expression (or parenthesized expression), optional opclass [(params)],
+    // ASC|DESC (not both), and NULLS FIRST|LAST (at most once).
+    private string ParseIndexItem(TokenCursor c)
+    {
+        int m = c.Mark();
+        ParseExpression(c);                                  // COLLATE is absorbed here as a postfix
+        if (c.Current is { Kind: TokenKind.Word } w && !w.IsWord("ASC") && !w.IsWord("DESC") && !w.IsWord("NULLS"))
+        { c.Advance(); while (c.MatchSymbol('.')) c.ExpectIdentifier(); if (c.AtSymbol('(')) CaptureBalancedParens(c); }   // opclass [schema-qualified] [(params)]
+        bool asc = c.MatchWord("ASC"), desc = !asc && c.MatchWord("DESC");
+        if (((asc || desc) && c.AtAnyWord("ASC", "DESC"))) throw new ParseException("ASC and DESC are mutually exclusive", c.Here);
+        if (c.MatchWord("NULLS"))
+        {
+            if (!c.MatchWord("FIRST")) c.ExpectWord("LAST");
+            if (c.AtWord("NULLS")) throw new ParseException("duplicate NULLS ordering", c.Here);
+        }
+        return Token.Render(c.Range(m, c.Mark()));
+    }
+
+    // WITH ( key [= value] [, …] ) reloptions — reject an empty list and out-of-range fillfactor.
+    private void ParseRelOptions(TokenCursor c)
+    {
+        c.ExpectSymbol('(');
+        if (c.AtSymbol(')')) throw new ParseException("storage parameter list cannot be empty", c.Here);
+        do
+        {
+            var key = c.ExpectIdentifier();
+            string? val = null;
+            if (c.MatchOperator("=")) { if (c.AtEnd || c.AtSymbol(',') || c.AtSymbol(')')) throw new ParseException("missing storage parameter value", c.Here); val = c.Advance().Value; }
+            if (key.Equals("fillfactor", System.StringComparison.OrdinalIgnoreCase) && int.TryParse(val, out var ff) && (ff < 10 || ff > 100))
+                throw new ParseException($"fillfactor must be between 10 and 100, got {ff}", c.Here);
+        } while (c.MatchSymbol(','));
+        c.ExpectSymbol(')');
     }
 
     private SqlStatement ParseCreateFunction(TokenCursor c)
@@ -101,27 +153,6 @@ public sealed partial class PgParser
         return null;
     }
 
-    /// <summary>One index element up to a top-level comma or ')': its leading column/expression text.</summary>
-    private static string CaptureIndexItem(TokenCursor c)
-    {
-        var toks = new List<Token>(); int depth = 0;
-        while (!c.AtEnd)
-        {
-            var t = c.Current!;
-            if (depth == 0 && (t.IsSymbol(',') || t.IsSymbol(')'))) break;
-            if (t.IsSymbol('(') || t.IsSymbol('[')) depth++;
-            else if (t.IsSymbol(')') || t.IsSymbol(']')) depth--;
-            toks.Add(c.Advance());
-        }
-        return Token.Render(toks);
-    }
-
-    private static List<Token> CaptureToEndTokens(TokenCursor c)
-    {
-        var toks = new List<Token>();
-        while (!c.AtEnd) toks.Add(c.Advance());
-        return toks;
-    }
 
     /// <summary>Best-effort argument-type list for a function signature (modes/names/defaults stripped).</summary>
     private static string ExtractArgTypes(List<Token> argInner)
