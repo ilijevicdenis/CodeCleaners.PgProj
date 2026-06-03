@@ -116,6 +116,7 @@ public sealed partial class PgParser
         if (c.MatchWords("MATERIALIZED", "VIEW")) return ParseCreateView(c, materialized: true);
         if (c.MatchWord("VIEW")) return ParseCreateView(c, materialized: false);
         if (c.MatchWord("SEQUENCE")) return ParseCreateSequence(c);
+        if (c.MatchWord("TYPE")) return ParseCreateType(c);
         if (c.AtWord("UNIQUE") || c.AtWord("INDEX")) return ParseCreateIndex(c);
         if (c.AtAnyWord("FUNCTION", "PROCEDURE")) return ParseCreateFunction(c);
         if (c.AtAnyWord("ROLE", "USER", "GROUP")) { var k = c.Advance().Value.ToUpperInvariant(); c.ExpectIdentifier(); ConsumeRest(c); return new CommandStatement { Kind = "CREATE " + k }; }

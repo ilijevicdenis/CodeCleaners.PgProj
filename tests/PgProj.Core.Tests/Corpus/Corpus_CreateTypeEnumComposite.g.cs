@@ -164,23 +164,23 @@ ALTER TYPE s.c25 ADD ATTRIBUTE y text COLLATE ""C""", "ok");
     [Fact]
     public void tyeca0060() => CorpusAssert.Parses(@"CREATE TYPE s.c26 AS (x text);
 ALTER TYPE s.c26 ALTER ATTRIBUTE x TYPE text COLLATE ""C""", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tyeca0061() => CorpusAssert.Parses(@"CREATE TYPE AS ENUM ('a', 'b')", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tyeca0062() => CorpusAssert.Parses(@"CREATE TYPE s.bad_enum AS ENUM ('a', 'a')", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tyeca0063() => CorpusAssert.Parses(@"CREATE TYPE s.bad_enum2 AS ENUM ('a', 'b',)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tyeca0064() => CorpusAssert.Parses(@"CREATE TYPE s.bad_enum3 AS ENUM (a, b)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tyeca0065() => CorpusAssert.Parses(@"CREATE TYPE s.bad_enum4 ENUM ('a', 'b')", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tyeca0066() => CorpusAssert.Parses(@"CREATE TYPE s.bad_enum5 AS ENUM 'a', 'b'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tyeca0067() => CorpusAssert.Parses(@"CREATE TYPE s.bad_comp AS (x integer,)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tyeca0068() => CorpusAssert.Parses(@"CREATE TYPE s.bad_comp2 AS (integer)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tyeca0069() => CorpusAssert.Parses(@"CREATE TYPE s.bad_comp3 (x integer)", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void tyeca0070() => CorpusAssert.Parses(@"ALTER TYPE s.nonexistent_type ADD VALUE 'x'", "error");
@@ -254,22 +254,22 @@ ALTER TYPE s.e21 ADD VALUE IF NOT EXISTS 'y'", "ok");
     public void tyeca0095() => CorpusAssert.Parses(@"CREATE TYPE s.e22 AS ENUM ('b', 'd');
 ALTER TYPE s.e22 ADD VALUE 'a' BEFORE 'b';
 ALTER TYPE s.e22 ADD VALUE 'c' BEFORE 'd'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tyeca0096() => CorpusAssert.Parses(@"ALTER TYPE s.mood ADD VALUE BEFORE 'ok'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tyeca0097() => CorpusAssert.Parses(@"ALTER TYPE s.mood ADD VALUE 'x' BEFORE AFTER 'ok'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tyeca0098() => CorpusAssert.Parses(@"CREATE TYPE s.e23 AS ENUM ('a');
 ALTER TYPE s.e23 RENAME VALUE TO 'b'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tyeca0099() => CorpusAssert.Parses(@"ALTER TYPE ADD VALUE 'x'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tyeca0100() => CorpusAssert.Parses(@"CREATE TYPE s.c31 AS (x integer);
 ALTER TYPE s.c31 ADD ATTRIBUTE", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tyeca0101() => CorpusAssert.Parses(@"CREATE TYPE s.c32 AS (x integer);
 ALTER TYPE s.c32 DROP ATTRIBUTE", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tyeca0102() => CorpusAssert.Parses(@"CREATE TYPE s.c33 AS (x integer);
 ALTER TYPE s.c33 ALTER ATTRIBUTE x", "error");
     [Fact]
@@ -347,24 +347,24 @@ ALTER TYPE s.c44 RENAME ATTRIBUTE x TO id", "ok");
     [Fact]
     public void tyeca0128() => CorpusAssert.Parses(@"CREATE TYPE s.e29 AS ENUM ('a');
 ALTER TYPE s.e29 ADD VALUE '' AFTER 'a'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tyeca0129() => CorpusAssert.Parses(@"CREATE TYPE s.c45 AS (x integer NOT NULL)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tyeca0130() => CorpusAssert.Parses(@"CREATE TYPE s.c46 AS (x integer DEFAULT 0)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tyeca0131() => CorpusAssert.Parses(@"CREATE TYPE s.c47 AS (x integer PRIMARY KEY)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tyeca0132() => CorpusAssert.Parses(@"CREATE TYPE s.c48 AS (x integer UNIQUE)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tyeca0133() => CorpusAssert.Parses(@"CREATE TYPE s.e30 AS ENUM ('a');
 ALTER TYPE s.e30 ADD VALUE 'b' BEFORE 'a' AFTER 'a'", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void tyeca0134() => CorpusAssert.Parses(@"CREATE TYPE s.c49 AS (x integer);
 ALTER TYPE s.c49 ALTER ATTRIBUTE x TYPE nonexistent_type_xyz", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tyeca0135() => CorpusAssert.Parses(@"CREATE TYPE s.e31 AS ENUM ('a', 'b');
 ALTER TYPE s.e31 ADD VALUE 'c' BEFORE", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tyeca0136() => CorpusAssert.Parses(@"CREATE TYPE s.e32 AS ENUM ('a', 'b');
 ALTER TYPE s.e32 ADD VALUE 'c' AFTER", "error");
     [Fact(Skip = "pending: parser not yet complete")]
@@ -460,10 +460,10 @@ ALTER TYPE s.e44 RENAME VALUE 'd' TO 'D'", "ok");
     public void tyeca0164() => CorpusAssert.Parses(@"CREATE TYPE s.c62 AS (val integer);
 ALTER TYPE s.c62 ADD ATTRIBUTE arr text[];
 ALTER TYPE s.c62 ADD ATTRIBUTE jb jsonb", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tyeca0165() => CorpusAssert.Parses(@"CREATE TYPE s.e45 AS ENUM;
 ALTER TYPE s.e45 ADD VALUE 'x'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tyeca0166() => CorpusAssert.Parses(@"CREATE TYPE s.c63 AS;
 ALTER TYPE s.c63 ADD ATTRIBUTE x integer", "error");
     [Fact]
@@ -613,17 +613,17 @@ ALTER TYPE mycomp17 ALTER ATTRIBUTE x TYPE bigint RESTRICT", "ok");
     public void tyecb0049() => CorpusAssert.Parses(@"CREATE TYPE comp_timestamptz AS (created_at timestamptz, updated_at timestamptz)", "ok");
     [Fact]
     public void tyecb0050() => CorpusAssert.Parses(@"CREATE TYPE comp_ranges AS (span int4range, big_span int8range)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tyecb0051() => CorpusAssert.Parses(@"CREATE TYPE AS ENUM ('a', 'b')", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tyecb0052() => CorpusAssert.Parses(@"CREATE TYPE myenum_bad AS ENUM", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tyecb0053() => CorpusAssert.Parses(@"CREATE TYPE myenum_bad3 AS ENUM 'a', 'b'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tyecb0054() => CorpusAssert.Parses(@"CREATE TYPE dup_enum AS ENUM ('a', 'a')", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tyecb0055() => CorpusAssert.Parses(@"CREATE TYPE mycomp_bad AS (a integer, b)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tyecb0056() => CorpusAssert.Parses(@"CREATE TYPE mycomp_bad2 AS (integer)", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void tyecb0057() => CorpusAssert.Parses(@"CREATE TYPE s.mood AS ENUM ('x')", "error");
@@ -648,7 +648,7 @@ ALTER TYPE mycomp17 ALTER ATTRIBUTE x TYPE bigint RESTRICT", "ok");
     [Fact]
     public void tyecb0067() => CorpusAssert.Parses(@"CREATE TYPE alterable_comp AS (city text, zip text);
 ALTER TYPE alterable_comp ALTER ATTRIBUTE city TYPE varchar(200)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tyecb0068() => CorpusAssert.Parses(@"ALTER TYPE s.mood ADD VALUE", "error");
     [Fact]
     public void tyecb0069() => CorpusAssert.Parses(@"ALTER TYPE s.mood RENAME VALUE 'sad' TO", "error");

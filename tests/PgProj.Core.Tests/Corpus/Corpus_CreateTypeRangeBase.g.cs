@@ -108,39 +108,39 @@ public class Corpus_CreateTypeRangeBase
     public void tyrba0049() => CorpusAssert.Parses(@"CREATE TYPE myrange44 AS RANGE (COLLATION = ""C"", SUBTYPE = text);", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void tyrba0050() => CorpusAssert.Parses(@"CREATE TYPE myshellx AS RANGE (SUBTYPE = int4, CANONICAL = myshellx_canonical);", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tyrba0051() => CorpusAssert.Parses(@"CREATE TYPE AS RANGE (SUBTYPE = int4);", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tyrba0052() => CorpusAssert.Parses(@"CREATE TYPE mybadr1 AS RANGE;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tyrba0053() => CorpusAssert.Parses(@"CREATE TYPE mybadr2 AS RANGE ();", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tyrba0054() => CorpusAssert.Parses(@"CREATE TYPE mybadr3 AS RANGE (SUBTYPE_OPCLASS = int4_ops);", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tyrba0055() => CorpusAssert.Parses(@"CREATE TYPE mybadr4 AS RANGE (SUBTYPE = );", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tyrba0056() => CorpusAssert.Parses(@"CREATE TYPE mybadr5 AS RANGE (SUBTYPE = int4, SUBTYPE = numeric);", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tyrba0057() => CorpusAssert.Parses(@"CREATE TYPE mybadr6 AS RANGE (SUBTYPE = int4, SUBTYPE_OPCLASS = int4_ops, SUBTYPE_OPCLASS = int4_ops);", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tyrba0058() => CorpusAssert.Parses(@"CREATE TYPE mybadr7 AS RANGE SUBTYPE = int4;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tyrba0059() => CorpusAssert.Parses(@"CREATE TYPE mybadr8 AS RANGE (SUBTYPE int4);", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tyrba0060() => CorpusAssert.Parses(@"CREATE TYPE mybadr9 RANGE (SUBTYPE = int4);", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void tyrba0061() => CorpusAssert.Parses(@"CREATE TYPE mybadr10 AS RANGE (SUBTYPE = nonexistent_type_xyz);", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tyrba0062() => CorpusAssert.Parses(@"CREATE TYPE mybadr11 AS RANGE (SUBTYPE = int4, UNKNOWN_OPT = foo);", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void tyrba0063() => CorpusAssert.Parses(@"CREATE TYPE mybadr12 AS RANGE (SUBTYPE = int4, SUBTYPE_DIFF = nonexistent_fn_xyz);", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void tyrba0064() => CorpusAssert.Parses(@"CREATE TYPE mybadr13 AS RANGE (SUBTYPE = int4, COLLATION = nonexistent_collation_xyz);", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tyrba0065() => CorpusAssert.Parses(@"CREATE TYPE mybadr14 AS RANGE (SUBTYPE = int4, MULTIRANGE_TYPE_NAME = mybadr14_multi, MULTIRANGE_TYPE_NAME = mybadr14_multi2);", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void tyrba0066() => CorpusAssert.Parses(@"CREATE TYPE mybadr15 AS RANGE (SUBTYPE = int4, COLLATION = ""C"");", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tyrba0067() => CorpusAssert.Parses(@"CREATE TYPE mybadr16 AS (SUBTYPE = int4);", "error");
     [Fact]
     public void tyrba0068() => CorpusAssert.Parses(@"CREATE TYPE myrange45 AS RANGE (SUBTYPE = s.mood);", "ok");
@@ -156,7 +156,7 @@ CREATE TYPE myrange48_use AS RANGE (SUBTYPE = int4);", "ok");
     [Fact]
     public void tyrba0073() => CorpusAssert.Parses(@"CREATE TYPE myshell3;
 CREATE TYPE myrange49 AS RANGE (SUBTYPE = int4);", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tyrba0074() => CorpusAssert.Parses(@"CREATE TYPE mybadr17 AS RANGE (SUBTYPE = int4,);", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void tyrba0075() => CorpusAssert.Parses(@"CREATE TYPE mybadr18 AS RANGE (SUBTYPE = int4, SUBTYPE_OPCLASS = int4_ops SUBTYPE_DIFF = float8mi);", "error");
@@ -184,7 +184,7 @@ CREATE TYPE myrange49 AS RANGE (SUBTYPE = int4);", "ok");
     public void tyrba0086() => CorpusAssert.Parses(@"CREATE TYPE mybadb4 (INPUT = myinput, OUTPUT = myoutput, INTERNALLENGTH = 4);", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void tyrba0087() => CorpusAssert.Parses(@"CREATE TYPE mybadb5 (INPUT = myinput, OUTPUT = myoutput, INTERNALLENGTH = VARIABLE);", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tyrba0088() => CorpusAssert.Parses(@"CREATE TYPE mybadb6 (INPUT = myinput, OUTPUT = myoutput, PASSEDBYVALUE);", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void tyrba0089() => CorpusAssert.Parses(@"CREATE TYPE mybadb7 (INPUT = myinput, OUTPUT = myoutput, ALIGNMENT = char);", "error");
@@ -234,9 +234,9 @@ CREATE TYPE myrange49 AS RANGE (SUBTYPE = int4);", "ok");
     public void tyrba0111() => CorpusAssert.Parses(@"CREATE TYPE mybadb29 (INPUT = myinput, OUTPUT = myoutput, ANALYZE = myanalyze);", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void tyrba0112() => CorpusAssert.Parses(@"CREATE TYPE mybadb30 (INPUT = myinput, OUTPUT = myoutput, SUBSCRIPT = mysubscript);", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tyrba0113() => CorpusAssert.Parses(@"CREATE TYPE mybadbsyn1 INPUT = myinput, OUTPUT = myoutput;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tyrba0114() => CorpusAssert.Parses(@"CREATE TYPE mybadbsyn2 (INPUT myinput, OUTPUT myoutput);", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void tyrba0115() => CorpusAssert.Parses(@"CREATE TYPE mybadbsyn3 (INPUT = myinput, OUTPUT = myoutput, ALIGNMENT = bigint);", "error");
@@ -301,11 +301,11 @@ SUBTYPE_DIFF = int4mi);", "error");
     public void tyrba0144() => CorpusAssert.Parses(@"CREATE TYPE mybadbsyn11 (INPUT = myinput, OUTPUT = myoutput, ALIGNMENT = 4);", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void tyrba0145() => CorpusAssert.Parses(@"CREATE TYPE mybadbsyn12 (INPUT = myinput, OUTPUT = myoutput, STORAGE = 'plain');", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tyrba0146() => CorpusAssert.Parses(@"CREATE TYPE mybadbsyn13 AS RANGE (SUBTYPE = int4) WITH (fillfactor = 70);", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void tyrba0147() => CorpusAssert.Parses(@"CREATE OR REPLACE TYPE myrange71 AS RANGE (SUBTYPE = int4);", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tyrba0148() => CorpusAssert.Parses(@"CREATE TYPE IF NOT EXISTS myrange72 AS RANGE (SUBTYPE = int4);", "error");
     [Fact]
     public void tyrba0149() => CorpusAssert.Parses(@"CREATE TYPE myrange73 AS RANGE (SUBTYPE = int4);
@@ -423,21 +423,21 @@ CREATE TYPE mybadr24 AS RANGE (SUBTYPE = int4);", "error");
 )", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void tyrbb0022() => CorpusAssert.Parses(@"CREATE TYPE s.r19 AS RANGE (SUBTYPE = int4, CANONICAL = mycanon)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tyrbb0023() => CorpusAssert.Parses(@"CREATE TYPE s.r20 AS RANGE ()", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tyrbb0024() => CorpusAssert.Parses(@"CREATE TYPE s.r21 AS RANGE (SUBTYPE_OPCLASS = int4_ops)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tyrbb0025() => CorpusAssert.Parses(@"CREATE TYPE AS RANGE (SUBTYPE = int4)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tyrbb0026() => CorpusAssert.Parses(@"CREATE TYPE s.r22 RANGE (SUBTYPE = int4)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tyrbb0027() => CorpusAssert.Parses(@"CREATE TYPE s.r23 AS RANGE SUBTYPE = int4", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tyrbb0028() => CorpusAssert.Parses(@"CREATE TYPE s.r24 AS RANGE (SUBTYPE int4)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tyrbb0029() => CorpusAssert.Parses(@"CREATE TYPE s.r25 AS RANGE (SUBTYPE = int4,)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tyrbb0030() => CorpusAssert.Parses(@"CREATE TYPE s.r26 AS RANGE (SUBTYPE = )", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void tyrbb0031() => CorpusAssert.Parses(@"CREATE TYPE s.r27 AS RANGE (SUBTYPE = int4 SUBTYPE_OPCLASS = int4_ops)", "error");
@@ -447,9 +447,9 @@ CREATE TYPE mybadr24 AS RANGE (SUBTYPE = int4);", "error");
     public void tyrbb0033() => CorpusAssert.Parses(@"CREATE TYPE s.r29 AS RANGE (SUBTYPE = s.mood)", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void tyrbb0034() => CorpusAssert.Parses(@"CREATE TYPE s.r30 AS RANGE (SUBTYPE = int4, COLLATION = ""C"")", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tyrbb0035() => CorpusAssert.Parses(@"CREATE TYPE s.r31 AS RANGE (SUBTYPE = int4, SUBTYPE = float8)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tyrbb0036() => CorpusAssert.Parses(@"CREATE TYPE s.r32 AS RANGE (SUBTYPE = int4, MULTIRANGE_TYPE_NAME = s.r32_multi, MULTIRANGE_TYPE_NAME = s.r32_other)", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void tyrbb0037() => CorpusAssert.Parses(@"CREATE TYPE s.r33 AS RANGE (SUBTYPE = int4);
@@ -508,7 +508,7 @@ SELECT isempty('empty'::s.r51)", "ok");
     public void tyrbb0061() => CorpusAssert.Parses(@"CREATE TYPE s.bt4 (INPUT = int4in, OUTPUT = int4out, INTERNALLENGTH = 4)", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void tyrbb0062() => CorpusAssert.Parses(@"CREATE TYPE s.bt5 (INPUT = int4in, OUTPUT = int4out, INTERNALLENGTH = VARIABLE)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tyrbb0063() => CorpusAssert.Parses(@"CREATE TYPE s.bt6 (INPUT = int4in, OUTPUT = int4out, PASSEDBYVALUE)", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void tyrbb0064() => CorpusAssert.Parses(@"CREATE TYPE s.bt7 (INPUT = int4in, OUTPUT = int4out, ALIGNMENT = int4)", "error");

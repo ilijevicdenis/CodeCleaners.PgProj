@@ -31,6 +31,8 @@ public sealed partial class PgParser
             if (kind == "TRIGGER" || kind == "POLICY" || kind == "RULE") { c.ExpectWord("ON"); ParseQualifiedName(c); }
         }
 
+        if (kind == "TYPE") { ParseAlterTypeAction(c, alter); return alter; }   // ENUM/attribute mutations have their own grammar
+
         // common tails
         if (c.MatchWord("RENAME"))
         {
@@ -275,6 +277,70 @@ public sealed partial class PgParser
 
     private static string? MatchCascadeRestrict(TokenCursor c)
         => c.MatchWord("CASCADE") ? "CASCADE" : (c.MatchWord("RESTRICT") ? "RESTRICT" : null);
+
+    private static void ExpectStringLit(TokenCursor c, string what)
+    {
+        if (c.Current is not { Kind: TokenKind.String }) throw new ParseException($"{what} must be a string literal", c.Here);
+        c.Advance();
+    }
+
+    // ALTER TYPE actions: ADD VALUE / RENAME VALUE for enums; ADD|DROP|ALTER ATTRIBUTE (comma-separated)
+    // for composites; plus RENAME TO / OWNER TO / SET SCHEMA / SET ( … ).
+    private void ParseAlterTypeAction(TokenCursor c, AlterStatement alter)
+    {
+        if (c.AtWord("ADD") && c.Peek()?.IsWord("VALUE") == true)
+        {
+            c.Advance(); c.Advance();                            // ADD VALUE
+            c.MatchWords("IF", "NOT", "EXISTS");
+            ExpectStringLit(c, "the new enum label");
+            if (c.MatchWord("BEFORE") || c.MatchWord("AFTER"))
+            {
+                if (c.AtAnyWord("BEFORE", "AFTER")) throw new ParseException("BEFORE and AFTER are mutually exclusive", c.Here);
+                ExpectStringLit(c, "the neighbour enum label");
+            }
+            alter.Actions.Add("ADD VALUE");
+            return;
+        }
+        if (c.MatchWord("RENAME"))
+        {
+            if (c.MatchWord("VALUE")) { ExpectStringLit(c, "the enum label"); c.ExpectWord("TO"); ExpectStringLit(c, "the new enum label"); alter.Actions.Add("RENAME VALUE"); return; }
+            if (c.MatchWord("ATTRIBUTE")) { c.ExpectIdentifier(); c.ExpectWord("TO"); c.ExpectIdentifier(); MatchCascadeRestrict(c); alter.Actions.Add("RENAME ATTRIBUTE"); return; }
+            c.ExpectWord("TO"); c.ExpectIdentifier(); alter.Actions.Add("RENAME"); return;   // RENAME TO new_name
+        }
+        if (c.MatchWords("OWNER", "TO")) { ParseRoleSpec(c); alter.Actions.Add("OWNER"); return; }
+        if (c.MatchWords("SET", "SCHEMA")) { c.ExpectIdentifier(); alter.Actions.Add("SET SCHEMA"); return; }
+        if (c.MatchWord("SET")) { if (c.AtSymbol('(')) CaptureBalancedParens(c); else ConsumeRest(c); alter.Actions.Add("SET"); return; }
+
+        // attribute mutations — one or a comma-separated list
+        if (c.AtAnyWord("ADD", "DROP", "ALTER"))
+        {
+            do { ParseAlterTypeAttribute(c); } while (c.MatchSymbol(','));
+            alter.Actions.Add("ATTRIBUTE");
+            return;
+        }
+        throw new ParseException("expected an ALTER TYPE action", c.Here);
+    }
+
+    private void ParseAlterTypeAttribute(TokenCursor c)
+    {
+        if (c.MatchWord("ADD"))
+        {
+            c.ExpectWord("ATTRIBUTE"); c.MatchWords("IF", "NOT", "EXISTS");
+            c.ExpectIdentifier(); ParseCastType(c);
+            if (c.MatchWord("COLLATE")) ParseQualifiedName(c);
+            MatchCascadeRestrict(c); return;
+        }
+        if (c.MatchWord("DROP"))
+        {
+            c.ExpectWord("ATTRIBUTE"); c.MatchWords("IF", "EXISTS");
+            c.ExpectIdentifier(); MatchCascadeRestrict(c); return;
+        }
+        c.ExpectWord("ALTER");
+        c.ExpectWord("ATTRIBUTE"); c.ExpectIdentifier();
+        c.MatchWords("SET", "DATA"); c.ExpectWord("TYPE"); ParseCastType(c);
+        if (c.MatchWord("COLLATE")) ParseQualifiedName(c);
+        MatchCascadeRestrict(c);
+    }
 
     private static void ConsumeNameOrString(TokenCursor c)
     {
