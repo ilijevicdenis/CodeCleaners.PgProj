@@ -172,13 +172,24 @@ public sealed partial class PgParser
 
     private string ParseDropTarget(TokenCursor c, string kind)
     {
-        // function/aggregate/operator/cast/operator class|family have signature-ish targets
-        if (kind is "FUNCTION" or "PROCEDURE" or "AGGREGATE" or "ROUTINE" or "OPERATOR" or "CAST" or "TRANSFORM")
+        // function/aggregate/operator/cast have signature-ish targets (name may be a symbol or "(types)")
+        if (kind is "FUNCTION" or "PROCEDURE" or "AGGREGATE" or "ROUTINE" or "OPERATOR" or "CAST")
         { ConsumeSignatureName(c); return "(signature)"; }
 
-        var (s, n) = ParseQualifiedName(c);
+        if (kind is "OPERATOR CLASS" or "OPERATOR FAMILY")
+        { var (s, n) = ParseQualifiedName(c); if (c.MatchWord("USING")) c.ExpectIdentifier(); return $"{s}.{n}"; }
+
+        if (kind == "TRANSFORM")    // DROP TRANSFORM FOR <type> LANGUAGE <lang>
+        {
+            c.MatchWord("FOR");
+            while (!c.AtEnd && !c.AtWord("LANGUAGE") && !c.AtWord("CASCADE") && !c.AtWord("RESTRICT") && !c.AtSymbol(',')) c.Advance();
+            if (c.MatchWord("LANGUAGE")) c.ExpectIdentifier();
+            return "transform";
+        }
+
+        var (sc, nm) = ParseQualifiedName(c);
         if (kind is "TRIGGER" or "RULE" or "POLICY") { c.ExpectWord("ON"); ParseQualifiedName(c); }
-        return s is null ? n : $"{s}.{n}";
+        return sc is null ? nm : $"{sc}.{nm}";
     }
 
     // ---- shared helpers -----------------------------------------------------
@@ -242,7 +253,9 @@ public sealed partial class PgParser
     /// <summary>Consume a name optionally followed by an argument-type list / operator args.</summary>
     private void ConsumeSignatureName(TokenCursor c)
     {
-        ParseQualifiedName(c);
+        // the name may be a qualified identifier OR an operator symbol; the signature is the "(types)"
+        while (!c.AtEnd && !c.AtSymbol('(') && !c.AtSymbol(',')
+               && !c.AtAnyWord("CASCADE", "RESTRICT", "RENAME", "OWNER", "SET", "DEPENDS")) c.Advance();
         if (c.AtSymbol('(')) CaptureBalancedParens(c);
     }
 

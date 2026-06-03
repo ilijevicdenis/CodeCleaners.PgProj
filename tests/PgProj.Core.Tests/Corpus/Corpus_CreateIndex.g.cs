@@ -91,9 +91,9 @@ public class Corpus_CreateIndex
     public void idxa0042() => CorpusAssert.Parses(@"CREATE INDEX ON s.t (name) INCLUDE (val, qty, flag)", "ok");
     [Fact]
     public void idxa0043() => CorpusAssert.Parses(@"CREATE UNIQUE INDEX ON s.t (name) INCLUDE (val)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void idxa0044() => CorpusAssert.Parses(@"CREATE UNIQUE INDEX ON s.t (name) NULLS DISTINCT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void idxa0045() => CorpusAssert.Parses(@"CREATE UNIQUE INDEX ON s.t (name) NULLS NOT DISTINCT", "ok");
     [Fact]
     public void idxa0046() => CorpusAssert.Parses(@"CREATE INDEX ON s.t (name) WHERE flag = true", "ok");
@@ -257,9 +257,9 @@ INSERT INTO idxa_tbl2 VALUES (1,'x'),(2,'y')", "ok");
     public void idxa0123() => CorpusAssert.Parses(@"CREATE INDEX ON s.t ((lower(name))) INCLUDE (id)", "ok");
     [Fact]
     public void idxa0124() => CorpusAssert.Parses(@"CREATE INDEX ON s.t (name) INCLUDE (id, val, qty, flag, status)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void idxa0125() => CorpusAssert.Parses(@"CREATE UNIQUE INDEX ON s.t (id, name) NULLS DISTINCT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void idxa0126() => CorpusAssert.Parses(@"CREATE UNIQUE INDEX ON s.t (id, name) NULLS NOT DISTINCT", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void idxa0127() => CorpusAssert.Parses(@"CREATE INDEX ON s.t (name) WITH (fillfactor = 9)", "error");
@@ -333,7 +333,7 @@ CREATE INDEX ON idxa_inc_tbl (a) INCLUDE (b, c)", "ok");
     public void idxa0160() => CorpusAssert.Parses(@"CREATE INDEX ON s.t USING btree (name) INCLUDE (val) WITH (fillfactor=85, deduplicate_items=on) WHERE qty >= 0", "ok");
     [Fact]
     public void idxa0161() => CorpusAssert.Parses(@"CREATE INDEX CONCURRENTLY idxa_conc2 ON s.t USING btree (name) INCLUDE (val) WHERE qty > 0", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void idxa0162() => CorpusAssert.Parses(@"CREATE UNIQUE INDEX IF NOT EXISTS idxa_uq_ifne ON s.t (name) NULLS NOT DISTINCT WITH (fillfactor=90)", "ok");
     [Fact]
     public void idxa0163() => CorpusAssert.Parses(@"CREATE INDEX ON s.t (name COLLATE ""C"" text_pattern_ops ASC NULLS LAST) INCLUDE (val) WHERE qty > 0", "ok");
@@ -473,11 +473,11 @@ CREATE INDEX ON idxa_inc_tbl (a) INCLUDE (b, c)", "ok");
     public void idxb0060() => CorpusAssert.Parses(@"CREATE INDEX ON s.events (occurred)", "ok");
     [Fact]
     public void idxb0061() => CorpusAssert.Parses(@"CREATE INDEX ON s.t (name) TABLESPACE pg_default", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void idxb0062() => CorpusAssert.Parses(@"CREATE UNIQUE INDEX ON s.t (name) NULLS DISTINCT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void idxb0063() => CorpusAssert.Parses(@"CREATE UNIQUE INDEX ON s.t (name) NULLS NOT DISTINCT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void idxb0064() => CorpusAssert.Parses(@"CREATE UNIQUE INDEX ON s.t (name, val) NULLS NOT DISTINCT", "ok");
     [Fact]
     public void idxb0065() => CorpusAssert.Parses(@"CREATE INDEX ON s.t (name text_pattern_ops)", "ok");
@@ -593,9 +593,9 @@ CREATE INDEX ON idxa_inc_tbl (a) INCLUDE (b, c)", "ok");
     public void idxb0120() => CorpusAssert.Parses(@"CREATE INDEX ON s.t (name INCLUDE (val))", "error");
     [Fact]
     public void idxb0121() => CorpusAssert.Parses(@"CREATE INDEX ON s.t INCLUDE (name)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void idxb0122() => CorpusAssert.Parses(@"CREATE INDEX ON s.t (name) NULLS DISTINCT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void idxb0123() => CorpusAssert.Parses(@"CREATE INDEX ON s.t (name) NULLS NOT DISTINCT", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void idxb0124() => CorpusAssert.Parses(@"CREATE INDEX CONCURRENTLY ON s.t (name)", "error");
@@ -697,7 +697,7 @@ CREATE INDEX ON idxa_inc_tbl (a) INCLUDE (b, c)", "ok");
     public void idxc0002() => CorpusAssert.Parses(@"CREATE INDEX ON s.t (name) WHERE qty > 0 WITH (fillfactor=80)", "error");
     [Fact]
     public void idxc0003() => CorpusAssert.Parses(@"CREATE INDEX ON s.t (name) TABLESPACE pg_default WITH (fillfactor=80)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void idxc0004() => CorpusAssert.Parses(@"CREATE UNIQUE INDEX ON s.t (name) NULLS NOT DISTINCT WITH (fillfactor=90) TABLESPACE pg_default WHERE qty > 0", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void idxc0005() => CorpusAssert.Parses(@"CREATE INDEX ON s.t (name) INCLUDE (val) NULLS NOT DISTINCT", "ok");
@@ -794,7 +794,7 @@ CREATE INDEX ON idxa_inc_tbl (a) INCLUDE (b, c)", "ok");
     [Fact]
     public void idxc0051() => CorpusAssert.Parses(@"CREATE TABLE idxc_t1 (a int, b text, c numeric, d boolean);
 CREATE INDEX ON idxc_t1 (a, b, c, d)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void idxc0052() => CorpusAssert.Parses(@"CREATE TABLE idxc_t2 (a int, b text);
 CREATE UNIQUE INDEX idxc_t2_ab_uq ON idxc_t2 (a, b) NULLS NOT DISTINCT", "ok");
     [Fact]
@@ -818,7 +818,7 @@ CREATE INDEX ON idxc_t4 (b text_pattern_ops) INCLUDE (a, c) WHERE a > 0", "ok");
     public void idxc0060() => CorpusAssert.Parses(@"CREATE INDEX ON s.t USING gist (span) WITH (buffering=auto, fillfactor=80)", "ok");
     [Fact]
     public void idxc0061() => CorpusAssert.Parses(@"CREATE INDEX ON s.t USING hash (name) WITH (fillfactor=50)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void idxc0062() => CorpusAssert.Parses(@"CREATE UNIQUE INDEX idxc_named_uq ON s.t (name) NULLS NOT DISTINCT WITH (fillfactor=90) TABLESPACE pg_default", "ok");
     [Fact]
     public void idxc0063() => CorpusAssert.Parses(@"CREATE INDEX IF NOT EXISTS idxc_ifne_with ON s.t (name) WITH (fillfactor=70)", "ok");
@@ -918,6 +918,6 @@ CREATE INDEX ON s.t (val)", "ok");
     public void idxc0108() => CorpusAssert.Parses(@"CREATE INDEX ON s.t (name) INCLUDE (no_such_col)", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void idxc0109() => CorpusAssert.Parses(@"CREATE INDEX ON s.t (name) WHERE no_such_col IS NOT NULL", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void idxc0110() => CorpusAssert.Parses(@"CREATE UNIQUE INDEX CONCURRENTLY IF NOT EXISTS idxc_all_flags ON s.t (name) NULLS NOT DISTINCT WITH (fillfactor=90) TABLESPACE pg_default WHERE qty >= 0", "ok");
 }

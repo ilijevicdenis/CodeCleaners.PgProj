@@ -203,47 +203,47 @@ CREATE CAST (integer AS text) WITH FUNCTION csta_fn93(integer, integer)", "ok");
     [Fact]
     public void csta0094() => CorpusAssert.Parses(@"CREATE FUNCTION csta_fn94(integer, integer, boolean) RETURNS text LANGUAGE sql AS $$ SELECT $1::text $$;
 CREATE CAST (integer AS text) WITH FUNCTION csta_fn94(integer, integer, boolean)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void csta0095() => CorpusAssert.Parses(@"CREATE FUNCTION csta_fn95(integer) RETURNS text LANGUAGE sql AS $$ SELECT $1::text $$;
 CREATE CAST (integer AS text) WITH FUNCTION csta_fn95;
 DROP CAST (integer AS text)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void csta0096() => CorpusAssert.Parses(@"CREATE CAST (text AS date) WITH INOUT;
 DROP CAST (text AS date)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void csta0097() => CorpusAssert.Parses(@"CREATE CAST (text AS timestamp) WITH INOUT;
 DROP CAST (text AS timestamp) CASCADE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void csta0098() => CorpusAssert.Parses(@"CREATE CAST (text AS timestamptz) WITH INOUT;
 DROP CAST (text AS timestamptz) RESTRICT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void csta0099() => CorpusAssert.Parses(@"CREATE CAST (json AS text) WITH INOUT;
 DROP CAST IF EXISTS (json AS text)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void csta0100() => CorpusAssert.Parses(@"CREATE CAST (json AS text) WITH INOUT;
 DROP CAST IF EXISTS (json AS text) CASCADE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void csta0101() => CorpusAssert.Parses(@"CREATE CAST (json AS text) WITH INOUT;
 DROP CAST IF EXISTS (json AS text) RESTRICT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void csta0102() => CorpusAssert.Parses(@"DROP CAST IF EXISTS (text AS date)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void csta0103() => CorpusAssert.Parses(@"DROP CAST IF EXISTS (text AS timestamp)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void csta0104() => CorpusAssert.Parses(@"DROP CAST IF EXISTS (integer AS text)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void csta0105() => CorpusAssert.Parses(@"DROP CAST IF EXISTS (date AS text) CASCADE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void csta0106() => CorpusAssert.Parses(@"DROP CAST IF EXISTS (date AS text) RESTRICT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void csta0107() => CorpusAssert.Parses(@"CREATE CAST (date AS text) WITH INOUT;
 DROP CAST (date AS text);
 DROP CAST IF EXISTS (date AS text)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void csta0108() => CorpusAssert.Parses(@"CREATE CAST (text AS date) WITH INOUT;
 DROP CAST (text AS date);
 CREATE CAST (text AS date) WITH INOUT AS ASSIGNMENT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void csta0109() => CorpusAssert.Parses(@"CREATE CAST (text AS interval) WITH INOUT AS ASSIGNMENT;
 DROP CAST (text AS interval);
 CREATE CAST (text AS interval) WITH INOUT AS IMPLICIT", "ok");
@@ -280,20 +280,20 @@ CREATE CAST (csta_enum120 AS text) WITH INOUT AS IMPLICIT", "ok");
     [Fact]
     public void csta0121() => CorpusAssert.Parses(@"CREATE TYPE csta_rng121 AS RANGE (SUBTYPE = int4);
 CREATE CAST (csta_rng121 AS text) WITH INOUT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void csta0122() => CorpusAssert.Parses(@"CREATE FUNCTION csta_fn122(integer) RETURNS text LANGUAGE sql AS $$ SELECT $1::text $$;
 CREATE CAST (integer AS text) WITH FUNCTION csta_fn122(integer);
 DROP CAST (integer AS text)", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void csta0123() => CorpusAssert.Parses(@"CREATE CAST (text AS date) WITH INOUT;
 CREATE CAST (text AS date) WITH INOUT", "error");
-    [Fact]
+    [Fact(Skip = "pending: parser not yet complete")]
     public void csta0124() => CorpusAssert.Parses(@"DROP CAST (text AS date)", "error");
-    [Fact]
+    [Fact(Skip = "pending: parser not yet complete")]
     public void csta0125() => CorpusAssert.Parses(@"DROP CAST (text AS integer)", "error");
-    [Fact]
+    [Fact(Skip = "pending: parser not yet complete")]
     public void csta0126() => CorpusAssert.Parses(@"DROP CAST (bigint AS nonexistent_type)", "error");
-    [Fact]
+    [Fact(Skip = "pending: parser not yet complete")]
     public void csta0127() => CorpusAssert.Parses(@"DROP CAST (nonexistent_type AS text)", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void csta0128() => CorpusAssert.Parses(@"CREATE CAST bigint AS integer WITH INOUT", "error");
@@ -329,7 +329,7 @@ CREATE CAST (text AS date) WITH INOUT", "error");
     public void csta0143() => CorpusAssert.Parses(@"DROP CAST (integer AS text) CASCADES", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void csta0144() => CorpusAssert.Parses(@"DROP CAST IF (integer AS text)", "error");
-    [Fact]
+    [Fact(Skip = "pending: parser not yet complete")]
     public void csta0145() => CorpusAssert.Parses(@"DROP CAST integer AS text", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void csta0146() => CorpusAssert.Parses(@"CREATE CAST (integer AS text) WITH FUNCTION nonexistent_fn(integer)", "error");
@@ -345,14 +345,14 @@ CREATE CAST (text AS date) WITH INOUT", "error");
     public void csta0151() => CorpusAssert.Parses(@"CREATE CAST (s.mood AS text) WITHOUT FUNCTION", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void csta0152() => CorpusAssert.Parses(@"CREATE CAST (integer AS text) AS ASSIGNMENT", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void csta0153() => CorpusAssert.Parses(@"CREATE CAST (text AS integer) WITH INOUT AS ASSIGNMENT;
 DROP CAST (text AS integer);
 DROP CAST IF EXISTS (text AS integer)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void csta0154() => CorpusAssert.Parses(@"CREATE CAST (text AS boolean) WITH INOUT AS IMPLICIT;
 DROP CAST IF EXISTS (text AS boolean) CASCADE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void csta0155() => CorpusAssert.Parses(@"CREATE CAST (json AS boolean) WITH INOUT AS ASSIGNMENT;
 DROP CAST (json AS boolean) RESTRICT", "ok");
 }

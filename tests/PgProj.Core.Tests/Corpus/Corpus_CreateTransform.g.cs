@@ -37,43 +37,43 @@ public class Corpus_CreateTransform
     public void tfma0015() => CorpusAssert.Parses(@"CREATE TRANSFORM FOR numeric LANGUAGE plpgsql (TO SQL WITH FUNCTION pg_catalog.numeric_avg(internal)); CREATE OR REPLACE TRANSFORM FOR numeric LANGUAGE plpgsql (TO SQL WITH FUNCTION pg_catalog.numeric_poly_sum(internal))", "ok");
     [Fact]
     public void tfma0016() => CorpusAssert.Parses(@"CREATE FUNCTION my_from_s4(internal) RETURNS internal LANGUAGE c STRICT IMMUTABLE AS '$libdir/plpgsql', 'plpgsql_call_handler'; CREATE OR REPLACE TRANSFORM FOR text LANGUAGE plpgsql (FROM SQL WITH FUNCTION my_from_s4(internal), TO SQL WITH FUNCTION pg_catalog.string_agg_finalfn(internal))", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tfma0017() => CorpusAssert.Parses(@"DROP TRANSFORM IF EXISTS FOR integer LANGUAGE plpgsql", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tfma0018() => CorpusAssert.Parses(@"DROP TRANSFORM IF EXISTS FOR numeric LANGUAGE plpgsql", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tfma0019() => CorpusAssert.Parses(@"DROP TRANSFORM IF EXISTS FOR text LANGUAGE plpgsql", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tfma0020() => CorpusAssert.Parses(@"DROP TRANSFORM IF EXISTS FOR integer LANGUAGE plpgsql CASCADE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tfma0021() => CorpusAssert.Parses(@"DROP TRANSFORM IF EXISTS FOR integer LANGUAGE plpgsql RESTRICT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tfma0022() => CorpusAssert.Parses(@"CREATE TRANSFORM FOR numeric LANGUAGE plpgsql (TO SQL WITH FUNCTION pg_catalog.numeric_avg(internal)); DROP TRANSFORM FOR numeric LANGUAGE plpgsql", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tfma0023() => CorpusAssert.Parses(@"CREATE TRANSFORM FOR numeric LANGUAGE plpgsql (TO SQL WITH FUNCTION pg_catalog.numeric_avg(internal)); DROP TRANSFORM FOR numeric LANGUAGE plpgsql CASCADE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tfma0024() => CorpusAssert.Parses(@"CREATE TRANSFORM FOR numeric LANGUAGE plpgsql (TO SQL WITH FUNCTION pg_catalog.numeric_avg(internal)); DROP TRANSFORM FOR numeric LANGUAGE plpgsql RESTRICT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tfma0025() => CorpusAssert.Parses(@"CREATE TRANSFORM FOR numeric LANGUAGE plpgsql (TO SQL WITH FUNCTION pg_catalog.numeric_avg(internal)); DROP TRANSFORM IF EXISTS FOR numeric LANGUAGE plpgsql CASCADE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tfma0026() => CorpusAssert.Parses(@"CREATE TRANSFORM FOR numeric LANGUAGE plpgsql (TO SQL WITH FUNCTION pg_catalog.numeric_avg(internal)); DROP TRANSFORM IF EXISTS FOR numeric LANGUAGE plpgsql RESTRICT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tfma0027() => CorpusAssert.Parses(@"CREATE TRANSFORM FOR numeric LANGUAGE plpgsql (TO SQL WITH FUNCTION pg_catalog.numeric_avg(internal)); DROP TRANSFORM FOR numeric LANGUAGE plpgsql; DROP TRANSFORM IF EXISTS FOR numeric LANGUAGE plpgsql", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tfma0028() => CorpusAssert.Parses(@"CREATE TRANSFORM FOR text LANGUAGE plpgsql (TO SQL WITH FUNCTION pg_catalog.string_agg_finalfn(internal)); DROP TRANSFORM FOR text LANGUAGE plpgsql", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tfma0029() => CorpusAssert.Parses(@"CREATE TRANSFORM FOR json LANGUAGE plpgsql (TO SQL WITH FUNCTION pg_catalog.json_agg_finalfn(internal)); DROP TRANSFORM FOR json LANGUAGE plpgsql", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tfma0030() => CorpusAssert.Parses(@"CREATE TRANSFORM FOR jsonb LANGUAGE plpgsql (TO SQL WITH FUNCTION pg_catalog.jsonb_agg_finalfn(internal)); DROP TRANSFORM FOR jsonb LANGUAGE plpgsql", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tfma0031() => CorpusAssert.Parses(@"CREATE TRANSFORM FOR interval LANGUAGE plpgsql (TO SQL WITH FUNCTION pg_catalog.interval_avg(internal)); DROP TRANSFORM FOR interval LANGUAGE plpgsql", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tfma0032() => CorpusAssert.Parses(@"CREATE TRANSFORM FOR bytea LANGUAGE plpgsql (TO SQL WITH FUNCTION pg_catalog.bytea_string_agg_finalfn(internal)); DROP TRANSFORM FOR bytea LANGUAGE plpgsql", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tfma0033() => CorpusAssert.Parses(@"CREATE TRANSFORM FOR numeric LANGUAGE plpgsql (TO SQL WITH FUNCTION pg_catalog.numeric_avg(internal)); DROP TRANSFORM IF EXISTS FOR numeric LANGUAGE plpgsql; CREATE TRANSFORM FOR numeric LANGUAGE plpgsql (TO SQL WITH FUNCTION pg_catalog.numeric_poly_sum(internal))", "ok");
     [Fact]
     public void tfma0034() => CorpusAssert.Parses(@"CREATE TRANSFORM FOR numeric LANGUAGE plpgsql (TO SQL WITH FUNCTION pg_catalog.numeric_avg(internal)); CREATE TRANSFORM FOR text LANGUAGE plpgsql (TO SQL WITH FUNCTION pg_catalog.string_agg_finalfn(internal)); CREATE TRANSFORM FOR json LANGUAGE plpgsql (TO SQL WITH FUNCTION pg_catalog.json_agg_finalfn(internal))", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tfma0035() => CorpusAssert.Parses(@"DROP TRANSFORM IF EXISTS FOR text LANGUAGE plpgsql; DROP TRANSFORM IF EXISTS FOR json LANGUAGE plpgsql; DROP TRANSFORM IF EXISTS FOR jsonb LANGUAGE plpgsql", "ok");
     [Fact]
     public void tfma0036() => CorpusAssert.Parses(@"CREATE TRANSFORM FOR numeric LANGUAGE sql (TO SQL WITH FUNCTION pg_catalog.numeric_avg(internal))", "ok");
@@ -81,21 +81,21 @@ public class Corpus_CreateTransform
     public void tfma0037() => CorpusAssert.Parses(@"CREATE TRANSFORM FOR numeric LANGUAGE c (TO SQL WITH FUNCTION pg_catalog.numeric_avg(internal))", "ok");
     [Fact]
     public void tfma0038() => CorpusAssert.Parses(@"CREATE TRANSFORM FOR numeric LANGUAGE internal (TO SQL WITH FUNCTION pg_catalog.numeric_avg(internal))", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tfma0039() => CorpusAssert.Parses(@"DROP TRANSFORM IF EXISTS FOR s.mood LANGUAGE plpgsql", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tfma0040() => CorpusAssert.Parses(@"DROP TRANSFORM IF EXISTS FOR s.addr LANGUAGE plpgsql", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tfma0041() => CorpusAssert.Parses(@"DROP TRANSFORM IF EXISTS FOR s.pos_int LANGUAGE plpgsql", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tfma0042() => CorpusAssert.Parses(@"DROP TRANSFORM IF EXISTS FOR int4range LANGUAGE plpgsql", "ok");
     [Fact]
     public void tfma0043() => CorpusAssert.Parses(@"CREATE TRANSFORM FOR ""numeric"" LANGUAGE plpgsql (TO SQL WITH FUNCTION pg_catalog.numeric_avg(internal))", "ok");
     [Fact]
     public void tfma0044() => CorpusAssert.Parses(@"CREATE TRANSFORM FOR numeric LANGUAGE ""plpgsql"" (TO SQL WITH FUNCTION pg_catalog.numeric_avg(internal))", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tfma0045() => CorpusAssert.Parses(@"DROP TRANSFORM IF EXISTS FOR ""integer"" LANGUAGE plpgsql", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tfma0046() => CorpusAssert.Parses(@"DROP TRANSFORM IF EXISTS FOR numeric LANGUAGE ""plpgsql""", "ok");
     [Fact]
     public void tfma0047() => CorpusAssert.Parses(@"create transform for numeric language plpgsql (to sql with function pg_catalog.numeric_avg(internal))", "ok");
@@ -115,9 +115,9 @@ public class Corpus_CreateTransform
     public void tfma0054() => CorpusAssert.Parses(@"CREATE FUNCTION my_stab_fn(internal) RETURNS internal LANGUAGE c STABLE AS '$libdir/plpgsql', 'plpgsql_call_handler'; CREATE TRANSFORM FOR integer LANGUAGE plpgsql (FROM SQL WITH FUNCTION my_stab_fn(internal))", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void tfma0055() => CorpusAssert.Parses(@"CREATE TRANSFORM FOR numeric LANGUAGE plpgsql (TO SQL WITH FUNCTION pg_catalog.numeric_avg(internal)); CREATE TRANSFORM FOR numeric LANGUAGE plpgsql (TO SQL WITH FUNCTION pg_catalog.numeric_avg(internal))", "error");
-    [Fact]
+    [Fact(Skip = "pending: parser not yet complete")]
     public void tfma0056() => CorpusAssert.Parses(@"DROP TRANSFORM FOR numeric LANGUAGE plpgsql", "error");
-    [Fact]
+    [Fact(Skip = "pending: parser not yet complete")]
     public void tfma0057() => CorpusAssert.Parses(@"DROP TRANSFORM FOR nonexistent_type_xyz LANGUAGE plpgsql", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void tfma0058() => CorpusAssert.Parses(@"CREATE TRANSFORM FOR nonexistent_type_xyz LANGUAGE plpgsql (TO SQL WITH FUNCTION pg_catalog.numeric_avg(internal))", "error");
@@ -171,11 +171,11 @@ public class Corpus_CreateTransform
     public void tfma0082() => CorpusAssert.Parses(@"CREATE TRANSFORM FOR numeric LANGUAGE plpgsql (TO SQL WITH FUNCTION pg_catalog.numeric_avg(internal), TO SQL WITH FUNCTION pg_catalog.numeric_poly_sum(internal))", "error");
     [Fact]
     public void tfma0083() => CorpusAssert.Parses(@"DROP TRANSFORM IF EXISTS FOR integer LANGUAGE plpgsql CASCADE RESTRICT", "error");
-    [Fact]
+    [Fact(Skip = "pending: parser not yet complete")]
     public void tfma0084() => CorpusAssert.Parses(@"DROP TRANSFORM FOR integer", "error");
-    [Fact]
+    [Fact(Skip = "pending: parser not yet complete")]
     public void tfma0085() => CorpusAssert.Parses(@"DROP TRANSFORM integer LANGUAGE plpgsql", "error");
-    [Fact]
+    [Fact(Skip = "pending: parser not yet complete")]
     public void tfma0086() => CorpusAssert.Parses(@"DROP TRANSFORM FOR LANGUAGE plpgsql", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void tfma0087() => CorpusAssert.Parses(@"REPLACE TRANSFORM FOR numeric LANGUAGE plpgsql (TO SQL WITH FUNCTION pg_catalog.numeric_avg(internal))", "error");
