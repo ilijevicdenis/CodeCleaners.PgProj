@@ -440,12 +440,8 @@ ctaa0035
 ctaa0036
 ctaa0053
 ctaa0054
-ctaa0060
 ctaa0061
-ctaa0062
 ctaa0065
-ctaa0071
-ctaa0072
 ctaa0076
 ctaa0077
 ctaa0081
@@ -462,8 +458,6 @@ ctaa0109
 ctaa0110
 ctaa0115
 ctaa0120
-ctaa0122
-ctaa0124
 ctaa0138
 ctaa0141
 ctaa0147
@@ -488,14 +482,11 @@ ctab0081
 ctab0082
 ctab0085
 ctab0086
-ctab0087
-ctab0088
 ctab0089
 ctab0090
 ctab0091
 ctab0092
 ctab0094
-ctab0106
 ctab0107
 ctab0108
 ctab0109
@@ -520,7 +511,6 @@ ctac0005
 ctac0023
 ctac0044
 ctac0050
-ctac0058
 ctac0060
 ctac0068
 ctac0069
@@ -538,7 +528,6 @@ ctac0085
 ctac0086
 ctac0087
 ctac0088
-ctac0093
 ctac0097
 ctac0100
 ctac0102

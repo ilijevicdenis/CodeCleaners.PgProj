@@ -129,11 +129,11 @@ CREATE TABLE s.ctaa_bad_rem_p PARTITION OF s.ctaa_bad_remainder FOR VALUES WITH 
     public void ctaa0058() => CorpusAssert.Parses(@"CREATE TABLE s.ctaa_storage4 (a text) WITH (autovacuum_vacuum_threshold = 50)", "ok");
     [Fact]
     public void ctaa0059() => CorpusAssert.Parses(@"CREATE TABLE s.ctaa_storage5 (a text) WITH (toast_tuple_target = 128)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ctaa0060() => CorpusAssert.Parses(@"CREATE TABLE s.ctaa_storage_bad (a text) WITH (fillfactor = 200)", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void ctaa0061() => CorpusAssert.Parses(@"CREATE TABLE s.ctaa_storage_badkey (a text) WITH (nonexistent_param = 1)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ctaa0062() => CorpusAssert.Parses(@"CREATE TABLE s.ctaa_storage_empty (a text) WITH ()", "error");
     [Fact]
     public void ctaa0063() => CorpusAssert.Parses(@"CREATE UNLOGGED TABLE s.ctaa_unlog1 (id int, val text)", "ok");
@@ -151,9 +151,9 @@ CREATE TABLE s.ctaa_bad_rem_p PARTITION OF s.ctaa_bad_remainder FOR VALUES WITH 
     public void ctaa0069() => CorpusAssert.Parses(@"CREATE TEMP TABLE ctaa_temp4 (id int) ON COMMIT DROP", "ok");
     [Fact]
     public void ctaa0070() => CorpusAssert.Parses(@"CREATE TEMP TABLE ctaa_temp5 (id int) ON COMMIT PRESERVE ROWS", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ctaa0071() => CorpusAssert.Parses(@"CREATE TABLE s.ctaa_oncommit_perm (id int) ON COMMIT DELETE ROWS", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ctaa0072() => CorpusAssert.Parses(@"CREATE TEMP TABLE ctaa_temp_bad (id int) ON COMMIT TRUNCATE", "error");
     [Fact]
     public void ctaa0073() => CorpusAssert.Parses(@"CREATE GLOBAL TEMP TABLE ctaa_gtemp (id int)", "ok");
@@ -274,11 +274,11 @@ CREATE TABLE s.ctaa_list_dup_p1 PARTITION OF s.ctaa_list_dup FOR VALUES IN ('eas
 CREATE TABLE s.ctaa_list_dup_p2 PARTITION OF s.ctaa_list_dup FOR VALUES IN ('east')", "error");
     [Fact]
     public void ctaa0121() => CorpusAssert.Parses(@"CREATE TABLE s.ctaa_part_named PARTITION OF s.events (CONSTRAINT chk_year CHECK (EXTRACT(year FROM occurred) = 2040)) FOR VALUES FROM ('2040-01-01') TO ('2041-01-01')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ctaa0122() => CorpusAssert.Parses(@"CREATE TABLE s.ctaa_inh_noparent () INHERITS ()", "error");
     [Fact]
     public void ctaa0123() => CorpusAssert.Parses(@"CREATE TABLE s.ctaa_of_coltype OF s.addr (street DEFAULT 'main st', city DEFAULT 'anytown')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ctaa0124() => CorpusAssert.Parses(@"CREATE TABLE s.ctaa_temp_ts (id int) ON COMMIT DELETE ROWS", "error");
     [Fact]
     public void ctaa0125() => CorpusAssert.Parses(@"CREATE TABLE s.ctaa_like_t_defaults_excl (LIKE s.t EXCLUDING DEFAULTS EXCLUDING IDENTITY)", "ok");
@@ -610,9 +610,9 @@ CREATE TEMP TABLE ctab_tmp_part_p1 PARTITION OF ctab_tmp_part FOR VALUES FROM (1
     public void ctab0086() => CorpusAssert.Parses(@"CREATE TABLE s.ctab_partof_inh (id int, d date NOT NULL) PARTITION BY RANGE (d);
 CREATE TABLE s.ctab_partof_inh_p PARTITION OF s.ctab_partof_inh FOR VALUES FROM ('2024-01-01') TO ('2025-01-01');
 CREATE TABLE s.ctab_partof_child () INHERITS (s.ctab_partof_inh_p)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ctab0087() => CorpusAssert.Parses(@"CREATE TABLE s.ctab_with_ff (id int) WITH (fillfactor = 0)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ctab0088() => CorpusAssert.Parses(@"CREATE TABLE s.ctab_with_ff2 (id int) WITH (fillfactor = 101)", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void ctab0089() => CorpusAssert.Parses(@"CREATE TABLE s.ctab_with_bad (id int) WITH (nonexistent_param = 42)", "error");
@@ -659,7 +659,7 @@ CREATE TABLE s.ctab_inh_multi2 () INHERITS (s.ctab_inh_multi)", "ok");
     [Fact]
     public void ctab0105() => CorpusAssert.Parses(@"CREATE TABLE s.ctab_partwith2 (id int NOT NULL) PARTITION BY HASH (id);
 CREATE TABLE s.ctab_partwith2_0 PARTITION OF s.ctab_partwith2 FOR VALUES WITH (MODULUS 2, REMAINDER 0) WITH (fillfactor = 90)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ctab0106() => CorpusAssert.Parses(@"CREATE TABLE s.ctab_temp_oncommit (id int) ON COMMIT DROP", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void ctab0107() => CorpusAssert.Parses(@"CREATE TABLE s.ctab_range_nobound (id int, d date NOT NULL, PRIMARY KEY (id, d)) PARTITION BY RANGE (d);
@@ -958,7 +958,7 @@ CREATE TABLE ctac_grandchild (detail text) INHERITS (ctac_child3)", "ok");
     public void ctac0056() => CorpusAssert.Parses(@"CREATE TEMPORARY TABLE ctac_temp4 (id int) ON COMMIT DELETE ROWS", "ok");
     [Fact]
     public void ctac0057() => CorpusAssert.Parses(@"CREATE TEMPORARY TABLE ctac_temp5 (id int) ON COMMIT PRESERVE ROWS", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ctac0058() => CorpusAssert.Parses(@"CREATE TABLE ctac_oncommit_perm (id int) ON COMMIT DROP", "error");
     [Fact]
     public void ctac0059() => CorpusAssert.Parses(@"CREATE TABLE ctac_ts1 (id int) TABLESPACE pg_default", "ok");
@@ -1054,7 +1054,7 @@ CREATE TABLE s.ctac_sq_child PARTITION OF ctac_schema_qualified FOR VALUES FROM 
     [Fact]
     public void ctac0092() => CorpusAssert.Parses(@"CREATE TABLE ctac_range_mc2 (a int, b int, c text) PARTITION BY RANGE (a, b);
 CREATE TABLE ctac_range_mc2_p1 PARTITION OF ctac_range_mc2 FOR VALUES FROM (1, 1) TO (100, 100)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ctac0093() => CorpusAssert.Parses(@"CREATE TABLE ctac_temp_oncommit (id int) ON COMMIT PRESERVE ROWS", "error");
     [Fact]
     public void ctac0094() => CorpusAssert.Parses(@"CREATE TABLE ctac_of_pk OF s.addr (PRIMARY KEY (street))", "ok");

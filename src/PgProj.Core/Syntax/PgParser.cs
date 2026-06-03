@@ -171,6 +171,7 @@ public sealed partial class PgParser
             ParseTableBody(inner, table);
             if (!c.AtEnd) table.TrailingText = CaptureRest(c);   // PARTITION BY / INHERITS / WITH / TABLESPACE / …
             ValidateColumnReferences(table, c);
+            ValidateTableTail(table.TrailingText, persistence, pos);
             return table;
         }
 
@@ -179,6 +180,37 @@ public sealed partial class PgParser
         var rest = c.AtEnd ? null : CaptureRest(c);
         return new CreateTableStatement
         { Position = pos, Schema = schema, Name = name, IfNotExists = ifNotExists, Persistence = persistence, IsPartitionOrTyped = true, TrailingText = rest };
+    }
+
+    // Validate the (already-captured) CREATE TABLE tail by re-tokenizing it — purely additive, the main
+    // parse flow is untouched. Only the clear, catalog-free mistakes are reported (zero false positives).
+    private void ValidateTableTail(string? tail, string? persistence, int here)
+    {
+        if (string.IsNullOrWhiteSpace(tail)) return;
+        List<Token> toks;
+        try { toks = OperatorLexer.Merge(Tokenizer.Tokenize(tail)); } catch { return; }
+        var t = new TokenCursor(toks);
+        while (!t.AtEnd)
+        {
+            if (t.MatchWords("ON", "COMMIT"))
+            {
+                if (persistence != "TEMP") throw new ParseException("ON COMMIT can only be used on a temporary table", here);
+                if (!(t.MatchWord("DROP") || t.MatchWords("DELETE", "ROWS") || t.MatchWords("PRESERVE", "ROWS")))
+                    throw new ParseException("ON COMMIT must be DROP, DELETE ROWS or PRESERVE ROWS", here);
+                continue;
+            }
+            if (t.MatchWord("INHERITS"))
+            {
+                if (t.AtSymbol('(') && t.Peek()?.IsSymbol(')') == true) throw new ParseException("INHERITS requires at least one parent table", here);
+                continue;
+            }
+            if (t.MatchWord("WITH") && t.AtSymbol('(') && t.Peek()?.IsSymbol(')') == true)
+                throw new ParseException("storage parameter list cannot be empty", here);
+            if (t.MatchWord("fillfactor") && t.MatchOperator("=") && t.Current is { Kind: TokenKind.Number } n
+                && long.TryParse(n.Value, out var ff) && (ff < 10 || ff > 100))
+                throw new ParseException($"fillfactor must be between 10 and 100, got {ff}", here);
+            if (!t.AtEnd) t.Advance();
+        }
     }
 
     private CreateTableAsStatement ParseCreateTableAs(TokenCursor c, string? schema, string name, bool ifNotExists, List<string> aliases)
