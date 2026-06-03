@@ -1,0 +1,40 @@
+{"id":"arrc0001","category":"arrays","sql":"SELECT ARRAY[1,2,3]","expect":"ok","ref":"arrays","note":"ARRAY[] constructor with integer literals"}
+{"id":"arrc0002","category":"arrays","sql":"SELECT ARRAY[[1,2],[3,4]]","expect":"ok","ref":"arrays","note":"nested ARRAY[] constructor producing 2D array"}
+{"id":"arrc0003","category":"arrays","sql":"SELECT '{1,2,3}'::int[]","expect":"ok","ref":"arrays","note":"array literal cast to int[]"}
+{"id":"arrc0004","category":"arrays","sql":"SELECT (ARRAY[10,20,30])[2]","expect":"ok","ref":"arrays","note":"subscript access on ARRAY constructor"}
+{"id":"arrc0005","category":"arrays","sql":"SELECT (ARRAY[1,2,3,4,5])[2:4]","expect":"ok","ref":"arrays","note":"slice with explicit lower and upper bound"}
+{"id":"arrc0006","category":"arrays","sql":"SELECT ARRAY[1,2,3] @> ARRAY[2,3]","expect":"ok","ref":"arrays","note":"contains operator @>"}
+{"id":"arrc0007","category":"arrays","sql":"SELECT ARRAY[1,2] <@ ARRAY[1,2,3]","expect":"ok","ref":"arrays","note":"is-contained-by operator <@"}
+{"id":"arrc0008","category":"arrays","sql":"SELECT ARRAY[1,2] && ARRAY[2,3]","expect":"ok","ref":"arrays","note":"overlaps operator &&"}
+{"id":"arrc0009","category":"arrays","sql":"SELECT ARRAY[1,2] || ARRAY[3,4]","expect":"ok","ref":"arrays","note":"concatenation operator ||"}
+{"id":"arrc0010","category":"arrays","sql":"SELECT 3 = ANY(ARRAY[1,2,3])","expect":"ok","ref":"arrays","note":"= ANY(array) membership test"}
+{"id":"arrc0011","category":"arrays","sql":"SELECT 5 > ALL(ARRAY[1,2,3])","expect":"ok","ref":"arrays","note":"ALL(array) quantified comparison"}
+{"id":"arrc0012","category":"arrays","sql":"SELECT array_append(ARRAY[1,2], 3)","expect":"ok","ref":"arrays","note":"array_append function"}
+{"id":"arrc0013","category":"arrays","sql":"SELECT array_prepend(0, ARRAY[1,2])","expect":"ok","ref":"arrays","note":"array_prepend function"}
+{"id":"arrc0014","category":"arrays","sql":"SELECT array_cat(ARRAY[1,2], ARRAY[3,4])","expect":"ok","ref":"arrays","note":"array_cat function"}
+{"id":"arrc0015","category":"arrays","sql":"SELECT array_length(ARRAY[1,2,3], 1)","expect":"ok","ref":"arrays","note":"array_length for dimension 1"}
+{"id":"arrc0016","category":"arrays","sql":"SELECT array_dims(ARRAY[[1,2],[3,4]])","expect":"ok","ref":"arrays","note":"array_dims returns dimension string"}
+{"id":"arrc0017","category":"arrays","sql":"SELECT array_upper(ARRAY[1,2,3], 1), array_lower(ARRAY[1,2,3], 1)","expect":"ok","ref":"arrays","note":"array_upper and array_lower"}
+{"id":"arrc0018","category":"arrays","sql":"SELECT array_position(ARRAY['a','b','c'], 'b')","expect":"ok","ref":"arrays","note":"array_position first occurrence"}
+{"id":"arrc0019","category":"arrays","sql":"SELECT array_positions(ARRAY[1,2,1,3,1], 1)","expect":"ok","ref":"arrays","note":"array_positions all occurrences"}
+{"id":"arrc0020","category":"arrays","sql":"SELECT array_remove(ARRAY[1,2,3,2], 2)","expect":"ok","ref":"arrays","note":"array_remove removes all matching elements"}
+{"id":"arrc0021","category":"arrays","sql":"SELECT array_replace(ARRAY[1,2,3,2], 2, 99)","expect":"ok","ref":"arrays","note":"array_replace replaces matching elements"}
+{"id":"arrc0022","category":"arrays","sql":"SELECT array_fill(0, ARRAY[3])","expect":"ok","ref":"arrays","note":"array_fill one-dimensional"}
+{"id":"arrc0023","category":"arrays","sql":"SELECT array_fill(1, ARRAY[2,3])","expect":"ok","ref":"arrays","note":"array_fill multi-dimensional"}
+{"id":"arrc0024","category":"arrays","sql":"SELECT cardinality(ARRAY[[1,2],[3,4]])","expect":"ok","ref":"arrays","note":"cardinality total element count"}
+{"id":"arrc0025","category":"arrays","sql":"SELECT array_to_string(ARRAY[1,2,3], ',')","expect":"ok","ref":"arrays","note":"array_to_string with delimiter"}
+{"id":"arrc0026","category":"arrays","sql":"SELECT string_to_array('a:b:c', ':')","expect":"ok","ref":"arrays","note":"string_to_array with delimiter"}
+{"id":"arrc0027","category":"arrays","sql":"SELECT unnest(ARRAY[10,20,30])","expect":"ok","ref":"arrays","note":"unnest expands 1D array to rows"}
+{"id":"arrc0028","category":"arrays","sql":"SELECT unnest(ARRAY[[1,2],[3,4]])","expect":"ok","ref":"arrays","note":"unnest on 2D array flattens to elements"}
+{"id":"arrc0029","category":"arrays","sql":"SELECT array_agg(id ORDER BY id) FROM s.t","expect":"ok","ref":"arrays","note":"array_agg aggregate with ORDER BY"}
+{"id":"arrc0030","category":"arrays","sql":"SELECT tags[1] FROM s.t","expect":"ok","ref":"arrays","note":"subscript column of type text[] from fixture table"}
+{"id":"arrc0031","category":"arrays","sql":"SELECT tags[1:2] FROM s.t","expect":"ok","ref":"arrays","note":"slice on fixture text[] column"}
+{"id":"arrc0032","category":"arrays","sql":"SELECT (ARRAY[[1,2,3],[4,5,6]])[1][2]","expect":"ok","ref":"arrays","note":"multi-dimensional subscript [1][2]"}
+{"id":"arrc0033","category":"arrays","sql":"SELECT (ARRAY[1,2,3,4,5])[:3]","expect":"ok","ref":"arrays","note":"slice with omitted lower bound"}
+{"id":"arrc0034","category":"arrays","sql":"SELECT (ARRAY[1,2,3,4,5])[3:]","expect":"ok","ref":"arrays","note":"slice with omitted upper bound"}
+{"id":"arrc0035","category":"arrays","sql":"SELECT array_to_string(ARRAY[1,NULL,3]::text[], ',', 'NULL')","expect":"ok","ref":"arrays","note":"array_to_string with null replacement string"}
+{"id":"arrc0036","category":"arrays","sql":"SELECT string_to_array('a,,b', ',', '')","expect":"ok","ref":"arrays","note":"string_to_array with null-string argument"}
+{"id":"arrc0037","category":"arrays","sql":"CREATE TABLE _arr_test (id serial, nums int[], tags text[][]); INSERT INTO _arr_test(nums, tags) VALUES (ARRAY[1,2,3], '{{\"a\",\"b\"},{\"c\",\"d\"}}'); SELECT nums[1], tags[1][2] FROM _arr_test","expect":"ok","ref":"arrays","note":"table column type int[] and text[][], insert and subscript"}
+{"id":"arrc0038","category":"arrays","sql":"SELECT ARRAY[1,2,3","expect":"error","ref":"arrays","note":"syntax error: unmatched bracket in ARRAY constructor"}
+{"id":"arrc0039","category":"arrays","sql":"SELECT '{1,2,3}'::int[","expect":"error","ref":"arrays","note":"syntax error: unclosed cast type bracket"}
+{"id":"arrc0040","category":"arrays","sql":"SELECT (ARRAY[1,2,3])[1 2]","expect":"error","ref":"arrays","note":"syntax error: missing colon in subscript range"}

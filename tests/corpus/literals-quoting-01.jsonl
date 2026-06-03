@@ -1,0 +1,170 @@
+{"id":"lita0001","category":"literals-quoting","sql":"SELECT 'hello'","expect":"ok","ref":"sql-syntax-lexical","note":"basic single-quoted string literal"}
+{"id":"lita0002","category":"literals-quoting","sql":"SELECT 'it''s a test'","expect":"ok","ref":"sql-syntax-lexical","note":"single quote escaped by doubling inside string"}
+{"id":"lita0003","category":"literals-quoting","sql":"SELECT ''''","expect":"ok","ref":"sql-syntax-lexical","note":"string containing only a single quote (doubled)"}
+{"id":"lita0004","category":"literals-quoting","sql":"SELECT ''","expect":"ok","ref":"sql-syntax-lexical","note":"empty string literal"}
+{"id":"lita0005","category":"literals-quoting","sql":"SELECT 'foo'\n'bar'","expect":"ok","ref":"sql-syntax-lexical","note":"adjacent string literals separated by newline are concatenated"}
+{"id":"lita0006","category":"literals-quoting","sql":"SELECT 'foo'\n  'bar'\n  'baz'","expect":"ok","ref":"sql-syntax-lexical","note":"three adjacent string literals concatenated across newlines"}
+{"id":"lita0007","category":"literals-quoting","sql":"SELECT 'foo' 'bar'","expect":"error","ref":"sql-syntax-lexical","note":"adjacent strings without newline between them is a syntax error"}
+{"id":"lita0008","category":"literals-quoting","sql":"SELECT ''bad'' ''concat''","expect":"error","ref":"sql-syntax-lexical","note":"adjacent strings without intervening newline — syntax error (only newline-separated allowed)"}
+{"id":"lita0009","category":"literals-quoting","sql":"SELECT 'embedded\nnewline'","expect":"ok","ref":"sql-syntax-lexical","note":"string literal containing a literal newline character"}
+{"id":"lita0010","category":"literals-quoting","sql":"SELECT E'hello\\nworld'","expect":"ok","ref":"sql-syntax-lexical","note":"E'' escape string with \\n newline escape"}
+{"id":"lita0011","category":"literals-quoting","sql":"SELECT E'tab\\there'","expect":"ok","ref":"sql-syntax-lexical","note":"E'' escape string with \\t tab escape"}
+{"id":"lita0012","category":"literals-quoting","sql":"SELECT E'back\\\\slash'","expect":"ok","ref":"sql-syntax-lexical","note":"E'' escape string with literal backslash via \\\\"}
+{"id":"lita0013","category":"literals-quoting","sql":"SELECT E'quote\\''","expect":"ok","ref":"sql-syntax-lexical","note":"E'' escape string with \\' single quote escape"}
+{"id":"lita0014","category":"literals-quoting","sql":"SELECT E'\\b\\f\\r'","expect":"ok","ref":"sql-syntax-lexical","note":"E'' escape string with \\b backspace, \\f form-feed, \\r carriage return"}
+{"id":"lita0015","category":"literals-quoting","sql":"SELECT E'\\x41'","expect":"ok","ref":"sql-syntax-lexical","note":"E'' hex escape \\xhh (letter A)"}
+{"id":"lita0016","category":"literals-quoting","sql":"SELECT E'\\x4'","expect":"ok","ref":"sql-syntax-lexical","note":"E'' hex escape \\xh single digit"}
+{"id":"lita0017","category":"literals-quoting","sql":"SELECT E'\\101'","expect":"ok","ref":"sql-syntax-lexical","note":"E'' octal escape \\ooo (letter A = 101 octal)"}
+{"id":"lita0018","category":"literals-quoting","sql":"SELECT E'\\07'","expect":"ok","ref":"sql-syntax-lexical","note":"E'' octal escape \\oo two digits (BEL)"}
+{"id":"lita0019","category":"literals-quoting","sql":"SELECT E'\\u0041'","expect":"ok","ref":"sql-syntax-lexical","note":"E'' \\uXXXX 16-bit Unicode escape (letter A)"}
+{"id":"lita0020","category":"literals-quoting","sql":"SELECT E'\\U00000041'","expect":"ok","ref":"sql-syntax-lexical","note":"E'' \\UXXXXXXXX 32-bit Unicode escape (letter A)"}
+{"id":"lita0021","category":"literals-quoting","sql":"SELECT E'\\u004'","expect":"error","ref":"sql-syntax-lexical","note":"E'' \\uXXXX with only 3 hex digits — invalid escape"}
+{"id":"lita0022","category":"literals-quoting","sql":"SELECT e'lowercase prefix'","expect":"ok","ref":"sql-syntax-lexical","note":"E'' prefix is case-insensitive (lowercase e)"}
+{"id":"lita0023","category":"literals-quoting","sql":"SELECT E'\\q'","expect":"ok","ref":"sql-syntax-lexical","note":"E'' unknown escape like \\q treated as literal backslash+q by default (warning only)"}
+{"id":"lita0024","category":"literals-quoting","sql":"SELECT U&'d\\0061t\\0061'","expect":"ok","ref":"sql-syntax-lexical","note":"U& string with 4-digit Unicode escapes"}
+{"id":"lita0025","category":"literals-quoting","sql":"SELECT U&'\\0048\\0065\\006C\\006C\\006F'","expect":"ok","ref":"sql-syntax-lexical","note":"U& string spelling 'Hello' via 4-digit escapes"}
+{"id":"lita0026","category":"literals-quoting","sql":"SELECT U&'\\+01F600'","expect":"ok","ref":"sql-syntax-lexical","note":"U& string with \\+XXXXXX 6-digit Unicode escape (emoji U+1F600)"}
+{"id":"lita0027","category":"literals-quoting","sql":"SELECT U&'!0041' UESCAPE '!'","expect":"ok","ref":"sql-syntax-lexical","note":"U& string with custom UESCAPE character"}
+{"id":"lita0028","category":"literals-quoting","sql":"SELECT U&'abc\\005'","expect":"error","ref":"sql-syntax-lexical","note":"U& escape with only 3 hex digits — invalid"}
+{"id":"lita0029","category":"literals-quoting","sql":"SELECT U&'abc' UESCAPE '+-'","expect":"error","ref":"sql-syntax-lexical","note":"UESCAPE character must be a single char — error"}
+{"id":"lita0030","category":"literals-quoting","sql":"SELECT U&'abc' UESCAPE '\"'","expect":"error","ref":"sql-syntax-lexical","note":"UESCAPE character cannot be double-quote — error"}
+{"id":"lita0031","category":"literals-quoting","sql":"SELECT $$dollar quoted string$$","expect":"ok","ref":"sql-syntax-lexical","note":"basic dollar-quoted string with empty tag"}
+{"id":"lita0032","category":"literals-quoting","sql":"SELECT $tag$dollar quoted with tag$tag$","expect":"ok","ref":"sql-syntax-lexical","note":"dollar-quoted string with alphanumeric tag"}
+{"id":"lita0033","category":"literals-quoting","sql":"SELECT $$it's got a single quote$$","expect":"ok","ref":"sql-syntax-lexical","note":"dollar-quoted string containing single quote (no escaping needed)"}
+{"id":"lita0034","category":"literals-quoting","sql":"SELECT $$backslash \\ no escape$$","expect":"ok","ref":"sql-syntax-lexical","note":"dollar-quoted string with literal backslash (no escaping)"}
+{"id":"lita0035","category":"literals-quoting","sql":"SELECT $outer$nested $$inner$$ content$outer$","expect":"ok","ref":"sql-syntax-lexical","note":"nested dollar-quoted strings with different tags"}
+{"id":"lita0036","category":"literals-quoting","sql":"SELECT $bad-tag$text$bad-tag$","expect":"error","ref":"sql-syntax-lexical","note":"dollar-quote tag containing hyphen — not a valid tag character, syntax error"}
+{"id":"lita0037","category":"literals-quoting","sql":"SELECT $1tag$content$1tag$","expect":"error","ref":"sql-syntax-lexical","note":"dollar-quote tag starting with digit — PG treats $1 as parameter, rest is trailing junk (error)"}
+{"id":"lita0038","category":"literals-quoting","sql":"SELECT $$$$","expect":"ok","ref":"sql-syntax-lexical","note":"empty dollar-quoted string"}
+{"id":"lita0039","category":"literals-quoting","sql":"SELECT $my_tag$content$my_tag$","expect":"ok","ref":"sql-syntax-lexical","note":"dollar-quote tag with underscore"}
+{"id":"lita0040","category":"literals-quoting","sql":"SELECT 42","expect":"ok","ref":"sql-syntax-lexical","note":"simple integer literal"}
+{"id":"lita0041","category":"literals-quoting","sql":"SELECT 0","expect":"ok","ref":"sql-syntax-lexical","note":"zero integer literal"}
+{"id":"lita0042","category":"literals-quoting","sql":"SELECT 2147483647","expect":"ok","ref":"sql-syntax-lexical","note":"max int4 value as integer literal"}
+{"id":"lita0043","category":"literals-quoting","sql":"SELECT 2147483648","expect":"ok","ref":"sql-syntax-lexical","note":"one above max int4 — promotes to bigint"}
+{"id":"lita0044","category":"literals-quoting","sql":"SELECT 9999999999999999999","expect":"ok","ref":"sql-syntax-lexical","note":"very large integer literal (becomes numeric)"}
+{"id":"lita0045","category":"literals-quoting","sql":"SELECT 3.14","expect":"ok","ref":"sql-syntax-lexical","note":"decimal numeric literal"}
+{"id":"lita0046","category":"literals-quoting","sql":"SELECT 3.","expect":"ok","ref":"sql-syntax-lexical","note":"decimal literal with trailing dot and no fractional digits"}
+{"id":"lita0047","category":"literals-quoting","sql":"SELECT .5","expect":"ok","ref":"sql-syntax-lexical","note":"decimal literal with leading dot"}
+{"id":"lita0048","category":"literals-quoting","sql":"SELECT 1e10","expect":"ok","ref":"sql-syntax-lexical","note":"scientific notation integer exponent"}
+{"id":"lita0049","category":"literals-quoting","sql":"SELECT 1.5e2","expect":"ok","ref":"sql-syntax-lexical","note":"scientific notation with decimal base"}
+{"id":"lita0050","category":"literals-quoting","sql":"SELECT 1.925e-3","expect":"ok","ref":"sql-syntax-lexical","note":"scientific notation with negative exponent"}
+{"id":"lita0051","category":"literals-quoting","sql":"SELECT 1.5E+10","expect":"ok","ref":"sql-syntax-lexical","note":"scientific notation with explicit positive exponent and uppercase E"}
+{"id":"lita0052","category":"literals-quoting","sql":"SELECT 0x1A2B","expect":"ok","ref":"sql-syntax-lexical","note":"hexadecimal integer literal (PG16+)"}
+{"id":"lita0053","category":"literals-quoting","sql":"SELECT 0XFFFF","expect":"ok","ref":"sql-syntax-lexical","note":"hex literal with uppercase X prefix"}
+{"id":"lita0054","category":"literals-quoting","sql":"SELECT 0xDEAD_BEEF","expect":"ok","ref":"sql-syntax-lexical","note":"hex literal with underscore digit separator (PG16+)"}
+{"id":"lita0055","category":"literals-quoting","sql":"SELECT 0o755","expect":"ok","ref":"sql-syntax-lexical","note":"octal integer literal (PG16+)"}
+{"id":"lita0056","category":"literals-quoting","sql":"SELECT 0O644","expect":"ok","ref":"sql-syntax-lexical","note":"octal literal with uppercase O prefix"}
+{"id":"lita0057","category":"literals-quoting","sql":"SELECT 0b1010","expect":"ok","ref":"sql-syntax-lexical","note":"binary integer literal (PG16+)"}
+{"id":"lita0058","category":"literals-quoting","sql":"SELECT 0B1100_1010","expect":"ok","ref":"sql-syntax-lexical","note":"binary literal with uppercase B and underscore separator"}
+{"id":"lita0059","category":"literals-quoting","sql":"SELECT 1_000_000","expect":"ok","ref":"sql-syntax-lexical","note":"decimal integer with underscore digit separators (PG16+)"}
+{"id":"lita0060","category":"literals-quoting","sql":"SELECT 1_500_000.25","expect":"ok","ref":"sql-syntax-lexical","note":"decimal number with underscore digit separators"}
+{"id":"lita0061","category":"literals-quoting","sql":"SELECT 1.618_034","expect":"ok","ref":"sql-syntax-lexical","note":"decimal with underscore in fractional part"}
+{"id":"lita0062","category":"literals-quoting","sql":"SELECT 1_000e2","expect":"ok","ref":"sql-syntax-lexical","note":"numeric with underscore in significand and exponent"}
+{"id":"lita0063","category":"literals-quoting","sql":"SELECT 1000_","expect":"error","ref":"sql-syntax-lexical","note":"numeric literal cannot end with underscore — trailing junk error"}
+{"id":"lita0064","category":"literals-quoting","sql":"SELECT 1__000","expect":"error","ref":"sql-syntax-lexical","note":"consecutive underscores in numeric literal — error"}
+{"id":"lita0065","category":"literals-quoting","sql":"SELECT 0x","expect":"error","ref":"sql-syntax-lexical","note":"hex prefix with no digits — syntax error"}
+{"id":"lita0066","category":"literals-quoting","sql":"SELECT 0o8","expect":"error","ref":"sql-syntax-lexical","note":"octal literal with digit 8 — invalid octal digit"}
+{"id":"lita0067","category":"literals-quoting","sql":"SELECT 0b2","expect":"error","ref":"sql-syntax-lexical","note":"binary literal with digit 2 — invalid binary digit"}
+{"id":"lita0068","category":"literals-quoting","sql":"SELECT 1.e5","expect":"ok","ref":"sql-syntax-lexical","note":"1. followed by e5 — PG parses 1. as numeric then e5 as separate identifier (no error)"}
+{"id":"lita0069","category":"literals-quoting","sql":"SELECT true","expect":"ok","ref":"sql-syntax-lexical","note":"boolean TRUE literal"}
+{"id":"lita0070","category":"literals-quoting","sql":"SELECT false","expect":"ok","ref":"sql-syntax-lexical","note":"boolean FALSE literal"}
+{"id":"lita0071","category":"literals-quoting","sql":"SELECT TRUE","expect":"ok","ref":"sql-syntax-lexical","note":"boolean TRUE literal uppercase"}
+{"id":"lita0072","category":"literals-quoting","sql":"SELECT FALSE","expect":"ok","ref":"sql-syntax-lexical","note":"boolean FALSE literal uppercase"}
+{"id":"lita0073","category":"literals-quoting","sql":"SELECT NULL","expect":"ok","ref":"sql-syntax-lexical","note":"NULL literal"}
+{"id":"lita0074","category":"literals-quoting","sql":"SELECT null","expect":"ok","ref":"sql-syntax-lexical","note":"null literal lowercase (case-insensitive keyword)"}
+{"id":"lita0075","category":"literals-quoting","sql":"SELECT B'1010'","expect":"ok","ref":"sql-syntax-lexical","note":"bit-string literal binary notation"}
+{"id":"lita0076","category":"literals-quoting","sql":"SELECT B'0'","expect":"ok","ref":"sql-syntax-lexical","note":"single-bit bit-string literal"}
+{"id":"lita0077","category":"literals-quoting","sql":"SELECT B''","expect":"ok","ref":"sql-syntax-lexical","note":"empty bit-string literal"}
+{"id":"lita0078","category":"literals-quoting","sql":"SELECT B'10101010'","expect":"ok","ref":"sql-syntax-lexical","note":"8-bit bit-string literal"}
+{"id":"lita0079","category":"literals-quoting","sql":"SELECT b'1100'","expect":"ok","ref":"sql-syntax-lexical","note":"bit-string literal with lowercase b prefix"}
+{"id":"lita0080","category":"literals-quoting","sql":"SELECT B'2'","expect":"error","ref":"sql-syntax-lexical","note":"bit-string with invalid digit 2 — only 0 and 1 allowed"}
+{"id":"lita0081","category":"literals-quoting","sql":"SELECT X'1FF'","expect":"ok","ref":"sql-syntax-lexical","note":"bit-string hex notation X''"}
+{"id":"lita0082","category":"literals-quoting","sql":"SELECT X'DEADBEEF'","expect":"ok","ref":"sql-syntax-lexical","note":"bit-string hex notation with uppercase letters"}
+{"id":"lita0083","category":"literals-quoting","sql":"SELECT X''","expect":"ok","ref":"sql-syntax-lexical","note":"empty hex bit-string literal"}
+{"id":"lita0084","category":"literals-quoting","sql":"SELECT x'FF'","expect":"ok","ref":"sql-syntax-lexical","note":"hex bit-string with lowercase x prefix"}
+{"id":"lita0085","category":"literals-quoting","sql":"SELECT X'GG'","expect":"error","ref":"sql-syntax-lexical","note":"hex bit-string with invalid character G — error"}
+{"id":"lita0086","category":"literals-quoting","sql":"SELECT integer '42'","expect":"ok","ref":"sql-syntax-lexical","note":"typed literal: type followed by string (integer '42')"}
+{"id":"lita0087","category":"literals-quoting","sql":"SELECT real '1.5'","expect":"ok","ref":"sql-syntax-lexical","note":"typed literal: real '1.5'"}
+{"id":"lita0088","category":"literals-quoting","sql":"SELECT float8 '3.14'","expect":"ok","ref":"sql-syntax-lexical","note":"typed literal: float8 '3.14'"}
+{"id":"lita0089","category":"literals-quoting","sql":"SELECT numeric '1.23456789'","expect":"ok","ref":"sql-syntax-lexical","note":"typed literal: numeric '1.23456789'"}
+{"id":"lita0090","category":"literals-quoting","sql":"SELECT boolean 'true'","expect":"ok","ref":"sql-syntax-lexical","note":"typed literal: boolean 'true'"}
+{"id":"lita0091","category":"literals-quoting","sql":"SELECT boolean 'false'","expect":"ok","ref":"sql-syntax-lexical","note":"typed literal: boolean 'false'"}
+{"id":"lita0092","category":"literals-quoting","sql":"SELECT '42'::integer","expect":"ok","ref":"sql-syntax-lexical","note":"cast operator :: from string to integer"}
+{"id":"lita0093","category":"literals-quoting","sql":"SELECT '3.14'::float8","expect":"ok","ref":"sql-syntax-lexical","note":"cast operator :: from string to float8"}
+{"id":"lita0094","category":"literals-quoting","sql":"SELECT '2024-01-15'::date","expect":"ok","ref":"sql-syntax-lexical","note":"cast operator :: string to date type"}
+{"id":"lita0095","category":"literals-quoting","sql":"SELECT '2024-01-15 10:30:00'::timestamp","expect":"ok","ref":"sql-syntax-lexical","note":"cast operator :: string to timestamp"}
+{"id":"lita0096","category":"literals-quoting","sql":"SELECT CAST('42' AS integer)","expect":"ok","ref":"sql-syntax-lexical","note":"CAST() function syntax for type conversion"}
+{"id":"lita0097","category":"literals-quoting","sql":"SELECT CAST('3.14' AS numeric(10,4))","expect":"ok","ref":"sql-syntax-lexical","note":"CAST() with parameterized type (numeric with precision/scale)"}
+{"id":"lita0098","category":"literals-quoting","sql":"SELECT CAST('hello' AS text)","expect":"ok","ref":"sql-syntax-lexical","note":"CAST() to text type"}
+{"id":"lita0099","category":"literals-quoting","sql":"SELECT CAST('true' AS boolean)","expect":"ok","ref":"sql-syntax-lexical","note":"CAST() string to boolean"}
+{"id":"lita0100","category":"literals-quoting","sql":"SELECT '42'::integer::text","expect":"ok","ref":"sql-syntax-lexical","note":"chained :: cast operators"}
+{"id":"lita0101","category":"literals-quoting","sql":"SELECT '1.5'::real::numeric(10,2)","expect":"ok","ref":"sql-syntax-lexical","note":"chained cast from real to numeric"}
+{"id":"lita0102","category":"literals-quoting","sql":"SELECT INTERVAL '1' YEAR","expect":"ok","ref":"sql-syntax-lexical","note":"interval literal with YEAR field"}
+{"id":"lita0103","category":"literals-quoting","sql":"SELECT INTERVAL '3' MONTH","expect":"ok","ref":"sql-syntax-lexical","note":"interval literal with MONTH field"}
+{"id":"lita0104","category":"literals-quoting","sql":"SELECT INTERVAL '7' DAY","expect":"ok","ref":"sql-syntax-lexical","note":"interval literal with DAY field"}
+{"id":"lita0105","category":"literals-quoting","sql":"SELECT INTERVAL '12' HOUR","expect":"ok","ref":"sql-syntax-lexical","note":"interval literal with HOUR field"}
+{"id":"lita0106","category":"literals-quoting","sql":"SELECT INTERVAL '30' MINUTE","expect":"ok","ref":"sql-syntax-lexical","note":"interval literal with MINUTE field"}
+{"id":"lita0107","category":"literals-quoting","sql":"SELECT INTERVAL '45' SECOND","expect":"ok","ref":"sql-syntax-lexical","note":"interval literal with SECOND field"}
+{"id":"lita0108","category":"literals-quoting","sql":"SELECT INTERVAL '1-6' YEAR TO MONTH","expect":"ok","ref":"sql-syntax-lexical","note":"interval literal with YEAR TO MONTH range"}
+{"id":"lita0109","category":"literals-quoting","sql":"SELECT INTERVAL '2 03:04:05'","expect":"ok","ref":"sql-syntax-lexical","note":"interval literal with day-time format, no field qualifier"}
+{"id":"lita0110","category":"literals-quoting","sql":"SELECT INTERVAL '5' SECOND(3)","expect":"ok","ref":"sql-syntax-lexical","note":"interval with SECOND field and precision"}
+{"id":"lita0111","category":"literals-quoting","sql":"SELECT INTERVAL '01:30' HOUR TO MINUTE","expect":"ok","ref":"sql-syntax-lexical","note":"interval HOUR TO MINUTE range"}
+{"id":"lita0112","category":"literals-quoting","sql":"SELECT INTERVAL '01:30:45' HOUR TO SECOND","expect":"ok","ref":"sql-syntax-lexical","note":"interval HOUR TO SECOND range"}
+{"id":"lita0113","category":"literals-quoting","sql":"SELECT INTERVAL '15:30' MINUTE TO SECOND","expect":"ok","ref":"sql-syntax-lexical","note":"interval MINUTE TO SECOND range"}
+{"id":"lita0114","category":"literals-quoting","sql":"SELECT INTERVAL '1 year 2 months 3 days'","expect":"ok","ref":"sql-syntax-lexical","note":"interval literal with verbose multi-part string"}
+{"id":"lita0115","category":"literals-quoting","sql":"SELECT INTERVAL 'P1Y2M3DT4H5M6S'","expect":"ok","ref":"sql-syntax-lexical","note":"interval in ISO 8601 duration format"}
+{"id":"lita0116","category":"literals-quoting","sql":"SELECT INTERVAL '1' SECOND YEAR","expect":"error","ref":"sql-syntax-lexical","note":"interval with two field qualifiers — syntax error"}
+{"id":"lita0117","category":"literals-quoting","sql":"SELECT ARRAY[1, 2, 3]","expect":"ok","ref":"sql-syntax-lexical","note":"ARRAY constructor with integer elements"}
+{"id":"lita0118","category":"literals-quoting","sql":"SELECT ARRAY['a', 'b', 'c']","expect":"ok","ref":"sql-syntax-lexical","note":"ARRAY constructor with text elements"}
+{"id":"lita0119","category":"literals-quoting","sql":"SELECT ARRAY[[1,2],[3,4]]","expect":"ok","ref":"sql-syntax-lexical","note":"2D array literal"}
+{"id":"lita0120","category":"literals-quoting","sql":"SELECT ARRAY[]::int[]","expect":"ok","ref":"sql-syntax-lexical","note":"empty ARRAY literal with explicit cast"}
+{"id":"lita0121","category":"literals-quoting","sql":"SELECT '{1,2,3}'::int[]","expect":"ok","ref":"sql-syntax-lexical","note":"array from string literal with :: cast"}
+{"id":"lita0122","category":"literals-quoting","sql":"SELECT '{\"a\",\"b\"}'::text[]","expect":"ok","ref":"sql-syntax-lexical","note":"text array from string literal"}
+{"id":"lita0123","category":"literals-quoting","sql":"SELECT ARRAY[true, false, true]","expect":"ok","ref":"sql-syntax-lexical","note":"ARRAY constructor with boolean elements"}
+{"id":"lita0124","category":"literals-quoting","sql":"SELECT ARRAY[1.1, 2.2, 3.3]","expect":"ok","ref":"sql-syntax-lexical","note":"ARRAY constructor with numeric elements"}
+{"id":"lita0125","category":"literals-quoting","sql":"SELECT ARRAY[NULL, 1, NULL]","expect":"ok","ref":"sql-syntax-lexical","note":"ARRAY constructor with NULL elements"}
+{"id":"lita0126","category":"literals-quoting","sql":"SELECT ROW(1, 'hello', true)","expect":"ok","ref":"sql-syntax-lexical","note":"ROW constructor with mixed literal types"}
+{"id":"lita0127","category":"literals-quoting","sql":"SELECT ROW(1, NULL, 3.14)","expect":"ok","ref":"sql-syntax-lexical","note":"ROW constructor with NULL element"}
+{"id":"lita0128","category":"literals-quoting","sql":"SELECT (1, 'hello', true)","expect":"ok","ref":"sql-syntax-lexical","note":"implicit row constructor (parenthesized list)"}
+{"id":"lita0129","category":"literals-quoting","sql":"SELECT 1 AS \"my column\"","expect":"ok","ref":"sql-syntax-lexical","note":"quoted identifier with space used as alias"}
+{"id":"lita0130","category":"literals-quoting","sql":"SELECT 1 AS \"CaseSensitive\"","expect":"ok","ref":"sql-syntax-lexical","note":"quoted identifier preserves case"}
+{"id":"lita0131","category":"literals-quoting","sql":"SELECT 1 AS \"with \"\"quotes\"\" inside\"","expect":"ok","ref":"sql-syntax-lexical","note":"quoted identifier with doubled double-quote inside"}
+{"id":"lita0132","category":"literals-quoting","sql":"CREATE TABLE s.\"My Table\" (id int); DROP TABLE s.\"My Table\"","expect":"ok","ref":"sql-syntax-lexical","note":"quoted identifier with space in table name"}
+{"id":"lita0133","category":"literals-quoting","sql":"SELECT 1 AS \"\"","expect":"error","ref":"sql-syntax-lexical","note":"empty quoted identifier — zero-length delimited identifier error"}
+{"id":"lita0134","category":"literals-quoting","sql":"SELECT 1 AS U&\"\\0041lpha\"","expect":"ok","ref":"sql-syntax-lexical","note":"U& unicode quoted identifier used as column alias"}
+{"id":"lita0135","category":"literals-quoting","sql":"SELECT 1 AS U&\"!0041BC\" UESCAPE '!'","expect":"ok","ref":"sql-syntax-lexical","note":"U& quoted identifier with custom UESCAPE used as alias"}
+{"id":"lita0136","category":"literals-quoting","sql":"SELECT 1 AS unquoted_ident","expect":"ok","ref":"sql-syntax-lexical","note":"unquoted identifier as alias (lowercase, underscore)"}
+{"id":"lita0137","category":"literals-quoting","sql":"SELECT 1 AS _leading_underscore","expect":"ok","ref":"sql-syntax-lexical","note":"identifier starting with underscore"}
+{"id":"lita0138","category":"literals-quoting","sql":"SELECT 1 AS ident$with$dollar","expect":"ok","ref":"sql-syntax-lexical","note":"identifier containing dollar sign (non-standard but allowed)"}
+{"id":"lita0139","category":"literals-quoting","sql":"SELECT 1 AS \"MixedCase\"","expect":"ok","ref":"sql-syntax-lexical","note":"quoted identifier with mixed case — case preserved"}
+{"id":"lita0140","category":"literals-quoting","sql":"SELECT date '2024-01-15'","expect":"ok","ref":"sql-syntax-lexical","note":"typed literal: date 'value'"}
+{"id":"lita0141","category":"literals-quoting","sql":"SELECT time '10:30:00'","expect":"ok","ref":"sql-syntax-lexical","note":"typed literal: time 'value'"}
+{"id":"lita0142","category":"literals-quoting","sql":"SELECT timestamp '2024-01-15 10:30:00'","expect":"ok","ref":"sql-syntax-lexical","note":"typed literal: timestamp 'value'"}
+{"id":"lita0143","category":"literals-quoting","sql":"SELECT timestamptz '2024-01-15 10:30:00+02'","expect":"ok","ref":"sql-syntax-lexical","note":"typed literal: timestamptz 'value'"}
+{"id":"lita0144","category":"literals-quoting","sql":"SELECT '2024-01-15'::date","expect":"ok","ref":"sql-syntax-lexical","note":":: cast to date type"}
+{"id":"lita0145","category":"literals-quoting","sql":"SELECT '10:30:00'::time","expect":"ok","ref":"sql-syntax-lexical","note":":: cast to time type"}
+{"id":"lita0146","category":"literals-quoting","sql":"SELECT '1 hour'::interval","expect":"ok","ref":"sql-syntax-lexical","note":":: cast string to interval type"}
+{"id":"lita0147","category":"literals-quoting","sql":"SELECT CAST('2024-01-15' AS date)","expect":"ok","ref":"sql-syntax-lexical","note":"CAST() to date type"}
+{"id":"lita0148","category":"literals-quoting","sql":"SELECT '42'::text::integer","expect":"ok","ref":"sql-syntax-lexical","note":"double :: cast chain text then integer"}
+{"id":"lita0149","category":"literals-quoting","sql":"SELECT 'hello' = E'hello'","expect":"ok","ref":"sql-syntax-lexical","note":"plain string and E-string compare equal"}
+{"id":"lita0150","category":"literals-quoting","sql":"SELECT $$test$$ = 'test'","expect":"ok","ref":"sql-syntax-lexical","note":"dollar-quoted and plain string compare equal"}
+{"id":"lita0151","category":"literals-quoting","sql":"SELECT E'\\n' = chr(10)","expect":"ok","ref":"sql-syntax-lexical","note":"E-string newline escape equals chr(10)"}
+{"id":"lita0152","category":"literals-quoting","sql":"SELECT 'abc'\nE'def'","expect":"error","ref":"sql-syntax-lexical","note":"plain string adjacent to E-string across newline — not allowed (only plain+plain concatenates)"}
+{"id":"lita0153","category":"literals-quoting","sql":"SELECT +42","expect":"ok","ref":"sql-syntax-lexical","note":"unary plus on integer literal (+ is operator not part of literal)"}
+{"id":"lita0154","category":"literals-quoting","sql":"SELECT -42","expect":"ok","ref":"sql-syntax-lexical","note":"unary minus on integer literal (- is operator not part of literal)"}
+{"id":"lita0155","category":"literals-quoting","sql":"SELECT -3.14","expect":"ok","ref":"sql-syntax-lexical","note":"unary minus on decimal literal"}
+{"id":"lita0156","category":"literals-quoting","sql":"SELECT 'hello'::varchar(3)","expect":"ok","ref":"sql-syntax-lexical","note":":: cast to varchar with length modifier"}
+{"id":"lita0157","category":"literals-quoting","sql":"SELECT CAST('hello' AS char(5))","expect":"ok","ref":"sql-syntax-lexical","note":"CAST to char with length modifier"}
+{"id":"lita0158","category":"literals-quoting","sql":"SELECT B'1010'::varbit","expect":"ok","ref":"sql-syntax-lexical","note":"bit-string literal cast to varbit"}
+{"id":"lita0159","category":"literals-quoting","sql":"SELECT X'FF'::bit(8)","expect":"ok","ref":"sql-syntax-lexical","note":"hex bit-string cast to bit(8)"}
+{"id":"lita0160","category":"literals-quoting","sql":"SELECT INTERVAL '1 2:03:04' DAY TO SECOND","expect":"ok","ref":"sql-syntax-lexical","note":"interval DAY TO SECOND range with compound value"}
+{"id":"lita0161","category":"literals-quoting","sql":"SELECT INTERVAL '5' DAY(3)","expect":"error","ref":"sql-syntax-lexical","note":"interval with DAY field and leading precision — not valid PostgreSQL syntax (precision only valid for SECOND)"}
+{"id":"lita0162","category":"literals-quoting","sql":"SELECT 'NaN'::float8","expect":"ok","ref":"sql-syntax-lexical","note":"special float literal NaN via cast"}
+{"id":"lita0163","category":"literals-quoting","sql":"SELECT 'Infinity'::float8","expect":"ok","ref":"sql-syntax-lexical","note":"special float literal Infinity via cast"}
+{"id":"lita0164","category":"literals-quoting","sql":"SELECT '-Infinity'::float8","expect":"ok","ref":"sql-syntax-lexical","note":"special float literal negative Infinity via cast"}
+{"id":"lita0165","category":"literals-quoting","sql":"SELECT 'bad date'::date","expect":"error","ref":"sql-syntax-lexical","note":"invalid date string cast to date — runtime error"}
+{"id":"lita0166","category":"literals-quoting","sql":"SELECT U&'\\ZZZZ'","expect":"error","ref":"sql-syntax-lexical","note":"U& string with invalid (non-hex) escape digits — error"}
+{"id":"lita0167","category":"literals-quoting","sql":"SELECT '\\x00'","expect":"ok","ref":"sql-syntax-lexical","note":"backslash in plain string is literal (no escape processing with standard_conforming_strings=on)"}
+{"id":"lita0168","category":"literals-quoting","sql":"SELECT 'hello'::integer","expect":"error","ref":"sql-syntax-lexical","note":"cast string that is not a valid integer — runtime cast error"}
+{"id":"lita0169","category":"literals-quoting","sql":"SELECT INTERVAL '99' YEAR(2)","expect":"error","ref":"sql-syntax-lexical","note":"interval YEAR(precision) — not valid PostgreSQL syntax (precision only allowed for SECOND)"}
+{"id":"lita0170","category":"literals-quoting","sql":"SELECT '5'::bit(4)","expect":"error","ref":"sql-syntax-lexical","note":"string '5' cannot be cast to bit(4) — invalid input syntax"}

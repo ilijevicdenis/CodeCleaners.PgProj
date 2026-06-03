@@ -1,0 +1,170 @@
+{"id":"seqa0001","category":"create-sequence","sql":"CREATE SEQUENCE myseq","expect":"ok","ref":"sql-createsequence","note":"minimal CREATE SEQUENCE with all defaults"}
+{"id":"seqa0002","category":"create-sequence","sql":"CREATE SEQUENCE myseq2 START 100","expect":"ok","ref":"sql-createsequence","note":"START without WITH keyword"}
+{"id":"seqa0003","category":"create-sequence","sql":"CREATE SEQUENCE myseq3 START WITH 100","expect":"ok","ref":"sql-createsequence","note":"START WITH keyword"}
+{"id":"seqa0004","category":"create-sequence","sql":"CREATE SEQUENCE myseq4 INCREMENT 5","expect":"ok","ref":"sql-createsequence","note":"INCREMENT without BY keyword"}
+{"id":"seqa0005","category":"create-sequence","sql":"CREATE SEQUENCE myseq5 INCREMENT BY 5","expect":"ok","ref":"sql-createsequence","note":"INCREMENT BY keyword"}
+{"id":"seqa0006","category":"create-sequence","sql":"CREATE SEQUENCE myseq6 MINVALUE 10","expect":"ok","ref":"sql-createsequence","note":"explicit MINVALUE"}
+{"id":"seqa0007","category":"create-sequence","sql":"CREATE SEQUENCE myseq7 MAXVALUE 1000","expect":"ok","ref":"sql-createsequence","note":"explicit MAXVALUE"}
+{"id":"seqa0008","category":"create-sequence","sql":"CREATE SEQUENCE myseq8 NO MINVALUE","expect":"ok","ref":"sql-createsequence","note":"NO MINVALUE keyword"}
+{"id":"seqa0009","category":"create-sequence","sql":"CREATE SEQUENCE myseq9 NO MAXVALUE","expect":"ok","ref":"sql-createsequence","note":"NO MAXVALUE keyword"}
+{"id":"seqa0010","category":"create-sequence","sql":"CREATE SEQUENCE myseq10 CYCLE","expect":"ok","ref":"sql-createsequence","note":"CYCLE keyword"}
+{"id":"seqa0011","category":"create-sequence","sql":"CREATE SEQUENCE myseq11 NO CYCLE","expect":"ok","ref":"sql-createsequence","note":"NO CYCLE keyword"}
+{"id":"seqa0012","category":"create-sequence","sql":"CREATE SEQUENCE myseq12 CACHE 10","expect":"ok","ref":"sql-createsequence","note":"CACHE with value"}
+{"id":"seqa0013","category":"create-sequence","sql":"CREATE SEQUENCE myseq13 AS smallint","expect":"ok","ref":"sql-createsequence","note":"AS smallint type"}
+{"id":"seqa0014","category":"create-sequence","sql":"CREATE SEQUENCE myseq14 AS integer","expect":"ok","ref":"sql-createsequence","note":"AS integer type"}
+{"id":"seqa0015","category":"create-sequence","sql":"CREATE SEQUENCE myseq15 AS bigint","expect":"ok","ref":"sql-createsequence","note":"AS bigint type (default)"}
+{"id":"seqa0016","category":"create-sequence","sql":"CREATE SEQUENCE s.myseq16 OWNED BY s.t.id","expect":"ok","ref":"sql-createsequence","note":"OWNED BY table.column (sequence in same schema as table)"}
+{"id":"seqa0017","category":"create-sequence","sql":"CREATE SEQUENCE myseq17 OWNED BY NONE","expect":"ok","ref":"sql-createsequence","note":"OWNED BY NONE"}
+{"id":"seqa0018","category":"create-sequence","sql":"CREATE TEMP SEQUENCE myseq18","expect":"ok","ref":"sql-createsequence","note":"TEMP keyword"}
+{"id":"seqa0019","category":"create-sequence","sql":"CREATE TEMPORARY SEQUENCE myseq19","expect":"ok","ref":"sql-createsequence","note":"TEMPORARY keyword"}
+{"id":"seqa0020","category":"create-sequence","sql":"CREATE UNLOGGED SEQUENCE myseq20","expect":"ok","ref":"sql-createsequence","note":"UNLOGGED sequence"}
+{"id":"seqa0021","category":"create-sequence","sql":"CREATE SEQUENCE IF NOT EXISTS s.seq","expect":"ok","ref":"sql-createsequence","note":"IF NOT EXISTS when sequence already exists (no error)"}
+{"id":"seqa0022","category":"create-sequence","sql":"CREATE SEQUENCE IF NOT EXISTS newseq21","expect":"ok","ref":"sql-createsequence","note":"IF NOT EXISTS when sequence does not exist"}
+{"id":"seqa0023","category":"create-sequence","sql":"CREATE SEQUENCE s.newseq22","expect":"ok","ref":"sql-createsequence","note":"schema-qualified sequence name"}
+{"id":"seqa0024","category":"create-sequence","sql":"CREATE SEQUENCE myseq24 START WITH 1 INCREMENT BY 1 MINVALUE 1 MAXVALUE 100 CACHE 1 NO CYCLE","expect":"ok","ref":"sql-createsequence","note":"all ascending options combined"}
+{"id":"seqa0025","category":"create-sequence","sql":"CREATE SEQUENCE myseq25 INCREMENT BY -1 START WITH 100 MINVALUE 1 MAXVALUE 100 CYCLE","expect":"ok","ref":"sql-createsequence","note":"descending sequence with CYCLE"}
+{"id":"seqa0026","category":"create-sequence","sql":"CREATE SEQUENCE myseq26 AS integer INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 START WITH 1 CACHE 1","expect":"ok","ref":"sql-createsequence","note":"AS integer full options"}
+{"id":"seqa0027","category":"create-sequence","sql":"CREATE SEQUENCE myseq27 AS smallint MINVALUE 1 MAXVALUE 32767","expect":"ok","ref":"sql-createsequence","note":"AS smallint with matching range"}
+{"id":"seqa0028","category":"create-sequence","sql":"CREATE SEQUENCE myseq28 CACHE 1","expect":"ok","ref":"sql-createsequence","note":"CACHE 1 (minimum allowed value)"}
+{"id":"seqa0029","category":"create-sequence","sql":"CREATE SEQUENCE myseq29 CACHE 1000","expect":"ok","ref":"sql-createsequence","note":"CACHE large value"}
+{"id":"seqa0030","category":"create-sequence","sql":"CREATE SEQUENCE myseq30 START WITH -100 INCREMENT BY -1 MAXVALUE -1 MINVALUE -1000","expect":"ok","ref":"sql-createsequence","note":"fully negative descending sequence"}
+{"id":"seqa0031","category":"create-sequence","sql":"CREATE SEQUENCE myseq31 INCREMENT BY 2 START WITH 2","expect":"ok","ref":"sql-createsequence","note":"even numbers sequence"}
+{"id":"seqa0032","category":"create-sequence","sql":"CREATE SEQUENCE myseq32 AS integer START WITH 1 INCREMENT BY 1 NO MINVALUE NO MAXVALUE","expect":"ok","ref":"sql-createsequence","note":"NO MINVALUE NO MAXVALUE with AS integer"}
+{"id":"seqa0033","category":"create-sequence","sql":"CREATE TEMP SEQUENCE myseq33 START WITH 50 INCREMENT BY 10 CACHE 5","expect":"ok","ref":"sql-createsequence","note":"TEMP with multiple options"}
+{"id":"seqa0034","category":"create-sequence","sql":"CREATE SEQUENCE myseq34; SELECT nextval('myseq34')","expect":"ok","ref":"sql-createsequence","note":"CREATE then nextval call"}
+{"id":"seqa0035","category":"create-sequence","sql":"CREATE SEQUENCE myseq35 START WITH 500; SELECT nextval('myseq35'); SELECT nextval('myseq35')","expect":"ok","ref":"sql-createsequence","note":"multiple nextval calls"}
+{"id":"seqa0036","category":"create-sequence","sql":"SELECT nextval('s.seq')","expect":"ok","ref":"sql-createsequence","note":"nextval on fixture sequence schema-qualified"}
+{"id":"seqa0037","category":"create-sequence","sql":"CREATE SEQUENCE myseq37 START WITH 10; SELECT nextval('myseq37'); SELECT currval('myseq37')","expect":"ok","ref":"sql-createsequence","note":"nextval then currval"}
+{"id":"seqa0038","category":"create-sequence","sql":"CREATE SEQUENCE myseq38 START WITH 1; SELECT setval('myseq38', 100)","expect":"ok","ref":"sql-createsequence","note":"setval with sequence name and value"}
+{"id":"seqa0039","category":"create-sequence","sql":"CREATE SEQUENCE myseq39 START WITH 1; SELECT setval('myseq39', 100, true)","expect":"ok","ref":"sql-createsequence","note":"setval with is_called=true"}
+{"id":"seqa0040","category":"create-sequence","sql":"CREATE SEQUENCE myseq40 START WITH 1; SELECT setval('myseq40', 100, false)","expect":"ok","ref":"sql-createsequence","note":"setval with is_called=false"}
+{"id":"seqa0041","category":"create-sequence","sql":"ALTER SEQUENCE s.seq RESTART","expect":"ok","ref":"sql-altersequence","note":"ALTER SEQUENCE RESTART without value"}
+{"id":"seqa0042","category":"create-sequence","sql":"ALTER SEQUENCE s.seq RESTART WITH 1","expect":"ok","ref":"sql-altersequence","note":"ALTER SEQUENCE RESTART WITH value"}
+{"id":"seqa0043","category":"create-sequence","sql":"ALTER SEQUENCE s.seq RESTART 200","expect":"ok","ref":"sql-altersequence","note":"ALTER SEQUENCE RESTART without WITH keyword"}
+{"id":"seqa0044","category":"create-sequence","sql":"ALTER SEQUENCE s.seq INCREMENT BY 3","expect":"ok","ref":"sql-altersequence","note":"ALTER SEQUENCE INCREMENT BY"}
+{"id":"seqa0045","category":"create-sequence","sql":"ALTER SEQUENCE s.seq INCREMENT 3","expect":"ok","ref":"sql-altersequence","note":"ALTER SEQUENCE INCREMENT without BY"}
+{"id":"seqa0046","category":"create-sequence","sql":"ALTER SEQUENCE s.seq MINVALUE 50","expect":"ok","ref":"sql-altersequence","note":"ALTER SEQUENCE set MINVALUE"}
+{"id":"seqa0047","category":"create-sequence","sql":"ALTER SEQUENCE s.seq MAXVALUE 9999","expect":"ok","ref":"sql-altersequence","note":"ALTER SEQUENCE set MAXVALUE"}
+{"id":"seqa0048","category":"create-sequence","sql":"ALTER SEQUENCE s.seq NO MINVALUE","expect":"ok","ref":"sql-altersequence","note":"ALTER SEQUENCE NO MINVALUE"}
+{"id":"seqa0049","category":"create-sequence","sql":"ALTER SEQUENCE s.seq NO MAXVALUE","expect":"ok","ref":"sql-altersequence","note":"ALTER SEQUENCE NO MAXVALUE"}
+{"id":"seqa0050","category":"create-sequence","sql":"ALTER SEQUENCE s.seq CYCLE","expect":"ok","ref":"sql-altersequence","note":"ALTER SEQUENCE enable CYCLE"}
+{"id":"seqa0051","category":"create-sequence","sql":"ALTER SEQUENCE s.seq NO CYCLE","expect":"ok","ref":"sql-altersequence","note":"ALTER SEQUENCE disable NO CYCLE"}
+{"id":"seqa0052","category":"create-sequence","sql":"ALTER SEQUENCE s.seq CACHE 5","expect":"ok","ref":"sql-altersequence","note":"ALTER SEQUENCE set CACHE"}
+{"id":"seqa0053","category":"create-sequence","sql":"ALTER SEQUENCE s.seq START WITH 200","expect":"ok","ref":"sql-altersequence","note":"ALTER SEQUENCE START WITH"}
+{"id":"seqa0054","category":"create-sequence","sql":"ALTER SEQUENCE s.seq AS integer","expect":"ok","ref":"sql-altersequence","note":"ALTER SEQUENCE change AS type"}
+{"id":"seqa0055","category":"create-sequence","sql":"ALTER SEQUENCE s.seq OWNED BY s.t.id","expect":"ok","ref":"sql-altersequence","note":"ALTER SEQUENCE OWNED BY column"}
+{"id":"seqa0056","category":"create-sequence","sql":"ALTER SEQUENCE s.seq OWNED BY NONE","expect":"ok","ref":"sql-altersequence","note":"ALTER SEQUENCE OWNED BY NONE"}
+{"id":"seqa0057","category":"create-sequence","sql":"CREATE SEQUENCE myseq57; ALTER SEQUENCE myseq57 RENAME TO myseq57_renamed","expect":"ok","ref":"sql-altersequence","note":"ALTER SEQUENCE RENAME TO"}
+{"id":"seqa0058","category":"create-sequence","sql":"CREATE SEQUENCE myseq58; ALTER SEQUENCE myseq58 SET SCHEMA s","expect":"ok","ref":"sql-altersequence","note":"ALTER SEQUENCE SET SCHEMA"}
+{"id":"seqa0059","category":"create-sequence","sql":"ALTER SEQUENCE s.seq OWNER TO CURRENT_USER","expect":"ok","ref":"sql-altersequence","note":"ALTER SEQUENCE OWNER TO CURRENT_USER"}
+{"id":"seqa0060","category":"create-sequence","sql":"ALTER SEQUENCE s.seq OWNER TO CURRENT_ROLE","expect":"ok","ref":"sql-altersequence","note":"ALTER SEQUENCE OWNER TO CURRENT_ROLE"}
+{"id":"seqa0061","category":"create-sequence","sql":"ALTER SEQUENCE s.seq OWNER TO SESSION_USER","expect":"ok","ref":"sql-altersequence","note":"ALTER SEQUENCE OWNER TO SESSION_USER"}
+{"id":"seqa0062","category":"create-sequence","sql":"ALTER SEQUENCE s.seq SET LOGGED","expect":"ok","ref":"sql-altersequence","note":"ALTER SEQUENCE SET LOGGED"}
+{"id":"seqa0063","category":"create-sequence","sql":"ALTER SEQUENCE s.seq SET UNLOGGED","expect":"ok","ref":"sql-altersequence","note":"ALTER SEQUENCE SET UNLOGGED"}
+{"id":"seqa0064","category":"create-sequence","sql":"ALTER SEQUENCE IF EXISTS s.seq RESTART WITH 1","expect":"ok","ref":"sql-altersequence","note":"ALTER SEQUENCE IF EXISTS on existing sequence"}
+{"id":"seqa0065","category":"create-sequence","sql":"ALTER SEQUENCE IF EXISTS nonexistent_seq RESTART WITH 1","expect":"ok","ref":"sql-altersequence","note":"ALTER SEQUENCE IF EXISTS on missing sequence (no error)"}
+{"id":"seqa0066","category":"create-sequence","sql":"ALTER SEQUENCE s.seq INCREMENT BY 5 MINVALUE 5 MAXVALUE 10000 RESTART WITH 5 CACHE 2 CYCLE","expect":"ok","ref":"sql-altersequence","note":"ALTER SEQUENCE multiple options combined"}
+{"id":"seqa0067","category":"create-sequence","sql":"ALTER SEQUENCE s.seq NO MINVALUE NO MAXVALUE NO CYCLE CACHE 1","expect":"ok","ref":"sql-altersequence","note":"ALTER SEQUENCE multiple NO options"}
+{"id":"seqa0068","category":"create-sequence","sql":"CREATE SEQUENCE myseq68 AS smallint; ALTER SEQUENCE myseq68 AS bigint","expect":"ok","ref":"sql-altersequence","note":"ALTER SEQUENCE widen type from smallint to bigint"}
+{"id":"seqa0069","category":"create-sequence","sql":"CREATE SEQUENCE myseq69 START 1; SELECT lastval()","expect":"error","ref":"sql-createsequence","note":"lastval() before any sequence used in session (semantic error)"}
+{"id":"seqa0070","category":"create-sequence","sql":"CREATE SEQUENCE myseq70new; SELECT currval('myseq70new')","expect":"error","ref":"sql-createsequence","note":"currval before nextval on fresh sequence (semantic error)"}
+{"id":"seqa0071","category":"create-sequence","sql":"CREATE SEQUENCE","expect":"error","ref":"sql-createsequence","note":"missing sequence name (syntax error)"}
+{"id":"seqa0072","category":"create-sequence","sql":"CREATE SEQUENCE myseq72 AS text","expect":"error","ref":"sql-createsequence","note":"AS unsupported type text (semantic error)"}
+{"id":"seqa0073","category":"create-sequence","sql":"CREATE SEQUENCE myseq73 AS float8","expect":"error","ref":"sql-createsequence","note":"AS unsupported type float8"}
+{"id":"seqa0074","category":"create-sequence","sql":"CREATE SEQUENCE myseq74 INCREMENT BY","expect":"error","ref":"sql-createsequence","note":"INCREMENT BY missing value (syntax error)"}
+{"id":"seqa0075","category":"create-sequence","sql":"CREATE SEQUENCE myseq75 MINVALUE","expect":"error","ref":"sql-createsequence","note":"MINVALUE missing value (syntax error)"}
+{"id":"seqa0076","category":"create-sequence","sql":"CREATE SEQUENCE myseq76 MAXVALUE","expect":"error","ref":"sql-createsequence","note":"MAXVALUE missing value (syntax error)"}
+{"id":"seqa0077","category":"create-sequence","sql":"CREATE SEQUENCE myseq77 START","expect":"error","ref":"sql-createsequence","note":"START missing value (syntax error)"}
+{"id":"seqa0078","category":"create-sequence","sql":"CREATE SEQUENCE myseq78 CACHE","expect":"error","ref":"sql-createsequence","note":"CACHE missing value (syntax error)"}
+{"id":"seqa0079","category":"create-sequence","sql":"CREATE SEQUENCE myseq79 CACHE 0","expect":"error","ref":"sql-createsequence","note":"CACHE 0 is invalid (must be >= 1)"}
+{"id":"seqa0080","category":"create-sequence","sql":"CREATE SEQUENCE myseq80 CACHE -1","expect":"error","ref":"sql-createsequence","note":"CACHE negative value invalid"}
+{"id":"seqa0081","category":"create-sequence","sql":"CREATE SEQUENCE s.seq","expect":"error","ref":"sql-createsequence","note":"sequence already exists (semantic error, no IF NOT EXISTS)"}
+{"id":"seqa0082","category":"create-sequence","sql":"CREATE SEQUENCE myseq82 MINVALUE 100 MAXVALUE 10","expect":"error","ref":"sql-createsequence","note":"MINVALUE > MAXVALUE semantic error"}
+{"id":"seqa0083","category":"create-sequence","sql":"CREATE SEQUENCE myseq83 START WITH 0 MINVALUE 1","expect":"error","ref":"sql-createsequence","note":"START below MINVALUE semantic error"}
+{"id":"seqa0084","category":"create-sequence","sql":"CREATE SEQUENCE myseq84 OWNED BY nonexistent_table.col","expect":"error","ref":"sql-createsequence","note":"OWNED BY nonexistent table (semantic error)"}
+{"id":"seqa0085","category":"create-sequence","sql":"CREATE SEQUENCE myseq85 OWNED BY s.t.nonexistent_col","expect":"error","ref":"sql-createsequence","note":"OWNED BY nonexistent column (semantic error)"}
+{"id":"seqa0086","category":"create-sequence","sql":"CREATE TEMP TEMPORARY SEQUENCE myseq86","expect":"error","ref":"sql-createsequence","note":"both TEMP and TEMPORARY keywords (syntax error)"}
+{"id":"seqa0087","category":"create-sequence","sql":"ALTER SEQUENCE nonexistent_seq RESTART WITH 1","expect":"error","ref":"sql-altersequence","note":"ALTER SEQUENCE on nonexistent sequence without IF EXISTS"}
+{"id":"seqa0088","category":"create-sequence","sql":"ALTER SEQUENCE s.seq CACHE 0","expect":"error","ref":"sql-altersequence","note":"ALTER SEQUENCE CACHE 0 invalid"}
+{"id":"seqa0089","category":"create-sequence","sql":"ALTER SEQUENCE s.seq RENAME TO","expect":"error","ref":"sql-altersequence","note":"RENAME TO missing new name (syntax error)"}
+{"id":"seqa0090","category":"create-sequence","sql":"ALTER SEQUENCE s.seq SET SCHEMA","expect":"error","ref":"sql-altersequence","note":"SET SCHEMA missing schema name (syntax error)"}
+{"id":"seqa0091","category":"create-sequence","sql":"ALTER SEQUENCE s.seq OWNER TO","expect":"error","ref":"sql-altersequence","note":"OWNER TO missing owner (syntax error)"}
+{"id":"seqa0092","category":"create-sequence","sql":"CREATE SEQUENCE myseq92 CYCLE MINVALUE 1 MAXVALUE 10 START WITH 1 INCREMENT BY 1","expect":"ok","ref":"sql-createsequence","note":"clause ordering: CYCLE before MINVALUE/MAXVALUE"}
+{"id":"seqa0093","category":"create-sequence","sql":"CREATE SEQUENCE myseq93 MAXVALUE 1000 MINVALUE 1 START WITH 1","expect":"ok","ref":"sql-createsequence","note":"MAXVALUE before MINVALUE ordering"}
+{"id":"seqa0094","category":"create-sequence","sql":"CREATE SEQUENCE myseq94 CACHE 5 INCREMENT BY 3 START WITH 3","expect":"ok","ref":"sql-createsequence","note":"CACHE before INCREMENT before START ordering"}
+{"id":"seqa0095","category":"create-sequence","sql":"CREATE SEQUENCE myseq95 OWNED BY NONE NO CYCLE NO MAXVALUE NO MINVALUE","expect":"ok","ref":"sql-createsequence","note":"NO options with OWNED BY NONE ordering variant"}
+{"id":"seqa0096","category":"create-sequence","sql":"CREATE SEQUENCE \"my seq 96\"","expect":"ok","ref":"sql-createsequence","note":"double-quoted sequence name with spaces"}
+{"id":"seqa0097","category":"create-sequence","sql":"CREATE SEQUENCE \"MySeq97\"","expect":"ok","ref":"sql-createsequence","note":"double-quoted mixed-case sequence name"}
+{"id":"seqa0098","category":"create-sequence","sql":"create sequence myseq98","expect":"ok","ref":"sql-createsequence","note":"lowercase CREATE SEQUENCE keywords"}
+{"id":"seqa0099","category":"create-sequence","sql":"CREATE SEQUENCE myseq99 -- inline comment\n START WITH 1","expect":"ok","ref":"sql-createsequence","note":"inline SQL comment between tokens"}
+{"id":"seqa0100","category":"create-sequence","sql":"CREATE SEQUENCE myseq100 /* block comment */ START WITH 1","expect":"ok","ref":"sql-createsequence","note":"block comment between tokens"}
+{"id":"seqa0101","category":"create-sequence","sql":"CREATE SEQUENCE myseq101 AS INTEGER","expect":"ok","ref":"sql-createsequence","note":"AS INTEGER (uppercase type keyword)"}
+{"id":"seqa0102","category":"create-sequence","sql":"CREATE SEQUENCE myseq102 AS SMALLINT","expect":"ok","ref":"sql-createsequence","note":"AS SMALLINT (uppercase)"}
+{"id":"seqa0103","category":"create-sequence","sql":"CREATE SEQUENCE myseq103 AS BIGINT","expect":"ok","ref":"sql-createsequence","note":"AS BIGINT (uppercase)"}
+{"id":"seqa0104","category":"create-sequence","sql":"CREATE SEQUENCE myseq104 AS int4","expect":"ok","ref":"sql-createsequence","note":"AS int4 alias for integer"}
+{"id":"seqa0105","category":"create-sequence","sql":"CREATE SEQUENCE myseq105 AS int2","expect":"ok","ref":"sql-createsequence","note":"AS int2 alias for smallint"}
+{"id":"seqa0106","category":"create-sequence","sql":"CREATE SEQUENCE myseq106 AS int8","expect":"ok","ref":"sql-createsequence","note":"AS int8 alias for bigint"}
+{"id":"seqa0107","category":"create-sequence","sql":"CREATE SEQUENCE myseq107 INCREMENT BY 1000000","expect":"ok","ref":"sql-createsequence","note":"large INCREMENT value"}
+{"id":"seqa0108","category":"create-sequence","sql":"CREATE SEQUENCE myseq108 INCREMENT BY -1000","expect":"ok","ref":"sql-createsequence","note":"large negative INCREMENT (descending)"}
+{"id":"seqa0109","category":"create-sequence","sql":"CREATE SEQUENCE myseq109 MINVALUE -9223372036854775807","expect":"ok","ref":"sql-createsequence","note":"MINVALUE near bigint minimum"}
+{"id":"seqa0110","category":"create-sequence","sql":"CREATE SEQUENCE myseq110 MAXVALUE 9223372036854775806","expect":"ok","ref":"sql-createsequence","note":"MAXVALUE near bigint maximum"}
+{"id":"seqa0111","category":"create-sequence","sql":"CREATE SEQUENCE myseq111 START WITH 1 INCREMENT BY 1 MINVALUE 1 MAXVALUE 9223372036854775806 CACHE 100 CYCLE OWNED BY NONE","expect":"ok","ref":"sql-createsequence","note":"full options all keywords combined"}
+{"id":"seqa0112","category":"create-sequence","sql":"CREATE UNLOGGED SEQUENCE myseq112 START WITH 1 CACHE 10","expect":"ok","ref":"sql-createsequence","note":"UNLOGGED with options"}
+{"id":"seqa0113","category":"create-sequence","sql":"CREATE SEQUENCE IF NOT EXISTS myseq113 AS integer START WITH 1 CACHE 5","expect":"ok","ref":"sql-createsequence","note":"IF NOT EXISTS with type and options"}
+{"id":"seqa0114","category":"create-sequence","sql":"CREATE SEQUENCE myseq114 INCREMENT BY 0","expect":"error","ref":"sql-createsequence","note":"INCREMENT BY 0 is invalid"}
+{"id":"seqa0115","category":"create-sequence","sql":"SELECT nextval('nonexistent_seq_xyz')","expect":"error","ref":"sql-createsequence","note":"nextval on nonexistent sequence (semantic error)"}
+{"id":"seqa0116","category":"create-sequence","sql":"SELECT setval('nonexistent_seq_xyz', 100)","expect":"error","ref":"sql-createsequence","note":"setval on nonexistent sequence (semantic error)"}
+{"id":"seqa0117","category":"create-sequence","sql":"CREATE SEQUENCE myseq117 START WITH 100 MINVALUE 100 MAXVALUE 200 CYCLE; SELECT nextval('myseq117')","expect":"ok","ref":"sql-createsequence","note":"CREATE with CYCLE then nextval"}
+{"id":"seqa0118","category":"create-sequence","sql":"ALTER SEQUENCE s.seq INCREMENT BY 2 RESTART WITH 100 CACHE 3 CYCLE OWNED BY NONE","expect":"ok","ref":"sql-altersequence","note":"ALTER SEQUENCE many options at once"}
+{"id":"seqa0119","category":"create-sequence","sql":"ALTER SEQUENCE s.seq AS smallint MINVALUE 1 MAXVALUE 32767 START WITH 1","expect":"ok","ref":"sql-altersequence","note":"ALTER SEQUENCE change to smallint with valid range"}
+{"id":"seqa0120","category":"create-sequence","sql":"CREATE SEQUENCE myseq120; ALTER SEQUENCE myseq120 SET SCHEMA s; SELECT nextval('s.myseq120')","expect":"ok","ref":"sql-altersequence","note":"SET SCHEMA then nextval in new schema"}
+{"id":"seqa0121","category":"create-sequence","sql":"ALTER SEQUENCE s.seq AS numeric","expect":"error","ref":"sql-altersequence","note":"ALTER SEQUENCE AS unsupported type numeric"}
+{"id":"seqa0122","category":"create-sequence","sql":"ALTER SEQUENCE s.seq MINVALUE 1000 MAXVALUE 500","expect":"error","ref":"sql-altersequence","note":"ALTER SEQUENCE MINVALUE > MAXVALUE"}
+{"id":"seqa0123","category":"create-sequence","sql":"ALTER SEQUENCE s.seq AS integer MAXVALUE 2147483648","expect":"error","ref":"sql-altersequence","note":"ALTER SEQUENCE MAXVALUE exceeds integer max"}
+{"id":"seqa0124","category":"create-sequence","sql":"CREATE SEQUENCE myseq124 AS smallint MAXVALUE 32768","expect":"error","ref":"sql-createsequence","note":"MAXVALUE exceeds smallint maximum"}
+{"id":"seqa0125","category":"create-sequence","sql":"CREATE SEQUENCE myseq125 AS smallint MINVALUE -32769","expect":"error","ref":"sql-createsequence","note":"MINVALUE below smallint minimum"}
+{"id":"seqa0126","category":"create-sequence","sql":"CREATE SEQUENCE myseq126 MAXVALUE 100 START WITH 200","expect":"error","ref":"sql-createsequence","note":"START above MAXVALUE semantic error"}
+{"id":"seqa0127","category":"create-sequence","sql":"CREATE SEQUENCE myseq127 INCREMENT BY -1 START WITH -1 MINVALUE -100 MAXVALUE -1","expect":"ok","ref":"sql-createsequence","note":"descending sequence START equals MAXVALUE"}
+{"id":"seqa0128","category":"create-sequence","sql":"CREATE SEQUENCE myseq128 NO CYCLE NO MINVALUE NO MAXVALUE","expect":"ok","ref":"sql-createsequence","note":"all NO options together"}
+{"id":"seqa0129","category":"create-sequence","sql":"SELECT nextval('s.seq'), currval('s.seq')","expect":"ok","ref":"sql-createsequence","note":"nextval and currval in same SELECT"}
+{"id":"seqa0130","category":"create-sequence","sql":"CREATE SEQUENCE myseq130; SELECT setval('myseq130', 1, false); SELECT nextval('myseq130')","expect":"ok","ref":"sql-createsequence","note":"setval is_called=false then nextval returns set value"}
+{"id":"seqa0131","category":"create-sequence","sql":"CREATE SEQUENCE s.myseq131 OWNED BY s.t2.id","expect":"ok","ref":"sql-createsequence","note":"OWNED BY second fixture table column (same schema)"}
+{"id":"seqa0132","category":"create-sequence","sql":"CREATE SEQUENCE s.myseq132 START WITH 1 INCREMENT BY 1 AS integer OWNED BY s.t.qty","expect":"ok","ref":"sql-createsequence","note":"OWNED BY non-pk integer column (same schema)"}
+{"id":"seqa0133","category":"create-sequence","sql":"CREATE SEQUENCE s.myseq133; ALTER SEQUENCE s.myseq133 OWNED BY s.t.id; ALTER SEQUENCE s.myseq133 OWNED BY NONE","expect":"ok","ref":"sql-altersequence","note":"OWNED BY column then OWNED BY NONE (sequence in same schema)"}
+{"id":"seqa0134","category":"create-sequence","sql":"CREATE TEMP SEQUENCE IF NOT EXISTS myseq134 AS smallint START WITH 1 INCREMENT BY 1 MINVALUE 1 MAXVALUE 32767 CACHE 1 NO CYCLE","expect":"ok","ref":"sql-createsequence","note":"TEMP + IF NOT EXISTS + all options"}
+{"id":"seqa0135","category":"create-sequence","sql":"CREATE SEQUENCE myseq135 START WITH 9223372036854775806","expect":"ok","ref":"sql-createsequence","note":"START near bigint max"}
+{"id":"seqa0136","category":"create-sequence","sql":"CREATE SEQUENCE myseq136 INCREMENT BY 1 START WITH 1; ALTER SEQUENCE myseq136 INCREMENT BY 5; SELECT nextval('myseq136')","expect":"ok","ref":"sql-altersequence","note":"CREATE then ALTER increment then nextval"}
+{"id":"seqa0137","category":"create-sequence","sql":"CREATE SEQUENCE myseq137; ALTER SEQUENCE myseq137 RESTART; SELECT nextval('myseq137')","expect":"ok","ref":"sql-altersequence","note":"RESTART without value restarts to recorded start"}
+{"id":"seqa0138","category":"create-sequence","sql":"ALTER SEQUENCE IF EXISTS s.seq AS bigint NO MINVALUE NO MAXVALUE NO CYCLE","expect":"ok","ref":"sql-altersequence","note":"ALTER IF EXISTS with multiple options"}
+{"id":"seqa0139","category":"create-sequence","sql":"CREATE SEQUENCE myseq139 START 1 CACHE 1 NO CYCLE OWNED BY NONE INCREMENT 1 MINVALUE 1 MAXVALUE 100","expect":"ok","ref":"sql-createsequence","note":"options in non-canonical order"}
+{"id":"seqa0140","category":"create-sequence","sql":"CREATE SEQUENCE myseq140 START WITH 1 MINVALUE MAXVALUE","expect":"error","ref":"sql-createsequence","note":"MINVALUE immediately followed by MAXVALUE keyword (syntax error, missing minvalue number)"}
+{"id":"seqa0141","category":"create-sequence","sql":"CREATE SEQUENCE myseq141 NO","expect":"error","ref":"sql-createsequence","note":"dangling NO keyword (syntax error)"}
+{"id":"seqa0142","category":"create-sequence","sql":"CREATE SEQUENCE myseq142 AS","expect":"error","ref":"sql-createsequence","note":"AS without type (syntax error)"}
+{"id":"seqa0143","category":"create-sequence","sql":"CREATE SEQUENCE myseq143 OWNED","expect":"error","ref":"sql-createsequence","note":"OWNED without BY (syntax error)"}
+{"id":"seqa0144","category":"create-sequence","sql":"CREATE SEQUENCE myseq144 OWNED BY","expect":"error","ref":"sql-createsequence","note":"OWNED BY without target (syntax error)"}
+{"id":"seqa0145","category":"create-sequence","sql":"CREATE SEQUENCE myseq145 START WITH INCREMENT BY 5","expect":"error","ref":"sql-createsequence","note":"START WITH missing numeric value (syntax error)"}
+{"id":"seqa0146","category":"create-sequence","sql":"ALTER SEQUENCE","expect":"error","ref":"sql-altersequence","note":"ALTER SEQUENCE without name (syntax error)"}
+{"id":"seqa0147","category":"create-sequence","sql":"ALTER SEQUENCE s.seq SET","expect":"error","ref":"sql-altersequence","note":"SET without LOGGED/UNLOGGED/SCHEMA (syntax error)"}
+{"id":"seqa0148","category":"create-sequence","sql":"ALTER SEQUENCE s.seq RENAME","expect":"error","ref":"sql-altersequence","note":"RENAME without TO (syntax error)"}
+{"id":"seqa0149","category":"create-sequence","sql":"CREATE SEQUENCE myseq149 USING btree","expect":"error","ref":"sql-createsequence","note":"USING clause not valid for sequences (syntax error)"}
+{"id":"seqa0150","category":"create-sequence","sql":"CREATE SEQUENCE myseq150 TABLESPACE pg_default","expect":"error","ref":"sql-createsequence","note":"TABLESPACE not a valid CREATE SEQUENCE option"}
+{"id":"seqa0151","category":"create-sequence","sql":"CREATE SEQUENCE myseq151; DROP SEQUENCE myseq151","expect":"ok","ref":"sql-createsequence","note":"CREATE then DROP SEQUENCE"}
+{"id":"seqa0152","category":"create-sequence","sql":"CREATE SEQUENCE IF NOT EXISTS myseq152; CREATE SEQUENCE IF NOT EXISTS myseq152","expect":"ok","ref":"sql-createsequence","note":"IF NOT EXISTS idempotent double create"}
+{"id":"seqa0153","category":"create-sequence","sql":"CREATE SEQUENCE myseq153 START WITH 1; SELECT pg_get_serial_sequence('s.t', 'id')","expect":"ok","ref":"sql-createsequence","note":"pg_get_serial_sequence for identity column"}
+{"id":"seqa0154","category":"create-sequence","sql":"CREATE SEQUENCE myseq154 AS integer INCREMENT BY -1 MINVALUE 1 MAXVALUE 2147483647 START WITH 2147483647","expect":"ok","ref":"sql-createsequence","note":"descending AS integer starting at explicit MAXVALUE"}
+{"id":"seqa0155","category":"create-sequence","sql":"CREATE SEQUENCE myseq155 AS smallint INCREMENT BY -1 MINVALUE -32767 MAXVALUE -1 START WITH -1","expect":"ok","ref":"sql-createsequence","note":"descending smallint sequence"}
+{"id":"seqa0156","category":"create-sequence","sql":"ALTER SEQUENCE s.seq START WITH 500 RESTART","expect":"ok","ref":"sql-altersequence","note":"ALTER SEQUENCE START then RESTART to new start value"}
+{"id":"seqa0157","category":"create-sequence","sql":"CREATE SEQUENCE myseq157; SELECT sequence_name FROM information_schema.sequences WHERE sequence_name = 'myseq157'","expect":"ok","ref":"sql-createsequence","note":"query information_schema.sequences after create"}
+{"id":"seqa0158","category":"create-sequence","sql":"CREATE SEQUENCE myseq158; SELECT * FROM pg_sequences WHERE sequencename = 'myseq158'","expect":"ok","ref":"sql-createsequence","note":"query pg_sequences catalog view after create"}
+{"id":"seqa0159","category":"create-sequence","sql":"CREATE SEQUENCE myseq159 START WITH 1; SELECT nextval('myseq159'); SELECT nextval('myseq159'); SELECT nextval('myseq159')","expect":"ok","ref":"sql-createsequence","note":"three successive nextval calls"}
+{"id":"seqa0160","category":"create-sequence","sql":"CREATE SEQUENCE myseq160 START WITH 1 MAXVALUE 2 NO CYCLE; SELECT nextval('myseq160'); SELECT nextval('myseq160'); SELECT nextval('myseq160')","expect":"error","ref":"sql-createsequence","note":"nextval beyond MAXVALUE with NO CYCLE (semantic error)"}
+{"id":"seqa0161","category":"create-sequence","sql":"CREATE SEQUENCE myseq161 START WITH 1 MAXVALUE 3 CYCLE; SELECT nextval('myseq161'); SELECT nextval('myseq161'); SELECT nextval('myseq161'); SELECT nextval('myseq161')","expect":"ok","ref":"sql-createsequence","note":"nextval wraps around with CYCLE"}
+{"id":"seqa0162","category":"create-sequence","sql":"ALTER SEQUENCE s.seq SET LOGGED; ALTER SEQUENCE s.seq SET UNLOGGED","expect":"ok","ref":"sql-altersequence","note":"ALTER SEQUENCE toggle LOGGED then UNLOGGED"}
+{"id":"seqa0163","category":"create-sequence","sql":"CREATE SEQUENCE myseq163; ALTER SEQUENCE myseq163 OWNER TO SESSION_USER; ALTER SEQUENCE myseq163 RENAME TO myseq163_new; DROP SEQUENCE myseq163_new","expect":"ok","ref":"sql-altersequence","note":"chained OWNER TO, RENAME, DROP"}
+{"id":"seqa0164","category":"create-sequence","sql":"CREATE SEQUENCE s.myseq164 START 1; ALTER SEQUENCE s.myseq164 RENAME TO myseq164_renamed; SELECT nextval('s.myseq164_renamed')","expect":"ok","ref":"sql-altersequence","note":"schema-qualified rename then nextval with new name"}
+{"id":"seqa0165","category":"create-sequence","sql":"CREATE UNLOGGED SEQUENCE myseq165; ALTER SEQUENCE myseq165 SET LOGGED","expect":"ok","ref":"sql-altersequence","note":"create UNLOGGED then ALTER to LOGGED"}
+{"id":"seqa0166","category":"create-sequence","sql":"SELECT nextval('s.seq'), nextval('s.seq'), nextval('s.seq')","expect":"ok","ref":"sql-createsequence","note":"multiple nextval calls on fixture seq in single SELECT"}
+{"id":"seqa0167","category":"create-sequence","sql":"CREATE SEQUENCE myseq167 START WITH 1 INCREMENT BY 1;\nSELECT setval('myseq167', 999);\nSELECT currval('myseq167')","expect":"ok","ref":"sql-createsequence","note":"setval then currval reads back set value"}
+{"id":"seqa0168","category":"create-sequence","sql":"ALTER SEQUENCE s.seq AS smallint MAXVALUE 32768","expect":"error","ref":"sql-altersequence","note":"ALTER SEQUENCE AS smallint with MAXVALUE exceeding smallint max"}
+{"id":"seqa0169","category":"create-sequence","sql":"CREATE SEQUENCE myseq169 MINVALUE 5 START WITH 3","expect":"error","ref":"sql-createsequence","note":"START below MINVALUE (start=3, minvalue=5)"}
+{"id":"seqa0170","category":"create-sequence","sql":"CREATE SEQUENCE myseq170 INCREMENT BY 1 MINVALUE 1 MAXVALUE 1000 START WITH 1 CACHE 50 NO CYCLE OWNED BY NONE AS bigint","expect":"ok","ref":"sql-createsequence","note":"all options in reverse-canonical order"}

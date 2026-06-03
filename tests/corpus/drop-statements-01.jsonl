@@ -1,0 +1,170 @@
+{"id":"drpa0001","category":"drop-statements","sql":"DROP TABLE s.t2","expect":"ok","ref":"sql-droptable","note":"DROP TABLE bare name (fixture table with no deps)"}
+{"id":"drpa0002","category":"drop-statements","sql":"DROP TABLE IF EXISTS s.t2","expect":"ok","ref":"sql-droptable","note":"DROP TABLE IF EXISTS existing table"}
+{"id":"drpa0003","category":"drop-statements","sql":"DROP TABLE IF EXISTS s.no_such_table","expect":"ok","ref":"sql-droptable","note":"DROP TABLE IF EXISTS non-existent table is a no-op"}
+{"id":"drpa0004","category":"drop-statements","sql":"DROP TABLE s.no_such_table","expect":"error","ref":"sql-droptable","note":"DROP TABLE non-existent without IF EXISTS is error"}
+{"id":"drpa0005","category":"drop-statements","sql":"DROP TABLE s.t2 RESTRICT","expect":"ok","ref":"sql-droptable","note":"DROP TABLE with explicit RESTRICT"}
+{"id":"drpa0006","category":"drop-statements","sql":"DROP TABLE s.t2 CASCADE","expect":"ok","ref":"sql-droptable","note":"DROP TABLE with CASCADE"}
+{"id":"drpa0007","category":"drop-statements","sql":"DROP TABLE IF EXISTS s.t2 CASCADE","expect":"ok","ref":"sql-droptable","note":"DROP TABLE IF EXISTS with CASCADE"}
+{"id":"drpa0008","category":"drop-statements","sql":"DROP TABLE IF EXISTS s.t2 RESTRICT","expect":"ok","ref":"sql-droptable","note":"DROP TABLE IF EXISTS with RESTRICT"}
+{"id":"drpa0009","category":"drop-statements","sql":"DROP TABLE s.t2 CASCADE RESTRICT","expect":"error","ref":"sql-droptable","note":"CASCADE and RESTRICT together is syntax error"}
+{"id":"drpa0010","category":"drop-statements","sql":"CREATE TABLE s.drop_tmp (a int); DROP TABLE s.drop_tmp","expect":"ok","ref":"sql-droptable","note":"CREATE then DROP in same transaction"}
+{"id":"drpa0011","category":"drop-statements","sql":"CREATE TABLE s.drop_a (a int); CREATE TABLE s.drop_b (b int); DROP TABLE s.drop_a, s.drop_b","expect":"ok","ref":"sql-droptable","note":"DROP TABLE multiple tables in one statement"}
+{"id":"drpa0012","category":"drop-statements","sql":"CREATE TABLE s.drop_a2 (a int); CREATE TABLE s.drop_b2 (b int); DROP TABLE IF EXISTS s.drop_a2, s.drop_b2","expect":"ok","ref":"sql-droptable","note":"DROP TABLE IF EXISTS multiple tables"}
+{"id":"drpa0013","category":"drop-statements","sql":"DROP TABLE","expect":"error","ref":"sql-droptable","note":"DROP TABLE with no name is syntax error"}
+{"id":"drpa0014","category":"drop-statements","sql":"DROP TABLE s.t2, s.no_exist","expect":"error","ref":"sql-droptable","note":"DROP TABLE list with one non-existent is error without IF EXISTS"}
+{"id":"drpa0015","category":"drop-statements","sql":"DROP TABLE IF EXISTS s.t2, s.no_exist","expect":"ok","ref":"sql-droptable","note":"DROP TABLE IF EXISTS list with one non-existent is no-op for missing"}
+{"id":"drpa0016","category":"drop-statements","sql":"drop table s.t2","expect":"ok","ref":"sql-droptable","note":"DROP TABLE keywords are case-insensitive"}
+{"id":"drpa0017","category":"drop-statements","sql":"DROP TABLE IF EXISTS s.t2, s.no_exist CASCADE","expect":"ok","ref":"sql-droptable","note":"DROP TABLE IF EXISTS multiple with CASCADE"}
+{"id":"drpa0018","category":"drop-statements","sql":"DROP VIEW s.v","expect":"ok","ref":"sql-dropview","note":"DROP VIEW bare name"}
+{"id":"drpa0019","category":"drop-statements","sql":"DROP VIEW IF EXISTS s.v","expect":"ok","ref":"sql-dropview","note":"DROP VIEW IF EXISTS existing view"}
+{"id":"drpa0020","category":"drop-statements","sql":"DROP VIEW IF EXISTS s.no_such_view","expect":"ok","ref":"sql-dropview","note":"DROP VIEW IF EXISTS non-existent is no-op"}
+{"id":"drpa0021","category":"drop-statements","sql":"DROP VIEW s.no_such_view","expect":"error","ref":"sql-dropview","note":"DROP VIEW non-existent without IF EXISTS is error"}
+{"id":"drpa0022","category":"drop-statements","sql":"DROP VIEW s.v CASCADE","expect":"ok","ref":"sql-dropview","note":"DROP VIEW with CASCADE"}
+{"id":"drpa0023","category":"drop-statements","sql":"DROP VIEW s.v RESTRICT","expect":"ok","ref":"sql-dropview","note":"DROP VIEW with RESTRICT"}
+{"id":"drpa0024","category":"drop-statements","sql":"DROP VIEW","expect":"error","ref":"sql-dropview","note":"DROP VIEW with no name is syntax error"}
+{"id":"drpa0025","category":"drop-statements","sql":"DROP MATERIALIZED VIEW s.mv","expect":"ok","ref":"sql-dropmaterializedview","note":"DROP MATERIALIZED VIEW bare name"}
+{"id":"drpa0026","category":"drop-statements","sql":"DROP MATERIALIZED VIEW IF EXISTS s.mv","expect":"ok","ref":"sql-dropmaterializedview","note":"DROP MATERIALIZED VIEW IF EXISTS existing"}
+{"id":"drpa0027","category":"drop-statements","sql":"DROP MATERIALIZED VIEW IF EXISTS s.no_such_mv","expect":"ok","ref":"sql-dropmaterializedview","note":"DROP MATERIALIZED VIEW IF EXISTS non-existent is no-op"}
+{"id":"drpa0028","category":"drop-statements","sql":"DROP MATERIALIZED VIEW s.no_such_mv","expect":"error","ref":"sql-dropmaterializedview","note":"DROP MATERIALIZED VIEW non-existent without IF EXISTS is error"}
+{"id":"drpa0029","category":"drop-statements","sql":"DROP MATERIALIZED VIEW s.mv CASCADE","expect":"ok","ref":"sql-dropmaterializedview","note":"DROP MATERIALIZED VIEW with CASCADE"}
+{"id":"drpa0030","category":"drop-statements","sql":"DROP MATERIALIZED VIEW s.mv RESTRICT","expect":"ok","ref":"sql-dropmaterializedview","note":"DROP MATERIALIZED VIEW with RESTRICT"}
+{"id":"drpa0031","category":"drop-statements","sql":"DROP MATERIALIZED VIEW","expect":"error","ref":"sql-dropmaterializedview","note":"DROP MATERIALIZED VIEW with no name is syntax error"}
+{"id":"drpa0032","category":"drop-statements","sql":"DROP MATERIALIZED VIEW s.mv CASCADE RESTRICT","expect":"error","ref":"sql-dropmaterializedview","note":"CASCADE and RESTRICT together for matview is error"}
+{"id":"drpa0033","category":"drop-statements","sql":"CREATE INDEX drop_idx_tmp ON s.t (name); DROP INDEX s.drop_idx_tmp","expect":"ok","ref":"sql-dropindex","note":"DROP INDEX schema-qualified unambiguous name"}
+{"id":"drpa0034","category":"drop-statements","sql":"DROP INDEX s.t_name_idx","expect":"ok","ref":"sql-dropindex","note":"DROP INDEX schema-qualified name"}
+{"id":"drpa0035","category":"drop-statements","sql":"DROP INDEX IF EXISTS s.t_name_idx","expect":"ok","ref":"sql-dropindex","note":"DROP INDEX IF EXISTS existing index schema-qualified"}
+{"id":"drpa0036","category":"drop-statements","sql":"DROP INDEX IF EXISTS s.no_such_idx","expect":"ok","ref":"sql-dropindex","note":"DROP INDEX IF EXISTS non-existent is no-op"}
+{"id":"drpa0037","category":"drop-statements","sql":"DROP INDEX s.no_such_idx","expect":"error","ref":"sql-dropindex","note":"DROP INDEX non-existent without IF EXISTS is error"}
+{"id":"drpa0038","category":"drop-statements","sql":"DROP INDEX s.t_name_idx CASCADE","expect":"ok","ref":"sql-dropindex","note":"DROP INDEX schema-qualified with CASCADE"}
+{"id":"drpa0039","category":"drop-statements","sql":"DROP INDEX s.t_name_idx RESTRICT","expect":"ok","ref":"sql-dropindex","note":"DROP INDEX schema-qualified with RESTRICT"}
+{"id":"drpa0040","category":"drop-statements","sql":"DROP INDEX CONCURRENTLY s.t_name_idx","expect":"ok","ref":"sql-dropindex","txn":"none","note":"DROP INDEX CONCURRENTLY outside transaction schema-qualified"}
+{"id":"drpa0041","category":"drop-statements","sql":"DROP INDEX CONCURRENTLY IF EXISTS s.t_name_idx","expect":"ok","ref":"sql-dropindex","txn":"none","note":"DROP INDEX CONCURRENTLY IF EXISTS schema-qualified"}
+{"id":"drpa0042","category":"drop-statements","sql":"DROP INDEX CONCURRENTLY IF EXISTS s.no_such_idx","expect":"ok","ref":"sql-dropindex","txn":"none","note":"DROP INDEX CONCURRENTLY IF EXISTS non-existent"}
+{"id":"drpa0043","category":"drop-statements","sql":"DROP INDEX","expect":"error","ref":"sql-dropindex","note":"DROP INDEX with no name is syntax error"}
+{"id":"drpa0044","category":"drop-statements","sql":"DROP INDEX CONCURRENTLY s.t_name_idx CASCADE","expect":"ok","ref":"sql-dropindex","txn":"none","note":"DROP INDEX CONCURRENTLY with CASCADE is allowed"}
+{"id":"drpa0045","category":"drop-statements","sql":"DROP SEQUENCE s.seq","expect":"ok","ref":"sql-dropsequence","note":"DROP SEQUENCE bare name"}
+{"id":"drpa0046","category":"drop-statements","sql":"DROP SEQUENCE IF EXISTS s.seq","expect":"ok","ref":"sql-dropsequence","note":"DROP SEQUENCE IF EXISTS existing"}
+{"id":"drpa0047","category":"drop-statements","sql":"DROP SEQUENCE IF EXISTS s.no_such_seq","expect":"ok","ref":"sql-dropsequence","note":"DROP SEQUENCE IF EXISTS non-existent is no-op"}
+{"id":"drpa0048","category":"drop-statements","sql":"DROP SEQUENCE s.no_such_seq","expect":"error","ref":"sql-dropsequence","note":"DROP SEQUENCE non-existent without IF EXISTS is error"}
+{"id":"drpa0049","category":"drop-statements","sql":"DROP SEQUENCE s.seq CASCADE","expect":"ok","ref":"sql-dropsequence","note":"DROP SEQUENCE with CASCADE"}
+{"id":"drpa0050","category":"drop-statements","sql":"DROP SEQUENCE s.seq RESTRICT","expect":"ok","ref":"sql-dropsequence","note":"DROP SEQUENCE with RESTRICT"}
+{"id":"drpa0051","category":"drop-statements","sql":"DROP SEQUENCE","expect":"error","ref":"sql-dropsequence","note":"DROP SEQUENCE with no name is syntax error"}
+{"id":"drpa0052","category":"drop-statements","sql":"CREATE SEQUENCE s.seq2 START 1; DROP SEQUENCE s.seq2","expect":"ok","ref":"sql-dropsequence","note":"CREATE then DROP SEQUENCE in same transaction"}
+{"id":"drpa0053","category":"drop-statements","sql":"DROP SCHEMA s CASCADE","expect":"ok","ref":"sql-dropschema","note":"DROP SCHEMA with CASCADE (schema has objects so CASCADE required)"}
+{"id":"drpa0054","category":"drop-statements","sql":"CREATE SCHEMA s_tmp; DROP SCHEMA s_tmp","expect":"ok","ref":"sql-dropschema","note":"DROP SCHEMA empty schema no options"}
+{"id":"drpa0055","category":"drop-statements","sql":"CREATE SCHEMA s_tmp2; DROP SCHEMA s_tmp2 RESTRICT","expect":"ok","ref":"sql-dropschema","note":"DROP SCHEMA empty schema with RESTRICT"}
+{"id":"drpa0056","category":"drop-statements","sql":"DROP SCHEMA IF EXISTS s CASCADE","expect":"ok","ref":"sql-dropschema","note":"DROP SCHEMA IF EXISTS with CASCADE"}
+{"id":"drpa0057","category":"drop-statements","sql":"DROP SCHEMA IF EXISTS no_such_schema","expect":"ok","ref":"sql-dropschema","note":"DROP SCHEMA IF EXISTS non-existent schema is no-op"}
+{"id":"drpa0058","category":"drop-statements","sql":"DROP SCHEMA no_such_schema","expect":"error","ref":"sql-dropschema","note":"DROP SCHEMA non-existent without IF EXISTS is error"}
+{"id":"drpa0059","category":"drop-statements","sql":"DROP SCHEMA s RESTRICT","expect":"error","ref":"sql-dropschema","note":"DROP SCHEMA non-empty with RESTRICT fails (has objects)"}
+{"id":"drpa0060","category":"drop-statements","sql":"DROP SCHEMA","expect":"error","ref":"sql-dropschema","note":"DROP SCHEMA with no name is syntax error"}
+{"id":"drpa0061","category":"drop-statements","sql":"CREATE SCHEMA s_a; CREATE SCHEMA s_b; DROP SCHEMA s_a, s_b","expect":"ok","ref":"sql-dropschema","note":"DROP SCHEMA multiple schemas"}
+{"id":"drpa0062","category":"drop-statements","sql":"DROP FUNCTION s.f(integer)","expect":"ok","ref":"sql-dropfunction","note":"DROP FUNCTION with arg type list"}
+{"id":"drpa0063","category":"drop-statements","sql":"DROP FUNCTION IF EXISTS s.f(integer)","expect":"ok","ref":"sql-dropfunction","note":"DROP FUNCTION IF EXISTS with arg type"}
+{"id":"drpa0064","category":"drop-statements","sql":"DROP FUNCTION IF EXISTS s.no_such_fn(integer)","expect":"ok","ref":"sql-dropfunction","note":"DROP FUNCTION IF EXISTS non-existent is no-op"}
+{"id":"drpa0065","category":"drop-statements","sql":"DROP FUNCTION s.no_such_fn(integer)","expect":"error","ref":"sql-dropfunction","note":"DROP FUNCTION non-existent without IF EXISTS is error"}
+{"id":"drpa0066","category":"drop-statements","sql":"DROP FUNCTION s.f(integer) CASCADE","expect":"ok","ref":"sql-dropfunction","note":"DROP FUNCTION with CASCADE"}
+{"id":"drpa0067","category":"drop-statements","sql":"DROP FUNCTION s.f(integer) RESTRICT","expect":"ok","ref":"sql-dropfunction","note":"DROP FUNCTION with RESTRICT"}
+{"id":"drpa0068","category":"drop-statements","sql":"DROP FUNCTION s.g(integer, integer)","expect":"ok","ref":"sql-dropfunction","note":"DROP FUNCTION two arg types"}
+{"id":"drpa0069","category":"drop-statements","sql":"DROP FUNCTION s.g(a integer, b integer)","expect":"ok","ref":"sql-dropfunction","note":"DROP FUNCTION with named parameters in arg list"}
+{"id":"drpa0070","category":"drop-statements","sql":"DROP FUNCTION s.f","expect":"ok","ref":"sql-dropfunction","note":"DROP FUNCTION without arg list (unambiguous overload)"}
+{"id":"drpa0071","category":"drop-statements","sql":"DROP FUNCTION IF EXISTS s.f","expect":"ok","ref":"sql-dropfunction","note":"DROP FUNCTION IF EXISTS without arg list"}
+{"id":"drpa0072","category":"drop-statements","sql":"DROP FUNCTION s.rows_f()","expect":"ok","ref":"sql-dropfunction","note":"DROP FUNCTION with empty arg list"}
+{"id":"drpa0073","category":"drop-statements","sql":"DROP FUNCTION","expect":"error","ref":"sql-dropfunction","note":"DROP FUNCTION with no name is syntax error"}
+{"id":"drpa0074","category":"drop-statements","sql":"DROP FUNCTION s.f(integer) CASCADE RESTRICT","expect":"error","ref":"sql-dropfunction","note":"DROP FUNCTION CASCADE and RESTRICT together is error"}
+{"id":"drpa0075","category":"drop-statements","sql":"CREATE FUNCTION s.drop_fn(x int) RETURNS int LANGUAGE sql AS $$ SELECT x $$; DROP FUNCTION s.drop_fn(integer)","expect":"ok","ref":"sql-dropfunction","note":"CREATE then DROP FUNCTION in same transaction"}
+{"id":"drpa0076","category":"drop-statements","sql":"DROP PROCEDURE s.p(integer)","expect":"ok","ref":"sql-dropprocedure","note":"DROP PROCEDURE with arg type list"}
+{"id":"drpa0077","category":"drop-statements","sql":"DROP PROCEDURE IF EXISTS s.p(integer)","expect":"ok","ref":"sql-dropprocedure","note":"DROP PROCEDURE IF EXISTS existing"}
+{"id":"drpa0078","category":"drop-statements","sql":"DROP PROCEDURE IF EXISTS s.no_such_proc(integer)","expect":"ok","ref":"sql-dropprocedure","note":"DROP PROCEDURE IF EXISTS non-existent is no-op"}
+{"id":"drpa0079","category":"drop-statements","sql":"DROP PROCEDURE s.no_such_proc(integer)","expect":"error","ref":"sql-dropprocedure","note":"DROP PROCEDURE non-existent without IF EXISTS is error"}
+{"id":"drpa0080","category":"drop-statements","sql":"DROP PROCEDURE s.p(integer) CASCADE","expect":"ok","ref":"sql-dropprocedure","note":"DROP PROCEDURE with CASCADE"}
+{"id":"drpa0081","category":"drop-statements","sql":"DROP PROCEDURE s.p(integer) RESTRICT","expect":"ok","ref":"sql-dropprocedure","note":"DROP PROCEDURE with RESTRICT"}
+{"id":"drpa0082","category":"drop-statements","sql":"DROP PROCEDURE s.p","expect":"ok","ref":"sql-dropprocedure","note":"DROP PROCEDURE without arg list (unambiguous)"}
+{"id":"drpa0083","category":"drop-statements","sql":"DROP PROCEDURE","expect":"error","ref":"sql-dropprocedure","note":"DROP PROCEDURE with no name is syntax error"}
+{"id":"drpa0084","category":"drop-statements","sql":"DROP PROCEDURE s.p(IN integer)","expect":"ok","ref":"sql-dropprocedure","note":"DROP PROCEDURE with IN mode in arg list"}
+{"id":"drpa0085","category":"drop-statements","sql":"CREATE PROCEDURE s.drop_proc(x int) LANGUAGE plpgsql AS $$ BEGIN END $$; DROP PROCEDURE s.drop_proc(integer)","expect":"ok","ref":"sql-dropprocedure","note":"CREATE then DROP PROCEDURE in same transaction"}
+{"id":"drpa0086","category":"drop-statements","sql":"CREATE TYPE s.drop_mood AS ENUM ('a','b'); DROP TYPE s.drop_mood","expect":"ok","ref":"sql-droptype","note":"DROP TYPE enum type no dependents"}
+{"id":"drpa0087","category":"drop-statements","sql":"CREATE TYPE s.drop_mood2 AS ENUM ('x','y'); DROP TYPE IF EXISTS s.drop_mood2","expect":"ok","ref":"sql-droptype","note":"DROP TYPE IF EXISTS newly created enum type"}
+{"id":"drpa0088","category":"drop-statements","sql":"DROP TYPE IF EXISTS s.no_such_type","expect":"ok","ref":"sql-droptype","note":"DROP TYPE IF EXISTS non-existent is no-op"}
+{"id":"drpa0089","category":"drop-statements","sql":"DROP TYPE s.no_such_type","expect":"error","ref":"sql-droptype","note":"DROP TYPE non-existent without IF EXISTS is error"}
+{"id":"drpa0090","category":"drop-statements","sql":"DROP TYPE s.mood CASCADE","expect":"ok","ref":"sql-droptype","note":"DROP TYPE with CASCADE (drops dependents)"}
+{"id":"drpa0091","category":"drop-statements","sql":"DROP TYPE s.addr CASCADE","expect":"ok","ref":"sql-droptype","note":"DROP TYPE composite type with CASCADE"}
+{"id":"drpa0092","category":"drop-statements","sql":"DROP TYPE s.addr RESTRICT","expect":"error","ref":"sql-droptype","note":"DROP TYPE composite type with RESTRICT fails when depended upon"}
+{"id":"drpa0093","category":"drop-statements","sql":"CREATE TYPE s.drop_type_e AS ENUM ('a','b'); DROP TYPE s.drop_type_e","expect":"ok","ref":"sql-droptype","note":"CREATE then DROP TYPE enum in same transaction"}
+{"id":"drpa0094","category":"drop-statements","sql":"CREATE TYPE s.drop_type_c AS (x int, y text); DROP TYPE s.drop_type_c","expect":"ok","ref":"sql-droptype","note":"CREATE then DROP TYPE composite in same transaction"}
+{"id":"drpa0095","category":"drop-statements","sql":"DROP TYPE","expect":"error","ref":"sql-droptype","note":"DROP TYPE with no name is syntax error"}
+{"id":"drpa0096","category":"drop-statements","sql":"DROP DOMAIN s.pos_int","expect":"ok","ref":"sql-dropdomain","note":"DROP DOMAIN existing domain"}
+{"id":"drpa0097","category":"drop-statements","sql":"DROP DOMAIN IF EXISTS s.pos_int","expect":"ok","ref":"sql-dropdomain","note":"DROP DOMAIN IF EXISTS existing domain"}
+{"id":"drpa0098","category":"drop-statements","sql":"DROP DOMAIN IF EXISTS s.no_such_domain","expect":"ok","ref":"sql-dropdomain","note":"DROP DOMAIN IF EXISTS non-existent is no-op"}
+{"id":"drpa0099","category":"drop-statements","sql":"DROP DOMAIN s.no_such_domain","expect":"error","ref":"sql-dropdomain","note":"DROP DOMAIN non-existent without IF EXISTS is error"}
+{"id":"drpa0100","category":"drop-statements","sql":"DROP DOMAIN s.pos_int CASCADE","expect":"ok","ref":"sql-dropdomain","note":"DROP DOMAIN with CASCADE"}
+{"id":"drpa0101","category":"drop-statements","sql":"DROP DOMAIN s.pos_int RESTRICT","expect":"ok","ref":"sql-dropdomain","note":"DROP DOMAIN with RESTRICT (no deps on domain)"}
+{"id":"drpa0102","category":"drop-statements","sql":"CREATE DOMAIN s.drop_dom AS integer CHECK (VALUE > 0); DROP DOMAIN s.drop_dom","expect":"ok","ref":"sql-dropdomain","note":"CREATE then DROP DOMAIN in same transaction"}
+{"id":"drpa0103","category":"drop-statements","sql":"DROP DOMAIN","expect":"error","ref":"sql-dropdomain","note":"DROP DOMAIN with no name is syntax error"}
+{"id":"drpa0104","category":"drop-statements","sql":"DROP TRIGGER t_touch ON s.t","expect":"ok","ref":"sql-droptrigger","note":"DROP TRIGGER on fixture table"}
+{"id":"drpa0105","category":"drop-statements","sql":"DROP TRIGGER IF EXISTS t_touch ON s.t","expect":"ok","ref":"sql-droptrigger","note":"DROP TRIGGER IF EXISTS existing trigger"}
+{"id":"drpa0106","category":"drop-statements","sql":"DROP TRIGGER IF EXISTS no_such_trig ON s.t","expect":"ok","ref":"sql-droptrigger","note":"DROP TRIGGER IF EXISTS non-existent trigger is no-op"}
+{"id":"drpa0107","category":"drop-statements","sql":"DROP TRIGGER no_such_trig ON s.t","expect":"error","ref":"sql-droptrigger","note":"DROP TRIGGER non-existent without IF EXISTS is error"}
+{"id":"drpa0108","category":"drop-statements","sql":"DROP TRIGGER t_touch ON s.t CASCADE","expect":"ok","ref":"sql-droptrigger","note":"DROP TRIGGER with CASCADE"}
+{"id":"drpa0109","category":"drop-statements","sql":"DROP TRIGGER t_touch ON s.t RESTRICT","expect":"ok","ref":"sql-droptrigger","note":"DROP TRIGGER with RESTRICT"}
+{"id":"drpa0110","category":"drop-statements","sql":"DROP TRIGGER","expect":"error","ref":"sql-droptrigger","note":"DROP TRIGGER with no name is syntax error"}
+{"id":"drpa0111","category":"drop-statements","sql":"DROP TRIGGER t_touch","expect":"error","ref":"sql-droptrigger","note":"DROP TRIGGER missing ON table is syntax error"}
+{"id":"drpa0112","category":"drop-statements","sql":"CREATE TABLE s.trg_tbl (a int); CREATE TRIGGER my_trg BEFORE INSERT ON s.trg_tbl FOR EACH ROW EXECUTE FUNCTION s.trg(); DROP TRIGGER my_trg ON s.trg_tbl","expect":"ok","ref":"sql-droptrigger","note":"CREATE then DROP TRIGGER in same transaction"}
+{"id":"drpa0113","category":"drop-statements","sql":"CREATE TABLE s.rl_tbl (a int); CREATE RULE my_rule AS ON INSERT TO s.rl_tbl DO NOTHING; DROP RULE my_rule ON s.rl_tbl","expect":"ok","ref":"sql-droprule","note":"DROP RULE on same-transaction INSERT rule"}
+{"id":"drpa0114","category":"drop-statements","sql":"CREATE TABLE s.rl_tbl2 (a int); CREATE RULE my_rule2 AS ON INSERT TO s.rl_tbl2 DO NOTHING; DROP RULE IF EXISTS my_rule2 ON s.rl_tbl2","expect":"ok","ref":"sql-droprule","note":"DROP RULE IF EXISTS existing INSERT rule"}
+{"id":"drpa0115","category":"drop-statements","sql":"CREATE TABLE s.rl_tbl3 (a int); DROP RULE IF EXISTS no_such_rule ON s.rl_tbl3","expect":"ok","ref":"sql-droprule","note":"DROP RULE IF EXISTS non-existent rule is no-op"}
+{"id":"drpa0116","category":"drop-statements","sql":"CREATE TABLE s.rl_tbl4 (a int); DROP RULE no_such_rule ON s.rl_tbl4","expect":"error","ref":"sql-droprule","note":"DROP RULE non-existent without IF EXISTS is error"}
+{"id":"drpa0117","category":"drop-statements","sql":"CREATE TABLE s.rl_tbl5 (a int); CREATE RULE my_rule5 AS ON INSERT TO s.rl_tbl5 DO NOTHING; DROP RULE my_rule5 ON s.rl_tbl5 CASCADE","expect":"ok","ref":"sql-droprule","note":"DROP RULE with CASCADE"}
+{"id":"drpa0118","category":"drop-statements","sql":"CREATE TABLE s.rl_tbl6 (a int); CREATE RULE my_rule6 AS ON INSERT TO s.rl_tbl6 DO NOTHING; DROP RULE my_rule6 ON s.rl_tbl6 RESTRICT","expect":"ok","ref":"sql-droprule","note":"DROP RULE with RESTRICT"}
+{"id":"drpa0119","category":"drop-statements","sql":"DROP RULE","expect":"error","ref":"sql-droprule","note":"DROP RULE with no name is syntax error"}
+{"id":"drpa0120","category":"drop-statements","sql":"DROP RULE my_rule ON","expect":"error","ref":"sql-droprule","note":"DROP RULE missing table name after ON is syntax error"}
+{"id":"drpa0121","category":"drop-statements","sql":"CREATE TABLE s.pol_tbl (owner text); ALTER TABLE s.pol_tbl ENABLE ROW LEVEL SECURITY; CREATE POLICY my_pol ON s.pol_tbl USING (owner = current_user); DROP POLICY my_pol ON s.pol_tbl","expect":"ok","ref":"sql-droppolicy","note":"DROP POLICY on same-transaction policy"}
+{"id":"drpa0122","category":"drop-statements","sql":"CREATE TABLE s.pol_tbl2 (owner text); ALTER TABLE s.pol_tbl2 ENABLE ROW LEVEL SECURITY; CREATE POLICY my_pol2 ON s.pol_tbl2 USING (owner = current_user); DROP POLICY IF EXISTS my_pol2 ON s.pol_tbl2","expect":"ok","ref":"sql-droppolicy","note":"DROP POLICY IF EXISTS existing policy"}
+{"id":"drpa0123","category":"drop-statements","sql":"CREATE TABLE s.pol_tbl3 (owner text); DROP POLICY IF EXISTS no_such_pol ON s.pol_tbl3","expect":"ok","ref":"sql-droppolicy","note":"DROP POLICY IF EXISTS non-existent is no-op"}
+{"id":"drpa0124","category":"drop-statements","sql":"CREATE TABLE s.pol_tbl4 (owner text); DROP POLICY no_such_pol ON s.pol_tbl4","expect":"error","ref":"sql-droppolicy","note":"DROP POLICY non-existent without IF EXISTS is error"}
+{"id":"drpa0125","category":"drop-statements","sql":"CREATE TABLE s.pol_tbl5 (owner text); ALTER TABLE s.pol_tbl5 ENABLE ROW LEVEL SECURITY; CREATE POLICY my_pol5 ON s.pol_tbl5 USING (owner = current_user); DROP POLICY my_pol5 ON s.pol_tbl5 CASCADE","expect":"ok","ref":"sql-droppolicy","note":"DROP POLICY with CASCADE"}
+{"id":"drpa0126","category":"drop-statements","sql":"CREATE TABLE s.pol_tbl6 (owner text); ALTER TABLE s.pol_tbl6 ENABLE ROW LEVEL SECURITY; CREATE POLICY my_pol6 ON s.pol_tbl6 USING (owner = current_user); DROP POLICY my_pol6 ON s.pol_tbl6 RESTRICT","expect":"ok","ref":"sql-droppolicy","note":"DROP POLICY with RESTRICT"}
+{"id":"drpa0127","category":"drop-statements","sql":"DROP POLICY","expect":"error","ref":"sql-droppolicy","note":"DROP POLICY with no name is syntax error"}
+{"id":"drpa0128","category":"drop-statements","sql":"DROP POLICY my_pol ON","expect":"error","ref":"sql-droppolicy","note":"DROP POLICY missing table name after ON is syntax error"}
+{"id":"drpa0129","category":"drop-statements","sql":"CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\"; DROP EXTENSION \"uuid-ossp\"","expect":"ok","ref":"sql-dropextension","note":"DROP EXTENSION by quoted name"}
+{"id":"drpa0130","category":"drop-statements","sql":"CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\"; DROP EXTENSION IF EXISTS \"uuid-ossp\"","expect":"ok","ref":"sql-dropextension","note":"DROP EXTENSION IF EXISTS existing extension"}
+{"id":"drpa0131","category":"drop-statements","sql":"DROP EXTENSION IF EXISTS no_such_extension","expect":"ok","ref":"sql-dropextension","note":"DROP EXTENSION IF EXISTS non-existent is no-op"}
+{"id":"drpa0132","category":"drop-statements","sql":"DROP EXTENSION no_such_extension","expect":"error","ref":"sql-dropextension","note":"DROP EXTENSION non-existent without IF EXISTS is error"}
+{"id":"drpa0133","category":"drop-statements","sql":"CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\"; DROP EXTENSION \"uuid-ossp\" CASCADE","expect":"ok","ref":"sql-dropextension","note":"DROP EXTENSION with CASCADE"}
+{"id":"drpa0134","category":"drop-statements","sql":"CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\"; DROP EXTENSION \"uuid-ossp\" RESTRICT","expect":"ok","ref":"sql-dropextension","note":"DROP EXTENSION with RESTRICT"}
+{"id":"drpa0135","category":"drop-statements","sql":"DROP EXTENSION","expect":"error","ref":"sql-dropextension","note":"DROP EXTENSION with no name is syntax error"}
+{"id":"drpa0136","category":"drop-statements","sql":"CREATE AGGREGATE s.agg_sum(integer) (SFUNC = int4pl, STYPE = integer, INITCOND = '0'); DROP AGGREGATE s.agg_sum(integer)","expect":"ok","ref":"sql-dropaggregate","note":"DROP AGGREGATE with single arg type"}
+{"id":"drpa0137","category":"drop-statements","sql":"CREATE AGGREGATE s.agg_sum2(integer) (SFUNC = int4pl, STYPE = integer, INITCOND = '0'); DROP AGGREGATE IF EXISTS s.agg_sum2(integer)","expect":"ok","ref":"sql-dropaggregate","note":"DROP AGGREGATE IF EXISTS existing"}
+{"id":"drpa0138","category":"drop-statements","sql":"DROP AGGREGATE IF EXISTS s.no_such_agg(integer)","expect":"ok","ref":"sql-dropaggregate","note":"DROP AGGREGATE IF EXISTS non-existent is no-op"}
+{"id":"drpa0139","category":"drop-statements","sql":"DROP AGGREGATE s.no_such_agg(integer)","expect":"error","ref":"sql-dropaggregate","note":"DROP AGGREGATE non-existent without IF EXISTS is error"}
+{"id":"drpa0140","category":"drop-statements","sql":"CREATE AGGREGATE s.agg_sum3(integer) (SFUNC = int4pl, STYPE = integer, INITCOND = '0'); DROP AGGREGATE s.agg_sum3(integer) CASCADE","expect":"ok","ref":"sql-dropaggregate","note":"DROP AGGREGATE with CASCADE"}
+{"id":"drpa0141","category":"drop-statements","sql":"CREATE AGGREGATE s.agg_sum4(integer) (SFUNC = int4pl, STYPE = integer, INITCOND = '0'); DROP AGGREGATE s.agg_sum4(integer) RESTRICT","expect":"ok","ref":"sql-dropaggregate","note":"DROP AGGREGATE with RESTRICT"}
+{"id":"drpa0142","category":"drop-statements","sql":"DROP AGGREGATE","expect":"error","ref":"sql-dropaggregate","note":"DROP AGGREGATE with no name is syntax error"}
+{"id":"drpa0143","category":"drop-statements","sql":"DROP AGGREGATE s.f","expect":"error","ref":"sql-dropaggregate","note":"DROP AGGREGATE without arg list is syntax error (required for aggregates)"}
+{"id":"drpa0144","category":"drop-statements","sql":"CREATE AGGREGATE s.agg_cnt(*) (SFUNC = int8inc, STYPE = bigint, INITCOND = '0'); DROP AGGREGATE s.agg_cnt(*)","expect":"ok","ref":"sql-dropaggregate","note":"DROP AGGREGATE with wildcard arg (zero-arg aggregate)"}
+{"id":"drpa0145","category":"drop-statements","sql":"DROP AGGREGATE IF EXISTS s.no_such_agg(integer, integer)","expect":"ok","ref":"sql-dropaggregate","note":"DROP AGGREGATE IF EXISTS two-arg signature non-existent is no-op"}
+{"id":"drpa0146","category":"drop-statements","sql":"CREATE TEXT SEARCH CONFIGURATION s.mycfg (COPY = pg_catalog.english); DROP TEXT SEARCH CONFIGURATION s.mycfg","expect":"ok","ref":"sql-droptsconfiguration","note":"DROP TEXT SEARCH CONFIGURATION"}
+{"id":"drpa0147","category":"drop-statements","sql":"CREATE TEXT SEARCH CONFIGURATION s.mycfg2 (COPY = pg_catalog.english); DROP TEXT SEARCH CONFIGURATION IF EXISTS s.mycfg2","expect":"ok","ref":"sql-droptsconfiguration","note":"DROP TEXT SEARCH CONFIGURATION IF EXISTS"}
+{"id":"drpa0148","category":"drop-statements","sql":"DROP TEXT SEARCH CONFIGURATION IF EXISTS s.no_such_cfg","expect":"ok","ref":"sql-droptsconfiguration","note":"DROP TEXT SEARCH CONFIGURATION IF EXISTS non-existent"}
+{"id":"drpa0149","category":"drop-statements","sql":"DROP TEXT SEARCH CONFIGURATION s.no_such_cfg","expect":"error","ref":"sql-droptsconfiguration","note":"DROP TEXT SEARCH CONFIGURATION non-existent without IF EXISTS"}
+{"id":"drpa0150","category":"drop-statements","sql":"CREATE TEXT SEARCH CONFIGURATION s.mycfg3 (COPY = pg_catalog.english); DROP TEXT SEARCH CONFIGURATION s.mycfg3 CASCADE","expect":"ok","ref":"sql-droptsconfiguration","note":"DROP TEXT SEARCH CONFIGURATION CASCADE"}
+{"id":"drpa0151","category":"drop-statements","sql":"CREATE TEXT SEARCH DICTIONARY s.mydict (TEMPLATE = pg_catalog.simple); DROP TEXT SEARCH DICTIONARY s.mydict","expect":"ok","ref":"sql-droptsdictionary","note":"DROP TEXT SEARCH DICTIONARY"}
+{"id":"drpa0152","category":"drop-statements","sql":"CREATE TEXT SEARCH DICTIONARY s.mydict2 (TEMPLATE = pg_catalog.simple); DROP TEXT SEARCH DICTIONARY IF EXISTS s.mydict2","expect":"ok","ref":"sql-droptsdictionary","note":"DROP TEXT SEARCH DICTIONARY IF EXISTS"}
+{"id":"drpa0153","category":"drop-statements","sql":"DROP TEXT SEARCH DICTIONARY IF EXISTS s.no_such_dict","expect":"ok","ref":"sql-droptsdictionary","note":"DROP TEXT SEARCH DICTIONARY IF EXISTS non-existent"}
+{"id":"drpa0154","category":"drop-statements","sql":"DROP TEXT SEARCH DICTIONARY s.no_such_dict","expect":"error","ref":"sql-droptsdictionary","note":"DROP TEXT SEARCH DICTIONARY non-existent without IF EXISTS"}
+{"id":"drpa0155","category":"drop-statements","sql":"CREATE TEXT SEARCH TEMPLATE s.mytmpl (LEXIZE = dsimple_lexize); DROP TEXT SEARCH TEMPLATE s.mytmpl","expect":"ok","ref":"sql-droptstemplate","note":"DROP TEXT SEARCH TEMPLATE"}
+{"id":"drpa0156","category":"drop-statements","sql":"CREATE TEXT SEARCH TEMPLATE s.mytmpl2 (LEXIZE = dsimple_lexize); DROP TEXT SEARCH TEMPLATE IF EXISTS s.mytmpl2","expect":"ok","ref":"sql-droptstemplate","note":"DROP TEXT SEARCH TEMPLATE IF EXISTS"}
+{"id":"drpa0157","category":"drop-statements","sql":"DROP TEXT SEARCH TEMPLATE IF EXISTS s.no_such_tmpl","expect":"ok","ref":"sql-droptstemplate","note":"DROP TEXT SEARCH TEMPLATE IF EXISTS non-existent"}
+{"id":"drpa0158","category":"drop-statements","sql":"DROP TEXT SEARCH TEMPLATE s.no_such_tmpl","expect":"error","ref":"sql-droptstemplate","note":"DROP TEXT SEARCH TEMPLATE non-existent without IF EXISTS"}
+{"id":"drpa0159","category":"drop-statements","sql":"CREATE TEXT SEARCH PARSER s.myparser (START = prsd_start, GETTOKEN = prsd_nexttoken, END = prsd_end, LEXTYPES = prsd_lextype); DROP TEXT SEARCH PARSER s.myparser","expect":"ok","ref":"sql-droptsparser","note":"DROP TEXT SEARCH PARSER"}
+{"id":"drpa0160","category":"drop-statements","sql":"DROP TEXT SEARCH PARSER IF EXISTS s.no_such_parser","expect":"ok","ref":"sql-droptsparser","note":"DROP TEXT SEARCH PARSER IF EXISTS non-existent"}
+{"id":"drpa0161","category":"drop-statements","sql":"DROP TEXT SEARCH PARSER s.no_such_parser","expect":"error","ref":"sql-droptsparser","note":"DROP TEXT SEARCH PARSER non-existent without IF EXISTS"}
+{"id":"drpa0162","category":"drop-statements","sql":"CREATE COLLATION s.mycollation (LOCALE = 'C'); DROP COLLATION s.mycollation","expect":"ok","ref":"sql-dropcollation","note":"DROP COLLATION"}
+{"id":"drpa0163","category":"drop-statements","sql":"CREATE COLLATION s.mycollation2 (LOCALE = 'C'); DROP COLLATION IF EXISTS s.mycollation2","expect":"ok","ref":"sql-dropcollation","note":"DROP COLLATION IF EXISTS"}
+{"id":"drpa0164","category":"drop-statements","sql":"DROP COLLATION IF EXISTS s.no_such_collation","expect":"ok","ref":"sql-dropcollation","note":"DROP COLLATION IF EXISTS non-existent is no-op"}
+{"id":"drpa0165","category":"drop-statements","sql":"DROP COLLATION s.no_such_collation","expect":"error","ref":"sql-dropcollation","note":"DROP COLLATION non-existent without IF EXISTS is error"}
+{"id":"drpa0166","category":"drop-statements","sql":"CREATE COLLATION s.mycollation3 (LOCALE = 'C'); DROP COLLATION s.mycollation3 CASCADE","expect":"ok","ref":"sql-dropcollation","note":"DROP COLLATION with CASCADE"}
+{"id":"drpa0167","category":"drop-statements","sql":"CREATE CONVERSION s.myconv FOR 'LATIN1' TO 'UTF8' FROM iso8859_1_to_utf8; DROP CONVERSION s.myconv","expect":"ok","ref":"sql-dropconversion","note":"DROP CONVERSION"}
+{"id":"drpa0168","category":"drop-statements","sql":"CREATE CONVERSION s.myconv2 FOR 'LATIN1' TO 'UTF8' FROM iso8859_1_to_utf8; DROP CONVERSION IF EXISTS s.myconv2","expect":"ok","ref":"sql-dropconversion","note":"DROP CONVERSION IF EXISTS"}
+{"id":"drpa0169","category":"drop-statements","sql":"DROP CONVERSION IF EXISTS s.no_such_conv","expect":"ok","ref":"sql-dropconversion","note":"DROP CONVERSION IF EXISTS non-existent is no-op"}
+{"id":"drpa0170","category":"drop-statements","sql":"DROP CONVERSION s.no_such_conv","expect":"error","ref":"sql-dropconversion","note":"DROP CONVERSION non-existent without IF EXISTS is error"}

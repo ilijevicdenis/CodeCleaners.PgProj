@@ -1,0 +1,155 @@
+{"id":"csta0001","category":"create-cast","sql":"CREATE CAST (text AS date) WITH INOUT","expect":"ok","ref":"sql-createcast","note":"WITH INOUT: text->date I/O conversion cast"}
+{"id":"csta0002","category":"create-cast","sql":"CREATE CAST (text AS date) WITH INOUT AS ASSIGNMENT","expect":"ok","ref":"sql-createcast","note":"WITH INOUT AS ASSIGNMENT: text->date assignment cast"}
+{"id":"csta0003","category":"create-cast","sql":"CREATE CAST (text AS date) WITH INOUT AS IMPLICIT","expect":"ok","ref":"sql-createcast","note":"WITH INOUT AS IMPLICIT: text->date implicit cast"}
+{"id":"csta0004","category":"create-cast","sql":"CREATE CAST (text AS timestamp) WITH INOUT","expect":"ok","ref":"sql-createcast","note":"WITH INOUT: text->timestamp I/O cast"}
+{"id":"csta0005","category":"create-cast","sql":"CREATE CAST (text AS timestamptz) WITH INOUT","expect":"ok","ref":"sql-createcast","note":"WITH INOUT: text->timestamptz I/O cast"}
+{"id":"csta0006","category":"create-cast","sql":"CREATE CAST (text AS interval) WITH INOUT","expect":"ok","ref":"sql-createcast","note":"WITH INOUT: text->interval I/O cast"}
+{"id":"csta0007","category":"create-cast","sql":"CREATE CAST (text AS boolean) WITH INOUT","expect":"ok","ref":"sql-createcast","note":"WITH INOUT: text->boolean I/O cast"}
+{"id":"csta0008","category":"create-cast","sql":"CREATE CAST (text AS int2) WITH INOUT","expect":"ok","ref":"sql-createcast","note":"WITH INOUT: text->int2 I/O cast"}
+{"id":"csta0009","category":"create-cast","sql":"CREATE CAST (text AS bigint) WITH INOUT","expect":"ok","ref":"sql-createcast","note":"WITH INOUT: text->bigint I/O cast"}
+{"id":"csta0010","category":"create-cast","sql":"CREATE CAST (text AS integer) WITH INOUT","expect":"ok","ref":"sql-createcast","note":"WITH INOUT: text->integer I/O cast"}
+{"id":"csta0011","category":"create-cast","sql":"CREATE CAST (text AS float8) WITH INOUT","expect":"ok","ref":"sql-createcast","note":"WITH INOUT: text->float8 I/O cast"}
+{"id":"csta0012","category":"create-cast","sql":"CREATE CAST (text AS json) WITH INOUT","expect":"ok","ref":"sql-createcast","note":"WITH INOUT: text->json I/O cast"}
+{"id":"csta0013","category":"create-cast","sql":"CREATE CAST (text AS jsonb) WITH INOUT","expect":"ok","ref":"sql-createcast","note":"WITH INOUT: text->jsonb I/O cast"}
+{"id":"csta0014","category":"create-cast","sql":"CREATE CAST (text AS bytea) WITH INOUT","expect":"ok","ref":"sql-createcast","note":"WITH INOUT: text->bytea I/O cast"}
+{"id":"csta0015","category":"create-cast","sql":"CREATE CAST (text AS uuid) WITH INOUT","expect":"ok","ref":"sql-createcast","note":"WITH INOUT: text->uuid I/O cast"}
+{"id":"csta0016","category":"create-cast","sql":"CREATE CAST (text AS macaddr) WITH INOUT","expect":"ok","ref":"sql-createcast","note":"WITH INOUT: text->macaddr I/O cast"}
+{"id":"csta0017","category":"create-cast","sql":"CREATE CAST (text AS bit) WITH INOUT","expect":"ok","ref":"sql-createcast","note":"WITH INOUT: text->bit I/O cast"}
+{"id":"csta0018","category":"create-cast","sql":"CREATE CAST (text AS point) WITH INOUT","expect":"ok","ref":"sql-createcast","note":"WITH INOUT: text->point I/O cast"}
+{"id":"csta0019","category":"create-cast","sql":"CREATE CAST (text AS numeric) WITH INOUT","expect":"ok","ref":"sql-createcast","note":"WITH INOUT: text->numeric I/O cast (numeric reserved word as type name)"}
+{"id":"csta0020","category":"create-cast","sql":"CREATE CAST (date AS text) WITH INOUT","expect":"ok","ref":"sql-createcast","note":"WITH INOUT: date->text I/O cast"}
+{"id":"csta0021","category":"create-cast","sql":"CREATE CAST (date AS text) WITH INOUT AS ASSIGNMENT","expect":"ok","ref":"sql-createcast","note":"WITH INOUT AS ASSIGNMENT: date->text"}
+{"id":"csta0022","category":"create-cast","sql":"CREATE CAST (date AS text) WITH INOUT AS IMPLICIT","expect":"ok","ref":"sql-createcast","note":"WITH INOUT AS IMPLICIT: date->text"}
+{"id":"csta0023","category":"create-cast","sql":"CREATE CAST (date AS integer) WITH INOUT","expect":"ok","ref":"sql-createcast","note":"WITH INOUT: date->integer I/O cast"}
+{"id":"csta0024","category":"create-cast","sql":"CREATE CAST (date AS float8) WITH INOUT","expect":"ok","ref":"sql-createcast","note":"WITH INOUT: date->float8 I/O cast"}
+{"id":"csta0025","category":"create-cast","sql":"CREATE CAST (date AS boolean) WITH INOUT","expect":"ok","ref":"sql-createcast","note":"WITH INOUT: date->boolean I/O cast"}
+{"id":"csta0026","category":"create-cast","sql":"CREATE CAST (date AS interval) WITH INOUT","expect":"ok","ref":"sql-createcast","note":"WITH INOUT: date->interval I/O cast"}
+{"id":"csta0027","category":"create-cast","sql":"CREATE CAST (date AS numeric) WITH INOUT","expect":"ok","ref":"sql-createcast","note":"WITH INOUT: date->numeric I/O cast"}
+{"id":"csta0028","category":"create-cast","sql":"CREATE CAST (integer AS date) WITH INOUT","expect":"ok","ref":"sql-createcast","note":"WITH INOUT: integer->date I/O cast"}
+{"id":"csta0029","category":"create-cast","sql":"CREATE CAST (float8 AS date) WITH INOUT","expect":"ok","ref":"sql-createcast","note":"WITH INOUT: float8->date I/O cast"}
+{"id":"csta0030","category":"create-cast","sql":"CREATE CAST (integer AS text) WITH INOUT","expect":"ok","ref":"sql-createcast","note":"WITH INOUT: integer->text I/O cast"}
+{"id":"csta0031","category":"create-cast","sql":"CREATE CAST (integer AS text) WITH INOUT AS ASSIGNMENT","expect":"ok","ref":"sql-createcast","note":"WITH INOUT AS ASSIGNMENT: integer->text"}
+{"id":"csta0032","category":"create-cast","sql":"CREATE CAST (integer AS text) WITH INOUT AS IMPLICIT","expect":"ok","ref":"sql-createcast","note":"WITH INOUT AS IMPLICIT: integer->text"}
+{"id":"csta0033","category":"create-cast","sql":"CREATE CAST (integer AS json) WITH INOUT","expect":"ok","ref":"sql-createcast","note":"WITH INOUT: integer->json I/O cast"}
+{"id":"csta0034","category":"create-cast","sql":"CREATE CAST (integer AS interval) WITH INOUT","expect":"ok","ref":"sql-createcast","note":"WITH INOUT: integer->interval I/O cast"}
+{"id":"csta0035","category":"create-cast","sql":"CREATE CAST (float8 AS text) WITH INOUT","expect":"ok","ref":"sql-createcast","note":"WITH INOUT: float8->text (double precision->text)"}
+{"id":"csta0036","category":"create-cast","sql":"CREATE CAST (float8 AS json) WITH INOUT","expect":"ok","ref":"sql-createcast","note":"WITH INOUT: float8->json I/O cast"}
+{"id":"csta0037","category":"create-cast","sql":"CREATE CAST (boolean AS date) WITH INOUT","expect":"ok","ref":"sql-createcast","note":"WITH INOUT: boolean->date I/O cast"}
+{"id":"csta0038","category":"create-cast","sql":"CREATE CAST (boolean AS json) WITH INOUT","expect":"ok","ref":"sql-createcast","note":"WITH INOUT: boolean->json I/O cast"}
+{"id":"csta0039","category":"create-cast","sql":"CREATE CAST (boolean AS jsonb) WITH INOUT","expect":"ok","ref":"sql-createcast","note":"WITH INOUT: boolean->jsonb I/O cast"}
+{"id":"csta0040","category":"create-cast","sql":"CREATE CAST (boolean AS interval) WITH INOUT","expect":"ok","ref":"sql-createcast","note":"WITH INOUT: boolean->interval I/O cast"}
+{"id":"csta0041","category":"create-cast","sql":"CREATE CAST (boolean AS numeric) WITH INOUT","expect":"ok","ref":"sql-createcast","note":"WITH INOUT: boolean->numeric I/O cast"}
+{"id":"csta0042","category":"create-cast","sql":"CREATE CAST (json AS text) WITH INOUT","expect":"ok","ref":"sql-createcast","note":"WITH INOUT: json->text I/O cast"}
+{"id":"csta0043","category":"create-cast","sql":"CREATE CAST (json AS integer) WITH INOUT","expect":"ok","ref":"sql-createcast","note":"WITH INOUT: json->integer I/O cast"}
+{"id":"csta0044","category":"create-cast","sql":"CREATE CAST (json AS boolean) WITH INOUT","expect":"ok","ref":"sql-createcast","note":"WITH INOUT: json->boolean I/O cast"}
+{"id":"csta0045","category":"create-cast","sql":"CREATE CAST (jsonb AS text) WITH INOUT","expect":"ok","ref":"sql-createcast","note":"WITH INOUT: jsonb->text I/O cast"}
+{"id":"csta0046","category":"create-cast","sql":"CREATE CAST (jsonb AS date) WITH INOUT","expect":"ok","ref":"sql-createcast","note":"WITH INOUT: jsonb->date I/O cast"}
+{"id":"csta0047","category":"create-cast","sql":"CREATE CAST (bytea AS text) WITH INOUT","expect":"ok","ref":"sql-createcast","note":"WITH INOUT: bytea->text I/O cast"}
+{"id":"csta0048","category":"create-cast","sql":"CREATE CAST (uuid AS text) WITH INOUT","expect":"ok","ref":"sql-createcast","note":"WITH INOUT: uuid->text I/O cast"}
+{"id":"csta0049","category":"create-cast","sql":"CREATE CAST (uuid AS varchar) WITH INOUT","expect":"ok","ref":"sql-createcast","note":"WITH INOUT: uuid->varchar I/O cast"}
+{"id":"csta0050","category":"create-cast","sql":"CREATE CAST (varchar AS uuid) WITH INOUT","expect":"ok","ref":"sql-createcast","note":"WITH INOUT: varchar->uuid I/O cast"}
+{"id":"csta0051","category":"create-cast","sql":"CREATE CAST (macaddr AS text) WITH INOUT","expect":"ok","ref":"sql-createcast","note":"WITH INOUT: macaddr->text I/O cast"}
+{"id":"csta0052","category":"create-cast","sql":"CREATE CAST (macaddr AS integer) WITH INOUT","expect":"ok","ref":"sql-createcast","note":"WITH INOUT: macaddr->integer I/O cast"}
+{"id":"csta0053","category":"create-cast","sql":"CREATE CAST (macaddr8 AS text) WITH INOUT","expect":"ok","ref":"sql-createcast","note":"WITH INOUT: macaddr8->text I/O cast"}
+{"id":"csta0054","category":"create-cast","sql":"CREATE CAST (point AS text) WITH INOUT","expect":"ok","ref":"sql-createcast","note":"WITH INOUT: point->text I/O cast"}
+{"id":"csta0055","category":"create-cast","sql":"CREATE CAST (varbit AS text) WITH INOUT","expect":"ok","ref":"sql-createcast","note":"WITH INOUT: varbit->text I/O cast"}
+{"id":"csta0056","category":"create-cast","sql":"CREATE CAST (tsvector AS text) WITH INOUT","expect":"ok","ref":"sql-createcast","note":"WITH INOUT: tsvector->text I/O cast"}
+{"id":"csta0057","category":"create-cast","sql":"CREATE CAST (tsquery AS text) WITH INOUT","expect":"ok","ref":"sql-createcast","note":"WITH INOUT: tsquery->text I/O cast"}
+{"id":"csta0058","category":"create-cast","sql":"CREATE CAST (int4range AS text) WITH INOUT","expect":"ok","ref":"sql-createcast","note":"WITH INOUT: int4range->text I/O cast (range type)"}
+{"id":"csta0059","category":"create-cast","sql":"CREATE CAST (interval AS integer) WITH INOUT","expect":"ok","ref":"sql-createcast","note":"WITH INOUT: interval->integer I/O cast"}
+{"id":"csta0060","category":"create-cast","sql":"CREATE CAST (interval AS text) WITH INOUT","expect":"ok","ref":"sql-createcast","note":"WITH INOUT: interval->text I/O cast"}
+{"id":"csta0061","category":"create-cast","sql":"CREATE CAST (interval AS date) WITH INOUT","expect":"ok","ref":"sql-createcast","note":"WITH INOUT: interval->date I/O cast"}
+{"id":"csta0062","category":"create-cast","sql":"CREATE CAST (interval AS boolean) WITH INOUT","expect":"ok","ref":"sql-createcast","note":"WITH INOUT: interval->boolean I/O cast"}
+{"id":"csta0063","category":"create-cast","sql":"CREATE CAST (oid AS text) WITH INOUT","expect":"ok","ref":"sql-createcast","note":"WITH INOUT: oid->text I/O cast"}
+{"id":"csta0064","category":"create-cast","sql":"CREATE CAST (text AS oid) WITH INOUT","expect":"ok","ref":"sql-createcast","note":"WITH INOUT: text->oid I/O cast"}
+{"id":"csta0065","category":"create-cast","sql":"CREATE CAST (oid AS boolean) WITH INOUT","expect":"ok","ref":"sql-createcast","note":"WITH INOUT: oid->boolean I/O cast"}
+{"id":"csta0066","category":"create-cast","sql":"CREATE CAST (oid AS float8) WITH INOUT","expect":"ok","ref":"sql-createcast","note":"WITH INOUT: oid->float8 I/O cast"}
+{"id":"csta0067","category":"create-cast","sql":"CREATE CAST (float8 AS oid) WITH INOUT","expect":"ok","ref":"sql-createcast","note":"WITH INOUT: float8->oid I/O cast"}
+{"id":"csta0068","category":"create-cast","sql":"CREATE CAST (boolean AS oid) WITH INOUT","expect":"ok","ref":"sql-createcast","note":"WITH INOUT: boolean->oid I/O cast"}
+{"id":"csta0069","category":"create-cast","sql":"CREATE CAST (int2 AS text) WITH INOUT","expect":"ok","ref":"sql-createcast","note":"WITH INOUT: int2->text I/O cast"}
+{"id":"csta0070","category":"create-cast","sql":"CREATE CAST (text AS int2) WITH INOUT","expect":"ok","ref":"sql-createcast","note":"WITH INOUT: text->int2 I/O cast"}
+{"id":"csta0071","category":"create-cast","sql":"CREATE CAST (int2 AS date) WITH INOUT","expect":"ok","ref":"sql-createcast","note":"WITH INOUT: int2->date I/O cast"}
+{"id":"csta0072","category":"create-cast","sql":"CREATE CAST (int2 AS boolean) WITH INOUT","expect":"ok","ref":"sql-createcast","note":"WITH INOUT: int2->boolean I/O cast"}
+{"id":"csta0073","category":"create-cast","sql":"CREATE CAST (double precision AS text) WITH INOUT","expect":"ok","ref":"sql-createcast","note":"WITH INOUT: double precision (long name) -> text"}
+{"id":"csta0074","category":"create-cast","sql":"CREATE CAST (character varying AS date) WITH INOUT","expect":"ok","ref":"sql-createcast","note":"WITH INOUT: character varying (long name) -> date"}
+{"id":"csta0075","category":"create-cast","sql":"CREATE CAST (character varying AS integer) WITH INOUT","expect":"ok","ref":"sql-createcast","note":"WITH INOUT: character varying -> integer"}
+{"id":"csta0076","category":"create-cast","sql":"CREATE CAST (s.mood AS text) WITH INOUT","expect":"ok","ref":"sql-createcast","note":"WITH INOUT: fixture enum s.mood -> text"}
+{"id":"csta0077","category":"create-cast","sql":"CREATE CAST (text AS s.mood) WITH INOUT","expect":"ok","ref":"sql-createcast","note":"WITH INOUT: text -> fixture enum s.mood"}
+{"id":"csta0078","category":"create-cast","sql":"CREATE CAST (s.mood AS varchar) WITH INOUT","expect":"ok","ref":"sql-createcast","note":"WITH INOUT: s.mood -> varchar"}
+{"id":"csta0079","category":"create-cast","sql":"CREATE CAST (varchar AS s.mood) WITH INOUT","expect":"ok","ref":"sql-createcast","note":"WITH INOUT: varchar -> s.mood"}
+{"id":"csta0080","category":"create-cast","sql":"CREATE CAST (s.mood AS integer) WITH INOUT","expect":"ok","ref":"sql-createcast","note":"WITH INOUT: s.mood -> integer"}
+{"id":"csta0081","category":"create-cast","sql":"CREATE CAST (s.mood AS float8) WITH INOUT","expect":"ok","ref":"sql-createcast","note":"WITH INOUT: s.mood -> float8"}
+{"id":"csta0082","category":"create-cast","sql":"CREATE CAST (s.mood AS text) WITH INOUT AS ASSIGNMENT","expect":"ok","ref":"sql-createcast","note":"WITH INOUT AS ASSIGNMENT: s.mood -> text"}
+{"id":"csta0083","category":"create-cast","sql":"CREATE CAST (s.mood AS text) WITH INOUT AS IMPLICIT","expect":"ok","ref":"sql-createcast","note":"WITH INOUT AS IMPLICIT: s.mood -> text"}
+{"id":"csta0084","category":"create-cast","sql":"CREATE CAST (s.pos_int AS text) WITH INOUT","expect":"ok","ref":"sql-createcast","note":"WITH INOUT: domain s.pos_int -> text"}
+{"id":"csta0085","category":"create-cast","sql":"CREATE CAST (s.pos_int AS integer) WITH INOUT","expect":"ok","ref":"sql-createcast","note":"WITH INOUT: domain s.pos_int -> integer"}
+{"id":"csta0086","category":"create-cast","sql":"CREATE FUNCTION csta_fn86(integer) RETURNS text LANGUAGE sql AS $$ SELECT $1::text $$;\nCREATE CAST (integer AS text) WITH FUNCTION csta_fn86(integer)","expect":"ok","ref":"sql-createcast","note":"WITH FUNCTION using a user-defined cast function"}
+{"id":"csta0087","category":"create-cast","sql":"CREATE FUNCTION csta_fn87(integer) RETURNS text LANGUAGE sql AS $$ SELECT $1::text $$;\nCREATE CAST (integer AS text) WITH FUNCTION csta_fn87(integer) AS ASSIGNMENT","expect":"ok","ref":"sql-createcast","note":"WITH FUNCTION + AS ASSIGNMENT: user-defined function"}
+{"id":"csta0088","category":"create-cast","sql":"CREATE FUNCTION csta_fn88(integer) RETURNS text LANGUAGE sql AS $$ SELECT $1::text $$;\nCREATE CAST (integer AS text) WITH FUNCTION csta_fn88(integer) AS IMPLICIT","expect":"ok","ref":"sql-createcast","note":"WITH FUNCTION + AS IMPLICIT: user-defined function"}
+{"id":"csta0089","category":"create-cast","sql":"CREATE FUNCTION csta_fn89(date) RETURNS text LANGUAGE sql AS $$ SELECT $1::text $$;\nCREATE CAST (date AS text) WITH FUNCTION csta_fn89(date)","expect":"ok","ref":"sql-createcast","note":"WITH FUNCTION: date->text using user-defined function"}
+{"id":"csta0090","category":"create-cast","sql":"CREATE FUNCTION csta_fn90(date) RETURNS text LANGUAGE sql AS $$ SELECT $1::text $$;\nCREATE CAST (date AS text) WITH FUNCTION csta_fn90(date) AS ASSIGNMENT","expect":"ok","ref":"sql-createcast","note":"WITH FUNCTION AS ASSIGNMENT: date->text user function"}
+{"id":"csta0091","category":"create-cast","sql":"CREATE FUNCTION csta_fn91(date) RETURNS text LANGUAGE sql AS $$ SELECT $1::text $$;\nCREATE CAST (date AS text) WITH FUNCTION csta_fn91(date) AS IMPLICIT","expect":"ok","ref":"sql-createcast","note":"WITH FUNCTION AS IMPLICIT: date->text user function"}
+{"id":"csta0092","category":"create-cast","sql":"CREATE SCHEMA csta_sc92;\nCREATE FUNCTION csta_sc92.myfn(integer) RETURNS text LANGUAGE sql AS $$ SELECT $1::text $$;\nCREATE CAST (integer AS text) WITH FUNCTION csta_sc92.myfn(integer)","expect":"ok","ref":"sql-createcast","note":"WITH FUNCTION: schema-qualified user-defined function name"}
+{"id":"csta0093","category":"create-cast","sql":"CREATE FUNCTION csta_fn93(integer, integer) RETURNS text LANGUAGE sql AS $$ SELECT $1::text $$;\nCREATE CAST (integer AS text) WITH FUNCTION csta_fn93(integer, integer)","expect":"ok","ref":"sql-createcast","note":"WITH FUNCTION: two-arg cast function (src, typmod)"}
+{"id":"csta0094","category":"create-cast","sql":"CREATE FUNCTION csta_fn94(integer, integer, boolean) RETURNS text LANGUAGE sql AS $$ SELECT $1::text $$;\nCREATE CAST (integer AS text) WITH FUNCTION csta_fn94(integer, integer, boolean)","expect":"ok","ref":"sql-createcast","note":"WITH FUNCTION: three-arg cast function (src, typmod, explicit_flag)"}
+{"id":"csta0095","category":"create-cast","sql":"CREATE FUNCTION csta_fn95(integer) RETURNS text LANGUAGE sql AS $$ SELECT $1::text $$;\nCREATE CAST (integer AS text) WITH FUNCTION csta_fn95;\nDROP CAST (integer AS text)","expect":"ok","ref":"sql-createcast","note":"WITH FUNCTION: function name without arg list (argument inferred)"}
+{"id":"csta0096","category":"create-cast","sql":"CREATE CAST (text AS date) WITH INOUT;\nDROP CAST (text AS date)","expect":"ok","ref":"sql-dropcast","note":"DROP CAST: drop a just-created cast (no IF EXISTS)"}
+{"id":"csta0097","category":"create-cast","sql":"CREATE CAST (text AS timestamp) WITH INOUT;\nDROP CAST (text AS timestamp) CASCADE","expect":"ok","ref":"sql-dropcast","note":"DROP CAST CASCADE: casts have no dependents, CASCADE is no-op"}
+{"id":"csta0098","category":"create-cast","sql":"CREATE CAST (text AS timestamptz) WITH INOUT;\nDROP CAST (text AS timestamptz) RESTRICT","expect":"ok","ref":"sql-dropcast","note":"DROP CAST RESTRICT: allowed by parser, has no effect"}
+{"id":"csta0099","category":"create-cast","sql":"CREATE CAST (json AS text) WITH INOUT;\nDROP CAST IF EXISTS (json AS text)","expect":"ok","ref":"sql-dropcast","note":"DROP CAST IF EXISTS: drops a real cast"}
+{"id":"csta0100","category":"create-cast","sql":"CREATE CAST (json AS text) WITH INOUT;\nDROP CAST IF EXISTS (json AS text) CASCADE","expect":"ok","ref":"sql-dropcast","note":"DROP CAST IF EXISTS CASCADE: cast exists, cascade no-op"}
+{"id":"csta0101","category":"create-cast","sql":"CREATE CAST (json AS text) WITH INOUT;\nDROP CAST IF EXISTS (json AS text) RESTRICT","expect":"ok","ref":"sql-dropcast","note":"DROP CAST IF EXISTS RESTRICT: cast exists, restrict no-op"}
+{"id":"csta0102","category":"create-cast","sql":"DROP CAST IF EXISTS (text AS date)","expect":"ok","ref":"sql-dropcast","note":"DROP CAST IF EXISTS: cast does not exist, no error (idempotent)"}
+{"id":"csta0103","category":"create-cast","sql":"DROP CAST IF EXISTS (text AS timestamp)","expect":"ok","ref":"sql-dropcast","note":"DROP CAST IF EXISTS on non-existent cast: no error"}
+{"id":"csta0104","category":"create-cast","sql":"DROP CAST IF EXISTS (integer AS text)","expect":"ok","ref":"sql-dropcast","note":"DROP CAST IF EXISTS integer->text: non-existent, silent"}
+{"id":"csta0105","category":"create-cast","sql":"DROP CAST IF EXISTS (date AS text) CASCADE","expect":"ok","ref":"sql-dropcast","note":"DROP CAST IF EXISTS CASCADE: non-existent cast, no error"}
+{"id":"csta0106","category":"create-cast","sql":"DROP CAST IF EXISTS (date AS text) RESTRICT","expect":"ok","ref":"sql-dropcast","note":"DROP CAST IF EXISTS RESTRICT: non-existent cast, no error"}
+{"id":"csta0107","category":"create-cast","sql":"CREATE CAST (date AS text) WITH INOUT;\nDROP CAST (date AS text);\nDROP CAST IF EXISTS (date AS text)","expect":"ok","ref":"sql-dropcast","note":"create, drop, then idempotent IF EXISTS drop of same cast"}
+{"id":"csta0108","category":"create-cast","sql":"CREATE CAST (text AS date) WITH INOUT;\nDROP CAST (text AS date);\nCREATE CAST (text AS date) WITH INOUT AS ASSIGNMENT","expect":"ok","ref":"sql-createcast","note":"create, drop, recreate same cast pair with different context"}
+{"id":"csta0109","category":"create-cast","sql":"CREATE CAST (text AS interval) WITH INOUT AS ASSIGNMENT;\nDROP CAST (text AS interval);\nCREATE CAST (text AS interval) WITH INOUT AS IMPLICIT","expect":"ok","ref":"sql-createcast","note":"multi-step: create AS ASSIGNMENT, drop, recreate AS IMPLICIT"}
+{"id":"csta0110","category":"create-cast","sql":"create cast (text as date) with inout","expect":"ok","ref":"sql-createcast","note":"fully lowercase CREATE CAST keywords"}
+{"id":"csta0111","category":"create-cast","sql":"CREATE CAST (TEXT AS DATE) WITH INOUT","expect":"ok","ref":"sql-createcast","note":"uppercase type names TEXT, DATE"}
+{"id":"csta0112","category":"create-cast","sql":"Create Cast (Text As Date) With Inout","expect":"ok","ref":"sql-createcast","note":"mixed-case keywords in CREATE CAST"}
+{"id":"csta0113","category":"create-cast","sql":"CREATE CAST (text AS date) WITH INOUT /* block comment */","expect":"ok","ref":"sql-createcast","note":"trailing block comment after WITH INOUT"}
+{"id":"csta0114","category":"create-cast","sql":"/* start */ CREATE CAST (text AS date) WITH INOUT","expect":"ok","ref":"sql-createcast","note":"leading block comment before CREATE CAST"}
+{"id":"csta0115","category":"create-cast","sql":"CREATE CAST (\n  text AS date\n) WITH INOUT","expect":"ok","ref":"sql-createcast","note":"newlines inside type pair parens"}
+{"id":"csta0116","category":"create-cast","sql":"CREATE CAST (text AS date)\n  WITH INOUT\n  AS ASSIGNMENT","expect":"ok","ref":"sql-createcast","note":"newlines between WITH INOUT and AS ASSIGNMENT"}
+{"id":"csta0117","category":"create-cast","sql":"CREATE TYPE csta_enum117 AS ENUM ('x','y','z');\nCREATE CAST (csta_enum117 AS text) WITH INOUT","expect":"ok","ref":"sql-createcast","note":"WITH INOUT using a user-created enum type as source"}
+{"id":"csta0118","category":"create-cast","sql":"CREATE TYPE csta_enum118 AS ENUM ('a','b');\nCREATE CAST (text AS csta_enum118) WITH INOUT","expect":"ok","ref":"sql-createcast","note":"WITH INOUT using a user-created enum as target"}
+{"id":"csta0119","category":"create-cast","sql":"CREATE TYPE csta_enum119 AS ENUM ('p','q');\nCREATE CAST (csta_enum119 AS text) WITH INOUT AS ASSIGNMENT","expect":"ok","ref":"sql-createcast","note":"enum->text WITH INOUT AS ASSIGNMENT"}
+{"id":"csta0120","category":"create-cast","sql":"CREATE TYPE csta_enum120 AS ENUM ('p','q');\nCREATE CAST (csta_enum120 AS text) WITH INOUT AS IMPLICIT","expect":"ok","ref":"sql-createcast","note":"enum->text WITH INOUT AS IMPLICIT"}
+{"id":"csta0121","category":"create-cast","sql":"CREATE TYPE csta_rng121 AS RANGE (SUBTYPE = int4);\nCREATE CAST (csta_rng121 AS text) WITH INOUT","expect":"ok","ref":"sql-createcast","note":"WITH INOUT: user-created range type -> text"}
+{"id":"csta0122","category":"create-cast","sql":"CREATE FUNCTION csta_fn122(integer) RETURNS text LANGUAGE sql AS $$ SELECT $1::text $$;\nCREATE CAST (integer AS text) WITH FUNCTION csta_fn122(integer);\nDROP CAST (integer AS text)","expect":"ok","ref":"sql-createcast","note":"WITH FUNCTION then drop: full lifecycle in one txn"}
+{"id":"csta0123","category":"create-cast","sql":"CREATE CAST (text AS date) WITH INOUT;\nCREATE CAST (text AS date) WITH INOUT","expect":"error","ref":"sql-createcast","note":"semantic error 42710: duplicate cast definition for same type pair"}
+{"id":"csta0124","category":"create-cast","sql":"DROP CAST (text AS date)","expect":"error","ref":"sql-dropcast","note":"semantic error 42704: DROP CAST without IF EXISTS, cast does not exist"}
+{"id":"csta0125","category":"create-cast","sql":"DROP CAST (text AS integer)","expect":"error","ref":"sql-dropcast","note":"semantic error 42704: no user-defined text->integer cast exists"}
+{"id":"csta0126","category":"create-cast","sql":"DROP CAST (bigint AS nonexistent_type)","expect":"error","ref":"sql-dropcast","note":"semantic error 42704: target type does not exist"}
+{"id":"csta0127","category":"create-cast","sql":"DROP CAST (nonexistent_type AS text)","expect":"error","ref":"sql-dropcast","note":"semantic error 42704: source type does not exist"}
+{"id":"csta0128","category":"create-cast","sql":"CREATE CAST bigint AS integer WITH INOUT","expect":"error","ref":"sql-createcast","note":"syntax error 42601: missing parentheses around type pair"}
+{"id":"csta0129","category":"create-cast","sql":"CREATE CAST (bigint integer) WITH INOUT","expect":"error","ref":"sql-createcast","note":"syntax error 42601: missing AS keyword between types"}
+{"id":"csta0130","category":"create-cast","sql":"CREATE CAST (bigint AS) WITH INOUT","expect":"error","ref":"sql-createcast","note":"syntax error 42601: missing target type after AS"}
+{"id":"csta0131","category":"create-cast","sql":"CREATE CAST (AS integer) WITH INOUT","expect":"error","ref":"sql-createcast","note":"syntax error 42601: missing source type before AS"}
+{"id":"csta0132","category":"create-cast","sql":"CREATE CAST (integer AS text)","expect":"error","ref":"sql-createcast","note":"syntax error 42601: missing conversion method clause entirely"}
+{"id":"csta0133","category":"create-cast","sql":"CREATE CAST (integer AS text) WITH FUNCTION","expect":"error","ref":"sql-createcast","note":"syntax error 42601: WITH FUNCTION with no function name"}
+{"id":"csta0134","category":"create-cast","sql":"CREATE CAST (integer AS text) WITH INOUT AS EXPLICIT","expect":"error","ref":"sql-createcast","note":"syntax error 42601: invalid context keyword EXPLICIT"}
+{"id":"csta0135","category":"create-cast","sql":"CREATE CAST (integer AS text) WITH INOUT AS ASSIGNMENT AS IMPLICIT","expect":"error","ref":"sql-createcast","note":"syntax error 42601: duplicate context clause AS ASSIGNMENT AS IMPLICIT"}
+{"id":"csta0136","category":"create-cast","sql":"CREATE CAST (integer AS text) WITHOUT FUNCTION WITH INOUT","expect":"error","ref":"sql-createcast","note":"syntax error 42601: cannot have both WITHOUT FUNCTION and WITH INOUT"}
+{"id":"csta0137","category":"create-cast","sql":"CREATE CAST (integer AS text) WITH FUNCTION csta_fn137(integer) WITHOUT FUNCTION","expect":"error","ref":"sql-createcast","note":"syntax error 42601: WITH FUNCTION followed by WITHOUT FUNCTION"}
+{"id":"csta0138","category":"create-cast","sql":"CREATE (integer AS text) WITH INOUT","expect":"error","ref":"sql-createcast","note":"syntax error 42601: missing CAST keyword after CREATE"}
+{"id":"csta0139","category":"create-cast","sql":"CAST (integer AS text) WITH INOUT","expect":"error","ref":"sql-createcast","note":"syntax error: missing CREATE keyword (starts with CAST)"}
+{"id":"csta0140","category":"create-cast","sql":"CREATE CAST (integer AS text) INOUT","expect":"error","ref":"sql-createcast","note":"syntax error 42601: WITH missing before INOUT"}
+{"id":"csta0141","category":"create-cast","sql":"CREATE CAST (integer AS text) FUNCTION myfn(integer)","expect":"error","ref":"sql-createcast","note":"syntax error 42601: WITH missing before FUNCTION"}
+{"id":"csta0142","category":"create-cast","sql":"CREATE CAST (integer text) WITH INOUT","expect":"error","ref":"sql-createcast","note":"syntax error 42601: missing AS in type pair"}
+{"id":"csta0143","category":"create-cast","sql":"DROP CAST (integer AS text) CASCADES","expect":"error","ref":"sql-dropcast","note":"syntax error 42601: CASCADES is not a valid keyword (should be CASCADE)"}
+{"id":"csta0144","category":"create-cast","sql":"DROP CAST IF (integer AS text)","expect":"error","ref":"sql-dropcast","note":"syntax error 42601: IF without EXISTS in DROP CAST"}
+{"id":"csta0145","category":"create-cast","sql":"DROP CAST integer AS text","expect":"error","ref":"sql-dropcast","note":"syntax error 42601: DROP CAST without parentheses"}
+{"id":"csta0146","category":"create-cast","sql":"CREATE CAST (integer AS text) WITH FUNCTION nonexistent_fn(integer)","expect":"error","ref":"sql-createcast","note":"semantic error 42883: function referenced does not exist"}
+{"id":"csta0147","category":"create-cast","sql":"CREATE CAST (integer AS text) WITH FUNCTION nonexistent_schema.myfn(integer)","expect":"error","ref":"sql-createcast","note":"semantic error 3F000: schema does not exist"}
+{"id":"csta0148","category":"create-cast","sql":"CREATE CAST (integer AS text) WITH FUNCTION s.f(integer)","expect":"error","ref":"sql-createcast","note":"semantic error 42P17: function return type (integer) does not match target type (text)"}
+{"id":"csta0149","category":"create-cast","sql":"CREATE CAST (integer AS text) WITH FUNCTION s.g(integer, integer)","expect":"error","ref":"sql-createcast","note":"semantic error 42P17: function return type (integer) mismatches target text"}
+{"id":"csta0150","category":"create-cast","sql":"CREATE CAST (integer AS integer) WITH INOUT","expect":"error","ref":"sql-createcast","note":"semantic error 42P17: source and target types are the same"}
+{"id":"csta0151","category":"create-cast","sql":"CREATE CAST (s.mood AS text) WITHOUT FUNCTION","expect":"error","ref":"sql-createcast","note":"semantic error 42P17: enum not binary-coercible to text (WITHOUT FUNCTION invalid)"}
+{"id":"csta0152","category":"create-cast","sql":"CREATE CAST (integer AS text) AS ASSIGNMENT","expect":"error","ref":"sql-createcast","note":"syntax error 42601: context keyword without any conversion method"}
+{"id":"csta0153","category":"create-cast","sql":"CREATE CAST (text AS integer) WITH INOUT AS ASSIGNMENT;\nDROP CAST (text AS integer);\nDROP CAST IF EXISTS (text AS integer)","expect":"ok","ref":"sql-dropcast","note":"create then drop then idempotent IF EXISTS drop"}
+{"id":"csta0154","category":"create-cast","sql":"CREATE CAST (text AS boolean) WITH INOUT AS IMPLICIT;\nDROP CAST IF EXISTS (text AS boolean) CASCADE","expect":"ok","ref":"sql-dropcast","note":"create AS IMPLICIT then DROP CAST IF EXISTS CASCADE"}
+{"id":"csta0155","category":"create-cast","sql":"CREATE CAST (json AS boolean) WITH INOUT AS ASSIGNMENT;\nDROP CAST (json AS boolean) RESTRICT","expect":"ok","ref":"sql-dropcast","note":"create then DROP CAST RESTRICT on existing cast"}

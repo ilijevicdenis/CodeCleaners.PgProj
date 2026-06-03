@@ -1,0 +1,57 @@
+{"id":"xmlb0001","category":"xml","sql":"SELECT xmlelement(name foo)","expect":"ok","ref":"functions-xml","note":"xmlelement minimal - element with no content"}
+{"id":"xmlb0002","category":"xml","sql":"SELECT xmlelement(name foo, 'hello')","expect":"ok","ref":"functions-xml","note":"xmlelement with text content"}
+{"id":"xmlb0003","category":"xml","sql":"SELECT xmlelement(name foo, xmlattributes('bar' AS baz))","expect":"ok","ref":"functions-xml","note":"xmlelement with XMLATTRIBUTES single attr"}
+{"id":"xmlb0004","category":"xml","sql":"SELECT xmlelement(name foo, xmlattributes('x' AS a, 42 AS b), 'content')","expect":"ok","ref":"functions-xml","note":"xmlelement with multiple attributes and text content"}
+{"id":"xmlb0005","category":"xml","sql":"SELECT xmlelement(name outer, xmlelement(name inner, 'nested'))","expect":"ok","ref":"functions-xml","note":"xmlelement nested inside xmlelement"}
+{"id":"xmlb0006","category":"xml","sql":"SELECT xmlelement('foo')","expect":"error","ref":"functions-xml","note":"xmlelement missing NAME keyword - syntax error"}
+{"id":"xmlb0007","category":"xml","sql":"SELECT xmlforest('abc' AS foo, 123 AS bar)","expect":"ok","ref":"functions-xml","note":"xmlforest with two aliased values"}
+{"id":"xmlb0008","category":"xml","sql":"SELECT xmlforest(1 AS a)","expect":"ok","ref":"functions-xml","note":"xmlforest single item"}
+{"id":"xmlb0009","category":"xml","sql":"SELECT xmlforest('x')","expect":"error","ref":"functions-xml","note":"xmlforest content without AS alias - syntax error"}
+{"id":"xmlb0010","category":"xml","sql":"SELECT xmlconcat(xmlelement(name a), xmlelement(name b))","expect":"ok","ref":"functions-xml","note":"xmlconcat two xml values"}
+{"id":"xmlb0011","category":"xml","sql":"SELECT xmlconcat(xmlelement(name x), NULL)","expect":"ok","ref":"functions-xml","note":"xmlconcat with NULL - null values omitted"}
+{"id":"xmlb0012","category":"xml","sql":"SELECT xmlpi(name php, 'echo \"hello\";')","expect":"ok","ref":"functions-xml","note":"xmlpi with name and content"}
+{"id":"xmlb0013","category":"xml","sql":"SELECT xmlpi(name target)","expect":"ok","ref":"functions-xml","note":"xmlpi with name only - no content"}
+{"id":"xmlb0014","category":"xml","sql":"SELECT xmlpi('target')","expect":"error","ref":"functions-xml","note":"xmlpi missing NAME keyword - syntax error"}
+{"id":"xmlb0015","category":"xml","sql":"SELECT xmlcomment('this is a comment')","expect":"ok","ref":"functions-xml","note":"xmlcomment basic usage"}
+{"id":"xmlb0016","category":"xml","sql":"SELECT xmlcomment('bad--comment')","expect":"error","ref":"functions-xml","note":"xmlcomment with double-dash - runtime error"}
+{"id":"xmlb0017","category":"xml","sql":"SELECT xmlroot(xmlparse(document '<?xml version=\"1.0\"?><root/>'), version '1.0', standalone yes)","expect":"ok","ref":"functions-xml","note":"xmlroot with version and standalone yes"}
+{"id":"xmlb0018","category":"xml","sql":"SELECT xmlroot(xmlparse(document '<?xml version=\"1.0\"?><root/>'), version no value, standalone no)","expect":"ok","ref":"functions-xml","note":"xmlroot with NO VALUE version and standalone no"}
+{"id":"xmlb0019","category":"xml","sql":"SELECT xmlroot(xmlparse(document '<?xml version=\"1.0\"?><root/>'), version '1.1')","expect":"ok","ref":"functions-xml","note":"xmlroot version only no standalone clause"}
+{"id":"xmlb0020","category":"xml","sql":"SELECT xmlparse(document '<?xml version=\"1.0\"?><root><child>text</child></root>')","expect":"ok","ref":"functions-xml","note":"xmlparse DOCUMENT mode"}
+{"id":"xmlb0021","category":"xml","sql":"SELECT xmlparse(content '<a>one</a><b>two</b>')","expect":"ok","ref":"functions-xml","note":"xmlparse CONTENT mode - fragment"}
+{"id":"xmlb0022","category":"xml","sql":"SELECT xmlparse(fragment '<a/>')","expect":"error","ref":"functions-xml","note":"xmlparse with invalid option FRAGMENT - syntax error"}
+{"id":"xmlb0023","category":"xml","sql":"SELECT xmlserialize(document xmlparse(document '<?xml version=\"1.0\"?><root/>') AS text)","expect":"ok","ref":"functions-xml","note":"xmlserialize DOCUMENT AS text"}
+{"id":"xmlb0024","category":"xml","sql":"SELECT xmlserialize(content xmlelement(name foo, 'bar') AS varchar)","expect":"ok","ref":"functions-xml","note":"xmlserialize CONTENT AS varchar"}
+{"id":"xmlb0025","category":"xml","sql":"SELECT xpath('/root/child/text()', xmlparse(document '<?xml version=\"1.0\"?><root><child>hello</child></root>'))","expect":"ok","ref":"functions-xml","note":"xpath basic expression returning text nodes"}
+{"id":"xmlb0026","category":"xml","sql":"SELECT xpath('/a/text()', xmlparse(content '<a>val</a>'), ARRAY[ARRAY['ns','http://example.com']])","expect":"ok","ref":"functions-xml","note":"xpath with namespace array parameter"}
+{"id":"xmlb0027","category":"xml","sql":"SELECT xpath_exists('/root', xmlparse(content '<root/>'))","expect":"ok","ref":"functions-xml","note":"xpath_exists basic usage"}
+{"id":"xmlb0028","category":"xml","sql":"SELECT xpath_exists('/ns:a', xmlparse(content '<ns:a xmlns:ns=\"http://x.com\"/>'), ARRAY[ARRAY['ns','http://x.com']])","expect":"ok","ref":"functions-xml","note":"xpath_exists with namespace array"}
+{"id":"xmlb0029","category":"xml","sql":"SELECT xmlparse(document '<?xml version=\"1.0\"?><root/>') IS DOCUMENT","expect":"ok","ref":"functions-xml","note":"IS DOCUMENT predicate - true for well-formed document"}
+{"id":"xmlb0030","category":"xml","sql":"SELECT xmlparse(content '<a/><b/>') IS DOCUMENT","expect":"ok","ref":"functions-xml","note":"IS DOCUMENT predicate - false for content fragment"}
+{"id":"xmlb0031","category":"xml","sql":"SELECT xmlparse(content '<a/><b/>') IS NOT DOCUMENT","expect":"ok","ref":"functions-xml","note":"IS NOT DOCUMENT predicate on content fragment"}
+{"id":"xmlb0032","category":"xml","sql":"SELECT xmlexists('//child' PASSING BY VALUE xmlparse(document '<?xml version=\"1.0\"?><root><child>x</child></root>'))","expect":"ok","ref":"functions-xml","note":"XMLEXISTS with PASSING BY VALUE using xmlparse"}
+{"id":"xmlb0033","category":"xml","sql":"SELECT xmlexists('//missing' PASSING xmlparse(content '<root/>'))","expect":"ok","ref":"functions-xml","note":"XMLEXISTS without BY VALUE/REF clause (default) using xmlparse"}
+{"id":"xmlb0034","category":"xml","sql":"SELECT * FROM XMLTABLE('/root/row' PASSING xmlparse(document '<?xml version=\"1.0\"?><root><row><id>1</id><val>a</val></row></root>') COLUMNS id int PATH 'id', val text PATH 'val')","expect":"ok","ref":"functions-xml","note":"XMLTABLE basic with PATH columns"}
+{"id":"xmlb0035","category":"xml","sql":"SELECT * FROM XMLTABLE('/rows/row' PASSING xmlparse(document '<?xml version=\"1.0\"?><rows><row><n>1</n></row></rows>') COLUMNS ord FOR ORDINALITY, n int PATH 'n')","expect":"ok","ref":"functions-xml","note":"XMLTABLE with FOR ORDINALITY column"}
+{"id":"xmlb0036","category":"xml","sql":"SELECT * FROM XMLTABLE('/r/item' PASSING xmlparse(document '<?xml version=\"1.0\"?><r><item/></r>') COLUMNS val text PATH 'missing' DEFAULT 'none')","expect":"ok","ref":"functions-xml","note":"XMLTABLE with DEFAULT expression on PATH column"}
+{"id":"xmlb0037","category":"xml","sql":"SELECT * FROM XMLTABLE(XMLNAMESPACES('http://example.com' AS ns), '/ns:root/ns:item' PASSING xmlparse(document '<?xml version=\"1.0\"?><root xmlns=\"http://example.com\"><item>x</item></root>') COLUMNS v text PATH 'text()')","expect":"ok","ref":"functions-xml","note":"XMLTABLE with XMLNAMESPACES clause (comma before row expression)"}
+{"id":"xmlb0038","category":"xml","sql":"SELECT table_to_xml('s.t'::regclass, false, false, '')","expect":"ok","ref":"functions-xml","note":"table_to_xml with nulls=false tableforest=false"}
+{"id":"xmlb0039","category":"xml","sql":"SELECT table_to_xml('s.t'::regclass, true, true, 'http://example.com')","expect":"ok","ref":"functions-xml","note":"table_to_xml with nulls=true tableforest=true and namespace"}
+{"id":"xmlb0040","category":"xml","sql":"SELECT query_to_xml('SELECT id, name FROM s.t LIMIT 0', false, false, '')","expect":"ok","ref":"functions-xml","note":"query_to_xml with a simple query"}
+{"id":"xmlb0041","category":"xml","sql":"CREATE TABLE xmlb_agg_test (x xml);\nINSERT INTO xmlb_agg_test VALUES (xmlelement(name a)), (xmlelement(name b));\nSELECT xmlagg(x) FROM xmlb_agg_test","expect":"ok","ref":"functions-xml","note":"xmlagg aggregate over xml column"}
+{"id":"xmlb0042","category":"xml","sql":"CREATE TABLE xmlb_agg_ord (x xml, y int);\nINSERT INTO xmlb_agg_ord VALUES (xmlelement(name a), 2), (xmlelement(name b), 1);\nSELECT xmlagg(x ORDER BY y) FROM xmlb_agg_ord","expect":"ok","ref":"functions-xml","note":"xmlagg with ORDER BY clause"}
+{"id":"xmlb0043","category":"xml","sql":"SELECT xml_is_well_formed('<abc/>')","expect":"ok","ref":"functions-xml","note":"xml_is_well_formed with well-formed XML"}
+{"id":"xmlb0044","category":"xml","sql":"SELECT xml_is_well_formed('not xml <<')","expect":"ok","ref":"functions-xml","note":"xml_is_well_formed with malformed input - returns false not error"}
+{"id":"xmlb0045","category":"xml","sql":"SELECT xml_is_well_formed_document('<?xml version=\"1.0\"?><root/>')","expect":"ok","ref":"functions-xml","note":"xml_is_well_formed_document variant"}
+{"id":"xmlb0046","category":"xml","sql":"SELECT xml_is_well_formed_content('<a/><b/>')","expect":"ok","ref":"functions-xml","note":"xml_is_well_formed_content variant for fragments"}
+{"id":"xmlb0047","category":"xml","sql":"SELECT xmlelement(name foo, xmlattributes(1 AS n, true AS flag), xmlforest('x' AS child))","expect":"ok","ref":"functions-xml","note":"xmlelement combining XMLATTRIBUTES with xmlforest child content"}
+{"id":"xmlb0048","category":"xml","sql":"SELECT xmlroot(xmlparse(document '<?xml version=\"1.0\"?><r/>'), version '1.0', standalone no value)","expect":"ok","ref":"functions-xml","note":"xmlroot standalone NO VALUE option"}
+{"id":"xmlb0049","category":"xml","sql":"SELECT xmlelement(name foo, xmlattributes())","expect":"error","ref":"functions-xml","note":"xmlattributes with empty list - syntax error"}
+{"id":"xmlb0050","category":"xml","sql":"SELECT xmlroot(xmlelement(name r), standalone yes)","expect":"error","ref":"functions-xml","note":"xmlroot missing VERSION keyword - syntax error"}
+{"id":"xmlb0051","category":"xml","sql":"SELECT xmlserialize(xmlelement(name x) AS text)","expect":"error","ref":"functions-xml","note":"xmlserialize missing DOCUMENT/CONTENT keyword - syntax error"}
+{"id":"xmlb0052","category":"xml","sql":"SELECT xmlparse(document '<not-closed>')","expect":"error","ref":"functions-xml","note":"xmlparse with malformed XML - runtime error"}
+{"id":"xmlb0053","category":"xml","sql":"SELECT * FROM XMLTABLE('/r' PASSING xmlparse(content '<r/>'))","expect":"error","ref":"functions-xml","note":"XMLTABLE missing COLUMNS clause - syntax error"}
+{"id":"xmlb0054","category":"xml","sql":"SELECT xmlpi(name xml)","expect":"error","ref":"functions-xml","note":"xmlpi with target name 'xml' - reserved PI target error"}
+{"id":"xmlb0055","category":"xml","sql":"SELECT xmlforest()","expect":"error","ref":"functions-xml","note":"xmlforest with empty argument list - syntax error"}
+{"id":"xmlb0056","category":"xml","sql":"SELECT xmlconcat()","expect":"error","ref":"functions-xml","note":"xmlconcat with no arguments - syntax error"}
+{"id":"xmlb0057","category":"xml","sql":"SELECT xmlexists('/root' PASSING BY COPY xmlparse(content '<root/>'))","expect":"error","ref":"functions-xml","note":"XMLEXISTS with invalid PASSING BY COPY - syntax error"}

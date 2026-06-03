@@ -1,0 +1,40 @@
+{"id":"cseb0001","category":"case-conditional","sql":"SELECT CASE WHEN 1 = 1 THEN 'yes' ELSE 'no' END","expect":"ok","ref":"functions-conditional","note":"searched CASE basic true branch"}
+{"id":"cseb0002","category":"case-conditional","sql":"SELECT CASE WHEN 1 = 2 THEN 'yes' ELSE 'no' END","expect":"ok","ref":"functions-conditional","note":"searched CASE basic false branch returns ELSE"}
+{"id":"cseb0003","category":"case-conditional","sql":"SELECT CASE WHEN 1 = 2 THEN 'yes' END","expect":"ok","ref":"functions-conditional","note":"searched CASE without ELSE returns NULL"}
+{"id":"cseb0004","category":"case-conditional","sql":"SELECT CASE WHEN 1 = 2 THEN 'a' WHEN 2 = 2 THEN 'b' ELSE 'c' END","expect":"ok","ref":"functions-conditional","note":"searched CASE multiple WHEN clauses"}
+{"id":"cseb0005","category":"case-conditional","sql":"SELECT CASE WHEN 1 = 2 THEN 'a' WHEN 3 = 4 THEN 'b' WHEN 5 = 5 THEN 'c' ELSE 'd' END","expect":"ok","ref":"functions-conditional","note":"searched CASE three WHEN branches"}
+{"id":"cseb0006","category":"case-conditional","sql":"SELECT CASE 1 WHEN 1 THEN 'one' WHEN 2 THEN 'two' ELSE 'other' END","expect":"ok","ref":"functions-conditional","note":"simple CASE with integer expression"}
+{"id":"cseb0007","category":"case-conditional","sql":"SELECT CASE 'hello' WHEN 'hello' THEN 1 WHEN 'world' THEN 2 END","expect":"ok","ref":"functions-conditional","note":"simple CASE with text expression, no ELSE"}
+{"id":"cseb0008","category":"case-conditional","sql":"SELECT CASE WHEN NULL THEN 1 ELSE 2 END","expect":"ok","ref":"functions-conditional","note":"searched CASE: NULL condition is treated as false, ELSE returned"}
+{"id":"cseb0009","category":"case-conditional","sql":"SELECT CASE WHEN true THEN CASE WHEN false THEN 'inner-false' ELSE 'inner-else' END ELSE 'outer' END","expect":"ok","ref":"functions-conditional","note":"nested CASE inside CASE THEN branch"}
+{"id":"cseb0010","category":"case-conditional","sql":"SELECT id, CASE WHEN val IS NULL THEN 0 ELSE val END FROM s.t","expect":"ok","ref":"functions-conditional","note":"searched CASE referencing table column, IS NULL check"}
+{"id":"cseb0011","category":"case-conditional","sql":"SELECT id, CASE status WHEN 'ok' THEN 1 WHEN 'happy' THEN 2 ELSE 0 END FROM s.t","expect":"ok","ref":"functions-conditional","note":"simple CASE over enum column from fixture table"}
+{"id":"cseb0012","category":"case-conditional","sql":"SELECT CASE WHEN qty > 10 THEN 'high' WHEN qty > 0 THEN 'low' ELSE 'zero' END FROM s.t","expect":"ok","ref":"functions-conditional","note":"searched CASE in SELECT list with comparison operators"}
+{"id":"cseb0013","category":"case-conditional","sql":"SELECT * FROM s.t WHERE CASE WHEN val IS NOT NULL THEN val > 0 ELSE false END","expect":"ok","ref":"functions-conditional","note":"CASE expression in WHERE clause"}
+{"id":"cseb0014","category":"case-conditional","sql":"SELECT CASE WHEN flag THEN 'yes' END AS flag_label FROM s.t","expect":"ok","ref":"functions-conditional","note":"CASE result aliased with AS, boolean condition"}
+{"id":"cseb0015","category":"case-conditional","sql":"SELECT id FROM s.t ORDER BY CASE WHEN val IS NULL THEN 1 ELSE 0 END, id","expect":"ok","ref":"functions-conditional","note":"CASE in ORDER BY clause"}
+{"id":"cseb0016","category":"case-conditional","sql":"SELECT COALESCE(NULL, NULL, 'fallback')","expect":"ok","ref":"functions-conditional","note":"COALESCE returns first non-NULL from multiple args"}
+{"id":"cseb0017","category":"case-conditional","sql":"SELECT COALESCE(val, 0) FROM s.t","expect":"ok","ref":"functions-conditional","note":"COALESCE with column and literal default"}
+{"id":"cseb0018","category":"case-conditional","sql":"SELECT COALESCE(NULL, NULL, NULL)","expect":"ok","ref":"functions-conditional","note":"COALESCE all NULLs returns NULL"}
+{"id":"cseb0019","category":"case-conditional","sql":"SELECT NULLIF(1, 1)","expect":"ok","ref":"functions-conditional","note":"NULLIF returns NULL when both args are equal"}
+{"id":"cseb0020","category":"case-conditional","sql":"SELECT NULLIF(1, 2)","expect":"ok","ref":"functions-conditional","note":"NULLIF returns first arg when they differ"}
+{"id":"cseb0021","category":"case-conditional","sql":"SELECT NULLIF(val, 0) FROM s.t","expect":"ok","ref":"functions-conditional","note":"NULLIF with column reference, converts zero to NULL"}
+{"id":"cseb0022","category":"case-conditional","sql":"SELECT GREATEST(1, 2, 3)","expect":"ok","ref":"functions-conditional","note":"GREATEST of integer literals"}
+{"id":"cseb0023","category":"case-conditional","sql":"SELECT GREATEST(NULL, 5, NULL, 3)","expect":"ok","ref":"functions-conditional","note":"GREATEST ignores NULLs when non-NULL present"}
+{"id":"cseb0024","category":"case-conditional","sql":"SELECT LEAST(10, 3, 7)","expect":"ok","ref":"functions-conditional","note":"LEAST of integer literals"}
+{"id":"cseb0025","category":"case-conditional","sql":"SELECT LEAST(NULL, NULL)","expect":"ok","ref":"functions-conditional","note":"LEAST with all NULLs returns NULL"}
+{"id":"cseb0026","category":"case-conditional","sql":"SELECT GREATEST(val, 0), LEAST(val, 100) FROM s.t","expect":"ok","ref":"functions-conditional","note":"GREATEST and LEAST with column reference"}
+{"id":"cseb0027","category":"case-conditional","sql":"SELECT COALESCE(NULLIF(val, 0), -1) FROM s.t","expect":"ok","ref":"functions-conditional","note":"COALESCE wrapping NULLIF — composed conditional functions"}
+{"id":"cseb0028","category":"case-conditional","sql":"SELECT CASE WHEN GREATEST(1, 2) > 1 THEN 'ok' ELSE 'fail' END","expect":"ok","ref":"functions-conditional","note":"GREATEST inside CASE WHEN condition"}
+{"id":"cseb0029","category":"case-conditional","sql":"SELECT CASE WHEN COALESCE(NULL, 0) = 0 THEN 'null-case' END","expect":"ok","ref":"functions-conditional","note":"COALESCE inside CASE WHEN condition"}
+{"id":"cseb0030","category":"case-conditional","sql":"SELECT CASE WHEN true THEN COALESCE(NULL, NULLIF(0, 0), 42) END","expect":"ok","ref":"functions-conditional","note":"deeply nested COALESCE and NULLIF inside CASE THEN"}
+{"id":"cseb0031","category":"case-conditional","sql":"SELECT CASE WHEN 1 = 1 THEN 'yes'","expect":"error","ref":"functions-conditional","note":"syntax error: CASE missing END keyword"}
+{"id":"cseb0032","category":"case-conditional","sql":"SELECT CASE WHEN THEN 'x' END","expect":"error","ref":"functions-conditional","note":"syntax error: WHEN with missing condition before THEN"}
+{"id":"cseb0033","category":"case-conditional","sql":"SELECT CASE 1 WHEN THEN 'x' END","expect":"error","ref":"functions-conditional","note":"syntax error: simple CASE WHEN with no value before THEN"}
+{"id":"cseb0034","category":"case-conditional","sql":"SELECT CASE ELSE 'x' END","expect":"error","ref":"functions-conditional","note":"syntax error: CASE with ELSE but no WHEN"}
+{"id":"cseb0035","category":"case-conditional","sql":"SELECT COALESCE()","expect":"error","ref":"functions-conditional","note":"syntax error: COALESCE requires at least one argument"}
+{"id":"cseb0036","category":"case-conditional","sql":"SELECT NULLIF(1, 2, 3)","expect":"error","ref":"functions-conditional","note":"semantic error: NULLIF requires exactly two arguments"}
+{"id":"cseb0037","category":"case-conditional","sql":"SELECT GREATEST()","expect":"error","ref":"functions-conditional","note":"syntax error: GREATEST requires at least one argument"}
+{"id":"cseb0038","category":"case-conditional","sql":"SELECT CASE WHEN 1=1 THEN 'a' WHEN END","expect":"error","ref":"functions-conditional","note":"syntax error: WHEN clause missing condition and THEN"}
+{"id":"cseb0039","category":"case-conditional","sql":"SELECT LEAST()","expect":"error","ref":"functions-conditional","note":"syntax error: LEAST requires at least one argument"}
+{"id":"cseb0040","category":"case-conditional","sql":"SELECT CASE val WHEN 'text' THEN 1 END FROM s.t","expect":"error","ref":"functions-conditional","note":"semantic error: simple CASE type mismatch (numeric vs text)"}

@@ -1,0 +1,109 @@
+{"id":"oexc0001","category":"operators-expr","sql":"SELECT 1 + 2","expect":"ok","ref":"functions-comparison","note":"arithmetic addition of integer literals"}
+{"id":"oexc0002","category":"operators-expr","sql":"SELECT 10 - 3","expect":"ok","ref":"functions-comparison","note":"arithmetic subtraction"}
+{"id":"oexc0003","category":"operators-expr","sql":"SELECT 4 * 5","expect":"ok","ref":"functions-comparison","note":"arithmetic multiplication"}
+{"id":"oexc0004","category":"operators-expr","sql":"SELECT 10 / 4","expect":"ok","ref":"functions-comparison","note":"arithmetic integer division"}
+{"id":"oexc0005","category":"operators-expr","sql":"SELECT 10 % 3","expect":"ok","ref":"functions-comparison","note":"modulo operator"}
+{"id":"oexc0006","category":"operators-expr","sql":"SELECT 2 ^ 10","expect":"ok","ref":"functions-comparison","note":"exponentiation operator"}
+{"id":"oexc0007","category":"operators-expr","sql":"SELECT -42","expect":"ok","ref":"functions-comparison","note":"unary minus on integer literal"}
+{"id":"oexc0008","category":"operators-expr","sql":"SELECT -val FROM s.t WHERE id = 1","expect":"ok","ref":"functions-comparison","note":"unary minus on column reference"}
+{"id":"oexc0009","category":"operators-expr","sql":"SELECT 1 = 1","expect":"ok","ref":"functions-comparison","note":"equality comparison returns true"}
+{"id":"oexc0010","category":"operators-expr","sql":"SELECT 1 <> 2","expect":"ok","ref":"functions-comparison","note":"not-equal operator <>"}
+{"id":"oexc0011","category":"operators-expr","sql":"SELECT 1 != 2","expect":"ok","ref":"functions-comparison","note":"not-equal operator != (alias)"}
+{"id":"oexc0012","category":"operators-expr","sql":"SELECT 1 < 2","expect":"ok","ref":"functions-comparison","note":"less-than comparison"}
+{"id":"oexc0013","category":"operators-expr","sql":"SELECT 2 <= 2","expect":"ok","ref":"functions-comparison","note":"less-than-or-equal comparison"}
+{"id":"oexc0014","category":"operators-expr","sql":"SELECT 3 > 2","expect":"ok","ref":"functions-comparison","note":"greater-than comparison"}
+{"id":"oexc0015","category":"operators-expr","sql":"SELECT 3 >= 3","expect":"ok","ref":"functions-comparison","note":"greater-than-or-equal comparison"}
+{"id":"oexc0016","category":"operators-expr","sql":"SELECT true AND false","expect":"ok","ref":"functions-comparison","note":"logical AND operator"}
+{"id":"oexc0017","category":"operators-expr","sql":"SELECT true OR false","expect":"ok","ref":"functions-comparison","note":"logical OR operator"}
+{"id":"oexc0018","category":"operators-expr","sql":"SELECT NOT true","expect":"ok","ref":"functions-comparison","note":"logical NOT operator"}
+{"id":"oexc0019","category":"operators-expr","sql":"SELECT NULL IS NULL","expect":"ok","ref":"functions-comparison","note":"IS NULL predicate on NULL literal"}
+{"id":"oexc0020","category":"operators-expr","sql":"SELECT 1 IS NOT NULL","expect":"ok","ref":"functions-comparison","note":"IS NOT NULL predicate on non-null"}
+{"id":"oexc0021","category":"operators-expr","sql":"SELECT true IS TRUE","expect":"ok","ref":"functions-comparison","note":"IS TRUE predicate"}
+{"id":"oexc0022","category":"operators-expr","sql":"SELECT false IS FALSE","expect":"ok","ref":"functions-comparison","note":"IS FALSE predicate"}
+{"id":"oexc0023","category":"operators-expr","sql":"SELECT NULL IS UNKNOWN","expect":"ok","ref":"functions-comparison","note":"IS UNKNOWN predicate on NULL (same as IS NULL for boolean)"}
+{"id":"oexc0024","category":"operators-expr","sql":"SELECT true IS NOT TRUE","expect":"ok","ref":"functions-comparison","note":"IS NOT TRUE predicate"}
+{"id":"oexc0025","category":"operators-expr","sql":"SELECT false IS NOT FALSE","expect":"ok","ref":"functions-comparison","note":"IS NOT FALSE predicate"}
+{"id":"oexc0026","category":"operators-expr","sql":"SELECT NULL IS NOT UNKNOWN","expect":"ok","ref":"functions-comparison","note":"IS NOT UNKNOWN predicate"}
+{"id":"oexc0027","category":"operators-expr","sql":"SELECT 1 IS DISTINCT FROM 2","expect":"ok","ref":"functions-comparison","note":"IS DISTINCT FROM operator (null-safe inequality)"}
+{"id":"oexc0028","category":"operators-expr","sql":"SELECT NULL IS DISTINCT FROM NULL","expect":"ok","ref":"functions-comparison","note":"IS DISTINCT FROM with both NULL returns false"}
+{"id":"oexc0029","category":"operators-expr","sql":"SELECT 1 IS NOT DISTINCT FROM 1","expect":"ok","ref":"functions-comparison","note":"IS NOT DISTINCT FROM operator (null-safe equality)"}
+{"id":"oexc0030","category":"operators-expr","sql":"SELECT NULL IS NOT DISTINCT FROM NULL","expect":"ok","ref":"functions-comparison","note":"IS NOT DISTINCT FROM with both NULL returns true"}
+{"id":"oexc0031","category":"operators-expr","sql":"SELECT 5 BETWEEN 1 AND 10","expect":"ok","ref":"functions-comparison","note":"BETWEEN ... AND range check inclusive"}
+{"id":"oexc0032","category":"operators-expr","sql":"SELECT 5 NOT BETWEEN 1 AND 4","expect":"ok","ref":"functions-comparison","note":"NOT BETWEEN range check"}
+{"id":"oexc0033","category":"operators-expr","sql":"SELECT 5 BETWEEN SYMMETRIC 10 AND 1","expect":"ok","ref":"functions-comparison","note":"BETWEEN SYMMETRIC swaps bounds if needed"}
+{"id":"oexc0034","category":"operators-expr","sql":"SELECT 5 NOT BETWEEN SYMMETRIC 10 AND 1","expect":"ok","ref":"functions-comparison","note":"NOT BETWEEN SYMMETRIC"}
+{"id":"oexc0035","category":"operators-expr","sql":"SELECT 2 IN (1, 2, 3)","expect":"ok","ref":"functions-comparison","note":"IN list membership check"}
+{"id":"oexc0036","category":"operators-expr","sql":"SELECT 5 NOT IN (1, 2, 3)","expect":"ok","ref":"functions-comparison","note":"NOT IN list membership check"}
+{"id":"oexc0037","category":"operators-expr","sql":"SELECT 'foo' || 'bar'","expect":"ok","ref":"functions-comparison","note":"string concatenation operator ||"}
+{"id":"oexc0038","category":"operators-expr","sql":"SELECT 'hello' || ' ' || 'world'","expect":"ok","ref":"functions-comparison","note":"chained string concatenation"}
+{"id":"oexc0039","category":"operators-expr","sql":"SELECT 5 & 3","expect":"ok","ref":"functions-comparison","note":"bitwise AND operator"}
+{"id":"oexc0040","category":"operators-expr","sql":"SELECT 5 | 3","expect":"ok","ref":"functions-comparison","note":"bitwise OR operator"}
+{"id":"oexc0041","category":"operators-expr","sql":"SELECT 5 # 3","expect":"ok","ref":"functions-comparison","note":"bitwise XOR operator #"}
+{"id":"oexc0042","category":"operators-expr","sql":"SELECT ~5","expect":"ok","ref":"functions-comparison","note":"bitwise NOT (unary complement)"}
+{"id":"oexc0043","category":"operators-expr","sql":"SELECT 1 << 3","expect":"ok","ref":"functions-comparison","note":"bitwise left shift operator"}
+{"id":"oexc0044","category":"operators-expr","sql":"SELECT 8 >> 2","expect":"ok","ref":"functions-comparison","note":"bitwise right shift operator"}
+{"id":"oexc0045","category":"operators-expr","sql":"SELECT 3 = ANY(ARRAY[1,2,3])","expect":"ok","ref":"functions-comparison","note":"= ANY with array literal"}
+{"id":"oexc0046","category":"operators-expr","sql":"SELECT 5 > ALL(ARRAY[1,2,3])","expect":"ok","ref":"functions-comparison","note":"> ALL with array literal"}
+{"id":"oexc0047","category":"operators-expr","sql":"SELECT 2 = SOME(ARRAY[1,2,3])","expect":"ok","ref":"functions-comparison","note":"= SOME (alias for ANY) with array"}
+{"id":"oexc0048","category":"operators-expr","sql":"SELECT 5 <> ANY(SELECT val FROM s.t)","expect":"ok","ref":"functions-comparison","note":"<> ANY with subquery"}
+{"id":"oexc0049","category":"operators-expr","sql":"SELECT 1 < ALL(SELECT val FROM s.t WHERE false)","expect":"ok","ref":"functions-comparison","note":"< ALL with empty subquery returns true"}
+{"id":"oexc0050","category":"operators-expr","sql":"SELECT (1, 2) = (1, 2)","expect":"ok","ref":"functions-comparison","note":"row value constructor equality comparison"}
+{"id":"oexc0051","category":"operators-expr","sql":"SELECT (1, 2) < (1, 3)","expect":"ok","ref":"functions-comparison","note":"row value constructor less-than comparison"}
+{"id":"oexc0052","category":"operators-expr","sql":"SELECT (2 + 3) * 4","expect":"ok","ref":"functions-comparison","note":"parentheses override default precedence (add before multiply)"}
+{"id":"oexc0053","category":"operators-expr","sql":"SELECT 2 + 3 * 4","expect":"ok","ref":"functions-comparison","note":"default precedence: multiply before add"}
+{"id":"oexc0054","category":"operators-expr","sql":"SELECT NOT (true AND false)","expect":"ok","ref":"functions-comparison","note":"NOT with parenthesized AND expression"}
+{"id":"oexc0055","category":"operators-expr","sql":"SELECT (true OR false) AND NOT true","expect":"ok","ref":"functions-comparison","note":"complex boolean with parens and NOT"}
+{"id":"oexc0056","category":"operators-expr","sql":"SELECT name COLLATE \"C\" FROM s.t LIMIT 1","expect":"ok","ref":"functions-comparison","note":"COLLATE clause in expression"}
+{"id":"oexc0057","category":"operators-expr","sql":"SELECT name COLLATE \"C\" < 'z' FROM s.t LIMIT 1","expect":"ok","ref":"functions-comparison","note":"COLLATE applied to comparison operand"}
+{"id":"oexc0058","category":"operators-expr","sql":"SELECT '<root/>'::xml IS DOCUMENT","expect":"ok","ref":"functions-comparison","note":"IS DOCUMENT predicate on xml value"}
+{"id":"oexc0059","category":"operators-expr","sql":"SELECT 'not xml'::text IS NOT DOCUMENT","expect":"error","ref":"functions-comparison","note":"IS NOT DOCUMENT requires xml type, text is rejected (semantic error)"}
+{"id":"oexc0060","category":"operators-expr","sql":"SELECT 1 +","expect":"error","ref":"functions-comparison","note":"dangling operator at end of expression (syntax error)"}
+{"id":"oexc0061","category":"operators-expr","sql":"SELECT 1 BETWEEN 2 3","expect":"error","ref":"functions-comparison","note":"BETWEEN missing AND keyword (syntax error)"}
+{"id":"oexc0062","category":"operators-expr","sql":"SELECT 1 + 2)","expect":"error","ref":"functions-comparison","note":"unmatched closing parenthesis (syntax error)"}
+{"id":"oexc0063","category":"operators-expr","sql":"SELECT 5 BETWEEN AND 10","expect":"error","ref":"functions-comparison","note":"BETWEEN missing lower bound (syntax error)"}
+{"id":"oexc0064","category":"operators-expr","sql":"SELECT IN (1, 2, 3)","expect":"error","ref":"functions-comparison","note":"IN without left-hand operand (syntax error)"}
+{"id":"oexc0065","category":"operators-expr","sql":"SELECT 1 IS DISTINCT 2","expect":"error","ref":"functions-comparison","note":"IS DISTINCT FROM missing FROM keyword (syntax error)"}
+{"id":"oexc0066","category":"operators-expr","sql":"SELECT 1 = = 1","expect":"error","ref":"functions-comparison","note":"double equals operator (syntax error)"}
+{"id":"oexc0067","category":"operators-expr","sql":"SELECT * 5","expect":"error","ref":"functions-comparison","note":"binary * without left operand (syntax error)"}
+{"id":"oexc0068","category":"operators-expr","sql":"SELECT 5 NOT DISTINCT FROM 3","expect":"error","ref":"functions-comparison","note":"NOT DISTINCT FROM without IS (syntax error)"}
+{"id":"oexc0069","category":"operators-expr","sql":"SELECT 1 IN ()","expect":"error","ref":"functions-comparison","note":"IN with empty list (syntax error)"}
+{"id":"oexc0070","category":"operators-expr","sql":"SELECT 1 NOT 2","expect":"error","ref":"functions-comparison","note":"NOT used as binary infix operator (syntax error)"}
+{"id":"oexc0071","category":"operators-expr","sql":"SELECT qty + val FROM s.t LIMIT 1","expect":"ok","ref":"functions-comparison","note":"arithmetic on typed columns (integer + numeric)"}
+{"id":"oexc0072","category":"operators-expr","sql":"SELECT qty * 2.5 FROM s.t LIMIT 1","expect":"ok","ref":"functions-comparison","note":"integer column times decimal literal"}
+{"id":"oexc0073","category":"operators-expr","sql":"SELECT flag AND (qty > 0) FROM s.t LIMIT 1","expect":"ok","ref":"functions-comparison","note":"boolean column ANDed with comparison on integer column"}
+{"id":"oexc0074","category":"operators-expr","sql":"SELECT name = 'test' OR val IS NULL FROM s.t LIMIT 1","expect":"ok","ref":"functions-comparison","note":"OR combining equality and IS NULL on real columns"}
+{"id":"oexc0075","category":"operators-expr","sql":"SELECT status = 'ok'::s.mood FROM s.t LIMIT 1","expect":"ok","ref":"functions-comparison","note":"enum equality comparison with cast literal"}
+{"id":"oexc0076","category":"operators-expr","sql":"SELECT 1 < 2 AND 3 < 4 AND 5 < 6","expect":"ok","ref":"functions-comparison","note":"chained AND with multiple comparisons"}
+{"id":"oexc0077","category":"operators-expr","sql":"SELECT GREATEST(1, 2, 3)","expect":"ok","ref":"functions-comparison","note":"GREATEST variadic comparison function"}
+{"id":"oexc0078","category":"operators-expr","sql":"SELECT LEAST(10, 5, 8)","expect":"ok","ref":"functions-comparison","note":"LEAST variadic comparison function"}
+{"id":"oexc0079","category":"operators-expr","sql":"SELECT num_nulls(NULL, NULL, 1)","expect":"ok","ref":"functions-comparison","note":"num_nulls counts NULL arguments"}
+{"id":"oexc0080","category":"operators-expr","sql":"SELECT num_nonnulls(1, NULL, 'x')","expect":"ok","ref":"functions-comparison","note":"num_nonnulls counts non-NULL arguments"}
+{"id":"oexc0081","category":"operators-expr","sql":"SELECT 1 <> <> 2","expect":"error","ref":"functions-comparison","note":"duplicate not-equal operators (syntax error)"}
+{"id":"oexc0082","category":"operators-expr","sql":"SELECT 1 BETWEEN 5","expect":"error","ref":"functions-comparison","note":"BETWEEN with only one bound (no AND) (syntax error)"}
+{"id":"oexc0083","category":"operators-expr","sql":"SELECT 1 = ALL","expect":"error","ref":"functions-comparison","note":"ALL without array or subquery argument (syntax error)"}
+{"id":"oexc0084","category":"operators-expr","sql":"SELECT 1 ANY (SELECT 1)","expect":"error","ref":"functions-comparison","note":"ANY without comparison operator (syntax error)"}
+{"id":"oexc0085","category":"operators-expr","sql":"SELECT 1 = ANY (1, 2, 3)","expect":"error","ref":"functions-comparison","note":"ANY requires array or subquery, not bare list (syntax error)"}
+{"id":"oexc0086","category":"operators-expr","sql":"SELECT COLLATE \"C\" 'hello'","expect":"error","ref":"functions-comparison","note":"COLLATE before operand instead of after (syntax error)"}
+{"id":"oexc0087","category":"operators-expr","sql":"SELECT 1 IS NOT TRUE FALSE","expect":"error","ref":"functions-comparison","note":"IS NOT TRUE followed by stray literal (syntax error)"}
+{"id":"oexc0088","category":"operators-expr","sql":"SELECT 1 SYMMETRIC BETWEEN 5 AND 10","expect":"error","ref":"functions-comparison","note":"SYMMETRIC before BETWEEN instead of after (syntax error)"}
+{"id":"oexc0089","category":"operators-expr","sql":"SELECT 1 NOT IN","expect":"error","ref":"functions-comparison","note":"NOT IN without list (syntax error)"}
+{"id":"oexc0090","category":"operators-expr","sql":"SELECT 1 / 0","expect":"error","ref":"functions-comparison","note":"integer division by zero literal (runtime error)"}
+{"id":"oexc0091","category":"operators-expr","sql":"SELECT 'abc' + 1","expect":"error","ref":"functions-comparison","note":"type mismatch: text plus integer (semantic error)"}
+{"id":"oexc0092","category":"operators-expr","sql":"SELECT 'x' BETWEEN 1 AND 10","expect":"error","ref":"functions-comparison","note":"type mismatch in BETWEEN: text vs integer (semantic error)"}
+{"id":"oexc0093","category":"operators-expr","sql":"SELECT (1,) = (1,)","expect":"error","ref":"functions-comparison","note":"trailing comma inside row constructor (syntax error)"}
+{"id":"oexc0094","category":"operators-expr","sql":"SELECT 5 BETWEEN 1 AND","expect":"error","ref":"functions-comparison","note":"BETWEEN missing upper bound (syntax error)"}
+{"id":"oexc0095","category":"operators-expr","sql":"SELECT NOT NOT NOT true","expect":"ok","ref":"functions-comparison","note":"triple NOT (odd number => same as NOT)"}
+{"id":"oexc0096","category":"operators-expr","sql":"SELECT NOT NOT true","expect":"ok","ref":"functions-comparison","note":"double NOT cancels out"}
+{"id":"oexc0097","category":"operators-expr","sql":"SELECT true IS TRUE AND false IS FALSE","expect":"ok","ref":"functions-comparison","note":"IS TRUE and IS FALSE combined with AND"}
+{"id":"oexc0098","category":"operators-expr","sql":"SELECT 1 = 1 IS TRUE","expect":"ok","ref":"functions-comparison","note":"comparison result fed to IS TRUE"}
+{"id":"oexc0099","category":"operators-expr","sql":"SELECT (ROW(1, 2)) = (ROW(1, 2))","expect":"ok","ref":"functions-comparison","note":"ROW(...) constructor equality using ROW keyword"}
+{"id":"oexc0100","category":"operators-expr","sql":"SELECT 3 BETWEEN 1 AND 5 AND 7 BETWEEN 5 AND 10","expect":"ok","ref":"functions-comparison","note":"two BETWEEN predicates ANDed together"}
+{"id":"oexc0101","category":"operators-expr","sql":"SELECT 1 IS NOT DISTINCT FROM","expect":"error","ref":"functions-comparison","note":"IS NOT DISTINCT FROM with no right operand (syntax error)"}
+{"id":"oexc0102","category":"operators-expr","sql":"SELECT NOT IN (1,2)","expect":"error","ref":"functions-comparison","note":"NOT IN without left-hand operand (syntax error)"}
+{"id":"oexc0103","category":"operators-expr","sql":"SELECT 1 || 2","expect":"error","ref":"functions-comparison","note":"|| concatenation on integers is not defined (semantic error)"}
+{"id":"oexc0104","category":"operators-expr","sql":"SELECT 1 = 2 = 3","expect":"error","ref":"functions-comparison","note":"chained equality (boolean = integer) is not supported (semantic error)"}
+{"id":"oexc0105","category":"operators-expr","sql":"SELECT 5 > ANY","expect":"error","ref":"functions-comparison","note":"> ANY without array or subquery (syntax error)"}
+{"id":"oexc0106","category":"operators-expr","sql":"SELECT (1, 2) = (1, 2, 3)","expect":"error","ref":"functions-comparison","note":"row constructors of different length (semantic error)"}
+{"id":"oexc0107","category":"operators-expr","sql":"SELECT true + false","expect":"error","ref":"functions-comparison","note":"arithmetic on booleans is not defined (semantic error)"}
+{"id":"oexc0108","category":"operators-expr","sql":"SELECT name & 3 FROM s.t LIMIT 1","expect":"error","ref":"functions-comparison","note":"bitwise AND on text column is not defined (semantic error)"}
+{"id":"oexc0109","category":"operators-expr","sql":"SELECT 1 = ANY()","expect":"error","ref":"functions-comparison","note":"ANY with empty argument list (syntax error)"}

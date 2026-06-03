@@ -1,0 +1,150 @@
+{"id":"expa0001","category":"explain","sql":"EXPLAIN SELECT 1","expect":"ok","ref":"sql-explain","note":"simplest possible EXPLAIN"}
+{"id":"expa0002","category":"explain","sql":"EXPLAIN SELECT * FROM s.t","expect":"ok","ref":"sql-explain","note":"EXPLAIN plain SELECT from fixture table"}
+{"id":"expa0003","category":"explain","sql":"EXPLAIN ANALYZE SELECT * FROM s.t","expect":"ok","ref":"sql-explain","note":"legacy ANALYZE keyword before statement"}
+{"id":"expa0004","category":"explain","sql":"EXPLAIN VERBOSE SELECT * FROM s.t","expect":"ok","ref":"sql-explain","note":"legacy VERBOSE keyword before statement"}
+{"id":"expa0005","category":"explain","sql":"EXPLAIN ANALYZE VERBOSE SELECT * FROM s.t","expect":"ok","ref":"sql-explain","note":"legacy ANALYZE VERBOSE order"}
+{"id":"expa0006","category":"explain","sql":"EXPLAIN (ANALYZE) SELECT * FROM s.t","expect":"ok","ref":"sql-explain","note":"option-list form ANALYZE (default true)"}
+{"id":"expa0007","category":"explain","sql":"EXPLAIN (VERBOSE) SELECT * FROM s.t","expect":"ok","ref":"sql-explain","note":"option-list form VERBOSE (default true)"}
+{"id":"expa0008","category":"explain","sql":"EXPLAIN (COSTS) SELECT * FROM s.t","expect":"ok","ref":"sql-explain","note":"option-list form COSTS (default true)"}
+{"id":"expa0009","category":"explain","sql":"EXPLAIN (BUFFERS) SELECT * FROM s.t","expect":"ok","ref":"sql-explain","note":"BUFFERS without ANALYZE - allowed (no stats shown)"}
+{"id":"expa0010","category":"explain","sql":"EXPLAIN (WAL) SELECT * FROM s.t","expect":"error","ref":"sql-explain","note":"WAL without ANALYZE - requires ANALYZE (semantic error)"}
+{"id":"expa0011","category":"explain","sql":"EXPLAIN (TIMING) SELECT * FROM s.t","expect":"error","ref":"sql-explain","note":"TIMING without ANALYZE - requires ANALYZE (semantic error)"}
+{"id":"expa0012","category":"explain","sql":"EXPLAIN (SUMMARY) SELECT * FROM s.t","expect":"ok","ref":"sql-explain","note":"SUMMARY option"}
+{"id":"expa0013","category":"explain","sql":"EXPLAIN (MEMORY) SELECT * FROM s.t","expect":"ok","ref":"sql-explain","note":"MEMORY option shows planning memory"}
+{"id":"expa0014","category":"explain","sql":"EXPLAIN (SETTINGS) SELECT * FROM s.t","expect":"ok","ref":"sql-explain","note":"SETTINGS option shows planner config params"}
+{"id":"expa0015","category":"explain","sql":"EXPLAIN (FORMAT TEXT) SELECT * FROM s.t","expect":"ok","ref":"sql-explain","note":"FORMAT TEXT (default)"}
+{"id":"expa0016","category":"explain","sql":"EXPLAIN (FORMAT XML) SELECT * FROM s.t","expect":"ok","ref":"sql-explain","note":"FORMAT XML"}
+{"id":"expa0017","category":"explain","sql":"EXPLAIN (FORMAT JSON) SELECT * FROM s.t","expect":"ok","ref":"sql-explain","note":"FORMAT JSON"}
+{"id":"expa0018","category":"explain","sql":"EXPLAIN (FORMAT YAML) SELECT * FROM s.t","expect":"ok","ref":"sql-explain","note":"FORMAT YAML"}
+{"id":"expa0019","category":"explain","sql":"EXPLAIN (ANALYZE TRUE) SELECT * FROM s.t","expect":"ok","ref":"sql-explain","note":"boolean TRUE for ANALYZE"}
+{"id":"expa0020","category":"explain","sql":"EXPLAIN (ANALYZE FALSE) SELECT * FROM s.t","expect":"ok","ref":"sql-explain","note":"boolean FALSE for ANALYZE"}
+{"id":"expa0021","category":"explain","sql":"EXPLAIN (ANALYZE ON) SELECT * FROM s.t","expect":"ok","ref":"sql-explain","note":"boolean ON for ANALYZE"}
+{"id":"expa0022","category":"explain","sql":"EXPLAIN (ANALYZE OFF) SELECT * FROM s.t","expect":"ok","ref":"sql-explain","note":"boolean OFF for ANALYZE"}
+{"id":"expa0023","category":"explain","sql":"EXPLAIN (ANALYZE 1) SELECT * FROM s.t","expect":"ok","ref":"sql-explain","note":"numeric 1 as boolean true for ANALYZE"}
+{"id":"expa0024","category":"explain","sql":"EXPLAIN (ANALYZE 0) SELECT * FROM s.t","expect":"ok","ref":"sql-explain","note":"numeric 0 as boolean false for ANALYZE"}
+{"id":"expa0025","category":"explain","sql":"EXPLAIN (VERBOSE TRUE) SELECT * FROM s.t","expect":"ok","ref":"sql-explain","note":"VERBOSE TRUE explicit"}
+{"id":"expa0026","category":"explain","sql":"EXPLAIN (VERBOSE FALSE) SELECT * FROM s.t","expect":"ok","ref":"sql-explain","note":"VERBOSE FALSE explicit"}
+{"id":"expa0027","category":"explain","sql":"EXPLAIN (COSTS TRUE) SELECT * FROM s.t","expect":"ok","ref":"sql-explain","note":"COSTS TRUE explicit"}
+{"id":"expa0028","category":"explain","sql":"EXPLAIN (COSTS FALSE) SELECT * FROM s.t","expect":"ok","ref":"sql-explain","note":"COSTS FALSE suppresses cost estimates"}
+{"id":"expa0029","category":"explain","sql":"EXPLAIN (ANALYZE, VERBOSE) SELECT * FROM s.t","expect":"ok","ref":"sql-explain","note":"multiple options: ANALYZE + VERBOSE"}
+{"id":"expa0030","category":"explain","sql":"EXPLAIN (ANALYZE, BUFFERS) SELECT * FROM s.t","expect":"ok","ref":"sql-explain","note":"ANALYZE + BUFFERS combo"}
+{"id":"expa0031","category":"explain","sql":"EXPLAIN (ANALYZE, WAL) SELECT * FROM s.t","expect":"ok","ref":"sql-explain","note":"ANALYZE + WAL combo"}
+{"id":"expa0032","category":"explain","sql":"EXPLAIN (ANALYZE, TIMING) SELECT * FROM s.t","expect":"ok","ref":"sql-explain","note":"ANALYZE + TIMING explicit"}
+{"id":"expa0033","category":"explain","sql":"EXPLAIN (ANALYZE, TIMING FALSE) SELECT * FROM s.t","expect":"ok","ref":"sql-explain","note":"ANALYZE with TIMING disabled"}
+{"id":"expa0034","category":"explain","sql":"EXPLAIN (ANALYZE, SUMMARY) SELECT * FROM s.t","expect":"ok","ref":"sql-explain","note":"ANALYZE + SUMMARY"}
+{"id":"expa0035","category":"explain","sql":"EXPLAIN (ANALYZE, SUMMARY FALSE) SELECT * FROM s.t","expect":"ok","ref":"sql-explain","note":"ANALYZE with SUMMARY disabled"}
+{"id":"expa0036","category":"explain","sql":"EXPLAIN (ANALYZE, VERBOSE, BUFFERS) SELECT * FROM s.t","expect":"ok","ref":"sql-explain","note":"three options: ANALYZE VERBOSE BUFFERS"}
+{"id":"expa0037","category":"explain","sql":"EXPLAIN (ANALYZE, VERBOSE, BUFFERS, FORMAT JSON) SELECT * FROM s.t","expect":"ok","ref":"sql-explain","note":"four options with FORMAT JSON"}
+{"id":"expa0038","category":"explain","sql":"EXPLAIN (ANALYZE, VERBOSE, BUFFERS, FORMAT XML) SELECT * FROM s.t","expect":"ok","ref":"sql-explain","note":"four options with FORMAT XML"}
+{"id":"expa0039","category":"explain","sql":"EXPLAIN (ANALYZE, VERBOSE, BUFFERS, FORMAT YAML) SELECT * FROM s.t","expect":"ok","ref":"sql-explain","note":"four options with FORMAT YAML"}
+{"id":"expa0040","category":"explain","sql":"EXPLAIN (ANALYZE, VERBOSE, BUFFERS, FORMAT TEXT) SELECT * FROM s.t","expect":"ok","ref":"sql-explain","note":"four options with FORMAT TEXT"}
+{"id":"expa0041","category":"explain","sql":"EXPLAIN (ANALYZE, VERBOSE, COSTS, SETTINGS, BUFFERS, WAL, TIMING, SUMMARY, MEMORY, FORMAT JSON) SELECT * FROM s.t","expect":"ok","ref":"sql-explain","note":"all options together"}
+{"id":"expa0042","category":"explain","sql":"EXPLAIN (GENERIC_PLAN) SELECT * FROM s.t WHERE id = $1","expect":"ok","ref":"sql-explain","note":"GENERIC_PLAN with parameterized query"}
+{"id":"expa0043","category":"explain","sql":"EXPLAIN (GENERIC_PLAN) SELECT * FROM s.t","expect":"ok","ref":"sql-explain","note":"GENERIC_PLAN without parameters"}
+{"id":"expa0044","category":"explain","sql":"EXPLAIN (GENERIC_PLAN, FORMAT JSON) SELECT * FROM s.t WHERE id = $1","expect":"ok","ref":"sql-explain","note":"GENERIC_PLAN with FORMAT JSON"}
+{"id":"expa0045","category":"explain","sql":"EXPLAIN INSERT INTO s.t (name, qty) VALUES ('x', 1)","expect":"ok","ref":"sql-explain","note":"EXPLAIN INSERT statement"}
+{"id":"expa0046","category":"explain","sql":"EXPLAIN (ANALYZE) INSERT INTO s.t (name, qty) VALUES ('x', 1)","expect":"ok","ref":"sql-explain","note":"EXPLAIN ANALYZE INSERT (rolled back)"}
+{"id":"expa0047","category":"explain","sql":"EXPLAIN UPDATE s.t SET qty = qty + 1 WHERE id = 1","expect":"ok","ref":"sql-explain","note":"EXPLAIN UPDATE statement"}
+{"id":"expa0048","category":"explain","sql":"EXPLAIN (ANALYZE) UPDATE s.t SET qty = qty + 1 WHERE id = 1","expect":"ok","ref":"sql-explain","note":"EXPLAIN ANALYZE UPDATE (rolled back)"}
+{"id":"expa0049","category":"explain","sql":"EXPLAIN DELETE FROM s.t WHERE id = 1","expect":"ok","ref":"sql-explain","note":"EXPLAIN DELETE statement"}
+{"id":"expa0050","category":"explain","sql":"EXPLAIN (ANALYZE) DELETE FROM s.t WHERE id = 1","expect":"ok","ref":"sql-explain","note":"EXPLAIN ANALYZE DELETE (rolled back)"}
+{"id":"expa0051","category":"explain","sql":"EXPLAIN MERGE INTO s.t USING s.t2 ON s.t.id = s.t2.t_id WHEN MATCHED THEN UPDATE SET qty = s.t.qty + 1 WHEN NOT MATCHED THEN INSERT (name, qty) VALUES ('new', 0)","expect":"ok","ref":"sql-explain","note":"EXPLAIN MERGE statement"}
+{"id":"expa0052","category":"explain","sql":"EXPLAIN (ANALYZE) MERGE INTO s.t USING s.t2 ON s.t.id = s.t2.t_id WHEN MATCHED THEN UPDATE SET qty = s.t.qty + 1 WHEN NOT MATCHED THEN INSERT (name, qty) VALUES ('new', 0)","expect":"ok","ref":"sql-explain","note":"EXPLAIN ANALYZE MERGE (rolled back)"}
+{"id":"expa0053","category":"explain","sql":"EXPLAIN CREATE TABLE expa_tmp AS SELECT * FROM s.t","expect":"ok","ref":"sql-explain","note":"EXPLAIN CREATE TABLE AS"}
+{"id":"expa0054","category":"explain","sql":"EXPLAIN (ANALYZE) CREATE TABLE expa_tmp2 AS SELECT * FROM s.t","expect":"ok","ref":"sql-explain","note":"EXPLAIN ANALYZE CREATE TABLE AS (rolled back)"}
+{"id":"expa0055","category":"explain","sql":"PREPARE expa_stmt AS SELECT * FROM s.t WHERE id = $1; EXPLAIN EXECUTE expa_stmt(1)","expect":"ok","ref":"sql-explain","note":"EXPLAIN EXECUTE prepared statement"}
+{"id":"expa0056","category":"explain","sql":"PREPARE expa_stmt2 AS SELECT * FROM s.t WHERE id = $1; EXPLAIN (ANALYZE) EXECUTE expa_stmt2(1)","expect":"ok","ref":"sql-explain","note":"EXPLAIN ANALYZE EXECUTE prepared statement"}
+{"id":"expa0057","category":"explain","sql":"EXPLAIN DECLARE cur CURSOR FOR SELECT * FROM s.t","expect":"ok","ref":"sql-explain","note":"EXPLAIN DECLARE cursor"}
+{"id":"expa0058","category":"explain","sql":"EXPLAIN SELECT id, name FROM s.t WHERE qty > 0 ORDER BY name LIMIT 10","expect":"ok","ref":"sql-explain","note":"EXPLAIN SELECT with WHERE ORDER LIMIT"}
+{"id":"expa0059","category":"explain","sql":"EXPLAIN SELECT s.t.id, s.t2.label FROM s.t JOIN s.t2 ON s.t.id = s.t2.t_id","expect":"ok","ref":"sql-explain","note":"EXPLAIN SELECT with JOIN"}
+{"id":"expa0060","category":"explain","sql":"EXPLAIN SELECT * FROM s.t WHERE data @> '{\"key\":\"val\"}'","expect":"ok","ref":"sql-explain","note":"EXPLAIN SELECT with JSONB operator"}
+{"id":"expa0061","category":"explain","sql":"EXPLAIN SELECT * FROM s.t WHERE tags @> ARRAY['x']","expect":"ok","ref":"sql-explain","note":"EXPLAIN SELECT with array operator"}
+{"id":"expa0062","category":"explain","sql":"EXPLAIN SELECT status, count(*) FROM s.t GROUP BY status HAVING count(*) > 0","expect":"ok","ref":"sql-explain","note":"EXPLAIN SELECT with GROUP BY HAVING"}
+{"id":"expa0063","category":"explain","sql":"EXPLAIN WITH cte AS (SELECT id FROM s.t) SELECT * FROM cte","expect":"ok","ref":"sql-explain","note":"EXPLAIN CTE query"}
+{"id":"expa0064","category":"explain","sql":"EXPLAIN SELECT * FROM s.t UNION SELECT * FROM s.t WHERE qty > 0","expect":"ok","ref":"sql-explain","note":"EXPLAIN UNION"}
+{"id":"expa0065","category":"explain","sql":"EXPLAIN SELECT * FROM s.t INTERSECT SELECT * FROM s.t WHERE qty > 0","expect":"ok","ref":"sql-explain","note":"EXPLAIN INTERSECT"}
+{"id":"expa0066","category":"explain","sql":"EXPLAIN SELECT * FROM s.t EXCEPT SELECT * FROM s.t WHERE qty > 0","expect":"ok","ref":"sql-explain","note":"EXPLAIN EXCEPT"}
+{"id":"expa0067","category":"explain","sql":"EXPLAIN SELECT * FROM s.v","expect":"ok","ref":"sql-explain","note":"EXPLAIN SELECT from view"}
+{"id":"expa0068","category":"explain","sql":"EXPLAIN SELECT * FROM s.mv","expect":"ok","ref":"sql-explain","note":"EXPLAIN SELECT from materialized view"}
+{"id":"expa0069","category":"explain","sql":"EXPLAIN SELECT * FROM s.rows_f()","expect":"ok","ref":"sql-explain","note":"EXPLAIN SELECT from set-returning function"}
+{"id":"expa0070","category":"explain","sql":"EXPLAIN SELECT * FROM s.t LEFT JOIN s.t2 ON s.t.id = s.t2.t_id","expect":"ok","ref":"sql-explain","note":"EXPLAIN SELECT with LEFT JOIN"}
+{"id":"expa0071","category":"explain","sql":"EXPLAIN SELECT * FROM s.parent UNION ALL SELECT id, kind FROM s.child","expect":"ok","ref":"sql-explain","note":"EXPLAIN UNION ALL with inheritance"}
+{"id":"expa0072","category":"explain","sql":"EXPLAIN SELECT * FROM s.events WHERE occurred BETWEEN '2024-01-01' AND '2024-12-31'","expect":"ok","ref":"sql-explain","note":"EXPLAIN SELECT against partitioned table"}
+{"id":"expa0073","category":"explain","sql":"EXPLAIN SELECT * FROM s.t WHERE name LIKE 'a%'","expect":"ok","ref":"sql-explain","note":"EXPLAIN SELECT with LIKE - may use index"}
+{"id":"expa0074","category":"explain","sql":"EXPLAIN (VERBOSE) SELECT s.t.id, s.t.name FROM s.t","expect":"ok","ref":"sql-explain","note":"VERBOSE shows schema-qualified names"}
+{"id":"expa0075","category":"explain","sql":"EXPLAIN (VERBOSE, FORMAT JSON) SELECT * FROM s.t","expect":"ok","ref":"sql-explain","note":"VERBOSE + FORMAT JSON"}
+{"id":"expa0076","category":"explain","sql":"EXPLAIN (COSTS FALSE) SELECT * FROM s.t","expect":"ok","ref":"sql-explain","note":"COSTS FALSE suppresses cost output"}
+{"id":"expa0077","category":"explain","sql":"EXPLAIN (COSTS OFF) SELECT * FROM s.t","expect":"ok","ref":"sql-explain","note":"COSTS OFF (OFF is a boolean alias)"}
+{"id":"expa0078","category":"explain","sql":"EXPLAIN (ANALYZE, BUFFERS, FORMAT JSON) SELECT * FROM s.t","expect":"ok","ref":"sql-explain","note":"ANALYZE BUFFERS with JSON output"}
+{"id":"expa0079","category":"explain","sql":"EXPLAIN (ANALYZE, BUFFERS, FORMAT XML) SELECT * FROM s.t","expect":"ok","ref":"sql-explain","note":"ANALYZE BUFFERS with XML output"}
+{"id":"expa0080","category":"explain","sql":"EXPLAIN (ANALYZE, BUFFERS, FORMAT YAML) SELECT * FROM s.t","expect":"ok","ref":"sql-explain","note":"ANALYZE BUFFERS with YAML output"}
+{"id":"expa0081","category":"explain","sql":"EXPLAIN (ANALYZE, VERBOSE, BUFFERS, SETTINGS, FORMAT JSON) SELECT * FROM s.t","expect":"ok","ref":"sql-explain","note":"ANALYZE+VERBOSE+BUFFERS+SETTINGS+JSON"}
+{"id":"expa0082","category":"explain","sql":"EXPLAIN (ANALYZE, MEMORY) SELECT * FROM s.t","expect":"ok","ref":"sql-explain","note":"ANALYZE + MEMORY"}
+{"id":"expa0083","category":"explain","sql":"EXPLAIN (MEMORY, FORMAT JSON) SELECT * FROM s.t","expect":"ok","ref":"sql-explain","note":"MEMORY without ANALYZE + JSON"}
+{"id":"expa0084","category":"explain","sql":"EXPLAIN (ANALYZE, WAL, BUFFERS) INSERT INTO s.t (name, qty) VALUES ('w', 1)","expect":"ok","ref":"sql-explain","note":"ANALYZE+WAL+BUFFERS on INSERT"}
+{"id":"expa0085","category":"explain","sql":"EXPLAIN (ANALYZE, TIMING TRUE, SUMMARY TRUE) SELECT * FROM s.t","expect":"ok","ref":"sql-explain","note":"ANALYZE with explicit TIMING TRUE SUMMARY TRUE"}
+{"id":"expa0086","category":"explain","sql":"EXPLAIN (ANALYZE, TIMING OFF, SUMMARY OFF) SELECT * FROM s.t","expect":"ok","ref":"sql-explain","note":"ANALYZE with TIMING and SUMMARY disabled"}
+{"id":"expa0087","category":"explain","sql":"EXPLAIN (ANALYZE TRUE, VERBOSE TRUE, COSTS TRUE, BUFFERS TRUE, FORMAT TEXT) SELECT 42","expect":"ok","ref":"sql-explain","note":"all boolean options explicit TRUE with TEXT format"}
+{"id":"expa0088","category":"explain","sql":"EXPLAIN (ANALYZE FALSE, VERBOSE FALSE, COSTS FALSE, SETTINGS FALSE) SELECT 42","expect":"ok","ref":"sql-explain","note":"several options explicit FALSE"}
+{"id":"expa0089","category":"explain","sql":"EXPLAIN (SETTINGS TRUE) SELECT * FROM s.t","expect":"ok","ref":"sql-explain","note":"SETTINGS TRUE explicit"}
+{"id":"expa0090","category":"explain","sql":"EXPLAIN (SETTINGS FALSE) SELECT * FROM s.t","expect":"ok","ref":"sql-explain","note":"SETTINGS FALSE explicit"}
+{"id":"expa0091","category":"explain","sql":"EXPLAIN SELECT * FROM s.t WHERE id = ANY(ARRAY[1,2,3])","expect":"ok","ref":"sql-explain","note":"EXPLAIN SELECT with ANY array condition"}
+{"id":"expa0092","category":"explain","sql":"EXPLAIN SELECT id, (SELECT count(*) FROM s.t2 WHERE t_id = s.t.id) AS cnt FROM s.t","expect":"ok","ref":"sql-explain","note":"EXPLAIN SELECT with correlated subquery"}
+{"id":"expa0093","category":"explain","sql":"EXPLAIN SELECT * FROM s.t WHERE EXISTS (SELECT 1 FROM s.t2 WHERE t_id = s.t.id)","expect":"ok","ref":"sql-explain","note":"EXPLAIN SELECT with EXISTS subquery"}
+{"id":"expa0094","category":"explain","sql":"EXPLAIN (ANALYZE) SELECT * FROM s.t ORDER BY name","expect":"ok","ref":"sql-explain","note":"EXPLAIN ANALYZE with ORDER BY (sort node)"}
+{"id":"expa0095","category":"explain","sql":"EXPLAIN (ANALYZE, VERBOSE, FORMAT JSON) SELECT count(*) FROM s.t GROUP BY status","expect":"ok","ref":"sql-explain","note":"EXPLAIN ANALYZE aggregate with JSON"}
+{"id":"expa0096","category":"explain","sql":"EXPLAIN SELECT * FROM s.t TABLESAMPLE BERNOULLI(50)","expect":"ok","ref":"sql-explain","note":"EXPLAIN SELECT with TABLESAMPLE"}
+{"id":"expa0097","category":"explain","sql":"EXPLAIN SELECT * FROM s.t WHERE span @> 5","expect":"ok","ref":"sql-explain","note":"EXPLAIN SELECT with range type operator"}
+{"id":"expa0098","category":"explain","sql":"EXPLAIN INSERT INTO s.t (name, qty) SELECT label, 1 FROM s.t2","expect":"ok","ref":"sql-explain","note":"EXPLAIN INSERT ... SELECT"}
+{"id":"expa0099","category":"explain","sql":"EXPLAIN UPDATE s.t SET val = subq.v FROM (SELECT t_id, sum(amount) AS v FROM s.t2 GROUP BY t_id) AS subq WHERE s.t.id = subq.t_id","expect":"ok","ref":"sql-explain","note":"EXPLAIN UPDATE with subquery FROM"}
+{"id":"expa0100","category":"explain","sql":"EXPLAIN DELETE FROM s.t WHERE id IN (SELECT t_id FROM s.t2)","expect":"ok","ref":"sql-explain","note":"EXPLAIN DELETE with subquery IN"}
+{"id":"expa0101","category":"explain","sql":"EXPLAIN VALUES (1, 'a'), (2, 'b')","expect":"ok","ref":"sql-explain","note":"EXPLAIN VALUES statement"}
+{"id":"expa0102","category":"explain","sql":"EXPLAIN (FORMAT JSON) VALUES (1, 'a')","expect":"ok","ref":"sql-explain","note":"EXPLAIN VALUES with FORMAT JSON"}
+{"id":"expa0103","category":"explain","sql":"EXPLAIN SELECT * FROM s.t WHERE home IS NOT NULL","expect":"ok","ref":"sql-explain","note":"EXPLAIN SELECT with composite type IS NOT NULL"}
+{"id":"expa0104","category":"explain","sql":"EXPLAIN SELECT (home).city FROM s.t WHERE home IS NOT NULL","expect":"ok","ref":"sql-explain","note":"EXPLAIN SELECT composite field dereference"}
+{"id":"expa0105","category":"explain","sql":"EXPLAIN (ANALYZE, VERBOSE, BUFFERS, WAL, TIMING, SUMMARY, MEMORY, FORMAT JSON) UPDATE s.t SET qty = qty + 1 WHERE id < 0","expect":"ok","ref":"sql-explain","note":"all meaningful options on UPDATE"}
+{"id":"expa0106","category":"explain","sql":"EXPLAIN (ANALYZE, VERBOSE, BUFFERS, WAL, FORMAT YAML) DELETE FROM s.t WHERE id < 0","expect":"ok","ref":"sql-explain","note":"all meaningful options on DELETE with YAML"}
+{"id":"expa0107","category":"explain","sql":"EXPLAIN (GENERIC_PLAN, VERBOSE) SELECT * FROM s.t WHERE id = $1 AND name = $2","expect":"ok","ref":"sql-explain","note":"GENERIC_PLAN with VERBOSE and multiple params"}
+{"id":"expa0108","category":"explain","sql":"EXPLAIN (GENERIC_PLAN, FORMAT JSON) SELECT * FROM s.t WHERE id = $1","expect":"ok","ref":"sql-explain","note":"GENERIC_PLAN with FORMAT JSON"}
+{"id":"expa0109","category":"explain","sql":"EXPLAIN (GENERIC_PLAN, COSTS FALSE) SELECT * FROM s.t WHERE id = $1","expect":"ok","ref":"sql-explain","note":"GENERIC_PLAN with COSTS FALSE"}
+{"id":"expa0110","category":"explain","sql":"EXPLAIN (ANALYZE, VERBOSE, FORMAT XML) SELECT id, name FROM s.t WHERE qty > 0","expect":"ok","ref":"sql-explain","note":"ANALYZE VERBOSE with XML format"}
+{"id":"expa0111","category":"explain","sql":"EXPLAIN (ANALYZE, VERBOSE, FORMAT YAML) SELECT id, name FROM s.t WHERE qty > 0","expect":"ok","ref":"sql-explain","note":"ANALYZE VERBOSE with YAML format"}
+{"id":"expa0112","category":"explain","sql":"EXPLAIN SELECT s.f(qty) FROM s.t","expect":"ok","ref":"sql-explain","note":"EXPLAIN SELECT calling scalar function (qty is integer)"}
+{"id":"expa0113","category":"explain","sql":"EXPLAIN (ANALYZE, BUFFERS) SELECT * FROM s.t WHERE id IN (SELECT id FROM s.t WHERE qty > 0)","expect":"ok","ref":"sql-explain","note":"EXPLAIN ANALYZE with nested IN subquery"}
+{"id":"expa0114","category":"explain","sql":"EXPLAIN SELECT * FROM s.t WHERE status = 'ok'::s.mood","expect":"ok","ref":"sql-explain","note":"EXPLAIN SELECT filtering on enum column"}
+{"id":"expa0115","category":"explain","sql":"EXPLAIN SELECT * FROM s.t LIMIT 10 OFFSET 5","expect":"ok","ref":"sql-explain","note":"EXPLAIN SELECT with LIMIT/OFFSET"}
+{"id":"expa0116","category":"explain","sql":"EXPLAIN (ANALYZE, VERBOSE, BUFFERS, SETTINGS, MEMORY, FORMAT JSON) SELECT count(*), status FROM s.t GROUP BY status","expect":"ok","ref":"sql-explain","note":"comprehensive options on aggregate query"}
+{"id":"expa0117","category":"explain","sql":"EXPLAIN WITH RECURSIVE r(n) AS (SELECT 1 UNION ALL SELECT n+1 FROM r WHERE n < 5) SELECT * FROM r","expect":"ok","ref":"sql-explain","note":"EXPLAIN recursive CTE"}
+{"id":"expa0118","category":"explain","sql":"EXPLAIN (ANALYZE) WITH RECURSIVE r(n) AS (SELECT 1 UNION ALL SELECT n+1 FROM r WHERE n < 5) SELECT * FROM r","expect":"ok","ref":"sql-explain","note":"EXPLAIN ANALYZE recursive CTE"}
+{"id":"expa0119","category":"explain","sql":"EXPLAIN SELECT * FROM s.t WHERE val BETWEEN 1.0 AND 100.0","expect":"ok","ref":"sql-explain","note":"EXPLAIN with BETWEEN predicate"}
+{"id":"expa0120","category":"explain","sql":"EXPLAIN SELECT row_number() OVER (PARTITION BY status ORDER BY id) AS rn, * FROM s.t","expect":"ok","ref":"sql-explain","note":"EXPLAIN SELECT with window function"}
+{"id":"expa0121","category":"explain","sql":"EXPLAIN (ANALYZE) SELECT row_number() OVER (PARTITION BY status ORDER BY id) AS rn, * FROM s.t","expect":"ok","ref":"sql-explain","note":"EXPLAIN ANALYZE with window function"}
+{"id":"expa0122","category":"explain","sql":"EXPLAIN SELECT * FROM s.t CROSS JOIN s.t2","expect":"ok","ref":"sql-explain","note":"EXPLAIN SELECT with CROSS JOIN"}
+{"id":"expa0123","category":"explain","sql":"EXPLAIN SELECT * FROM s.t NATURAL JOIN s.t2","expect":"ok","ref":"sql-explain","note":"NATURAL JOIN on tables sharing id column - ok"}
+{"id":"expa0124","category":"explain","sql":"EXPLAIN (SERIALIZE NONE) SELECT * FROM s.t","expect":"ok","ref":"sql-explain","note":"SERIALIZE NONE option (default)"}
+{"id":"expa0125","category":"explain","sql":"EXPLAIN (ANALYZE, SERIALIZE TEXT) SELECT * FROM s.t","expect":"ok","ref":"sql-explain","note":"ANALYZE + SERIALIZE TEXT"}
+{"id":"expa0126","category":"explain","sql":"EXPLAIN (ANALYZE, SERIALIZE BINARY) SELECT * FROM s.t","expect":"ok","ref":"sql-explain","note":"ANALYZE + SERIALIZE BINARY"}
+{"id":"expa0127","category":"explain","sql":"EXPLAIN (SERIALIZE TEXT) SELECT * FROM s.t","expect":"error","ref":"sql-explain","note":"SERIALIZE TEXT without ANALYZE - requires ANALYZE"}
+{"id":"expa0128","category":"explain","sql":"EXPLAIN (SERIALIZE BINARY) SELECT * FROM s.t","expect":"error","ref":"sql-explain","note":"SERIALIZE BINARY without ANALYZE - requires ANALYZE"}
+{"id":"expa0129","category":"explain","sql":"EXPLAIN","expect":"error","ref":"sql-explain","note":"EXPLAIN with no statement - syntax error"}
+{"id":"expa0130","category":"explain","sql":"EXPLAIN ()","expect":"error","ref":"sql-explain","note":"empty option list - syntax error"}
+{"id":"expa0131","category":"explain","sql":"EXPLAIN (FORMAT) SELECT 1","expect":"error","ref":"sql-explain","note":"FORMAT option with no value - syntax error"}
+{"id":"expa0132","category":"explain","sql":"EXPLAIN (FORMAT CSV) SELECT 1","expect":"error","ref":"sql-explain","note":"FORMAT CSV is not a valid format value - error"}
+{"id":"expa0133","category":"explain","sql":"EXPLAIN (FORMAT HTML) SELECT 1","expect":"error","ref":"sql-explain","note":"FORMAT HTML is not valid - error"}
+{"id":"expa0134","category":"explain","sql":"EXPLAIN (ANALYZE, GENERIC_PLAN) SELECT * FROM s.t WHERE id = $1","expect":"error","ref":"sql-explain","note":"ANALYZE + GENERIC_PLAN is forbidden combination"}
+{"id":"expa0135","category":"explain","sql":"EXPLAIN (BADOPTION) SELECT 1","expect":"error","ref":"sql-explain","note":"unknown option name - error"}
+{"id":"expa0136","category":"explain","sql":"EXPLAIN (ANALYZE MAYBE) SELECT 1","expect":"error","ref":"sql-explain","note":"invalid boolean value for ANALYZE - error"}
+{"id":"expa0137","category":"explain","sql":"EXPLAIN VERBOSE ANALYZE SELECT 1","expect":"error","ref":"sql-explain","note":"legacy syntax wrong order VERBOSE before ANALYZE - error"}
+{"id":"expa0138","category":"explain","sql":"EXPLAIN (ANALYZE, VERBOSE FORMAT JSON) SELECT 1","expect":"error","ref":"sql-explain","note":"missing comma between options - syntax error"}
+{"id":"expa0139","category":"explain","sql":"EXPLAIN (ANALYZE, VERBOSE,) SELECT 1","expect":"error","ref":"sql-explain","note":"trailing comma in option list - syntax error"}
+{"id":"expa0140","category":"explain","sql":"EXPLAIN (ANALYZE VERBOSE) SELECT 1","expect":"error","ref":"sql-explain","note":"missing comma between options ANALYZE VERBOSE - syntax error"}
+{"id":"expa0141","category":"explain","sql":"EXPLAIN ANALYZE SELECT","expect":"ok","ref":"sql-explain","note":"EXPLAIN ANALYZE SELECT with no target (SELECT alone is valid in PG)"}
+{"id":"expa0142","category":"explain","sql":"EXPLAIN SELECT * FROM nonexistent_table_xyz","expect":"error","ref":"sql-explain","note":"EXPLAIN SELECT from non-existent table - semantic error (42P01)"}
+{"id":"expa0143","category":"explain","sql":"EXPLAIN (ANALYZE, VERBOSE, FORMAT JSON) INSERT INTO s.t (name, qty) VALUES ('z', 99)","expect":"ok","ref":"sql-explain","note":"EXPLAIN ANALYZE INSERT with JSON format (rolled back)"}
+{"id":"expa0144","category":"explain","sql":"EXPLAIN (ANALYZE, VERBOSE, FORMAT YAML) DELETE FROM s.t WHERE id < 0","expect":"ok","ref":"sql-explain","note":"EXPLAIN ANALYZE DELETE no-op with YAML"}
+{"id":"expa0145","category":"explain","sql":"EXPLAIN (ANALYZE, VERBOSE, FORMAT XML) UPDATE s.t SET qty = 0 WHERE id < 0","expect":"ok","ref":"sql-explain","note":"EXPLAIN ANALYZE UPDATE no-op with XML"}
+{"id":"expa0146","category":"explain","sql":"EXPLAIN (ANALYZE, BUFFERS, WAL, TIMING, SUMMARY, MEMORY, FORMAT JSON) MERGE INTO s.t USING s.t2 ON s.t.id = s.t2.t_id WHEN MATCHED THEN UPDATE SET qty = 0","expect":"ok","ref":"sql-explain","note":"all analyze options on MERGE with JSON"}
+{"id":"expa0147","category":"explain","sql":"EXPLAIN (VERBOSE ON) SELECT 1","expect":"ok","ref":"sql-explain","note":"VERBOSE ON as boolean alias for true"}
+{"id":"expa0148","category":"explain","sql":"EXPLAIN (VERBOSE OFF) SELECT 1","expect":"ok","ref":"sql-explain","note":"VERBOSE OFF as boolean alias for false"}
+{"id":"expa0149","category":"explain","sql":"EXPLAIN (SUMMARY ON, FORMAT JSON) SELECT count(*) FROM s.t","expect":"ok","ref":"sql-explain","note":"SUMMARY ON with JSON format"}
+{"id":"expa0150","category":"explain","sql":"EXPLAIN (ANALYZE, SERIALIZE NONE, BUFFERS, FORMAT JSON) SELECT * FROM s.t","expect":"ok","ref":"sql-explain","note":"ANALYZE + SERIALIZE NONE + BUFFERS + JSON all together"}

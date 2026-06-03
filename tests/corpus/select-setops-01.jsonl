@@ -1,0 +1,170 @@
+{"id":"selsa0001","category":"select-setops","sql":"SELECT 1 UNION SELECT 2","expect":"ok","ref":"sql-select","note":"basic UNION of two literal selects"}
+{"id":"selsa0002","category":"select-setops","sql":"SELECT 1 UNION ALL SELECT 2","expect":"ok","ref":"sql-select","note":"UNION ALL retains duplicates"}
+{"id":"selsa0003","category":"select-setops","sql":"SELECT 1 UNION DISTINCT SELECT 2","expect":"ok","ref":"sql-select","note":"UNION DISTINCT is explicit default"}
+{"id":"selsa0004","category":"select-setops","sql":"SELECT 1 INTERSECT SELECT 1","expect":"ok","ref":"sql-select","note":"basic INTERSECT of two literal selects"}
+{"id":"selsa0005","category":"select-setops","sql":"SELECT 1 INTERSECT ALL SELECT 1","expect":"ok","ref":"sql-select","note":"INTERSECT ALL retains duplicates"}
+{"id":"selsa0006","category":"select-setops","sql":"SELECT 1 INTERSECT DISTINCT SELECT 1","expect":"ok","ref":"sql-select","note":"INTERSECT DISTINCT explicit"}
+{"id":"selsa0007","category":"select-setops","sql":"SELECT 2 EXCEPT SELECT 1","expect":"ok","ref":"sql-select","note":"basic EXCEPT of two literal selects"}
+{"id":"selsa0008","category":"select-setops","sql":"SELECT 2 EXCEPT ALL SELECT 1","expect":"ok","ref":"sql-select","note":"EXCEPT ALL retains extra duplicates"}
+{"id":"selsa0009","category":"select-setops","sql":"SELECT 2 EXCEPT DISTINCT SELECT 1","expect":"ok","ref":"sql-select","note":"EXCEPT DISTINCT explicit"}
+{"id":"selsa0010","category":"select-setops","sql":"SELECT id FROM s.t UNION SELECT id FROM s.t2","expect":"ok","ref":"sql-select","note":"UNION over fixture tables"}
+{"id":"selsa0011","category":"select-setops","sql":"SELECT id FROM s.t UNION ALL SELECT id FROM s.t2","expect":"ok","ref":"sql-select","note":"UNION ALL over fixture tables"}
+{"id":"selsa0012","category":"select-setops","sql":"SELECT id FROM s.t INTERSECT SELECT id FROM s.t2","expect":"ok","ref":"sql-select","note":"INTERSECT over fixture tables"}
+{"id":"selsa0013","category":"select-setops","sql":"SELECT id FROM s.t INTERSECT ALL SELECT id FROM s.t2","expect":"ok","ref":"sql-select","note":"INTERSECT ALL over fixture tables"}
+{"id":"selsa0014","category":"select-setops","sql":"SELECT id FROM s.t EXCEPT SELECT id FROM s.t2","expect":"ok","ref":"sql-select","note":"EXCEPT over fixture tables"}
+{"id":"selsa0015","category":"select-setops","sql":"SELECT id FROM s.t EXCEPT ALL SELECT id FROM s.t2","expect":"ok","ref":"sql-select","note":"EXCEPT ALL over fixture tables"}
+{"id":"selsa0016","category":"select-setops","sql":"SELECT 1 UNION SELECT 2 UNION SELECT 3","expect":"ok","ref":"sql-select","note":"chaining three UNION operators left-to-right"}
+{"id":"selsa0017","category":"select-setops","sql":"SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3","expect":"ok","ref":"sql-select","note":"chaining three UNION ALL operators"}
+{"id":"selsa0018","category":"select-setops","sql":"SELECT 1 INTERSECT SELECT 1 INTERSECT SELECT 1","expect":"ok","ref":"sql-select","note":"chaining three INTERSECT operators"}
+{"id":"selsa0019","category":"select-setops","sql":"SELECT 1 EXCEPT SELECT 2 EXCEPT SELECT 3","expect":"ok","ref":"sql-select","note":"chaining three EXCEPT operators"}
+{"id":"selsa0020","category":"select-setops","sql":"SELECT 1 UNION SELECT 2 INTERSECT SELECT 2","expect":"ok","ref":"sql-select","note":"INTERSECT binds tighter than UNION (UNION first operand, then result)"}
+{"id":"selsa0021","category":"select-setops","sql":"SELECT 1 UNION SELECT 2 EXCEPT SELECT 2","expect":"ok","ref":"sql-select","note":"UNION then EXCEPT evaluated left-to-right"}
+{"id":"selsa0022","category":"select-setops","sql":"SELECT 2 EXCEPT SELECT 1 UNION SELECT 3","expect":"ok","ref":"sql-select","note":"EXCEPT then UNION evaluated left-to-right"}
+{"id":"selsa0023","category":"select-setops","sql":"(SELECT 1 UNION SELECT 2) INTERSECT SELECT 1","expect":"ok","ref":"sql-select","note":"parentheses override INTERSECT precedence"}
+{"id":"selsa0024","category":"select-setops","sql":"SELECT 1 UNION (SELECT 2 INTERSECT SELECT 2)","expect":"ok","ref":"sql-select","note":"explicit parenthesized INTERSECT inside UNION"}
+{"id":"selsa0025","category":"select-setops","sql":"(SELECT 1 UNION SELECT 2) EXCEPT SELECT 1","expect":"ok","ref":"sql-select","note":"parenthesized UNION then EXCEPT"}
+{"id":"selsa0026","category":"select-setops","sql":"SELECT 1 UNION SELECT 2 ORDER BY 1","expect":"ok","ref":"sql-select","note":"ORDER BY on UNION combined result by position"}
+{"id":"selsa0027","category":"select-setops","sql":"SELECT 1 AS n UNION SELECT 2 AS n ORDER BY n","expect":"ok","ref":"sql-select","note":"ORDER BY column alias on UNION result"}
+{"id":"selsa0028","category":"select-setops","sql":"SELECT 1 UNION SELECT 2 ORDER BY 1 LIMIT 1","expect":"ok","ref":"sql-select","note":"LIMIT on UNION combined result"}
+{"id":"selsa0029","category":"select-setops","sql":"SELECT 1 UNION SELECT 2 ORDER BY 1 LIMIT 1 OFFSET 0","expect":"ok","ref":"sql-select","note":"LIMIT and OFFSET on UNION combined result"}
+{"id":"selsa0030","category":"select-setops","sql":"SELECT 1 INTERSECT SELECT 1 ORDER BY 1","expect":"ok","ref":"sql-select","note":"ORDER BY on INTERSECT combined result"}
+{"id":"selsa0031","category":"select-setops","sql":"SELECT 2 EXCEPT SELECT 1 ORDER BY 1","expect":"ok","ref":"sql-select","note":"ORDER BY on EXCEPT combined result"}
+{"id":"selsa0032","category":"select-setops","sql":"SELECT id, name FROM s.t UNION SELECT id, label FROM s.t2","expect":"ok","ref":"sql-select","note":"UNION with two columns from different tables"}
+{"id":"selsa0033","category":"select-setops","sql":"SELECT id, name FROM s.t UNION ALL SELECT id, label FROM s.t2 ORDER BY 1","expect":"ok","ref":"sql-select","note":"UNION ALL two-column with ORDER BY"}
+{"id":"selsa0034","category":"select-setops","sql":"SELECT id, name FROM s.t INTERSECT SELECT id, label FROM s.t2","expect":"ok","ref":"sql-select","note":"INTERSECT two columns"}
+{"id":"selsa0035","category":"select-setops","sql":"SELECT id, name FROM s.t EXCEPT SELECT id, label FROM s.t2","expect":"ok","ref":"sql-select","note":"EXCEPT two columns"}
+{"id":"selsa0036","category":"select-setops","sql":"SELECT 1, 'a' UNION SELECT 2, 'b' UNION SELECT 3, 'c' ORDER BY 1 DESC","expect":"ok","ref":"sql-select","note":"chained UNION three rows ORDER BY DESC"}
+{"id":"selsa0037","category":"select-setops","sql":"SELECT 1 AS x UNION SELECT 1 AS y","expect":"ok","ref":"sql-select","note":"UNION with differing aliases - first query alias wins"}
+{"id":"selsa0038","category":"select-setops","sql":"SELECT val FROM s.t UNION SELECT amount FROM s.t2","expect":"ok","ref":"sql-select","note":"UNION on numeric columns from fixture"}
+{"id":"selsa0039","category":"select-setops","sql":"SELECT val FROM s.t UNION ALL SELECT amount FROM s.t2 ORDER BY 1 NULLS FIRST","expect":"ok","ref":"sql-select","note":"UNION ALL ORDER BY NULLS FIRST"}
+{"id":"selsa0040","category":"select-setops","sql":"SELECT val FROM s.t UNION ALL SELECT amount FROM s.t2 ORDER BY 1 NULLS LAST","expect":"ok","ref":"sql-select","note":"UNION ALL ORDER BY NULLS LAST"}
+{"id":"selsa0041","category":"select-setops","sql":"SELECT val FROM s.t UNION ALL SELECT amount FROM s.t2 ORDER BY 1 ASC","expect":"ok","ref":"sql-select","note":"UNION ALL ORDER BY ASC explicit"}
+{"id":"selsa0042","category":"select-setops","sql":"SELECT val FROM s.t UNION ALL SELECT amount FROM s.t2 ORDER BY 1 DESC","expect":"ok","ref":"sql-select","note":"UNION ALL ORDER BY DESC"}
+{"id":"selsa0043","category":"select-setops","sql":"SELECT 1 UNION SELECT 2 LIMIT 10","expect":"ok","ref":"sql-select","note":"LIMIT without ORDER BY on UNION"}
+{"id":"selsa0044","category":"select-setops","sql":"SELECT 1 UNION SELECT 2 OFFSET 0","expect":"ok","ref":"sql-select","note":"OFFSET alone on UNION result"}
+{"id":"selsa0045","category":"select-setops","sql":"SELECT 1 UNION SELECT 2 OFFSET 1 ROW","expect":"ok","ref":"sql-select","note":"OFFSET with ROW keyword"}
+{"id":"selsa0046","category":"select-setops","sql":"SELECT 1 UNION SELECT 2 OFFSET 0 ROWS","expect":"ok","ref":"sql-select","note":"OFFSET with ROWS keyword"}
+{"id":"selsa0047","category":"select-setops","sql":"SELECT 1 UNION SELECT 2 FETCH FIRST 1 ROW ONLY","expect":"ok","ref":"sql-select","note":"FETCH FIRST ROW ONLY on UNION result"}
+{"id":"selsa0048","category":"select-setops","sql":"SELECT 1 UNION SELECT 2 FETCH NEXT 1 ROWS ONLY","expect":"ok","ref":"sql-select","note":"FETCH NEXT ROWS ONLY on UNION result"}
+{"id":"selsa0049","category":"select-setops","sql":"SELECT 1 UNION SELECT 2 ORDER BY 1 FETCH FIRST 1 ROW WITH TIES","expect":"ok","ref":"sql-select","note":"FETCH WITH TIES on UNION result"}
+{"id":"selsa0050","category":"select-setops","sql":"SELECT 1 UNION SELECT 2 LIMIT ALL","expect":"ok","ref":"sql-select","note":"LIMIT ALL on UNION result"}
+{"id":"selsa0051","category":"select-setops","sql":"(SELECT 1 ORDER BY 1 LIMIT 1) UNION (SELECT 2 ORDER BY 1 LIMIT 1)","expect":"ok","ref":"sql-select","note":"ORDER BY and LIMIT inside parenthesized sub-selects of UNION"}
+{"id":"selsa0052","category":"select-setops","sql":"(SELECT 1 LIMIT 1) INTERSECT (SELECT 1 LIMIT 1)","expect":"ok","ref":"sql-select","note":"LIMIT in parenthesized operands of INTERSECT"}
+{"id":"selsa0053","category":"select-setops","sql":"(SELECT 2 ORDER BY 1) EXCEPT (SELECT 1 ORDER BY 1)","expect":"ok","ref":"sql-select","note":"ORDER BY inside parenthesized EXCEPT operands"}
+{"id":"selsa0054","category":"select-setops","sql":"SELECT name FROM s.t UNION SELECT city FROM (SELECT (home).city AS city FROM s.t) sub","expect":"ok","ref":"sql-select","note":"UNION with subquery as second operand"}
+{"id":"selsa0055","category":"select-setops","sql":"SELECT id FROM s.t UNION SELECT id FROM (SELECT id FROM s.t2 WHERE id IS NOT NULL) sub","expect":"ok","ref":"sql-select","note":"UNION second operand is filtered subquery"}
+{"id":"selsa0056","category":"select-setops","sql":"WITH cte AS (SELECT 1 AS n) SELECT n FROM cte UNION SELECT 2","expect":"ok","ref":"sql-select","note":"CTE followed by UNION"}
+{"id":"selsa0057","category":"select-setops","sql":"WITH cte AS (SELECT id FROM s.t) SELECT id FROM cte UNION ALL SELECT id FROM s.t2","expect":"ok","ref":"sql-select","note":"CTE in first operand of UNION ALL"}
+{"id":"selsa0058","category":"select-setops","sql":"WITH cte AS (SELECT 1 AS n) SELECT n FROM cte INTERSECT SELECT 1","expect":"ok","ref":"sql-select","note":"CTE followed by INTERSECT"}
+{"id":"selsa0059","category":"select-setops","sql":"WITH cte AS (SELECT 1 AS n) SELECT n FROM cte EXCEPT SELECT 2","expect":"ok","ref":"sql-select","note":"CTE followed by EXCEPT"}
+{"id":"selsa0060","category":"select-setops","sql":"SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5","expect":"ok","ref":"sql-select","note":"chaining five UNION operators"}
+{"id":"selsa0061","category":"select-setops","sql":"SELECT 1 UNION ALL SELECT 1 UNION ALL SELECT 1","expect":"ok","ref":"sql-select","note":"UNION ALL with all-duplicate rows"}
+{"id":"selsa0062","category":"select-setops","sql":"SELECT 1 INTERSECT SELECT 1 INTERSECT ALL SELECT 1","expect":"ok","ref":"sql-select","note":"INTERSECT then INTERSECT ALL chained"}
+{"id":"selsa0063","category":"select-setops","sql":"SELECT 1 EXCEPT ALL SELECT 2 EXCEPT ALL SELECT 3","expect":"ok","ref":"sql-select","note":"chained EXCEPT ALL"}
+{"id":"selsa0064","category":"select-setops","sql":"SELECT 1 UNION ALL SELECT 2 INTERSECT ALL SELECT 2","expect":"ok","ref":"sql-select","note":"INTERSECT ALL binds tighter than UNION ALL"}
+{"id":"selsa0065","category":"select-setops","sql":"(SELECT 1 UNION ALL SELECT 2) INTERSECT ALL SELECT 2","expect":"ok","ref":"sql-select","note":"parentheses force UNION ALL before INTERSECT ALL"}
+{"id":"selsa0066","category":"select-setops","sql":"SELECT id FROM s.t UNION SELECT id FROM s.parent UNION SELECT id FROM s.child","expect":"ok","ref":"sql-select","note":"UNION across three fixture tables including inherited"}
+{"id":"selsa0067","category":"select-setops","sql":"SELECT status::text FROM s.t UNION SELECT 'ok'","expect":"ok","ref":"sql-select","note":"UNION with explicit cast to align types"}
+{"id":"selsa0068","category":"select-setops","sql":"SELECT NULL UNION SELECT 1","expect":"ok","ref":"sql-select","note":"UNION with NULL literal"}
+{"id":"selsa0069","category":"select-setops","sql":"SELECT NULL::int UNION SELECT 1","expect":"ok","ref":"sql-select","note":"UNION NULL cast to int with integer literal"}
+{"id":"selsa0070","category":"select-setops","sql":"SELECT 1 UNION SELECT NULL","expect":"ok","ref":"sql-select","note":"UNION integer with NULL - type resolution"}
+{"id":"selsa0071","category":"select-setops","sql":"SELECT true UNION SELECT false","expect":"ok","ref":"sql-select","note":"UNION boolean literals"}
+{"id":"selsa0072","category":"select-setops","sql":"SELECT 1.5 UNION SELECT 2","expect":"ok","ref":"sql-select","note":"UNION numeric and integer - type coercion"}
+{"id":"selsa0073","category":"select-setops","sql":"SELECT 'a' UNION SELECT 'b' ORDER BY 1","expect":"ok","ref":"sql-select","note":"UNION text literals with ORDER BY"}
+{"id":"selsa0074","category":"select-setops","sql":"SELECT ARRAY[1,2] UNION SELECT ARRAY[3,4]","expect":"ok","ref":"sql-select","note":"UNION array literals"}
+{"id":"selsa0075","category":"select-setops","sql":"SELECT id, name, val FROM s.t UNION ALL SELECT id, label, amount FROM s.t2","expect":"ok","ref":"sql-select","note":"UNION ALL three columns matching types"}
+{"id":"selsa0076","category":"select-setops","sql":"SELECT 1, 2, 3 INTERSECT SELECT 1, 2, 3","expect":"ok","ref":"sql-select","note":"INTERSECT three-column literals"}
+{"id":"selsa0077","category":"select-setops","sql":"SELECT 1, 2 EXCEPT SELECT 3, 4","expect":"ok","ref":"sql-select","note":"EXCEPT two-column literals with no overlap"}
+{"id":"selsa0078","category":"select-setops","sql":"SELECT id FROM s.t UNION SELECT id FROM s.t2 ORDER BY 1 ASC NULLS FIRST LIMIT 5","expect":"ok","ref":"sql-select","note":"full ORDER BY with NULLS FIRST and LIMIT"}
+{"id":"selsa0079","category":"select-setops","sql":"SELECT id FROM s.t UNION SELECT id FROM s.t2 ORDER BY 1 DESC NULLS LAST LIMIT 5 OFFSET 0","expect":"ok","ref":"sql-select","note":"full ORDER BY DESC NULLS LAST LIMIT OFFSET"}
+{"id":"selsa0080","category":"select-setops","sql":"SELECT * FROM s.v UNION SELECT id, name, val FROM s.t","expect":"ok","ref":"sql-select","note":"UNION using view as operand"}
+{"id":"selsa0081","category":"select-setops","sql":"SELECT id, name, val FROM s.t INTERSECT SELECT * FROM s.v","expect":"ok","ref":"sql-select","note":"INTERSECT with view as second operand"}
+{"id":"selsa0082","category":"select-setops","sql":"SELECT id, name, val FROM s.t EXCEPT SELECT * FROM s.v","expect":"ok","ref":"sql-select","note":"EXCEPT with view as second operand"}
+{"id":"selsa0083","category":"select-setops","sql":"SELECT n FROM s.f(1) AS t(n) UNION SELECT s.f(2)","expect":"ok","ref":"sql-select","note":"UNION with set-returning function as operand"}
+{"id":"selsa0084","category":"select-setops","sql":"SELECT s.f(1) UNION SELECT s.g(1,2)","expect":"ok","ref":"sql-select","note":"UNION of two scalar function calls"}
+{"id":"selsa0085","category":"select-setops","sql":"SELECT generate_series(1,3) UNION SELECT generate_series(4,6)","expect":"ok","ref":"sql-select","note":"UNION with generate_series SRF"}
+{"id":"selsa0086","category":"select-setops","sql":"SELECT generate_series(1,3) INTERSECT SELECT generate_series(2,4)","expect":"ok","ref":"sql-select","note":"INTERSECT with overlapping generate_series ranges"}
+{"id":"selsa0087","category":"select-setops","sql":"SELECT generate_series(1,3) EXCEPT SELECT generate_series(2,4)","expect":"ok","ref":"sql-select","note":"EXCEPT with generate_series - difference"}
+{"id":"selsa0088","category":"select-setops","sql":"SELECT 1 AS a, 2 AS b UNION SELECT 3 AS c, 4 AS d ORDER BY a","expect":"ok","ref":"sql-select","note":"ORDER BY first-query column alias on UNION"}
+{"id":"selsa0089","category":"select-setops","sql":"SELECT 1 AS a, 2 AS b UNION SELECT 3 AS c, 4 AS d ORDER BY b","expect":"ok","ref":"sql-select","note":"ORDER BY second column alias on UNION"}
+{"id":"selsa0090","category":"select-setops","sql":"SELECT 1 UNION SELECT 2 ORDER BY 1 LIMIT 0","expect":"ok","ref":"sql-select","note":"LIMIT 0 on UNION - returns no rows"}
+{"id":"selsa0091","category":"select-setops","sql":"SELECT id FROM s.t WHERE false UNION SELECT id FROM s.t2 WHERE false","expect":"ok","ref":"sql-select","note":"UNION of two empty result sets"}
+{"id":"selsa0092","category":"select-setops","sql":"SELECT id FROM s.t WHERE id < 0 INTERSECT SELECT id FROM s.t2 WHERE id < 0","expect":"ok","ref":"sql-select","note":"INTERSECT of two empty sets"}
+{"id":"selsa0093","category":"select-setops","sql":"SELECT id FROM s.t EXCEPT ALL SELECT id FROM s.t WHERE false","expect":"ok","ref":"sql-select","note":"EXCEPT ALL with empty right operand"}
+{"id":"selsa0094","category":"select-setops","sql":"TABLE s.t UNION TABLE s.t","expect":"ok","ref":"sql-select","note":"TABLE shorthand as operand in UNION"}
+{"id":"selsa0095","category":"select-setops","sql":"TABLE s.t INTERSECT TABLE s.t","expect":"ok","ref":"sql-select","note":"TABLE shorthand as operand in INTERSECT"}
+{"id":"selsa0096","category":"select-setops","sql":"TABLE s.t EXCEPT TABLE s.t","expect":"ok","ref":"sql-select","note":"TABLE shorthand as operand in EXCEPT - empty result"}
+{"id":"selsa0097","category":"select-setops","sql":"TABLE s.t UNION ALL TABLE s.t","expect":"ok","ref":"sql-select","note":"TABLE shorthand UNION ALL"}
+{"id":"selsa0098","category":"select-setops","sql":"SELECT id FROM s.t UNION SELECT id FROM s.t2 UNION ALL SELECT 0","expect":"ok","ref":"sql-select","note":"mixed UNION and UNION ALL chained"}
+{"id":"selsa0099","category":"select-setops","sql":"SELECT 1 UNION SELECT 2 UNION ALL SELECT 2 UNION SELECT 2","expect":"ok","ref":"sql-select","note":"alternating UNION / UNION ALL chain"}
+{"id":"selsa0100","category":"select-setops","sql":"(SELECT 1 UNION SELECT 2) UNION ALL (SELECT 3 UNION SELECT 4)","expect":"ok","ref":"sql-select","note":"parenthesized UNION groups combined with UNION ALL"}
+{"id":"selsa0101","category":"select-setops","sql":"(SELECT 1 INTERSECT SELECT 1) UNION (SELECT 2 INTERSECT SELECT 2)","expect":"ok","ref":"sql-select","note":"two parenthesized INTERSECT groups joined by UNION"}
+{"id":"selsa0102","category":"select-setops","sql":"(SELECT 1 EXCEPT SELECT 2) UNION ALL (SELECT 3 EXCEPT SELECT 4)","expect":"ok","ref":"sql-select","note":"two parenthesized EXCEPT groups joined by UNION ALL"}
+{"id":"selsa0103","category":"select-setops","sql":"((SELECT 1 UNION SELECT 2) INTERSECT SELECT 1) UNION SELECT 3","expect":"ok","ref":"sql-select","note":"deeply nested parenthesized set operations"}
+{"id":"selsa0104","category":"select-setops","sql":"SELECT 1 UNION SELECT 2 INTERSECT SELECT 2 EXCEPT SELECT 2","expect":"ok","ref":"sql-select","note":"UNION, INTERSECT, EXCEPT chained with default precedence"}
+{"id":"selsa0105","category":"select-setops","sql":"SELECT id FROM s.t UNION SELECT id FROM s.t2 ORDER BY id","expect":"ok","ref":"sql-select","note":"ORDER BY unqualified column name referencing first-query output"}
+{"id":"selsa0106","category":"select-setops","sql":"SELECT id, name FROM s.t UNION SELECT id, label FROM s.t2 ORDER BY name","expect":"ok","ref":"sql-select","note":"ORDER BY alias from first query of UNION"}
+{"id":"selsa0107","category":"select-setops","sql":"SELECT id, name FROM s.t UNION SELECT id, label FROM s.t2 ORDER BY 2 DESC","expect":"ok","ref":"sql-select","note":"ORDER BY column position DESC on UNION"}
+{"id":"selsa0108","category":"select-setops","sql":"SELECT id, name FROM s.t UNION SELECT id, label FROM s.t2 ORDER BY 1 ASC, 2 DESC","expect":"ok","ref":"sql-select","note":"multi-key ORDER BY on UNION result"}
+{"id":"selsa0109","category":"select-setops","sql":"SELECT id FROM s.t UNION SELECT id FROM s.t2 LIMIT 5 OFFSET 2","expect":"ok","ref":"sql-select","note":"LIMIT and OFFSET without ORDER BY on UNION"}
+{"id":"selsa0110","category":"select-setops","sql":"SELECT 1 UNION SELECT 2 FETCH FIRST ROW ONLY","expect":"ok","ref":"sql-select","note":"FETCH FIRST without count"}
+{"id":"selsa0111","category":"select-setops","sql":"SELECT id FROM s.t UNION SELECT id FROM s.t2 FETCH NEXT 2 ROWS WITH TIES","expect":"error","ref":"sql-select","note":"FETCH WITH TIES requires ORDER BY - semantic error"}
+{"id":"selsa0112","category":"select-setops","sql":"SELECT 1 UNION SELECT 2, 3","expect":"error","ref":"sql-select","note":"column count mismatch in UNION - semantic error"}
+{"id":"selsa0113","category":"select-setops","sql":"SELECT 1, 2 UNION SELECT 3","expect":"error","ref":"sql-select","note":"column count mismatch UNION reversed - semantic error"}
+{"id":"selsa0114","category":"select-setops","sql":"SELECT 1 INTERSECT SELECT 2, 3","expect":"error","ref":"sql-select","note":"column count mismatch in INTERSECT - semantic error"}
+{"id":"selsa0115","category":"select-setops","sql":"SELECT 1, 2 EXCEPT SELECT 3","expect":"error","ref":"sql-select","note":"column count mismatch in EXCEPT - semantic error"}
+{"id":"selsa0116","category":"select-setops","sql":"SELECT 1 UNION SELECT 'not a number' WHERE","expect":"error","ref":"sql-select","note":"syntax error: WHERE with no condition"}
+{"id":"selsa0117","category":"select-setops","sql":"SELECT 1 EXCEPTING SELECT 2","expect":"error","ref":"sql-select","note":"EXCEPTING is not a valid keyword - syntax error"}
+{"id":"selsa0118","category":"select-setops","sql":"SELECT 1 UNIONING SELECT 2","expect":"error","ref":"sql-select","note":"UNIONING is not valid SQL - syntax error"}
+{"id":"selsa0119","category":"select-setops","sql":"SELECT 1 INTERSECTING SELECT 2","expect":"error","ref":"sql-select","note":"INTERSECTING is not valid SQL - syntax error"}
+{"id":"selsa0120","category":"select-setops","sql":"SELECT 1 UNION UNION SELECT 2","expect":"error","ref":"sql-select","note":"double UNION keyword is syntax error"}
+{"id":"selsa0121","category":"select-setops","sql":"SELECT 1 UNION","expect":"error","ref":"sql-select","note":"UNION with no right operand is syntax error"}
+{"id":"selsa0122","category":"select-setops","sql":"UNION SELECT 1","expect":"error","ref":"sql-select","note":"UNION with no left operand is syntax error"}
+{"id":"selsa0123","category":"select-setops","sql":"SELECT 1 INTERSECT","expect":"error","ref":"sql-select","note":"INTERSECT with no right operand"}
+{"id":"selsa0124","category":"select-setops","sql":"SELECT 1 EXCEPT","expect":"error","ref":"sql-select","note":"EXCEPT with no right operand"}
+{"id":"selsa0125","category":"select-setops","sql":"SELECT 1 UNION ALL ALL SELECT 2","expect":"error","ref":"sql-select","note":"duplicate ALL keyword after UNION"}
+{"id":"selsa0126","category":"select-setops","sql":"SELECT 1 UNION DISTINCT ALL SELECT 2","expect":"error","ref":"sql-select","note":"DISTINCT and ALL together after UNION"}
+{"id":"selsa0127","category":"select-setops","sql":"SELECT 1 UNION ALL DISTINCT SELECT 2","expect":"error","ref":"sql-select","note":"ALL and DISTINCT together after UNION"}
+{"id":"selsa0128","category":"select-setops","sql":"SELECT 1 ORDER BY 1 UNION SELECT 2","expect":"error","ref":"sql-select","note":"ORDER BY in first operand without parens is syntax error"}
+{"id":"selsa0129","category":"select-setops","sql":"SELECT 1 UNION SELECT 2 ORDER BY 1 ORDER BY 1","expect":"error","ref":"sql-select","note":"duplicate ORDER BY on combined result is syntax error"}
+{"id":"selsa0130","category":"select-setops","sql":"SELECT 1 UNION SELECT 2 LIMIT 1 LIMIT 2","expect":"error","ref":"sql-select","note":"duplicate LIMIT clause is syntax error"}
+{"id":"selsa0131","category":"select-setops","sql":"SELECT 1 CORRESPONDING SELECT 2","expect":"error","ref":"sql-select","note":"CORRESPONDING not supported in PostgreSQL - syntax error"}
+{"id":"selsa0132","category":"select-setops","sql":"SELECT 1 UNION CORRESPONDING BY (a) SELECT 2","expect":"error","ref":"sql-select","note":"CORRESPONDING BY not supported - syntax error"}
+{"id":"selsa0133","category":"select-setops","sql":"SELECT 1 UNION SELECT 2 HAVING count(*) > 0","expect":"ok","ref":"sql-select","note":"HAVING attaches to the second SELECT in UNION making it valid"}
+{"id":"selsa0134","category":"select-setops","sql":"SELECT id FROM s.t UNION SELECT name FROM s.t","expect":"error","ref":"sql-select","note":"type mismatch: bigint UNION text - semantic error"}
+{"id":"selsa0135","category":"select-setops","sql":"SELECT true UNION SELECT 42","expect":"error","ref":"sql-select","note":"type mismatch boolean UNION integer - semantic error"}
+{"id":"selsa0136","category":"select-setops","sql":"SELECT 1 UNION SELECT 2 GROUP BY 1","expect":"ok","ref":"sql-select","note":"GROUP BY attaches to the second SELECT in UNION making it valid"}
+{"id":"selsa0137","category":"select-setops","sql":"SELECT 1 UNION SELECT 2 WHERE true","expect":"ok","ref":"sql-select","note":"WHERE attaches to the second SELECT in UNION making it valid"}
+{"id":"selsa0138","category":"select-setops","sql":"SELECT 1 UNION SELECT","expect":"error","ref":"sql-select","note":"SELECT with no select-list in right operand of UNION - syntax error"}
+{"id":"selsa0139","category":"select-setops","sql":"SELECT 1 EXCEPT SELECT","expect":"error","ref":"sql-select","note":"SELECT with no select-list in right operand of EXCEPT - syntax error"}
+{"id":"selsa0140","category":"select-setops","sql":"SELECT UNION SELECT 1","expect":"error","ref":"sql-select","note":"SELECT with no select-list in left operand of UNION - syntax error"}
+{"id":"selsa0141","category":"select-setops","sql":"SELECT id FROM s.t UNION SELECT id FROM nonexistent_table","expect":"error","ref":"sql-select","note":"UNION with non-existent table - semantic error"}
+{"id":"selsa0142","category":"select-setops","sql":"SELECT 1 AS n UNION SELECT 2 ORDER BY nonexistent_col","expect":"error","ref":"sql-select","note":"ORDER BY references non-existent column - semantic error"}
+{"id":"selsa0143","category":"select-setops","sql":"SELECT 1 UNION SELECT 2 ORDER BY 3","expect":"error","ref":"sql-select","note":"ORDER BY position out of range - semantic error"}
+{"id":"selsa0144","category":"select-setops","sql":"SELECT 1 UNION SELECT 2 LIMIT -1","expect":"error","ref":"sql-select","note":"negative LIMIT value is error"}
+{"id":"selsa0145","category":"select-setops","sql":"SELECT 1 UNION SELECT 2 OFFSET -1","expect":"error","ref":"sql-select","note":"negative OFFSET value is error"}
+{"id":"selsa0146","category":"select-setops","sql":"SELECT id FROM s.t UNION SELECT id FROM s.t UNION SELECT id FROM s.t INTERSECT SELECT id FROM s.t","expect":"ok","ref":"sql-select","note":"three-way UNION then INTERSECT with precedence"}
+{"id":"selsa0147","category":"select-setops","sql":"SELECT 1 UNION SELECT 1 UNION ALL SELECT 1 INTERSECT ALL SELECT 1 EXCEPT SELECT 1","expect":"ok","ref":"sql-select","note":"all five set operators chained in one query"}
+{"id":"selsa0148","category":"select-setops","sql":"SELECT id FROM s.t EXCEPT ALL SELECT id FROM s.t UNION ALL SELECT id FROM s.t2","expect":"ok","ref":"sql-select","note":"EXCEPT ALL then UNION ALL chain"}
+{"id":"selsa0149","category":"select-setops","sql":"SELECT id FROM s.t EXCEPT SELECT id FROM s.t","expect":"ok","ref":"sql-select","note":"EXCEPT of table with itself yields empty"}
+{"id":"selsa0150","category":"select-setops","sql":"SELECT id FROM s.t INTERSECT SELECT id FROM s.t","expect":"ok","ref":"sql-select","note":"INTERSECT of table with itself is identity"}
+{"id":"selsa0151","category":"select-setops","sql":"SELECT id FROM s.t UNION SELECT id FROM s.t","expect":"ok","ref":"sql-select","note":"UNION of table with itself deduplicates"}
+{"id":"selsa0152","category":"select-setops","sql":"SELECT id FROM s.t UNION ALL SELECT id FROM s.t","expect":"ok","ref":"sql-select","note":"UNION ALL of table with itself doubles rows"}
+{"id":"selsa0153","category":"select-setops","sql":"SELECT 1 UNION SELECT 2 FETCH FIRST 0 ROWS ONLY","expect":"ok","ref":"sql-select","note":"FETCH FIRST 0 ROWS ONLY returns empty"}
+{"id":"selsa0154","category":"select-setops","sql":"SELECT id, name, val, qty, flag FROM s.t UNION SELECT id, label, amount, t_id, (amount > 0) FROM s.t2","expect":"ok","ref":"sql-select","note":"UNION with five columns type coercion"}
+{"id":"selsa0155","category":"select-setops","sql":"SELECT 'foo'::text UNION SELECT 'bar'::varchar","expect":"ok","ref":"sql-select","note":"UNION text and varchar - compatible types"}
+{"id":"selsa0156","category":"select-setops","sql":"SELECT 1::int UNION SELECT 2::bigint","expect":"ok","ref":"sql-select","note":"UNION int and bigint - upcast"}
+{"id":"selsa0157","category":"select-setops","sql":"SELECT 1::smallint UNION SELECT 2::int UNION SELECT 3::bigint","expect":"ok","ref":"sql-select","note":"UNION smallint, int, bigint chained type resolution"}
+{"id":"selsa0158","category":"select-setops","sql":"SELECT 1::numeric UNION SELECT 2::float8","expect":"ok","ref":"sql-select","note":"UNION numeric and float8 - common type float8"}
+{"id":"selsa0159","category":"select-setops","sql":"SELECT CURRENT_DATE UNION SELECT CURRENT_DATE","expect":"ok","ref":"sql-select","note":"UNION with CURRENT_DATE (deterministic within txn)"}
+{"id":"selsa0160","category":"select-setops","sql":"SELECT id FROM s.t UNION SELECT id FROM s.t ORDER BY id FETCH FIRST 5 ROWS ONLY","expect":"ok","ref":"sql-select","note":"FETCH FIRST on UNION with ORDER BY"}
+{"id":"selsa0161","category":"select-setops","sql":"SELECT id FROM s.t UNION SELECT id FROM s.t ORDER BY 1 FETCH NEXT 5 ROWS WITH TIES","expect":"ok","ref":"sql-select","note":"FETCH NEXT WITH TIES on UNION (valid with ORDER BY)"}
+{"id":"selsa0162","category":"select-setops","sql":"SELECT id FROM s.t UNION SELECT id FROM s.t2 FOR UPDATE","expect":"error","ref":"sql-select","note":"FOR UPDATE not allowed on UNION result - semantic error (0A000)"}
+{"id":"selsa0163","category":"select-setops","sql":"SELECT id FROM s.t UNION SELECT id FROM s.t2 FOR SHARE","expect":"error","ref":"sql-select","note":"FOR SHARE not allowed on UNION result - semantic error (0A000)"}
+{"id":"selsa0164","category":"select-setops","sql":"SELECT id FROM s.t INTERSECT SELECT id FROM s.t2 FOR KEY SHARE","expect":"error","ref":"sql-select","note":"FOR KEY SHARE not allowed on INTERSECT result - semantic error (0A000)"}
+{"id":"selsa0165","category":"select-setops","sql":"SELECT 1 UNION SELECT 2 FROM s.nonexistent_xyz","expect":"error","ref":"sql-select","note":"UNION right operand FROM nonexistent table - semantic error"}
+{"id":"selsa0166","category":"select-setops","sql":"SELECT id FROM s.t UNION ALL SELECT id FROM s.t UNION ALL SELECT id FROM s.t UNION ALL SELECT id FROM s.t UNION ALL SELECT id FROM s.t","expect":"ok","ref":"sql-select","note":"five-way UNION ALL chained with fixture table"}
+{"id":"selsa0167","category":"select-setops","sql":"SELECT 1 EXCEPT SELECT 1","expect":"ok","ref":"sql-select","note":"EXCEPT where left equals right yields empty result"}
+{"id":"selsa0168","category":"select-setops","sql":"SELECT 1 INTERSECT SELECT 2","expect":"ok","ref":"sql-select","note":"INTERSECT with no overlap yields empty result"}
+{"id":"selsa0169","category":"select-setops","sql":"SELECT id FROM s.t UNION SELECT t_id FROM s.t2 WHERE t_id IS NOT NULL UNION SELECT id FROM s.parent","expect":"ok","ref":"sql-select","note":"three-table UNION with WHERE filter in middle operand"}
+{"id":"selsa0170","category":"select-setops","sql":"SELECT 1 UNION SELECT 2 UNION SELECT 3 ORDER BY 1 DESC LIMIT 2 OFFSET 1","expect":"ok","ref":"sql-select","note":"three-way UNION with full ORDER BY DESC LIMIT OFFSET"}

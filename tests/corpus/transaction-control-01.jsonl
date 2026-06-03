@@ -1,0 +1,170 @@
+{"id":"txca0001","category":"transaction-control","sql":"BEGIN","expect":"ok","ref":"sql-begin","note":"bare BEGIN","txn":"none"}
+{"id":"txca0002","category":"transaction-control","sql":"BEGIN WORK","expect":"ok","ref":"sql-begin","note":"BEGIN WORK keyword","txn":"none"}
+{"id":"txca0003","category":"transaction-control","sql":"BEGIN TRANSACTION","expect":"ok","ref":"sql-begin","note":"BEGIN TRANSACTION keyword","txn":"none"}
+{"id":"txca0004","category":"transaction-control","sql":"START TRANSACTION","expect":"ok","ref":"sql-begin","note":"START TRANSACTION keyword","txn":"none"}
+{"id":"txca0005","category":"transaction-control","sql":"BEGIN READ ONLY","expect":"ok","ref":"sql-begin","note":"BEGIN with READ ONLY","txn":"none"}
+{"id":"txca0006","category":"transaction-control","sql":"BEGIN READ WRITE","expect":"ok","ref":"sql-begin","note":"BEGIN with READ WRITE","txn":"none"}
+{"id":"txca0007","category":"transaction-control","sql":"BEGIN DEFERRABLE","expect":"ok","ref":"sql-begin","note":"BEGIN with DEFERRABLE","txn":"none"}
+{"id":"txca0008","category":"transaction-control","sql":"BEGIN NOT DEFERRABLE","expect":"ok","ref":"sql-begin","note":"BEGIN with NOT DEFERRABLE","txn":"none"}
+{"id":"txca0009","category":"transaction-control","sql":"BEGIN ISOLATION LEVEL SERIALIZABLE","expect":"ok","ref":"sql-begin","note":"BEGIN with isolation level SERIALIZABLE","txn":"none"}
+{"id":"txca0010","category":"transaction-control","sql":"BEGIN ISOLATION LEVEL REPEATABLE READ","expect":"ok","ref":"sql-begin","note":"BEGIN with isolation level REPEATABLE READ","txn":"none"}
+{"id":"txca0011","category":"transaction-control","sql":"BEGIN ISOLATION LEVEL READ COMMITTED","expect":"ok","ref":"sql-begin","note":"BEGIN with isolation level READ COMMITTED","txn":"none"}
+{"id":"txca0012","category":"transaction-control","sql":"BEGIN ISOLATION LEVEL READ UNCOMMITTED","expect":"ok","ref":"sql-begin","note":"BEGIN with isolation level READ UNCOMMITTED","txn":"none"}
+{"id":"txca0013","category":"transaction-control","sql":"BEGIN ISOLATION LEVEL SERIALIZABLE READ ONLY","expect":"ok","ref":"sql-begin","note":"BEGIN serializable + read only","txn":"none"}
+{"id":"txca0014","category":"transaction-control","sql":"BEGIN ISOLATION LEVEL SERIALIZABLE READ WRITE","expect":"ok","ref":"sql-begin","note":"BEGIN serializable + read write","txn":"none"}
+{"id":"txca0015","category":"transaction-control","sql":"BEGIN ISOLATION LEVEL SERIALIZABLE DEFERRABLE","expect":"ok","ref":"sql-begin","note":"BEGIN serializable + deferrable","txn":"none"}
+{"id":"txca0016","category":"transaction-control","sql":"BEGIN ISOLATION LEVEL SERIALIZABLE NOT DEFERRABLE","expect":"ok","ref":"sql-begin","note":"BEGIN serializable + not deferrable","txn":"none"}
+{"id":"txca0017","category":"transaction-control","sql":"BEGIN ISOLATION LEVEL SERIALIZABLE READ ONLY DEFERRABLE","expect":"ok","ref":"sql-begin","note":"BEGIN serializable + read only + deferrable (all three)","txn":"none"}
+{"id":"txca0018","category":"transaction-control","sql":"BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY","expect":"ok","ref":"sql-begin","note":"BEGIN repeatable read + read only","txn":"none"}
+{"id":"txca0019","category":"transaction-control","sql":"BEGIN ISOLATION LEVEL READ COMMITTED READ WRITE NOT DEFERRABLE","expect":"ok","ref":"sql-begin","note":"BEGIN read committed + read write + not deferrable","txn":"none"}
+{"id":"txca0020","category":"transaction-control","sql":"BEGIN READ ONLY DEFERRABLE","expect":"ok","ref":"sql-begin","note":"BEGIN read only + deferrable (no isolation)","txn":"none"}
+{"id":"txca0021","category":"transaction-control","sql":"BEGIN READ WRITE NOT DEFERRABLE","expect":"ok","ref":"sql-begin","note":"BEGIN read write + not deferrable","txn":"none"}
+{"id":"txca0022","category":"transaction-control","sql":"START TRANSACTION ISOLATION LEVEL SERIALIZABLE","expect":"ok","ref":"sql-begin","note":"START TRANSACTION with SERIALIZABLE","txn":"none"}
+{"id":"txca0023","category":"transaction-control","sql":"START TRANSACTION ISOLATION LEVEL REPEATABLE READ","expect":"ok","ref":"sql-begin","note":"START TRANSACTION with REPEATABLE READ","txn":"none"}
+{"id":"txca0024","category":"transaction-control","sql":"START TRANSACTION ISOLATION LEVEL READ COMMITTED","expect":"ok","ref":"sql-begin","note":"START TRANSACTION with READ COMMITTED","txn":"none"}
+{"id":"txca0025","category":"transaction-control","sql":"START TRANSACTION ISOLATION LEVEL READ UNCOMMITTED","expect":"ok","ref":"sql-begin","note":"START TRANSACTION with READ UNCOMMITTED","txn":"none"}
+{"id":"txca0026","category":"transaction-control","sql":"START TRANSACTION READ ONLY","expect":"ok","ref":"sql-begin","note":"START TRANSACTION READ ONLY","txn":"none"}
+{"id":"txca0027","category":"transaction-control","sql":"START TRANSACTION READ WRITE","expect":"ok","ref":"sql-begin","note":"START TRANSACTION READ WRITE","txn":"none"}
+{"id":"txca0028","category":"transaction-control","sql":"START TRANSACTION DEFERRABLE","expect":"ok","ref":"sql-begin","note":"START TRANSACTION DEFERRABLE","txn":"none"}
+{"id":"txca0029","category":"transaction-control","sql":"START TRANSACTION NOT DEFERRABLE","expect":"ok","ref":"sql-begin","note":"START TRANSACTION NOT DEFERRABLE","txn":"none"}
+{"id":"txca0030","category":"transaction-control","sql":"START TRANSACTION ISOLATION LEVEL SERIALIZABLE READ ONLY DEFERRABLE","expect":"ok","ref":"sql-begin","note":"START TRANSACTION with all three options","txn":"none"}
+{"id":"txca0031","category":"transaction-control","sql":"COMMIT","expect":"ok","ref":"sql-commit","note":"bare COMMIT","txn":"none"}
+{"id":"txca0032","category":"transaction-control","sql":"COMMIT WORK","expect":"ok","ref":"sql-commit","note":"COMMIT WORK","txn":"none"}
+{"id":"txca0033","category":"transaction-control","sql":"COMMIT TRANSACTION","expect":"ok","ref":"sql-commit","note":"COMMIT TRANSACTION","txn":"none"}
+{"id":"txca0034","category":"transaction-control","sql":"END","expect":"ok","ref":"sql-commit","note":"END as alias for COMMIT","txn":"none"}
+{"id":"txca0035","category":"transaction-control","sql":"END WORK","expect":"ok","ref":"sql-commit","note":"END WORK","txn":"none"}
+{"id":"txca0036","category":"transaction-control","sql":"END TRANSACTION","expect":"ok","ref":"sql-commit","note":"END TRANSACTION","txn":"none"}
+{"id":"txca0037","category":"transaction-control","sql":"COMMIT AND CHAIN","expect":"ok","ref":"sql-commit","note":"COMMIT AND CHAIN","txn":"none"}
+{"id":"txca0038","category":"transaction-control","sql":"COMMIT AND NO CHAIN","expect":"ok","ref":"sql-commit","note":"COMMIT AND NO CHAIN","txn":"none"}
+{"id":"txca0039","category":"transaction-control","sql":"COMMIT WORK AND CHAIN","expect":"ok","ref":"sql-commit","note":"COMMIT WORK AND CHAIN","txn":"none"}
+{"id":"txca0040","category":"transaction-control","sql":"COMMIT WORK AND NO CHAIN","expect":"ok","ref":"sql-commit","note":"COMMIT WORK AND NO CHAIN","txn":"none"}
+{"id":"txca0041","category":"transaction-control","sql":"COMMIT TRANSACTION AND CHAIN","expect":"ok","ref":"sql-commit","note":"COMMIT TRANSACTION AND CHAIN","txn":"none"}
+{"id":"txca0042","category":"transaction-control","sql":"COMMIT TRANSACTION AND NO CHAIN","expect":"ok","ref":"sql-commit","note":"COMMIT TRANSACTION AND NO CHAIN","txn":"none"}
+{"id":"txca0043","category":"transaction-control","sql":"END AND CHAIN","expect":"ok","ref":"sql-commit","note":"END AND CHAIN","txn":"none"}
+{"id":"txca0044","category":"transaction-control","sql":"END AND NO CHAIN","expect":"ok","ref":"sql-commit","note":"END AND NO CHAIN","txn":"none"}
+{"id":"txca0045","category":"transaction-control","sql":"END WORK AND CHAIN","expect":"ok","ref":"sql-commit","note":"END WORK AND CHAIN","txn":"none"}
+{"id":"txca0046","category":"transaction-control","sql":"END TRANSACTION AND NO CHAIN","expect":"ok","ref":"sql-commit","note":"END TRANSACTION AND NO CHAIN","txn":"none"}
+{"id":"txca0047","category":"transaction-control","sql":"ROLLBACK","expect":"ok","ref":"sql-rollback","note":"bare ROLLBACK","txn":"none"}
+{"id":"txca0048","category":"transaction-control","sql":"ROLLBACK WORK","expect":"ok","ref":"sql-rollback","note":"ROLLBACK WORK","txn":"none"}
+{"id":"txca0049","category":"transaction-control","sql":"ROLLBACK TRANSACTION","expect":"ok","ref":"sql-rollback","note":"ROLLBACK TRANSACTION","txn":"none"}
+{"id":"txca0050","category":"transaction-control","sql":"ABORT","expect":"ok","ref":"sql-abort","note":"ABORT as alias for ROLLBACK","txn":"none"}
+{"id":"txca0051","category":"transaction-control","sql":"ABORT WORK","expect":"ok","ref":"sql-abort","note":"ABORT WORK","txn":"none"}
+{"id":"txca0052","category":"transaction-control","sql":"ABORT TRANSACTION","expect":"ok","ref":"sql-abort","note":"ABORT TRANSACTION","txn":"none"}
+{"id":"txca0053","category":"transaction-control","sql":"ROLLBACK AND CHAIN","expect":"ok","ref":"sql-rollback","note":"ROLLBACK AND CHAIN","txn":"none"}
+{"id":"txca0054","category":"transaction-control","sql":"ROLLBACK AND NO CHAIN","expect":"ok","ref":"sql-rollback","note":"ROLLBACK AND NO CHAIN","txn":"none"}
+{"id":"txca0055","category":"transaction-control","sql":"ROLLBACK WORK AND CHAIN","expect":"ok","ref":"sql-rollback","note":"ROLLBACK WORK AND CHAIN","txn":"none"}
+{"id":"txca0056","category":"transaction-control","sql":"ROLLBACK WORK AND NO CHAIN","expect":"ok","ref":"sql-rollback","note":"ROLLBACK WORK AND NO CHAIN","txn":"none"}
+{"id":"txca0057","category":"transaction-control","sql":"ROLLBACK TRANSACTION AND CHAIN","expect":"ok","ref":"sql-rollback","note":"ROLLBACK TRANSACTION AND CHAIN","txn":"none"}
+{"id":"txca0058","category":"transaction-control","sql":"ROLLBACK TRANSACTION AND NO CHAIN","expect":"ok","ref":"sql-rollback","note":"ROLLBACK TRANSACTION AND NO CHAIN","txn":"none"}
+{"id":"txca0059","category":"transaction-control","sql":"ABORT AND CHAIN","expect":"ok","ref":"sql-abort","note":"ABORT AND CHAIN","txn":"none"}
+{"id":"txca0060","category":"transaction-control","sql":"ABORT AND NO CHAIN","expect":"ok","ref":"sql-abort","note":"ABORT AND NO CHAIN","txn":"none"}
+{"id":"txca0061","category":"transaction-control","sql":"ABORT WORK AND CHAIN","expect":"ok","ref":"sql-abort","note":"ABORT WORK AND CHAIN","txn":"none"}
+{"id":"txca0062","category":"transaction-control","sql":"ABORT TRANSACTION AND NO CHAIN","expect":"ok","ref":"sql-abort","note":"ABORT TRANSACTION AND NO CHAIN","txn":"none"}
+{"id":"txca0063","category":"transaction-control","sql":"BEGIN; SAVEPOINT foo; ROLLBACK TO SAVEPOINT foo; COMMIT","expect":"ok","ref":"sql-savepoint","note":"SAVEPOINT basic usage","txn":"none"}
+{"id":"txca0064","category":"transaction-control","sql":"BEGIN; SAVEPOINT my_save; COMMIT","expect":"ok","ref":"sql-savepoint","note":"SAVEPOINT named identifier","txn":"none"}
+{"id":"txca0065","category":"transaction-control","sql":"BEGIN; SAVEPOINT sp1; SAVEPOINT sp2; ROLLBACK TO sp1; COMMIT","expect":"ok","ref":"sql-savepoint","note":"nested SAVEPOINTs, ROLLBACK TO without SAVEPOINT keyword","txn":"none"}
+{"id":"txca0066","category":"transaction-control","sql":"BEGIN; SAVEPOINT alpha; RELEASE SAVEPOINT alpha; COMMIT","expect":"ok","ref":"sql-release-savepoint","note":"RELEASE SAVEPOINT name","txn":"none"}
+{"id":"txca0067","category":"transaction-control","sql":"BEGIN; SAVEPOINT beta; RELEASE beta; COMMIT","expect":"ok","ref":"sql-release-savepoint","note":"RELEASE name (no SAVEPOINT keyword)","txn":"none"}
+{"id":"txca0068","category":"transaction-control","sql":"BEGIN; SAVEPOINT sp; ROLLBACK TO SAVEPOINT sp; COMMIT","expect":"ok","ref":"sql-rollback-to","note":"ROLLBACK TO SAVEPOINT name","txn":"none"}
+{"id":"txca0069","category":"transaction-control","sql":"BEGIN; SAVEPOINT sp; ROLLBACK TO sp; COMMIT","expect":"ok","ref":"sql-rollback-to","note":"ROLLBACK TO name (no SAVEPOINT keyword)","txn":"none"}
+{"id":"txca0070","category":"transaction-control","sql":"BEGIN; SAVEPOINT \"MyPoint\"; ROLLBACK TO \"MyPoint\"; COMMIT","expect":"ok","ref":"sql-savepoint","note":"SAVEPOINT with double-quoted name","txn":"none"}
+{"id":"txca0071","category":"transaction-control","sql":"BEGIN; SAVEPOINT s1; INSERT INTO s.t(name) VALUES('x'); ROLLBACK TO s1; COMMIT","expect":"ok","ref":"sql-savepoint","note":"SAVEPOINT + DML + ROLLBACK TO (DML reverted)","txn":"none"}
+{"id":"txca0072","category":"transaction-control","sql":"BEGIN; SAVEPOINT a; SAVEPOINT b; RELEASE SAVEPOINT b; ROLLBACK TO a; COMMIT","expect":"ok","ref":"sql-savepoint","note":"nested savepoints: release inner, rollback outer","txn":"none"}
+{"id":"txca0073","category":"transaction-control","sql":"BEGIN; SET TRANSACTION ISOLATION LEVEL SERIALIZABLE; COMMIT","expect":"ok","ref":"sql-set-transaction","note":"SET TRANSACTION ISOLATION LEVEL SERIALIZABLE inside txn","txn":"none"}
+{"id":"txca0074","category":"transaction-control","sql":"BEGIN; SET TRANSACTION ISOLATION LEVEL REPEATABLE READ; COMMIT","expect":"ok","ref":"sql-set-transaction","note":"SET TRANSACTION ISOLATION LEVEL REPEATABLE READ inside txn","txn":"none"}
+{"id":"txca0075","category":"transaction-control","sql":"BEGIN; SET TRANSACTION ISOLATION LEVEL READ COMMITTED; COMMIT","expect":"ok","ref":"sql-set-transaction","note":"SET TRANSACTION ISOLATION LEVEL READ COMMITTED inside txn","txn":"none"}
+{"id":"txca0076","category":"transaction-control","sql":"BEGIN; SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED; COMMIT","expect":"ok","ref":"sql-set-transaction","note":"SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED inside txn","txn":"none"}
+{"id":"txca0077","category":"transaction-control","sql":"BEGIN; SET TRANSACTION READ ONLY; COMMIT","expect":"ok","ref":"sql-set-transaction","note":"SET TRANSACTION READ ONLY","txn":"none"}
+{"id":"txca0078","category":"transaction-control","sql":"BEGIN; SET TRANSACTION READ WRITE; COMMIT","expect":"ok","ref":"sql-set-transaction","note":"SET TRANSACTION READ WRITE","txn":"none"}
+{"id":"txca0079","category":"transaction-control","sql":"BEGIN; SET TRANSACTION DEFERRABLE; COMMIT","expect":"ok","ref":"sql-set-transaction","note":"SET TRANSACTION DEFERRABLE","txn":"none"}
+{"id":"txca0080","category":"transaction-control","sql":"BEGIN; SET TRANSACTION NOT DEFERRABLE; COMMIT","expect":"ok","ref":"sql-set-transaction","note":"SET TRANSACTION NOT DEFERRABLE","txn":"none"}
+{"id":"txca0081","category":"transaction-control","sql":"BEGIN; SET TRANSACTION ISOLATION LEVEL SERIALIZABLE READ ONLY DEFERRABLE; COMMIT","expect":"ok","ref":"sql-set-transaction","note":"SET TRANSACTION with all three options","txn":"none"}
+{"id":"txca0082","category":"transaction-control","sql":"BEGIN; SET TRANSACTION ISOLATION LEVEL REPEATABLE READ READ ONLY NOT DEFERRABLE; COMMIT","expect":"ok","ref":"sql-set-transaction","note":"SET TRANSACTION repeatable read + read only + not deferrable","txn":"none"}
+{"id":"txca0083","category":"transaction-control","sql":"SET TRANSACTION ISOLATION LEVEL SERIALIZABLE","expect":"ok","ref":"sql-set-transaction","note":"SET TRANSACTION outside explicit txn block (session default)","txn":"none"}
+{"id":"txca0084","category":"transaction-control","sql":"SET TRANSACTION READ ONLY","expect":"ok","ref":"sql-set-transaction","note":"SET TRANSACTION READ ONLY outside txn","txn":"none"}
+{"id":"txca0085","category":"transaction-control","sql":"SET TRANSACTION READ WRITE","expect":"ok","ref":"sql-set-transaction","note":"SET TRANSACTION READ WRITE outside txn","txn":"none"}
+{"id":"txca0086","category":"transaction-control","sql":"BEGIN; SET CONSTRAINTS ALL DEFERRED; COMMIT","expect":"ok","ref":"sql-set-constraints","note":"SET CONSTRAINTS ALL DEFERRED","txn":"none"}
+{"id":"txca0087","category":"transaction-control","sql":"BEGIN; SET CONSTRAINTS ALL IMMEDIATE; COMMIT","expect":"ok","ref":"sql-set-constraints","note":"SET CONSTRAINTS ALL IMMEDIATE","txn":"none"}
+{"id":"txca0088","category":"transaction-control","sql":"BEGIN; CREATE TABLE tmp_ref(id int PRIMARY KEY); CREATE TABLE tmp_fk(fid int, CONSTRAINT fk_fid FOREIGN KEY (fid) REFERENCES tmp_ref(id) DEFERRABLE INITIALLY DEFERRED); SET CONSTRAINTS fk_fid IMMEDIATE; COMMIT","expect":"ok","ref":"sql-set-constraints","note":"SET CONSTRAINTS named FK constraint IMMEDIATE","txn":"none"}
+{"id":"txca0089","category":"transaction-control","sql":"BEGIN; CREATE TABLE tmp_ref2(id int PRIMARY KEY); CREATE TABLE tmp_fk2(fid int, CONSTRAINT fk_fid2 FOREIGN KEY (fid) REFERENCES tmp_ref2(id) DEFERRABLE INITIALLY IMMEDIATE); SET CONSTRAINTS fk_fid2 DEFERRED; COMMIT","expect":"ok","ref":"sql-set-constraints","note":"SET CONSTRAINTS named FK constraint DEFERRED","txn":"none"}
+{"id":"txca0090","category":"transaction-control","sql":"BEGIN; SET CONSTRAINTS ALL DEFERRED; SET CONSTRAINTS ALL IMMEDIATE; COMMIT","expect":"ok","ref":"sql-set-constraints","note":"SET CONSTRAINTS ALL: switch deferred then immediate","txn":"none"}
+{"id":"txca0091","category":"transaction-control","sql":"BEGIN; CREATE TABLE tmpr(id int PRIMARY KEY); CREATE TABLE tmpfk(fid int, CONSTRAINT c1 FOREIGN KEY (fid) REFERENCES tmpr(id) DEFERRABLE, CONSTRAINT c2 FOREIGN KEY (fid) REFERENCES tmpr(id) DEFERRABLE); SET CONSTRAINTS c1, c2 DEFERRED; COMMIT","expect":"ok","ref":"sql-set-constraints","note":"SET CONSTRAINTS with comma-separated FK constraint list","txn":"none"}
+{"id":"txca0092","category":"transaction-control","sql":"BEGIN ISOLATION LEVEL PHANTOM","expect":"error","ref":"sql-begin","note":"error: invalid isolation level name"}
+{"id":"txca0093","category":"transaction-control","sql":"BEGIN ISOLATION LEVEL","expect":"error","ref":"sql-begin","note":"error: missing isolation level value"}
+{"id":"txca0094","category":"transaction-control","sql":"BEGIN ISOLATION SERIALIZABLE","expect":"error","ref":"sql-begin","note":"error: ISOLATION without LEVEL keyword"}
+{"id":"txca0095","category":"transaction-control","sql":"BEGIN LEVEL SERIALIZABLE","expect":"error","ref":"sql-begin","note":"error: LEVEL without ISOLATION"}
+{"id":"txca0096","category":"transaction-control","sql":"BEGIN READ","expect":"error","ref":"sql-begin","note":"error: READ without ONLY or WRITE"}
+{"id":"txca0097","category":"transaction-control","sql":"BEGIN DEFERRABLE READ ONLY ISOLATION LEVEL SERIALIZABLE","expect":"ok","ref":"sql-begin","note":"BEGIN options in alternate order: DEFERRABLE first","txn":"none"}
+{"id":"txca0098","category":"transaction-control","sql":"START TRANSACTION ISOLATION LEVEL SERIALIZABLE, READ ONLY, DEFERRABLE","expect":"ok","ref":"sql-begin","note":"START TRANSACTION options comma-separated","txn":"none"}
+{"id":"txca0099","category":"transaction-control","sql":"BEGIN ISOLATION LEVEL SERIALIZABLE, READ ONLY, DEFERRABLE","expect":"ok","ref":"sql-begin","note":"BEGIN options comma-separated","txn":"none"}
+{"id":"txca0100","category":"transaction-control","sql":"COMMIT CHAIN","expect":"error","ref":"sql-commit","note":"error: COMMIT CHAIN missing AND keyword"}
+{"id":"txca0101","category":"transaction-control","sql":"ROLLBACK CHAIN","expect":"error","ref":"sql-rollback","note":"error: ROLLBACK CHAIN missing AND keyword"}
+{"id":"txca0102","category":"transaction-control","sql":"SAVEPOINT","expect":"error","ref":"sql-savepoint","note":"error: SAVEPOINT with no name (syntax error)"}
+{"id":"txca0103","category":"transaction-control","sql":"RELEASE SAVEPOINT","expect":"error","ref":"sql-release-savepoint","note":"error: RELEASE SAVEPOINT with no name"}
+{"id":"txca0104","category":"transaction-control","sql":"ROLLBACK TO","expect":"error","ref":"sql-rollback-to","note":"error: ROLLBACK TO with no savepoint name"}
+{"id":"txca0105","category":"transaction-control","sql":"ROLLBACK TO SAVEPOINT","expect":"error","ref":"sql-rollback-to","note":"error: ROLLBACK TO SAVEPOINT with no name"}
+{"id":"txca0106","category":"transaction-control","sql":"BEGIN; SET TRANSACTION ISOLATION LEVEL PHANTOM; COMMIT","expect":"error","ref":"sql-set-transaction","note":"error: SET TRANSACTION with invalid isolation level","txn":"none"}
+{"id":"txca0107","category":"transaction-control","sql":"SET CONSTRAINTS","expect":"error","ref":"sql-set-constraints","note":"error: SET CONSTRAINTS with nothing after it"}
+{"id":"txca0108","category":"transaction-control","sql":"SET CONSTRAINTS ALL","expect":"error","ref":"sql-set-constraints","note":"error: SET CONSTRAINTS ALL missing DEFERRED/IMMEDIATE"}
+{"id":"txca0109","category":"transaction-control","sql":"BEGIN READ ONLY READ WRITE","expect":"ok","ref":"sql-begin","note":"BEGIN with READ ONLY then READ WRITE (PG accepts, last wins)","txn":"none"}
+{"id":"txca0110","category":"transaction-control","sql":"BEGIN TRANSACTION ISOLATION LEVEL SERIALIZABLE READ ONLY","expect":"ok","ref":"sql-begin","note":"BEGIN TRANSACTION with two options","txn":"none"}
+{"id":"txca0111","category":"transaction-control","sql":"BEGIN WORK ISOLATION LEVEL READ COMMITTED","expect":"ok","ref":"sql-begin","note":"BEGIN WORK with isolation level","txn":"none"}
+{"id":"txca0112","category":"transaction-control","sql":"START TRANSACTION READ ONLY DEFERRABLE","expect":"ok","ref":"sql-begin","note":"START TRANSACTION READ ONLY DEFERRABLE (no isolation)","txn":"none"}
+{"id":"txca0113","category":"transaction-control","sql":"BEGIN; SAVEPOINT abc123; COMMIT","expect":"ok","ref":"sql-savepoint","note":"SAVEPOINT with alphanumeric name","txn":"none"}
+{"id":"txca0114","category":"transaction-control","sql":"BEGIN; SAVEPOINT _underscore_sp; RELEASE _underscore_sp; COMMIT","expect":"ok","ref":"sql-savepoint","note":"SAVEPOINT name starting with underscore","txn":"none"}
+{"id":"txca0115","category":"transaction-control","sql":"BEGIN; SAVEPOINT sp1; SAVEPOINT sp1; ROLLBACK TO sp1; COMMIT","expect":"ok","ref":"sql-savepoint","note":"duplicate SAVEPOINT name (resets the savepoint)","txn":"none"}
+{"id":"txca0116","category":"transaction-control","sql":"BEGIN; SAVEPOINT s1; RELEASE SAVEPOINT s1; ROLLBACK TO s1; COMMIT","expect":"error","ref":"sql-release-savepoint","note":"error: ROLLBACK TO after RELEASE (savepoint gone)","txn":"none"}
+{"id":"txca0117","category":"transaction-control","sql":"BEGIN; SET TRANSACTION SNAPSHOT 'not-a-real-snapshot-id'; COMMIT","expect":"error","ref":"sql-set-transaction","note":"error: SET TRANSACTION SNAPSHOT with invalid snapshot id","txn":"none"}
+{"id":"txca0118","category":"transaction-control","sql":"BEGIN; SET TRANSACTION ISOLATION LEVEL SERIALIZABLE; SET TRANSACTION ISOLATION LEVEL READ COMMITTED; COMMIT","expect":"ok","ref":"sql-set-transaction","note":"SET TRANSACTION called twice in same txn (PG allows)","txn":"none"}
+{"id":"txca0119","category":"transaction-control","sql":"BEGIN; INSERT INTO s.t(name) VALUES('txtest'); SET TRANSACTION ISOLATION LEVEL SERIALIZABLE; COMMIT","expect":"error","ref":"sql-set-transaction","note":"error: SET TRANSACTION after DML (too late in transaction)","txn":"none"}
+{"id":"txca0120","category":"transaction-control","sql":"BEGIN; ROLLBACK TO nonexistent_sp; COMMIT","expect":"error","ref":"sql-rollback-to","note":"error: ROLLBACK TO nonexistent savepoint","txn":"none"}
+{"id":"txca0121","category":"transaction-control","sql":"begin","expect":"ok","ref":"sql-begin","note":"BEGIN in lowercase","txn":"none"}
+{"id":"txca0122","category":"transaction-control","sql":"begin work","expect":"ok","ref":"sql-begin","note":"begin work in lowercase","txn":"none"}
+{"id":"txca0123","category":"transaction-control","sql":"begin isolation level serializable","expect":"ok","ref":"sql-begin","note":"BEGIN with options all lowercase","txn":"none"}
+{"id":"txca0124","category":"transaction-control","sql":"commit","expect":"ok","ref":"sql-commit","note":"COMMIT lowercase","txn":"none"}
+{"id":"txca0125","category":"transaction-control","sql":"rollback","expect":"ok","ref":"sql-rollback","note":"ROLLBACK lowercase","txn":"none"}
+{"id":"txca0126","category":"transaction-control","sql":"abort","expect":"ok","ref":"sql-abort","note":"ABORT lowercase","txn":"none"}
+{"id":"txca0127","category":"transaction-control","sql":"BEGIN; savepoint MySP; rollback to savepoint MySP; commit","expect":"ok","ref":"sql-savepoint","note":"mixed case SAVEPOINT keywords","txn":"none"}
+{"id":"txca0128","category":"transaction-control","sql":"BEGIN; SET CONSTRAINTS ALL DEFERRED; ROLLBACK","expect":"ok","ref":"sql-set-constraints","note":"SET CONSTRAINTS + ROLLBACK (no COMMIT needed)","txn":"none"}
+{"id":"txca0129","category":"transaction-control","sql":"set constraints all deferred","expect":"ok","ref":"sql-set-constraints","note":"SET CONSTRAINTS lowercase outside txn","txn":"none"}
+{"id":"txca0130","category":"transaction-control","sql":"BEGIN; ROLLBACK","expect":"ok","ref":"sql-rollback","note":"simple BEGIN then ROLLBACK","txn":"none"}
+{"id":"txca0131","category":"transaction-control","sql":"BEGIN; ABORT","expect":"ok","ref":"sql-abort","note":"simple BEGIN then ABORT","txn":"none"}
+{"id":"txca0132","category":"transaction-control","sql":"BEGIN; END","expect":"ok","ref":"sql-commit","note":"simple BEGIN then END","txn":"none"}
+{"id":"txca0133","category":"transaction-control","sql":"BEGIN ISOLATION LEVEL SERIALIZABLE READ WRITE NOT DEFERRABLE","expect":"ok","ref":"sql-begin","note":"BEGIN all three options: serializable + rw + not deferrable","txn":"none"}
+{"id":"txca0134","category":"transaction-control","sql":"BEGIN ISOLATION LEVEL REPEATABLE READ READ WRITE DEFERRABLE","expect":"ok","ref":"sql-begin","note":"BEGIN repeatable read + rw + deferrable","txn":"none"}
+{"id":"txca0135","category":"transaction-control","sql":"BEGIN ISOLATION LEVEL READ UNCOMMITTED READ ONLY DEFERRABLE","expect":"ok","ref":"sql-begin","note":"BEGIN read uncommitted + ro + deferrable","txn":"none"}
+{"id":"txca0136","category":"transaction-control","sql":"BEGIN ISOLATION LEVEL READ COMMITTED NOT DEFERRABLE","expect":"ok","ref":"sql-begin","note":"BEGIN read committed + not deferrable","txn":"none"}
+{"id":"txca0137","category":"transaction-control","sql":"BEGIN; SET TRANSACTION READ ONLY; SELECT id FROM s.t; COMMIT","expect":"ok","ref":"sql-set-transaction","note":"SET TRANSACTION READ ONLY then SELECT is fine","txn":"none"}
+{"id":"txca0138","category":"transaction-control","sql":"BEGIN; SET TRANSACTION READ ONLY; INSERT INTO s.t(name) VALUES('x'); COMMIT","expect":"error","ref":"sql-set-transaction","note":"error: DML in READ ONLY transaction","txn":"none"}
+{"id":"txca0139","category":"transaction-control","sql":"BEGIN READ ONLY; INSERT INTO s.t(name) VALUES('y'); COMMIT","expect":"error","ref":"sql-begin","note":"error: INSERT in READ ONLY transaction","txn":"none"}
+{"id":"txca0140","category":"transaction-control","sql":"BEGIN; SAVEPOINT sp_a; SAVEPOINT sp_b; RELEASE sp_a; COMMIT","expect":"ok","ref":"sql-release-savepoint","note":"RELEASE outer savepoint (also releases inner)","txn":"none"}
+{"id":"txca0141","category":"transaction-control","sql":"BEGIN; SET TRANSACTION ISOLATION LEVEL SERIALIZABLE READ ONLY; COMMIT","expect":"ok","ref":"sql-set-transaction","note":"SET TRANSACTION two options: serializable + read only","txn":"none"}
+{"id":"txca0142","category":"transaction-control","sql":"BEGIN; SET TRANSACTION READ ONLY DEFERRABLE; COMMIT","expect":"ok","ref":"sql-set-transaction","note":"SET TRANSACTION read only + deferrable","txn":"none"}
+{"id":"txca0143","category":"transaction-control","sql":"BEGIN; SET TRANSACTION NOT DEFERRABLE; COMMIT","expect":"ok","ref":"sql-set-transaction","note":"SET TRANSACTION NOT DEFERRABLE alone","txn":"none"}
+{"id":"txca0144","category":"transaction-control","sql":"BEGIN; SET TRANSACTION DEFERRABLE; COMMIT","expect":"ok","ref":"sql-set-transaction","note":"SET TRANSACTION DEFERRABLE alone","txn":"none"}
+{"id":"txca0145","category":"transaction-control","sql":"SET LOCAL TRANSACTION ISOLATION LEVEL SERIALIZABLE","expect":"ok","ref":"sql-set-transaction","note":"SET LOCAL TRANSACTION ... parsed as SET LOCAL of variable TRANSACTION (valid SET syntax)","txn":"none"}
+{"id":"txca0146","category":"transaction-control","sql":"BEGIN SNAPSHOT 'abc'","expect":"error","ref":"sql-begin","note":"error: SNAPSHOT is only valid in SET TRANSACTION not BEGIN"}
+{"id":"txca0147","category":"transaction-control","sql":"BEGIN ISOLATION LEVEL SERIALIZABLE ISOLATION LEVEL READ COMMITTED","expect":"ok","ref":"sql-begin","note":"duplicate ISOLATION LEVEL in BEGIN (PG accepts, last wins)","txn":"none"}
+{"id":"txca0148","category":"transaction-control","sql":"BEGIN DEFERRABLE DEFERRABLE","expect":"ok","ref":"sql-begin","note":"duplicate DEFERRABLE in BEGIN (PG accepts)","txn":"none"}
+{"id":"txca0149","category":"transaction-control","sql":"END ISOLATION LEVEL SERIALIZABLE","expect":"error","ref":"sql-commit","note":"error: END does not accept transaction options"}
+{"id":"txca0150","category":"transaction-control","sql":"ABORT ISOLATION LEVEL SERIALIZABLE","expect":"error","ref":"sql-abort","note":"error: ABORT does not accept transaction options"}
+{"id":"txca0151","category":"transaction-control","sql":"BEGIN; SAVEPOINT 1bad; COMMIT","expect":"error","ref":"sql-savepoint","note":"error: SAVEPOINT name starting with digit (syntax error)","txn":"none"}
+{"id":"txca0152","category":"transaction-control","sql":"BEGIN; RELEASE SAVEPOINT nonexistent_sp; COMMIT","expect":"error","ref":"sql-release-savepoint","note":"error: RELEASE nonexistent savepoint","txn":"none"}
+{"id":"txca0153","category":"transaction-control","sql":"START TRANSACTION ISOLATION LEVEL SERIALIZABLE, READ WRITE, NOT DEFERRABLE","expect":"ok","ref":"sql-begin","note":"START TRANSACTION all options comma-separated","txn":"none"}
+{"id":"txca0154","category":"transaction-control","sql":"BEGIN ISOLATION LEVEL READ COMMITTED, READ ONLY","expect":"ok","ref":"sql-begin","note":"BEGIN two options comma-separated","txn":"none"}
+{"id":"txca0155","category":"transaction-control","sql":"BEGIN TRANSACTION ISOLATION LEVEL REPEATABLE READ, READ ONLY, NOT DEFERRABLE","expect":"ok","ref":"sql-begin","note":"BEGIN TRANSACTION three options comma-separated","txn":"none"}
+{"id":"txca0156","category":"transaction-control","sql":"BEGIN; SAVEPOINT sp1; SAVEPOINT sp2; ROLLBACK TO SAVEPOINT sp1; RELEASE SAVEPOINT sp2; COMMIT","expect":"error","ref":"sql-savepoint","note":"error: RELEASE sp2 after ROLLBACK TO sp1 removed sp2","txn":"none"}
+{"id":"txca0157","category":"transaction-control","sql":"BEGIN; SAVEPOINT sp1; SAVEPOINT sp2; ROLLBACK TO SAVEPOINT sp1; SAVEPOINT sp2; RELEASE sp2; COMMIT","expect":"ok","ref":"sql-savepoint","note":"re-establish sp2 after ROLLBACK TO sp1, then RELEASE","txn":"none"}
+{"id":"txca0158","category":"transaction-control","sql":"BEGIN; SET TRANSACTION ISOLATION LEVEL SERIALIZABLE, READ ONLY; COMMIT","expect":"ok","ref":"sql-set-transaction","note":"SET TRANSACTION two options comma-separated","txn":"none"}
+{"id":"txca0159","category":"transaction-control","sql":"BEGIN; SET TRANSACTION READ ONLY, NOT DEFERRABLE; COMMIT","expect":"ok","ref":"sql-set-transaction","note":"SET TRANSACTION READ ONLY, NOT DEFERRABLE comma-separated","txn":"none"}
+{"id":"txca0160","category":"transaction-control","sql":"BEGIN; SET TRANSACTION ISOLATION LEVEL REPEATABLE READ, READ WRITE, DEFERRABLE; COMMIT","expect":"ok","ref":"sql-set-transaction","note":"SET TRANSACTION all three options comma-separated","txn":"none"}
+{"id":"txca0161","category":"transaction-control","sql":"COMMIT AND CHAIN; BEGIN","expect":"error","ref":"sql-commit","note":"error: COMMIT AND CHAIN requires an active transaction block","txn":"none"}
+{"id":"txca0162","category":"transaction-control","sql":"ROLLBACK AND CHAIN; COMMIT","expect":"error","ref":"sql-rollback","note":"error: ROLLBACK AND CHAIN requires an active transaction block","txn":"none"}
+{"id":"txca0163","category":"transaction-control","sql":"BEGIN; SAVEPOINT \"my savepoint\"; ROLLBACK TO \"my savepoint\"; COMMIT","expect":"ok","ref":"sql-savepoint","note":"SAVEPOINT with quoted name containing space","txn":"none"}
+{"id":"txca0164","category":"transaction-control","sql":"BEGIN; SAVEPOINT transaction; RELEASE SAVEPOINT transaction; COMMIT","expect":"ok","ref":"sql-savepoint","note":"SAVEPOINT using reserved keyword as name (quoted context)","txn":"none"}
+{"id":"txca0165","category":"transaction-control","sql":"BEGIN TRANSACTION READ ONLY ISOLATION LEVEL SERIALIZABLE","expect":"ok","ref":"sql-begin","note":"BEGIN TRANSACTION options in alternate order: READ ONLY before ISOLATION LEVEL","txn":"none"}
+{"id":"txca0166","category":"transaction-control","sql":"BEGIN NOT DEFERRABLE READ ONLY ISOLATION LEVEL READ COMMITTED","expect":"ok","ref":"sql-begin","note":"BEGIN all options in reversed order","txn":"none"}
+{"id":"txca0167","category":"transaction-control","sql":"BEGIN; SET CONSTRAINTS ALL DEFERRED; SAVEPOINT sp; SET CONSTRAINTS ALL IMMEDIATE; ROLLBACK TO sp; COMMIT","expect":"ok","ref":"sql-set-constraints","note":"SET CONSTRAINTS scope with SAVEPOINT","txn":"none"}
+{"id":"txca0168","category":"transaction-control","sql":"SET TRANSACTION ISOLATION LEVEL SERIALIZABLE READ ONLY DEFERRABLE","expect":"ok","ref":"sql-set-transaction","note":"SET TRANSACTION all options outside txn block","txn":"none"}
+{"id":"txca0169","category":"transaction-control","sql":"SET TRANSACTION NOT DEFERRABLE","expect":"ok","ref":"sql-set-transaction","note":"SET TRANSACTION NOT DEFERRABLE outside txn block","txn":"none"}
+{"id":"txca0170","category":"transaction-control","sql":"SET TRANSACTION DEFERRABLE","expect":"ok","ref":"sql-set-transaction","note":"SET TRANSACTION DEFERRABLE outside txn block","txn":"none"}

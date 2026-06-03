@@ -1,0 +1,35 @@
+{"id":"seljc0001","category":"select-joins","sql":"SELECT t.id, t2.label FROM s.t JOIN s.t2 ON t.id = t2.t_id","expect":"ok","ref":"sql-select","note":"INNER JOIN with ON clause"}
+{"id":"seljc0002","category":"select-joins","sql":"SELECT t.id, t2.label FROM s.t INNER JOIN s.t2 ON t.id = t2.t_id","expect":"ok","ref":"sql-select","note":"explicit INNER JOIN with ON clause"}
+{"id":"seljc0003","category":"select-joins","sql":"SELECT t2.id, t2.t_id FROM s.t2 LEFT JOIN s.t ON t2.t_id = t.id","expect":"ok","ref":"sql-select","note":"LEFT JOIN with ON clause"}
+{"id":"seljc0004","category":"select-joins","sql":"SELECT t2.id, t2.t_id FROM s.t2 LEFT OUTER JOIN s.t ON t2.t_id = t.id","expect":"ok","ref":"sql-select","note":"LEFT OUTER JOIN with ON clause"}
+{"id":"seljc0005","category":"select-joins","sql":"SELECT t.id, t2.label FROM s.t RIGHT JOIN s.t2 ON t.id = t2.t_id","expect":"ok","ref":"sql-select","note":"RIGHT JOIN with ON clause"}
+{"id":"seljc0006","category":"select-joins","sql":"SELECT t.id, t2.label FROM s.t RIGHT OUTER JOIN s.t2 ON t.id = t2.t_id","expect":"ok","ref":"sql-select","note":"RIGHT OUTER JOIN with ON clause"}
+{"id":"seljc0007","category":"select-joins","sql":"SELECT t.id, t2.label FROM s.t FULL JOIN s.t2 ON t.id = t2.t_id","expect":"ok","ref":"sql-select","note":"FULL JOIN with ON clause"}
+{"id":"seljc0008","category":"select-joins","sql":"SELECT t.id, t2.label FROM s.t FULL OUTER JOIN s.t2 ON t.id = t2.t_id","expect":"ok","ref":"sql-select","note":"FULL OUTER JOIN with ON clause"}
+{"id":"seljc0009","category":"select-joins","sql":"SELECT * FROM s.t CROSS JOIN s.t2","expect":"ok","ref":"sql-select","note":"CROSS JOIN (no ON/USING)"}
+{"id":"seljc0010","category":"select-joins","sql":"SELECT t.id, t2.t_id FROM s.t JOIN s.t2 USING (id)","expect":"ok","ref":"sql-select","note":"JOIN USING with shared column name"}
+{"id":"seljc0011","category":"select-joins","sql":"SELECT a.id, b.id FROM s.t AS a JOIN s.t AS b ON a.id <> b.id","expect":"ok","ref":"sql-select","note":"self join with aliases"}
+{"id":"seljc0012","category":"select-joins","sql":"SELECT t.id, sub.label FROM s.t JOIN (SELECT t_id, label FROM s.t2) AS sub ON t.id = sub.t_id","expect":"ok","ref":"sql-select","note":"JOIN to subquery"}
+{"id":"seljc0013","category":"select-joins","sql":"SELECT t.id, t2.label, p.kind FROM s.t JOIN s.t2 ON t.id = t2.t_id JOIN s.parent AS p ON t.id = p.id","expect":"ok","ref":"sql-select","note":"multiple JOINs chained"}
+{"id":"seljc0014","category":"select-joins","sql":"SELECT t.id, lf.* FROM s.t, LATERAL (SELECT * FROM s.t2 WHERE t2.t_id = t.id) AS lf","expect":"ok","ref":"sql-select","note":"LATERAL subquery in FROM comma list"}
+{"id":"seljc0015","category":"select-joins","sql":"SELECT t.id, lf.* FROM s.t JOIN LATERAL (SELECT * FROM s.t2 WHERE t2.t_id = t.id) AS lf ON true","expect":"ok","ref":"sql-select","note":"JOIN LATERAL subquery with ON true"}
+{"id":"seljc0016","category":"select-joins","sql":"SELECT t.id FROM (s.t JOIN s.t2 ON s.t.id = s.t2.t_id)","expect":"ok","ref":"sql-select","note":"parenthesized join expression in FROM"}
+{"id":"seljc0017","category":"select-joins","sql":"SELECT * FROM s.t NATURAL JOIN s.t2","expect":"ok","ref":"sql-select","note":"NATURAL JOIN (auto-matches common columns)"}
+{"id":"seljc0018","category":"select-joins","sql":"SELECT * FROM s.t2 NATURAL LEFT JOIN s.t","expect":"ok","ref":"sql-select","note":"NATURAL LEFT JOIN"}
+{"id":"seljc0019","category":"select-joins","sql":"SELECT t.id, rf.* FROM s.t LEFT JOIN LATERAL s.rows_f() AS rf ON true","expect":"ok","ref":"sql-select","note":"LEFT JOIN LATERAL set-returning function"}
+{"id":"seljc0020","category":"select-joins","sql":"SELECT * FROM s.t JOIN s.t2","expect":"error","ref":"sql-select","note":"syntax error: JOIN without ON or USING"}
+{"id":"seljc0021","category":"select-joins","sql":"SELECT * FROM s.t JOIN s.t2 USING id","expect":"error","ref":"sql-select","note":"syntax error: USING without parenthesized column list"}
+{"id":"seljc0022","category":"select-joins","sql":"SELECT * FROM s.t CROSS JOIN s.t2 ON s.t.id = s.t2.t_id","expect":"error","ref":"sql-select","note":"syntax error: CROSS JOIN cannot have ON clause"}
+{"id":"seljc0023","category":"select-joins","sql":"SELECT * FROM s.t NATURAL JOIN s.t2 ON s.t.id = s.t2.t_id","expect":"error","ref":"sql-select","note":"syntax error: NATURAL JOIN cannot have ON clause"}
+{"id":"seljc0024","category":"select-joins","sql":"SELECT t.id FROM s.t JOIN USING (id)","expect":"error","ref":"sql-select","note":"syntax error: JOIN with no right-hand relation"}
+{"id":"seljc0025","category":"select-joins","sql":"SELECT t.id, t.name, t2.label, p.kind FROM s.t LEFT JOIN s.t2 ON t.id = t2.t_id JOIN s.parent AS p ON t.id = p.id WHERE t.id IS NOT NULL","expect":"ok","ref":"sql-select","note":"mixed LEFT JOIN and INNER JOIN with WHERE"}
+{"id":"seljc0026","category":"select-joins","sql":"SELECT t.id FROM s.t JOIN s.t2 ON t.id = t2.t_id AND t2.amount > 0","expect":"ok","ref":"sql-select","note":"JOIN ON with compound condition"}
+{"id":"seljc0027","category":"select-joins","sql":"SELECT COALESCE(a.id, b.id) AS id FROM s.t AS a FULL JOIN s.t AS b USING (id)","expect":"ok","ref":"sql-select","note":"FULL JOIN USING with COALESCE on join column"}
+{"id":"seljc0028","category":"select-joins","sql":"SELECT * FROM s.t JOIN s.t2 ON s.t.id = s.t2.t_id ORDER BY s.t.id","expect":"ok","ref":"sql-select","note":"JOIN with schema-qualified column refs and ORDER BY"}
+{"id":"seljc0029","category":"select-joins","sql":"SELECT count(*) FROM s.t JOIN s.t2 ON t.id = t2.t_id GROUP BY t.status HAVING count(*) > 0","expect":"ok","ref":"sql-select","note":"JOIN combined with GROUP BY and HAVING"}
+{"id":"seljc0030","category":"select-joins","sql":"SELECT t.id FROM s.t LEFT JOIN s.t2 ON t.id = t2.t_id WHERE t2.id IS NULL","expect":"ok","ref":"sql-select","note":"LEFT JOIN with IS NULL filter to find non-matching rows"}
+{"id":"seljc0031","category":"select-joins","sql":"SELECT * FROM s.t INNER s.t2 ON s.t.id = s.t2.t_id","expect":"error","ref":"sql-select","note":"syntax error: INNER without JOIN keyword"}
+{"id":"seljc0032","category":"select-joins","sql":"SELECT * FROM s.t JOIN s.t2 ON","expect":"error","ref":"sql-select","note":"syntax error: ON clause with no predicate"}
+{"id":"seljc0033","category":"select-joins","sql":"SELECT * FROM s.t OUTER JOIN s.t2 ON s.t.id = s.t2.t_id","expect":"error","ref":"sql-select","note":"syntax error: OUTER without LEFT/RIGHT/FULL direction"}
+{"id":"seljc0034","category":"select-joins","sql":"SELECT t.id FROM s.t JOIN s.t2 USING ()","expect":"error","ref":"sql-select","note":"syntax error: USING with empty column list"}
+{"id":"seljc0035","category":"select-joins","sql":"SELECT * FROM s.t NATURAL CROSS JOIN s.t2","expect":"error","ref":"sql-select","note":"syntax error: NATURAL CROSS JOIN is not valid"}

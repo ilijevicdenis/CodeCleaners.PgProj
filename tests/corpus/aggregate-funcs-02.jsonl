@@ -1,0 +1,170 @@
+{"id":"aggfb0001","category":"aggregate-funcs","sql":"SELECT count(*) FROM s.t","expect":"ok","ref":"functions-aggregate","note":"count(*) basic form counts all rows including nulls"}
+{"id":"aggfb0002","category":"aggregate-funcs","sql":"SELECT count(val) FROM s.t","expect":"ok","ref":"functions-aggregate","note":"count(expr) counts non-null values"}
+{"id":"aggfb0003","category":"aggregate-funcs","sql":"SELECT count(DISTINCT val) FROM s.t","expect":"ok","ref":"functions-aggregate","note":"count(DISTINCT expr) counts distinct non-null values"}
+{"id":"aggfb0004","category":"aggregate-funcs","sql":"SELECT count(ALL val) FROM s.t","expect":"ok","ref":"functions-aggregate","note":"count(ALL expr) explicit ALL modifier is default behavior"}
+{"id":"aggfb0005","category":"aggregate-funcs","sql":"SELECT count(DISTINCT name, val) FROM s.t","expect":"error","ref":"functions-aggregate","note":"count(DISTINCT) with multiple args is syntax error"}
+{"id":"aggfb0006","category":"aggregate-funcs","sql":"SELECT count() FROM s.t","expect":"error","ref":"functions-aggregate","note":"count() with no argument is syntax error"}
+{"id":"aggfb0007","category":"aggregate-funcs","sql":"SELECT count(DISTINCT *) FROM s.t","expect":"error","ref":"functions-aggregate","note":"count(DISTINCT *) is not valid syntax"}
+{"id":"aggfb0008","category":"aggregate-funcs","sql":"SELECT sum(val) FROM s.t","expect":"ok","ref":"functions-aggregate","note":"sum over numeric column"}
+{"id":"aggfb0009","category":"aggregate-funcs","sql":"SELECT sum(DISTINCT val) FROM s.t","expect":"ok","ref":"functions-aggregate","note":"sum(DISTINCT expr) sums distinct values only"}
+{"id":"aggfb0010","category":"aggregate-funcs","sql":"SELECT sum() FROM s.t","expect":"error","ref":"functions-aggregate","note":"sum() with no argument is syntax error"}
+{"id":"aggfb0011","category":"aggregate-funcs","sql":"SELECT sum(name) FROM s.t","expect":"error","ref":"functions-aggregate","note":"sum over non-numeric type text is type error"}
+{"id":"aggfb0012","category":"aggregate-funcs","sql":"SELECT avg(val) FROM s.t","expect":"ok","ref":"functions-aggregate","note":"avg over numeric column returns numeric"}
+{"id":"aggfb0013","category":"aggregate-funcs","sql":"SELECT avg(DISTINCT val) FROM s.t","expect":"ok","ref":"functions-aggregate","note":"avg(DISTINCT expr) averages distinct values"}
+{"id":"aggfb0014","category":"aggregate-funcs","sql":"SELECT avg() FROM s.t","expect":"error","ref":"functions-aggregate","note":"avg() with no argument is syntax error"}
+{"id":"aggfb0015","category":"aggregate-funcs","sql":"SELECT avg(name) FROM s.t","expect":"error","ref":"functions-aggregate","note":"avg over text type is type error"}
+{"id":"aggfb0016","category":"aggregate-funcs","sql":"SELECT min(val) FROM s.t","expect":"ok","ref":"functions-aggregate","note":"min over numeric column"}
+{"id":"aggfb0017","category":"aggregate-funcs","sql":"SELECT min(name) FROM s.t","expect":"ok","ref":"functions-aggregate","note":"min over text column (lexicographic ordering)"}
+{"id":"aggfb0018","category":"aggregate-funcs","sql":"SELECT min() FROM s.t","expect":"error","ref":"functions-aggregate","note":"min() with no argument is syntax error"}
+{"id":"aggfb0019","category":"aggregate-funcs","sql":"SELECT max(val) FROM s.t","expect":"ok","ref":"functions-aggregate","note":"max over numeric column"}
+{"id":"aggfb0020","category":"aggregate-funcs","sql":"SELECT max(name) FROM s.t","expect":"ok","ref":"functions-aggregate","note":"max over text column"}
+{"id":"aggfb0021","category":"aggregate-funcs","sql":"SELECT max() FROM s.t","expect":"error","ref":"functions-aggregate","note":"max() with no argument is syntax error"}
+{"id":"aggfb0022","category":"aggregate-funcs","sql":"SELECT min(val), max(val), avg(val) FROM s.t","expect":"ok","ref":"functions-aggregate","note":"min max avg combined in same select list"}
+{"id":"aggfb0023","category":"aggregate-funcs","sql":"SELECT sum(val), count(*), avg(val) FROM s.t","expect":"ok","ref":"functions-aggregate","note":"multiple aggregates in single query without GROUP BY"}
+{"id":"aggfb0024","category":"aggregate-funcs","sql":"SELECT name, count(*) FROM s.t GROUP BY name","expect":"ok","ref":"functions-aggregate","note":"count(*) with GROUP BY"}
+{"id":"aggfb0025","category":"aggregate-funcs","sql":"SELECT name, sum(val) FROM s.t GROUP BY name","expect":"ok","ref":"functions-aggregate","note":"sum with GROUP BY"}
+{"id":"aggfb0026","category":"aggregate-funcs","sql":"SELECT name, avg(val) FROM s.t GROUP BY name","expect":"ok","ref":"functions-aggregate","note":"avg with GROUP BY"}
+{"id":"aggfb0027","category":"aggregate-funcs","sql":"SELECT name, min(val), max(val) FROM s.t GROUP BY name","expect":"ok","ref":"functions-aggregate","note":"min and max combined with GROUP BY"}
+{"id":"aggfb0028","category":"aggregate-funcs","sql":"SELECT array_agg(val) FROM s.t","expect":"ok","ref":"functions-aggregate","note":"array_agg basic form builds array from values"}
+{"id":"aggfb0029","category":"aggregate-funcs","sql":"SELECT array_agg(val ORDER BY val) FROM s.t","expect":"ok","ref":"functions-aggregate","note":"array_agg with ORDER BY inside aggregate"}
+{"id":"aggfb0030","category":"aggregate-funcs","sql":"SELECT array_agg(val ORDER BY val DESC NULLS LAST) FROM s.t","expect":"ok","ref":"functions-aggregate","note":"array_agg ORDER BY DESC NULLS LAST"}
+{"id":"aggfb0031","category":"aggregate-funcs","sql":"SELECT array_agg(val ORDER BY val ASC NULLS FIRST) FROM s.t","expect":"ok","ref":"functions-aggregate","note":"array_agg ORDER BY ASC NULLS FIRST"}
+{"id":"aggfb0032","category":"aggregate-funcs","sql":"SELECT array_agg(DISTINCT val) FROM s.t","expect":"ok","ref":"functions-aggregate","note":"array_agg(DISTINCT) supported since PG16"}
+{"id":"aggfb0033","category":"aggregate-funcs","sql":"SELECT array_agg() FROM s.t","expect":"error","ref":"functions-aggregate","note":"array_agg() with no argument is syntax error"}
+{"id":"aggfb0034","category":"aggregate-funcs","sql":"SELECT name, array_agg(val ORDER BY val) FROM s.t GROUP BY name","expect":"ok","ref":"functions-aggregate","note":"array_agg ORDER BY with GROUP BY"}
+{"id":"aggfb0035","category":"aggregate-funcs","sql":"SELECT string_agg(name, ',') FROM s.t","expect":"ok","ref":"functions-aggregate","note":"string_agg basic form with literal delimiter"}
+{"id":"aggfb0036","category":"aggregate-funcs","sql":"SELECT string_agg(name, ',' ORDER BY name) FROM s.t","expect":"ok","ref":"functions-aggregate","note":"string_agg with ORDER BY inside aggregate"}
+{"id":"aggfb0037","category":"aggregate-funcs","sql":"SELECT string_agg(name, ',' ORDER BY name DESC NULLS LAST) FROM s.t","expect":"ok","ref":"functions-aggregate","note":"string_agg ORDER BY with NULLS LAST modifier"}
+{"id":"aggfb0038","category":"aggregate-funcs","sql":"SELECT string_agg(DISTINCT name, ',') FROM s.t","expect":"ok","ref":"functions-aggregate","note":"string_agg(DISTINCT expr, delim) deduplicates values before concatenation"}
+{"id":"aggfb0039","category":"aggregate-funcs","sql":"SELECT name, string_agg(name, '|' ORDER BY val) FROM s.t GROUP BY name","expect":"ok","ref":"functions-aggregate","note":"string_agg ORDER BY non-output col with GROUP BY"}
+{"id":"aggfb0040","category":"aggregate-funcs","sql":"SELECT string_agg(name) FROM s.t","expect":"error","ref":"functions-aggregate","note":"string_agg requires two arguments (delimiter missing)"}
+{"id":"aggfb0041","category":"aggregate-funcs","sql":"SELECT string_agg() FROM s.t","expect":"error","ref":"functions-aggregate","note":"string_agg() with no args is syntax error"}
+{"id":"aggfb0042","category":"aggregate-funcs","sql":"SELECT string_agg(name, ',', ';') FROM s.t","expect":"error","ref":"functions-aggregate","note":"string_agg with three arguments is error (takes exactly two)"}
+{"id":"aggfb0043","category":"aggregate-funcs","sql":"SELECT json_agg(name) FROM s.t","expect":"ok","ref":"functions-aggregate","note":"json_agg aggregates values into JSON array"}
+{"id":"aggfb0044","category":"aggregate-funcs","sql":"SELECT json_agg(t) FROM s.t t","expect":"ok","ref":"functions-aggregate","note":"json_agg of whole row as composite type"}
+{"id":"aggfb0045","category":"aggregate-funcs","sql":"SELECT jsonb_agg(name) FROM s.t","expect":"ok","ref":"functions-aggregate","note":"jsonb_agg aggregates values into JSONB array"}
+{"id":"aggfb0046","category":"aggregate-funcs","sql":"SELECT name, json_agg(val ORDER BY val) FROM s.t GROUP BY name","expect":"ok","ref":"functions-aggregate","note":"json_agg with ORDER BY and GROUP BY"}
+{"id":"aggfb0047","category":"aggregate-funcs","sql":"SELECT name, jsonb_agg(val ORDER BY val DESC) FROM s.t GROUP BY name","expect":"ok","ref":"functions-aggregate","note":"jsonb_agg with ORDER BY DESC and GROUP BY"}
+{"id":"aggfb0048","category":"aggregate-funcs","sql":"SELECT json_object_agg(name, val) FROM s.t","expect":"ok","ref":"functions-aggregate","note":"json_object_agg(key, value) builds JSON object"}
+{"id":"aggfb0049","category":"aggregate-funcs","sql":"SELECT jsonb_object_agg(name, val) FROM s.t","expect":"ok","ref":"functions-aggregate","note":"jsonb_object_agg(key, value) builds JSONB object"}
+{"id":"aggfb0050","category":"aggregate-funcs","sql":"SELECT json_object_agg(name, qty ORDER BY name) FROM s.t","expect":"ok","ref":"functions-aggregate","note":"json_object_agg with ORDER BY inside aggregate"}
+{"id":"aggfb0051","category":"aggregate-funcs","sql":"SELECT json_object_agg(name) FROM s.t","expect":"error","ref":"functions-aggregate","note":"json_object_agg requires two arguments"}
+{"id":"aggfb0052","category":"aggregate-funcs","sql":"SELECT jsonb_object_agg(name) FROM s.t","expect":"error","ref":"functions-aggregate","note":"jsonb_object_agg requires two arguments"}
+{"id":"aggfb0053","category":"aggregate-funcs","sql":"SELECT json_agg() FROM s.t","expect":"error","ref":"functions-aggregate","note":"json_agg() with no argument is syntax error"}
+{"id":"aggfb0054","category":"aggregate-funcs","sql":"SELECT bool_and(flag) FROM s.t","expect":"ok","ref":"functions-aggregate","note":"bool_and aggregate over boolean column"}
+{"id":"aggfb0055","category":"aggregate-funcs","sql":"SELECT bool_or(flag) FROM s.t","expect":"ok","ref":"functions-aggregate","note":"bool_or aggregate over boolean column"}
+{"id":"aggfb0056","category":"aggregate-funcs","sql":"SELECT every(flag) FROM s.t","expect":"ok","ref":"functions-aggregate","note":"every() is SQL-standard synonym for bool_and"}
+{"id":"aggfb0057","category":"aggregate-funcs","sql":"SELECT bool_and(val > 0) FROM s.t","expect":"ok","ref":"functions-aggregate","note":"bool_and with boolean expression argument"}
+{"id":"aggfb0058","category":"aggregate-funcs","sql":"SELECT name, bool_and(flag), bool_or(flag) FROM s.t GROUP BY name","expect":"ok","ref":"functions-aggregate","note":"bool_and and bool_or with GROUP BY"}
+{"id":"aggfb0059","category":"aggregate-funcs","sql":"SELECT bool_and() FROM s.t","expect":"error","ref":"functions-aggregate","note":"bool_and() with no argument is syntax error"}
+{"id":"aggfb0060","category":"aggregate-funcs","sql":"SELECT bool_or() FROM s.t","expect":"error","ref":"functions-aggregate","note":"bool_or() with no argument is syntax error"}
+{"id":"aggfb0061","category":"aggregate-funcs","sql":"SELECT bool_and(name) FROM s.t","expect":"error","ref":"functions-aggregate","note":"bool_and over non-boolean type (text) is type error"}
+{"id":"aggfb0062","category":"aggregate-funcs","sql":"SELECT bit_and(qty) FROM s.t","expect":"ok","ref":"functions-aggregate","note":"bit_and aggregate over integer column"}
+{"id":"aggfb0063","category":"aggregate-funcs","sql":"SELECT bit_or(qty) FROM s.t","expect":"ok","ref":"functions-aggregate","note":"bit_or aggregate over integer column"}
+{"id":"aggfb0064","category":"aggregate-funcs","sql":"SELECT bit_xor(qty) FROM s.t","expect":"ok","ref":"functions-aggregate","note":"bit_xor aggregate over integer column"}
+{"id":"aggfb0065","category":"aggregate-funcs","sql":"SELECT name, bit_and(qty), bit_or(qty), bit_xor(qty) FROM s.t GROUP BY name","expect":"ok","ref":"functions-aggregate","note":"bit_and/or/xor combined with GROUP BY"}
+{"id":"aggfb0066","category":"aggregate-funcs","sql":"SELECT bit_and() FROM s.t","expect":"error","ref":"functions-aggregate","note":"bit_and with no argument is syntax error"}
+{"id":"aggfb0067","category":"aggregate-funcs","sql":"SELECT bit_xor(qty, val) FROM s.t","expect":"error","ref":"functions-aggregate","note":"bit_xor with two arguments is type error (takes one integer)"}
+{"id":"aggfb0068","category":"aggregate-funcs","sql":"SELECT bit_and(name) FROM s.t","expect":"error","ref":"functions-aggregate","note":"bit_and over text type is type error"}
+{"id":"aggfb0069","category":"aggregate-funcs","sql":"SELECT count(*) FILTER (WHERE val > 0) FROM s.t","expect":"ok","ref":"functions-aggregate","note":"FILTER (WHERE cond) clause on count(*)"}
+{"id":"aggfb0070","category":"aggregate-funcs","sql":"SELECT sum(val) FILTER (WHERE qty > 0) FROM s.t","expect":"ok","ref":"functions-aggregate","note":"FILTER on sum aggregate restricts summed rows"}
+{"id":"aggfb0071","category":"aggregate-funcs","sql":"SELECT avg(val) FILTER (WHERE flag) FROM s.t","expect":"ok","ref":"functions-aggregate","note":"FILTER with boolean column as filter condition"}
+{"id":"aggfb0072","category":"aggregate-funcs","sql":"SELECT array_agg(val ORDER BY val) FILTER (WHERE val IS NOT NULL) FROM s.t","expect":"ok","ref":"functions-aggregate","note":"FILTER combined with ORDER BY inside aggregate"}
+{"id":"aggfb0073","category":"aggregate-funcs","sql":"SELECT count(*) FILTER (WHERE val > 0), count(*) FILTER (WHERE val <= 0) FROM s.t","expect":"ok","ref":"functions-aggregate","note":"multiple FILTER clauses on different aggregates in same query"}
+{"id":"aggfb0074","category":"aggregate-funcs","sql":"SELECT count(DISTINCT val) FILTER (WHERE val > 0) FROM s.t","expect":"ok","ref":"functions-aggregate","note":"DISTINCT inside aggregate combined with FILTER clause"}
+{"id":"aggfb0075","category":"aggregate-funcs","sql":"SELECT name, count(*) FILTER (WHERE qty > 0) FROM s.t GROUP BY name","expect":"ok","ref":"functions-aggregate","note":"FILTER clause with GROUP BY"}
+{"id":"aggfb0076","category":"aggregate-funcs","sql":"SELECT count(*) FILTER WHERE val > 0 FROM s.t","expect":"error","ref":"functions-aggregate","note":"FILTER missing parentheses around WHERE is syntax error"}
+{"id":"aggfb0077","category":"aggregate-funcs","sql":"SELECT count(*) FILTER (val > 0) FROM s.t","expect":"error","ref":"functions-aggregate","note":"FILTER without WHERE keyword is syntax error"}
+{"id":"aggfb0078","category":"aggregate-funcs","sql":"SELECT count(*) FILTER () FROM s.t","expect":"error","ref":"functions-aggregate","note":"FILTER with empty parens (no WHERE) is syntax error"}
+{"id":"aggfb0079","category":"aggregate-funcs","sql":"SELECT count(*) FILTER (WHERE) FROM s.t","expect":"error","ref":"functions-aggregate","note":"FILTER (WHERE) with no condition expression is syntax error"}
+{"id":"aggfb0080","category":"aggregate-funcs","sql":"SELECT percentile_cont(0.5) WITHIN GROUP (ORDER BY val) FROM s.t","expect":"ok","ref":"functions-aggregate","note":"percentile_cont ordered-set aggregate basic form"}
+{"id":"aggfb0081","category":"aggregate-funcs","sql":"SELECT percentile_cont(0.75) WITHIN GROUP (ORDER BY val DESC) FROM s.t","expect":"ok","ref":"functions-aggregate","note":"percentile_cont ORDER BY DESC in WITHIN GROUP"}
+{"id":"aggfb0082","category":"aggregate-funcs","sql":"SELECT percentile_cont(ARRAY[0.25, 0.5, 0.75]) WITHIN GROUP (ORDER BY val) FROM s.t","expect":"ok","ref":"functions-aggregate","note":"percentile_cont with array of fraction values"}
+{"id":"aggfb0083","category":"aggregate-funcs","sql":"SELECT percentile_disc(0.5) WITHIN GROUP (ORDER BY val) FROM s.t","expect":"ok","ref":"functions-aggregate","note":"percentile_disc ordered-set aggregate basic form"}
+{"id":"aggfb0084","category":"aggregate-funcs","sql":"SELECT percentile_disc(0.5) WITHIN GROUP (ORDER BY name) FROM s.t","expect":"ok","ref":"functions-aggregate","note":"percentile_disc over text column"}
+{"id":"aggfb0085","category":"aggregate-funcs","sql":"SELECT percentile_disc(ARRAY[0.1, 0.5, 0.9]) WITHIN GROUP (ORDER BY val) FROM s.t","expect":"ok","ref":"functions-aggregate","note":"percentile_disc with array of fractions"}
+{"id":"aggfb0086","category":"aggregate-funcs","sql":"SELECT mode() WITHIN GROUP (ORDER BY val) FROM s.t","expect":"ok","ref":"functions-aggregate","note":"mode() ordered-set aggregate returns most frequent value"}
+{"id":"aggfb0087","category":"aggregate-funcs","sql":"SELECT mode() WITHIN GROUP (ORDER BY name) FROM s.t","expect":"ok","ref":"functions-aggregate","note":"mode() over text column"}
+{"id":"aggfb0088","category":"aggregate-funcs","sql":"SELECT name, percentile_cont(0.5) WITHIN GROUP (ORDER BY val) FROM s.t GROUP BY name","expect":"ok","ref":"functions-aggregate","note":"percentile_cont with GROUP BY"}
+{"id":"aggfb0089","category":"aggregate-funcs","sql":"SELECT name, mode() WITHIN GROUP (ORDER BY val) FROM s.t GROUP BY name","expect":"ok","ref":"functions-aggregate","note":"mode() with GROUP BY"}
+{"id":"aggfb0090","category":"aggregate-funcs","sql":"SELECT percentile_cont(0.5) WITHIN GROUP (ORDER BY val) FILTER (WHERE val IS NOT NULL) FROM s.t","expect":"ok","ref":"functions-aggregate","note":"ordered-set aggregate with FILTER clause"}
+{"id":"aggfb0091","category":"aggregate-funcs","sql":"SELECT mode() WITHIN GROUP (ORDER BY name) FILTER (WHERE name IS NOT NULL) FROM s.t","expect":"ok","ref":"functions-aggregate","note":"mode() with FILTER clause"}
+{"id":"aggfb0092","category":"aggregate-funcs","sql":"SELECT count(*) WITHIN GROUP (ORDER BY val) FROM s.t","expect":"error","ref":"functions-aggregate","note":"WITHIN GROUP not valid on ordinary aggregate count"}
+{"id":"aggfb0093","category":"aggregate-funcs","sql":"SELECT sum(val) WITHIN GROUP (ORDER BY val) FROM s.t","expect":"error","ref":"functions-aggregate","note":"WITHIN GROUP not valid on ordinary aggregate sum"}
+{"id":"aggfb0094","category":"aggregate-funcs","sql":"SELECT bool_and(flag) WITHIN GROUP (ORDER BY val) FROM s.t","expect":"error","ref":"functions-aggregate","note":"WITHIN GROUP on bool_and is error"}
+{"id":"aggfb0095","category":"aggregate-funcs","sql":"SELECT array_agg(val) WITHIN GROUP (ORDER BY val) FROM s.t","expect":"error","ref":"functions-aggregate","note":"WITHIN GROUP on array_agg is error"}
+{"id":"aggfb0096","category":"aggregate-funcs","sql":"SELECT percentile_cont(0.5) FROM s.t","expect":"error","ref":"functions-aggregate","note":"percentile_cont without WITHIN GROUP clause is error"}
+{"id":"aggfb0097","category":"aggregate-funcs","sql":"SELECT percentile_disc(0.5) FROM s.t","expect":"error","ref":"functions-aggregate","note":"percentile_disc without WITHIN GROUP clause is error"}
+{"id":"aggfb0098","category":"aggregate-funcs","sql":"SELECT mode(val) WITHIN GROUP (ORDER BY val) FROM s.t","expect":"error","ref":"functions-aggregate","note":"mode() takes no direct args (values come through WITHIN GROUP only)"}
+{"id":"aggfb0099","category":"aggregate-funcs","sql":"SELECT rank(1) WITHIN GROUP (ORDER BY qty) FROM s.t","expect":"ok","ref":"functions-aggregate","note":"hypothetical-set rank aggregate"}
+{"id":"aggfb0100","category":"aggregate-funcs","sql":"SELECT dense_rank(1) WITHIN GROUP (ORDER BY qty) FROM s.t","expect":"ok","ref":"functions-aggregate","note":"hypothetical-set dense_rank aggregate"}
+{"id":"aggfb0101","category":"aggregate-funcs","sql":"SELECT percent_rank(1) WITHIN GROUP (ORDER BY qty) FROM s.t","expect":"ok","ref":"functions-aggregate","note":"hypothetical-set percent_rank aggregate"}
+{"id":"aggfb0102","category":"aggregate-funcs","sql":"SELECT cume_dist(1) WITHIN GROUP (ORDER BY qty) FROM s.t","expect":"ok","ref":"functions-aggregate","note":"hypothetical-set cume_dist aggregate"}
+{"id":"aggfb0103","category":"aggregate-funcs","sql":"SELECT rank(5, 'text') WITHIN GROUP (ORDER BY qty, name) FROM s.t","expect":"ok","ref":"functions-aggregate","note":"hypothetical rank with multiple args matching ORDER BY columns"}
+{"id":"aggfb0104","category":"aggregate-funcs","sql":"SELECT name, rank(1) WITHIN GROUP (ORDER BY qty) FROM s.t GROUP BY name","expect":"ok","ref":"functions-aggregate","note":"hypothetical rank with GROUP BY"}
+{"id":"aggfb0105","category":"aggregate-funcs","sql":"SELECT rank() WITHIN GROUP (ORDER BY qty) FROM s.t","expect":"error","ref":"functions-aggregate","note":"hypothetical rank() requires hypothetical value argument"}
+{"id":"aggfb0106","category":"aggregate-funcs","sql":"SELECT dense_rank() WITHIN GROUP (ORDER BY qty) FROM s.t","expect":"error","ref":"functions-aggregate","note":"hypothetical dense_rank() requires hypothetical value argument"}
+{"id":"aggfb0107","category":"aggregate-funcs","sql":"SELECT corr(qty, val) FROM s.t","expect":"ok","ref":"functions-aggregate","note":"corr(Y,X) Pearson correlation coefficient"}
+{"id":"aggfb0108","category":"aggregate-funcs","sql":"SELECT covar_pop(qty, val) FROM s.t","expect":"ok","ref":"functions-aggregate","note":"covar_pop population covariance"}
+{"id":"aggfb0109","category":"aggregate-funcs","sql":"SELECT covar_samp(qty, val) FROM s.t","expect":"ok","ref":"functions-aggregate","note":"covar_samp sample covariance"}
+{"id":"aggfb0110","category":"aggregate-funcs","sql":"SELECT stddev(val) FROM s.t","expect":"ok","ref":"functions-aggregate","note":"stddev sample standard deviation (alias for stddev_samp)"}
+{"id":"aggfb0111","category":"aggregate-funcs","sql":"SELECT stddev_pop(val) FROM s.t","expect":"ok","ref":"functions-aggregate","note":"stddev_pop population standard deviation"}
+{"id":"aggfb0112","category":"aggregate-funcs","sql":"SELECT stddev_samp(val) FROM s.t","expect":"ok","ref":"functions-aggregate","note":"stddev_samp sample standard deviation"}
+{"id":"aggfb0113","category":"aggregate-funcs","sql":"SELECT variance(val) FROM s.t","expect":"ok","ref":"functions-aggregate","note":"variance sample variance (alias for var_samp)"}
+{"id":"aggfb0114","category":"aggregate-funcs","sql":"SELECT var_pop(val) FROM s.t","expect":"ok","ref":"functions-aggregate","note":"var_pop population variance"}
+{"id":"aggfb0115","category":"aggregate-funcs","sql":"SELECT var_samp(val) FROM s.t","expect":"ok","ref":"functions-aggregate","note":"var_samp sample variance"}
+{"id":"aggfb0116","category":"aggregate-funcs","sql":"SELECT corr(val) FROM s.t","expect":"error","ref":"functions-aggregate","note":"corr requires exactly two arguments"}
+{"id":"aggfb0117","category":"aggregate-funcs","sql":"SELECT regr_slope(val) FROM s.t","expect":"error","ref":"functions-aggregate","note":"regr_slope requires exactly two arguments Y and X"}
+{"id":"aggfb0118","category":"aggregate-funcs","sql":"SELECT covar_pop(val) FROM s.t","expect":"error","ref":"functions-aggregate","note":"covar_pop requires exactly two arguments"}
+{"id":"aggfb0119","category":"aggregate-funcs","sql":"SELECT stddev(name) FROM s.t","expect":"error","ref":"functions-aggregate","note":"stddev over text type is type error"}
+{"id":"aggfb0120","category":"aggregate-funcs","sql":"SELECT regr_slope(qty, val) FROM s.t","expect":"ok","ref":"functions-aggregate","note":"regr_slope slope of linear regression Y=aX+b"}
+{"id":"aggfb0121","category":"aggregate-funcs","sql":"SELECT regr_intercept(qty, val) FROM s.t","expect":"ok","ref":"functions-aggregate","note":"regr_intercept Y-intercept of linear regression"}
+{"id":"aggfb0122","category":"aggregate-funcs","sql":"SELECT regr_r2(qty, val) FROM s.t","expect":"ok","ref":"functions-aggregate","note":"regr_r2 square of correlation coefficient"}
+{"id":"aggfb0123","category":"aggregate-funcs","sql":"SELECT regr_avgx(qty, val) FROM s.t","expect":"ok","ref":"functions-aggregate","note":"regr_avgx average of independent variable X"}
+{"id":"aggfb0124","category":"aggregate-funcs","sql":"SELECT regr_avgy(qty, val) FROM s.t","expect":"ok","ref":"functions-aggregate","note":"regr_avgy average of dependent variable Y"}
+{"id":"aggfb0125","category":"aggregate-funcs","sql":"SELECT regr_count(qty, val) FROM s.t","expect":"ok","ref":"functions-aggregate","note":"regr_count number of non-null row pairs"}
+{"id":"aggfb0126","category":"aggregate-funcs","sql":"SELECT regr_sxx(qty, val) FROM s.t","expect":"ok","ref":"functions-aggregate","note":"regr_sxx sum of squares of independent variable"}
+{"id":"aggfb0127","category":"aggregate-funcs","sql":"SELECT regr_syy(qty, val) FROM s.t","expect":"ok","ref":"functions-aggregate","note":"regr_syy sum of squares of dependent variable"}
+{"id":"aggfb0128","category":"aggregate-funcs","sql":"SELECT regr_sxy(qty, val) FROM s.t","expect":"ok","ref":"functions-aggregate","note":"regr_sxy sum of products of independent and dependent variable"}
+{"id":"aggfb0129","category":"aggregate-funcs","sql":"SELECT range_agg(span) FROM s.t","expect":"ok","ref":"functions-aggregate","note":"range_agg computes union of ranges"}
+{"id":"aggfb0130","category":"aggregate-funcs","sql":"SELECT range_intersect_agg(span) FROM s.t","expect":"ok","ref":"functions-aggregate","note":"range_intersect_agg computes intersection of all ranges"}
+{"id":"aggfb0131","category":"aggregate-funcs","sql":"SELECT name, range_agg(span) FROM s.t GROUP BY name","expect":"ok","ref":"functions-aggregate","note":"range_agg with GROUP BY"}
+{"id":"aggfb0132","category":"aggregate-funcs","sql":"SELECT range_agg(span) FILTER (WHERE span IS NOT NULL) FROM s.t","expect":"ok","ref":"functions-aggregate","note":"range_agg with FILTER clause"}
+{"id":"aggfb0133","category":"aggregate-funcs","sql":"SELECT range_agg(val) FROM s.t","expect":"error","ref":"functions-aggregate","note":"range_agg on non-range type (numeric) is type error"}
+{"id":"aggfb0134","category":"aggregate-funcs","sql":"SELECT range_intersect_agg(name) FROM s.t","expect":"error","ref":"functions-aggregate","note":"range_intersect_agg on non-range type (text) is type error"}
+{"id":"aggfb0135","category":"aggregate-funcs","sql":"SELECT grouping(name) FROM s.t GROUP BY name","expect":"ok","ref":"functions-aggregate","note":"grouping() function returns 0 for grouped rows"}
+{"id":"aggfb0136","category":"aggregate-funcs","sql":"SELECT name, status, grouping(name, status) FROM s.t GROUP BY ROLLUP (name, status)","expect":"ok","ref":"functions-aggregate","note":"grouping() with two arguments on ROLLUP grouping set"}
+{"id":"aggfb0137","category":"aggregate-funcs","sql":"SELECT name, grouping(name) FROM s.t GROUP BY CUBE (name)","expect":"ok","ref":"functions-aggregate","note":"grouping() to detect super-aggregate rows in CUBE result"}
+{"id":"aggfb0138","category":"aggregate-funcs","sql":"SELECT name, status, grouping(name) + grouping(status) FROM s.t GROUP BY ROLLUP (name, status)","expect":"ok","ref":"functions-aggregate","note":"arithmetic on two grouping() calls in SELECT"}
+{"id":"aggfb0139","category":"aggregate-funcs","sql":"SELECT grouping(name) FROM s.t","expect":"error","ref":"functions-aggregate","note":"grouping() outside GROUP BY context is error"}
+{"id":"aggfb0140","category":"aggregate-funcs","sql":"SELECT grouping() FROM s.t GROUP BY name","expect":"error","ref":"functions-aggregate","note":"grouping() with no arguments is syntax error"}
+{"id":"aggfb0141","category":"aggregate-funcs","sql":"SELECT count(*) FILTER (WHERE flag) FROM s.t","expect":"ok","ref":"functions-aggregate","note":"FILTER with boolean column reference in condition"}
+{"id":"aggfb0142","category":"aggregate-funcs","sql":"SELECT sum(val), avg(val), stddev(val), variance(val) FROM s.t","expect":"ok","ref":"functions-aggregate","note":"four statistical aggregates combined in one query"}
+{"id":"aggfb0143","category":"aggregate-funcs","sql":"SELECT name, sum(val) FILTER (WHERE qty > 0), avg(val) FILTER (WHERE qty = 0) FROM s.t GROUP BY name","expect":"ok","ref":"functions-aggregate","note":"two aggregates each with distinct FILTER in grouped query"}
+{"id":"aggfb0144","category":"aggregate-funcs","sql":"SELECT count(*) FROM s.t WHERE val > (SELECT avg(val) FROM s.t)","expect":"ok","ref":"functions-aggregate","note":"aggregate in subquery used inside WHERE of outer query"}
+{"id":"aggfb0145","category":"aggregate-funcs","sql":"SELECT name, array_agg(val) FROM s.t GROUP BY name HAVING array_agg(val) IS NOT NULL","expect":"ok","ref":"functions-aggregate","note":"HAVING with array_agg result check"}
+{"id":"aggfb0146","category":"aggregate-funcs","sql":"SELECT name, string_agg(name, ',') FROM s.t GROUP BY name HAVING string_agg(name, ',') != ''","expect":"ok","ref":"functions-aggregate","note":"HAVING comparing string_agg output"}
+{"id":"aggfb0147","category":"aggregate-funcs","sql":"SELECT percentile_disc(0.5) WITHIN GROUP (ORDER BY val) FILTER (WHERE qty > 0) FROM s.t","expect":"ok","ref":"functions-aggregate","note":"percentile_disc with FILTER clause"}
+{"id":"aggfb0148","category":"aggregate-funcs","sql":"SELECT sum(val ORDER BY val) FROM s.t","expect":"ok","ref":"functions-aggregate","note":"ORDER BY inside sum aggregate valid in PG (no effect on result)"}
+{"id":"aggfb0149","category":"aggregate-funcs","sql":"SELECT count(*) FROM s.t GROUP BY","expect":"error","ref":"functions-aggregate","note":"GROUP BY with no expression is syntax error"}
+{"id":"aggfb0150","category":"aggregate-funcs","sql":"SELECT name, count(*) FROM s.t GROUP BY name HAVING sum(val) > 0","expect":"ok","ref":"functions-aggregate","note":"HAVING with different aggregate than what appears in SELECT"}
+{"id":"aggfb0151","category":"aggregate-funcs","sql":"SELECT name, count(*) FROM s.t GROUP BY name ORDER BY count(*) DESC","expect":"ok","ref":"functions-aggregate","note":"ORDER BY aggregate expression in grouped query"}
+{"id":"aggfb0152","category":"aggregate-funcs","sql":"SELECT name, sum(val) AS total FROM s.t GROUP BY name ORDER BY total DESC","expect":"ok","ref":"functions-aggregate","note":"ORDER BY alias of aggregate expression"}
+{"id":"aggfb0153","category":"aggregate-funcs","sql":"SELECT COALESCE(sum(val), 0) FROM s.t","expect":"ok","ref":"functions-aggregate","note":"coalesce wrapping aggregate to replace NULL with default"}
+{"id":"aggfb0154","category":"aggregate-funcs","sql":"SELECT max(val) - min(val) FROM s.t","expect":"ok","ref":"functions-aggregate","note":"arithmetic expression combining two aggregates"}
+{"id":"aggfb0155","category":"aggregate-funcs","sql":"SELECT count(*) FROM s.t HAVING count(*) > 0","expect":"ok","ref":"functions-aggregate","note":"HAVING without GROUP BY on whole-table aggregate"}
+{"id":"aggfb0156","category":"aggregate-funcs","sql":"WITH agg AS (SELECT name, count(*) AS n FROM s.t GROUP BY name) SELECT name, n FROM agg WHERE n > 0","expect":"ok","ref":"functions-aggregate","note":"aggregate in CTE filtered in outer query"}
+{"id":"aggfb0157","category":"aggregate-funcs","sql":"SELECT name, (SELECT count(*) FROM s.t2 WHERE s.t2.t_id = s.t.id) FROM s.t","expect":"ok","ref":"functions-aggregate","note":"correlated subquery with aggregate in SELECT list"}
+{"id":"aggfb0158","category":"aggregate-funcs","sql":"SELECT name, SUM(val) FROM s.t GROUP BY name UNION SELECT label, SUM(amount) FROM s.t2 GROUP BY label","expect":"ok","ref":"functions-aggregate","note":"UNION of two grouped aggregate queries"}
+{"id":"aggfb0159","category":"aggregate-funcs","sql":"SELECT name, count(*) FROM s.t GROUP BY name HAVING count(*) = ANY (ARRAY[1,2,3])","expect":"ok","ref":"functions-aggregate","note":"HAVING with = ANY array comparison on aggregate"}
+{"id":"aggfb0160","category":"aggregate-funcs","sql":"SELECT name, stddev(val) FILTER (WHERE qty > 0) FROM s.t GROUP BY name","expect":"ok","ref":"functions-aggregate","note":"stddev with FILTER clause and GROUP BY"}
+{"id":"aggfb0161","category":"aggregate-funcs","sql":"SELECT name, percentile_disc(0.5) WITHIN GROUP (ORDER BY val) FILTER (WHERE qty > 0) FROM s.t GROUP BY name","expect":"ok","ref":"functions-aggregate","note":"percentile_disc with FILTER and GROUP BY"}
+{"id":"aggfb0162","category":"aggregate-funcs","sql":"SELECT json_agg(t ORDER BY t.val) FROM s.t t","expect":"ok","ref":"functions-aggregate","note":"json_agg of whole row type with ORDER BY"}
+{"id":"aggfb0163","category":"aggregate-funcs","sql":"SELECT name, count(*) FROM s.t GROUP BY name HAVING HAVING count(*) > 0","expect":"error","ref":"functions-aggregate","note":"duplicate HAVING keyword is syntax error"}
+{"id":"aggfb0164","category":"aggregate-funcs","sql":"SELECT name FROM s.t HAVING","expect":"error","ref":"functions-aggregate","note":"HAVING with no predicate expression is syntax error"}
+{"id":"aggfb0165","category":"aggregate-funcs","sql":"SELECT name FROM s.t WHERE count(*) > 0","expect":"error","ref":"functions-aggregate","note":"aggregate function not allowed in WHERE clause"}
+{"id":"aggfb0166","category":"aggregate-funcs","sql":"SELECT name FROM s.t WHERE sum(val) > 100","expect":"error","ref":"functions-aggregate","note":"sum aggregate in WHERE clause is error"}
+{"id":"aggfb0167","category":"aggregate-funcs","sql":"SELECT name, qty FROM s.t GROUP BY name","expect":"error","ref":"functions-aggregate","note":"non-grouped column qty in SELECT without aggregate is error"}
+{"id":"aggfb0168","category":"aggregate-funcs","sql":"SELECT name FROM s.t GROUP BY name HAVING qty > 0","expect":"error","ref":"functions-aggregate","note":"non-grouped non-aggregate column in HAVING is error"}
+{"id":"aggfb0169","category":"aggregate-funcs","sql":"SELECT name, count(*) FROM s.t GROUP BY name HAVING count(*) > 0 GROUP BY name","expect":"error","ref":"functions-aggregate","note":"second GROUP BY clause after HAVING is syntax error"}
+{"id":"aggfb0170","category":"aggregate-funcs","sql":"SELECT name FROM s.t GROUP BY name HAVING count(*) > 0 WHERE name IS NOT NULL","expect":"error","ref":"functions-aggregate","note":"WHERE after HAVING is syntax error"}

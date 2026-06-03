@@ -1,0 +1,150 @@
+{"id":"tysb0001","category":"type-syntax","sql":"SELECT CAST(42 AS smallint)","expect":"ok","ref":"datatype","note":"CAST to smallint"}
+{"id":"tysb0002","category":"type-syntax","sql":"SELECT CAST(42 AS int2)","expect":"ok","ref":"datatype","note":"CAST to int2 alias"}
+{"id":"tysb0003","category":"type-syntax","sql":"SELECT CAST(42 AS integer)","expect":"ok","ref":"datatype","note":"CAST to integer"}
+{"id":"tysb0004","category":"type-syntax","sql":"SELECT CAST(42 AS int)","expect":"ok","ref":"datatype","note":"CAST to int alias"}
+{"id":"tysb0005","category":"type-syntax","sql":"SELECT CAST(42 AS int4)","expect":"ok","ref":"datatype","note":"CAST to int4 alias"}
+{"id":"tysb0006","category":"type-syntax","sql":"SELECT CAST(42 AS bigint)","expect":"ok","ref":"datatype","note":"CAST to bigint"}
+{"id":"tysb0007","category":"type-syntax","sql":"SELECT CAST(42 AS int8)","expect":"ok","ref":"datatype","note":"CAST to int8 alias"}
+{"id":"tysb0008","category":"type-syntax","sql":"SELECT CAST(3.14 AS decimal)","expect":"ok","ref":"datatype","note":"CAST to decimal"}
+{"id":"tysb0009","category":"type-syntax","sql":"SELECT CAST(3.14 AS decimal(10,2))","expect":"ok","ref":"datatype","note":"CAST to decimal(precision,scale)"}
+{"id":"tysb0010","category":"type-syntax","sql":"SELECT CAST(3.14 AS numeric)","expect":"ok","ref":"datatype","note":"CAST to numeric"}
+{"id":"tysb0011","category":"type-syntax","sql":"SELECT CAST(3.14 AS numeric(8,3))","expect":"ok","ref":"datatype","note":"CAST to numeric(p,s)"}
+{"id":"tysb0012","category":"type-syntax","sql":"SELECT CAST(3.14 AS real)","expect":"ok","ref":"datatype","note":"CAST to real"}
+{"id":"tysb0013","category":"type-syntax","sql":"SELECT CAST(3.14 AS float4)","expect":"ok","ref":"datatype","note":"CAST to float4 alias"}
+{"id":"tysb0014","category":"type-syntax","sql":"SELECT CAST(3.14 AS double precision)","expect":"ok","ref":"datatype","note":"CAST to double precision"}
+{"id":"tysb0015","category":"type-syntax","sql":"SELECT CAST(3.14 AS float8)","expect":"ok","ref":"datatype","note":"CAST to float8 alias"}
+{"id":"tysb0016","category":"type-syntax","sql":"SELECT CAST(3.14 AS float(10))","expect":"ok","ref":"datatype","note":"CAST to float(p) low precision -> real"}
+{"id":"tysb0017","category":"type-syntax","sql":"SELECT CAST(3.14 AS float(25))","expect":"ok","ref":"datatype","note":"CAST to float(p) high precision -> double"}
+{"id":"tysb0018","category":"type-syntax","sql":"SELECT CAST(100 AS money)","expect":"ok","ref":"datatype","note":"CAST to money"}
+{"id":"tysb0019","category":"type-syntax","sql":"SELECT CAST('hello' AS char(10))","expect":"ok","ref":"datatype","note":"CAST to char(n)"}
+{"id":"tysb0020","category":"type-syntax","sql":"SELECT CAST('hello' AS character(10))","expect":"ok","ref":"datatype","note":"CAST to character(n)"}
+{"id":"tysb0021","category":"type-syntax","sql":"SELECT CAST('hello' AS varchar(20))","expect":"ok","ref":"datatype","note":"CAST to varchar(n)"}
+{"id":"tysb0022","category":"type-syntax","sql":"SELECT CAST('hello' AS character varying(20))","expect":"ok","ref":"datatype","note":"CAST to character varying(n)"}
+{"id":"tysb0023","category":"type-syntax","sql":"SELECT CAST('hello' AS text)","expect":"ok","ref":"datatype","note":"CAST to text"}
+{"id":"tysb0024","category":"type-syntax","sql":"SELECT CAST('hello' AS bpchar)","expect":"ok","ref":"datatype","note":"CAST to bpchar (internal name for char)"}
+{"id":"tysb0025","category":"type-syntax","sql":"SELECT CAST('\\xDEAD' AS bytea)","expect":"ok","ref":"datatype","note":"CAST to bytea"}
+{"id":"tysb0026","category":"type-syntax","sql":"SELECT CAST('2024-01-01 12:00:00' AS timestamp)","expect":"ok","ref":"datatype","note":"CAST to timestamp"}
+{"id":"tysb0027","category":"type-syntax","sql":"SELECT CAST('2024-01-01 12:00:00' AS timestamp(0))","expect":"ok","ref":"datatype","note":"CAST to timestamp(p)"}
+{"id":"tysb0028","category":"type-syntax","sql":"SELECT CAST('2024-01-01 12:00:00' AS timestamp without time zone)","expect":"ok","ref":"datatype","note":"CAST to timestamp without time zone"}
+{"id":"tysb0029","category":"type-syntax","sql":"SELECT CAST('2024-01-01 12:00:00+00' AS timestamp with time zone)","expect":"ok","ref":"datatype","note":"CAST to timestamp with time zone"}
+{"id":"tysb0030","category":"type-syntax","sql":"SELECT CAST('2024-01-01 12:00:00+00' AS timestamptz)","expect":"ok","ref":"datatype","note":"CAST to timestamptz alias"}
+{"id":"tysb0031","category":"type-syntax","sql":"SELECT CAST('2024-01-01 12:00:00+00' AS timestamp(3) with time zone)","expect":"ok","ref":"datatype","note":"CAST to timestamp(p) with time zone"}
+{"id":"tysb0032","category":"type-syntax","sql":"SELECT CAST('2024-01-01' AS date)","expect":"ok","ref":"datatype","note":"CAST to date"}
+{"id":"tysb0033","category":"type-syntax","sql":"SELECT CAST('12:00:00' AS time)","expect":"ok","ref":"datatype","note":"CAST to time"}
+{"id":"tysb0034","category":"type-syntax","sql":"SELECT CAST('12:00:00' AS time(2))","expect":"ok","ref":"datatype","note":"CAST to time(p)"}
+{"id":"tysb0035","category":"type-syntax","sql":"SELECT CAST('12:00:00' AS time without time zone)","expect":"ok","ref":"datatype","note":"CAST to time without time zone"}
+{"id":"tysb0036","category":"type-syntax","sql":"SELECT CAST('12:00:00+00' AS time with time zone)","expect":"ok","ref":"datatype","note":"CAST to time with time zone"}
+{"id":"tysb0037","category":"type-syntax","sql":"SELECT CAST('12:00:00+00' AS timetz)","expect":"ok","ref":"datatype","note":"CAST to timetz alias"}
+{"id":"tysb0038","category":"type-syntax","sql":"SELECT CAST('1 year 2 months' AS interval)","expect":"ok","ref":"datatype","note":"CAST to interval"}
+{"id":"tysb0039","category":"type-syntax","sql":"SELECT CAST('1 year' AS interval year)","expect":"ok","ref":"datatype","note":"CAST to interval with YEAR field"}
+{"id":"tysb0040","category":"type-syntax","sql":"SELECT CAST('2 months' AS interval month)","expect":"ok","ref":"datatype","note":"CAST to interval with MONTH field"}
+{"id":"tysb0041","category":"type-syntax","sql":"SELECT CAST('3 days' AS interval day)","expect":"ok","ref":"datatype","note":"CAST to interval with DAY field"}
+{"id":"tysb0042","category":"type-syntax","sql":"SELECT CAST('4 hours' AS interval hour)","expect":"ok","ref":"datatype","note":"CAST to interval with HOUR field"}
+{"id":"tysb0043","category":"type-syntax","sql":"SELECT CAST('5 minutes' AS interval minute)","expect":"ok","ref":"datatype","note":"CAST to interval with MINUTE field"}
+{"id":"tysb0044","category":"type-syntax","sql":"SELECT CAST('6 seconds' AS interval second)","expect":"ok","ref":"datatype","note":"CAST to interval with SECOND field"}
+{"id":"tysb0045","category":"type-syntax","sql":"SELECT CAST('1 day 2 hours' AS interval day to hour)","expect":"ok","ref":"datatype","note":"CAST to interval DAY TO HOUR"}
+{"id":"tysb0046","category":"type-syntax","sql":"SELECT CAST('1 hour 30 minutes' AS interval hour to minute)","expect":"ok","ref":"datatype","note":"CAST to interval HOUR TO MINUTE"}
+{"id":"tysb0047","category":"type-syntax","sql":"SELECT CAST('1 minute 30 seconds' AS interval minute to second)","expect":"ok","ref":"datatype","note":"CAST to interval MINUTE TO SECOND"}
+{"id":"tysb0048","category":"type-syntax","sql":"SELECT CAST('1 year 2 months' AS interval year to month)","expect":"ok","ref":"datatype","note":"CAST to interval YEAR TO MONTH"}
+{"id":"tysb0049","category":"type-syntax","sql":"SELECT CAST('30 seconds' AS interval second(3))","expect":"ok","ref":"datatype","note":"CAST to interval SECOND(p)"}
+{"id":"tysb0050","category":"type-syntax","sql":"SELECT CAST('1 minute 30 seconds' AS interval minute to second(2))","expect":"ok","ref":"datatype","note":"CAST to interval MINUTE TO SECOND(p)"}
+{"id":"tysb0051","category":"type-syntax","sql":"SELECT CAST('true' AS boolean)","expect":"ok","ref":"datatype","note":"CAST to boolean"}
+{"id":"tysb0052","category":"type-syntax","sql":"SELECT CAST('true' AS bool)","expect":"ok","ref":"datatype","note":"CAST to bool alias"}
+{"id":"tysb0053","category":"type-syntax","sql":"SELECT CAST('(1,2)' AS point)","expect":"ok","ref":"datatype","note":"CAST to point"}
+{"id":"tysb0054","category":"type-syntax","sql":"SELECT CAST('{1,2,3}' AS line)","expect":"ok","ref":"datatype","note":"CAST to line"}
+{"id":"tysb0055","category":"type-syntax","sql":"SELECT CAST('[(1,2),(3,4)]' AS lseg)","expect":"ok","ref":"datatype","note":"CAST to lseg"}
+{"id":"tysb0056","category":"type-syntax","sql":"SELECT CAST('((0,0),(1,1))' AS box)","expect":"ok","ref":"datatype","note":"CAST to box"}
+{"id":"tysb0057","category":"type-syntax","sql":"SELECT CAST('((0,0),(1,1),(2,0))' AS path)","expect":"ok","ref":"datatype","note":"CAST to path"}
+{"id":"tysb0058","category":"type-syntax","sql":"SELECT CAST('((0,0),(1,0),(1,1),(0,1))' AS polygon)","expect":"ok","ref":"datatype","note":"CAST to polygon"}
+{"id":"tysb0059","category":"type-syntax","sql":"SELECT CAST('<(1,2),3>' AS circle)","expect":"ok","ref":"datatype","note":"CAST to circle"}
+{"id":"tysb0060","category":"type-syntax","sql":"SELECT CAST('192.168.1.0/24' AS cidr)","expect":"ok","ref":"datatype","note":"CAST to cidr"}
+{"id":"tysb0061","category":"type-syntax","sql":"SELECT CAST('192.168.1.1' AS inet)","expect":"ok","ref":"datatype","note":"CAST to inet"}
+{"id":"tysb0062","category":"type-syntax","sql":"SELECT CAST('08:00:2b:01:02:03' AS macaddr)","expect":"ok","ref":"datatype","note":"CAST to macaddr"}
+{"id":"tysb0063","category":"type-syntax","sql":"SELECT CAST('08:00:2b:01:02:03:04:05' AS macaddr8)","expect":"ok","ref":"datatype","note":"CAST to macaddr8"}
+{"id":"tysb0064","category":"type-syntax","sql":"SELECT CAST(B'101' AS bit(3))","expect":"ok","ref":"datatype","note":"CAST to bit(n)"}
+{"id":"tysb0065","category":"type-syntax","sql":"SELECT CAST(B'101' AS bit varying(10))","expect":"ok","ref":"datatype","note":"CAST to bit varying(n)"}
+{"id":"tysb0066","category":"type-syntax","sql":"SELECT CAST(B'101' AS varbit(10))","expect":"ok","ref":"datatype","note":"CAST to varbit alias"}
+{"id":"tysb0067","category":"type-syntax","sql":"SELECT CAST('hello world' AS tsvector)","expect":"ok","ref":"datatype","note":"CAST to tsvector"}
+{"id":"tysb0068","category":"type-syntax","sql":"SELECT CAST('hello & world' AS tsquery)","expect":"ok","ref":"datatype","note":"CAST to tsquery"}
+{"id":"tysb0069","category":"type-syntax","sql":"SELECT CAST('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11' AS uuid)","expect":"ok","ref":"datatype","note":"CAST to uuid"}
+{"id":"tysb0070","category":"type-syntax","sql":"SELECT CAST('<a/>' AS xml)","expect":"ok","ref":"datatype","note":"CAST to xml"}
+{"id":"tysb0071","category":"type-syntax","sql":"SELECT CAST('{\"a\":1}' AS json)","expect":"ok","ref":"datatype","note":"CAST to json"}
+{"id":"tysb0072","category":"type-syntax","sql":"SELECT CAST('{\"a\":1}' AS jsonb)","expect":"ok","ref":"datatype","note":"CAST to jsonb"}
+{"id":"tysb0073","category":"type-syntax","sql":"SELECT CAST('[1,3)' AS int4range)","expect":"ok","ref":"datatype","note":"CAST to int4range"}
+{"id":"tysb0074","category":"type-syntax","sql":"SELECT CAST('[1,100)' AS int8range)","expect":"ok","ref":"datatype","note":"CAST to int8range"}
+{"id":"tysb0075","category":"type-syntax","sql":"SELECT CAST('[1.5,2.5)' AS numrange)","expect":"ok","ref":"datatype","note":"CAST to numrange"}
+{"id":"tysb0076","category":"type-syntax","sql":"SELECT CAST('[2024-01-01,2024-12-31]' AS daterange)","expect":"ok","ref":"datatype","note":"CAST to daterange"}
+{"id":"tysb0077","category":"type-syntax","sql":"SELECT CAST('[2024-01-01 00:00:00,2024-12-31 23:59:59)' AS tsrange)","expect":"ok","ref":"datatype","note":"CAST to tsrange"}
+{"id":"tysb0078","category":"type-syntax","sql":"SELECT CAST('[2024-01-01 00:00:00+00,2024-12-31 23:59:59+00)' AS tstzrange)","expect":"ok","ref":"datatype","note":"CAST to tstzrange"}
+{"id":"tysb0079","category":"type-syntax","sql":"SELECT CAST('{[1,3),[5,8)}' AS int4multirange)","expect":"ok","ref":"datatype","note":"CAST to int4multirange"}
+{"id":"tysb0080","category":"type-syntax","sql":"SELECT CAST('{[1,100),[200,300)}' AS int8multirange)","expect":"ok","ref":"datatype","note":"CAST to int8multirange"}
+{"id":"tysb0081","category":"type-syntax","sql":"SELECT CAST('{[1.0,2.0),[3.0,4.0)}' AS nummultirange)","expect":"ok","ref":"datatype","note":"CAST to nummultirange"}
+{"id":"tysb0082","category":"type-syntax","sql":"SELECT CAST('{[2024-01-01,2024-06-01)}' AS datemultirange)","expect":"ok","ref":"datatype","note":"CAST to datemultirange"}
+{"id":"tysb0083","category":"type-syntax","sql":"SELECT CAST('{[2024-01-01 00:00:00,2024-06-01 00:00:00)}' AS tsmultirange)","expect":"ok","ref":"datatype","note":"CAST to tsmultirange"}
+{"id":"tysb0084","category":"type-syntax","sql":"SELECT CAST('{[2024-01-01 00:00:00+00,2024-06-01 00:00:00+00)}' AS tstzmultirange)","expect":"ok","ref":"datatype","note":"CAST to tstzmultirange"}
+{"id":"tysb0085","category":"type-syntax","sql":"SELECT CAST(1 AS oid)","expect":"ok","ref":"datatype","note":"CAST to oid"}
+{"id":"tysb0086","category":"type-syntax","sql":"SELECT CAST('s.t' AS regclass)","expect":"ok","ref":"datatype","note":"CAST to regclass"}
+{"id":"tysb0087","category":"type-syntax","sql":"SELECT CAST('s.f' AS regproc)","expect":"ok","ref":"datatype","note":"CAST to regproc"}
+{"id":"tysb0088","category":"type-syntax","sql":"SELECT CAST('integer' AS regtype)","expect":"ok","ref":"datatype","note":"CAST to regtype"}
+{"id":"tysb0089","category":"type-syntax","sql":"SELECT CAST('0/1' AS pg_lsn)","expect":"ok","ref":"datatype","note":"CAST to pg_lsn"}
+{"id":"tysb0090","category":"type-syntax","sql":"CREATE TABLE pg_type_col_test (a smallint, b int2, c integer, d int, e int4, f bigint, g int8)","expect":"ok","ref":"datatype","note":"column types: integer family"}
+{"id":"tysb0091","category":"type-syntax","sql":"CREATE TABLE pg_type_col_dec (a decimal, b decimal(10), c decimal(10,2), d numeric, e numeric(8), f numeric(8,3))","expect":"ok","ref":"datatype","note":"column types: decimal/numeric with optional modifiers"}
+{"id":"tysb0092","category":"type-syntax","sql":"CREATE TABLE pg_type_col_float (a real, b float4, c double precision, d float8, e float(1), f float(53))","expect":"ok","ref":"datatype","note":"column types: floating point family"}
+{"id":"tysb0093","category":"type-syntax","sql":"CREATE TABLE pg_type_col_char (a char, b char(1), c character(5), d varchar, e varchar(100), f character varying(200), g text, h bpchar)","expect":"ok","ref":"datatype","note":"column types: character family"}
+{"id":"tysb0094","category":"type-syntax","sql":"CREATE TABLE pg_type_col_temporal (a date, b time, c time(3), d timetz, e time(2) with time zone, f timestamp, g timestamp(6), h timestamptz, i timestamp(0) with time zone)","expect":"ok","ref":"datatype","note":"column types: date/time family"}
+{"id":"tysb0095","category":"type-syntax","sql":"CREATE TABLE pg_type_col_interval (a interval, b interval year, c interval month, d interval day, e interval hour, f interval minute, g interval second, h interval year to month, i interval day to hour, j interval day to minute, k interval day to second, l interval hour to minute, m interval hour to second, n interval minute to second)","expect":"ok","ref":"datatype","note":"column types: interval with all field options"}
+{"id":"tysb0096","category":"type-syntax","sql":"CREATE TABLE pg_type_col_bool (a boolean, b bool)","expect":"ok","ref":"datatype","note":"column types: boolean"}
+{"id":"tysb0097","category":"type-syntax","sql":"CREATE TABLE pg_type_col_geo (a point, b line, c lseg, d box, e path, f polygon, g circle)","expect":"ok","ref":"datatype","note":"column types: geometric types"}
+{"id":"tysb0098","category":"type-syntax","sql":"CREATE TABLE pg_type_col_net (a cidr, b inet, c macaddr, d macaddr8)","expect":"ok","ref":"datatype","note":"column types: network types"}
+{"id":"tysb0099","category":"type-syntax","sql":"CREATE TABLE pg_type_col_bit (a bit, b bit(8), c bit varying, d bit varying(16), e varbit(32))","expect":"ok","ref":"datatype","note":"column types: bit string types"}
+{"id":"tysb0100","category":"type-syntax","sql":"CREATE TABLE pg_type_col_ts (a tsvector, b tsquery)","expect":"ok","ref":"datatype","note":"column types: text search types"}
+{"id":"tysb0101","category":"type-syntax","sql":"CREATE TABLE pg_type_col_misc (a uuid, b xml, c json, d jsonb, e bytea, f money)","expect":"ok","ref":"datatype","note":"column types: misc types"}
+{"id":"tysb0102","category":"type-syntax","sql":"CREATE TABLE pg_type_col_ranges (a int4range, b int8range, c numrange, d daterange, e tsrange, f tstzrange)","expect":"ok","ref":"datatype","note":"column types: range types"}
+{"id":"tysb0103","category":"type-syntax","sql":"CREATE TABLE pg_type_col_multiranges (a int4multirange, b int8multirange, c nummultirange, d datemultirange, e tsmultirange, f tstzmultirange)","expect":"ok","ref":"datatype","note":"column types: multirange types"}
+{"id":"tysb0104","category":"type-syntax","sql":"CREATE TABLE pg_type_col_oid (a oid, b regclass, c regproc, d regtype, e regoper, f regoperator, g regprocedure, h regrole, i regnamespace, j regdictionary)","expect":"ok","ref":"datatype","note":"column types: OID alias types"}
+{"id":"tysb0105","category":"type-syntax","sql":"CREATE TABLE pg_type_col_lsn (a pg_lsn)","expect":"ok","ref":"datatype","note":"column type: pg_lsn"}
+{"id":"tysb0106","category":"type-syntax","sql":"SELECT ARRAY[1,2,3]::integer[]","expect":"ok","ref":"datatype","note":"array type: t[] one-dimensional"}
+{"id":"tysb0107","category":"type-syntax","sql":"SELECT ARRAY[[1,2],[3,4]]::integer[][]","expect":"ok","ref":"datatype","note":"array type: t[][] two-dimensional"}
+{"id":"tysb0108","category":"type-syntax","sql":"CREATE TABLE pg_arr_col (a integer[], b text[], c boolean[])","expect":"ok","ref":"datatype","note":"column array type: t[]"}
+{"id":"tysb0109","category":"type-syntax","sql":"CREATE TABLE pg_arr_col2 (a integer[3], b text[10])","expect":"ok","ref":"datatype","note":"column array type: t[n] with size (ignored by PG)"}
+{"id":"tysb0110","category":"type-syntax","sql":"CREATE TABLE pg_arr_col3 (a integer ARRAY, b text ARRAY)","expect":"ok","ref":"datatype","note":"column array type: t ARRAY keyword form"}
+{"id":"tysb0111","category":"type-syntax","sql":"CREATE TABLE pg_arr_col4 (a integer ARRAY[5], b text ARRAY[10])","expect":"ok","ref":"datatype","note":"column array type: t ARRAY[n] keyword form"}
+{"id":"tysb0112","category":"type-syntax","sql":"CREATE TABLE pg_arr_col5 (a integer[][], b text[][])","expect":"ok","ref":"datatype","note":"column array type: t[][] multidimensional"}
+{"id":"tysb0113","category":"type-syntax","sql":"SELECT 42::smallint, 42::integer, 42::bigint","expect":"ok","ref":"datatype","note":"typecast operator :: for integer types"}
+{"id":"tysb0114","category":"type-syntax","sql":"SELECT 3.14::real, 3.14::float4, 3.14::float8, CAST(3.14 AS double precision)","expect":"ok","ref":"datatype","note":"typecast operator :: for float types and CAST to double precision"}
+{"id":"tysb0115","category":"type-syntax","sql":"SELECT 'hello'::text, 'hello'::varchar, 'hello'::char(10)","expect":"ok","ref":"datatype","note":"typecast operator :: for character types"}
+{"id":"tysb0116","category":"type-syntax","sql":"SELECT '2024-01-01'::date, '12:00:00'::time, '2024-01-01 12:00:00'::timestamp","expect":"ok","ref":"datatype","note":"typecast operator :: for date/time types"}
+{"id":"tysb0117","category":"type-syntax","sql":"SELECT 'true'::boolean, 'false'::bool","expect":"ok","ref":"datatype","note":"typecast operator :: for boolean"}
+{"id":"tysb0118","category":"type-syntax","sql":"SELECT 'hello world'::tsvector, 'hello & world'::tsquery","expect":"ok","ref":"datatype","note":"typecast operator :: for text search types"}
+{"id":"tysb0119","category":"type-syntax","sql":"SELECT '{\"a\":1}'::json, '{\"a\":1}'::jsonb","expect":"ok","ref":"datatype","note":"typecast operator :: for json/jsonb"}
+{"id":"tysb0120","category":"type-syntax","sql":"SELECT 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'::uuid","expect":"ok","ref":"datatype","note":"typecast operator :: for uuid"}
+{"id":"tysb0121","category":"type-syntax","sql":"SELECT interval '1 day' * 3","expect":"ok","ref":"datatype","note":"interval literal type prefix syntax"}
+{"id":"tysb0122","category":"type-syntax","sql":"SELECT CAST(42 AS numeric(0))","expect":"error","ref":"datatype","note":"numeric(0) precision must be positive - semantic error"}
+{"id":"tysb0123","category":"type-syntax","sql":"SELECT CAST('x' AS char(0))","expect":"error","ref":"datatype","note":"char(0) length must be at least 1 - semantic error"}
+{"id":"tysb0124","category":"type-syntax","sql":"SELECT CAST(42 AS nosuchtype)","expect":"error","ref":"datatype","note":"unknown type name - semantic error"}
+{"id":"tysb0125","category":"type-syntax","sql":"SELECT CAST(42 AS bit varying())","expect":"error","ref":"datatype","note":"bit varying() empty parens - syntax error"}
+{"id":"tysb0126","category":"type-syntax","sql":"SELECT CAST(42 AS float(0))","expect":"error","ref":"datatype","note":"float(0) precision must be at least 1 - semantic error"}
+{"id":"tysb0127","category":"type-syntax","sql":"SELECT CAST(42 AS float(54))","expect":"error","ref":"datatype","note":"float(p) precision must be <= 53 - semantic error"}
+{"id":"tysb0128","category":"type-syntax","sql":"SELECT CAST(42 AS integer())","expect":"error","ref":"datatype","note":"integer does not accept modifier - syntax error"}
+{"id":"tysb0129","category":"type-syntax","sql":"SELECT CAST(42 AS double)","expect":"error","ref":"datatype","note":"double alone is not a valid type - syntax error"}
+{"id":"tysb0130","category":"type-syntax","sql":"SELECT CAST(42 AS timestamp with zone)","expect":"error","ref":"datatype","note":"timestamp with zone missing TIME keyword - syntax error"}
+{"id":"tysb0131","category":"type-syntax","sql":"SELECT CAST(42 AS time zone)","expect":"error","ref":"datatype","note":"time zone (missing WITH) - syntax error"}
+{"id":"tysb0132","category":"type-syntax","sql":"SELECT CAST(42 AS character varying())","expect":"error","ref":"datatype","note":"character varying() empty parens - syntax error"}
+{"id":"tysb0133","category":"type-syntax","sql":"SELECT 42::","expect":"error","ref":"datatype","note":"typecast operator :: with no type - syntax error"}
+{"id":"tysb0134","category":"type-syntax","sql":"CREATE TABLE pg_type_col_txsn (a txid_snapshot)","expect":"ok","ref":"datatype","note":"column type: txid_snapshot (deprecated alias for pg_snapshot)"}
+{"id":"tysb0135","category":"type-syntax","sql":"CREATE TABLE pg_type_col_snap (a pg_snapshot)","expect":"ok","ref":"datatype","note":"column type: pg_snapshot"}
+{"id":"tysb0136","category":"type-syntax","sql":"SELECT CAST('1 year' AS interval(3))","expect":"ok","ref":"datatype","note":"CAST to interval with precision only"}
+{"id":"tysb0137","category":"type-syntax","sql":"CREATE TABLE pg_type_col_int_prec (a interval day to second(6), b interval second(4))","expect":"ok","ref":"datatype","note":"column interval with precision in to-field"}
+{"id":"tysb0138","category":"type-syntax","sql":"SELECT CAST(42 AS numeric(1001,0))","expect":"error","ref":"datatype","note":"numeric precision too large (>1000) - semantic error"}
+{"id":"tysb0139","category":"type-syntax","sql":"SELECT CAST(42 AS timestamp(7))","expect":"error","ref":"datatype","note":"timestamp precision too large (>6) - semantic error"}
+{"id":"tysb0140","category":"type-syntax","sql":"SELECT '{1,2,3}'::int[]","expect":"ok","ref":"datatype","note":"array literal via typecast ::int[]"}
+{"id":"tysb0141","category":"type-syntax","sql":"SELECT CAST(1 AS regoper)","expect":"ok","ref":"datatype","note":"CAST to regoper OID type"}
+{"id":"tysb0142","category":"type-syntax","sql":"SELECT CAST(1 AS regnamespace)","expect":"ok","ref":"datatype","note":"CAST to regnamespace OID type"}
+{"id":"tysb0143","category":"type-syntax","sql":"SELECT CAST(1 AS regrole)","expect":"ok","ref":"datatype","note":"CAST to regrole OID type"}
+{"id":"tysb0144","category":"type-syntax","sql":"SELECT CAST('pg_catalog.int4' AS regtype)","expect":"ok","ref":"datatype","note":"regtype with schema-qualified name string"}
+{"id":"tysb0145","category":"type-syntax","sql":"SELECT 1::oid::regclass","expect":"ok","ref":"datatype","note":"chained typecast operators"}
+{"id":"tysb0146","category":"type-syntax","sql":"CREATE TABLE pg_type_ts_tz (a timestamp(6) without time zone, b timestamp(0) with time zone)","expect":"ok","ref":"datatype","note":"timestamp column with precision and timezone keyword"}
+{"id":"tysb0147","category":"type-syntax","sql":"CREATE TABLE pg_type_time_tz (a time(3) without time zone, b time(0) with time zone)","expect":"ok","ref":"datatype","note":"time column with precision and timezone keyword"}
+{"id":"tysb0148","category":"type-syntax","sql":"SELECT CAST(42 AS integer) + CAST(1 AS smallint)","expect":"ok","ref":"datatype","note":"CAST in arithmetic expression"}
+{"id":"tysb0149","category":"type-syntax","sql":"SELECT numrange(1.0, 2.0)::numrange","expect":"ok","ref":"datatype","note":"range constructor then typecast"}
+{"id":"tysb0150","category":"type-syntax","sql":"SELECT CAST(42 AS timestamp without zone)","expect":"error","ref":"datatype","note":"timestamp without zone missing TIME keyword - syntax error"}

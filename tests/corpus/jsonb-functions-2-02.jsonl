@@ -1,0 +1,170 @@
+{"id":"jsn2b0001","category":"jsonb-functions-2","sql":"SELECT jsonb_set('{\"a\":1}'::jsonb, '{a}', '2'::jsonb)","expect":"ok","ref":"functions-json","note":"jsonb_set basic replace"}
+{"id":"jsn2b0002","category":"jsonb-functions-2","sql":"SELECT jsonb_set('{\"a\":1}'::jsonb, '{b}', '2'::jsonb, true)","expect":"ok","ref":"functions-json","note":"jsonb_set create_if_missing=true"}
+{"id":"jsn2b0003","category":"jsonb-functions-2","sql":"SELECT jsonb_set('{\"a\":1}'::jsonb, '{b}', '2'::jsonb, false)","expect":"ok","ref":"functions-json","note":"jsonb_set create_if_missing=false"}
+{"id":"jsn2b0004","category":"jsonb-functions-2","sql":"SELECT jsonb_set('[1,2,3]'::jsonb, '{1}', '99'::jsonb)","expect":"ok","ref":"functions-json","note":"jsonb_set array element replace"}
+{"id":"jsn2b0005","category":"jsonb-functions-2","sql":"SELECT jsonb_set('{\"a\":{\"b\":1}}'::jsonb, '{a,b}', '\"hello\"'::jsonb)","expect":"ok","ref":"functions-json","note":"jsonb_set nested path"}
+{"id":"jsn2b0006","category":"jsonb-functions-2","sql":"SELECT jsonb_set(data, '{key}', '42'::jsonb) FROM s.t","expect":"ok","ref":"functions-json","note":"jsonb_set on table column"}
+{"id":"jsn2b0007","category":"jsonb-functions-2","sql":"SELECT jsonb_set('{\"a\":1}'::jsonb, '{a}')","expect":"error","ref":"functions-json","note":"jsonb_set missing new_value argument"}
+{"id":"jsn2b0008","category":"jsonb-functions-2","sql":"SELECT jsonb_set('{\"a\":1}'::jsonb)","expect":"error","ref":"functions-json","note":"jsonb_set missing path and value"}
+{"id":"jsn2b0009","category":"jsonb-functions-2","sql":"SELECT jsonb_set_lax('{\"a\":1}'::jsonb, '{a}', null)","expect":"ok","ref":"functions-json","note":"jsonb_set_lax with null value default treatment"}
+{"id":"jsn2b0010","category":"jsonb-functions-2","sql":"SELECT jsonb_set_lax('{\"a\":1}'::jsonb, '{a}', null, true, 'use_json_null')","expect":"ok","ref":"functions-json","note":"jsonb_set_lax use_json_null treatment"}
+{"id":"jsn2b0011","category":"jsonb-functions-2","sql":"SELECT jsonb_set_lax('{\"a\":1}'::jsonb, '{a}', null, true, 'delete_key')","expect":"ok","ref":"functions-json","note":"jsonb_set_lax delete_key treatment"}
+{"id":"jsn2b0012","category":"jsonb-functions-2","sql":"SELECT jsonb_set_lax('{\"a\":1}'::jsonb, '{a}', null, true, 'return_target')","expect":"ok","ref":"functions-json","note":"jsonb_set_lax return_target treatment"}
+{"id":"jsn2b0013","category":"jsonb-functions-2","sql":"SELECT jsonb_set_lax('{\"a\":1}'::jsonb, '{a}', null, true, 'raise_exception')","expect":"error","ref":"functions-json","note":"jsonb_set_lax raise_exception on null (runtime error)"}
+{"id":"jsn2b0014","category":"jsonb-functions-2","sql":"SELECT jsonb_set_lax('{\"a\":1}'::jsonb, '{a}', null, true, 'bad_option')","expect":"error","ref":"functions-json","note":"jsonb_set_lax invalid null_value_treatment"}
+{"id":"jsn2b0015","category":"jsonb-functions-2","sql":"SELECT jsonb_set_lax('{\"a\":1}'::jsonb, '{b}', null, false, 'return_target')","expect":"ok","ref":"functions-json","note":"jsonb_set_lax create_if_missing=false return_target"}
+{"id":"jsn2b0016","category":"jsonb-functions-2","sql":"SELECT jsonb_insert('{\"a\":[0,1,2]}'::jsonb, '{a,1}', '\"new\"'::jsonb)","expect":"ok","ref":"functions-json","note":"jsonb_insert before element (default)"}
+{"id":"jsn2b0017","category":"jsonb-functions-2","sql":"SELECT jsonb_insert('{\"a\":[0,1,2]}'::jsonb, '{a,1}', '\"new\"'::jsonb, true)","expect":"ok","ref":"functions-json","note":"jsonb_insert after element"}
+{"id":"jsn2b0018","category":"jsonb-functions-2","sql":"SELECT jsonb_insert('{\"a\":[0,1,2]}'::jsonb, '{a,1}', '\"new\"'::jsonb, false)","expect":"ok","ref":"functions-json","note":"jsonb_insert before element explicit false"}
+{"id":"jsn2b0019","category":"jsonb-functions-2","sql":"SELECT jsonb_insert('{\"a\":1}'::jsonb, '{b}', '2'::jsonb)","expect":"ok","ref":"functions-json","note":"jsonb_insert new object key"}
+{"id":"jsn2b0020","category":"jsonb-functions-2","sql":"SELECT jsonb_insert('[0,1,2]'::jsonb, '{1}', '99'::jsonb)","expect":"ok","ref":"functions-json","note":"jsonb_insert into array at index"}
+{"id":"jsn2b0021","category":"jsonb-functions-2","sql":"SELECT jsonb_insert('{\"a\":1}'::jsonb)","expect":"error","ref":"functions-json","note":"jsonb_insert too few arguments"}
+{"id":"jsn2b0022","category":"jsonb-functions-2","sql":"SELECT jsonb_strip_nulls('{\"a\":1,\"b\":null,\"c\":3}'::jsonb)","expect":"ok","ref":"functions-json","note":"jsonb_strip_nulls object with nulls"}
+{"id":"jsn2b0023","category":"jsonb-functions-2","sql":"SELECT jsonb_strip_nulls('[1,null,2,null,3]'::jsonb)","expect":"ok","ref":"functions-json","note":"jsonb_strip_nulls array keeps nulls by default"}
+{"id":"jsn2b0024","category":"jsonb-functions-2","sql":"SELECT jsonb_strip_nulls('[1,null,2,null,3]'::jsonb, true)","expect":"ok","ref":"functions-json","note":"jsonb_strip_nulls array strip_in_arrays=true"}
+{"id":"jsn2b0025","category":"jsonb-functions-2","sql":"SELECT jsonb_strip_nulls('[1,null,2,null,3]'::jsonb, false)","expect":"ok","ref":"functions-json","note":"jsonb_strip_nulls strip_in_arrays=false"}
+{"id":"jsn2b0026","category":"jsonb-functions-2","sql":"SELECT jsonb_strip_nulls('{\"a\":{\"b\":null,\"c\":1}}'::jsonb)","expect":"ok","ref":"functions-json","note":"jsonb_strip_nulls nested object"}
+{"id":"jsn2b0027","category":"jsonb-functions-2","sql":"SELECT jsonb_strip_nulls('null'::jsonb)","expect":"ok","ref":"functions-json","note":"jsonb_strip_nulls JSON null scalar"}
+{"id":"jsn2b0028","category":"jsonb-functions-2","sql":"SELECT jsonb_strip_nulls()","expect":"error","ref":"functions-json","note":"jsonb_strip_nulls no arguments"}
+{"id":"jsn2b0029","category":"jsonb-functions-2","sql":"SELECT jsonb_pretty('{\"a\":1,\"b\":[1,2]}'::jsonb)","expect":"ok","ref":"functions-json","note":"jsonb_pretty basic formatting"}
+{"id":"jsn2b0030","category":"jsonb-functions-2","sql":"SELECT jsonb_pretty('[{\"f1\":1,\"f2\":null},2]'::jsonb)","expect":"ok","ref":"functions-json","note":"jsonb_pretty array with object"}
+{"id":"jsn2b0031","category":"jsonb-functions-2","sql":"SELECT jsonb_pretty('\"hello\"'::jsonb)","expect":"ok","ref":"functions-json","note":"jsonb_pretty scalar string"}
+{"id":"jsn2b0032","category":"jsonb-functions-2","sql":"SELECT jsonb_pretty()","expect":"error","ref":"functions-json","note":"jsonb_pretty no arguments"}
+{"id":"jsn2b0033","category":"jsonb-functions-2","sql":"SELECT jsonb_pretty(data) FROM s.t","expect":"ok","ref":"functions-json","note":"jsonb_pretty on table column"}
+{"id":"jsn2b0034","category":"jsonb-functions-2","sql":"SELECT * FROM json_each('{\"a\":\"foo\",\"b\":\"bar\"}'::json)","expect":"ok","ref":"functions-json","note":"json_each expand object"}
+{"id":"jsn2b0035","category":"jsonb-functions-2","sql":"SELECT * FROM jsonb_each('{\"a\":1,\"b\":2}'::jsonb)","expect":"ok","ref":"functions-json","note":"jsonb_each expand object"}
+{"id":"jsn2b0036","category":"jsonb-functions-2","sql":"SELECT key, value FROM jsonb_each('{\"x\":true,\"y\":null}'::jsonb)","expect":"ok","ref":"functions-json","note":"jsonb_each named columns"}
+{"id":"jsn2b0037","category":"jsonb-functions-2","sql":"SELECT * FROM json_each_text('{\"a\":\"foo\",\"b\":\"bar\"}'::json)","expect":"ok","ref":"functions-json","note":"json_each_text values as text"}
+{"id":"jsn2b0038","category":"jsonb-functions-2","sql":"SELECT * FROM jsonb_each_text('{\"a\":1,\"b\":true}'::jsonb)","expect":"ok","ref":"functions-json","note":"jsonb_each_text values as text"}
+{"id":"jsn2b0039","category":"jsonb-functions-2","sql":"SELECT key, value FROM jsonb_each_text('{\"x\":\"hello\"}'::jsonb)","expect":"ok","ref":"functions-json","note":"jsonb_each_text named columns"}
+{"id":"jsn2b0040","category":"jsonb-functions-2","sql":"SELECT * FROM jsonb_each('[1,2,3]'::jsonb)","expect":"error","ref":"functions-json","note":"jsonb_each on array (not object) is error"}
+{"id":"jsn2b0041","category":"jsonb-functions-2","sql":"SELECT * FROM jsonb_array_elements('[1,2,3]'::jsonb)","expect":"ok","ref":"functions-json","note":"jsonb_array_elements expand array"}
+{"id":"jsn2b0042","category":"jsonb-functions-2","sql":"SELECT * FROM jsonb_array_elements('[\"a\",true,null,{\"x\":1}]'::jsonb)","expect":"ok","ref":"functions-json","note":"jsonb_array_elements mixed types"}
+{"id":"jsn2b0043","category":"jsonb-functions-2","sql":"SELECT * FROM json_array_elements('[1,2,3]'::json)","expect":"ok","ref":"functions-json","note":"json_array_elements basic"}
+{"id":"jsn2b0044","category":"jsonb-functions-2","sql":"SELECT * FROM jsonb_array_elements_text('[\"a\",\"b\",\"c\"]'::jsonb)","expect":"ok","ref":"functions-json","note":"jsonb_array_elements_text as text"}
+{"id":"jsn2b0045","category":"jsonb-functions-2","sql":"SELECT * FROM json_array_elements_text('[\"x\",\"y\"]'::json)","expect":"ok","ref":"functions-json","note":"json_array_elements_text basic"}
+{"id":"jsn2b0046","category":"jsonb-functions-2","sql":"SELECT * FROM jsonb_array_elements('{\"a\":1}'::jsonb)","expect":"error","ref":"functions-json","note":"jsonb_array_elements on object is error"}
+{"id":"jsn2b0047","category":"jsonb-functions-2","sql":"SELECT * FROM jsonb_object_keys('{\"a\":1,\"b\":2,\"c\":3}'::jsonb)","expect":"ok","ref":"functions-json","note":"jsonb_object_keys returns key set"}
+{"id":"jsn2b0048","category":"jsonb-functions-2","sql":"SELECT * FROM json_object_keys('{\"f1\":\"abc\",\"f2\":\"def\"}'::json)","expect":"ok","ref":"functions-json","note":"json_object_keys basic"}
+{"id":"jsn2b0049","category":"jsonb-functions-2","sql":"SELECT * FROM jsonb_object_keys('[1,2,3]'::jsonb)","expect":"error","ref":"functions-json","note":"jsonb_object_keys on array is error"}
+{"id":"jsn2b0050","category":"jsonb-functions-2","sql":"SELECT * FROM jsonb_object_keys('{}'::jsonb)","expect":"ok","ref":"functions-json","note":"jsonb_object_keys empty object"}
+{"id":"jsn2b0051","category":"jsonb-functions-2","sql":"CREATE TYPE jsn2b_row AS (a int, b text); SELECT * FROM json_populate_record(null::jsn2b_row, '{\"a\":1,\"b\":\"hello\"}')","expect":"ok","ref":"functions-json","note":"json_populate_record basic usage"}
+{"id":"jsn2b0052","category":"jsonb-functions-2","sql":"CREATE TYPE jsn2b_row2 AS (a int, b text); SELECT * FROM jsonb_populate_record(null::jsn2b_row2, '{\"a\":2,\"b\":\"world\"}'::jsonb)","expect":"ok","ref":"functions-json","note":"jsonb_populate_record basic usage"}
+{"id":"jsn2b0053","category":"jsonb-functions-2","sql":"CREATE TYPE jsn2b_row3 AS (a int, b text); SELECT * FROM json_populate_record(null::jsn2b_row3, '{\"a\":1,\"extra\":\"ignored\"}')","expect":"ok","ref":"functions-json","note":"json_populate_record extra keys ignored"}
+{"id":"jsn2b0054","category":"jsonb-functions-2","sql":"CREATE TYPE jsn2b_row4 AS (a int, b text); SELECT * FROM json_populate_record(null::jsn2b_row4, '{\"a\":1}')","expect":"ok","ref":"functions-json","note":"json_populate_record missing key becomes null"}
+{"id":"jsn2b0055","category":"jsonb-functions-2","sql":"CREATE TYPE jsn2b_arr_row AS (a int, b text[]); SELECT * FROM jsonb_populate_record(null::jsn2b_arr_row, '{\"a\":1,\"b\":[\"x\",\"y\"]}'::jsonb)","expect":"ok","ref":"functions-json","note":"jsonb_populate_record with array field"}
+{"id":"jsn2b0056","category":"jsonb-functions-2","sql":"CREATE TYPE jsn2b_row5 AS (a int, b text); SELECT * FROM json_populate_recordset(null::jsn2b_row5, '[{\"a\":1,\"b\":\"x\"},{\"a\":2,\"b\":\"y\"}]')","expect":"ok","ref":"functions-json","note":"json_populate_recordset basic usage"}
+{"id":"jsn2b0057","category":"jsonb-functions-2","sql":"CREATE TYPE jsn2b_row6 AS (a int, b text); SELECT * FROM jsonb_populate_recordset(null::jsn2b_row6, '[{\"a\":3,\"b\":\"z\"},{\"a\":4,\"b\":\"w\"}]'::jsonb)","expect":"ok","ref":"functions-json","note":"jsonb_populate_recordset basic usage"}
+{"id":"jsn2b0058","category":"jsonb-functions-2","sql":"CREATE TYPE jsn2b_row7 AS (a int, b text); SELECT * FROM json_populate_recordset(null::jsn2b_row7, '[]')","expect":"ok","ref":"functions-json","note":"json_populate_recordset empty array"}
+{"id":"jsn2b0059","category":"jsonb-functions-2","sql":"SELECT * FROM json_to_record('{\"a\":1,\"b\":\"foo\",\"c\":true}') AS x(a int, b text, c boolean)","expect":"ok","ref":"functions-json","note":"json_to_record with AS clause"}
+{"id":"jsn2b0060","category":"jsonb-functions-2","sql":"SELECT * FROM jsonb_to_record('{\"a\":1,\"b\":\"foo\"}'::jsonb) AS x(a int, b text)","expect":"ok","ref":"functions-json","note":"jsonb_to_record with AS clause"}
+{"id":"jsn2b0061","category":"jsonb-functions-2","sql":"SELECT * FROM json_to_record('{\"a\":1,\"b\":[1,2,3]}') AS x(a int, b int[])","expect":"ok","ref":"functions-json","note":"json_to_record with array column"}
+{"id":"jsn2b0062","category":"jsonb-functions-2","sql":"SELECT * FROM json_to_record('{\"a\":1}') AS x(a int, z text)","expect":"ok","ref":"functions-json","note":"json_to_record missing key gives null"}
+{"id":"jsn2b0063","category":"jsonb-functions-2","sql":"SELECT * FROM json_to_record('{\"a\":1}')","expect":"error","ref":"functions-json","note":"json_to_record without AS clause is error"}
+{"id":"jsn2b0064","category":"jsonb-functions-2","sql":"SELECT * FROM json_to_recordset('[{\"a\":1,\"b\":\"x\"},{\"a\":2,\"b\":\"y\"}]') AS x(a int, b text)","expect":"ok","ref":"functions-json","note":"json_to_recordset basic"}
+{"id":"jsn2b0065","category":"jsonb-functions-2","sql":"SELECT * FROM jsonb_to_recordset('[{\"a\":1,\"b\":\"x\"},{\"a\":2}]'::jsonb) AS x(a int, b text)","expect":"ok","ref":"functions-json","note":"jsonb_to_recordset basic"}
+{"id":"jsn2b0066","category":"jsonb-functions-2","sql":"SELECT * FROM json_to_recordset('[{\"a\":1,\"b\":\"x\"}]')","expect":"error","ref":"functions-json","note":"json_to_recordset without AS clause is error"}
+{"id":"jsn2b0067","category":"jsonb-functions-2","sql":"SELECT jsonb_path_exists('{\"a\":[1,2,3,4,5]}'::jsonb, '$.a[*] ? (@ >= 2)')","expect":"ok","ref":"functions-json","note":"jsonb_path_exists basic filter"}
+{"id":"jsn2b0068","category":"jsonb-functions-2","sql":"SELECT jsonb_path_exists('{\"a\":1}'::jsonb, '$.b')","expect":"ok","ref":"functions-json","note":"jsonb_path_exists missing path returns false"}
+{"id":"jsn2b0069","category":"jsonb-functions-2","sql":"SELECT jsonb_path_exists('{\"a\":[1,2,3,4,5]}'::jsonb, '$.a[*] ? (@ >= $min)', '{\"min\":2}'::jsonb)","expect":"ok","ref":"functions-json","note":"jsonb_path_exists with vars"}
+{"id":"jsn2b0070","category":"jsonb-functions-2","sql":"SELECT jsonb_path_exists('{\"a\":1}'::jsonb, '$.a', '{}'::jsonb, true)","expect":"ok","ref":"functions-json","note":"jsonb_path_exists with silent=true"}
+{"id":"jsn2b0071","category":"jsonb-functions-2","sql":"SELECT jsonb_path_exists('{\"a\":1}'::jsonb, '$.a', '{}'::jsonb, false)","expect":"ok","ref":"functions-json","note":"jsonb_path_exists with silent=false"}
+{"id":"jsn2b0072","category":"jsonb-functions-2","sql":"SELECT jsonb_path_exists('{\"a\":1}'::jsonb, 'invalid path !!!')","expect":"error","ref":"functions-json","note":"jsonb_path_exists bad jsonpath syntax"}
+{"id":"jsn2b0073","category":"jsonb-functions-2","sql":"SELECT jsonb_path_query('{\"a\":[1,2,3]}'::jsonb, '$.a[*]')","expect":"ok","ref":"functions-json","note":"jsonb_path_query returns set"}
+{"id":"jsn2b0074","category":"jsonb-functions-2","sql":"SELECT * FROM jsonb_path_query('{\"a\":[1,2,3]}'::jsonb, '$.a[*]')","expect":"ok","ref":"functions-json","note":"jsonb_path_query as set-returning"}
+{"id":"jsn2b0075","category":"jsonb-functions-2","sql":"SELECT jsonb_path_query('{\"a\":[1,2,3,4,5]}'::jsonb, '$.a[*] ? (@ > $x)', '{\"x\":3}'::jsonb)","expect":"ok","ref":"functions-json","note":"jsonb_path_query with vars"}
+{"id":"jsn2b0076","category":"jsonb-functions-2","sql":"SELECT jsonb_path_query('{\"a\":1}'::jsonb, '$.a', '{}'::jsonb, true)","expect":"ok","ref":"functions-json","note":"jsonb_path_query with silent=true"}
+{"id":"jsn2b0077","category":"jsonb-functions-2","sql":"SELECT jsonb_path_query_array('{\"a\":[1,2,3,4,5]}'::jsonb, '$.a[*] ? (@ >= $min)', '{\"min\":3}'::jsonb)","expect":"ok","ref":"functions-json","note":"jsonb_path_query_array with vars returns array"}
+{"id":"jsn2b0078","category":"jsonb-functions-2","sql":"SELECT jsonb_path_query_array('{\"a\":[1,2,3]}'::jsonb, '$.a[*]')","expect":"ok","ref":"functions-json","note":"jsonb_path_query_array basic"}
+{"id":"jsn2b0079","category":"jsonb-functions-2","sql":"SELECT jsonb_path_query_array('{\"a\":[1,2,3]}'::jsonb, '$.b[*]')","expect":"ok","ref":"functions-json","note":"jsonb_path_query_array no match returns empty array"}
+{"id":"jsn2b0080","category":"jsonb-functions-2","sql":"SELECT jsonb_path_query_first('{\"a\":[1,2,3]}'::jsonb, '$.a[*]')","expect":"ok","ref":"functions-json","note":"jsonb_path_query_first returns first"}
+{"id":"jsn2b0081","category":"jsonb-functions-2","sql":"SELECT jsonb_path_query_first('{\"a\":[1,2,3]}'::jsonb, '$.b')","expect":"ok","ref":"functions-json","note":"jsonb_path_query_first no match returns null"}
+{"id":"jsn2b0082","category":"jsonb-functions-2","sql":"SELECT jsonb_path_query_first('{\"a\":[1,2,3]}'::jsonb, '$.a[*] ? (@ > $x)', '{\"x\":1}'::jsonb)","expect":"ok","ref":"functions-json","note":"jsonb_path_query_first with vars"}
+{"id":"jsn2b0083","category":"jsonb-functions-2","sql":"SELECT data @? '$.key' FROM s.t","expect":"ok","ref":"functions-json","note":"@? jsonpath exists operator on column"}
+{"id":"jsn2b0084","category":"jsonb-functions-2","sql":"SELECT data @@ '$.val > 0' FROM s.t","expect":"ok","ref":"functions-json","note":"@@ jsonpath match operator on column"}
+{"id":"jsn2b0085","category":"jsonb-functions-2","sql":"SELECT '{\"a\":1}'::jsonb @? '$.a'","expect":"ok","ref":"functions-json","note":"@? operator inline literal"}
+{"id":"jsn2b0086","category":"jsonb-functions-2","sql":"SELECT '{\"a\":1}'::jsonb @@ '$.a > 0'","expect":"ok","ref":"functions-json","note":"@@ operator inline literal"}
+{"id":"jsn2b0087","category":"jsonb-functions-2","sql":"SELECT jsonb_path_exists_tz('[\"2015-08-01 12:00:00-05\"]'::jsonb, '$[*] ? (@.datetime() < \"2015-08-02\".datetime())')","expect":"ok","ref":"functions-json","note":"jsonb_path_exists_tz timezone-aware"}
+{"id":"jsn2b0088","category":"jsonb-functions-2","sql":"SELECT jsonb_path_query_array_tz('[\"2015-08-01\"]'::jsonb, '$[*].datetime()')","expect":"ok","ref":"functions-json","note":"jsonb_path_query_array_tz basic"}
+{"id":"jsn2b0089","category":"jsonb-functions-2","sql":"SELECT jsonb_path_query_first_tz('[\"2015-08-01\"]'::jsonb, '$[*].datetime()')","expect":"ok","ref":"functions-json","note":"jsonb_path_query_first_tz basic"}
+{"id":"jsn2b0090","category":"jsonb-functions-2","sql":"SELECT jsonb_path_match('{\"a\":[1,2,3,4,5]}'::jsonb, 'exists($.a[*] ? (@ >= $min && @ <= $max))', '{\"min\":2,\"max\":4}'::jsonb)","expect":"ok","ref":"functions-json","note":"jsonb_path_match with vars"}
+{"id":"jsn2b0091","category":"jsonb-functions-2","sql":"SELECT jsonb_path_match('{\"a\":5}'::jsonb, '$.a > 3')","expect":"ok","ref":"functions-json","note":"jsonb_path_match comparison predicate"}
+{"id":"jsn2b0092","category":"jsonb-functions-2","sql":"SELECT JSON_EXISTS('{\"key1\":[1,2,3]}'::jsonb, '$.key1[*]')","expect":"ok","ref":"functions-json","note":"JSON_EXISTS basic"}
+{"id":"jsn2b0093","category":"jsonb-functions-2","sql":"SELECT JSON_EXISTS('{\"key1\":[1,2,3]}'::jsonb, '$.key1[*] ? (@ > $x)' PASSING 2 AS x)","expect":"ok","ref":"functions-json","note":"JSON_EXISTS with PASSING clause"}
+{"id":"jsn2b0094","category":"jsonb-functions-2","sql":"SELECT JSON_EXISTS('{\"a\":1}'::jsonb, '$.b' TRUE ON ERROR)","expect":"ok","ref":"functions-json","note":"JSON_EXISTS TRUE ON ERROR"}
+{"id":"jsn2b0095","category":"jsonb-functions-2","sql":"SELECT JSON_EXISTS('{\"a\":1}'::jsonb, '$.b' FALSE ON ERROR)","expect":"ok","ref":"functions-json","note":"JSON_EXISTS FALSE ON ERROR"}
+{"id":"jsn2b0096","category":"jsonb-functions-2","sql":"SELECT JSON_EXISTS('{\"a\":1}'::jsonb, '$.b' UNKNOWN ON ERROR)","expect":"ok","ref":"functions-json","note":"JSON_EXISTS UNKNOWN ON ERROR"}
+{"id":"jsn2b0097","category":"jsonb-functions-2","sql":"SELECT JSON_EXISTS('{\"a\":1}'::jsonb, '$.b' ERROR ON ERROR)","expect":"ok","ref":"functions-json","note":"JSON_EXISTS ERROR ON ERROR"}
+{"id":"jsn2b0098","category":"jsonb-functions-2","sql":"SELECT JSON_EXISTS('{\"a\":1}'::jsonb, PASSING 2 AS x)","expect":"error","ref":"functions-json","note":"JSON_EXISTS missing path expression"}
+{"id":"jsn2b0099","category":"jsonb-functions-2","sql":"SELECT JSON_VALUE('{\"a\":\"123\"}'::jsonb, '$.a')","expect":"ok","ref":"functions-json","note":"JSON_VALUE basic returns text"}
+{"id":"jsn2b0100","category":"jsonb-functions-2","sql":"SELECT JSON_VALUE('\"123.45\"'::jsonb, '$' RETURNING float)","expect":"ok","ref":"functions-json","note":"JSON_VALUE RETURNING float"}
+{"id":"jsn2b0101","category":"jsonb-functions-2","sql":"SELECT JSON_VALUE('{\"a\":42}'::jsonb, '$.a' RETURNING int)","expect":"ok","ref":"functions-json","note":"JSON_VALUE RETURNING int"}
+{"id":"jsn2b0102","category":"jsonb-functions-2","sql":"SELECT JSON_VALUE('{\"a\":\"hello\"}'::jsonb, '$.a' RETURNING text)","expect":"ok","ref":"functions-json","note":"JSON_VALUE RETURNING text explicit"}
+{"id":"jsn2b0103","category":"jsonb-functions-2","sql":"SELECT JSON_VALUE('{\"a\":1}'::jsonb, '$.b' NULL ON EMPTY)","expect":"ok","ref":"functions-json","note":"JSON_VALUE NULL ON EMPTY"}
+{"id":"jsn2b0104","category":"jsonb-functions-2","sql":"SELECT JSON_VALUE('{\"a\":1}'::jsonb, '$.b' DEFAULT 'missing' ON EMPTY)","expect":"ok","ref":"functions-json","note":"JSON_VALUE DEFAULT ON EMPTY"}
+{"id":"jsn2b0105","category":"jsonb-functions-2","sql":"SELECT JSON_VALUE('{\"a\":1}'::jsonb, '$.b' ERROR ON EMPTY)","expect":"error","ref":"functions-json","note":"JSON_VALUE ERROR ON EMPTY raises error"}
+{"id":"jsn2b0106","category":"jsonb-functions-2","sql":"SELECT JSON_VALUE('{\"a\":1}'::jsonb, '$.b' NULL ON ERROR)","expect":"ok","ref":"functions-json","note":"JSON_VALUE NULL ON ERROR"}
+{"id":"jsn2b0107","category":"jsonb-functions-2","sql":"SELECT JSON_VALUE('{\"a\":1}'::jsonb, '$.b' RETURNING int DEFAULT 0 ON ERROR)","expect":"ok","ref":"functions-json","note":"JSON_VALUE DEFAULT ON ERROR with RETURNING"}
+{"id":"jsn2b0108","category":"jsonb-functions-2","sql":"SELECT JSON_VALUE('{\"a\":1}'::jsonb, '$.a' PASSING 1 AS x RETURNING int)","expect":"ok","ref":"functions-json","note":"JSON_VALUE with PASSING clause"}
+{"id":"jsn2b0109","category":"jsonb-functions-2","sql":"SELECT JSON_QUERY('{\"a\":\"hello\"}'::jsonb, '$.a' KEEP QUOTES)","expect":"ok","ref":"functions-json","note":"JSON_QUERY KEEP QUOTES (not JSON_VALUE)"}
+{"id":"jsn2b0110","category":"jsonb-functions-2","sql":"SELECT JSON_QUERY('{\"a\":\"hello\"}'::jsonb, '$.a' WITHOUT WRAPPER OMIT QUOTES)","expect":"ok","ref":"functions-json","note":"JSON_QUERY WITHOUT WRAPPER OMIT QUOTES"}
+{"id":"jsn2b0111","category":"jsonb-functions-2","sql":"SELECT JSON_VALUE('{\"a\":1}'::jsonb, RETURNING int)","expect":"error","ref":"functions-json","note":"JSON_VALUE missing path expression"}
+{"id":"jsn2b0112","category":"jsonb-functions-2","sql":"SELECT JSON_QUERY('{\"a\":[1,2,3]}'::jsonb, '$.a')","expect":"ok","ref":"functions-json","note":"JSON_QUERY basic returns jsonb"}
+{"id":"jsn2b0113","category":"jsonb-functions-2","sql":"SELECT JSON_QUERY('[1,2,3]'::jsonb, '$[*]' WITH WRAPPER)","expect":"ok","ref":"functions-json","note":"JSON_QUERY WITH WRAPPER for multiple values"}
+{"id":"jsn2b0114","category":"jsonb-functions-2","sql":"SELECT JSON_QUERY('[1,2,3]'::jsonb, '$[*]' WITH UNCONDITIONAL WRAPPER)","expect":"ok","ref":"functions-json","note":"JSON_QUERY WITH UNCONDITIONAL WRAPPER"}
+{"id":"jsn2b0115","category":"jsonb-functions-2","sql":"SELECT JSON_QUERY('[1,2,3]'::jsonb, '$[*]' WITH CONDITIONAL WRAPPER)","expect":"ok","ref":"functions-json","note":"JSON_QUERY WITH CONDITIONAL WRAPPER"}
+{"id":"jsn2b0116","category":"jsonb-functions-2","sql":"SELECT JSON_QUERY('[1,2,3]'::jsonb, '$' WITHOUT WRAPPER)","expect":"ok","ref":"functions-json","note":"JSON_QUERY WITHOUT WRAPPER explicit"}
+{"id":"jsn2b0117","category":"jsonb-functions-2","sql":"SELECT JSON_QUERY('{\"a\":1}'::jsonb, '$.a' RETURNING text)","expect":"ok","ref":"functions-json","note":"JSON_QUERY RETURNING text"}
+{"id":"jsn2b0118","category":"jsonb-functions-2","sql":"SELECT JSON_QUERY('{\"a\":1}'::jsonb, '$.b' NULL ON EMPTY)","expect":"ok","ref":"functions-json","note":"JSON_QUERY NULL ON EMPTY"}
+{"id":"jsn2b0119","category":"jsonb-functions-2","sql":"SELECT JSON_QUERY('{\"a\":1}'::jsonb, '$.b' EMPTY ARRAY ON EMPTY)","expect":"ok","ref":"functions-json","note":"JSON_QUERY EMPTY ARRAY ON EMPTY"}
+{"id":"jsn2b0120","category":"jsonb-functions-2","sql":"SELECT JSON_QUERY('{\"a\":1}'::jsonb, '$.b' EMPTY OBJECT ON EMPTY)","expect":"ok","ref":"functions-json","note":"JSON_QUERY EMPTY OBJECT ON EMPTY"}
+{"id":"jsn2b0121","category":"jsonb-functions-2","sql":"SELECT JSON_QUERY('{\"a\":1}'::jsonb, '$.b' ERROR ON EMPTY)","expect":"error","ref":"functions-json","note":"JSON_QUERY ERROR ON EMPTY raises error"}
+{"id":"jsn2b0122","category":"jsonb-functions-2","sql":"SELECT JSON_QUERY('{\"a\":1}'::jsonb, '$.a' NULL ON ERROR)","expect":"ok","ref":"functions-json","note":"JSON_QUERY NULL ON ERROR"}
+{"id":"jsn2b0123","category":"jsonb-functions-2","sql":"SELECT JSON_QUERY('{\"a\":1}'::jsonb, '$.a' OMIT QUOTES)","expect":"ok","ref":"functions-json","note":"JSON_QUERY OMIT QUOTES"}
+{"id":"jsn2b0124","category":"jsonb-functions-2","sql":"SELECT JSON_QUERY('{\"a\":1}'::jsonb, '$.a' KEEP QUOTES)","expect":"ok","ref":"functions-json","note":"JSON_QUERY KEEP QUOTES"}
+{"id":"jsn2b0125","category":"jsonb-functions-2","sql":"SELECT JSON_QUERY('{\"a\":1}'::jsonb, '$.a' PASSING 5 AS x RETURNING text)","expect":"ok","ref":"functions-json","note":"JSON_QUERY PASSING with RETURNING"}
+{"id":"jsn2b0126","category":"jsonb-functions-2","sql":"SELECT JSON_QUERY('{\"a\":1}'::jsonb, RETURNING text)","expect":"error","ref":"functions-json","note":"JSON_QUERY missing path expression"}
+{"id":"jsn2b0127","category":"jsonb-functions-2","sql":"SELECT JSON_QUERY('[1,2,3]'::jsonb, '$[*]' WITH ARRAY WRAPPER)","expect":"ok","ref":"functions-json","note":"JSON_QUERY WITH ARRAY WRAPPER"}
+{"id":"jsn2b0128","category":"jsonb-functions-2","sql":"SELECT json('123')","expect":"ok","ref":"functions-json","note":"JSON() constructor from integer string"}
+{"id":"jsn2b0129","category":"jsonb-functions-2","sql":"SELECT json('{\"a\":1}')","expect":"ok","ref":"functions-json","note":"JSON() constructor from object string"}
+{"id":"jsn2b0130","category":"jsonb-functions-2","sql":"SELECT json('[1,2,3]')","expect":"ok","ref":"functions-json","note":"JSON() constructor from array string"}
+{"id":"jsn2b0131","category":"jsonb-functions-2","sql":"SELECT json('not valid json')","expect":"error","ref":"functions-json","note":"JSON() constructor invalid input"}
+{"id":"jsn2b0132","category":"jsonb-functions-2","sql":"SELECT json('{\"a\":1,\"a\":2}' WITHOUT UNIQUE KEYS)","expect":"ok","ref":"functions-json","note":"JSON() WITHOUT UNIQUE KEYS allows duplicates"}
+{"id":"jsn2b0133","category":"jsonb-functions-2","sql":"SELECT json('{\"a\":1,\"a\":2}' WITH UNIQUE KEYS)","expect":"error","ref":"functions-json","note":"JSON() WITH UNIQUE KEYS rejects duplicates"}
+{"id":"jsn2b0134","category":"jsonb-functions-2","sql":"SELECT json('{\"a\":1}' WITH UNIQUE KEYS)","expect":"ok","ref":"functions-json","note":"JSON() WITH UNIQUE KEYS unique input ok"}
+{"id":"jsn2b0135","category":"jsonb-functions-2","sql":"SELECT json_scalar(123)","expect":"ok","ref":"functions-json","note":"json_scalar integer"}
+{"id":"jsn2b0136","category":"jsonb-functions-2","sql":"SELECT json_scalar(123.45)","expect":"ok","ref":"functions-json","note":"json_scalar numeric"}
+{"id":"jsn2b0137","category":"jsonb-functions-2","sql":"SELECT json_scalar(true)","expect":"ok","ref":"functions-json","note":"json_scalar boolean true"}
+{"id":"jsn2b0138","category":"jsonb-functions-2","sql":"SELECT json_scalar(false)","expect":"ok","ref":"functions-json","note":"json_scalar boolean false"}
+{"id":"jsn2b0139","category":"jsonb-functions-2","sql":"SELECT json_scalar(null)","expect":"ok","ref":"functions-json","note":"json_scalar null"}
+{"id":"jsn2b0140","category":"jsonb-functions-2","sql":"SELECT json_scalar('hello')","expect":"ok","ref":"functions-json","note":"json_scalar text becomes string"}
+{"id":"jsn2b0141","category":"jsonb-functions-2","sql":"SELECT json_scalar()","expect":"error","ref":"functions-json","note":"json_scalar no argument"}
+{"id":"jsn2b0142","category":"jsonb-functions-2","sql":"SELECT json_serialize('{\"a\":1}')","expect":"ok","ref":"functions-json","note":"json_serialize basic to text"}
+{"id":"jsn2b0143","category":"jsonb-functions-2","sql":"SELECT json_serialize('{\"a\":1}' RETURNING text)","expect":"ok","ref":"functions-json","note":"json_serialize RETURNING text explicit"}
+{"id":"jsn2b0144","category":"jsonb-functions-2","sql":"SELECT json_serialize('{\"a\":1}' RETURNING bytea)","expect":"ok","ref":"functions-json","note":"json_serialize RETURNING bytea"}
+{"id":"jsn2b0145","category":"jsonb-functions-2","sql":"SELECT json_serialize('{\"a\":1}' RETURNING varchar)","expect":"ok","ref":"functions-json","note":"json_serialize RETURNING varchar"}
+{"id":"jsn2b0146","category":"jsonb-functions-2","sql":"SELECT '123' IS JSON","expect":"ok","ref":"functions-json","note":"IS JSON basic test"}
+{"id":"jsn2b0147","category":"jsonb-functions-2","sql":"SELECT '123' IS JSON VALUE","expect":"ok","ref":"functions-json","note":"IS JSON VALUE test"}
+{"id":"jsn2b0148","category":"jsonb-functions-2","sql":"SELECT '{\"a\":1}' IS JSON OBJECT","expect":"ok","ref":"functions-json","note":"IS JSON OBJECT test"}
+{"id":"jsn2b0149","category":"jsonb-functions-2","sql":"SELECT '[1,2]' IS JSON ARRAY","expect":"ok","ref":"functions-json","note":"IS JSON ARRAY test"}
+{"id":"jsn2b0150","category":"jsonb-functions-2","sql":"SELECT '123' IS JSON SCALAR","expect":"ok","ref":"functions-json","note":"IS JSON SCALAR test"}
+{"id":"jsn2b0151","category":"jsonb-functions-2","sql":"SELECT 'not json' IS NOT JSON","expect":"ok","ref":"functions-json","note":"IS NOT JSON test"}
+{"id":"jsn2b0152","category":"jsonb-functions-2","sql":"SELECT '{\"a\":1}' IS NOT JSON OBJECT","expect":"ok","ref":"functions-json","note":"IS NOT JSON OBJECT test"}
+{"id":"jsn2b0153","category":"jsonb-functions-2","sql":"SELECT '[1,2]' IS NOT JSON ARRAY","expect":"ok","ref":"functions-json","note":"IS NOT JSON ARRAY test"}
+{"id":"jsn2b0154","category":"jsonb-functions-2","sql":"SELECT '{\"a\":1,\"b\":2}' IS JSON OBJECT WITH UNIQUE KEYS","expect":"ok","ref":"functions-json","note":"IS JSON OBJECT WITH UNIQUE KEYS test"}
+{"id":"jsn2b0155","category":"jsonb-functions-2","sql":"SELECT '{\"a\":1,\"a\":2}' IS JSON OBJECT WITH UNIQUE KEYS","expect":"ok","ref":"functions-json","note":"IS JSON WITH UNIQUE KEYS returns false for duplicates"}
+{"id":"jsn2b0156","category":"jsonb-functions-2","sql":"SELECT '{\"a\":1}' IS JSON WITHOUT UNIQUE KEYS","expect":"ok","ref":"functions-json","note":"IS JSON WITHOUT UNIQUE KEYS test"}
+{"id":"jsn2b0157","category":"jsonb-functions-2","sql":"SELECT data IS JSON FROM s.t","expect":"ok","ref":"functions-json","note":"IS JSON on table column"}
+{"id":"jsn2b0158","category":"jsonb-functions-2","sql":"SELECT data IS JSON OBJECT FROM s.t","expect":"ok","ref":"functions-json","note":"IS JSON OBJECT on table column"}
+{"id":"jsn2b0159","category":"jsonb-functions-2","sql":"SELECT 123 IS JSON","expect":"error","ref":"functions-json","note":"IS JSON on integer type is error (only text/bytea/json/jsonb)"}
+{"id":"jsn2b0160","category":"jsonb-functions-2","sql":"SELECT JSON_QUERY('{\"a\":[1,2,3]}'::jsonb, '$.a[*]' WITH CONDITIONAL ARRAY WRAPPER)","expect":"ok","ref":"functions-json","note":"JSON_QUERY WITH CONDITIONAL ARRAY WRAPPER"}
+{"id":"jsn2b0161","category":"jsonb-functions-2","sql":"SELECT JSON_QUERY('{\"a\":[1,2,3]}'::jsonb, '$.a[*]' WITH UNCONDITIONAL ARRAY WRAPPER)","expect":"ok","ref":"functions-json","note":"JSON_QUERY WITH UNCONDITIONAL ARRAY WRAPPER"}
+{"id":"jsn2b0162","category":"jsonb-functions-2","sql":"SELECT jsonb_path_query_array(data, '$.key') FROM s.t","expect":"ok","ref":"functions-json","note":"jsonb_path_query_array on table column"}
+{"id":"jsn2b0163","category":"jsonb-functions-2","sql":"SELECT jsonb_path_exists(data, '$.key') FROM s.t","expect":"ok","ref":"functions-json","note":"jsonb_path_exists on table column"}
+{"id":"jsn2b0164","category":"jsonb-functions-2","sql":"SELECT jsonb_set(data, '{key}', '1'::jsonb) FROM s.t WHERE data IS NOT NULL","expect":"ok","ref":"functions-json","note":"jsonb_set on filtered table column"}
+{"id":"jsn2b0165","category":"jsonb-functions-2","sql":"SELECT jsonb_insert(data, '{newkey}', '\"value\"'::jsonb) FROM s.t","expect":"ok","ref":"functions-json","note":"jsonb_insert on table column"}
+{"id":"jsn2b0166","category":"jsonb-functions-2","sql":"SELECT jsonb_strip_nulls(data) FROM s.t","expect":"ok","ref":"functions-json","note":"jsonb_strip_nulls on table column"}
+{"id":"jsn2b0167","category":"jsonb-functions-2","sql":"SELECT json_serialize(data::text RETURNING text) FROM s.t","expect":"ok","ref":"functions-json","note":"json_serialize column data as text"}
+{"id":"jsn2b0168","category":"jsonb-functions-2","sql":"SELECT JSON_EXISTS(data, '$.key') FROM s.t","expect":"ok","ref":"functions-json","note":"JSON_EXISTS on table column"}
+{"id":"jsn2b0169","category":"jsonb-functions-2","sql":"SELECT JSON_VALUE(data, '$.key') FROM s.t","expect":"ok","ref":"functions-json","note":"JSON_VALUE on table column"}
+{"id":"jsn2b0170","category":"jsonb-functions-2","sql":"SELECT JSON_QUERY(data, '$.key') FROM s.t","expect":"ok","ref":"functions-json","note":"JSON_QUERY on table column"}

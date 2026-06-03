@@ -1,0 +1,170 @@
+{"id":"txpb0001","category":"text-pattern","sql":"SELECT 'hello' LIKE 'h%'","expect":"ok","ref":"functions-matching","note":"LIKE with percent wildcard"}
+{"id":"txpb0002","category":"text-pattern","sql":"SELECT 'hello' LIKE 'h_llo'","expect":"ok","ref":"functions-matching","note":"LIKE with underscore wildcard"}
+{"id":"txpb0003","category":"text-pattern","sql":"SELECT 'hello' LIKE 'world'","expect":"ok","ref":"functions-matching","note":"LIKE non-matching pattern returns false"}
+{"id":"txpb0004","category":"text-pattern","sql":"SELECT 'hello' NOT LIKE 'h%'","expect":"ok","ref":"functions-matching","note":"NOT LIKE with percent wildcard"}
+{"id":"txpb0005","category":"text-pattern","sql":"SELECT 'hello' NOT LIKE 'world'","expect":"ok","ref":"functions-matching","note":"NOT LIKE non-matching returns true"}
+{"id":"txpb0006","category":"text-pattern","sql":"SELECT 'Hello' ILIKE 'h%'","expect":"ok","ref":"functions-matching","note":"ILIKE case-insensitive match"}
+{"id":"txpb0007","category":"text-pattern","sql":"SELECT 'Hello' ILIKE 'H%'","expect":"ok","ref":"functions-matching","note":"ILIKE case-insensitive exact case"}
+{"id":"txpb0008","category":"text-pattern","sql":"SELECT 'Hello' NOT ILIKE 'h%'","expect":"ok","ref":"functions-matching","note":"NOT ILIKE case-insensitive non-match"}
+{"id":"txpb0009","category":"text-pattern","sql":"SELECT 'hello' LIKE '\\%hello' ESCAPE '\\'","expect":"ok","ref":"functions-matching","note":"LIKE ESCAPE with backslash escaping percent"}
+{"id":"txpb0010","category":"text-pattern","sql":"SELECT '100% done' LIKE '100!% done' ESCAPE '!'","expect":"ok","ref":"functions-matching","note":"LIKE ESCAPE with custom escape char"}
+{"id":"txpb0011","category":"text-pattern","sql":"SELECT 'a_b' LIKE 'a!_b' ESCAPE '!'","expect":"ok","ref":"functions-matching","note":"LIKE ESCAPE with underscore literal"}
+{"id":"txpb0012","category":"text-pattern","sql":"SELECT 'hello' LIKE '%' ESCAPE '!'","expect":"ok","ref":"functions-matching","note":"LIKE ESCAPE with no special chars in pattern"}
+{"id":"txpb0013","category":"text-pattern","sql":"SELECT 'hello' ILIKE '%ello' ESCAPE '!'","expect":"ok","ref":"functions-matching","note":"ILIKE with ESCAPE clause"}
+{"id":"txpb0014","category":"text-pattern","sql":"SELECT 'hello' NOT ILIKE '%world%' ESCAPE '!'","expect":"ok","ref":"functions-matching","note":"NOT ILIKE with ESCAPE clause"}
+{"id":"txpb0015","category":"text-pattern","sql":"SELECT 'hello' LIKE 'ab' ESCAPE 'ab'","expect":"error","ref":"functions-matching","note":"LIKE ESCAPE with multi-char escape string is error"}
+{"id":"txpb0016","category":"text-pattern","sql":"SELECT name FROM s.t WHERE name LIKE 'A%'","expect":"ok","ref":"functions-matching","note":"LIKE in WHERE clause on table column"}
+{"id":"txpb0017","category":"text-pattern","sql":"SELECT name FROM s.t WHERE name ILIKE 'a%'","expect":"ok","ref":"functions-matching","note":"ILIKE in WHERE clause on table column"}
+{"id":"txpb0018","category":"text-pattern","sql":"SELECT name FROM s.t WHERE name NOT LIKE '%x%'","expect":"ok","ref":"functions-matching","note":"NOT LIKE in WHERE clause"}
+{"id":"txpb0019","category":"text-pattern","sql":"SELECT 'hello' SIMILAR TO 'h(e|a)llo'","expect":"ok","ref":"functions-matching","note":"SIMILAR TO with alternation"}
+{"id":"txpb0020","category":"text-pattern","sql":"SELECT 'hello' SIMILAR TO 'h%'","expect":"ok","ref":"functions-matching","note":"SIMILAR TO with percent wildcard"}
+{"id":"txpb0021","category":"text-pattern","sql":"SELECT 'hello' SIMILAR TO 'h_llo'","expect":"ok","ref":"functions-matching","note":"SIMILAR TO with underscore wildcard"}
+{"id":"txpb0022","category":"text-pattern","sql":"SELECT 'hello' SIMILAR TO '[hH]ello'","expect":"ok","ref":"functions-matching","note":"SIMILAR TO with character class"}
+{"id":"txpb0023","category":"text-pattern","sql":"SELECT 'hello' NOT SIMILAR TO 'world'","expect":"ok","ref":"functions-matching","note":"NOT SIMILAR TO non-matching"}
+{"id":"txpb0024","category":"text-pattern","sql":"SELECT 'hello' SIMILAR TO 'h(e|a)llo' ESCAPE '!'","expect":"ok","ref":"functions-matching","note":"SIMILAR TO with ESCAPE clause"}
+{"id":"txpb0025","category":"text-pattern","sql":"SELECT '100%' SIMILAR TO '100!%' ESCAPE '!'","expect":"ok","ref":"functions-matching","note":"SIMILAR TO ESCAPE escaping percent"}
+{"id":"txpb0026","category":"text-pattern","sql":"SELECT 'hello' SIMILAR 'h%'","expect":"error","ref":"functions-matching","note":"SIMILAR without TO is a syntax error"}
+{"id":"txpb0027","category":"text-pattern","sql":"SELECT 'hello' SIMILAR TO 'h%' ESCAPE 'abc'","expect":"error","ref":"functions-matching","note":"SIMILAR TO ESCAPE with multi-char escape is error"}
+{"id":"txpb0028","category":"text-pattern","sql":"SELECT 'hello' ~ 'h.*'","expect":"ok","ref":"functions-matching","note":"POSIX ~ case-sensitive regex match"}
+{"id":"txpb0029","category":"text-pattern","sql":"SELECT 'hello' ~ '^h'","expect":"ok","ref":"functions-matching","note":"POSIX ~ with anchor"}
+{"id":"txpb0030","category":"text-pattern","sql":"SELECT 'hello' ~* 'H.*'","expect":"ok","ref":"functions-matching","note":"POSIX ~* case-insensitive regex match"}
+{"id":"txpb0031","category":"text-pattern","sql":"SELECT 'hello' !~ 'world'","expect":"ok","ref":"functions-matching","note":"POSIX !~ case-sensitive non-match"}
+{"id":"txpb0032","category":"text-pattern","sql":"SELECT 'hello' !~* 'WORLD'","expect":"ok","ref":"functions-matching","note":"POSIX !~* case-insensitive non-match"}
+{"id":"txpb0033","category":"text-pattern","sql":"SELECT 'hello' ~ '[0-9]+'","expect":"ok","ref":"functions-matching","note":"POSIX ~ with character class range"}
+{"id":"txpb0034","category":"text-pattern","sql":"SELECT 'hello world' ~ '\\bworld\\b'","expect":"ok","ref":"functions-matching","note":"POSIX ~ with word boundary"}
+{"id":"txpb0035","category":"text-pattern","sql":"SELECT name FROM s.t WHERE name ~ '^[A-Z]'","expect":"ok","ref":"functions-matching","note":"POSIX ~ in WHERE clause on column"}
+{"id":"txpb0036","category":"text-pattern","sql":"SELECT name FROM s.t WHERE name ~* 'test'","expect":"ok","ref":"functions-matching","note":"POSIX ~* in WHERE clause"}
+{"id":"txpb0037","category":"text-pattern","sql":"SELECT regexp_match('hello world', 'w(or)ld')","expect":"ok","ref":"functions-matching","note":"regexp_match basic usage"}
+{"id":"txpb0038","category":"text-pattern","sql":"SELECT regexp_match('hello', 'h(e)llo')","expect":"ok","ref":"functions-matching","note":"regexp_match with capture group"}
+{"id":"txpb0039","category":"text-pattern","sql":"SELECT regexp_match('HELLO', 'h(e)llo', 'i')","expect":"ok","ref":"functions-matching","note":"regexp_match with flags arg case-insensitive"}
+{"id":"txpb0040","category":"text-pattern","sql":"SELECT regexp_match('hello', 'h(e)llo', 'g')","expect":"error","ref":"functions-matching","note":"regexp_match with g flag is error (use regexp_matches)"}
+{"id":"txpb0041","category":"text-pattern","sql":"SELECT * FROM regexp_matches('hello world', '(\\w+)', 'g')","expect":"ok","ref":"functions-matching","note":"regexp_matches with g flag returns set"}
+{"id":"txpb0042","category":"text-pattern","sql":"SELECT * FROM regexp_matches('hello', '(h)(e)', 'g')","expect":"ok","ref":"functions-matching","note":"regexp_matches multiple capture groups"}
+{"id":"txpb0043","category":"text-pattern","sql":"SELECT * FROM regexp_matches('HELLO', '(\\w+)', 'gi')","expect":"ok","ref":"functions-matching","note":"regexp_matches with gi flags"}
+{"id":"txpb0044","category":"text-pattern","sql":"SELECT regexp_replace('hello world', 'world', 'earth')","expect":"ok","ref":"functions-matching","note":"regexp_replace basic replacement"}
+{"id":"txpb0045","category":"text-pattern","sql":"SELECT regexp_replace('hello hello', 'hello', 'hi', 'g')","expect":"ok","ref":"functions-matching","note":"regexp_replace with g flag replaces all"}
+{"id":"txpb0046","category":"text-pattern","sql":"SELECT regexp_replace('HELLO', 'hello', 'hi', 'i')","expect":"ok","ref":"functions-matching","note":"regexp_replace with case-insensitive flag"}
+{"id":"txpb0047","category":"text-pattern","sql":"SELECT regexp_replace('hello world', '(\\w+)', '[\\1]', 'g')","expect":"ok","ref":"functions-matching","note":"regexp_replace with backreference"}
+{"id":"txpb0048","category":"text-pattern","sql":"SELECT regexp_replace('hello', 'l+', 'L', 'z')","expect":"error","ref":"functions-matching","note":"regexp_replace with invalid flag is error"}
+{"id":"txpb0049","category":"text-pattern","sql":"SELECT * FROM regexp_split_to_table('one two three', '\\s+')","expect":"ok","ref":"functions-matching","note":"regexp_split_to_table basic split"}
+{"id":"txpb0050","category":"text-pattern","sql":"SELECT * FROM regexp_split_to_table('one,two,three', ',')","expect":"ok","ref":"functions-matching","note":"regexp_split_to_table with comma delimiter"}
+{"id":"txpb0051","category":"text-pattern","sql":"SELECT * FROM regexp_split_to_table('HELLO WORLD', '\\s+', 'i')","expect":"ok","ref":"functions-matching","note":"regexp_split_to_table with flags"}
+{"id":"txpb0052","category":"text-pattern","sql":"SELECT regexp_split_to_array('one two three', '\\s+')","expect":"ok","ref":"functions-matching","note":"regexp_split_to_array basic split"}
+{"id":"txpb0053","category":"text-pattern","sql":"SELECT regexp_split_to_array('a,b,c', ',')","expect":"ok","ref":"functions-matching","note":"regexp_split_to_array with comma delimiter"}
+{"id":"txpb0054","category":"text-pattern","sql":"SELECT regexp_split_to_array('HELLO WORLD', '\\s+', 'i')","expect":"ok","ref":"functions-matching","note":"regexp_split_to_array with flags"}
+{"id":"txpb0055","category":"text-pattern","sql":"SELECT regexp_count('hello world hello', 'hello')","expect":"ok","ref":"functions-matching","note":"regexp_count basic count"}
+{"id":"txpb0056","category":"text-pattern","sql":"SELECT regexp_count('aababab', 'ab')","expect":"ok","ref":"functions-matching","note":"regexp_count overlapping matches"}
+{"id":"txpb0057","category":"text-pattern","sql":"SELECT regexp_count('HELLO hello', 'hello', 1, 'i')","expect":"ok","ref":"functions-matching","note":"regexp_count with start position and flags"}
+{"id":"txpb0058","category":"text-pattern","sql":"SELECT regexp_count('hello', 'l', 1)","expect":"ok","ref":"functions-matching","note":"regexp_count with start position"}
+{"id":"txpb0059","category":"text-pattern","sql":"SELECT regexp_instr('hello world', 'world')","expect":"ok","ref":"functions-matching","note":"regexp_instr basic position"}
+{"id":"txpb0060","category":"text-pattern","sql":"SELECT regexp_instr('hello world', 'world', 1)","expect":"ok","ref":"functions-matching","note":"regexp_instr with start position"}
+{"id":"txpb0061","category":"text-pattern","sql":"SELECT regexp_instr('hello world', 'world', 1, 1)","expect":"ok","ref":"functions-matching","note":"regexp_instr with start and occurrence"}
+{"id":"txpb0062","category":"text-pattern","sql":"SELECT regexp_instr('hello world', 'world', 1, 1, 0)","expect":"ok","ref":"functions-matching","note":"regexp_instr with endoption=0 (start position)"}
+{"id":"txpb0063","category":"text-pattern","sql":"SELECT regexp_instr('hello world', 'world', 1, 1, 1)","expect":"ok","ref":"functions-matching","note":"regexp_instr with endoption=1 (end position)"}
+{"id":"txpb0064","category":"text-pattern","sql":"SELECT regexp_instr('HELLO', 'hello', 1, 1, 0, 'i')","expect":"ok","ref":"functions-matching","note":"regexp_instr with flags"}
+{"id":"txpb0065","category":"text-pattern","sql":"SELECT regexp_substr('hello world', 'w\\w+')","expect":"ok","ref":"functions-matching","note":"regexp_substr basic extract"}
+{"id":"txpb0066","category":"text-pattern","sql":"SELECT regexp_substr('hello world', 'w\\w+', 1)","expect":"ok","ref":"functions-matching","note":"regexp_substr with start position"}
+{"id":"txpb0067","category":"text-pattern","sql":"SELECT regexp_substr('hello hello world', 'hello', 1, 2)","expect":"ok","ref":"functions-matching","note":"regexp_substr with occurrence"}
+{"id":"txpb0068","category":"text-pattern","sql":"SELECT regexp_substr('HELLO WORLD', 'world', 1, 1, 'i')","expect":"ok","ref":"functions-matching","note":"regexp_substr with flags"}
+{"id":"txpb0069","category":"text-pattern","sql":"SELECT regexp_substr('hello world', '(\\w+)', 1, 1, '', 1)","expect":"ok","ref":"functions-matching","note":"regexp_substr with subexpression"}
+{"id":"txpb0070","category":"text-pattern","sql":"SELECT regexp_like('hello', 'h.*o')","expect":"ok","ref":"functions-matching","note":"regexp_like basic match"}
+{"id":"txpb0071","category":"text-pattern","sql":"SELECT regexp_like('hello', 'H.*O', 'i')","expect":"ok","ref":"functions-matching","note":"regexp_like with case-insensitive flag"}
+{"id":"txpb0072","category":"text-pattern","sql":"SELECT regexp_like('hello', '^hello$')","expect":"ok","ref":"functions-matching","note":"regexp_like with anchors"}
+{"id":"txpb0073","category":"text-pattern","sql":"SELECT regexp_like('hello', 'world')","expect":"ok","ref":"functions-matching","note":"regexp_like non-matching returns false"}
+{"id":"txpb0074","category":"text-pattern","sql":"SELECT substring('hello world' FROM 1 FOR 5)","expect":"ok","ref":"functions-matching","note":"substring FROM pos FOR len SQL syntax"}
+{"id":"txpb0075","category":"text-pattern","sql":"SELECT substring('hello world' FROM 7)","expect":"ok","ref":"functions-matching","note":"substring FROM pos only"}
+{"id":"txpb0076","category":"text-pattern","sql":"SELECT substring('hello' FROM 2 FOR 3)","expect":"ok","ref":"functions-matching","note":"substring FROM 2 FOR 3"}
+{"id":"txpb0077","category":"text-pattern","sql":"SELECT substring('hello world' SIMILAR '%#\"world#\"%' ESCAPE '#')","expect":"ok","ref":"functions-matching","note":"substring SIMILAR TO ESCAPE syntax for regex extraction"}
+{"id":"txpb0078","category":"text-pattern","sql":"SELECT substring('hello' FROM 'h(e)llo')","expect":"ok","ref":"functions-matching","note":"substring FROM regex pattern extracts group"}
+{"id":"txpb0079","category":"text-pattern","sql":"SELECT substring('hello world' FROM '\\w+$')","expect":"ok","ref":"functions-matching","note":"substring FROM regex with anchor"}
+{"id":"txpb0080","category":"text-pattern","sql":"SELECT substring('hello' SIMILAR 'h(e)llo')","expect":"error","ref":"functions-matching","note":"substring SIMILAR without ESCAPE is syntax error"}
+{"id":"txpb0081","category":"text-pattern","sql":"SELECT position('lo' IN 'hello')","expect":"ok","ref":"functions-matching","note":"position function basic usage"}
+{"id":"txpb0082","category":"text-pattern","sql":"SELECT position('xyz' IN 'hello')","expect":"ok","ref":"functions-matching","note":"position function not found returns 0"}
+{"id":"txpb0083","category":"text-pattern","sql":"SELECT position('' IN 'hello')","expect":"ok","ref":"functions-matching","note":"position of empty string"}
+{"id":"txpb0084","category":"text-pattern","sql":"SELECT strpos('hello world', 'world')","expect":"ok","ref":"functions-matching","note":"strpos function basic usage"}
+{"id":"txpb0085","category":"text-pattern","sql":"SELECT strpos('hello', 'xyz')","expect":"ok","ref":"functions-matching","note":"strpos not found returns 0"}
+{"id":"txpb0086","category":"text-pattern","sql":"SELECT strpos('hello', '')","expect":"ok","ref":"functions-matching","note":"strpos empty needle"}
+{"id":"txpb0087","category":"text-pattern","sql":"SELECT overlay('hello' PLACING 'world' FROM 1 FOR 5)","expect":"ok","ref":"functions-matching","note":"overlay PLACING FROM FOR full syntax"}
+{"id":"txpb0088","category":"text-pattern","sql":"SELECT overlay('hello world' PLACING 'earth' FROM 7 FOR 5)","expect":"ok","ref":"functions-matching","note":"overlay replaces world with earth"}
+{"id":"txpb0089","category":"text-pattern","sql":"SELECT overlay('hello' PLACING 'XYZ' FROM 2)","expect":"ok","ref":"functions-matching","note":"overlay PLACING FROM without FOR"}
+{"id":"txpb0090","category":"text-pattern","sql":"SELECT overlay('hello' PLACING '' FROM 3 FOR 2)","expect":"ok","ref":"functions-matching","note":"overlay with empty replacement (deletion)"}
+{"id":"txpb0091","category":"text-pattern","sql":"SELECT overlay('hello' PLACING 'x' FROM 1 FOR 0)","expect":"ok","ref":"functions-matching","note":"overlay with FOR 0 (insert without deleting)"}
+{"id":"txpb0092","category":"text-pattern","sql":"SELECT overlay('hello' FROM 1 FOR 3)","expect":"error","ref":"functions-matching","note":"overlay missing PLACING keyword is error"}
+{"id":"txpb0093","category":"text-pattern","sql":"SELECT trim('hello')","expect":"ok","ref":"functions-matching","note":"trim both sides whitespace"}
+{"id":"txpb0094","category":"text-pattern","sql":"SELECT trim(BOTH FROM '  hello  ')","expect":"ok","ref":"functions-matching","note":"trim BOTH FROM syntax"}
+{"id":"txpb0095","category":"text-pattern","sql":"SELECT trim(LEADING FROM '  hello  ')","expect":"ok","ref":"functions-matching","note":"trim LEADING FROM syntax"}
+{"id":"txpb0096","category":"text-pattern","sql":"SELECT trim(TRAILING FROM '  hello  ')","expect":"ok","ref":"functions-matching","note":"trim TRAILING FROM syntax"}
+{"id":"txpb0097","category":"text-pattern","sql":"SELECT trim(BOTH 'x' FROM 'xhellox')","expect":"ok","ref":"functions-matching","note":"trim BOTH specific char FROM string"}
+{"id":"txpb0098","category":"text-pattern","sql":"SELECT trim(LEADING '0' FROM '00123')","expect":"ok","ref":"functions-matching","note":"trim LEADING zero chars"}
+{"id":"txpb0099","category":"text-pattern","sql":"SELECT trim(TRAILING '.' FROM 'hello...')","expect":"ok","ref":"functions-matching","note":"trim TRAILING specific char"}
+{"id":"txpb0100","category":"text-pattern","sql":"SELECT ltrim('  hello  ')","expect":"ok","ref":"functions-matching","note":"ltrim removes leading whitespace"}
+{"id":"txpb0101","category":"text-pattern","sql":"SELECT ltrim('xxhello', 'x')","expect":"ok","ref":"functions-matching","note":"ltrim with explicit trim chars"}
+{"id":"txpb0102","category":"text-pattern","sql":"SELECT rtrim('  hello  ')","expect":"ok","ref":"functions-matching","note":"rtrim removes trailing whitespace"}
+{"id":"txpb0103","category":"text-pattern","sql":"SELECT rtrim('helloxx', 'x')","expect":"ok","ref":"functions-matching","note":"rtrim with explicit trim chars"}
+{"id":"txpb0104","category":"text-pattern","sql":"SELECT btrim('  hello  ')","expect":"ok","ref":"functions-matching","note":"btrim removes both sides whitespace"}
+{"id":"txpb0105","category":"text-pattern","sql":"SELECT btrim('xhellox', 'x')","expect":"ok","ref":"functions-matching","note":"btrim with explicit trim chars"}
+{"id":"txpb0106","category":"text-pattern","sql":"SELECT 'hello' LIKE '%' COLLATE \"C\"","expect":"ok","ref":"functions-matching","note":"LIKE with explicit C collation"}
+{"id":"txpb0107","category":"text-pattern","sql":"SELECT 'hello' LIKE 'h%' COLLATE \"POSIX\"","expect":"ok","ref":"functions-matching","note":"LIKE with POSIX collation"}
+{"id":"txpb0108","category":"text-pattern","sql":"SELECT name COLLATE \"C\" LIKE 'A%' FROM s.t","expect":"ok","ref":"functions-matching","note":"LIKE on column with COLLATE"}
+{"id":"txpb0109","category":"text-pattern","sql":"SELECT 'hello' ~ 'h.*' COLLATE \"C\"","expect":"ok","ref":"functions-matching","note":"POSIX regex with collation"}
+{"id":"txpb0110","category":"text-pattern","sql":"SELECT 'hello' LIKE '%'","expect":"ok","ref":"functions-matching","note":"LIKE with pure percent matches anything"}
+{"id":"txpb0111","category":"text-pattern","sql":"SELECT 'hello' LIKE '_____'","expect":"ok","ref":"functions-matching","note":"LIKE with five underscores matches 5-char string"}
+{"id":"txpb0112","category":"text-pattern","sql":"SELECT '' LIKE ''","expect":"ok","ref":"functions-matching","note":"LIKE empty string against empty pattern"}
+{"id":"txpb0113","category":"text-pattern","sql":"SELECT '' LIKE '%'","expect":"ok","ref":"functions-matching","note":"LIKE empty string against percent matches"}
+{"id":"txpb0114","category":"text-pattern","sql":"SELECT NULL LIKE 'hello'","expect":"ok","ref":"functions-matching","note":"NULL LIKE returns NULL (ok to execute)"}
+{"id":"txpb0115","category":"text-pattern","sql":"SELECT 'hello' LIKE NULL","expect":"ok","ref":"functions-matching","note":"LIKE NULL pattern returns NULL (ok to execute)"}
+{"id":"txpb0116","category":"text-pattern","sql":"SELECT 'hello' SIMILAR TO '%' ESCAPE NULL","expect":"ok","ref":"functions-matching","note":"SIMILAR TO with NULL escape"}
+{"id":"txpb0117","category":"text-pattern","sql":"SELECT regexp_match('hello', '[a-z]+')","expect":"ok","ref":"functions-matching","note":"regexp_match with character class"}
+{"id":"txpb0118","category":"text-pattern","sql":"SELECT regexp_match('hello', '(\\w+)\\s+(\\w+)')","expect":"ok","ref":"functions-matching","note":"regexp_match no match returns NULL"}
+{"id":"txpb0119","category":"text-pattern","sql":"SELECT regexp_match('hello world', '(\\w+)\\s+(\\w+)')","expect":"ok","ref":"functions-matching","note":"regexp_match two capture groups"}
+{"id":"txpb0120","category":"text-pattern","sql":"SELECT (regexp_match('hello world', '(\\w+)\\s+(\\w+)'))[1]","expect":"ok","ref":"functions-matching","note":"regexp_match subscript first group"}
+{"id":"txpb0121","category":"text-pattern","sql":"SELECT (regexp_match('hello world', '(\\w+)\\s+(\\w+)'))[2]","expect":"ok","ref":"functions-matching","note":"regexp_match subscript second group"}
+{"id":"txpb0122","category":"text-pattern","sql":"SELECT regexp_replace('hello', '(h)ello', '\\1i', 'g')","expect":"ok","ref":"functions-matching","note":"regexp_replace backreference \\1"}
+{"id":"txpb0123","category":"text-pattern","sql":"SELECT regexp_replace('foo bar', '\\s+', '-')","expect":"ok","ref":"functions-matching","note":"regexp_replace whitespace with dash"}
+{"id":"txpb0124","category":"text-pattern","sql":"SELECT regexp_replace('abc123', '[0-9]+', '#')","expect":"ok","ref":"functions-matching","note":"regexp_replace digits with hash"}
+{"id":"txpb0125","category":"text-pattern","sql":"SELECT regexp_replace('ABC', '[a-z]+', 'x', 'gi')","expect":"ok","ref":"functions-matching","note":"regexp_replace case-insensitive global"}
+{"id":"txpb0126","category":"text-pattern","sql":"SELECT * FROM regexp_split_to_table('a::b::c', '::')","expect":"ok","ref":"functions-matching","note":"regexp_split_to_table with multi-char delimiter"}
+{"id":"txpb0127","category":"text-pattern","sql":"SELECT * FROM regexp_split_to_table('hello', '')","expect":"ok","ref":"functions-matching","note":"regexp_split_to_table with empty pattern splits chars"}
+{"id":"txpb0128","category":"text-pattern","sql":"SELECT array_length(regexp_split_to_array('one two three', '\\s+'), 1)","expect":"ok","ref":"functions-matching","note":"regexp_split_to_array array length"}
+{"id":"txpb0129","category":"text-pattern","sql":"SELECT regexp_count('abcabc', 'abc')","expect":"ok","ref":"functions-matching","note":"regexp_count simple repeated pattern"}
+{"id":"txpb0130","category":"text-pattern","sql":"SELECT regexp_count('hello', '[aeiou]')","expect":"ok","ref":"functions-matching","note":"regexp_count vowels in hello"}
+{"id":"txpb0131","category":"text-pattern","sql":"SELECT regexp_instr('the cat sat', 'cat')","expect":"ok","ref":"functions-matching","note":"regexp_instr finds cat position"}
+{"id":"txpb0132","category":"text-pattern","sql":"SELECT regexp_instr('one two one', 'one', 1, 2)","expect":"ok","ref":"functions-matching","note":"regexp_instr second occurrence"}
+{"id":"txpb0133","category":"text-pattern","sql":"SELECT regexp_substr('hello world', '\\w+', 7)","expect":"ok","ref":"functions-matching","note":"regexp_substr from position 7"}
+{"id":"txpb0134","category":"text-pattern","sql":"SELECT regexp_like('abc123', '^[a-z]+[0-9]+$')","expect":"ok","ref":"functions-matching","note":"regexp_like full pattern match"}
+{"id":"txpb0135","category":"text-pattern","sql":"SELECT 'abc' LIKE ESCAPE '!'","expect":"error","ref":"functions-matching","note":"LIKE without pattern before ESCAPE is error"}
+{"id":"txpb0136","category":"text-pattern","sql":"SELECT LIKE 'abc%'","expect":"error","ref":"functions-matching","note":"LIKE without left operand is error"}
+{"id":"txpb0137","category":"text-pattern","sql":"SELECT 'hello' LIKE 42","expect":"error","ref":"functions-matching","note":"LIKE with non-text right operand integer is error"}
+{"id":"txpb0138","category":"text-pattern","sql":"SELECT 'hello' NOT SIMILAR TO 'h%'","expect":"ok","ref":"functions-matching","note":"NOT SIMILAR TO matching pattern"}
+{"id":"txpb0139","category":"text-pattern","sql":"SELECT 'hello' SIMILAR TO '(h|H)(e|E)(l|L){2}(o|O)'","expect":"ok","ref":"functions-matching","note":"SIMILAR TO with quantifier"}
+{"id":"txpb0140","category":"text-pattern","sql":"SELECT 'hello' SIMILAR TO 'h[aeiou]llo'","expect":"ok","ref":"functions-matching","note":"SIMILAR TO with bracket expression"}
+{"id":"txpb0141","category":"text-pattern","sql":"SELECT 'hello' SIMILAR TO 'h[^aeiou]llo'","expect":"ok","ref":"functions-matching","note":"SIMILAR TO with negated bracket expression"}
+{"id":"txpb0142","category":"text-pattern","sql":"SELECT 'hello' SIMILAR TO 'he?llo'","expect":"ok","ref":"functions-matching","note":"SIMILAR TO with optional character"}
+{"id":"txpb0143","category":"text-pattern","sql":"SELECT 'hello' SIMILAR TO 'he+llo'","expect":"ok","ref":"functions-matching","note":"SIMILAR TO with one-or-more quantifier"}
+{"id":"txpb0144","category":"text-pattern","sql":"SELECT 'hello' SIMILAR TO 'he*llo'","expect":"ok","ref":"functions-matching","note":"SIMILAR TO with zero-or-more quantifier on e"}
+{"id":"txpb0145","category":"text-pattern","sql":"SELECT 'hello' SIMILAR TO 'hel{2}o'","expect":"ok","ref":"functions-matching","note":"SIMILAR TO with exact repetition {2}"}
+{"id":"txpb0146","category":"text-pattern","sql":"SELECT 'hello' SIMILAR TO 'hel{1,3}o'","expect":"ok","ref":"functions-matching","note":"SIMILAR TO with range repetition {1,3}"}
+{"id":"txpb0147","category":"text-pattern","sql":"SELECT 'ab' ~ 'a(?:b)'","expect":"ok","ref":"functions-matching","note":"POSIX regex non-capturing group"}
+{"id":"txpb0148","category":"text-pattern","sql":"SELECT 'hello' ~ '(?i)HELLO'","expect":"ok","ref":"functions-matching","note":"POSIX regex inline flag (?i)"}
+{"id":"txpb0149","category":"text-pattern","sql":"SELECT 'hello\nworld' ~ '(?n).'","expect":"ok","ref":"functions-matching","note":"POSIX regex newline-sensitive mode"}
+{"id":"txpb0150","category":"text-pattern","sql":"SELECT 'hello' ~ '[[:alpha:]]+'","expect":"ok","ref":"functions-matching","note":"POSIX regex POSIX character class"}
+{"id":"txpb0151","category":"text-pattern","sql":"SELECT 'abc123' ~ '[[:digit:]]+'","expect":"ok","ref":"functions-matching","note":"POSIX regex digit class"}
+{"id":"txpb0152","category":"text-pattern","sql":"SELECT 'hello' !~ '^[0-9]'","expect":"ok","ref":"functions-matching","note":"POSIX !~ not starting with digit"}
+{"id":"txpb0153","category":"text-pattern","sql":"SELECT 'HELLO' !~* '^h'","expect":"ok","ref":"functions-matching","note":"POSIX !~* case-insensitive not match"}
+{"id":"txpb0154","category":"text-pattern","sql":"SELECT position('lo' in 'hello')","expect":"ok","ref":"functions-matching","note":"position lowercase in keyword"}
+{"id":"txpb0155","category":"text-pattern","sql":"SELECT position('hello' IN '')","expect":"ok","ref":"functions-matching","note":"position of string in empty returns 0"}
+{"id":"txpb0156","category":"text-pattern","sql":"SELECT strpos('hello world hello', 'hello')","expect":"ok","ref":"functions-matching","note":"strpos finds first occurrence"}
+{"id":"txpb0157","category":"text-pattern","sql":"SELECT overlay('Txxxxxt' PLACING 'BBB' FROM 2 FOR 4)","expect":"ok","ref":"functions-matching","note":"overlay classic example from docs"}
+{"id":"txpb0158","category":"text-pattern","sql":"SELECT trim(BOTH '\"' FROM '\"hello\"')","expect":"ok","ref":"functions-matching","note":"trim double-quote chars from string"}
+{"id":"txpb0159","category":"text-pattern","sql":"SELECT trim(' hello ')","expect":"ok","ref":"functions-matching","note":"trim function default both sides"}
+{"id":"txpb0160","category":"text-pattern","sql":"SELECT ltrim('   ')","expect":"ok","ref":"functions-matching","note":"ltrim all spaces"}
+{"id":"txpb0161","category":"text-pattern","sql":"SELECT rtrim('hello   ')","expect":"ok","ref":"functions-matching","note":"rtrim trailing spaces"}
+{"id":"txpb0162","category":"text-pattern","sql":"SELECT 'hello' LIKE '%' OR 'world' LIKE 'w%'","expect":"ok","ref":"functions-matching","note":"LIKE combined with OR"}
+{"id":"txpb0163","category":"text-pattern","sql":"SELECT CASE WHEN 'hello' LIKE 'h%' THEN 1 ELSE 0 END","expect":"ok","ref":"functions-matching","note":"LIKE inside CASE expression"}
+{"id":"txpb0164","category":"text-pattern","sql":"SELECT name FROM s.t WHERE name SIMILAR TO '[A-Z]%'","expect":"ok","ref":"functions-matching","note":"SIMILAR TO in WHERE on table column"}
+{"id":"txpb0165","category":"text-pattern","sql":"SELECT name FROM s.t WHERE name ~ '^[a-z]' AND name LIKE '%e%'","expect":"ok","ref":"functions-matching","note":"POSIX ~ combined with LIKE in WHERE"}
+{"id":"txpb0166","category":"text-pattern","sql":"SELECT 'hello' LIKE 'h%' AND 'world' ~ 'w.*d'","expect":"ok","ref":"functions-matching","note":"LIKE and POSIX ~ combined with AND"}
+{"id":"txpb0167","category":"text-pattern","sql":"SELECT regexp_match('hello', '[invalid')","expect":"error","ref":"functions-matching","note":"regexp_match with invalid regex pattern is error"}
+{"id":"txpb0168","category":"text-pattern","sql":"SELECT 'hello' ~ '[invalid'","expect":"error","ref":"functions-matching","note":"POSIX ~ with invalid regex is error"}
+{"id":"txpb0169","category":"text-pattern","sql":"SELECT substring('hello world' SIMILAR '%#\"(\\w+)#\"%' ESCAPE '#')","expect":"ok","ref":"functions-matching","note":"substring SIMILAR ESCAPE extracts word"}
+{"id":"txpb0170","category":"text-pattern","sql":"SELECT regexp_replace('hello world', '(\\w+) (\\w+)', '\\2 \\1')","expect":"ok","ref":"functions-matching","note":"regexp_replace swap two words via backreferences"}

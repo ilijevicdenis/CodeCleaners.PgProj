@@ -1,0 +1,160 @@
+{"id":"cmta0001","category":"comment-on","sql":"COMMENT ON TABLE s.t IS 'a table comment'","expect":"ok","ref":"sql-comment","note":"COMMENT ON TABLE with schema-qualified name"}
+{"id":"cmta0002","category":"comment-on","sql":"COMMENT ON TABLE s.t2 IS 'second table'","expect":"ok","ref":"sql-comment","note":"COMMENT ON TABLE second fixture table"}
+{"id":"cmta0003","category":"comment-on","sql":"COMMENT ON TABLE s.parent IS 'parent table'","expect":"ok","ref":"sql-comment","note":"COMMENT ON TABLE parent fixture"}
+{"id":"cmta0004","category":"comment-on","sql":"COMMENT ON TABLE s.child IS 'child table'","expect":"ok","ref":"sql-comment","note":"COMMENT ON TABLE child (inherited)"}
+{"id":"cmta0005","category":"comment-on","sql":"COMMENT ON TABLE s.events IS 'partitioned table'","expect":"ok","ref":"sql-comment","note":"COMMENT ON TABLE partitioned table"}
+{"id":"cmta0006","category":"comment-on","sql":"COMMENT ON TABLE s.events_2024 IS 'partition for 2024'","expect":"ok","ref":"sql-comment","note":"COMMENT ON TABLE partition"}
+{"id":"cmta0007","category":"comment-on","sql":"COMMENT ON TABLE s.t IS NULL","expect":"ok","ref":"sql-comment","note":"COMMENT ON TABLE IS NULL removes comment"}
+{"id":"cmta0008","category":"comment-on","sql":"COMMENT ON TABLE s.t IS ''","expect":"ok","ref":"sql-comment","note":"COMMENT ON TABLE IS empty string"}
+{"id":"cmta0009","category":"comment-on","sql":"COMMENT ON TABLE no_such_table IS 'x'","expect":"error","ref":"sql-comment","note":"semantic error: table does not exist"}
+{"id":"cmta0010","category":"comment-on","sql":"COMMENT ON TABLE s.t","expect":"error","ref":"sql-comment","note":"syntax error: missing IS clause"}
+{"id":"cmta0011","category":"comment-on","sql":"COMMENT ON TABLE s.t IS","expect":"error","ref":"sql-comment","note":"syntax error: IS without value"}
+{"id":"cmta0012","category":"comment-on","sql":"COMMENT ON TABLE s.t 'no is keyword'","expect":"error","ref":"sql-comment","note":"syntax error: missing IS keyword"}
+{"id":"cmta0013","category":"comment-on","sql":"COMMENT ON COLUMN s.t.name IS 'the name column'","expect":"ok","ref":"sql-comment","note":"COMMENT ON COLUMN schema.table.col"}
+{"id":"cmta0014","category":"comment-on","sql":"COMMENT ON COLUMN s.t.val IS 'numeric value'","expect":"ok","ref":"sql-comment","note":"COMMENT ON COLUMN numeric column"}
+{"id":"cmta0015","category":"comment-on","sql":"COMMENT ON COLUMN s.t.qty IS 'quantity'","expect":"ok","ref":"sql-comment","note":"COMMENT ON COLUMN integer column"}
+{"id":"cmta0016","category":"comment-on","sql":"COMMENT ON COLUMN s.t.flag IS 'boolean flag'","expect":"ok","ref":"sql-comment","note":"COMMENT ON COLUMN boolean column"}
+{"id":"cmta0017","category":"comment-on","sql":"COMMENT ON COLUMN s.t.tags IS 'text array tags'","expect":"ok","ref":"sql-comment","note":"COMMENT ON COLUMN array column"}
+{"id":"cmta0018","category":"comment-on","sql":"COMMENT ON COLUMN s.t.data IS 'jsonb data'","expect":"ok","ref":"sql-comment","note":"COMMENT ON COLUMN jsonb column"}
+{"id":"cmta0019","category":"comment-on","sql":"COMMENT ON COLUMN s.t.home IS 'composite address'","expect":"ok","ref":"sql-comment","note":"COMMENT ON COLUMN composite type column"}
+{"id":"cmta0020","category":"comment-on","sql":"COMMENT ON COLUMN s.t.status IS 'mood enum'","expect":"ok","ref":"sql-comment","note":"COMMENT ON COLUMN enum column"}
+{"id":"cmta0021","category":"comment-on","sql":"COMMENT ON COLUMN s.t.created_at IS NULL","expect":"ok","ref":"sql-comment","note":"COMMENT ON COLUMN IS NULL removes comment"}
+{"id":"cmta0022","category":"comment-on","sql":"COMMENT ON COLUMN s.t.no_such_col IS 'x'","expect":"error","ref":"sql-comment","note":"semantic error: column does not exist"}
+{"id":"cmta0023","category":"comment-on","sql":"COMMENT ON COLUMN s.t IS 'missing column name'","expect":"error","ref":"sql-comment","note":"syntax error: COLUMN needs table.col form"}
+{"id":"cmta0024","category":"comment-on","sql":"COMMENT ON COLUMN s.t.name.extra IS 'too many parts'","expect":"error","ref":"sql-comment","note":"syntax error: too many dotted parts for column"}
+{"id":"cmta0025","category":"comment-on","sql":"COMMENT ON COLUMN s.t2.label IS 'label column'","expect":"ok","ref":"sql-comment","note":"COMMENT ON COLUMN in t2"}
+{"id":"cmta0026","category":"comment-on","sql":"COMMENT ON COLUMN s.t2.amount IS 'amount column'","expect":"ok","ref":"sql-comment","note":"COMMENT ON COLUMN numeric in t2"}
+{"id":"cmta0027","category":"comment-on","sql":"COMMENT ON VIEW s.v IS 'simple view'","expect":"ok","ref":"sql-comment","note":"COMMENT ON VIEW"}
+{"id":"cmta0028","category":"comment-on","sql":"COMMENT ON VIEW s.v IS NULL","expect":"ok","ref":"sql-comment","note":"COMMENT ON VIEW IS NULL"}
+{"id":"cmta0029","category":"comment-on","sql":"COMMENT ON VIEW no_such_view IS 'x'","expect":"error","ref":"sql-comment","note":"semantic error: view not found"}
+{"id":"cmta0030","category":"comment-on","sql":"COMMENT ON MATERIALIZED VIEW s.mv IS 'status count matview'","expect":"ok","ref":"sql-comment","note":"COMMENT ON MATERIALIZED VIEW"}
+{"id":"cmta0031","category":"comment-on","sql":"COMMENT ON MATERIALIZED VIEW s.mv IS NULL","expect":"ok","ref":"sql-comment","note":"COMMENT ON MATERIALIZED VIEW IS NULL"}
+{"id":"cmta0032","category":"comment-on","sql":"COMMENT ON MATERIALIZED VIEW no_such_mv IS 'x'","expect":"error","ref":"sql-comment","note":"semantic error: matview not found"}
+{"id":"cmta0033","category":"comment-on","sql":"COMMENT ON INDEX s.t_name_idx IS 'name index'","expect":"ok","ref":"sql-comment","note":"COMMENT ON INDEX"}
+{"id":"cmta0034","category":"comment-on","sql":"COMMENT ON INDEX s.t_name_idx IS NULL","expect":"ok","ref":"sql-comment","note":"COMMENT ON INDEX IS NULL"}
+{"id":"cmta0035","category":"comment-on","sql":"COMMENT ON INDEX no_such_idx IS 'x'","expect":"error","ref":"sql-comment","note":"semantic error: index not found"}
+{"id":"cmta0036","category":"comment-on","sql":"COMMENT ON SEQUENCE s.seq IS 'the sequence'","expect":"ok","ref":"sql-comment","note":"COMMENT ON SEQUENCE"}
+{"id":"cmta0037","category":"comment-on","sql":"COMMENT ON SEQUENCE s.seq IS NULL","expect":"ok","ref":"sql-comment","note":"COMMENT ON SEQUENCE IS NULL"}
+{"id":"cmta0038","category":"comment-on","sql":"COMMENT ON SEQUENCE no_such_seq IS 'x'","expect":"error","ref":"sql-comment","note":"semantic error: sequence not found"}
+{"id":"cmta0039","category":"comment-on","sql":"COMMENT ON FUNCTION s.f(integer) IS 'add one'","expect":"ok","ref":"sql-comment","note":"COMMENT ON FUNCTION with arg type"}
+{"id":"cmta0040","category":"comment-on","sql":"COMMENT ON FUNCTION s.g(integer, integer) IS 'add two ints'","expect":"ok","ref":"sql-comment","note":"COMMENT ON FUNCTION two args"}
+{"id":"cmta0041","category":"comment-on","sql":"COMMENT ON FUNCTION s.rows_f() IS 'returns setof t'","expect":"ok","ref":"sql-comment","note":"COMMENT ON FUNCTION no args"}
+{"id":"cmta0042","category":"comment-on","sql":"COMMENT ON FUNCTION s.f IS 'no parens'","expect":"ok","ref":"sql-comment","note":"COMMENT ON FUNCTION without arg list (allowed when unambiguous)"}
+{"id":"cmta0043","category":"comment-on","sql":"COMMENT ON FUNCTION s.f(integer) IS NULL","expect":"ok","ref":"sql-comment","note":"COMMENT ON FUNCTION IS NULL"}
+{"id":"cmta0044","category":"comment-on","sql":"COMMENT ON FUNCTION no_such_func(integer) IS 'x'","expect":"error","ref":"sql-comment","note":"semantic error: function not found"}
+{"id":"cmta0045","category":"comment-on","sql":"COMMENT ON FUNCTION s.g(IN a integer, IN b integer) IS 'with argmode'","expect":"ok","ref":"sql-comment","note":"COMMENT ON FUNCTION with IN argmode"}
+{"id":"cmta0046","category":"comment-on","sql":"COMMENT ON FUNCTION s.g(a integer, b integer) IS 'named args'","expect":"ok","ref":"sql-comment","note":"COMMENT ON FUNCTION with named args"}
+{"id":"cmta0047","category":"comment-on","sql":"COMMENT ON PROCEDURE s.p(integer) IS 'a procedure'","expect":"ok","ref":"sql-comment","note":"COMMENT ON PROCEDURE with arg type"}
+{"id":"cmta0048","category":"comment-on","sql":"COMMENT ON PROCEDURE s.p IS 'procedure no parens'","expect":"ok","ref":"sql-comment","note":"COMMENT ON PROCEDURE without arg list"}
+{"id":"cmta0049","category":"comment-on","sql":"COMMENT ON PROCEDURE s.p(IN n integer) IS 'named IN arg'","expect":"ok","ref":"sql-comment","note":"COMMENT ON PROCEDURE with IN argmode and name"}
+{"id":"cmta0050","category":"comment-on","sql":"COMMENT ON PROCEDURE s.p(integer) IS NULL","expect":"ok","ref":"sql-comment","note":"COMMENT ON PROCEDURE IS NULL"}
+{"id":"cmta0051","category":"comment-on","sql":"COMMENT ON PROCEDURE no_such_proc(integer) IS 'x'","expect":"error","ref":"sql-comment","note":"semantic error: procedure not found"}
+{"id":"cmta0052","category":"comment-on","sql":"COMMENT ON ROUTINE s.f(integer) IS 'routine comment on function'","expect":"ok","ref":"sql-comment","note":"COMMENT ON ROUTINE referring to a function"}
+{"id":"cmta0053","category":"comment-on","sql":"COMMENT ON ROUTINE s.p(integer) IS 'routine comment on procedure'","expect":"ok","ref":"sql-comment","note":"COMMENT ON ROUTINE referring to a procedure"}
+{"id":"cmta0054","category":"comment-on","sql":"COMMENT ON ROUTINE s.f IS 'routine no parens'","expect":"ok","ref":"sql-comment","note":"COMMENT ON ROUTINE without arg list"}
+{"id":"cmta0055","category":"comment-on","sql":"COMMENT ON TYPE s.mood IS 'enum type'","expect":"ok","ref":"sql-comment","note":"COMMENT ON TYPE enum"}
+{"id":"cmta0056","category":"comment-on","sql":"COMMENT ON TYPE s.addr IS 'composite type'","expect":"ok","ref":"sql-comment","note":"COMMENT ON TYPE composite"}
+{"id":"cmta0057","category":"comment-on","sql":"COMMENT ON TYPE s.mood IS NULL","expect":"ok","ref":"sql-comment","note":"COMMENT ON TYPE IS NULL"}
+{"id":"cmta0058","category":"comment-on","sql":"COMMENT ON TYPE no_such_type IS 'x'","expect":"error","ref":"sql-comment","note":"semantic error: type not found"}
+{"id":"cmta0059","category":"comment-on","sql":"COMMENT ON DOMAIN s.pos_int IS 'positive integer domain'","expect":"ok","ref":"sql-comment","note":"COMMENT ON DOMAIN"}
+{"id":"cmta0060","category":"comment-on","sql":"COMMENT ON DOMAIN s.pos_int IS NULL","expect":"ok","ref":"sql-comment","note":"COMMENT ON DOMAIN IS NULL"}
+{"id":"cmta0061","category":"comment-on","sql":"COMMENT ON DOMAIN no_such_domain IS 'x'","expect":"error","ref":"sql-comment","note":"semantic error: domain not found"}
+{"id":"cmta0062","category":"comment-on","sql":"COMMENT ON SCHEMA s IS 'the s schema'","expect":"ok","ref":"sql-comment","note":"COMMENT ON SCHEMA"}
+{"id":"cmta0063","category":"comment-on","sql":"COMMENT ON SCHEMA s IS NULL","expect":"ok","ref":"sql-comment","note":"COMMENT ON SCHEMA IS NULL"}
+{"id":"cmta0064","category":"comment-on","sql":"COMMENT ON SCHEMA no_such_schema IS 'x'","expect":"error","ref":"sql-comment","note":"semantic error: schema not found"}
+{"id":"cmta0065","category":"comment-on","sql":"COMMENT ON TRIGGER t_touch ON s.t IS 'the trigger'","expect":"ok","ref":"sql-comment","note":"COMMENT ON TRIGGER name ON table"}
+{"id":"cmta0066","category":"comment-on","sql":"COMMENT ON TRIGGER t_touch ON s.t IS NULL","expect":"ok","ref":"sql-comment","note":"COMMENT ON TRIGGER IS NULL"}
+{"id":"cmta0067","category":"comment-on","sql":"COMMENT ON TRIGGER no_such_trg ON s.t IS 'x'","expect":"error","ref":"sql-comment","note":"semantic error: trigger not found on table"}
+{"id":"cmta0068","category":"comment-on","sql":"COMMENT ON TRIGGER t_touch ON no_such_table IS 'x'","expect":"error","ref":"sql-comment","note":"semantic error: trigger ON nonexistent table"}
+{"id":"cmta0069","category":"comment-on","sql":"COMMENT ON TRIGGER t_touch IS 'missing ON'","expect":"error","ref":"sql-comment","note":"syntax error: TRIGGER missing ON clause"}
+{"id":"cmta0070","category":"comment-on","sql":"COMMENT ON COLUMN s.events.occurred IS 'partition key column'","expect":"ok","ref":"sql-comment","note":"COMMENT ON COLUMN partition key"}
+{"id":"cmta0071","category":"comment-on","sql":"COMMENT ON COLUMN s.events.payload IS 'event payload'","expect":"ok","ref":"sql-comment","note":"COMMENT ON COLUMN partition table jsonb"}
+{"id":"cmta0072","category":"comment-on","sql":"COMMENT ON TABLE s.t IS 'multi-line\ncomment text'","expect":"ok","ref":"sql-comment","note":"COMMENT ON TABLE with embedded newline in string"}
+{"id":"cmta0073","category":"comment-on","sql":"COMMENT ON TABLE s.t IS 'it''s escaped'","expect":"ok","ref":"sql-comment","note":"COMMENT ON TABLE with single-quote escaped in string"}
+{"id":"cmta0074","category":"comment-on","sql":"COMMENT ON TABLE s.t IS $tag$dollar quoted comment$tag$","expect":"ok","ref":"sql-comment","note":"COMMENT ON TABLE dollar-quoted string"}
+{"id":"cmta0075","category":"comment-on","sql":"COMMENT ON TABLE s.t IS $$anonymous dollar quote$$","expect":"ok","ref":"sql-comment","note":"COMMENT ON TABLE anonymous dollar-quote"}
+{"id":"cmta0076","category":"comment-on","sql":"COMMENT ON TABLE s.t IS E'escaped\\nstring'","expect":"ok","ref":"sql-comment","note":"COMMENT ON TABLE E-escaped string literal"}
+{"id":"cmta0077","category":"comment-on","sql":"comment on table s.t is 'lowercase keywords'","expect":"ok","ref":"sql-comment","note":"COMMENT ON TABLE all lowercase keywords"}
+{"id":"cmta0078","category":"comment-on","sql":"Comment On Table s.t Is 'mixed case keywords'","expect":"ok","ref":"sql-comment","note":"COMMENT ON TABLE mixed case keywords"}
+{"id":"cmta0079","category":"comment-on","sql":"COMMENT ON TABLE s.t IS 'x'; COMMENT ON TABLE s.t2 IS 'y'","expect":"ok","ref":"sql-comment","note":"two COMMENT statements in one case"}
+{"id":"cmta0080","category":"comment-on","sql":"CREATE TABLE s.tmp_cmta (x int); COMMENT ON TABLE s.tmp_cmta IS 'temp table comment'","expect":"ok","ref":"sql-comment","note":"CREATE then COMMENT ON in same transaction"}
+{"id":"cmta0081","category":"comment-on","sql":"CREATE TABLE s.tmp_cmta2 (x int, y text); COMMENT ON COLUMN s.tmp_cmta2.y IS 'y column'","expect":"ok","ref":"sql-comment","note":"CREATE TABLE then COMMENT ON COLUMN in same txn"}
+{"id":"cmta0082","category":"comment-on","sql":"COMMENT TABLE s.t IS 'missing ON'","expect":"error","ref":"sql-comment","note":"syntax error: missing ON keyword"}
+{"id":"cmta0083","category":"comment-on","sql":"COMMENT ON s.t IS 'missing object type'","expect":"error","ref":"sql-comment","note":"syntax error: missing object type keyword"}
+{"id":"cmta0084","category":"comment-on","sql":"COMMENT ON TABLE IS 'missing object name'","expect":"error","ref":"sql-comment","note":"syntax error: missing object name after TABLE"}
+{"id":"cmta0085","category":"comment-on","sql":"COMMENT ON COLUMN s.t.name IS 42","expect":"error","ref":"sql-comment","note":"syntax error: comment value must be string or NULL not integer"}
+{"id":"cmta0086","category":"comment-on","sql":"COMMENT ON COLUMN s.t.name IS TRUE","expect":"error","ref":"sql-comment","note":"syntax error: comment value must be string or NULL not boolean"}
+{"id":"cmta0087","category":"comment-on","sql":"COMMENT ON CONSTRAINT my_constraint ON s.t IS 'a constraint'","expect":"error","ref":"sql-comment","note":"semantic error: constraint does not exist on table"}
+{"id":"cmta0088","category":"comment-on","sql":"ALTER TABLE s.t2 ADD CONSTRAINT fk_t2_t_cmta FOREIGN KEY (t_id) REFERENCES s.t(id); COMMENT ON CONSTRAINT fk_t2_t_cmta ON s.t2 IS 'foreign key'","expect":"ok","ref":"sql-comment","note":"COMMENT ON CONSTRAINT ON table (table constraint)"}
+{"id":"cmta0089","category":"comment-on","sql":"COMMENT ON CONSTRAINT pos_int_check ON DOMAIN s.pos_int IS 'domain constraint'","expect":"ok","ref":"sql-comment","note":"COMMENT ON CONSTRAINT ON DOMAIN using fixture constraint name"}
+{"id":"cmta0090","category":"comment-on","sql":"COMMENT ON RULE my_rule ON s.v IS 'x'","expect":"error","ref":"sql-comment","note":"semantic error: rule does not exist"}
+{"id":"cmta0091","category":"comment-on","sql":"CREATE RULE my_rule AS ON INSERT TO s.v DO INSTEAD NOTHING; COMMENT ON RULE my_rule ON s.v IS 'insert rule'","expect":"ok","ref":"sql-comment","note":"COMMENT ON RULE name ON view"}
+{"id":"cmta0092","category":"comment-on","sql":"COMMENT ON RULE no_rule ON s.t IS 'x'","expect":"error","ref":"sql-comment","note":"semantic error: named rule not found on table"}
+{"id":"cmta0093","category":"comment-on","sql":"CREATE TABLE s.ruleable (id int); CREATE RULE my_cmta_rule AS ON INSERT TO s.ruleable DO INSTEAD NOTHING; COMMENT ON RULE my_cmta_rule ON s.ruleable IS 'insert rule on table'","expect":"ok","ref":"sql-comment","note":"COMMENT ON RULE created in same txn"}
+{"id":"cmta0094","category":"comment-on","sql":"COMMENT ON DATABASE postgres IS 'the postgres db'","expect":"ok","ref":"sql-comment","note":"COMMENT ON DATABASE"}
+{"id":"cmta0095","category":"comment-on","sql":"COMMENT ON DATABASE postgres IS NULL","expect":"ok","ref":"sql-comment","note":"COMMENT ON DATABASE IS NULL"}
+{"id":"cmta0096","category":"comment-on","sql":"COMMENT ON DATABASE no_such_db IS 'x'","expect":"ok","ref":"sql-comment","note":"COMMENT ON DATABASE silently succeeds even for nonexistent names (PG behavior)"}
+{"id":"cmta0097","category":"comment-on","sql":"COMMENT ON ROLE postgres IS 'superuser role'","expect":"ok","ref":"sql-comment","note":"COMMENT ON ROLE existing role"}
+{"id":"cmta0098","category":"comment-on","sql":"COMMENT ON ROLE no_such_role IS 'x'","expect":"error","ref":"sql-comment","note":"semantic error: role not found"}
+{"id":"cmta0099","category":"comment-on","sql":"COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL language'","expect":"ok","ref":"sql-comment","note":"COMMENT ON EXTENSION plpgsql (always present)"}
+{"id":"cmta0100","category":"comment-on","sql":"COMMENT ON EXTENSION no_such_ext IS 'x'","expect":"error","ref":"sql-comment","note":"semantic error: extension not found"}
+{"id":"cmta0101","category":"comment-on","sql":"COMMENT ON LANGUAGE plpgsql IS 'PL/pgSQL procedural language'","expect":"ok","ref":"sql-comment","note":"COMMENT ON LANGUAGE plpgsql"}
+{"id":"cmta0102","category":"comment-on","sql":"COMMENT ON PROCEDURAL LANGUAGE plpgsql IS 'with PROCEDURAL keyword'","expect":"ok","ref":"sql-comment","note":"COMMENT ON PROCEDURAL LANGUAGE (synonym)"}
+{"id":"cmta0103","category":"comment-on","sql":"COMMENT ON LANGUAGE no_such_lang IS 'x'","expect":"error","ref":"sql-comment","note":"semantic error: language not found"}
+{"id":"cmta0104","category":"comment-on","sql":"COMMENT ON TABLESPACE pg_default IS 'default tablespace'","expect":"ok","ref":"sql-comment","note":"COMMENT ON TABLESPACE"}
+{"id":"cmta0105","category":"comment-on","sql":"COMMENT ON TABLESPACE no_such_ts IS 'x'","expect":"error","ref":"sql-comment","note":"semantic error: tablespace not found"}
+{"id":"cmta0106","category":"comment-on","sql":"COMMENT ON COLLATION pg_catalog.\"default\" IS 'default collation'","expect":"ok","ref":"sql-comment","note":"COMMENT ON COLLATION schema-qualified"}
+{"id":"cmta0107","category":"comment-on","sql":"COMMENT ON COLLATION no_such_coll IS 'x'","expect":"error","ref":"sql-comment","note":"semantic error: collation not found"}
+{"id":"cmta0108","category":"comment-on","sql":"COMMENT ON CAST (integer AS bigint) IS 'int to bigint cast'","expect":"ok","ref":"sql-comment","note":"COMMENT ON CAST source AS target"}
+{"id":"cmta0109","category":"comment-on","sql":"COMMENT ON CAST (integer AS bigint) IS NULL","expect":"ok","ref":"sql-comment","note":"COMMENT ON CAST IS NULL"}
+{"id":"cmta0110","category":"comment-on","sql":"COMMENT ON CAST (no_type AS bigint) IS 'x'","expect":"error","ref":"sql-comment","note":"semantic error: cast with nonexistent source type"}
+{"id":"cmta0111","category":"comment-on","sql":"COMMENT ON CONVERSION pg_catalog.iso_8859_1_to_utf8 IS 'encoding conversion'","expect":"ok","ref":"sql-comment","note":"COMMENT ON CONVERSION existing pg_catalog conversion"}
+{"id":"cmta0112","category":"comment-on","sql":"COMMENT ON CONVERSION no_such_conv IS 'x'","expect":"error","ref":"sql-comment","note":"semantic error: conversion not found"}
+{"id":"cmta0113","category":"comment-on","sql":"COMMENT ON TEXT SEARCH CONFIGURATION pg_catalog.english IS 'english FTS config'","expect":"ok","ref":"sql-comment","note":"COMMENT ON TEXT SEARCH CONFIGURATION"}
+{"id":"cmta0114","category":"comment-on","sql":"COMMENT ON TEXT SEARCH CONFIGURATION no_such_tsc IS 'x'","expect":"error","ref":"sql-comment","note":"semantic error: text search configuration not found"}
+{"id":"cmta0115","category":"comment-on","sql":"COMMENT ON TEXT SEARCH DICTIONARY pg_catalog.english_stem IS 'english stemmer'","expect":"ok","ref":"sql-comment","note":"COMMENT ON TEXT SEARCH DICTIONARY"}
+{"id":"cmta0116","category":"comment-on","sql":"COMMENT ON TEXT SEARCH DICTIONARY no_such_dict IS 'x'","expect":"error","ref":"sql-comment","note":"semantic error: text search dictionary not found"}
+{"id":"cmta0117","category":"comment-on","sql":"COMMENT ON TEXT SEARCH PARSER pg_catalog.default IS 'default FTS parser'","expect":"ok","ref":"sql-comment","note":"COMMENT ON TEXT SEARCH PARSER"}
+{"id":"cmta0118","category":"comment-on","sql":"COMMENT ON TEXT SEARCH PARSER no_such_parser IS 'x'","expect":"error","ref":"sql-comment","note":"semantic error: text search parser not found"}
+{"id":"cmta0119","category":"comment-on","sql":"COMMENT ON TEXT SEARCH TEMPLATE pg_catalog.simple IS 'simple FTS template'","expect":"ok","ref":"sql-comment","note":"COMMENT ON TEXT SEARCH TEMPLATE"}
+{"id":"cmta0120","category":"comment-on","sql":"COMMENT ON TEXT SEARCH TEMPLATE no_such_tmpl IS 'x'","expect":"error","ref":"sql-comment","note":"semantic error: text search template not found"}
+{"id":"cmta0121","category":"comment-on","sql":"COMMENT ON AGGREGATE count(*) IS 'count all rows'","expect":"ok","ref":"sql-comment","note":"COMMENT ON AGGREGATE with wildcard signature"}
+{"id":"cmta0122","category":"comment-on","sql":"COMMENT ON AGGREGATE pg_catalog.count(\"any\") IS 'count non-null values'","expect":"ok","ref":"sql-comment","note":"COMMENT ON AGGREGATE count with any pseudo-type arg"}
+{"id":"cmta0123","category":"comment-on","sql":"COMMENT ON AGGREGATE sum(integer) IS 'sum of integers'","expect":"ok","ref":"sql-comment","note":"COMMENT ON AGGREGATE sum with arg type"}
+{"id":"cmta0124","category":"comment-on","sql":"COMMENT ON AGGREGATE no_such_agg(*) IS 'x'","expect":"error","ref":"sql-comment","note":"semantic error: aggregate not found"}
+{"id":"cmta0125","category":"comment-on","sql":"COMMENT ON AGGREGATE count(*) IS NULL","expect":"ok","ref":"sql-comment","note":"COMMENT ON AGGREGATE IS NULL"}
+{"id":"cmta0126","category":"comment-on","sql":"COMMENT ON OPERATOR +(integer, integer) IS 'integer addition'","expect":"ok","ref":"sql-comment","note":"COMMENT ON OPERATOR binary +"}
+{"id":"cmta0127","category":"comment-on","sql":"COMMENT ON OPERATOR -(integer, integer) IS 'integer subtraction'","expect":"ok","ref":"sql-comment","note":"COMMENT ON OPERATOR binary -"}
+{"id":"cmta0128","category":"comment-on","sql":"COMMENT ON OPERATOR -(NONE, integer) IS 'integer negation'","expect":"ok","ref":"sql-comment","note":"COMMENT ON OPERATOR unary prefix with NONE left type"}
+{"id":"cmta0129","category":"comment-on","sql":"COMMENT ON OPERATOR +(integer, integer) IS NULL","expect":"ok","ref":"sql-comment","note":"COMMENT ON OPERATOR IS NULL"}
+{"id":"cmta0130","category":"comment-on","sql":"COMMENT ON OPERATOR no_op(integer, integer) IS 'x'","expect":"error","ref":"sql-comment","note":"semantic error: operator not found"}
+{"id":"cmta0131","category":"comment-on","sql":"COMMENT ON OPERATOR CLASS btree_integer_ops USING btree IS 'btree int ops'","expect":"error","ref":"sql-comment","note":"semantic error: operator class name not found"}
+{"id":"cmta0132","category":"comment-on","sql":"COMMENT ON OPERATOR CLASS pg_catalog.int4_ops USING btree IS 'int4 btree ops'","expect":"ok","ref":"sql-comment","note":"COMMENT ON OPERATOR CLASS USING index method"}
+{"id":"cmta0133","category":"comment-on","sql":"COMMENT ON OPERATOR FAMILY truly_no_such_opfam USING btree IS 'x'","expect":"error","ref":"sql-comment","note":"semantic error: operator family not found"}
+{"id":"cmta0134","category":"comment-on","sql":"COMMENT ON OPERATOR FAMILY pg_catalog.integer_ops USING btree IS 'integer btree family'","expect":"ok","ref":"sql-comment","note":"COMMENT ON OPERATOR FAMILY USING index method"}
+{"id":"cmta0135","category":"comment-on","sql":"COMMENT ON ACCESS METHOD btree IS 'btree index method'","expect":"ok","ref":"sql-comment","note":"COMMENT ON ACCESS METHOD btree"}
+{"id":"cmta0136","category":"comment-on","sql":"COMMENT ON ACCESS METHOD hash IS 'hash index method'","expect":"ok","ref":"sql-comment","note":"COMMENT ON ACCESS METHOD hash"}
+{"id":"cmta0137","category":"comment-on","sql":"COMMENT ON ACCESS METHOD no_such_am IS 'x'","expect":"error","ref":"sql-comment","note":"semantic error: access method not found"}
+{"id":"cmta0138","category":"comment-on","sql":"COMMENT ON FOREIGN DATA WRAPPER no_such_fdw IS 'x'","expect":"error","ref":"sql-comment","note":"semantic error: FDW not found"}
+{"id":"cmta0139","category":"comment-on","sql":"COMMENT ON SERVER no_such_server IS 'x'","expect":"error","ref":"sql-comment","note":"semantic error: server not found"}
+{"id":"cmta0140","category":"comment-on","sql":"COMMENT ON STATISTICS no_such_stats IS 'x'","expect":"error","ref":"sql-comment","note":"semantic error: statistics object not found"}
+{"id":"cmta0141","category":"comment-on","sql":"CREATE STATISTICS s.cmta_stats ON name, val FROM s.t; COMMENT ON STATISTICS s.cmta_stats IS 'multi-column stats'","expect":"ok","ref":"sql-comment","note":"COMMENT ON STATISTICS created in same txn"}
+{"id":"cmta0142","category":"comment-on","sql":"COMMENT ON FOREIGN TABLE no_such_ft IS 'x'","expect":"error","ref":"sql-comment","note":"semantic error: foreign table not found"}
+{"id":"cmta0143","category":"comment-on","sql":"COMMENT ON EVENT TRIGGER no_such_et IS 'x'","expect":"error","ref":"sql-comment","note":"semantic error: event trigger not found"}
+{"id":"cmta0144","category":"comment-on","sql":"CREATE FUNCTION s.et_fn() RETURNS event_trigger LANGUAGE plpgsql AS $$ BEGIN END $$; CREATE EVENT TRIGGER cmta_et ON ddl_command_start EXECUTE FUNCTION s.et_fn(); COMMENT ON EVENT TRIGGER cmta_et IS 'ddl event trigger'","expect":"ok","ref":"sql-comment","note":"COMMENT ON EVENT TRIGGER created in same txn with proper event_trigger function"}
+{"id":"cmta0145","category":"comment-on","sql":"COMMENT ON PUBLICATION no_such_pub IS 'x'","expect":"error","ref":"sql-comment","note":"semantic error: publication not found"}
+{"id":"cmta0146","category":"comment-on","sql":"COMMENT ON SUBSCRIPTION no_such_sub IS 'x'","expect":"error","ref":"sql-comment","note":"semantic error: subscription not found"}
+{"id":"cmta0147","category":"comment-on","sql":"COMMENT ON LARGE OBJECT 0 IS 'large object'","expect":"error","ref":"sql-comment","note":"semantic error: large object OID 0 does not exist"}
+{"id":"cmta0148","category":"comment-on","sql":"COMMENT ON TABLE s.t IS 42","expect":"error","ref":"sql-comment","note":"syntax error: non-string non-NULL comment value"}
+{"id":"cmta0149","category":"comment-on","sql":"COMMENT ON TABLE s.t IS 'x' CASCADE","expect":"error","ref":"sql-comment","note":"syntax error: no CASCADE in COMMENT ON"}
+{"id":"cmta0150","category":"comment-on","sql":"COMMENT ON TABLE s.t IS 'x' RESTRICT","expect":"error","ref":"sql-comment","note":"syntax error: no RESTRICT in COMMENT ON"}
+{"id":"cmta0151","category":"comment-on","sql":"COMMENT ON FUNCTION s.f(OUT x integer) IS 'out param'","expect":"error","ref":"sql-comment","note":"semantic error: OUT param in COMMENT ON FUNCTION signature not matched"}
+{"id":"cmta0152","category":"comment-on","sql":"COMMENT ON FUNCTION s.g(integer, OUT integer) IS 'mixed modes'","expect":"error","ref":"sql-comment","note":"semantic error: OUT arg in function signature for comment not matched"}
+{"id":"cmta0153","category":"comment-on","sql":"COMMENT ON TYPE integer IS 'built-in integer type'","expect":"ok","ref":"sql-comment","note":"COMMENT ON TYPE built-in type"}
+{"id":"cmta0154","category":"comment-on","sql":"COMMENT ON TYPE text IS 'built-in text type'","expect":"ok","ref":"sql-comment","note":"COMMENT ON TYPE text built-in"}
+{"id":"cmta0155","category":"comment-on","sql":"COMMENT ON COLUMN s.t.id IS 'identity pk'","expect":"ok","ref":"sql-comment","note":"COMMENT ON COLUMN identity primary key column"}
+{"id":"cmta0156","category":"comment-on","sql":"COMMENT ON COLUMN s.t.span IS 'int4range column'","expect":"ok","ref":"sql-comment","note":"COMMENT ON COLUMN range type column"}
+{"id":"cmta0157","category":"comment-on","sql":"COMMENT ON TABLE s.t IS U&'unicode \\0041 comment'","expect":"ok","ref":"sql-comment","note":"COMMENT ON TABLE with unicode escape string literal"}
+{"id":"cmta0158","category":"comment-on","sql":"COMMENT ON SCHEMA public IS 'the public schema'","expect":"ok","ref":"sql-comment","note":"COMMENT ON SCHEMA public"}
+{"id":"cmta0159","category":"comment-on","sql":"COMMENT ON TYPE s.addr IS NULL","expect":"ok","ref":"sql-comment","note":"COMMENT ON TYPE composite IS NULL"}
+{"id":"cmta0160","category":"comment-on","sql":"COMMENT ON AGGREGATE pg_catalog.array_agg(anynonarray) IS 'array aggregate'","expect":"ok","ref":"sql-comment","note":"COMMENT ON AGGREGATE array_agg with anynonarray pseudo-type"}

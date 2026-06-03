@@ -1,0 +1,50 @@
+{"id":"domb0001","category":"create-domain","sql":"CREATE DOMAIN d1 AS integer","expect":"ok","ref":"sql-createdomain","note":"minimal domain: AS integer, no constraints"}
+{"id":"domb0002","category":"create-domain","sql":"CREATE DOMAIN d2 AS text","expect":"ok","ref":"sql-createdomain","note":"minimal domain over text"}
+{"id":"domb0003","category":"create-domain","sql":"CREATE DOMAIN d3 AS numeric(10,2)","expect":"ok","ref":"sql-createdomain","note":"domain over numeric with precision and scale"}
+{"id":"domb0004","category":"create-domain","sql":"CREATE DOMAIN d4 AS varchar(50)","expect":"ok","ref":"sql-createdomain","note":"domain over varchar with length"}
+{"id":"domb0005","category":"create-domain","sql":"CREATE DOMAIN d5 AS boolean DEFAULT false","expect":"ok","ref":"sql-createdomain","note":"domain with DEFAULT boolean literal"}
+{"id":"domb0006","category":"create-domain","sql":"CREATE DOMAIN d6 AS text DEFAULT 'hello'","expect":"ok","ref":"sql-createdomain","note":"domain with DEFAULT string literal"}
+{"id":"domb0007","category":"create-domain","sql":"CREATE DOMAIN d7 AS integer DEFAULT 0","expect":"ok","ref":"sql-createdomain","note":"domain with DEFAULT integer literal"}
+{"id":"domb0008","category":"create-domain","sql":"CREATE DOMAIN d8 AS integer NOT NULL","expect":"ok","ref":"sql-createdomain","note":"domain with NOT NULL constraint"}
+{"id":"domb0009","category":"create-domain","sql":"CREATE DOMAIN d9 AS text NULL","expect":"ok","ref":"sql-createdomain","note":"domain with explicit NULL (allow nulls)"}
+{"id":"domb0010","category":"create-domain","sql":"CREATE DOMAIN d10 AS integer CHECK (VALUE > 0)","expect":"ok","ref":"sql-createdomain","note":"domain with CHECK constraint using VALUE"}
+{"id":"domb0011","category":"create-domain","sql":"CREATE DOMAIN d11 AS integer CHECK (VALUE >= 0 AND VALUE <= 100)","expect":"ok","ref":"sql-createdomain","note":"domain CHECK with compound condition on VALUE"}
+{"id":"domb0012","category":"create-domain","sql":"CREATE DOMAIN d12 AS integer CONSTRAINT positive CHECK (VALUE > 0)","expect":"ok","ref":"sql-createdomain","note":"named CONSTRAINT with CHECK"}
+{"id":"domb0013","category":"create-domain","sql":"CREATE DOMAIN d13 AS integer NOT NULL DEFAULT 1 CHECK (VALUE > 0)","expect":"ok","ref":"sql-createdomain","note":"multiple constraints: NOT NULL, DEFAULT, CHECK"}
+{"id":"domb0014","category":"create-domain","sql":"CREATE DOMAIN d14 AS text NOT NULL DEFAULT 'x' CHECK (VALUE <> '')","expect":"ok","ref":"sql-createdomain","note":"text domain with NOT NULL, DEFAULT, and CHECK"}
+{"id":"domb0015","category":"create-domain","sql":"CREATE DOMAIN d15 AS integer CONSTRAINT nn NOT NULL CONSTRAINT pos CHECK (VALUE > 0)","expect":"ok","ref":"sql-createdomain","note":"two named constraints: NOT NULL and CHECK"}
+{"id":"domb0016","category":"create-domain","sql":"CREATE DOMAIN d16 AS text COLLATE \"C\"","expect":"ok","ref":"sql-createdomain","note":"domain with COLLATE clause"}
+{"id":"domb0017","category":"create-domain","sql":"CREATE DOMAIN d17 AS text COLLATE \"C\" NOT NULL","expect":"ok","ref":"sql-createdomain","note":"domain with COLLATE and NOT NULL"}
+{"id":"domb0018","category":"create-domain","sql":"CREATE DOMAIN d18 AS text COLLATE \"C\" DEFAULT 'abc' CHECK (VALUE ~ '^[a-z]+$')","expect":"ok","ref":"sql-createdomain","note":"text domain with COLLATE, DEFAULT, regex CHECK"}
+{"id":"domb0019","category":"create-domain","sql":"CREATE DOMAIN d19 AS integer[]","expect":"ok","ref":"sql-createdomain","note":"domain over integer array type"}
+{"id":"domb0020","category":"create-domain","sql":"CREATE DOMAIN d20 AS text[]","expect":"ok","ref":"sql-createdomain","note":"domain over text array type"}
+{"id":"domb0021","category":"create-domain","sql":"CREATE DOMAIN s.d21 AS integer CHECK (VALUE > 0)","expect":"ok","ref":"sql-createdomain","note":"schema-qualified domain name"}
+{"id":"domb0022","category":"create-domain","sql":"CREATE DOMAIN d22 AS numeric NOT NULL DEFAULT 0.0 CONSTRAINT rng CHECK (VALUE BETWEEN 0.0 AND 999.99)","expect":"ok","ref":"sql-createdomain","note":"numeric domain with named range CHECK"}
+{"id":"domb0023","category":"create-domain","sql":"CREATE DOMAIN d23 AS timestamp DEFAULT now()","expect":"ok","ref":"sql-createdomain","note":"domain DEFAULT using function call"}
+{"id":"domb0024","category":"create-domain","sql":"CREATE DOMAIN d24 AS integer; ALTER DOMAIN d24 SET DEFAULT 42","expect":"ok","ref":"sql-alterdomain","note":"ALTER DOMAIN SET DEFAULT"}
+{"id":"domb0025","category":"create-domain","sql":"CREATE DOMAIN d25 AS integer DEFAULT 0; ALTER DOMAIN d25 DROP DEFAULT","expect":"ok","ref":"sql-alterdomain","note":"ALTER DOMAIN DROP DEFAULT"}
+{"id":"domb0026","category":"create-domain","sql":"CREATE DOMAIN d26 AS integer; ALTER DOMAIN d26 SET NOT NULL","expect":"ok","ref":"sql-alterdomain","note":"ALTER DOMAIN SET NOT NULL"}
+{"id":"domb0027","category":"create-domain","sql":"CREATE DOMAIN d27 AS integer NOT NULL; ALTER DOMAIN d27 DROP NOT NULL","expect":"ok","ref":"sql-alterdomain","note":"ALTER DOMAIN DROP NOT NULL"}
+{"id":"domb0028","category":"create-domain","sql":"CREATE DOMAIN d28 AS integer; ALTER DOMAIN d28 ADD CHECK (VALUE > 0)","expect":"ok","ref":"sql-alterdomain","note":"ALTER DOMAIN ADD CHECK constraint"}
+{"id":"domb0029","category":"create-domain","sql":"CREATE DOMAIN d29 AS integer; ALTER DOMAIN d29 ADD CONSTRAINT pos CHECK (VALUE > 0)","expect":"ok","ref":"sql-alterdomain","note":"ALTER DOMAIN ADD named CHECK constraint"}
+{"id":"domb0030","category":"create-domain","sql":"CREATE DOMAIN d30 AS integer CONSTRAINT chk CHECK (VALUE > 0); ALTER DOMAIN d30 DROP CONSTRAINT chk","expect":"ok","ref":"sql-alterdomain","note":"ALTER DOMAIN DROP CONSTRAINT by name"}
+{"id":"domb0031","category":"create-domain","sql":"CREATE DOMAIN d31 AS integer; ALTER DOMAIN d31 DROP CONSTRAINT IF EXISTS nonexistent","expect":"ok","ref":"sql-alterdomain","note":"ALTER DOMAIN DROP CONSTRAINT IF EXISTS (no error when missing)"}
+{"id":"domb0032","category":"create-domain","sql":"CREATE DOMAIN d32 AS integer CONSTRAINT old_name CHECK (VALUE > 0); ALTER DOMAIN d32 RENAME CONSTRAINT old_name TO new_name","expect":"ok","ref":"sql-alterdomain","note":"ALTER DOMAIN RENAME CONSTRAINT"}
+{"id":"domb0033","category":"create-domain","sql":"CREATE DOMAIN d33 AS integer; ALTER DOMAIN d33 ADD CONSTRAINT c1 CHECK (VALUE > 0) NOT VALID; ALTER DOMAIN d33 VALIDATE CONSTRAINT c1","expect":"ok","ref":"sql-alterdomain","note":"ALTER DOMAIN ADD constraint NOT VALID then VALIDATE CONSTRAINT"}
+{"id":"domb0034","category":"create-domain","sql":"CREATE DOMAIN d34 AS integer; ALTER DOMAIN d34 RENAME TO d34_renamed","expect":"ok","ref":"sql-alterdomain","note":"ALTER DOMAIN RENAME TO"}
+{"id":"domb0035","category":"create-domain","sql":"CREATE DOMAIN d35 AS integer; ALTER DOMAIN d35 SET SCHEMA s","expect":"ok","ref":"sql-alterdomain","note":"ALTER DOMAIN SET SCHEMA"}
+{"id":"domb0036","category":"create-domain","sql":"CREATE DOMAIN d36 AS integer; DROP DOMAIN d36","expect":"ok","ref":"sql-dropdomain","note":"DROP DOMAIN basic"}
+{"id":"domb0037","category":"create-domain","sql":"DROP DOMAIN IF EXISTS nonexistent_domain_xyz","expect":"ok","ref":"sql-dropdomain","note":"DROP DOMAIN IF EXISTS (domain does not exist, no error)"}
+{"id":"domb0038","category":"create-domain","sql":"CREATE DOMAIN d38a AS integer; CREATE DOMAIN d38b AS text; DROP DOMAIN d38a, d38b","expect":"ok","ref":"sql-dropdomain","note":"DROP DOMAIN multiple domains in one statement"}
+{"id":"domb0039","category":"create-domain","sql":"CREATE DOMAIN d39 AS integer; DROP DOMAIN d39 RESTRICT","expect":"ok","ref":"sql-dropdomain","note":"DROP DOMAIN with explicit RESTRICT"}
+{"id":"domb0040","category":"create-domain","sql":"CREATE DOMAIN d40 AS integer; DROP DOMAIN d40 CASCADE","expect":"ok","ref":"sql-dropdomain","note":"DROP DOMAIN CASCADE"}
+{"id":"domb0041","category":"create-domain","sql":"CREATE DOMAIN d41 AS integer CHECK (VALUE > 0); ALTER DOMAIN d41 ADD CHECK (VALUE < 1000)","expect":"ok","ref":"sql-alterdomain","note":"domain with initial CHECK, then ADD another CHECK via ALTER"}
+{"id":"domb0042","category":"create-domain","sql":"CREATE DOMAIN d42 AS integer; ALTER DOMAIN d42 OWNER TO CURRENT_USER","expect":"ok","ref":"sql-alterdomain","note":"ALTER DOMAIN OWNER TO CURRENT_USER"}
+{"id":"domb0043","category":"create-domain","sql":"CREATE DOMAIN integer","expect":"error","ref":"sql-createdomain","note":"error: missing AS and base type (bare reserved word as name)"}
+{"id":"domb0044","category":"create-domain","sql":"CREATE DOMAIN d44","expect":"error","ref":"sql-createdomain","note":"error: missing AS and base type entirely"}
+{"id":"domb0045","category":"create-domain","sql":"CREATE DOMAIN d45 AS nonexistent_type_xyz","expect":"error","ref":"sql-createdomain","note":"error: semantic - base type does not exist"}
+{"id":"domb0046","category":"create-domain","sql":"CREATE DOMAIN d46 AS integer CHECK (x > 0)","expect":"error","ref":"sql-createdomain","note":"error: CHECK expression references column name instead of VALUE (semantic)"}
+{"id":"domb0047","category":"create-domain","sql":"CREATE DOMAIN d47 AS integer CHECK VALUE > 0","expect":"error","ref":"sql-createdomain","note":"error: CHECK missing parentheses around expression"}
+{"id":"domb0048","category":"create-domain","sql":"CREATE DOMAIN d48 AS integer DEFAULT","expect":"error","ref":"sql-createdomain","note":"error: DEFAULT with no expression"}
+{"id":"domb0049","category":"create-domain","sql":"ALTER DOMAIN nonexistent_domain_zzz SET DEFAULT 1","expect":"error","ref":"sql-alterdomain","note":"error: ALTER DOMAIN on non-existent domain (semantic)"}
+{"id":"domb0050","category":"create-domain","sql":"CREATE DOMAIN d50 AS integer COLLATE \"C\"","expect":"error","ref":"sql-createdomain","note":"error: COLLATE on non-collatable type (integer does not support collation)"}

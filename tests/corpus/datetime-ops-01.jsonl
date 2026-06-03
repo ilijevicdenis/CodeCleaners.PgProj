@@ -1,0 +1,170 @@
+{"id":"dta0001","category":"datetime-ops","sql":"SELECT CURRENT_DATE","expect":"ok","ref":"functions-datetime","note":"CURRENT_DATE pseudo-function"}
+{"id":"dta0002","category":"datetime-ops","sql":"SELECT CURRENT_TIME","expect":"ok","ref":"functions-datetime","note":"CURRENT_TIME pseudo-function"}
+{"id":"dta0003","category":"datetime-ops","sql":"SELECT CURRENT_TIMESTAMP","expect":"ok","ref":"functions-datetime","note":"CURRENT_TIMESTAMP pseudo-function"}
+{"id":"dta0004","category":"datetime-ops","sql":"SELECT CURRENT_TIME(3)","expect":"ok","ref":"functions-datetime","note":"CURRENT_TIME with precision"}
+{"id":"dta0005","category":"datetime-ops","sql":"SELECT CURRENT_TIMESTAMP(0)","expect":"ok","ref":"functions-datetime","note":"CURRENT_TIMESTAMP with precision 0"}
+{"id":"dta0006","category":"datetime-ops","sql":"SELECT LOCALTIME","expect":"ok","ref":"functions-datetime","note":"LOCALTIME pseudo-function"}
+{"id":"dta0007","category":"datetime-ops","sql":"SELECT LOCALTIMESTAMP","expect":"ok","ref":"functions-datetime","note":"LOCALTIMESTAMP pseudo-function"}
+{"id":"dta0008","category":"datetime-ops","sql":"SELECT LOCALTIME(2)","expect":"ok","ref":"functions-datetime","note":"LOCALTIME with precision"}
+{"id":"dta0009","category":"datetime-ops","sql":"SELECT LOCALTIMESTAMP(6)","expect":"ok","ref":"functions-datetime","note":"LOCALTIMESTAMP with precision 6"}
+{"id":"dta0010","category":"datetime-ops","sql":"SELECT now()","expect":"ok","ref":"functions-datetime","note":"now() function"}
+{"id":"dta0011","category":"datetime-ops","sql":"SELECT clock_timestamp()","expect":"ok","ref":"functions-datetime","note":"clock_timestamp() function"}
+{"id":"dta0012","category":"datetime-ops","sql":"SELECT statement_timestamp()","expect":"ok","ref":"functions-datetime","note":"statement_timestamp() function"}
+{"id":"dta0013","category":"datetime-ops","sql":"SELECT transaction_timestamp()","expect":"ok","ref":"functions-datetime","note":"transaction_timestamp() function"}
+{"id":"dta0014","category":"datetime-ops","sql":"SELECT timeofday()","expect":"ok","ref":"functions-datetime","note":"timeofday() returns text"}
+{"id":"dta0015","category":"datetime-ops","sql":"SELECT DATE '2024-01-15'","expect":"ok","ref":"functions-datetime","note":"DATE literal"}
+{"id":"dta0016","category":"datetime-ops","sql":"SELECT TIME '12:30:00'","expect":"ok","ref":"functions-datetime","note":"TIME literal"}
+{"id":"dta0017","category":"datetime-ops","sql":"SELECT TIMESTAMP '2024-01-15 12:30:00'","expect":"ok","ref":"functions-datetime","note":"TIMESTAMP literal"}
+{"id":"dta0018","category":"datetime-ops","sql":"SELECT TIMESTAMPTZ '2024-01-15 12:30:00+05'","expect":"ok","ref":"functions-datetime","note":"TIMESTAMPTZ literal with offset"}
+{"id":"dta0019","category":"datetime-ops","sql":"SELECT TIMESTAMP WITH TIME ZONE '2024-01-15 12:30:00 UTC'","expect":"ok","ref":"functions-datetime","note":"TIMESTAMP WITH TIME ZONE literal"}
+{"id":"dta0020","category":"datetime-ops","sql":"SELECT TIME WITH TIME ZONE '12:30:00+00'","expect":"ok","ref":"functions-datetime","note":"TIME WITH TIME ZONE literal"}
+{"id":"dta0021","category":"datetime-ops","sql":"SELECT INTERVAL '1' YEAR","expect":"ok","ref":"functions-datetime","note":"INTERVAL with YEAR field qualifier"}
+{"id":"dta0022","category":"datetime-ops","sql":"SELECT INTERVAL '3' MONTH","expect":"ok","ref":"functions-datetime","note":"INTERVAL with MONTH field qualifier"}
+{"id":"dta0023","category":"datetime-ops","sql":"SELECT INTERVAL '7' DAY","expect":"ok","ref":"functions-datetime","note":"INTERVAL with DAY field qualifier"}
+{"id":"dta0024","category":"datetime-ops","sql":"SELECT INTERVAL '5' HOUR","expect":"ok","ref":"functions-datetime","note":"INTERVAL with HOUR field qualifier"}
+{"id":"dta0025","category":"datetime-ops","sql":"SELECT INTERVAL '30' MINUTE","expect":"ok","ref":"functions-datetime","note":"INTERVAL with MINUTE field qualifier"}
+{"id":"dta0026","category":"datetime-ops","sql":"SELECT INTERVAL '45' SECOND","expect":"ok","ref":"functions-datetime","note":"INTERVAL with SECOND field qualifier"}
+{"id":"dta0027","category":"datetime-ops","sql":"SELECT INTERVAL '1-6' YEAR TO MONTH","expect":"ok","ref":"functions-datetime","note":"INTERVAL YEAR TO MONTH range"}
+{"id":"dta0028","category":"datetime-ops","sql":"SELECT INTERVAL '2 12:00:00' DAY TO SECOND","expect":"ok","ref":"functions-datetime","note":"INTERVAL DAY TO SECOND range"}
+{"id":"dta0029","category":"datetime-ops","sql":"SELECT INTERVAL '12:30' HOUR TO MINUTE","expect":"ok","ref":"functions-datetime","note":"INTERVAL HOUR TO MINUTE range"}
+{"id":"dta0030","category":"datetime-ops","sql":"SELECT INTERVAL '12:30:45' HOUR TO SECOND","expect":"ok","ref":"functions-datetime","note":"INTERVAL HOUR TO SECOND range"}
+{"id":"dta0031","category":"datetime-ops","sql":"SELECT INTERVAL '30:45' MINUTE TO SECOND","expect":"ok","ref":"functions-datetime","note":"INTERVAL MINUTE TO SECOND range"}
+{"id":"dta0032","category":"datetime-ops","sql":"SELECT INTERVAL '1 year 2 months 3 days'","expect":"ok","ref":"functions-datetime","note":"INTERVAL verbose string"}
+{"id":"dta0033","category":"datetime-ops","sql":"SELECT INTERVAL '1 day 2 hours 30 minutes'","expect":"ok","ref":"functions-datetime","note":"INTERVAL mixed units string"}
+{"id":"dta0034","category":"datetime-ops","sql":"SELECT INTERVAL '1.5' SECOND","expect":"ok","ref":"functions-datetime","note":"INTERVAL fractional seconds"}
+{"id":"dta0035","category":"datetime-ops","sql":"SELECT INTERVAL '1' SECOND(3)","expect":"ok","ref":"functions-datetime","note":"INTERVAL SECOND with precision"}
+{"id":"dta0036","category":"datetime-ops","sql":"SELECT INTERVAL '2 12:30:45' DAY TO SECOND(2)","expect":"ok","ref":"functions-datetime","note":"INTERVAL DAY TO SECOND with precision"}
+{"id":"dta0037","category":"datetime-ops","sql":"SELECT INTERVAL '00:00:00'","expect":"ok","ref":"functions-datetime","note":"INTERVAL zero value"}
+{"id":"dta0038","category":"datetime-ops","sql":"SELECT INTERVAL '-1 day'","expect":"ok","ref":"functions-datetime","note":"INTERVAL negative value"}
+{"id":"dta0039","category":"datetime-ops","sql":"SELECT EXTRACT(YEAR FROM DATE '2024-06-15')","expect":"ok","ref":"functions-datetime","note":"EXTRACT YEAR from DATE"}
+{"id":"dta0040","category":"datetime-ops","sql":"SELECT EXTRACT(MONTH FROM DATE '2024-06-15')","expect":"ok","ref":"functions-datetime","note":"EXTRACT MONTH from DATE"}
+{"id":"dta0041","category":"datetime-ops","sql":"SELECT EXTRACT(DAY FROM DATE '2024-06-15')","expect":"ok","ref":"functions-datetime","note":"EXTRACT DAY from DATE"}
+{"id":"dta0042","category":"datetime-ops","sql":"SELECT EXTRACT(HOUR FROM TIMESTAMP '2024-06-15 10:30:00')","expect":"ok","ref":"functions-datetime","note":"EXTRACT HOUR from TIMESTAMP"}
+{"id":"dta0043","category":"datetime-ops","sql":"SELECT EXTRACT(MINUTE FROM TIMESTAMP '2024-06-15 10:30:00')","expect":"ok","ref":"functions-datetime","note":"EXTRACT MINUTE from TIMESTAMP"}
+{"id":"dta0044","category":"datetime-ops","sql":"SELECT EXTRACT(SECOND FROM TIMESTAMP '2024-06-15 10:30:45.123')","expect":"ok","ref":"functions-datetime","note":"EXTRACT SECOND from TIMESTAMP"}
+{"id":"dta0045","category":"datetime-ops","sql":"SELECT EXTRACT(DOW FROM DATE '2024-06-15')","expect":"ok","ref":"functions-datetime","note":"EXTRACT DOW (day of week)"}
+{"id":"dta0046","category":"datetime-ops","sql":"SELECT EXTRACT(DOY FROM DATE '2024-06-15')","expect":"ok","ref":"functions-datetime","note":"EXTRACT DOY (day of year)"}
+{"id":"dta0047","category":"datetime-ops","sql":"SELECT EXTRACT(WEEK FROM DATE '2024-06-15')","expect":"ok","ref":"functions-datetime","note":"EXTRACT WEEK (ISO week number)"}
+{"id":"dta0048","category":"datetime-ops","sql":"SELECT EXTRACT(QUARTER FROM DATE '2024-06-15')","expect":"ok","ref":"functions-datetime","note":"EXTRACT QUARTER"}
+{"id":"dta0049","category":"datetime-ops","sql":"SELECT EXTRACT(EPOCH FROM TIMESTAMP '2024-01-01 00:00:00')","expect":"ok","ref":"functions-datetime","note":"EXTRACT EPOCH from TIMESTAMP"}
+{"id":"dta0050","category":"datetime-ops","sql":"SELECT EXTRACT(CENTURY FROM DATE '2024-01-01')","expect":"ok","ref":"functions-datetime","note":"EXTRACT CENTURY"}
+{"id":"dta0051","category":"datetime-ops","sql":"SELECT EXTRACT(DECADE FROM DATE '2024-01-01')","expect":"ok","ref":"functions-datetime","note":"EXTRACT DECADE"}
+{"id":"dta0052","category":"datetime-ops","sql":"SELECT EXTRACT(MILLENNIUM FROM DATE '2024-01-01')","expect":"ok","ref":"functions-datetime","note":"EXTRACT MILLENNIUM"}
+{"id":"dta0053","category":"datetime-ops","sql":"SELECT EXTRACT(MICROSECONDS FROM TIME '10:30:45.123456')","expect":"ok","ref":"functions-datetime","note":"EXTRACT MICROSECONDS from TIME"}
+{"id":"dta0054","category":"datetime-ops","sql":"SELECT EXTRACT(MILLISECONDS FROM TIME '10:30:45.123')","expect":"ok","ref":"functions-datetime","note":"EXTRACT MILLISECONDS from TIME"}
+{"id":"dta0055","category":"datetime-ops","sql":"SELECT EXTRACT(ISODOW FROM DATE '2024-06-15')","expect":"ok","ref":"functions-datetime","note":"EXTRACT ISODOW (ISO day of week, Mon=1)"}
+{"id":"dta0056","category":"datetime-ops","sql":"SELECT EXTRACT(ISOYEAR FROM DATE '2024-01-01')","expect":"ok","ref":"functions-datetime","note":"EXTRACT ISOYEAR (ISO 8601 year)"}
+{"id":"dta0057","category":"datetime-ops","sql":"SELECT EXTRACT(TIMEZONE FROM TIMESTAMPTZ '2024-01-01 00:00:00+05:30')","expect":"ok","ref":"functions-datetime","note":"EXTRACT TIMEZONE offset in seconds"}
+{"id":"dta0058","category":"datetime-ops","sql":"SELECT EXTRACT(TIMEZONE_HOUR FROM TIMESTAMPTZ '2024-01-01 00:00:00+05:30')","expect":"ok","ref":"functions-datetime","note":"EXTRACT TIMEZONE_HOUR"}
+{"id":"dta0059","category":"datetime-ops","sql":"SELECT EXTRACT(TIMEZONE_MINUTE FROM TIMESTAMPTZ '2024-01-01 00:00:00+05:30')","expect":"ok","ref":"functions-datetime","note":"EXTRACT TIMEZONE_MINUTE"}
+{"id":"dta0060","category":"datetime-ops","sql":"SELECT EXTRACT(EPOCH FROM INTERVAL '1 day')","expect":"ok","ref":"functions-datetime","note":"EXTRACT EPOCH from INTERVAL"}
+{"id":"dta0061","category":"datetime-ops","sql":"SELECT EXTRACT(YEAR FROM)","expect":"error","ref":"functions-datetime","note":"EXTRACT missing source expression - syntax error"}
+{"id":"dta0062","category":"datetime-ops","sql":"SELECT EXTRACT(FOOBAR FROM DATE '2024-01-01')","expect":"error","ref":"functions-datetime","note":"EXTRACT with invalid field name"}
+{"id":"dta0063","category":"datetime-ops","sql":"SELECT EXTRACT YEAR FROM DATE '2024-01-01'","expect":"error","ref":"functions-datetime","note":"EXTRACT without parentheses - syntax error"}
+{"id":"dta0064","category":"datetime-ops","sql":"SELECT EXTRACT(FROM DATE '2024-01-01')","expect":"error","ref":"functions-datetime","note":"EXTRACT with missing field - syntax error"}
+{"id":"dta0065","category":"datetime-ops","sql":"SELECT date_part('year', TIMESTAMP '2024-06-15 10:30:00')","expect":"ok","ref":"functions-datetime","note":"date_part year from timestamp"}
+{"id":"dta0066","category":"datetime-ops","sql":"SELECT date_part('month', DATE '2024-06-15')","expect":"ok","ref":"functions-datetime","note":"date_part month from date"}
+{"id":"dta0067","category":"datetime-ops","sql":"SELECT date_part('day', TIMESTAMP '2024-06-15 10:30:00')","expect":"ok","ref":"functions-datetime","note":"date_part day from timestamp"}
+{"id":"dta0068","category":"datetime-ops","sql":"SELECT date_part('hour', INTERVAL '2 hours 30 minutes')","expect":"ok","ref":"functions-datetime","note":"date_part hour from interval"}
+{"id":"dta0069","category":"datetime-ops","sql":"SELECT date_part('epoch', now())","expect":"ok","ref":"functions-datetime","note":"date_part epoch from timestamptz"}
+{"id":"dta0070","category":"datetime-ops","sql":"SELECT date_part('dow', CURRENT_DATE)","expect":"ok","ref":"functions-datetime","note":"date_part dow using CURRENT_DATE"}
+{"id":"dta0071","category":"datetime-ops","sql":"SELECT date_part('quarter', DATE '2024-06-15')","expect":"ok","ref":"functions-datetime","note":"date_part quarter from date"}
+{"id":"dta0072","category":"datetime-ops","sql":"SELECT date_trunc('year', TIMESTAMP '2024-06-15 10:30:00')","expect":"ok","ref":"functions-datetime","note":"date_trunc year"}
+{"id":"dta0073","category":"datetime-ops","sql":"SELECT date_trunc('month', TIMESTAMP '2024-06-15 10:30:00')","expect":"ok","ref":"functions-datetime","note":"date_trunc month"}
+{"id":"dta0074","category":"datetime-ops","sql":"SELECT date_trunc('day', TIMESTAMP '2024-06-15 10:30:00')","expect":"ok","ref":"functions-datetime","note":"date_trunc day"}
+{"id":"dta0075","category":"datetime-ops","sql":"SELECT date_trunc('hour', TIMESTAMP '2024-06-15 10:30:00')","expect":"ok","ref":"functions-datetime","note":"date_trunc hour"}
+{"id":"dta0076","category":"datetime-ops","sql":"SELECT date_trunc('minute', TIMESTAMP '2024-06-15 10:30:45')","expect":"ok","ref":"functions-datetime","note":"date_trunc minute"}
+{"id":"dta0077","category":"datetime-ops","sql":"SELECT date_trunc('second', TIMESTAMP '2024-06-15 10:30:45.123')","expect":"ok","ref":"functions-datetime","note":"date_trunc second"}
+{"id":"dta0078","category":"datetime-ops","sql":"SELECT date_trunc('week', DATE '2024-06-15')","expect":"ok","ref":"functions-datetime","note":"date_trunc week from date"}
+{"id":"dta0079","category":"datetime-ops","sql":"SELECT date_trunc('quarter', TIMESTAMP '2024-06-15 10:30:00')","expect":"ok","ref":"functions-datetime","note":"date_trunc quarter"}
+{"id":"dta0080","category":"datetime-ops","sql":"SELECT date_trunc('century', TIMESTAMP '2024-06-15 10:30:00')","expect":"ok","ref":"functions-datetime","note":"date_trunc century"}
+{"id":"dta0081","category":"datetime-ops","sql":"SELECT date_trunc('decade', TIMESTAMP '2024-06-15 10:30:00')","expect":"ok","ref":"functions-datetime","note":"date_trunc decade"}
+{"id":"dta0082","category":"datetime-ops","sql":"SELECT date_trunc('millennium', TIMESTAMP '2024-06-15 10:30:00')","expect":"ok","ref":"functions-datetime","note":"date_trunc millennium"}
+{"id":"dta0083","category":"datetime-ops","sql":"SELECT date_trunc('hour', TIMESTAMPTZ '2024-06-15 10:30:00+00', 'America/New_York')","expect":"ok","ref":"functions-datetime","note":"date_trunc with timezone argument"}
+{"id":"dta0084","category":"datetime-ops","sql":"SELECT date_trunc('day', TIMESTAMPTZ '2024-06-15 10:30:00+00', 'UTC')","expect":"ok","ref":"functions-datetime","note":"date_trunc timestamptz with UTC timezone"}
+{"id":"dta0085","category":"datetime-ops","sql":"SELECT date_trunc('microseconds', TIMESTAMP '2024-06-15 10:30:45.123456')","expect":"ok","ref":"functions-datetime","note":"date_trunc microseconds"}
+{"id":"dta0086","category":"datetime-ops","sql":"SELECT date_trunc('milliseconds', TIMESTAMP '2024-06-15 10:30:45.123')","expect":"ok","ref":"functions-datetime","note":"date_trunc milliseconds"}
+{"id":"dta0087","category":"datetime-ops","sql":"SELECT date_trunc('foobar', TIMESTAMP '2024-06-15 10:30:00')","expect":"error","ref":"functions-datetime","note":"date_trunc invalid unit - runtime error"}
+{"id":"dta0088","category":"datetime-ops","sql":"SELECT DATE '2024-01-15' + INTERVAL '1 day'","expect":"ok","ref":"functions-datetime","note":"date + interval arithmetic"}
+{"id":"dta0089","category":"datetime-ops","sql":"SELECT DATE '2024-01-15' - INTERVAL '1 month'","expect":"ok","ref":"functions-datetime","note":"date - interval arithmetic"}
+{"id":"dta0090","category":"datetime-ops","sql":"SELECT DATE '2024-03-01' - DATE '2024-01-01'","expect":"ok","ref":"functions-datetime","note":"date - date = integer days"}
+{"id":"dta0091","category":"datetime-ops","sql":"SELECT TIMESTAMP '2024-01-15 10:00:00' + INTERVAL '2 hours'","expect":"ok","ref":"functions-datetime","note":"timestamp + interval"}
+{"id":"dta0092","category":"datetime-ops","sql":"SELECT TIMESTAMP '2024-01-15 10:00:00' - INTERVAL '30 minutes'","expect":"ok","ref":"functions-datetime","note":"timestamp - interval"}
+{"id":"dta0093","category":"datetime-ops","sql":"SELECT TIMESTAMP '2024-06-01 12:00:00' - TIMESTAMP '2024-01-01 00:00:00'","expect":"ok","ref":"functions-datetime","note":"timestamp - timestamp = interval"}
+{"id":"dta0094","category":"datetime-ops","sql":"SELECT INTERVAL '1 hour' + INTERVAL '30 minutes'","expect":"ok","ref":"functions-datetime","note":"interval + interval"}
+{"id":"dta0095","category":"datetime-ops","sql":"SELECT INTERVAL '2 hours' - INTERVAL '30 minutes'","expect":"ok","ref":"functions-datetime","note":"interval - interval"}
+{"id":"dta0096","category":"datetime-ops","sql":"SELECT INTERVAL '1 hour' * 3","expect":"ok","ref":"functions-datetime","note":"interval * integer"}
+{"id":"dta0097","category":"datetime-ops","sql":"SELECT 3 * INTERVAL '1 hour'","expect":"ok","ref":"functions-datetime","note":"integer * interval"}
+{"id":"dta0098","category":"datetime-ops","sql":"SELECT INTERVAL '6 hours' / 2","expect":"ok","ref":"functions-datetime","note":"interval / number"}
+{"id":"dta0099","category":"datetime-ops","sql":"SELECT -INTERVAL '1 day'","expect":"ok","ref":"functions-datetime","note":"unary minus on interval"}
+{"id":"dta0100","category":"datetime-ops","sql":"SELECT TIMESTAMP '2024-01-15 10:00:00' AT TIME ZONE 'UTC'","expect":"ok","ref":"functions-datetime","note":"TIMESTAMP AT TIME ZONE named zone"}
+{"id":"dta0101","category":"datetime-ops","sql":"SELECT TIMESTAMPTZ '2024-01-15 10:00:00+00' AT TIME ZONE 'America/New_York'","expect":"ok","ref":"functions-datetime","note":"TIMESTAMPTZ AT TIME ZONE converts to local"}
+{"id":"dta0102","category":"datetime-ops","sql":"SELECT TIME '10:00:00' AT TIME ZONE 'UTC'","expect":"ok","ref":"functions-datetime","note":"TIME AT TIME ZONE"}
+{"id":"dta0103","category":"datetime-ops","sql":"SELECT TIMESTAMP '2024-01-15 10:00:00' AT TIME ZONE '+05:30'","expect":"ok","ref":"functions-datetime","note":"TIMESTAMP AT TIME ZONE with offset string"}
+{"id":"dta0104","category":"datetime-ops","sql":"SELECT TIMESTAMP '2024-01-15 10:00:00' AT TIME ZONE INTERVAL '+05:30'","expect":"ok","ref":"functions-datetime","note":"TIMESTAMP AT TIME ZONE with INTERVAL offset"}
+{"id":"dta0105","category":"datetime-ops","sql":"SELECT (DATE '2024-01-01', DATE '2024-12-31') OVERLAPS (DATE '2024-06-01', DATE '2025-01-01')","expect":"ok","ref":"functions-datetime","note":"OVERLAPS with two date ranges"}
+{"id":"dta0106","category":"datetime-ops","sql":"SELECT (TIMESTAMP '2024-01-01 00:00:00', TIMESTAMP '2024-06-01 00:00:00') OVERLAPS (TIMESTAMP '2024-05-01 00:00:00', TIMESTAMP '2024-12-31 00:00:00')","expect":"ok","ref":"functions-datetime","note":"OVERLAPS with two timestamp ranges"}
+{"id":"dta0107","category":"datetime-ops","sql":"SELECT (DATE '2024-01-01', INTERVAL '6 months') OVERLAPS (DATE '2024-06-01', INTERVAL '6 months')","expect":"ok","ref":"functions-datetime","note":"OVERLAPS with date and interval"}
+{"id":"dta0108","category":"datetime-ops","sql":"SELECT (TIMESTAMP '2024-01-01 00:00:00', INTERVAL '90 days') OVERLAPS (TIMESTAMP '2024-03-01 00:00:00', INTERVAL '60 days')","expect":"ok","ref":"functions-datetime","note":"OVERLAPS with timestamp and interval"}
+{"id":"dta0109","category":"datetime-ops","sql":"SELECT age(TIMESTAMP '2024-01-01 00:00:00', TIMESTAMP '2020-01-01 00:00:00')","expect":"ok","ref":"functions-datetime","note":"age() with two timestamps"}
+{"id":"dta0110","category":"datetime-ops","sql":"SELECT age(TIMESTAMP '1990-06-15 00:00:00')","expect":"ok","ref":"functions-datetime","note":"age() with one timestamp (vs current_date)"}
+{"id":"dta0111","category":"datetime-ops","sql":"SELECT make_date(2024, 6, 15)","expect":"ok","ref":"functions-datetime","note":"make_date(year, month, day)"}
+{"id":"dta0112","category":"datetime-ops","sql":"SELECT make_time(10, 30, 45.5)","expect":"ok","ref":"functions-datetime","note":"make_time(hour, min, sec)"}
+{"id":"dta0113","category":"datetime-ops","sql":"SELECT make_timestamp(2024, 6, 15, 10, 30, 45.0)","expect":"ok","ref":"functions-datetime","note":"make_timestamp(y,m,d,h,min,sec)"}
+{"id":"dta0114","category":"datetime-ops","sql":"SELECT make_timestamptz(2024, 6, 15, 10, 30, 45.0, 'UTC')","expect":"ok","ref":"functions-datetime","note":"make_timestamptz with timezone name"}
+{"id":"dta0115","category":"datetime-ops","sql":"SELECT make_timestamptz(2024, 6, 15, 10, 30, 45.0)","expect":"ok","ref":"functions-datetime","note":"make_timestamptz without timezone uses session tz"}
+{"id":"dta0116","category":"datetime-ops","sql":"SELECT make_interval(years := 1, months := 6, days := 15)","expect":"ok","ref":"functions-datetime","note":"make_interval with named params"}
+{"id":"dta0117","category":"datetime-ops","sql":"SELECT make_interval(hours := 2, mins := 30, secs := 45.0)","expect":"ok","ref":"functions-datetime","note":"make_interval hours/mins/secs"}
+{"id":"dta0118","category":"datetime-ops","sql":"SELECT make_interval(weeks := 2)","expect":"ok","ref":"functions-datetime","note":"make_interval weeks only"}
+{"id":"dta0119","category":"datetime-ops","sql":"SELECT make_interval(0, 0, 0, 0, 0, 0, 0.0)","expect":"ok","ref":"functions-datetime","note":"make_interval all positional args zero"}
+{"id":"dta0120","category":"datetime-ops","sql":"SELECT to_char(TIMESTAMP '2024-06-15 10:30:45', 'YYYY-MM-DD HH24:MI:SS')","expect":"ok","ref":"functions-datetime","note":"to_char timestamp with format"}
+{"id":"dta0121","category":"datetime-ops","sql":"SELECT to_char(CURRENT_DATE, 'Day, DD Month YYYY')","expect":"ok","ref":"functions-datetime","note":"to_char date with day/month names"}
+{"id":"dta0122","category":"datetime-ops","sql":"SELECT to_char(INTERVAL '2 hours 30 minutes', 'HH24:MI:SS')","expect":"ok","ref":"functions-datetime","note":"to_char interval with format"}
+{"id":"dta0123","category":"datetime-ops","sql":"SELECT to_char(TIMESTAMP '2024-06-15 10:30:45', 'YYYY')","expect":"ok","ref":"functions-datetime","note":"to_char year only format"}
+{"id":"dta0124","category":"datetime-ops","sql":"SELECT to_char(TIMESTAMP '2024-06-15 10:30:45', 'Q')","expect":"ok","ref":"functions-datetime","note":"to_char quarter format"}
+{"id":"dta0125","category":"datetime-ops","sql":"SELECT to_char(TIMESTAMP '2024-06-15 10:30:45', 'WW')","expect":"ok","ref":"functions-datetime","note":"to_char week of year format"}
+{"id":"dta0126","category":"datetime-ops","sql":"SELECT to_char(TIMESTAMP '2024-06-15 10:30:45', 'TZ')","expect":"ok","ref":"functions-datetime","note":"to_char timezone abbreviation format"}
+{"id":"dta0127","category":"datetime-ops","sql":"SELECT to_date('2024-06-15', 'YYYY-MM-DD')","expect":"ok","ref":"functions-datetime","note":"to_date with ISO format"}
+{"id":"dta0128","category":"datetime-ops","sql":"SELECT to_date('15/06/2024', 'DD/MM/YYYY')","expect":"ok","ref":"functions-datetime","note":"to_date with DD/MM/YYYY format"}
+{"id":"dta0129","category":"datetime-ops","sql":"SELECT to_date('June 15, 2024', 'Month DD, YYYY')","expect":"ok","ref":"functions-datetime","note":"to_date with month name format"}
+{"id":"dta0130","category":"datetime-ops","sql":"SELECT to_timestamp('2024-06-15 10:30:45', 'YYYY-MM-DD HH24:MI:SS')","expect":"ok","ref":"functions-datetime","note":"to_timestamp with format string"}
+{"id":"dta0131","category":"datetime-ops","sql":"SELECT to_timestamp('15/06/2024 10:30', 'DD/MM/YYYY HH24:MI')","expect":"ok","ref":"functions-datetime","note":"to_timestamp DD/MM/YYYY format"}
+{"id":"dta0132","category":"datetime-ops","sql":"SELECT to_timestamp(0)","expect":"ok","ref":"functions-datetime","note":"to_timestamp from Unix epoch integer"}
+{"id":"dta0133","category":"datetime-ops","sql":"SELECT to_timestamp(1718444400.5)","expect":"ok","ref":"functions-datetime","note":"to_timestamp from float Unix epoch"}
+{"id":"dta0134","category":"datetime-ops","sql":"SELECT justify_days(INTERVAL '40 days')","expect":"ok","ref":"functions-datetime","note":"justify_days converts excess days to months"}
+{"id":"dta0135","category":"datetime-ops","sql":"SELECT justify_hours(INTERVAL '30 hours')","expect":"ok","ref":"functions-datetime","note":"justify_hours converts excess hours to days"}
+{"id":"dta0136","category":"datetime-ops","sql":"SELECT justify_interval(INTERVAL '1 month -1 hour')","expect":"ok","ref":"functions-datetime","note":"justify_interval normalizes full interval"}
+{"id":"dta0137","category":"datetime-ops","sql":"SELECT isfinite(DATE '2024-01-01')","expect":"ok","ref":"functions-datetime","note":"isfinite on finite date"}
+{"id":"dta0138","category":"datetime-ops","sql":"SELECT isfinite(TIMESTAMP '2024-01-01 00:00:00')","expect":"ok","ref":"functions-datetime","note":"isfinite on finite timestamp"}
+{"id":"dta0139","category":"datetime-ops","sql":"SELECT isfinite(INTERVAL '1 day')","expect":"ok","ref":"functions-datetime","note":"isfinite on interval"}
+{"id":"dta0140","category":"datetime-ops","sql":"SELECT isfinite(DATE 'infinity')","expect":"ok","ref":"functions-datetime","note":"isfinite on infinity date returns false"}
+{"id":"dta0141","category":"datetime-ops","sql":"SELECT isfinite(TIMESTAMP 'infinity')","expect":"ok","ref":"functions-datetime","note":"isfinite on infinity timestamp returns false"}
+{"id":"dta0142","category":"datetime-ops","sql":"SELECT date_bin(INTERVAL '15 minutes', TIMESTAMP '2024-06-15 10:37:00', TIMESTAMP '2024-06-15 00:00:00')","expect":"ok","ref":"functions-datetime","note":"date_bin with 15-minute stride"}
+{"id":"dta0143","category":"datetime-ops","sql":"SELECT date_bin(INTERVAL '1 hour', TIMESTAMP '2024-06-15 10:37:00', TIMESTAMP '2024-06-15 00:00:00')","expect":"ok","ref":"functions-datetime","note":"date_bin with 1-hour stride"}
+{"id":"dta0144","category":"datetime-ops","sql":"SELECT date_bin(INTERVAL '1 day', TIMESTAMPTZ '2024-06-15 10:37:00+00', TIMESTAMPTZ '2024-01-01 00:00:00+00')","expect":"ok","ref":"functions-datetime","note":"date_bin with timestamptz"}
+{"id":"dta0145","category":"datetime-ops","sql":"SELECT DATE '2024-01-01' + INTEGER '30'","expect":"ok","ref":"functions-datetime","note":"date + integer days"}
+{"id":"dta0146","category":"datetime-ops","sql":"SELECT INTEGER '30' + DATE '2024-01-01'","expect":"ok","ref":"functions-datetime","note":"integer + date days"}
+{"id":"dta0147","category":"datetime-ops","sql":"SELECT DATE '2024-01-31' - INTEGER '10'","expect":"ok","ref":"functions-datetime","note":"date - integer days"}
+{"id":"dta0148","category":"datetime-ops","sql":"SELECT TIMESTAMP '2024-01-15 10:00:00' + TIME '02:30:00'","expect":"ok","ref":"functions-datetime","note":"timestamp + time = timestamp"}
+{"id":"dta0149","category":"datetime-ops","sql":"SELECT INTERVAL '1 day' + INTERVAL '2 hours'","expect":"ok","ref":"functions-datetime","note":"interval addition combining day and hours"}
+{"id":"dta0150","category":"datetime-ops","sql":"SELECT INTERVAL '1 year' * 2.5","expect":"ok","ref":"functions-datetime","note":"interval * double precision"}
+{"id":"dta0151","category":"datetime-ops","sql":"SELECT EXTRACT(EPOCH FROM TIMESTAMPTZ '2024-01-01 00:00:00+00')","expect":"ok","ref":"functions-datetime","note":"EXTRACT EPOCH from TIMESTAMPTZ"}
+{"id":"dta0152","category":"datetime-ops","sql":"SELECT EXTRACT(YEAR FROM INTERVAL '14 months')","expect":"ok","ref":"functions-datetime","note":"EXTRACT YEAR from INTERVAL"}
+{"id":"dta0153","category":"datetime-ops","sql":"SELECT EXTRACT(MONTH FROM INTERVAL '14 months')","expect":"ok","ref":"functions-datetime","note":"EXTRACT MONTH from INTERVAL (remainder)"}
+{"id":"dta0154","category":"datetime-ops","sql":"SELECT EXTRACT(DAY FROM INTERVAL '3 days 5 hours')","expect":"ok","ref":"functions-datetime","note":"EXTRACT DAY from INTERVAL"}
+{"id":"dta0155","category":"datetime-ops","sql":"SELECT TIMESTAMP '2024-01-15 10:00:00' AT TIME ZONE 'Europe/London'","expect":"ok","ref":"functions-datetime","note":"AT TIME ZONE with continent/city format"}
+{"id":"dta0156","category":"datetime-ops","sql":"SELECT DATE '2024-01-01' < DATE '2024-12-31'","expect":"ok","ref":"functions-datetime","note":"date comparison less-than"}
+{"id":"dta0157","category":"datetime-ops","sql":"SELECT DATE '2024-01-01' = DATE '2024-01-01'","expect":"ok","ref":"functions-datetime","note":"date equality comparison"}
+{"id":"dta0158","category":"datetime-ops","sql":"SELECT TIMESTAMP '2024-01-01' BETWEEN TIMESTAMP '2023-01-01' AND TIMESTAMP '2025-01-01'","expect":"ok","ref":"functions-datetime","note":"timestamp BETWEEN"}
+{"id":"dta0159","category":"datetime-ops","sql":"SELECT INTERVAL '1 day' < INTERVAL '2 days'","expect":"ok","ref":"functions-datetime","note":"interval comparison less-than"}
+{"id":"dta0160","category":"datetime-ops","sql":"SELECT INTERVAL '1-6' MONTH TO YEAR","expect":"error","ref":"functions-datetime","note":"INTERVAL MONTH TO YEAR is invalid range order - syntax error"}
+{"id":"dta0161","category":"datetime-ops","sql":"SELECT EXTRACT(YEAR, DATE '2024-01-01')","expect":"error","ref":"functions-datetime","note":"EXTRACT with comma instead of FROM - syntax error"}
+{"id":"dta0162","category":"datetime-ops","sql":"SELECT date_trunc(TIMESTAMP '2024-06-15 10:30:00', 'year')","expect":"error","ref":"functions-datetime","note":"date_trunc args reversed - wrong type"}
+{"id":"dta0163","category":"datetime-ops","sql":"SELECT INTERVAL 'xyz'","expect":"error","ref":"functions-datetime","note":"INTERVAL with invalid string value"}
+{"id":"dta0164","category":"datetime-ops","sql":"SELECT make_date(2024, 13, 1)","expect":"error","ref":"functions-datetime","note":"make_date with invalid month 13"}
+{"id":"dta0165","category":"datetime-ops","sql":"SELECT make_date(2024, 6, 32)","expect":"error","ref":"functions-datetime","note":"make_date with invalid day 32"}
+{"id":"dta0166","category":"datetime-ops","sql":"SELECT make_time(25, 0, 0.0)","expect":"error","ref":"functions-datetime","note":"make_time with hour > 23"}
+{"id":"dta0167","category":"datetime-ops","sql":"SELECT age()","expect":"error","ref":"functions-datetime","note":"age() with no arguments - syntax error"}
+{"id":"dta0168","category":"datetime-ops","sql":"SELECT DATE '2024-13-01'","expect":"error","ref":"functions-datetime","note":"DATE literal with invalid month 13"}
+{"id":"dta0169","category":"datetime-ops","sql":"SELECT TIME '25:00:00'","expect":"error","ref":"functions-datetime","note":"TIME literal with hour > 24"}
+{"id":"dta0170","category":"datetime-ops","sql":"SELECT INTERVAL '1' DAY TO HOUR","expect":"ok","ref":"functions-datetime","note":"INTERVAL DAY TO HOUR range"}

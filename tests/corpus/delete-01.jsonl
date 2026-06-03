@@ -1,0 +1,170 @@
+{"id":"dela0001","category":"delete","sql":"DELETE FROM s.t","expect":"ok","ref":"sql-delete","note":"minimal DELETE FROM with no WHERE"}
+{"id":"dela0002","category":"delete","sql":"DELETE FROM s.t WHERE id = 1","expect":"ok","ref":"sql-delete","note":"DELETE FROM with simple WHERE equality"}
+{"id":"dela0003","category":"delete","sql":"DELETE FROM s.t WHERE val > 100","expect":"ok","ref":"sql-delete","note":"DELETE WHERE with comparison operator"}
+{"id":"dela0004","category":"delete","sql":"DELETE FROM s.t WHERE name = 'x' AND qty > 0","expect":"ok","ref":"sql-delete","note":"DELETE WHERE with AND condition"}
+{"id":"dela0005","category":"delete","sql":"DELETE FROM s.t WHERE name = 'x' OR val IS NULL","expect":"ok","ref":"sql-delete","note":"DELETE WHERE with OR condition"}
+{"id":"dela0006","category":"delete","sql":"DELETE FROM s.t WHERE flag = true","expect":"ok","ref":"sql-delete","note":"DELETE WHERE boolean column"}
+{"id":"dela0007","category":"delete","sql":"DELETE FROM s.t WHERE status = 'ok'","expect":"ok","ref":"sql-delete","note":"DELETE WHERE enum value"}
+{"id":"dela0008","category":"delete","sql":"DELETE FROM s.t WHERE id IN (1,2,3)","expect":"ok","ref":"sql-delete","note":"DELETE WHERE IN list"}
+{"id":"dela0009","category":"delete","sql":"DELETE FROM s.t WHERE id NOT IN (1,2,3)","expect":"ok","ref":"sql-delete","note":"DELETE WHERE NOT IN list"}
+{"id":"dela0010","category":"delete","sql":"DELETE FROM s.t WHERE name LIKE '%test%'","expect":"ok","ref":"sql-delete","note":"DELETE WHERE LIKE pattern"}
+{"id":"dela0011","category":"delete","sql":"DELETE FROM s.t WHERE name ILIKE '%test%'","expect":"ok","ref":"sql-delete","note":"DELETE WHERE ILIKE (case-insensitive)"}
+{"id":"dela0012","category":"delete","sql":"DELETE FROM s.t WHERE val BETWEEN 10 AND 100","expect":"ok","ref":"sql-delete","note":"DELETE WHERE BETWEEN"}
+{"id":"dela0013","category":"delete","sql":"DELETE FROM s.t WHERE val IS NULL","expect":"ok","ref":"sql-delete","note":"DELETE WHERE IS NULL"}
+{"id":"dela0014","category":"delete","sql":"DELETE FROM s.t WHERE val IS NOT NULL","expect":"ok","ref":"sql-delete","note":"DELETE WHERE IS NOT NULL"}
+{"id":"dela0015","category":"delete","sql":"DELETE FROM s.t WHERE tags IS NOT NULL","expect":"ok","ref":"sql-delete","note":"DELETE WHERE array column IS NOT NULL"}
+{"id":"dela0016","category":"delete","sql":"DELETE FROM s.t AS tbl WHERE tbl.id = 1","expect":"ok","ref":"sql-delete","note":"DELETE FROM with AS alias"}
+{"id":"dela0017","category":"delete","sql":"DELETE FROM s.t tbl WHERE tbl.name = 'x'","expect":"ok","ref":"sql-delete","note":"DELETE FROM with alias without AS keyword"}
+{"id":"dela0018","category":"delete","sql":"DELETE FROM ONLY s.t WHERE id = 1","expect":"ok","ref":"sql-delete","note":"DELETE FROM ONLY (exclude descendants)"}
+{"id":"dela0019","category":"delete","sql":"DELETE FROM ONLY s.parent WHERE id = 1","expect":"ok","ref":"sql-delete","note":"DELETE FROM ONLY on parent table with inheritance"}
+{"id":"dela0020","category":"delete","sql":"DELETE FROM s.parent WHERE id = 1","expect":"ok","ref":"sql-delete","note":"DELETE from parent table (includes child rows)"}
+{"id":"dela0021","category":"delete","sql":"DELETE FROM s.t * WHERE id = 1","expect":"ok","ref":"sql-delete","note":"DELETE FROM with explicit * (include descendants)"}
+{"id":"dela0022","category":"delete","sql":"DELETE FROM s.parent * WHERE id = 1","expect":"ok","ref":"sql-delete","note":"DELETE FROM parent* (explicit descendant inclusion)"}
+{"id":"dela0023","category":"delete","sql":"DELETE FROM s.t WHERE id = 1 RETURNING *","expect":"ok","ref":"sql-delete","note":"DELETE RETURNING *"}
+{"id":"dela0024","category":"delete","sql":"DELETE FROM s.t WHERE id = 1 RETURNING id","expect":"ok","ref":"sql-delete","note":"DELETE RETURNING single column"}
+{"id":"dela0025","category":"delete","sql":"DELETE FROM s.t WHERE id = 1 RETURNING id, name","expect":"ok","ref":"sql-delete","note":"DELETE RETURNING multiple columns"}
+{"id":"dela0026","category":"delete","sql":"DELETE FROM s.t WHERE id = 1 RETURNING id AS deleted_id, name AS deleted_name","expect":"ok","ref":"sql-delete","note":"DELETE RETURNING with column aliases"}
+{"id":"dela0027","category":"delete","sql":"DELETE FROM s.t WHERE id = 1 RETURNING val * 2 AS doubled","expect":"ok","ref":"sql-delete","note":"DELETE RETURNING expression"}
+{"id":"dela0028","category":"delete","sql":"DELETE FROM s.t WHERE id = 1 RETURNING id, name, val, qty, flag","expect":"ok","ref":"sql-delete","note":"DELETE RETURNING several columns"}
+{"id":"dela0029","category":"delete","sql":"DELETE FROM s.t USING s.t2 WHERE s.t.id = s.t2.t_id AND s.t2.label = 'drop'","expect":"ok","ref":"sql-delete","note":"DELETE USING another table in WHERE"}
+{"id":"dela0030","category":"delete","sql":"DELETE FROM s.t2 USING s.t WHERE s.t2.t_id = s.t.id AND s.t.flag = true","expect":"ok","ref":"sql-delete","note":"DELETE USING references target's related table"}
+{"id":"dela0031","category":"delete","sql":"DELETE FROM s.t AS a USING s.t2 AS b WHERE a.id = b.t_id AND b.amount > 0","expect":"ok","ref":"sql-delete","note":"DELETE USING with aliases on both tables"}
+{"id":"dela0032","category":"delete","sql":"DELETE FROM s.t USING s.t2 WHERE s.t.id = s.t2.t_id RETURNING s.t.id, s.t2.label","expect":"ok","ref":"sql-delete","note":"DELETE USING with RETURNING referencing USING table column"}
+{"id":"dela0033","category":"delete","sql":"DELETE FROM s.t WHERE id IN (SELECT t_id FROM s.t2 WHERE amount > 50)","expect":"ok","ref":"sql-delete","note":"DELETE WHERE IN subquery"}
+{"id":"dela0034","category":"delete","sql":"DELETE FROM s.t WHERE EXISTS (SELECT 1 FROM s.t2 WHERE s.t2.t_id = s.t.id)","expect":"ok","ref":"sql-delete","note":"DELETE WHERE EXISTS correlated subquery"}
+{"id":"dela0035","category":"delete","sql":"DELETE FROM s.t WHERE NOT EXISTS (SELECT 1 FROM s.t2 WHERE s.t2.t_id = s.t.id)","expect":"ok","ref":"sql-delete","note":"DELETE WHERE NOT EXISTS"}
+{"id":"dela0036","category":"delete","sql":"DELETE FROM s.t WHERE id = ANY(ARRAY[1,2,3]::bigint[])","expect":"ok","ref":"sql-delete","note":"DELETE WHERE id = ANY(array)"}
+{"id":"dela0037","category":"delete","sql":"DELETE FROM s.t WHERE id = ALL(ARRAY[1]::bigint[])","expect":"ok","ref":"sql-delete","note":"DELETE WHERE id = ALL(array)"}
+{"id":"dela0038","category":"delete","sql":"WITH to_del AS (SELECT id FROM s.t WHERE val IS NULL) DELETE FROM s.t USING to_del WHERE s.t.id = to_del.id","expect":"ok","ref":"sql-delete","note":"DELETE with CTE (WITH clause)"}
+{"id":"dela0039","category":"delete","sql":"WITH d AS (DELETE FROM s.t2 WHERE amount < 0 RETURNING t_id) SELECT * FROM d","expect":"ok","ref":"sql-delete","note":"DELETE inside CTE with RETURNING used in outer SELECT"}
+{"id":"dela0040","category":"delete","sql":"WITH RECURSIVE r AS (SELECT id FROM s.t WHERE id = 1 UNION ALL SELECT t.id FROM s.t t JOIN r ON t.id = r.id + 1 WHERE t.id < 5) DELETE FROM s.t WHERE id IN (SELECT id FROM r)","expect":"ok","ref":"sql-delete","note":"DELETE with recursive CTE in WITH"}
+{"id":"dela0041","category":"delete","sql":"DELETE FROM s.t WHERE id = (SELECT min(id) FROM s.t)","expect":"ok","ref":"sql-delete","note":"DELETE WHERE scalar subquery"}
+{"id":"dela0042","category":"delete","sql":"DELETE FROM s.t WHERE (name, qty) IN (SELECT label, 0 FROM s.t2)","expect":"ok","ref":"sql-delete","note":"DELETE WHERE row-constructor IN subquery"}
+{"id":"dela0043","category":"delete","sql":"DELETE FROM s.t2 WHERE t_id IS NULL","expect":"ok","ref":"sql-delete","note":"DELETE WHERE FK column IS NULL"}
+{"id":"dela0044","category":"delete","sql":"DELETE FROM s.t WHERE created_at < now() - interval '1 year'","expect":"ok","ref":"sql-delete","note":"DELETE WHERE timestamp comparison with interval"}
+{"id":"dela0045","category":"delete","sql":"DELETE FROM s.t WHERE data IS NOT NULL","expect":"ok","ref":"sql-delete","note":"DELETE WHERE jsonb column IS NOT NULL"}
+{"id":"dela0046","category":"delete","sql":"DELETE FROM s.t WHERE data @> '{\"active\": false}'::jsonb","expect":"ok","ref":"sql-delete","note":"DELETE WHERE jsonb containment operator"}
+{"id":"dela0047","category":"delete","sql":"DELETE FROM s.t WHERE tags && ARRAY['a','b']","expect":"ok","ref":"sql-delete","note":"DELETE WHERE array overlap operator"}
+{"id":"dela0048","category":"delete","sql":"DELETE FROM s.t WHERE 'x' = ANY(tags)","expect":"ok","ref":"sql-delete","note":"DELETE WHERE ANY(array column)"}
+{"id":"dela0049","category":"delete","sql":"DELETE FROM s.t WHERE span @> 5","expect":"ok","ref":"sql-delete","note":"DELETE WHERE range containment"}
+{"id":"dela0050","category":"delete","sql":"DELETE FROM s.t WHERE NOT flag","expect":"ok","ref":"sql-delete","note":"DELETE WHERE NOT boolean"}
+{"id":"dela0051","category":"delete","sql":"DELETE FROM s.t WHERE (flag IS TRUE)","expect":"ok","ref":"sql-delete","note":"DELETE WHERE IS TRUE predicate"}
+{"id":"dela0052","category":"delete","sql":"DELETE FROM s.t WHERE (flag IS FALSE)","expect":"ok","ref":"sql-delete","note":"DELETE WHERE IS FALSE predicate"}
+{"id":"dela0053","category":"delete","sql":"DELETE FROM s.t WHERE id > 0 RETURNING OLD.*","expect":"ok","ref":"sql-delete","note":"DELETE RETURNING OLD.* (PG18 new syntax)"}
+{"id":"dela0054","category":"delete","sql":"DELETE FROM s.t WHERE id > 0 RETURNING NEW.*","expect":"ok","ref":"sql-delete","note":"DELETE RETURNING NEW.* (always NULL for DELETE)"}
+{"id":"dela0055","category":"delete","sql":"DELETE FROM s.t WHERE id > 0 RETURNING WITH (OLD AS before) before.id","expect":"ok","ref":"sql-delete","note":"DELETE RETURNING WITH OLD AS alias"}
+{"id":"dela0056","category":"delete","sql":"DELETE FROM s.t WHERE id > 0 RETURNING WITH (NEW AS after) after.name","expect":"ok","ref":"sql-delete","note":"DELETE RETURNING WITH NEW AS alias"}
+{"id":"dela0057","category":"delete","sql":"DELETE FROM s.t WHERE id > 0 RETURNING WITH (OLD AS o, NEW AS n) o.id, n.name","expect":"ok","ref":"sql-delete","note":"DELETE RETURNING WITH multiple OLD/NEW aliases"}
+{"id":"dela0058","category":"delete","sql":"DELETE FROM s.t USING s.t2, s.mv WHERE s.t.id = s.t2.t_id","expect":"ok","ref":"sql-delete","note":"DELETE USING multiple items in USING list"}
+{"id":"dela0059","category":"delete","sql":"DELETE FROM s.t AS x USING (SELECT id FROM s.t2 WHERE amount > 0) AS sub WHERE x.id = sub.id","expect":"ok","ref":"sql-delete","note":"DELETE USING subquery in USING clause"}
+{"id":"dela0060","category":"delete","sql":"DELETE FROM s.t WHERE s.f(qty) > 1","expect":"ok","ref":"sql-delete","note":"DELETE WHERE using user-defined function"}
+{"id":"dela0061","category":"delete","sql":"DELETE FROM s.t WHERE s.g(qty, 0) = 0","expect":"ok","ref":"sql-delete","note":"DELETE WHERE using two-arg UDF"}
+{"id":"dela0062","category":"delete","sql":"DELETE FROM s.t WHERE id = 0 RETURNING id, name, val, qty, flag, tags, data, status, created_at","expect":"ok","ref":"sql-delete","note":"DELETE RETURNING all named columns"}
+{"id":"dela0063","category":"delete","sql":"DELETE FROM s.t WHERE name ~ '^[A-Z]'","expect":"ok","ref":"sql-delete","note":"DELETE WHERE regex match operator"}
+{"id":"dela0064","category":"delete","sql":"DELETE FROM s.t WHERE name !~ '^[A-Z]'","expect":"ok","ref":"sql-delete","note":"DELETE WHERE regex not-match operator"}
+{"id":"dela0065","category":"delete","sql":"DELETE FROM s.t WHERE name ~* 'test'","expect":"ok","ref":"sql-delete","note":"DELETE WHERE case-insensitive regex"}
+{"id":"dela0066","category":"delete","sql":"DELETE FROM s.t WHERE val < 0 RETURNING -val AS abs_val","expect":"ok","ref":"sql-delete","note":"DELETE RETURNING unary minus expression"}
+{"id":"dela0067","category":"delete","sql":"DELETE FROM s.t WHERE id = 1 RETURNING CASE WHEN val > 0 THEN 'positive' ELSE 'zero_or_neg' END AS sign","expect":"ok","ref":"sql-delete","note":"DELETE RETURNING CASE expression"}
+{"id":"dela0068","category":"delete","sql":"DELETE FROM s.t WHERE id = 1 RETURNING coalesce(val, 0) AS safe_val","expect":"ok","ref":"sql-delete","note":"DELETE RETURNING COALESCE expression"}
+{"id":"dela0069","category":"delete","sql":"DELETE FROM s.t WHERE id = 1 RETURNING now() AS deleted_at","expect":"ok","ref":"sql-delete","note":"DELETE RETURNING function call"}
+{"id":"dela0070","category":"delete","sql":"DELETE FROM s.t WHERE qty < 0","expect":"ok","ref":"sql-delete","note":"DELETE WHERE integer column condition"}
+{"id":"dela0071","category":"delete","sql":"DELETE FROM ONLY s.t AS a WHERE a.val > 100","expect":"ok","ref":"sql-delete","note":"DELETE FROM ONLY with alias"}
+{"id":"dela0072","category":"delete","sql":"DELETE FROM ONLY s.parent * WHERE kind = 'x'","expect":"error","ref":"sql-delete","note":"ONLY and * together is a syntax error"}
+{"id":"dela0073","category":"delete","sql":"DELETE s.t WHERE id = 1","expect":"error","ref":"sql-delete","note":"missing FROM keyword (syntax error)"}
+{"id":"dela0074","category":"delete","sql":"DELETE FROM WHERE id = 1","expect":"error","ref":"sql-delete","note":"missing table name after FROM"}
+{"id":"dela0075","category":"delete","sql":"DELETE FROM s.t WHERE","expect":"error","ref":"sql-delete","note":"WHERE with no condition (syntax error)"}
+{"id":"dela0076","category":"delete","sql":"DELETE FROM s.t RETURNING","expect":"error","ref":"sql-delete","note":"RETURNING with no output expression (syntax error)"}
+{"id":"dela0077","category":"delete","sql":"DELETE FROM s.t USING WHERE id = 1","expect":"error","ref":"sql-delete","note":"USING with no table (syntax error)"}
+{"id":"dela0078","category":"delete","sql":"DELETE FROM s.t WHERE id = 1 WHERE name = 'x'","expect":"error","ref":"sql-delete","note":"duplicate WHERE clause (syntax error)"}
+{"id":"dela0079","category":"delete","sql":"DELETE FROM s.t USING s.t2 USING s.mv WHERE id = 1","expect":"error","ref":"sql-delete","note":"duplicate USING clause (syntax error)"}
+{"id":"dela0080","category":"delete","sql":"DELETE FROM s.nonexistent WHERE id = 1","expect":"error","ref":"sql-delete","note":"DELETE from non-existent table (semantic error)"}
+{"id":"dela0081","category":"delete","sql":"DELETE FROM s.t WHERE nosuchcol = 1","expect":"error","ref":"sql-delete","note":"DELETE WHERE non-existent column (semantic error)"}
+{"id":"dela0082","category":"delete","sql":"DELETE FROM s.v WHERE id = 1","expect":"ok","ref":"sql-delete","note":"DELETE from auto-updatable simple view (single table, no aggregates)"}
+{"id":"dela0083","category":"delete","sql":"DELETE FROM s.t WHERE id = 1 RETURNING nosuchcol","expect":"error","ref":"sql-delete","note":"RETURNING non-existent column (semantic error)"}
+{"id":"dela0084","category":"delete","sql":"FROM s.t DELETE WHERE id = 1","expect":"error","ref":"sql-delete","note":"FROM before DELETE keyword (syntax error)"}
+{"id":"dela0085","category":"delete","sql":"DELETE FROM s.t WHERE id = 1 AND","expect":"error","ref":"sql-delete","note":"incomplete AND condition (syntax error)"}
+{"id":"dela0086","category":"delete","sql":"DELETE FROM s.t WHERE id IN ()","expect":"error","ref":"sql-delete","note":"empty IN list (syntax error)"}
+{"id":"dela0087","category":"delete","sql":"DELETE FROM s.t ONLY WHERE id = 1","expect":"error","ref":"sql-delete","note":"ONLY after table name instead of before (syntax error)"}
+{"id":"dela0088","category":"delete","sql":"DELETE FROM s.t WHERE id = 1 RETURNING * AS x","expect":"error","ref":"sql-delete","note":"cannot alias * in RETURNING (syntax error)"}
+{"id":"dela0089","category":"delete","sql":"DELETE FROM s.t WHERE CURRENT OF no_such_cursor","expect":"error","ref":"sql-delete","note":"WHERE CURRENT OF non-existent cursor (semantic error)"}
+{"id":"dela0090","category":"delete","sql":"DELETE FROM s.t WHERE CURRENT OF","expect":"error","ref":"sql-delete","note":"WHERE CURRENT OF with no cursor name (syntax error)"}
+{"id":"dela0091","category":"delete","sql":"TRUNCATE s.t2","expect":"ok","ref":"sql-truncate","note":"basic TRUNCATE (no TABLE keyword)"}
+{"id":"dela0092","category":"delete","sql":"TRUNCATE TABLE s.t2","expect":"ok","ref":"sql-truncate","note":"TRUNCATE TABLE keyword form"}
+{"id":"dela0093","category":"delete","sql":"TRUNCATE s.t, s.t2","expect":"ok","ref":"sql-truncate","note":"TRUNCATE multiple tables"}
+{"id":"dela0094","category":"delete","sql":"TRUNCATE TABLE s.t, s.t2","expect":"ok","ref":"sql-truncate","note":"TRUNCATE TABLE multiple tables"}
+{"id":"dela0095","category":"delete","sql":"TRUNCATE s.t2 RESTART IDENTITY","expect":"ok","ref":"sql-truncate","note":"TRUNCATE RESTART IDENTITY"}
+{"id":"dela0096","category":"delete","sql":"TRUNCATE s.t2 CONTINUE IDENTITY","expect":"ok","ref":"sql-truncate","note":"TRUNCATE CONTINUE IDENTITY (explicit default)"}
+{"id":"dela0097","category":"delete","sql":"TRUNCATE s.t CASCADE","expect":"ok","ref":"sql-truncate","note":"TRUNCATE CASCADE"}
+{"id":"dela0098","category":"delete","sql":"TRUNCATE s.t2 RESTRICT","expect":"ok","ref":"sql-truncate","note":"TRUNCATE RESTRICT (explicit default, no FK referencing s.t2)"}
+{"id":"dela0099","category":"delete","sql":"TRUNCATE s.t RESTART IDENTITY CASCADE","expect":"ok","ref":"sql-truncate","note":"TRUNCATE RESTART IDENTITY CASCADE"}
+{"id":"dela0100","category":"delete","sql":"TRUNCATE s.t2 RESTART IDENTITY RESTRICT","expect":"ok","ref":"sql-truncate","note":"TRUNCATE RESTART IDENTITY RESTRICT"}
+{"id":"dela0101","category":"delete","sql":"TRUNCATE s.t CONTINUE IDENTITY CASCADE","expect":"ok","ref":"sql-truncate","note":"TRUNCATE CONTINUE IDENTITY CASCADE"}
+{"id":"dela0102","category":"delete","sql":"TRUNCATE s.t2 CONTINUE IDENTITY RESTRICT","expect":"ok","ref":"sql-truncate","note":"TRUNCATE CONTINUE IDENTITY RESTRICT"}
+{"id":"dela0103","category":"delete","sql":"TRUNCATE TABLE s.t RESTART IDENTITY CASCADE","expect":"ok","ref":"sql-truncate","note":"TRUNCATE TABLE with all options"}
+{"id":"dela0104","category":"delete","sql":"TRUNCATE TABLE s.t, s.t2 RESTART IDENTITY CASCADE","expect":"ok","ref":"sql-truncate","note":"TRUNCATE TABLE multiple tables with all options"}
+{"id":"dela0105","category":"delete","sql":"TRUNCATE ONLY s.t2","expect":"ok","ref":"sql-truncate","note":"TRUNCATE ONLY (exclude descendants, no FK referencing s.t2)"}
+{"id":"dela0106","category":"delete","sql":"TRUNCATE ONLY s.parent","expect":"ok","ref":"sql-truncate","note":"TRUNCATE ONLY parent (no child rows)"}
+{"id":"dela0107","category":"delete","sql":"TRUNCATE s.parent *","expect":"ok","ref":"sql-truncate","note":"TRUNCATE with * (include descendants)"}
+{"id":"dela0108","category":"delete","sql":"TRUNCATE ONLY s.t2 RESTART IDENTITY","expect":"ok","ref":"sql-truncate","note":"TRUNCATE ONLY with RESTART IDENTITY"}
+{"id":"dela0109","category":"delete","sql":"TRUNCATE ONLY s.t CASCADE","expect":"ok","ref":"sql-truncate","note":"TRUNCATE ONLY with CASCADE"}
+{"id":"dela0110","category":"delete","sql":"TRUNCATE TABLE ONLY s.t2","expect":"ok","ref":"sql-truncate","note":"TRUNCATE TABLE ONLY form"}
+{"id":"dela0111","category":"delete","sql":"TRUNCATE TABLE ONLY s.parent RESTART IDENTITY CASCADE","expect":"ok","ref":"sql-truncate","note":"TRUNCATE TABLE ONLY with all options"}
+{"id":"dela0112","category":"delete","sql":"TRUNCATE s.t2 CASCADE","expect":"ok","ref":"sql-truncate","note":"TRUNCATE child table with CASCADE"}
+{"id":"dela0113","category":"delete","sql":"TRUNCATE nonexistent_table","expect":"error","ref":"sql-truncate","note":"TRUNCATE non-existent table (semantic error)"}
+{"id":"dela0114","category":"delete","sql":"TRUNCATE s.t WHERE id = 1","expect":"error","ref":"sql-truncate","note":"TRUNCATE does not support WHERE clause (syntax error)"}
+{"id":"dela0115","category":"delete","sql":"TRUNCATE s.t RETURNING *","expect":"error","ref":"sql-truncate","note":"TRUNCATE does not support RETURNING (syntax error)"}
+{"id":"dela0116","category":"delete","sql":"TRUNCATE RESTART IDENTITY s.t","expect":"error","ref":"sql-truncate","note":"RESTART IDENTITY before table name (syntax error)"}
+{"id":"dela0117","category":"delete","sql":"TRUNCATE s.t RESTART CONTINUE IDENTITY","expect":"error","ref":"sql-truncate","note":"both RESTART and CONTINUE IDENTITY (syntax error)"}
+{"id":"dela0118","category":"delete","sql":"TRUNCATE s.t CASCADE RESTRICT","expect":"error","ref":"sql-truncate","note":"both CASCADE and RESTRICT (syntax error)"}
+{"id":"dela0119","category":"delete","sql":"TRUNCATE","expect":"error","ref":"sql-truncate","note":"TRUNCATE with no table name (syntax error)"}
+{"id":"dela0120","category":"delete","sql":"WITH del AS (DELETE FROM s.t WHERE flag = false RETURNING id, name) SELECT id, name FROM del","expect":"ok","ref":"sql-delete","note":"data-modifying CTE: DELETE in WITH, SELECT from CTE"}
+{"id":"dela0121","category":"delete","sql":"WITH del AS (DELETE FROM s.t2 WHERE amount = 0 RETURNING t_id) DELETE FROM s.t WHERE id IN (SELECT t_id FROM del)","expect":"ok","ref":"sql-delete","note":"chained data-modifying CTEs: DELETE in WITH feeds outer DELETE"}
+{"id":"dela0122","category":"delete","sql":"DELETE FROM s.t WHERE id = (SELECT id FROM s.t ORDER BY id LIMIT 1)","expect":"ok","ref":"sql-delete","note":"DELETE WHERE scalar subquery with ORDER BY and LIMIT"}
+{"id":"dela0123","category":"delete","sql":"DELETE FROM s.t WHERE id IN (SELECT t_id FROM s.t2 GROUP BY t_id HAVING count(*) > 1)","expect":"ok","ref":"sql-delete","note":"DELETE WHERE IN subquery with GROUP BY HAVING"}
+{"id":"dela0124","category":"delete","sql":"DELETE FROM s.t AS t1 USING s.t AS t2 WHERE t1.id != t2.id AND t1.name = t2.name","expect":"ok","ref":"sql-delete","note":"DELETE self-join via USING with alias"}
+{"id":"dela0125","category":"delete","sql":"DELETE FROM s.t WHERE id = 1 RETURNING id, (SELECT count(*) FROM s.t2 WHERE t_id = s.t.id) AS child_count","expect":"ok","ref":"sql-delete","note":"DELETE RETURNING with correlated subquery in output"}
+{"id":"dela0126","category":"delete","sql":"DELETE FROM s.t WHERE val > (SELECT avg(val) FROM s.t)","expect":"ok","ref":"sql-delete","note":"DELETE WHERE compared to aggregate subquery"}
+{"id":"dela0127","category":"delete","sql":"DELETE FROM s.t WHERE id = 1 RETURNING *; SELECT 1","expect":"ok","ref":"sql-delete","note":"DELETE RETURNING followed by another statement"}
+{"id":"dela0128","category":"delete","sql":"DELETE FROM s.t WHERE status IN ('sad', 'happy')","expect":"ok","ref":"sql-delete","note":"DELETE WHERE enum IN list"}
+{"id":"dela0129","category":"delete","sql":"DELETE FROM s.t WHERE status = ANY(ARRAY['sad','ok']::s.mood[])","expect":"ok","ref":"sql-delete","note":"DELETE WHERE enum = ANY(array cast)"}
+{"id":"dela0130","category":"delete","sql":"DELETE FROM s.t WHERE (home).city = 'NY'","expect":"ok","ref":"sql-delete","note":"DELETE WHERE composite type field access"}
+{"id":"dela0131","category":"delete","sql":"DELETE FROM s.t WHERE id = 1 RETURNING (home).street AS street","expect":"ok","ref":"sql-delete","note":"DELETE RETURNING composite type field"}
+{"id":"dela0132","category":"delete","sql":"DELETE FROM s.t WHERE id = 1 RETURNING home","expect":"ok","ref":"sql-delete","note":"DELETE RETURNING composite column"}
+{"id":"dela0133","category":"delete","sql":"DELETE FROM s.events WHERE occurred = '2024-06-01'","expect":"ok","ref":"sql-delete","note":"DELETE from partitioned table (routes to partition)"}
+{"id":"dela0134","category":"delete","sql":"DELETE FROM s.events_2024 WHERE occurred = '2024-06-01'","expect":"ok","ref":"sql-delete","note":"DELETE from a specific partition directly"}
+{"id":"dela0135","category":"delete","sql":"DELETE FROM ONLY s.events WHERE occurred = '2024-06-01'","expect":"ok","ref":"sql-delete","note":"DELETE ONLY from partitioned table parent"}
+{"id":"dela0136","category":"delete","sql":"DELETE FROM s.t WHERE id = 1 RETURNING id old_id","expect":"ok","ref":"sql-delete","note":"RETURNING column alias without AS keyword"}
+{"id":"dela0137","category":"delete","sql":"DELETE FROM s.t WHERE val > 0 RETURNING id, name ORDER BY id","expect":"error","ref":"sql-delete","note":"RETURNING does not support ORDER BY (syntax error)"}
+{"id":"dela0138","category":"delete","sql":"DELETE FROM s.t WHERE val > 0 RETURNING id LIMIT 1","expect":"error","ref":"sql-delete","note":"RETURNING does not support LIMIT (syntax error)"}
+{"id":"dela0139","category":"delete","sql":"DELETE FROM s.t USING (VALUES (1),(2),(3)) AS v(id) WHERE s.t.id = v.id","expect":"ok","ref":"sql-delete","note":"DELETE USING VALUES list as from_item"}
+{"id":"dela0140","category":"delete","sql":"DELETE FROM s.t USING s.rows_f() AS rf WHERE s.t.id = rf.id","expect":"ok","ref":"sql-delete","note":"DELETE USING set-returning function as from_item"}
+{"id":"dela0141","category":"delete","sql":"DELETE FROM s.t2 USING s.t JOIN s.t2 t22 ON s.t.id = t22.t_id WHERE s.t2.id = t22.id","expect":"ok","ref":"sql-delete","note":"DELETE USING joined tables (JOIN in from_item)"}
+{"id":"dela0142","category":"delete","sql":"DELETE FROM s.t WHERE id = 1 RETURNING id, name; DELETE FROM s.t2 WHERE t_id = 1","expect":"ok","ref":"sql-delete","note":"two DELETE statements in one sql field"}
+{"id":"dela0143","category":"delete","sql":"/* comment */ DELETE FROM s.t WHERE id = 1","expect":"ok","ref":"sql-delete","note":"DELETE preceded by block comment"}
+{"id":"dela0144","category":"delete","sql":"-- line comment\nDELETE FROM s.t WHERE id = 1","expect":"ok","ref":"sql-delete","note":"DELETE preceded by line comment"}
+{"id":"dela0145","category":"delete","sql":"DELETE FROM s.t WHERE id = 1 -- inline comment\n","expect":"ok","ref":"sql-delete","note":"DELETE with inline trailing comment"}
+{"id":"dela0146","category":"delete","sql":"delete from s.t where id = 1","expect":"ok","ref":"sql-delete","note":"DELETE all lowercase (keyword case-insensitivity)"}
+{"id":"dela0147","category":"delete","sql":"Delete From s.t Where id = 1","expect":"ok","ref":"sql-delete","note":"DELETE mixed case keywords"}
+{"id":"dela0148","category":"delete","sql":"DELETE FROM s.t WHERE qty <> 0","expect":"ok","ref":"sql-delete","note":"DELETE WHERE not-equal (<>)"}
+{"id":"dela0149","category":"delete","sql":"DELETE FROM s.t WHERE qty != 0","expect":"ok","ref":"sql-delete","note":"DELETE WHERE not-equal (!=)"}
+{"id":"dela0150","category":"delete","sql":"DELETE FROM s.t WHERE id > 0 RETURNING WITH (OLD AS o) o.id, o.name, o.val","expect":"ok","ref":"sql-delete","note":"DELETE RETURNING WITH OLD alias multiple columns"}
+{"id":"dela0151","category":"delete","sql":"DELETE FROM s.t WHERE id > 0 RETURNING WITH (OLD AS deleted_row) deleted_row.*","expect":"ok","ref":"sql-delete","note":"DELETE RETURNING WITH OLD alias wildcard"}
+{"id":"dela0152","category":"delete","sql":"DELETE FROM s.t USING (SELECT DISTINCT t_id FROM s.t2) AS sub WHERE s.t.id = sub.t_id","expect":"ok","ref":"sql-delete","note":"DELETE USING subquery with DISTINCT"}
+{"id":"dela0153","category":"delete","sql":"DELETE FROM s.t WHERE id IN (WITH src AS (SELECT id FROM s.t WHERE val < 0) SELECT id FROM src)","expect":"ok","ref":"sql-delete","note":"DELETE WHERE IN subquery that itself uses a CTE"}
+{"id":"dela0154","category":"delete","sql":"DELETE FROM s.t WHERE val::text LIKE '1%'","expect":"ok","ref":"sql-delete","note":"DELETE WHERE with explicit type cast in condition"}
+{"id":"dela0155","category":"delete","sql":"DELETE FROM s.t WHERE id = 1 RETURNING id::text AS id_text","expect":"ok","ref":"sql-delete","note":"DELETE RETURNING with cast in output expression"}
+{"id":"dela0156","category":"delete","sql":"DELETE FROM s.t WHERE id BETWEEN 1 AND 10 RETURNING count(*) OVER () AS total","expect":"error","ref":"sql-delete","note":"window functions are not allowed in RETURNING (semantic error)"}
+{"id":"dela0157","category":"delete","sql":"DELETE FROM s.t WHERE id = 1 AND val IS NOT NULL AND qty >= 0 AND flag = false AND status <> 'sad'","expect":"ok","ref":"sql-delete","note":"DELETE WHERE with many AND conditions across different types"}
+{"id":"dela0158","category":"delete","sql":"DELETE FROM s.t WHERE (id, name) = (1, 'x')","expect":"ok","ref":"sql-delete","note":"DELETE WHERE row constructor equality"}
+{"id":"dela0159","category":"delete","sql":"DELETE FROM s.t WHERE id ISNULL","expect":"ok","ref":"sql-delete","note":"DELETE WHERE using ISNULL shorthand"}
+{"id":"dela0160","category":"delete","sql":"DELETE FROM s.t WHERE id NOTNULL","expect":"ok","ref":"sql-delete","note":"DELETE WHERE using NOTNULL shorthand"}
+{"id":"dela0161","category":"delete","sql":"DELETE FROM s.t WHERE id = 1 RETURNING id, CASE status WHEN 'ok' THEN 1 WHEN 'happy' THEN 2 ELSE 0 END AS mood_code","expect":"ok","ref":"sql-delete","note":"DELETE RETURNING simple CASE expression on enum"}
+{"id":"dela0162","category":"delete","sql":"DELETE FROM s.t WHERE s.f(id::integer) > 0","expect":"ok","ref":"sql-delete","note":"DELETE WHERE UDF applied to PK with cast"}
+{"id":"dela0163","category":"delete","sql":"DELETE FROM s.t USING s.t2 WHERE s.t.id = s.t2.t_id AND s.t2.amount BETWEEN 10 AND 100 RETURNING s.t.id, s.t2.amount","expect":"ok","ref":"sql-delete","note":"DELETE USING with BETWEEN in WHERE and RETURNING multi-table cols"}
+{"id":"dela0164","category":"delete","sql":"TRUNCATE s.events CASCADE","expect":"ok","ref":"sql-truncate","note":"TRUNCATE partitioned table with CASCADE"}
+{"id":"dela0165","category":"delete","sql":"TRUNCATE s.events RESTART IDENTITY CASCADE","expect":"ok","ref":"sql-truncate","note":"TRUNCATE partitioned table RESTART IDENTITY CASCADE"}
+{"id":"dela0166","category":"delete","sql":"DELETE FROM s.t WHERE id = 1 RETURNING WITH () id","expect":"error","ref":"sql-delete","note":"RETURNING WITH empty alias list (syntax error)"}
+{"id":"dela0167","category":"delete","sql":"DELETE FROM s.t WHERE id = 1 RETURNING WITH (OLD) id","expect":"error","ref":"sql-delete","note":"RETURNING WITH OLD without AS alias (syntax error)"}
+{"id":"dela0168","category":"delete","sql":"DELETE FROM s.t WHERE id = 1 RETURNING WITH (OLD AS) id","expect":"error","ref":"sql-delete","note":"RETURNING WITH OLD AS with no alias name (syntax error)"}
+{"id":"dela0169","category":"delete","sql":"DELETE FROM s.t WHERE true","expect":"ok","ref":"sql-delete","note":"DELETE WHERE literal true (deletes all rows)"}
+{"id":"dela0170","category":"delete","sql":"DELETE FROM s.t WHERE false","expect":"ok","ref":"sql-delete","note":"DELETE WHERE literal false (deletes no rows)"}

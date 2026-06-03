@@ -1,0 +1,30 @@
+{"id":"srfb0001","category":"srf-setreturning","sql":"SELECT generate_series(1, 5)","expect":"ok","ref":"functions-srf","note":"generate_series integer basic form"}
+{"id":"srfb0002","category":"srf-setreturning","sql":"SELECT generate_series(1, 10, 2)","expect":"ok","ref":"functions-srf","note":"generate_series integer with step"}
+{"id":"srfb0003","category":"srf-setreturning","sql":"SELECT generate_series(10, 1, -1)","expect":"ok","ref":"functions-srf","note":"generate_series integer descending step"}
+{"id":"srfb0004","category":"srf-setreturning","sql":"SELECT generate_series(1.0, 5.0, 0.5)","expect":"ok","ref":"functions-srf","note":"generate_series numeric with fractional step"}
+{"id":"srfb0005","category":"srf-setreturning","sql":"SELECT generate_series('2024-01-01'::timestamp, '2024-01-05'::timestamp, '1 day'::interval)","expect":"ok","ref":"functions-srf","note":"generate_series timestamp with interval step"}
+{"id":"srfb0006","category":"srf-setreturning","sql":"SELECT generate_series('2024-01-01'::timestamptz, '2024-01-03'::timestamptz, '12 hours'::interval)","expect":"ok","ref":"functions-srf","note":"generate_series timestamptz with interval step"}
+{"id":"srfb0007","category":"srf-setreturning","sql":"SELECT * FROM generate_series(1, 3)","expect":"ok","ref":"functions-srf","note":"generate_series in FROM clause"}
+{"id":"srfb0008","category":"srf-setreturning","sql":"SELECT * FROM generate_series(1, 3) AS g(n)","expect":"ok","ref":"functions-srf","note":"generate_series in FROM with column alias"}
+{"id":"srfb0009","category":"srf-setreturning","sql":"SELECT n FROM generate_series(1, 5) AS gs(n) WHERE n > 2","expect":"ok","ref":"functions-srf","note":"generate_series column alias used in WHERE"}
+{"id":"srfb0010","category":"srf-setreturning","sql":"SELECT unnest(ARRAY[1,2,3])","expect":"ok","ref":"functions-srf","note":"unnest single array in SELECT target list"}
+{"id":"srfb0011","category":"srf-setreturning","sql":"SELECT * FROM unnest(ARRAY['a','b','c']) AS u(val)","expect":"ok","ref":"functions-srf","note":"unnest in FROM with column alias"}
+{"id":"srfb0012","category":"srf-setreturning","sql":"SELECT * FROM unnest(ARRAY[1,2,3]) WITH ORDINALITY AS u(val, ord)","expect":"ok","ref":"functions-srf","note":"unnest WITH ORDINALITY"}
+{"id":"srfb0013","category":"srf-setreturning","sql":"SELECT unnest(ARRAY[1,2,3]), unnest(ARRAY['a','b','c'])","expect":"ok","ref":"functions-srf","note":"multiple unnest in target list parallel expansion"}
+{"id":"srfb0014","category":"srf-setreturning","sql":"SELECT * FROM unnest(ARRAY[10,20,30], ARRAY['x','y','z']) AS u(num, lbl)","expect":"ok","ref":"functions-srf","note":"unnest multiple arrays in FROM (parallel)"}
+{"id":"srfb0015","category":"srf-setreturning","sql":"SELECT * FROM unnest(ARRAY[1,2,3], ARRAY['a','b']) AS u(n, l)","expect":"ok","ref":"functions-srf","note":"unnest two arrays of different lengths (pads with NULL)"}
+{"id":"srfb0016","category":"srf-setreturning","sql":"SELECT generate_subscripts(ARRAY[[1,2],[3,4]], 1)","expect":"ok","ref":"functions-srf","note":"generate_subscripts 2D array dim 1"}
+{"id":"srfb0017","category":"srf-setreturning","sql":"SELECT generate_subscripts(ARRAY[[1,2],[3,4]], 2)","expect":"ok","ref":"functions-srf","note":"generate_subscripts 2D array dim 2"}
+{"id":"srfb0018","category":"srf-setreturning","sql":"SELECT * FROM generate_subscripts(ARRAY['a','b','c'], 1) AS gs(idx)","expect":"ok","ref":"functions-srf","note":"generate_subscripts in FROM with alias"}
+{"id":"srfb0019","category":"srf-setreturning","sql":"SELECT * FROM ROWS FROM (generate_series(1,3), unnest(ARRAY['a','b','c'])) AS t(n, c)","expect":"ok","ref":"functions-srf","note":"ROWS FROM combining two SRFs with trailing alias"}
+{"id":"srfb0020","category":"srf-setreturning","sql":"SELECT * FROM ROWS FROM (generate_series(1,3), unnest(ARRAY['x','y','z'])) AS t(n, c)","expect":"ok","ref":"functions-srf","note":"ROWS FROM with trailing column alias list"}
+{"id":"srfb0021","category":"srf-setreturning","sql":"SELECT * FROM ROWS FROM (generate_series(1,5), unnest(ARRAY[10,20])) WITH ORDINALITY AS t(a, b, ord)","expect":"ok","ref":"functions-srf","note":"ROWS FROM WITH ORDINALITY"}
+{"id":"srfb0022","category":"srf-setreturning","sql":"SELECT s.rows_f()","expect":"ok","ref":"functions-srf","note":"user-defined SETOF function in target list"}
+{"id":"srfb0023","category":"srf-setreturning","sql":"SELECT * FROM s.rows_f()","expect":"ok","ref":"functions-srf","note":"user-defined SETOF function in FROM"}
+{"id":"srfb0024","category":"srf-setreturning","sql":"SELECT t.id, sub.n FROM s.t t, LATERAL generate_series(1, t.qty) AS sub(n)","expect":"ok","ref":"functions-srf","note":"LATERAL SRF referencing outer column"}
+{"id":"srfb0025","category":"srf-setreturning","sql":"SELECT * FROM s.t, LATERAL unnest(s.t.tags) AS tag WHERE tag LIKE 'a%'","expect":"ok","ref":"functions-srf","note":"LATERAL unnest of array column from outer table"}
+{"id":"srfb0026","category":"srf-setreturning","sql":"SELECT * FROM jsonb_array_elements('[1,2,3]'::jsonb)","expect":"ok","ref":"functions-srf","note":"jsonb_array_elements in FROM"}
+{"id":"srfb0027","category":"srf-setreturning","sql":"SELECT * FROM jsonb_each('{\"a\":1,\"b\":2}'::jsonb)","expect":"ok","ref":"functions-srf","note":"jsonb_each in FROM returning key-value pairs"}
+{"id":"srfb0028","category":"srf-setreturning","sql":"SELECT * FROM regexp_split_to_table('one,two,three', ',')","expect":"ok","ref":"functions-srf","note":"regexp_split_to_table in FROM"}
+{"id":"srfb0029","category":"srf-setreturning","sql":"SELECT generate_series(1, 5) WHERE generate_series(1,5) > 2","expect":"error","ref":"functions-srf","note":"SRF in WHERE clause is a syntax/semantic error"}
+{"id":"srfb0030","category":"srf-setreturning","sql":"SELECT generate_series()","expect":"error","ref":"functions-srf","note":"generate_series with no arguments - wrong arity"}
