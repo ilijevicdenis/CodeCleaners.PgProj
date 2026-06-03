@@ -56,4 +56,40 @@ public class ScriptGeneratorTests
 
         Assert.True(schemaPos < tablePos && tablePos < fkPos);
     }
+
+    [Fact]
+    public void Index_on_a_materialized_view_is_created_after_the_view()
+    {
+        // Regression: an index ON a matview was emitted at the table-index phase (65), before the
+        // matview (created with views at 75) existed → 42P01 on deploy. It must now follow the view.
+        var source = TestModel.Build("""
+            CREATE MATERIALIZED VIEW app.mv AS SELECT 1 AS x;
+            CREATE UNIQUE INDEX mv_pk ON app.mv (x);
+            """);
+        var script = new DeployScriptGenerator().Generate(new SchemaComparer().Compare(source, new DatabaseModel()));
+
+        var mvPos = script.IndexOf("CREATE MATERIALIZED VIEW", System.StringComparison.Ordinal);
+        var idxPos = script.IndexOf("CREATE UNIQUE INDEX", System.StringComparison.Ordinal);
+
+        Assert.True(mvPos >= 0 && idxPos >= 0, "expected both the matview and its index in the script");
+        Assert.True(mvPos < idxPos, "the materialized view must be created before the index on it");
+    }
+
+    [Fact]
+    public void Index_on_a_plain_table_still_precedes_views()
+    {
+        // The matview fix must not push ordinary table indexes (phase 65) past views (75).
+        var source = TestModel.Build("""
+            CREATE TABLE app.t (id int, name text);
+            CREATE INDEX t_name ON app.t (name);
+            CREATE VIEW app.v AS SELECT id FROM app.t;
+            """);
+        var script = new DeployScriptGenerator().Generate(new SchemaComparer().Compare(source, new DatabaseModel()));
+
+        var idxPos = script.IndexOf("CREATE INDEX", System.StringComparison.Ordinal);
+        var viewPos = script.IndexOf("CREATE OR REPLACE VIEW", System.StringComparison.Ordinal);
+        if (viewPos < 0) viewPos = script.IndexOf("CREATE VIEW", System.StringComparison.Ordinal);
+
+        Assert.True(idxPos >= 0 && viewPos >= 0 && idxPos < viewPos, "a table index should still come before views");
+    }
 }
