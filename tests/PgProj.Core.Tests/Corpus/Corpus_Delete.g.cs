@@ -263,9 +263,9 @@ public class Corpus_Delete
     public void dela0128() => CorpusAssert.Parses(@"DELETE FROM s.t WHERE status IN ('sad', 'happy')", "ok");
     [Fact]
     public void dela0129() => CorpusAssert.Parses(@"DELETE FROM s.t WHERE status = ANY(ARRAY['sad','ok']::s.mood[])", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dela0130() => CorpusAssert.Parses(@"DELETE FROM s.t WHERE (home).city = 'NY'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dela0131() => CorpusAssert.Parses(@"DELETE FROM s.t WHERE id = 1 RETURNING (home).street AS street", "ok");
     [Fact]
     public void dela0132() => CorpusAssert.Parses(@"DELETE FROM s.t WHERE id = 1 RETURNING home", "ok");

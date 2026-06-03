@@ -17,6 +17,7 @@ public sealed class PostfixExpr : Expr { public string Op { get; init; } = ""; p
 public sealed class CastExpr : Expr { public Expr Operand { get; init; } = null!; public string TypeText { get; init; } = ""; }
 public sealed class CollateExpr : Expr { public Expr Operand { get; init; } = null!; public string Collation { get; init; } = ""; }
 public sealed class SubscriptExpr : Expr { public Expr Operand { get; init; } = null!; public string IndexText { get; init; } = ""; }
+public sealed class FieldAccessExpr : Expr { public Expr Operand { get; init; } = null!; public string Field { get; init; } = ""; }  // (composite).field / (composite).*
 public sealed class RowExpr : Expr { public List<Expr> Items { get; } = new(); public bool ExplicitRow { get; init; } }
 public sealed class ArrayExpr : Expr { public List<Expr> Elements { get; } = new(); public SelectQuery? Subquery { get; init; } }
 public sealed class SubqueryExpr : Expr { public SelectQuery Query { get; init; } = null!; }

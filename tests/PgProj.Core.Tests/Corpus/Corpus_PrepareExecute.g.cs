@@ -183,7 +183,7 @@ public class Corpus_PrepareExecute
     public void prxa0088() => CorpusAssert.Parses(@"PREPARE q88 AS SELECT data->>'key' FROM s.t", "ok");
     [Fact]
     public void prxa0089() => CorpusAssert.Parses(@"PREPARE q89 (text) AS SELECT data->$1 FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void prxa0090() => CorpusAssert.Parses(@"PREPARE q90 AS SELECT (home).city FROM s.t", "ok");
     [Fact]
     public void prxa0091() => CorpusAssert.Parses(@"PREPARE q91 AS SELECT tags[1] FROM s.t", "ok");

@@ -136,7 +136,11 @@ public sealed partial class PgParser
             if (c.MatchWord("WITH") || c.MatchWord("WITHOUT")) { c.MatchWord("UNIQUE"); c.MatchWord("KEYS"); }
             return new IsCheckExpr { Operand = left, Not = not, What = "JSON" };
         }
-        throw new ParseException("expected NULL/TRUE/FALSE/UNKNOWN/DISTINCT FROM/DOCUMENT/JSON after IS", c.Here);
+        // IS [NOT] [NFC|NFD|NFKC|NFKD] NORMALIZED
+        if (c.AtAnyWord("NFC", "NFD", "NFKC", "NFKD") && c.Peek()?.IsWord("NORMALIZED") == true)
+        { c.Advance(); c.Advance(); return new IsCheckExpr { Operand = left, Not = not, What = "NORMALIZED" }; }
+        if (c.MatchWord("NORMALIZED")) return new IsCheckExpr { Operand = left, Not = not, What = "NORMALIZED" };
+        throw new ParseException("expected NULL/TRUE/FALSE/UNKNOWN/DISTINCT FROM/DOCUMENT/JSON/NORMALIZED after IS", c.Here);
     }
 
     // general (named/symbolic) binary operators: ||, @>, ->, ->>, #>, &, |, #, <<, >>, ~, !~, etc.
@@ -209,6 +213,9 @@ public sealed partial class PgParser
         while (true)
         {
             if (c.MatchOperator("::")) { e = new CastExpr { Operand = e, TypeText = ParseCastType(c) }; continue; }
+            // composite/row field access on a parenthesized or call result: (rowval).field / (rowval).*
+            if (c.AtSymbol('.') && e is RowExpr or SubqueryExpr or FuncCallExpr or CastExpr or FieldAccessExpr)
+            { c.Advance(); e = c.MatchSymbol('*') ? new FieldAccessExpr { Operand = e, Field = "*" } : new FieldAccessExpr { Operand = e, Field = c.ExpectIdentifier() }; continue; }
             if (c.AtSymbol('[')) { e = new SubscriptExpr { Operand = e, IndexText = Token.Render(CaptureBracket(c)) }; continue; }
             if (c.MatchWord("COLLATE")) { var (s, n) = ParseQualifiedName(c); e = new CollateExpr { Operand = e, Collation = s is null ? n : $"{s}.{n}" }; continue; }
             if (c.LookaheadWords("AT", "TIME", "ZONE")) { c.MatchWords("AT", "TIME", "ZONE"); e = new BinaryExpr { Op = "AT TIME ZONE", Left = e, Right = ParseAdditive(c) }; continue; }
@@ -305,6 +312,9 @@ public sealed partial class PgParser
             return row;
         }
         c.ExpectSymbol(')');
+        // (composite).field / (composite).*  — parenthesization disambiguates a row-value field access
+        if (c.AtSymbol('.'))
+        { c.Advance(); return c.MatchSymbol('*') ? new FieldAccessExpr { Operand = first, Field = "*" } : new FieldAccessExpr { Operand = first, Field = c.ExpectIdentifier() }; }
         return first;
     }
 
@@ -460,7 +470,7 @@ public sealed partial class PgParser
                 call.Args.Add(ParseExpression(c));
                 break;
             case "SUBSTRING":
-                call.Args.Add(ParseExpression(c));
+                call.Args.Add(ParseGeneralOp(c));             // below predicate level so SIMILAR isn't eaten as SIMILAR TO
                 if (c.MatchWord("FROM")) { call.Args.Add(ParseExpression(c)); if (c.MatchWord("FOR")) call.Args.Add(ParseExpression(c)); }
                 else if (c.MatchWord("FOR")) call.Args.Add(ParseExpression(c));
                 else while (c.MatchSymbol(',')) call.Args.Add(ParseExpression(c));

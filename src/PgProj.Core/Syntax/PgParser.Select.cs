@@ -285,8 +285,14 @@ public sealed partial class PgParser
         else rel.ColumnAliases.AddRange(ParseColumnNameList(c));
     }
 
-    private static bool IsFromBoundary(string w) =>
-        w.Equals("ON", StringComparison.OrdinalIgnoreCase) || w.Equals("USING", StringComparison.OrdinalIgnoreCase)
+    // Set while parsing a DML source/FROM/USING list, where a trailing RETURNING must not be
+    // swallowed as a table alias (FROM del RETURNING *). RETURNING is unreserved, so it stays a
+    // legal alias everywhere else.
+    private bool _returningIsAliasBoundary;
+
+    private bool IsFromBoundary(string w) =>
+        (_returningIsAliasBoundary && w.Equals("RETURNING", StringComparison.OrdinalIgnoreCase))
+        || w.Equals("ON", StringComparison.OrdinalIgnoreCase) || w.Equals("USING", StringComparison.OrdinalIgnoreCase)
         || w.Equals("WHERE", StringComparison.OrdinalIgnoreCase) || w.Equals("GROUP", StringComparison.OrdinalIgnoreCase)
         || w.Equals("HAVING", StringComparison.OrdinalIgnoreCase) || w.Equals("WINDOW", StringComparison.OrdinalIgnoreCase)
         || w.Equals("ORDER", StringComparison.OrdinalIgnoreCase) || w.Equals("LIMIT", StringComparison.OrdinalIgnoreCase)

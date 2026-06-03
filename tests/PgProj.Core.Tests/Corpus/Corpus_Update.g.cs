@@ -602,7 +602,7 @@ name = 'comment_ok'", "ok");
     public void updb0124() => CorpusAssert.Parses(@"UPDATE s.t SET name = 'x' WHERE created_at > '2020-01-01'::timestamptz", "ok");
     [Fact]
     public void updb0125() => CorpusAssert.Parses(@"UPDATE s.t SET name = 'x' WHERE span && int4range(1,5)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void updb0126() => CorpusAssert.Parses(@"UPDATE s.t SET val = 0 WHERE (home).city = 'NYC'", "ok");
     [Fact]
     public void updb0127() => CorpusAssert.Parses(@"UPDATE s.t SET data = jsonb_set(data, '{key}', '""val""') WHERE data IS NOT NULL", "ok");

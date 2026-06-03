@@ -73,8 +73,8 @@ public sealed partial class PgParser
             do { node.Columns.Add(CaptureIndexItem(c)); } while (c.MatchSymbol(','));
         c.ExpectSymbol(')');
 
-        if (c.MatchWord("NULLS")) { c.MatchWord("NOT"); c.ExpectWord("DISTINCT"); }   // NULLS [NOT] DISTINCT
         if (c.MatchWord("INCLUDE") && c.AtSymbol('(')) CaptureBalancedParens(c);
+        if (c.MatchWord("NULLS")) { c.MatchWord("NOT"); c.ExpectWord("DISTINCT"); }   // INCLUDE precedes NULLS [NOT] DISTINCT
         if (c.MatchWord("WITH") && c.AtSymbol('(')) CaptureBalancedParens(c);
         if (c.MatchWord("TABLESPACE")) c.ExpectIdentifier();
         if (c.MatchWord("WHERE")) node.Where = Token.Render(CaptureToEndTokens(c));

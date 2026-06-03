@@ -103,7 +103,7 @@ public class Corpus_SelectCte
     public void selca0048() => CorpusAssert.Parses(@"WITH upd AS (UPDATE s.t SET qty = qty + 1 WHERE id = -999 RETURNING id, qty) SELECT * FROM upd", "ok");
     [Fact]
     public void selca0049() => CorpusAssert.Parses(@"WITH ins AS (INSERT INTO s.t(name, qty) VALUES ('a', 1) RETURNING id), sel AS (SELECT id FROM ins) SELECT * FROM sel", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selca0050() => CorpusAssert.Parses(@"WITH del AS (DELETE FROM s.t WHERE id = -999 RETURNING id), ins AS (INSERT INTO s.t2(t_id, label) SELECT id, 'moved' FROM del RETURNING *) SELECT * FROM ins", "ok");
     [Fact]
     public void selca0051() => CorpusAssert.Parses(@"WITH upd AS (UPDATE s.t SET name = 'updated' WHERE id = -999 RETURNING id, name), logged AS (SELECT id, name, now() AS ts FROM upd) SELECT * FROM logged", "ok");
@@ -205,13 +205,13 @@ cte AS (SELECT 1 AS n) SELECT * FROM cte", "ok");
     public void selca0098() => CorpusAssert.Parses(@"WITH RECURSIVE r(n) AS NOT MATERIALIZED (SELECT 1 UNION ALL SELECT n+1 FROM r WHERE n < 5) SELECT * FROM r", "ok");
     [Fact]
     public void selca0099() => CorpusAssert.Parses(@"WITH cte AS (SELECT id, name FROM s.t WHERE status = 'ok') SELECT * FROM cte", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selca0100() => CorpusAssert.Parses(@"WITH cte AS (SELECT id, (home).city FROM s.t) SELECT * FROM cte WHERE city IS NOT NULL", "ok");
     [Fact]
     public void selca0101() => CorpusAssert.Parses(@"WITH cte AS (SELECT id, data FROM s.t WHERE data IS NOT NULL) SELECT id, data->>'key' FROM cte", "ok");
     [Fact]
     public void selca0102() => CorpusAssert.Parses(@"WITH cte AS (SELECT id, tags FROM s.t WHERE tags IS NOT NULL) SELECT id, tags[1] FROM cte", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selca0103() => CorpusAssert.Parses(@"WITH src AS (SELECT id, name FROM s.t) INSERT INTO s.t2(label) SELECT name FROM src RETURNING *", "ok");
     [Fact]
     public void selca0104() => CorpusAssert.Parses(@"WITH src AS (SELECT id FROM s.t WHERE id < 0) UPDATE s.t SET qty = 0 WHERE id IN (SELECT id FROM src)", "ok");
@@ -525,7 +525,7 @@ cte AS (SELECT 1 AS n) SELECT * FROM cte", "ok");
     public void selcb0088() => CorpusAssert.Parses(@"WITH RECURSIVE r(n) AS (SELECT 5 UNION ALL SELECT n-1 FROM r WHERE n > 1) SELECT n FROM r ORDER BY n", "ok");
     [Fact]
     public void selcb0089() => CorpusAssert.Parses(@"WITH cte AS (SELECT id, name, val FROM s.t), ranked AS (SELECT *, rank() OVER (ORDER BY val DESC) AS rnk FROM cte) SELECT * FROM ranked WHERE rnk = 1", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selcb0090() => CorpusAssert.Parses(@"WITH ins AS (INSERT INTO s.t(name) VALUES ('wtest') RETURNING id), ins2 AS (INSERT INTO s.t2(t_id, label) SELECT id, 'child' FROM ins RETURNING id) SELECT * FROM ins2", "ok");
     [Fact]
     public void selcb0091() => CorpusAssert.Parses(@"WITH upd AS (UPDATE s.t2 SET amount = amount + 1 WHERE id = -99 RETURNING id, amount) SELECT * FROM upd", "ok");
@@ -577,7 +577,7 @@ cte AS (SELECT 1 AS n) SELECT * FROM cte", "ok");
     public void selcb0114() => CorpusAssert.Parses(@"WITH cte AS (SELECT id FROM s.t ORDER BY id) SELECT * FROM cte", "ok");
     [Fact]
     public void selcb0115() => CorpusAssert.Parses(@"WITH RECURSIVE r(n) AS (SELECT 1 UNION SELECT n+1 FROM r WHERE n < 3) SELECT * FROM r", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selcb0116() => CorpusAssert.Parses(@"WITH cte AS (SELECT id, home FROM s.t WHERE home IS NOT NULL) SELECT (home).city FROM cte", "ok");
     [Fact]
     public void selcb0117() => CorpusAssert.Parses(@"WITH cte AS (SELECT id, span FROM s.t WHERE span IS NOT NULL) SELECT id FROM cte WHERE span @> 5", "ok");

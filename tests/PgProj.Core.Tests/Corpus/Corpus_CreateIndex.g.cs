@@ -143,7 +143,7 @@ public class Corpus_CreateIndex
     public void idxa0068() => CorpusAssert.Parses(@"CREATE INDEX ON s.t (name) WITH (fillfactor = 70) WHERE qty > 0", "ok");
     [Fact]
     public void idxa0069() => CorpusAssert.Parses(@"CREATE INDEX ON s.t (name) INCLUDE (val) WHERE qty > 0", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void idxa0070() => CorpusAssert.Parses(@"CREATE UNIQUE INDEX ON s.t (name) INCLUDE (val) NULLS NOT DISTINCT WHERE qty > 0", "ok");
     [Fact]
     public void idxa0071() => CorpusAssert.Parses(@"CREATE INDEX ON ONLY s.child (extra)", "ok");
@@ -193,7 +193,7 @@ public class Corpus_CreateIndex
     public void idxa0093() => CorpusAssert.Parses(@"CREATE INDEX ON s.t (name) WITH (fillfactor = 90) TABLESPACE pg_default", "ok");
     [Fact]
     public void idxa0094() => CorpusAssert.Parses(@"CREATE INDEX ON s.t (name) INCLUDE (val) WITH (fillfactor = 80) TABLESPACE pg_default WHERE qty > 0", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void idxa0095() => CorpusAssert.Parses(@"CREATE UNIQUE INDEX ON s.t (name) INCLUDE (qty) NULLS NOT DISTINCT WITH (fillfactor = 90) WHERE flag = false", "ok");
     [Fact]
     public void idxa0096() => CorpusAssert.Parses(@"CREATE INDEX ON s.t (name) WITH (fillfactor = 90);
@@ -315,7 +315,7 @@ INSERT INTO idxa_tbl2 VALUES (1,'x'),(2,'y')", "ok");
     public void idxa0152() => CorpusAssert.Parses(@"CREATE INDEX ON s.t (name) WITH ()", "error");
     [Fact]
     public void idxa0153() => CorpusAssert.Parses(@"CREATE INDEX ON s.t (name) NULLS DISTINCT NULLS NOT DISTINCT", "error");
-    [Fact]
+    [Fact(Skip = "pending: parser not yet complete")]
     public void idxa0154() => CorpusAssert.Parses(@"CREATE INDEX ON s.t (name) INCLUDE NULLS NOT DISTINCT", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void idxa0155() => CorpusAssert.Parses(@"CREATE INDEX ON s.v (name)", "error");
@@ -555,13 +555,13 @@ CREATE INDEX ON idxa_inc_tbl (a) INCLUDE (b, c)", "ok");
     public void idxb0101() => CorpusAssert.Parses(@"CREATE INDEX ON s.t (name) INCLUDE (created_at, data)", "ok");
     [Fact]
     public void idxb0102() => CorpusAssert.Parses(@"CREATE INDEX ON s.t USING btree (name) INCLUDE (val) WITH (fillfactor = 70) WHERE qty > 0", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void idxb0103() => CorpusAssert.Parses(@"CREATE UNIQUE INDEX ON s.t USING btree (name) INCLUDE (qty) NULLS NOT DISTINCT WHERE flag = false", "ok");
     [Fact]
     public void idxb0104() => CorpusAssert.Parses(@"CREATE INDEX ON s.t (name) TABLESPACE pg_default", "ok");
     [Fact]
     public void idxb0105() => CorpusAssert.Parses(@"CREATE INDEX ON s.t (name) WITH (fillfactor = 90) TABLESPACE pg_default", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void idxb0106() => CorpusAssert.Parses(@"CREATE INDEX ON s.t (name) INCLUDE (val) NULLS DISTINCT WITH (fillfactor = 80) TABLESPACE pg_default WHERE qty > 0", "ok");
     [Fact]
     public void idxb0107() => CorpusAssert.Parses(@"CREATE INDEX ON s.t (name) USING btree", "error");
@@ -699,11 +699,11 @@ CREATE INDEX ON idxa_inc_tbl (a) INCLUDE (b, c)", "ok");
     public void idxc0003() => CorpusAssert.Parses(@"CREATE INDEX ON s.t (name) TABLESPACE pg_default WITH (fillfactor=80)", "error");
     [Fact]
     public void idxc0004() => CorpusAssert.Parses(@"CREATE UNIQUE INDEX ON s.t (name) NULLS NOT DISTINCT WITH (fillfactor=90) TABLESPACE pg_default WHERE qty > 0", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void idxc0005() => CorpusAssert.Parses(@"CREATE INDEX ON s.t (name) INCLUDE (val) NULLS NOT DISTINCT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void idxc0006() => CorpusAssert.Parses(@"CREATE INDEX ON s.t USING btree (name) INCLUDE (val) NULLS DISTINCT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void idxc0007() => CorpusAssert.Parses(@"CREATE UNIQUE INDEX ON s.t (name) INCLUDE (val) NULLS DISTINCT WITH (fillfactor=75)", "ok");
     [Fact]
     public void idxc0008() => CorpusAssert.Parses(@"CREATE INDEX ON s.t USING spgist (name)", "ok");

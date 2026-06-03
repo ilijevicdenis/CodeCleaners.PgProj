@@ -457,21 +457,21 @@ DROP FOREIGN DATA WRAPPER drop_fdw4 CASCADE", "ok");
     [Fact]
     public void fdwa0119() => CorpusAssert.Parses(@"CREATE FOREIGN DATA WRAPPER drop_fdw5;
 DROP FOREIGN DATA WRAPPER drop_fdw5 RESTRICT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void fdwa0120() => CorpusAssert.Parses(@"CREATE FOREIGN DATA WRAPPER dummy;
 CREATE SERVER drop_um_srv FOREIGN DATA WRAPPER dummy;
 CREATE USER MAPPING FOR CURRENT_USER SERVER drop_um_srv;
 DROP USER MAPPING FOR CURRENT_USER SERVER drop_um_srv", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void fdwa0121() => CorpusAssert.Parses(@"CREATE FOREIGN DATA WRAPPER dummy;
 CREATE SERVER drop_um_srv2 FOREIGN DATA WRAPPER dummy;
 CREATE USER MAPPING FOR PUBLIC SERVER drop_um_srv2;
 DROP USER MAPPING IF EXISTS FOR PUBLIC SERVER drop_um_srv2", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void fdwa0122() => CorpusAssert.Parses(@"DROP USER MAPPING IF EXISTS FOR CURRENT_USER SERVER nonexistent_srv", "ok");
     [Fact]
-    public void fdwa0123() => CorpusAssert.Parses(@"DROP USER MAPPING FOR CURRENT_USER SERVER nonexistent_srv2", "error");
+    public void fdwa0122() => CorpusAssert.Parses(@"DROP USER MAPPING IF EXISTS FOR CURRENT_USER SERVER nonexistent_srv", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
+    public void fdwa0123() => CorpusAssert.Parses(@"DROP USER MAPPING FOR CURRENT_USER SERVER nonexistent_srv2", "error");
+    [Fact]
     public void fdwa0124() => CorpusAssert.Parses(@"CREATE FOREIGN DATA WRAPPER dummy;
 CREATE SERVER drop_um_srv3 FOREIGN DATA WRAPPER dummy;
 CREATE USER MAPPING FOR USER SERVER drop_um_srv3;
@@ -832,19 +832,19 @@ CREATE USER MAPPING IF NOT EXISTS FOR CURRENT_USER SERVER myserver", "ok");
     public void fdwb0061() => CorpusAssert.Parses(@"CREATE USER MAPPING FOR SERVER myserver", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void fdwb0062() => CorpusAssert.Parses(@"CREATE USER MAPPING CURRENT_USER SERVER myserver", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void fdwb0063() => CorpusAssert.Parses(@"CREATE FOREIGN DATA WRAPPER dummy;
 CREATE SERVER myserver FOREIGN DATA WRAPPER dummy;
 CREATE USER MAPPING FOR CURRENT_USER SERVER myserver;
 DROP USER MAPPING FOR CURRENT_USER SERVER myserver", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void fdwb0064() => CorpusAssert.Parses(@"CREATE FOREIGN DATA WRAPPER dummy;
 CREATE SERVER myserver FOREIGN DATA WRAPPER dummy;
 CREATE USER MAPPING FOR PUBLIC SERVER myserver;
 DROP USER MAPPING FOR PUBLIC SERVER myserver", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void fdwb0065() => CorpusAssert.Parses(@"DROP USER MAPPING IF EXISTS FOR CURRENT_USER SERVER nonexistent_server_xyz", "ok");
     [Fact]
+    public void fdwb0065() => CorpusAssert.Parses(@"DROP USER MAPPING IF EXISTS FOR CURRENT_USER SERVER nonexistent_server_xyz", "ok");
+    [Fact(Skip = "pending: parser not yet complete")]
     public void fdwb0066() => CorpusAssert.Parses(@"DROP USER MAPPING FOR CURRENT_USER SERVER nonexistent_server_xyz", "error");
     [Fact]
     public void fdwb0067() => CorpusAssert.Parses(@"DROP USER MAPPING FOR SERVER myserver", "error");

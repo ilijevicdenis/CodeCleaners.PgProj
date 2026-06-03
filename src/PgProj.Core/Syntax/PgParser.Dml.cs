@@ -30,7 +30,7 @@ public sealed partial class PgParser
         if (c.MatchWord("OVERRIDING")) { ins.Overriding = c.ExpectIdentifier(); c.ExpectWord("VALUE"); }
 
         if (c.MatchWords("DEFAULT", "VALUES")) ins.DefaultValues = true;
-        else ins.Source = ParseSelectStatement(c);
+        else { var prev = _returningIsAliasBoundary; _returningIsAliasBoundary = true; try { ins.Source = ParseSelectStatement(c); } finally { _returningIsAliasBoundary = prev; } }
 
         if (c.MatchWords("ON", "CONFLICT")) ins.OnConflict = ParseOnConflict(c);
         ParseReturning(c, ins);
@@ -71,7 +71,7 @@ public sealed partial class PgParser
         c.ExpectWord("SET");
         up.Set.AddRange(ParseSetClauses(c));
 
-        if (c.MatchWord("FROM")) up.From = ParseFromClause(c);
+        if (c.MatchWord("FROM")) { var prev = _returningIsAliasBoundary; _returningIsAliasBoundary = true; try { up.From = ParseFromClause(c); } finally { _returningIsAliasBoundary = prev; } }
         ParseWhereOrCurrentOf(c, v => up.Where = v, cur => up.WhereCurrentOf = cur);
         ParseReturning(c, up);
         return up;
@@ -88,7 +88,7 @@ public sealed partial class PgParser
         if (c.MatchWord("AS")) del.Alias = c.ExpectIdentifier();
         else if (c.Current is { Kind: TokenKind.Word } w && !w.IsWord("USING") && !w.IsWord("WHERE") && !w.IsWord("RETURNING")) del.Alias = c.Advance().Value;
 
-        if (c.MatchWord("USING")) del.Using = ParseFromClause(c);
+        if (c.MatchWord("USING")) { var prev = _returningIsAliasBoundary; _returningIsAliasBoundary = true; try { del.Using = ParseFromClause(c); } finally { _returningIsAliasBoundary = prev; } }
         ParseWhereOrCurrentOf(c, v => del.Where = v, cur => del.WhereCurrentOf = cur);
         ParseReturning(c, del);
         return del;

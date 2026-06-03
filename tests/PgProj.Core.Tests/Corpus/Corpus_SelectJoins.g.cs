@@ -223,9 +223,9 @@ public class Corpus_SelectJoins
     public void selja0108() => CorpusAssert.Parses(@"SELECT t.id, t2.label FROM s.t JOIN s.t2 ON t.id = t2.t_id WHERE t.span @> 5::int4range", "error");
     [Fact]
     public void selja0109() => CorpusAssert.Parses(@"SELECT t.id, t2.label FROM s.t JOIN s.t2 ON t.id = t2.t_id WHERE t.span @> int4range(1, 10)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0110() => CorpusAssert.Parses(@"SELECT t.id FROM s.t JOIN s.t2 ON t.id = t2.t_id WHERE (t.home).city = 'NYC'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0111() => CorpusAssert.Parses(@"SELECT (t.home).street, t2.label FROM s.t JOIN s.t2 ON t.id = t2.t_id", "ok");
     [Fact]
     public void selja0112() => CorpusAssert.Parses(@"SELECT t.id FROM s.t JOIN s.t2 ON t.id = t2.t_id WHERE t.val::integer > 10", "ok");
@@ -587,7 +587,7 @@ public class Corpus_SelectJoins
     public void seljb0120() => CorpusAssert.Parses(@"SELECT t.id FROM s.t LEFT JOIN s.t2 ON t.id = t2.t_id AND t2.amount > 10 WHERE t.id < 1000", "ok");
     [Fact]
     public void seljb0121() => CorpusAssert.Parses(@"SELECT t.name FROM s.t JOIN s.t2 ON t.id = t2.t_id WHERE t.span && int4range(1,10)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljb0122() => CorpusAssert.Parses(@"SELECT (t.home).city FROM s.t JOIN s.t2 ON t.id = t2.t_id WHERE (t.home).zip IS NOT NULL", "ok");
     [Fact]
     public void seljb0123() => CorpusAssert.Parses(@"SELECT t.id FROM s.t JOIN s.t2 ON t.id = t2.t_id JOIN s.t2 AS t2c ON t.id = t2c.t_id AND t2c.label <> t2.label", "ok");

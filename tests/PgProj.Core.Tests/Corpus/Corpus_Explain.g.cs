@@ -211,7 +211,7 @@ public class Corpus_Explain
     public void expa0102() => CorpusAssert.Parses(@"EXPLAIN (FORMAT JSON) VALUES (1, 'a')", "ok");
     [Fact]
     public void expa0103() => CorpusAssert.Parses(@"EXPLAIN SELECT * FROM s.t WHERE home IS NOT NULL", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void expa0104() => CorpusAssert.Parses(@"EXPLAIN SELECT (home).city FROM s.t WHERE home IS NOT NULL", "ok");
     [Fact]
     public void expa0105() => CorpusAssert.Parses(@"EXPLAIN (ANALYZE, VERBOSE, BUFFERS, WAL, TIMING, SUMMARY, MEMORY, FORMAT JSON) UPDATE s.t SET qty = qty + 1 WHERE id < 0", "ok");

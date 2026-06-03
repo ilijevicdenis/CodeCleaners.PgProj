@@ -179,6 +179,15 @@ public sealed partial class PgParser
         if (kind is "OPERATOR CLASS" or "OPERATOR FAMILY")
         { var (s, n) = ParseQualifiedName(c); if (c.MatchWord("USING")) c.ExpectIdentifier(); return $"{s}.{n}"; }
 
+        if (kind == "USER MAPPING")  // DROP USER MAPPING FOR { name | USER | CURRENT_USER | CURRENT_ROLE | SESSION_USER | PUBLIC } SERVER name
+        {
+            c.ExpectWord("FOR");
+            if (!(c.MatchWord("CURRENT_USER") || c.MatchWord("CURRENT_ROLE") || c.MatchWord("SESSION_USER") || c.MatchWord("USER") || c.MatchWord("PUBLIC")))
+                c.ExpectIdentifier();
+            c.ExpectWord("SERVER");
+            return $"mapping@{c.ExpectIdentifier()}";
+        }
+
         if (kind == "TRANSFORM")    // DROP TRANSFORM FOR <type> LANGUAGE <lang>
         {
             c.MatchWord("FOR");

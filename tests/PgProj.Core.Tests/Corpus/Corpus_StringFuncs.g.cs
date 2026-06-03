@@ -55,7 +55,7 @@ public class Corpus_StringFuncs
     public void strfa0024() => CorpusAssert.Parses(@"SELECT substring('hello' FROM 2 FOR 3)", "ok");
     [Fact]
     public void strfa0025() => CorpusAssert.Parses(@"SELECT substring('hello world' FROM '[a-z]+')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void strfa0026() => CorpusAssert.Parses(@"SELECT substring('hello world' SIMILAR '%#""world#""%' ESCAPE '#')", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void strfa0027() => CorpusAssert.Parses(@"SELECT substr()", "error");
@@ -291,11 +291,11 @@ public class Corpus_StringFuncs
     public void strfa0142() => CorpusAssert.Parses(@"SELECT normalize('café', NFKD)", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void strfa0143() => CorpusAssert.Parses(@"SELECT normalize('hello', INVALID_FORM)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void strfa0144() => CorpusAssert.Parses(@"SELECT 'café' IS NORMALIZED", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void strfa0145() => CorpusAssert.Parses(@"SELECT 'café' IS NFC NORMALIZED", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void strfa0146() => CorpusAssert.Parses(@"SELECT 'hello' IS NOT NORMALIZED", "ok");
     [Fact]
     public void strfa0147() => CorpusAssert.Parses(@"SELECT to_hex(255)", "ok");
@@ -455,7 +455,7 @@ public class Corpus_StringFuncs
     public void strfb0024() => CorpusAssert.Parses(@"SELECT substring('hello', 2, 3)", "ok");
     [Fact]
     public void strfb0025() => CorpusAssert.Parses(@"SELECT substring('hello world' FROM 'w[a-z]+')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void strfb0026() => CorpusAssert.Parses(@"SELECT substring('hello world' SIMILAR '%#""world#""%' ESCAPE '#')", "ok");
     [Fact]
     public void strfb0027() => CorpusAssert.Parses(@"SELECT substring('hello' FOR 3)", "ok");

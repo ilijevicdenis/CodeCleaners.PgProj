@@ -225,9 +225,9 @@ public class Corpus_TextPattern
     public void txpa0109() => CorpusAssert.Parses(@"SELECT substring('foobar' FROM 'baz')", "ok");
     [Fact]
     public void txpa0110() => CorpusAssert.Parses(@"SELECT substring('foobar' FROM '^f..b')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txpa0111() => CorpusAssert.Parses(@"SELECT substring('foobar' SIMILAR '%#""o_b#""%' ESCAPE '#')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txpa0112() => CorpusAssert.Parses(@"SELECT substring('foobar' SIMILAR 'f%' ESCAPE '#')", "ok");
     [Fact]
     public void txpa0113() => CorpusAssert.Parses(@"SELECT substring('foobar' FROM '%' FOR '\')", "ok");
@@ -497,7 +497,7 @@ public class Corpus_TextPattern
     public void txpb0075() => CorpusAssert.Parses(@"SELECT substring('hello world' FROM 7)", "ok");
     [Fact]
     public void txpb0076() => CorpusAssert.Parses(@"SELECT substring('hello' FROM 2 FOR 3)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txpb0077() => CorpusAssert.Parses(@"SELECT substring('hello world' SIMILAR '%#""world#""%' ESCAPE '#')", "ok");
     [Fact]
     public void txpb0078() => CorpusAssert.Parses(@"SELECT substring('hello' FROM 'h(e)llo')", "ok");
@@ -682,7 +682,7 @@ world' ~ '(?n).'", "ok");
     public void txpb0167() => CorpusAssert.Parses(@"SELECT regexp_match('hello', '[invalid')", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void txpb0168() => CorpusAssert.Parses(@"SELECT 'hello' ~ '[invalid'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txpb0169() => CorpusAssert.Parses(@"SELECT substring('hello world' SIMILAR '%#""(\w+)#""%' ESCAPE '#')", "ok");
     [Fact]
     public void txpb0170() => CorpusAssert.Parses(@"SELECT regexp_replace('hello world', '(\w+) (\w+)', '\2 \1')", "ok");
@@ -700,7 +700,7 @@ world' ~ '(?n).'", "ok");
     public void txpc0006() => CorpusAssert.Parses(@"SELECT regexp_split_to_table('a,b,,c', ','), regexp_split_to_array('x:y:z', ':'), regexp_count('aabbaab', 'a+'), regexp_instr('foobarfoo', 'bar'), regexp_substr('foobarfoo', 'b.r'), regexp_like('Hello', 'h.*', 'i')", "ok");
     [Fact]
     public void txpc0007() => CorpusAssert.Parses(@"SELECT 'foobar' ~ 'foo', 'foobar' ~* 'FOO', 'foobar' !~ 'baz', 'foobar' !~* 'BAZ'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void txpc0008() => CorpusAssert.Parses(@"SELECT substring('Thomas' FROM 2 FOR 3), substring('Thomas' SIMILAR '%#""o_a#""%' ESCAPE '#'), overlay('Txxxas' PLACING 'hom' FROM 2 FOR 3), position('om' IN 'Thomas'), strpos('Thomas', 'om')", "ok");
     [Fact]
     public void txpc0009() => CorpusAssert.Parses(@"SELECT trim(BOTH 'x' FROM 'xhellox'), ltrim('   hi'), rtrim('hi   '), btrim('  hi  ')", "ok");

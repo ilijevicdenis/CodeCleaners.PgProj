@@ -309,9 +309,9 @@ public class Corpus_SelectBasic
     public void selba0151() => CorpusAssert.Parses(@"SELECT * FROM s.events", "ok");
     [Fact]
     public void selba0152() => CorpusAssert.Parses(@"SELECT * FROM s.events_2024", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0153() => CorpusAssert.Parses(@"SELECT id, (home).street FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0154() => CorpusAssert.Parses(@"SELECT id, (home).city AS city FROM s.t", "ok");
     [Fact]
     public void selba0155() => CorpusAssert.Parses(@"SELECT tags[1] FROM s.t", "ok");
@@ -625,7 +625,7 @@ public class Corpus_SelectBasic
     public void selbb0109() => CorpusAssert.Parses(@"SELECT data->'nested' FROM s.t", "ok");
     [Fact]
     public void selbb0110() => CorpusAssert.Parses(@"SELECT tags[1] FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selbb0111() => CorpusAssert.Parses(@"SELECT (home).city FROM s.t", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void selbb0112() => CorpusAssert.Parses(@"SELECT home.city FROM s.t", "error");

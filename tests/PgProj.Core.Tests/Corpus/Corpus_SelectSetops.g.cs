@@ -111,7 +111,7 @@ public class Corpus_SelectSetops
     public void selsa0052() => CorpusAssert.Parses(@"(SELECT 1 LIMIT 1) INTERSECT (SELECT 1 LIMIT 1)", "ok");
     [Fact]
     public void selsa0053() => CorpusAssert.Parses(@"(SELECT 2 ORDER BY 1) EXCEPT (SELECT 1 ORDER BY 1)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selsa0054() => CorpusAssert.Parses(@"SELECT name FROM s.t UNION SELECT city FROM (SELECT (home).city AS city FROM s.t) sub", "ok");
     [Fact]
     public void selsa0055() => CorpusAssert.Parses(@"SELECT id FROM s.t UNION SELECT id FROM (SELECT id FROM s.t2 WHERE id IS NOT NULL) sub", "ok");

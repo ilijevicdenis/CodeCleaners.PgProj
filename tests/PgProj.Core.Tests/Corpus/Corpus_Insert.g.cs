@@ -317,7 +317,7 @@ public class Corpus_Insert
     public void insa0155() => CorpusAssert.Parses(@"INSERT INTO s.t (name) VALUES ('SelectStar') RETURNING id, name, val, qty, flag, tags, data, home, status, span, created_at", "ok");
     [Fact]
     public void insa0156() => CorpusAssert.Parses(@"INSERT INTO s.t (id, name) OVERRIDING SYSTEM VALUE VALUES (985, 'OvrCteRet') RETURNING id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void insa0157() => CorpusAssert.Parses(@"WITH src AS (SELECT 'WithRet' AS n) INSERT INTO s.t (name) SELECT n FROM src RETURNING id, name", "ok");
     [Fact]
     public void insa0158() => CorpusAssert.Parses(@"INSERT INTO s.t (name) VALUES ('NoVals')", "ok");
@@ -465,7 +465,7 @@ public class Corpus_Insert
     public void insb0059() => CorpusAssert.Parses(@"WITH ins AS (INSERT INTO s.t (name) VALUES ('cte-ins') RETURNING id) SELECT id FROM ins", "ok");
     [Fact]
     public void insb0060() => CorpusAssert.Parses(@"WITH ins AS (INSERT INTO s.t (name, val) VALUES ('m1', 1.0), ('m2', 2.0) RETURNING id, name) SELECT count(*) FROM ins", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void insb0061() => CorpusAssert.Parses(@"WITH ins1 AS (INSERT INTO s.t (name) VALUES ('c1') RETURNING id), ins2 AS (INSERT INTO s.t2 (t_id, label) SELECT id, 'child' FROM ins1 RETURNING id) SELECT * FROM ins2", "ok");
     [Fact]
     public void insb0062() => CorpusAssert.Parses(@"INSERT INTO s.t (name, val) VALUES ('e1', 1.0); INSERT INTO s.t (name, val) VALUES ('e2', 2.0)", "ok");
