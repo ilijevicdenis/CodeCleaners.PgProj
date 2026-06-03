@@ -51,9 +51,9 @@ public sealed partial class PgParser
         if (c.MatchWord("LANGUAGE")) lang = LangNameOrString(c);
         if (c.Current is not { Kind: TokenKind.DollarString or TokenKind.String })
             throw new ParseException("expected a code block after DO", c.Here);
-        c.Advance();
+        var body = c.Advance().Value;
         if (c.MatchWord("LANGUAGE")) lang = LangNameOrString(c);   // LANGUAGE may follow the body
-        return new CommandStatement { Kind = "DO", Detail = lang };
+        return new CommandStatement { Kind = "DO", Detail = lang, Body = body };
     }
 
     private static string LangNameOrString(TokenCursor c)

@@ -79,6 +79,8 @@ public sealed class CreateFunctionStatement : SqlStatement
     public string Name { get; set; } = "";
     public string ArgTypes { get; set; } = "";
     public bool IsProcedure { get; init; }
+    public string? Language { get; set; }            // LANGUAGE name (lowercased), if given
+    public string? Body { get; set; }                // the AS body token, verbatim (dollar-quoted or string)
 }
 
 // ---- CREATE TABLE -----------------------------------------------------------

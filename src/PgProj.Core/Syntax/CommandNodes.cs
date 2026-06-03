@@ -11,4 +11,5 @@ public sealed class CommandStatement : SqlStatement
     public string? Detail { get; set; }              // a salient name/target where useful
     public SqlStatement? Inner { get; set; }         // EXPLAIN / PREPARE wrapped statement
     public SelectQuery? Query { get; set; }          // DECLARE CURSOR FOR <query>
+    public string? Body { get; set; }                // DO: the (dollar-quoted) code block, verbatim
 }

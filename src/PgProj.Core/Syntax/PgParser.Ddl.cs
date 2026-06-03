@@ -151,7 +151,7 @@ public sealed partial class PgParser
         // RETURNS … and the option/body tail — captured as before, validated via a sub-cursor.
         int m = c.Mark();
         ConsumeRest(c);
-        ValidateFunctionTail(c.Range(m, c.Mark()), hasOut);
+        ValidateFunctionTail(c.Range(m, c.Mark()), hasOut, node);
         return node;
     }
 
@@ -219,7 +219,7 @@ public sealed partial class PgParser
     // Validate RETURNS + the option/body tail: at most one of each option category, valid PARALLEL value,
     // COST > 0, ROWS only for set-returning functions, OUT params incompatible with RETURNS TABLE, and a
     // body must be present. Unknown trailing tokens fall back to lenient acceptance (no false positives).
-    private void ValidateFunctionTail(List<Token> tail, bool hasOut)
+    private void ValidateFunctionTail(List<Token> tail, bool hasOut, CreateFunctionStatement node)
     {
         var o = new TokenCursor(tail);
         bool returnsSet = false, returnsTable = false;
@@ -235,7 +235,7 @@ public sealed partial class PgParser
         bool hasBody = false, hasRows = false, clean = true;
         while (!o.AtEnd)
         {
-            if (o.MatchWord("LANGUAGE")) { if (o.Current is { Kind: TokenKind.String }) o.Advance(); else o.ExpectIdentifier(); continue; }
+            if (o.MatchWord("LANGUAGE")) { node.Language = (o.Current is { Kind: TokenKind.String } ls ? o.Advance().Value : o.ExpectIdentifier()).ToLowerInvariant(); continue; }
             if (o.AtAnyWord("IMMUTABLE", "STABLE", "VOLATILE")) { o.Advance(); Once("volatility"); continue; }
             if (o.MatchWords("NOT", "LEAKPROOF") || o.MatchWord("LEAKPROOF")) { Once("leakproof"); continue; }
             if (o.MatchWord("STRICT") || o.MatchWords("CALLED", "ON", "NULL", "INPUT") || o.MatchWords("RETURNS", "NULL", "ON", "NULL", "INPUT")) { Once("null-handling"); continue; }
@@ -247,7 +247,7 @@ public sealed partial class PgParser
             if (o.MatchWord("SUPPORT")) { ParseQualifiedName(o); continue; }
             if (o.MatchWord("TRANSFORM")) { do { o.ExpectWord("FOR"); o.ExpectWord("TYPE"); ParseCastType(o); } while (o.MatchSymbol(',')); continue; }
             if (o.MatchWord("SET")) { o.ExpectIdentifier(); if (o.MatchWords("FROM", "CURRENT")) { } else { if (!(o.MatchWord("TO") || o.MatchOperator("="))) throw new ParseException("expected TO or = in SET", o.Here); do { o.Advance(); } while (o.MatchSymbol(',') && !o.AtEnd); } continue; }
-            if (o.MatchWord("AS")) { hasBody = true; ConsumeRest(o); continue; }
+            if (o.MatchWord("AS")) { hasBody = true; if (o.Current is { Kind: TokenKind.DollarString or TokenKind.String } b) node.Body = b.Value; ConsumeRest(o); continue; }
             if (o.MatchWords("BEGIN", "ATOMIC")) { hasBody = true; ConsumeRest(o); continue; }
             if (o.MatchWord("RETURN")) { hasBody = true; ConsumeRest(o); continue; }
             clean = false; break;                                // unknown token — stop validating, stay lenient

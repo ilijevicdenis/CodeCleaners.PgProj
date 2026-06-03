@@ -49,6 +49,8 @@ public sealed class SemanticAnalyzer
         {
             case QueryStatement q: AnalyzeQuery(q.Query); break;
             case DropStatement drop: AnalyzeDrop(drop); break;
+            case CommandStatement { Kind: "DO" } doBlock: AnalyzePlpgsql(doBlock.Body, doBlock.Detail, defaultIsPlpgsql: true); break;
+            case CreateFunctionStatement fn: AnalyzePlpgsql(fn.Body, fn.Language, defaultIsPlpgsql: false); break;
             case InsertStatement ins: AnalyzeInsert(ins); break;
             case UpdateStatement up:
                 ResolveTable(up.Schema, up.Table);
@@ -172,6 +174,16 @@ public sealed class SemanticAnalyzer
             case ExistsExpr ex: AnalyzeQuery(ex.Query); break;
             case SubscriptExpr ss: CheckExpr(ss.Operand); break;
         }
+    }
+
+    // Validate a PL/pgSQL body (DO block or LANGUAGE plpgsql function) for compile-time structural errors.
+    private void AnalyzePlpgsql(string? body, string? language, bool defaultIsPlpgsql)
+    {
+        if (body is null) return;
+        var lang = language?.Trim().Trim('\'').ToLowerInvariant();
+        bool isPlpgsql = lang is "plpgsql" || (lang is null && defaultIsPlpgsql);
+        if (!isPlpgsql) return;
+        foreach (var e in PlpgsqlValidator.Validate(body)) Report(e);
     }
 
     // DROP of a relation (table/view/…) that does not exist in a managed schema — unless IF EXISTS.
