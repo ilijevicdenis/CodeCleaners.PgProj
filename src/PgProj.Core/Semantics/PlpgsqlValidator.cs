@@ -19,8 +19,15 @@ public sealed class PlpgsqlValidator
 {
     private readonly TokenCursor _c;
     private readonly List<string> _errors = new();
+    private int _loopDepth;
 
     private PlpgsqlValidator(TokenCursor c) => _c = c;
+
+    private static readonly HashSet<string> NotAssignmentTargets = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "SELECT", "INSERT", "UPDATE", "DELETE", "PERFORM", "EXECUTE", "GET", "RETURN", "OPEN", "CLOSE",
+        "FETCH", "MOVE", "RAISE", "NULL", "ASSERT", "CALL", "COMMIT", "ROLLBACK", "EXIT", "CONTINUE", "WITH",
+    };
 
     private static readonly HashSet<string> RaiseLevels = new(StringComparer.OrdinalIgnoreCase)
     { "DEBUG", "LOG", "INFO", "NOTICE", "WARNING", "EXCEPTION" };
@@ -95,12 +102,15 @@ public sealed class PlpgsqlValidator
         if (_c.AtOperator("<<") || _c.AtWord("DECLARE") || _c.AtWord("BEGIN")) { ParseBlock(); _c.MatchSymbol(';'); return; }
         if (_c.MatchWord("IF")) { ParseIf(); return; }
         if (_c.MatchWord("CASE")) { ParseCase(); return; }
-        if (_c.MatchWord("LOOP")) { ParseStatements(); ExpectEnd("LOOP"); return; }
-        if (_c.MatchWord("WHILE")) { ConsumeUntilWord("LOOP"); ExpectWord("LOOP"); ParseStatements(); ExpectEnd("LOOP"); return; }
-        if (_c.AtWord("FOR") || _c.AtWord("FOREACH")) { _c.Advance(); ConsumeUntilWord("LOOP"); ExpectWord("LOOP"); ParseStatements(); ExpectEnd("LOOP"); return; }
+        if (_c.MatchWord("LOOP")) { _loopDepth++; ParseStatements(); _loopDepth--; ExpectEnd("LOOP"); return; }
+        if (_c.MatchWord("WHILE")) { ConsumeUntilWord("LOOP"); ExpectWord("LOOP"); _loopDepth++; ParseStatements(); _loopDepth--; ExpectEnd("LOOP"); return; }
+        if (_c.AtWord("FOR") || _c.AtWord("FOREACH")) { _c.Advance(); ConsumeUntilWord("LOOP"); ExpectWord("LOOP"); _loopDepth++; ParseStatements(); _loopDepth--; ExpectEnd("LOOP"); return; }
+        if (_c.AtAnyWord("EXIT", "CONTINUE")) { var kw = _c.Advance().Value.ToUpperInvariant(); if ((_c.AtSymbol(';') || _c.AtWord("WHEN")) && _loopDepth == 0) Err($"{kw} cannot be used outside a loop"); ConsumeToSemicolon(); return; }
         if (_c.MatchWord("RAISE")) { ParseRaise(); return; }
         if (_c.AtAnyWord("FETCH", "MOVE")) { ParseFetchMove(); return; }
         if (_c.MatchWord("CLOSE")) { if (_c.AtEnd || _c.AtSymbol(';')) Err("CLOSE requires a cursor name"); ConsumeToSemicolon(); return; }
+        if (_c.AtOperator(":=")) { Err("missing assignment target before :="); throw Lost(); }
+        if (TryParseAssignment()) return;
         // anything else: a plain statement up to ';'
         ConsumeToSemicolon();
     }
@@ -122,7 +132,33 @@ public sealed class PlpgsqlValidator
         ExpectEnd("CASE");
     }
 
-    private void ExpectEnd(string what) { if (!_c.MatchWord("END")) throw Lost(); if (!_c.MatchWord(what)) throw Lost(); _c.MatchSymbol(';'); }
+    private void ExpectEnd(string what)
+    {
+        if (!_c.MatchWord("END")) throw Lost();                  // not at END — we likely misparsed; bail silently
+        if (!_c.MatchWord(what)) { Err($"expected END {what}"); throw Lost(); }   // END present but wrong/missing keyword — a real error
+        _c.MatchSymbol(';');
+    }
+
+    // target := expr ;  — only the structurally-clear mistakes are reported.
+    private bool TryParseAssignment()
+    {
+        if (_c.Current is not { Kind: TokenKind.Word or TokenKind.QuotedIdent } w || NotAssignmentTargets.Contains(w.Value)) return false;
+        int mk = _c.Mark();
+        _c.Advance();
+        while (_c.AtSymbol('.') && _c.Peek() is { Kind: TokenKind.Word or TokenKind.QuotedIdent }) { _c.Advance(); _c.Advance(); }
+        while (_c.AtSymbol('[')) SkipBracket();
+        if (!_c.MatchOperator(":=")) { _c.Reset(mk); return false; }   // not an assignment
+        if (_c.AtEnd || _c.AtSymbol(';')) Err("missing expression after :=");
+        ConsumeToSemicolon();
+        return true;
+    }
+
+    private void SkipBracket()
+    {
+        if (!_c.AtSymbol('[')) return;
+        int depth = 0;
+        do { if (_c.AtSymbol('[')) depth++; else if (_c.AtSymbol(']')) depth--; _c.Advance(); } while (!_c.AtEnd && depth > 0);
+    }
 
     // ---- DECLARE section ----------------------------------------------------
 

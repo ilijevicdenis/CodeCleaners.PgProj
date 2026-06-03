@@ -207,9 +207,9 @@ public class Corpus_PlpgsqlAssign
     public void ppaa0100() => CorpusAssert.Parses(@"DO $$ DECLARE x s.pos_int; BEGIN x := -1; EXCEPTION WHEN check_violation THEN NULL; END $$;", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void ppaa0101() => CorpusAssert.Parses(@"DO $$ DECLARE x int; BEGIN x 42; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0102() => CorpusAssert.Parses(@"DO $$ DECLARE x int; BEGIN := 42; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppaa0103() => CorpusAssert.Parses(@"DO $$ DECLARE x int; BEGIN x := ; END $$;", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void ppaa0104() => CorpusAssert.Parses(@"DO $$ DECLARE x int; BEGIN x :== 42; END $$;", "error");
@@ -403,7 +403,7 @@ END $$;", "ok");
     public void ppab0027() => CorpusAssert.Parses(@"DO $$ DECLARE oid_var oid; BEGIN GET DIAGNOSTICS oid_var = PG_ROUTINE_OID; END $$;", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void ppab0028() => CorpusAssert.Parses(@"DO $$ DECLARE x int; BEGIN x 42; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ppab0029() => CorpusAssert.Parses(@"DO $$ DECLARE x int; BEGIN := 42; END $$;", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void ppab0030() => CorpusAssert.Parses(@"DO $$ DECLARE x int; BEGIN SELECT name INTO FROM s.t LIMIT 1; END $$;", "error");

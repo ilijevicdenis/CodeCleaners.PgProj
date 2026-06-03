@@ -229,11 +229,11 @@ CREATE TRIGGER t_bad BEFORE INSERT ON s.t FOR EACH ROW EXECUTE FUNCTION s.trg_re
     public void pptba0110() => CorpusAssert.Parses(@"CREATE FUNCTION s.trg_tg_nargs_read_only() RETURNS trigger LANGUAGE plpgsql AS $$ DECLARE n integer; BEGIN n := TG_NARGS; RAISE NOTICE 'nargs=%', n; RETURN NEW; END $$;", "ok");
     [Fact]
     public void pptba0111() => CorpusAssert.Parses(@"CREATE FUNCTION s.trg_bad_declare_var() RETURNS trigger LANGUAGE plpgsql AS $$ DECLARE 123bad text; BEGIN RETURN NEW; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pptba0112() => CorpusAssert.Parses(@"CREATE FUNCTION s.trg_bad_if_noend() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN IF TG_OP = 'INSERT' THEN RETURN NEW; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pptba0113() => CorpusAssert.Parses(@"CREATE FUNCTION s.trg_bad_loop_noend() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN LOOP RAISE NOTICE 'x'; END $$;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pptba0114() => CorpusAssert.Parses(@"CREATE FUNCTION s.trg_bad_case_noend() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN CASE TG_OP WHEN 'INSERT' THEN RETURN NEW; END $$;", "error");
     [Fact]
     public void pptba0115() => CorpusAssert.Parses(@"CREATE FUNCTION s.trg_bad_raise_level() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN RAISE BADLEVEL 'msg'; RETURN NEW; END $$;", "error");
