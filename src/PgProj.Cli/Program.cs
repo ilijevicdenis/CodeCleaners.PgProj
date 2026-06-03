@@ -31,6 +31,8 @@ public static class Program
                 "publish" => await Publish(args),
                 "validate" => await Validate(args),
                 "extract" => await Extract(args),
+                "drift" => await Drift(args),
+                "pull" => await Pull(args),
                 "analyze" => Analyze(args),
                 "script" => Script(args),
                 "help" or "--help" or "-h" => PrintUsageReturn(0),
@@ -206,6 +208,63 @@ public static class Program
         return 0;
     }
 
+    // ---- drift / pull (scenario 3: reverse-sync the project FROM the database) -----------
+
+    private static async Task<int> Drift(string[] args)
+    {
+        var project = DatabaseProject.Load(RequirePositional(args, "project file"));
+        var live = await ReadTarget(args);
+        // Report everything, including would-be deletes, so the user sees the full picture.
+        var plan = PgProj.Core.Sync.ReverseSync.Plan(project, live, new PgProj.Core.Sync.DriftOptions { AllowDeletes = true });
+
+        if (!plan.HasDrift)
+        {
+            Console.WriteLine("No drift. The project already matches the database.");
+            return 0;
+        }
+
+        Console.WriteLine($"{plan.FileChanges.Count} project file(s) drift from the database:");
+        foreach (var fc in plan.FileChanges)
+            Console.WriteLine($"  [{Mark(fc)}] {fc.Kind.ToString().ToLowerInvariant()} {fc.RelativePath} — {fc.Summary}");
+        if (plan.DestructiveCount > 0)
+            Console.WriteLine($"\n{plan.DestructiveCount} change(s) delete files (apply with: pull --allow-deletes).");
+        Console.WriteLine("\nRun 'pull' to write these changes into the project.");
+        return 0;
+    }
+
+    private static async Task<int> Pull(string[] args)
+    {
+        var project = DatabaseProject.Load(RequirePositional(args, "project file"));
+        var live = await ReadTarget(args);
+        var allowDeletes = HasFlag(args, "--allow-deletes");
+        var plan = PgProj.Core.Sync.ReverseSync.Plan(project, live, new PgProj.Core.Sync.DriftOptions { AllowDeletes = allowDeletes });
+
+        if (!plan.HasDrift)
+        {
+            Console.WriteLine("Nothing to pull — the project already matches the database.");
+            return 0;
+        }
+
+        Console.WriteLine($"{plan.FileChanges.Count} project file(s) will be {(HasFlag(args, "--dry-run") ? "changed" : "written")}:");
+        foreach (var fc in plan.FileChanges)
+            Console.WriteLine($"  [{Mark(fc)}] {fc.Kind.ToString().ToLowerInvariant()} {fc.RelativePath} — {fc.Summary}");
+
+        if (HasFlag(args, "--dry-run"))
+        {
+            Console.WriteLine("\n(dry run — no files written)");
+            return 0;
+        }
+
+        var touched = PgProj.Core.Sync.ReverseSync.Apply(project, plan);
+        Console.WriteLine($"\nPulled {touched.Count} file(s) from the database into the project.");
+        if (!allowDeletes && plan.SchemaChanges.Any(c => c.IsDestructive))
+            Console.WriteLine("Note: objects dropped in the database were left in place (re-run with --allow-deletes to remove their files).");
+        return 0;
+    }
+
+    private static string Mark(PgProj.Core.Sync.ProjectFileChange fc) =>
+        fc.IsDestructive ? "!" : fc.Kind == PgProj.Core.Sync.ProjectFileChangeKind.Create ? "+" : "~";
+
     // ---- analyze (static analysis over the AST) -----------------------------------------
 
     private static int Analyze(string[] args)
@@ -362,6 +421,8 @@ public static class Program
           pgproj publish <project.pgproj> --connection <conn> [--dry-run] [-o script.sql] [--allow-drops] [--no-transaction] [--parallel] [--strict] [--no-analyze]
           pgproj validate <project.pgproj> --connection <conn> [--strict] [--no-analyze]   (apply to a throwaway temp DB, rolled back)
           pgproj extract --connection <conn> -o <outDir>
+          pgproj drift   <project.pgproj> --connection <conn>                          (preview project files that differ from the DB)
+          pgproj pull    <project.pgproj> --connection <conn> [--dry-run] [--allow-deletes]   (rewrite project files FROM the DB — scenario 3)
           pgproj analyze <project.pgproj> [--strict]    (static safety analysis over the AST)
 
         Options:
@@ -369,6 +430,7 @@ public static class Program
           -o, --output       Output file or directory
           --dry-run          Generate the deploy script but do not execute it
           --allow-drops      Allow destructive changes (drop tables/columns/etc. not in the project)
+          --allow-deletes    pull: delete project files for objects dropped from the database
           --no-transaction   Do not wrap the deploy script in BEGIN/COMMIT
           --parallel         Publish with intra-phase parallelism (phase-level atomicity)
           --strict           Analysis gate: treat warnings as errors (build/publish fail on warnings)
