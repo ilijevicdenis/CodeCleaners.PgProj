@@ -48,6 +48,7 @@ public sealed class SemanticAnalyzer
         switch (stmt)
         {
             case QueryStatement q: AnalyzeQuery(q.Query); break;
+            case DropStatement drop: AnalyzeDrop(drop); break;
             case InsertStatement ins: AnalyzeInsert(ins); break;
             case UpdateStatement up:
                 ResolveTable(up.Schema, up.Table);
@@ -170,6 +171,20 @@ public sealed class SemanticAnalyzer
             case SubqueryExpr sq: AnalyzeQuery(sq.Query); break;
             case ExistsExpr ex: AnalyzeQuery(ex.Query); break;
             case SubscriptExpr ss: CheckExpr(ss.Operand); break;
+        }
+    }
+
+    // DROP of a relation (table/view/…) that does not exist in a managed schema — unless IF EXISTS.
+    // Restricted to relation kinds the catalog tracks reliably; other kinds are left for later.
+    private void AnalyzeDrop(DropStatement drop)
+    {
+        if (drop.IfExists || _scriptRenames || _scriptAlters) return;   // an ALTER may have moved/renamed the target
+        if (drop.ObjectKind is not ("TABLE" or "VIEW" or "MATERIALIZED VIEW" or "FOREIGN TABLE")) return;
+        foreach (var raw in drop.Names)
+        {
+            var dot = raw.LastIndexOf('.');
+            if (dot <= 0) continue;                          // unqualified — schema unknown, skip
+            ResolveTable(raw[..dot], raw[(dot + 1)..]);
         }
     }
 

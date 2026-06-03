@@ -808,10 +808,6 @@ domb0047
 domb0048
 domb0049
 domb0050
-drpa0004
-drpa0014
-drpa0021
-drpa0028
 drpa0037
 drpa0048
 drpa0058
@@ -836,10 +832,7 @@ drpa0158
 drpa0161
 drpa0165
 drpa0170
-drpb0011
 drpb0012
-drpb0021
-drpb0027
 drpb0037
 drpb0046
 drpb0054
@@ -860,8 +853,6 @@ drpb0123
 drpb0129
 drpb0130
 drpb0136
-drpb0146
-drpb0147
 drpb0157
 drpb0170
 drpc0004

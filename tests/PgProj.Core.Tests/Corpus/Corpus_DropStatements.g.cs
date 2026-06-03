@@ -11,7 +11,7 @@ public class Corpus_DropStatements
     public void drpa0002() => CorpusAssert.Parses(@"DROP TABLE IF EXISTS s.t2", "ok");
     [Fact]
     public void drpa0003() => CorpusAssert.Parses(@"DROP TABLE IF EXISTS s.no_such_table", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpa0004() => CorpusAssert.Parses(@"DROP TABLE s.no_such_table", "error");
     [Fact]
     public void drpa0005() => CorpusAssert.Parses(@"DROP TABLE s.t2 RESTRICT", "ok");
@@ -31,7 +31,7 @@ public class Corpus_DropStatements
     public void drpa0012() => CorpusAssert.Parses(@"CREATE TABLE s.drop_a2 (a int); CREATE TABLE s.drop_b2 (b int); DROP TABLE IF EXISTS s.drop_a2, s.drop_b2", "ok");
     [Fact]
     public void drpa0013() => CorpusAssert.Parses(@"DROP TABLE", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpa0014() => CorpusAssert.Parses(@"DROP TABLE s.t2, s.no_exist", "error");
     [Fact]
     public void drpa0015() => CorpusAssert.Parses(@"DROP TABLE IF EXISTS s.t2, s.no_exist", "ok");
@@ -45,7 +45,7 @@ public class Corpus_DropStatements
     public void drpa0019() => CorpusAssert.Parses(@"DROP VIEW IF EXISTS s.v", "ok");
     [Fact]
     public void drpa0020() => CorpusAssert.Parses(@"DROP VIEW IF EXISTS s.no_such_view", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpa0021() => CorpusAssert.Parses(@"DROP VIEW s.no_such_view", "error");
     [Fact]
     public void drpa0022() => CorpusAssert.Parses(@"DROP VIEW s.v CASCADE", "ok");
@@ -59,7 +59,7 @@ public class Corpus_DropStatements
     public void drpa0026() => CorpusAssert.Parses(@"DROP MATERIALIZED VIEW IF EXISTS s.mv", "ok");
     [Fact]
     public void drpa0027() => CorpusAssert.Parses(@"DROP MATERIALIZED VIEW IF EXISTS s.no_such_mv", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpa0028() => CorpusAssert.Parses(@"DROP MATERIALIZED VIEW s.no_such_mv", "error");
     [Fact]
     public void drpa0029() => CorpusAssert.Parses(@"DROP MATERIALIZED VIEW s.mv CASCADE", "ok");
@@ -365,7 +365,7 @@ public class Corpus_DropStatements
     public void drpb0009() => CorpusAssert.Parses(@"DROP TABLE", "error");
     [Fact]
     public void drpb0010() => CorpusAssert.Parses(@"DROP TABLE s.t CASCADE RESTRICT", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpb0011() => CorpusAssert.Parses(@"DROP TABLE s.no_such_table", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void drpb0012() => CorpusAssert.Parses(@"CREATE TABLE s.drop_parent (id int); CREATE TABLE s.drop_child (x int REFERENCES s.drop_parent(id)); DROP TABLE s.drop_parent RESTRICT", "error");
@@ -385,7 +385,7 @@ public class Corpus_DropStatements
     public void drpb0019() => CorpusAssert.Parses(@"CREATE VIEW s.drop_vres AS SELECT 1 AS x; DROP VIEW s.drop_vres RESTRICT", "ok");
     [Fact]
     public void drpb0020() => CorpusAssert.Parses(@"DROP VIEW", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpb0021() => CorpusAssert.Parses(@"DROP VIEW s.no_such_view", "error");
     [Fact]
     public void drpb0022() => CorpusAssert.Parses(@"CREATE VIEW s.drop_v1 AS SELECT 1; CREATE VIEW s.drop_v2 AS SELECT 2; DROP VIEW s.drop_v1, s.drop_v2", "ok");
@@ -397,7 +397,7 @@ public class Corpus_DropStatements
     public void drpb0025() => CorpusAssert.Parses(@"CREATE MATERIALIZED VIEW s.drop_mvcas AS SELECT 1 AS x; DROP MATERIALIZED VIEW s.drop_mvcas CASCADE", "ok");
     [Fact]
     public void drpb0026() => CorpusAssert.Parses(@"CREATE MATERIALIZED VIEW s.drop_mvres AS SELECT 1 AS x; DROP MATERIALIZED VIEW s.drop_mvres RESTRICT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpb0027() => CorpusAssert.Parses(@"DROP MATERIALIZED VIEW s.no_such_mv", "error");
     [Fact]
     public void drpb0028() => CorpusAssert.Parses(@"DROP MATERIALIZED VIEW", "error");
@@ -635,9 +635,9 @@ public class Corpus_DropStatements
     public void drpb0144() => CorpusAssert.Parses(@"CREATE FUNCTION s.drop_fn_out(x int) RETURNS int LANGUAGE sql AS $$ SELECT x $$; DROP FUNCTION s.drop_fn_out(int)", "ok");
     [Fact]
     public void drpb0145() => CorpusAssert.Parses(@"CREATE FUNCTION s.drop_fn_var(VARIADIC x int[]) RETURNS int LANGUAGE sql AS $$ SELECT 1 $$; DROP FUNCTION s.drop_fn_var(VARIADIC int[])", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpb0146() => CorpusAssert.Parses(@"DROP TABLE s.t, s.no_such_extra", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpb0147() => CorpusAssert.Parses(@"DROP VIEW s.v, s.no_such_view", "error");
     [Fact]
     public void drpb0148() => CorpusAssert.Parses(@"CREATE TABLE s.drp_kw (a int); drop table s.drp_kw", "ok");
