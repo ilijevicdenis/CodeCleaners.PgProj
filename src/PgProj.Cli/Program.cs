@@ -1,10 +1,14 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using PgProj.Core.Analysis;
+using PgProj.Core.Ast;
 using PgProj.Core.Comparison;
 using PgProj.Core.Introspection;
 using PgProj.Core.Model;
+using PgProj.Core.Parsing;
 using PgProj.Core.Project;
 
 namespace PgProj.Cli;
@@ -51,20 +55,22 @@ public static class Program
         Console.WriteLine($"Building project '{project.Name}' ({result.Files.Count} file(s), default schema '{project.DefaultSchema}')");
         PrintModelSummary(result.Model);
 
+        if (result.Diagnostics.Count > 0)
+        {
+            Console.Error.WriteLine();
+            Console.Error.WriteLine($"Build failed with {result.Diagnostics.Count} problem(s):");
+            foreach (var d in result.Diagnostics) Console.Error.WriteLine($"  - {d}");
+            return 1;
+        }
+
+        // Static-analysis gate (skip with --no-analyze; escalate warnings with --strict).
+        if (AnalysisGateBlocks(project, args)) return 1;
+
         var outPath = GetOption(args, "-o", "--output")
                       ?? Path.Combine(project.ProjectDirectory, "bin", $"{project.Name}.model.json");
         Directory.CreateDirectory(Path.GetDirectoryName(outPath)!);
         File.WriteAllText(outPath, ModelJson.Serialize(result.Model));
         Console.WriteLine($"Model written to {outPath}");
-
-        if (result.Diagnostics.Count > 0)
-        {
-            Console.Error.WriteLine();
-            Console.Error.WriteLine($"Build finished with {result.Diagnostics.Count} problem(s):");
-            foreach (var d in result.Diagnostics) Console.Error.WriteLine($"  - {d}");
-            return 1;
-        }
-
         Console.WriteLine("Build succeeded.");
         return 0;
     }
@@ -100,7 +106,11 @@ public static class Program
 
     private static async Task<int> Publish(string[] args)
     {
-        var (source, _) = BuildSourceOrThrow(args);
+        var (source, project) = BuildSourceOrThrow(args);
+
+        // Gate before touching the database: a failing analysis must not reach the server.
+        if (AnalysisGateBlocks(project, args)) return 1;
+
         var target = await ReadTarget(args);
 
         var changes = new SchemaComparer().Compare(source, target, new ComparerOptions
@@ -176,30 +186,54 @@ public static class Program
     private static int Analyze(string[] args)
     {
         var project = DatabaseProject.Load(RequirePositional(args, "project file"));
-        var parser = new PgProj.Core.Parsing.AstParser(project.DefaultSchema);
-        var statements = new List<PgProj.Core.Ast.SqlStatement>();
+        var findings = RunAnalysis(project, out var ruleCount);
+        Console.WriteLine($"Analyzed '{project.Name}': {ruleCount} rule(s).");
+        return ReportFindings(findings, HasFlag(args, "--strict"), alwaysReport: true) ? 1 : 0;
+    }
+
+    // ---- shared analysis gate -----------------------------------------------------------
+
+    private static IReadOnlyList<Diagnostic> RunAnalysis(DatabaseProject project, out int ruleCount)
+    {
+        var parser = new AstParser(project.DefaultSchema);
+        var statements = new List<SqlStatement>();
         foreach (var file in project.ResolveSqlFiles())
             statements.AddRange(parser.Parse(File.ReadAllText(file)).Statements);
 
-        var script = new PgProj.Core.Ast.SqlScript { Statements = statements };
-        var analyzer = PgProj.Core.Analysis.SqlAnalyzer.Default();
-        var findings = analyzer.Analyze(script);
+        var analyzer = SqlAnalyzer.Default();
+        ruleCount = analyzer.Rules.Count;
+        return analyzer.Analyze(new SqlScript { Statements = statements });
+    }
 
-        Console.WriteLine($"Analyzed '{project.Name}': {statements.Count} statement(s), {analyzer.Rules.Count} rule(s).");
-        foreach (var d in parser.Diagnostics) Console.Error.WriteLine($"  parse: {d}");
+    /// <summary>Prints findings and returns true if the gate should block (errors, or warnings under --strict).</summary>
+    private static bool ReportFindings(IReadOnlyList<Diagnostic> findings, bool strict, bool alwaysReport)
+    {
+        var errors = findings.Count(f => f.Severity == DiagnosticSeverity.Error);
+        var warnings = findings.Count(f => f.Severity == DiagnosticSeverity.Warning);
+        var infos = findings.Count(f => f.Severity == DiagnosticSeverity.Info);
+        var blocked = errors > 0 || (strict && warnings > 0);
 
-        if (findings.Count == 0) { Console.WriteLine("No findings. ✓"); return 0; }
+        if (findings.Count == 0)
+        {
+            if (alwaysReport) Console.WriteLine("No findings. ✓");
+            return false;
+        }
 
         foreach (var d in findings.OrderByDescending(f => f.Severity))
             Console.WriteLine($"  {d}");
+        Console.WriteLine($"analysis: {errors} error, {warnings} warning, {infos} info" +
+                          (blocked ? "  — blocking (treat warnings as errors via --strict)" : ""));
+        return blocked;
+    }
 
-        var errors = findings.Count(f => f.Severity == PgProj.Core.Analysis.DiagnosticSeverity.Error);
-        var warnings = findings.Count(f => f.Severity == PgProj.Core.Analysis.DiagnosticSeverity.Warning);
-        var infos = findings.Count(f => f.Severity == PgProj.Core.Analysis.DiagnosticSeverity.Info);
-        Console.WriteLine($"\n{findings.Count} finding(s): {errors} error, {warnings} warning, {infos} info.");
-
-        var strict = HasFlag(args, "--strict");
-        return errors > 0 || (strict && warnings > 0) ? 1 : 0;
+    /// <summary>The build/publish gate. Returns true if the operation must abort.</summary>
+    private static bool AnalysisGateBlocks(DatabaseProject project, string[] args)
+    {
+        if (HasFlag(args, "--no-analyze")) return false;
+        var findings = RunAnalysis(project, out _);
+        var blocked = ReportFindings(findings, HasFlag(args, "--strict"), alwaysReport: false);
+        if (blocked) Console.Error.WriteLine("Aborted by analysis gate (pass --no-analyze to skip).");
+        return blocked;
     }
 
     // ---- script (full create from project, no server) -----------------------------------
@@ -299,10 +333,10 @@ public static class Program
         pgproj — PostgreSQL database project tool
 
         Usage:
-          pgproj build   <project.pgproj> [-o model.json]
+          pgproj build   <project.pgproj> [-o model.json] [--strict] [--no-analyze]
           pgproj script  <project.pgproj> [-o create.sql] [--no-transaction]
           pgproj compare <project.pgproj> --connection <conn> [--allow-drops]
-          pgproj publish <project.pgproj> --connection <conn> [--dry-run] [-o script.sql] [--allow-drops] [--no-transaction]
+          pgproj publish <project.pgproj> --connection <conn> [--dry-run] [-o script.sql] [--allow-drops] [--no-transaction] [--parallel] [--strict] [--no-analyze]
           pgproj extract --connection <conn> -o <outDir>
           pgproj analyze <project.pgproj> [--strict]    (static safety analysis over the AST)
 
@@ -313,6 +347,8 @@ public static class Program
           --allow-drops      Allow destructive changes (drop tables/columns/etc. not in the project)
           --no-transaction   Do not wrap the deploy script in BEGIN/COMMIT
           --parallel         Publish with intra-phase parallelism (phase-level atomicity)
+          --strict           Analysis gate: treat warnings as errors (build/publish fail on warnings)
+          --no-analyze       Skip the static-analysis gate on build/publish
         """);
     }
 }

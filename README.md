@@ -111,3 +111,11 @@ it without changing the file format.
 Mirrors SSDT's "block on data loss": by default the comparer **never drops** objects that exist
 on the server but not in the project. Pass `--allow-drops` to opt in. Deploy scripts are wrapped
 in `BEGIN`/`COMMIT` unless you pass `--no-transaction`, so a failed step rolls back cleanly.
+
+## Analysis gate
+
+`build` and `publish` run the static analyzer first. **Errors always block**; `--strict` makes
+**warnings block too** (treat-warnings-as-errors); `info` never blocks. `--no-analyze` skips the
+gate. Because the MSBuild SDK's `Build` target invokes `pgproj build`, `dotnet build SampleDb.pgproj`
+(and a Visual Studio build) gets the gate automatically — a `publish` that fails analysis aborts
+**before** connecting to the server.
