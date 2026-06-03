@@ -175,6 +175,7 @@ public sealed partial class PgParser
         }
 
         // PARTITION OF parent … / OF type … — no column list; accept the remainder verbatim.
+        if (c.AtAnyWord("SELECT", "VALUES")) throw new ParseException("expected AS before the query in CREATE TABLE AS", c.Here);
         var rest = c.AtEnd ? null : CaptureRest(c);
         return new CreateTableStatement
         { Position = pos, Schema = schema, Name = name, IfNotExists = ifNotExists, Persistence = persistence, IsPartitionOrTyped = true, TrailingText = rest };
@@ -184,6 +185,8 @@ public sealed partial class PgParser
     {
         c.ExpectWord("AS");
         if (c.AtEnd) throw new ParseException("expected a query after AS", c.Here);
+        if (c.Current is { Kind: TokenKind.Word } qw && !c.AtAnyWord("SELECT", "VALUES", "TABLE", "EXECUTE", "WITH"))
+            throw new ParseException($"CREATE TABLE AS source must be SELECT/VALUES/TABLE/EXECUTE, not \"{qw.Value}\"", c.Here);
         var stmt = new CreateTableAsStatement { Schema = schema, Name = name, IfNotExists = ifNotExists };
         stmt.ColumnAliases.AddRange(aliases);
         stmt.QueryText = CaptureRest(c);   // SELECT / VALUES / TABLE / EXECUTE (+ optional WITH [NO] DATA)

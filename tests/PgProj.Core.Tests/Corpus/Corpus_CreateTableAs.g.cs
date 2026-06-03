@@ -189,11 +189,11 @@ CREATE TEMP TABLE ctasa_t65 ON COMMIT DROP AS EXECUTE ctasa_prep5(0)", "ok");
     public void ctasa0088() => CorpusAssert.Parses(@"CREATE TABLE ctasa_err46 AS SELECT id FROM s.t WHERE val::nosuchtype = 1", "error");
     [Fact]
     public void ctasa0089() => CorpusAssert.Parses(@"CREATE TABLE ctasa_t89 AS SELECT id, name FROM s.t WHERE name LIKE 'A%'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ctasa0090() => CorpusAssert.Parses(@"CREATE TABLE ctasa_err25 AS UPDATE s.t SET name = 'x'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ctasa0091() => CorpusAssert.Parses(@"CREATE TABLE ctasa_err26 AS INSERT INTO s.t (name) VALUES ('x')", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ctasa0092() => CorpusAssert.Parses(@"CREATE TABLE ctasa_err27 AS DELETE FROM s.t", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void ctasa0093() => CorpusAssert.Parses(@"CREATE TABLE ctasa_err28 TABLESPACE nonexistent_tblspc AS SELECT id FROM s.t", "error");
@@ -313,9 +313,9 @@ SELECT id, label FROM s.t2", "ok");
     public void ctasa0149() => CorpusAssert.Parses(@"CREATE TABLE ctasa_err18 AS SELECT id FROM s.t GROUP BY", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void ctasa0150() => CorpusAssert.Parses(@"CREATE TABLE ctasa_err19 USING AS SELECT id FROM s.t", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ctasa0151() => CorpusAssert.Parses(@"CREATE TABLE ctasa_t151 SELECT id FROM s.t", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ctasa0152() => CorpusAssert.Parses(@"CREATE TABLE AS SELECT id FROM s.t", "error");
     [Fact]
     public void ctasa0153() => CorpusAssert.Parses(@"CREATE TABLE ctasa_err1 AS", "error");
@@ -407,7 +407,7 @@ CREATE TABLE ctas_execute AS EXECUTE ctas_prep(0)", "ok");
     public void ctasb0025() => CorpusAssert.Parses(@"CREATE LOCAL TEMP TABLE ctas_local_temp AS SELECT id FROM s.t WITH NO DATA", "ok");
     [Fact]
     public void ctasb0026() => CorpusAssert.Parses(@"CREATE GLOBAL TEMP TABLE ctas_global_temp AS SELECT id FROM s.t WITH NO DATA", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void ctasb0027() => CorpusAssert.Parses(@"CREATE TABLE ctas_missing_as SELECT id FROM s.t", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void ctasb0028() => CorpusAssert.Parses(@"CREATE TABLE ctas_bad_data AS SELECT id FROM s.t WITH DATA NO", "error");
