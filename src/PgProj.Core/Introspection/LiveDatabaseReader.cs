@@ -821,13 +821,6 @@ public sealed class LiveDatabaseReader
             while (await r.ReadAsync(ct))
                 list.Add(MakeRaw(kind, r.GetString(0), r.GetString(1), $"{tag}:{r.GetString(0)}.{r.GetString(1)}", string.Empty, bodyComparable: false));
         }
-        async Task Global(ObjectKind kind, string tag, string sql)
-        {
-            await using var cmd = new NpgsqlCommand(sql, conn);
-            await using var r = await cmd.ExecuteReaderAsync(ct);
-            while (await r.ReadAsync(ct))
-                list.Add(MakeRaw(kind, "", r.GetString(0), $"{tag}:{r.GetString(0)}", string.Empty, bodyComparable: false));
-        }
 
         // Conversion, FDW, Server, Cast, and column-based Statistics now have real DDL reconstruction
         // (below); the rest stay existence-only until they get a clean reconstruction too.
