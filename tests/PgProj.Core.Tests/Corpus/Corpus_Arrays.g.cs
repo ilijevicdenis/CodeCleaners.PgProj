@@ -223,9 +223,9 @@ public class Corpus_Arrays
     public void arra0108() => CorpusAssert.Parses(@"SELECT status, array_agg(name) FROM s.t GROUP BY status", "ok");
     [Fact]
     public void arra0109() => CorpusAssert.Parses(@"CREATE TABLE t_arr (a int[]); INSERT INTO t_arr VALUES (ARRAY[1,2,3]); SELECT a[1] FROM t_arr;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void arra0110() => CorpusAssert.Parses(@"CREATE TABLE t_arr2 (a int[]); UPDATE t_arr2 SET a[1] = 99 WHERE false; SELECT 1;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void arra0111() => CorpusAssert.Parses(@"CREATE TABLE t_arr3 (a int[]); UPDATE t_arr3 SET a[1:2] = '{10,20}' WHERE false; SELECT 1;", "ok");
     [Fact]
     public void arra0112() => CorpusAssert.Parses(@"SELECT ARRAY[1,2,3]::text[]", "ok");

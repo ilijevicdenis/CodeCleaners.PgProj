@@ -59,7 +59,7 @@ public class Corpus_Insert
     public void insa0026() => CorpusAssert.Parses(@"WITH a AS (SELECT 'A' AS name), b AS (SELECT 'B' AS name) INSERT INTO s.t (name) SELECT name FROM a UNION ALL SELECT name FROM b", "ok");
     [Fact]
     public void insa0027() => CorpusAssert.Parses(@"WITH RECURSIVE r(n) AS (VALUES(1) UNION ALL SELECT n+1 FROM r WHERE n < 3) INSERT INTO s.t (name, qty) SELECT 'rec'||n, n FROM r", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void insa0028() => CorpusAssert.Parses(@"WITH moved AS (DELETE FROM s.t2 WHERE label IS NULL RETURNING t_id) INSERT INTO s.t (name, qty) SELECT 'moved', count(*)::integer FROM moved", "ok");
     [Fact]
     public void insa0029() => CorpusAssert.Parses(@"INSERT INTO s.t (name) VALUES ('Sam') RETURNING id", "ok");
@@ -181,9 +181,9 @@ public class Corpus_Insert
     public void insa0087() => CorpusAssert.Parses(@"INSERT INTO s.t (name, flag) VALUES ('Bool_t', TRUE), ('Bool_f', FALSE)", "ok");
     [Fact]
     public void insa0088() => CorpusAssert.Parses(@"INSERT INTO s.t (name, flag) VALUES ('boolkey', 'true'::boolean)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void insa0089() => CorpusAssert.Parses(@"WITH ins AS (INSERT INTO s.t (name) VALUES ('CTEins') RETURNING id) SELECT id FROM ins", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void insa0090() => CorpusAssert.Parses(@"WITH ins AS (INSERT INTO s.t (name) VALUES ('CTAins2') RETURNING id) INSERT INTO s.t2 (t_id, label) SELECT id, 'child' FROM ins", "ok");
     [Fact]
     public void insa0091() => CorpusAssert.Parses(@"INSERT INTO s.t (name) VALUES ('WithComment') -- trailing comment", "ok");
@@ -337,7 +337,7 @@ public class Corpus_Insert
     public void insa0165() => CorpusAssert.Parses(@"INSERT INTO s.t (name, qty) VALUES ('TypeCoerce', '5')", "ok");
     [Fact]
     public void insa0166() => CorpusAssert.Parses(@"INSERT INTO s.t (name, qty) VALUES ('TypeCoerce2', '5'::integer)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void insa0167() => CorpusAssert.Parses(@"WITH del AS (DELETE FROM s.t2 RETURNING t_id), ins AS (INSERT INTO s.t (name) VALUES ('cta') RETURNING id) SELECT del.t_id, ins.id FROM del, ins", "ok");
     [Fact]
     public void insa0168() => CorpusAssert.Parses(@"INSERT INTO s.t (name) VALUES ('OvfConf') ON CONFLICT (id) DO UPDATE SET name = EXCLUDED.name WHERE EXCLUDED.name <> 'skip'", "ok");
@@ -461,9 +461,9 @@ public class Corpus_Insert
     public void insb0057() => CorpusAssert.Parses(@"INSERT INTO s.t (name, qty) SELECT name, qty FROM s.t WHERE false ORDER BY name", "ok");
     [Fact]
     public void insb0058() => CorpusAssert.Parses(@"INSERT INTO s.t (name, qty) SELECT 'x', qty FROM s.t WHERE false UNION ALL SELECT 'y', 1", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void insb0059() => CorpusAssert.Parses(@"WITH ins AS (INSERT INTO s.t (name) VALUES ('cte-ins') RETURNING id) SELECT id FROM ins", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void insb0060() => CorpusAssert.Parses(@"WITH ins AS (INSERT INTO s.t (name, val) VALUES ('m1', 1.0), ('m2', 2.0) RETURNING id, name) SELECT count(*) FROM ins", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void insb0061() => CorpusAssert.Parses(@"WITH ins1 AS (INSERT INTO s.t (name) VALUES ('c1') RETURNING id), ins2 AS (INSERT INTO s.t2 (t_id, label) SELECT id, 'child' FROM ins1 RETURNING id) SELECT * FROM ins2", "ok");
@@ -627,9 +627,9 @@ SELECT currval('s.seq')", "ok");
     public void insb0139() => CorpusAssert.Parses(@"INSERT INTO s.t (name) SELECT 'cte-wrap' WHERE NOT EXISTS (SELECT 1 FROM s.t WHERE name = 'cte-wrap')", "ok");
     [Fact]
     public void insb0140() => CorpusAssert.Parses(@"INSERT INTO s.t (name, val) SELECT name, val * 2 FROM s.t WHERE false", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void insb0141() => CorpusAssert.Parses(@"WITH d AS (DELETE FROM s.t WHERE false RETURNING name) INSERT INTO s.t2 (label) SELECT name FROM d", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void insb0142() => CorpusAssert.Parses(@"WITH u AS (UPDATE s.t SET qty = qty WHERE false RETURNING name) INSERT INTO s.t2 (label) SELECT name FROM u", "ok");
     [Fact]
     public void insb0143() => CorpusAssert.Parses(@"INSERT INTO s.t (name) SELECT 'order-off' ORDER BY 1", "ok");
@@ -649,7 +649,7 @@ SELECT currval('s.seq')", "ok");
     public void insb0150() => CorpusAssert.Parses(@"INSERT INTO s.t (name, qty) VALUES ('oc-idx1-b', 10) ON CONFLICT (id) DO UPDATE SET name = EXCLUDED.name, qty = EXCLUDED.qty WHERE EXCLUDED.qty > 0", "ok");
     [Fact]
     public void insb0151() => CorpusAssert.Parses(@"INSERT INTO s.t (name, qty) VALUES ('oc-idx1', 1) ON CONFLICT (id) DO UPDATE SET qty = EXCLUDED.qty + s.t.qty WHERE s.t.qty < 100", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void insb0152() => CorpusAssert.Parses(@"INSERT INTO s.t (name) VALUES ('exc-star') ON CONFLICT (id) DO UPDATE SET (name) = ROW(EXCLUDED.name)", "ok");
     [Fact]
     public void insb0153() => CorpusAssert.Parses(@"INSERT INTO s.t (name, val, qty) VALUES ('multi-set', 1.0, 2) ON CONFLICT (id) DO UPDATE SET (val, qty) = (EXCLUDED.val, EXCLUDED.qty)", "ok");

@@ -69,6 +69,7 @@ public sealed partial class PgParser
     private static string? ClassifyLeading(TokenCursor c)
     {
         if (c.AtAnyWord("SELECT", "WITH", "VALUES", "TABLE", "INSERT", "UPDATE", "DELETE", "MERGE", "TRUNCATE")) return "QUERY";
+        if (c.AtSymbol('(')) return "QUERY";   // parenthesised set-op query
         if (c.Current is { Kind: TokenKind.Word } cw && CommandKeywords.Contains(cw.Value)) return "QUERY";
         if (c.AtAnyWord("ALTER", "DROP")) return "QUERY";
         if (!c.AtWord("CREATE")) return null;
@@ -79,6 +80,7 @@ public sealed partial class PgParser
         if (head?.IsWord("TABLE") == true) return "CREATE TABLE";
         if (head?.IsWord("SCHEMA") == true) return "CREATE SCHEMA";
         if (head?.IsWord("PUBLICATION") == true || head?.IsWord("SUBSCRIPTION") == true) return "CREATE";
+        if (head is { } h2 && (h2.IsWord("ROLE") || h2.IsWord("USER") || h2.IsWord("GROUP"))) return "CREATE";
         return null;
     }
 
@@ -95,7 +97,7 @@ public sealed partial class PgParser
             q.With.AddRange(ctes); q.WithRecursive = recursive;
             return new QueryStatement { Query = q };
         }
-        if (c.AtAnyWord("SELECT", "VALUES", "TABLE"))
+        if (c.AtAnyWord("SELECT", "VALUES", "TABLE") || c.AtSymbol('('))
             return new QueryStatement { Query = ParseSelectStatement(c) };
         if (c.AtWord("INSERT")) return ParseInsert(c, null, false);
         if (c.AtWord("UPDATE")) return ParseUpdate(c, null, false);
@@ -117,6 +119,7 @@ public sealed partial class PgParser
         }
         if (c.MatchWord("TABLE")) return ParseCreateTable(c, persistence);
         if (c.MatchWord("SCHEMA")) return ParseCreateSchema(c);
+        if (c.AtAnyWord("ROLE", "USER", "GROUP")) { var k = c.Advance().Value.ToUpperInvariant(); c.ExpectIdentifier(); ConsumeRest(c); return new CommandStatement { Kind = "CREATE " + k }; }
         if (c.MatchWord("PUBLICATION")) { c.ExpectIdentifier(); ConsumeRest(c); return new CommandStatement { Kind = "CREATE PUBLICATION" }; }
         if (c.MatchWord("SUBSCRIPTION"))
         {

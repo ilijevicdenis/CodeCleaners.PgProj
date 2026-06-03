@@ -176,18 +176,24 @@ public sealed partial class PgParser
     private SetClause ParseSetClause(TokenCursor c)
     {
         var sc = new SetClause();
-        if (c.AtSymbol('('))                                 // (c1, c2) = (v1, v2) | (sub-select)
+        if (c.AtSymbol('('))                                 // (c1, c2) = (v1, v2) | ROW(..) | (sub-select)
         {
             sc.Multi = true;
             sc.Columns.AddRange(ParseColumnNameList(c));
-            c.MatchOperator("=");
-            if (!c.AtSymbol('(')) throw new ParseException("expected '(' after multi-column SET =", c.Here);
-            c.Advance();
-            if (c.AtAnyWord("SELECT", "WITH", "VALUES", "TABLE")) { sc.SubSelect = ParseSelectStatement(c); c.ExpectSymbol(')'); }
-            else { c.MatchWord("ROW"); sc.Values.Add(ParseExpression(c)); while (c.MatchSymbol(',')) sc.Values.Add(ParseExpression(c)); c.ExpectSymbol(')'); }
+            if (!c.MatchOperator("=")) throw new ParseException("expected '=' in multi-column SET", c.Here);
+            if (c.AtSymbol('('))
+            {
+                c.Advance();
+                if (c.AtAnyWord("SELECT", "WITH", "VALUES", "TABLE")) sc.SubSelect = ParseSelectStatement(c);
+                else { sc.Values.Add(ParseExpression(c)); while (c.MatchSymbol(',')) sc.Values.Add(ParseExpression(c)); }
+                c.ExpectSymbol(')');
+            }
+            else sc.Value = ParseExpression(c);              // ROW(...) etc
             return sc;
         }
         sc.Columns.Add(c.ExpectIdentifier());
+        while (c.AtSymbol('[')) CaptureBracket(c);            // tags[1] = …
+        while (c.MatchSymbol('.')) { c.ExpectIdentifier(); while (c.AtSymbol('[')) CaptureBracket(c); }   // home.city = …
         if (!c.MatchOperator("=")) throw new ParseException("expected '=' in SET assignment", c.Here);
         if (c.MatchWord("DEFAULT")) sc.Default = true;
         else sc.Value = ParseExpression(c);
@@ -204,6 +210,7 @@ public sealed partial class PgParser
     private void ParseReturning(TokenCursor c, DmlStatement s)
     {
         if (!c.MatchWord("RETURNING")) return;
+        if (c.MatchWord("WITH") && c.AtSymbol('(')) CaptureBalancedParens(c);   // PG18: RETURNING WITH (OLD/NEW AS …)
         if (c.MatchSymbol('*')) { s.ReturningStar = true; return; }
         s.Returning.Add(ParseSelectItem(c));
         while (c.MatchSymbol(',')) s.Returning.Add(ParseSelectItem(c));

@@ -159,17 +159,17 @@ public class Corpus_SelectBasic
     public void selba0076() => CorpusAssert.Parses(@"SELECT id FROM s.t OFFSET 5", "ok");
     [Fact]
     public void selba0077() => CorpusAssert.Parses(@"SELECT id FROM s.t OFFSET 5 ROWS", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0078() => CorpusAssert.Parses(@"SELECT id FROM s.t FETCH FIRST 5 ROWS ONLY", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0079() => CorpusAssert.Parses(@"SELECT id FROM s.t FETCH NEXT 5 ROWS ONLY", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0080() => CorpusAssert.Parses(@"SELECT id FROM s.t FETCH FIRST 1 ROW ONLY", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0081() => CorpusAssert.Parses(@"SELECT id FROM s.t OFFSET 2 ROWS FETCH NEXT 3 ROWS ONLY", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0082() => CorpusAssert.Parses(@"SELECT id FROM s.t ORDER BY id FETCH FIRST 5 ROWS WITH TIES", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0083() => CorpusAssert.Parses(@"SELECT id, name FROM s.t ORDER BY id FETCH FIRST 5 ROWS WITH TIES", "ok");
     [Fact]
     public void selba0084() => CorpusAssert.Parses(@"SELECT id FROM s.t LIMIT NULL", "ok");
@@ -373,7 +373,7 @@ public class Corpus_SelectBasic
     public void selba0183() => CorpusAssert.Parses(@"SELECT id FROM s.t HAVING COUNT(*) > 0", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void selba0184() => CorpusAssert.Parses(@"SELECT ALL DISTINCT id FROM s.t", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selba0185() => CorpusAssert.Parses(@"SELECT id FROM s.t FETCH FIRST ROWS ONLY", "ok");
     [Fact]
     public void selba0186() => CorpusAssert.Parses(@"SELECT id name extra FROM s.t", "error");
@@ -547,17 +547,17 @@ public class Corpus_SelectBasic
     public void selbb0070() => CorpusAssert.Parses(@"SELECT id FROM s.t LIMIT 10 OFFSET 5", "ok");
     [Fact]
     public void selbb0071() => CorpusAssert.Parses(@"SELECT id FROM s.t OFFSET 5 LIMIT 10", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selbb0072() => CorpusAssert.Parses(@"SELECT id FROM s.t FETCH FIRST 5 ROWS ONLY", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selbb0073() => CorpusAssert.Parses(@"SELECT id FROM s.t FETCH NEXT 5 ROWS ONLY", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selbb0074() => CorpusAssert.Parses(@"SELECT id FROM s.t FETCH FIRST 1 ROW ONLY", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selbb0075() => CorpusAssert.Parses(@"SELECT id FROM s.t OFFSET 0 ROWS FETCH NEXT 5 ROWS ONLY", "ok");
     [Fact]
-    public void selbb0076() => CorpusAssert.Parses(@"SELECT id FROM s.t FETCH FIRST 5 ROWS WITH TIES", "error");
+    public void selbb0072() => CorpusAssert.Parses(@"SELECT id FROM s.t FETCH FIRST 5 ROWS ONLY", "ok");
+    [Fact]
+    public void selbb0073() => CorpusAssert.Parses(@"SELECT id FROM s.t FETCH NEXT 5 ROWS ONLY", "ok");
+    [Fact]
+    public void selbb0074() => CorpusAssert.Parses(@"SELECT id FROM s.t FETCH FIRST 1 ROW ONLY", "ok");
+    [Fact]
+    public void selbb0075() => CorpusAssert.Parses(@"SELECT id FROM s.t OFFSET 0 ROWS FETCH NEXT 5 ROWS ONLY", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
+    public void selbb0076() => CorpusAssert.Parses(@"SELECT id FROM s.t FETCH FIRST 5 ROWS WITH TIES", "error");
+    [Fact]
     public void selbb0077() => CorpusAssert.Parses(@"SELECT id FROM s.t ORDER BY id FETCH FIRST 5 ROWS WITH TIES", "ok");
     [Fact]
     public void selbb0078() => CorpusAssert.Parses(@"SELECT s.t.id, s.t.name FROM s.t, s.t2", "ok");

@@ -77,7 +77,7 @@ public class Corpus_TypeSyntax
     public void tysa0035() => CorpusAssert.Parses(@"SELECT CAST('2024-01-01 12:00:00+00' AS timestamp with time zone)", "ok");
     [Fact]
     public void tysa0036() => CorpusAssert.Parses(@"SELECT CAST('2024-01-01 12:00:00+00' AS timestamptz)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tysa0037() => CorpusAssert.Parses(@"SELECT CAST('2024-01-01 12:00:00+00' AS timestamp(3) with time zone)", "ok");
     [Fact]
     public void tysa0038() => CorpusAssert.Parses(@"SELECT CAST('2024-01-01' AS date)", "ok");
@@ -91,33 +91,33 @@ public class Corpus_TypeSyntax
     public void tysa0042() => CorpusAssert.Parses(@"SELECT CAST('12:00:00+00' AS time with time zone)", "ok");
     [Fact]
     public void tysa0043() => CorpusAssert.Parses(@"SELECT CAST('12:00:00+00' AS timetz)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tysa0044() => CorpusAssert.Parses(@"SELECT CAST('12:00:00+00' AS time(3) with time zone)", "ok");
     [Fact]
     public void tysa0045() => CorpusAssert.Parses(@"SELECT CAST('1 day' AS interval)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tysa0046() => CorpusAssert.Parses(@"SELECT CAST('1 day' AS interval day)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tysa0047() => CorpusAssert.Parses(@"SELECT CAST('01:00:00' AS interval hour to second)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tysa0048() => CorpusAssert.Parses(@"SELECT CAST('1 year' AS interval year)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tysa0049() => CorpusAssert.Parses(@"SELECT CAST('1 month' AS interval month)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tysa0050() => CorpusAssert.Parses(@"SELECT CAST('01:00' AS interval hour to minute)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tysa0051() => CorpusAssert.Parses(@"SELECT CAST('1:00' AS interval minute to second)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tysa0052() => CorpusAssert.Parses(@"SELECT CAST('1 day' AS interval day to hour)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tysa0053() => CorpusAssert.Parses(@"SELECT CAST('1 day' AS interval day to minute)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tysa0054() => CorpusAssert.Parses(@"SELECT CAST('1 day' AS interval day to second)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tysa0055() => CorpusAssert.Parses(@"SELECT CAST('1 year 2 months' AS interval year to month)", "ok");
     [Fact]
     public void tysa0056() => CorpusAssert.Parses(@"SELECT CAST('1 day' AS interval(0))", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tysa0057() => CorpusAssert.Parses(@"SELECT CAST('01:00:00' AS interval second(2))", "ok");
     [Fact]
     public void tysa0058() => CorpusAssert.Parses(@"SELECT CAST(true AS boolean)", "ok");
@@ -309,7 +309,7 @@ public class Corpus_TypeSyntax
     public void tysa0151() => CorpusAssert.Parses(@"SELECT 'hello'::text, 'hello'::varchar, 'h'::char, 'hello'::bpchar", "ok");
     [Fact]
     public void tysa0152() => CorpusAssert.Parses(@"SELECT now()::date, now()::timestamp, now()::timestamptz", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tysa0153() => CorpusAssert.Parses(@"SELECT '1 day'::interval, '1 hour'::interval hour, '1:00:00'::interval hour to second", "ok");
     [Fact]
     public void tysa0154() => CorpusAssert.Parses(@"SELECT true::boolean, 'true'::bool", "ok");
@@ -405,7 +405,7 @@ public class Corpus_TypeSyntax
     public void tysb0029() => CorpusAssert.Parses(@"SELECT CAST('2024-01-01 12:00:00+00' AS timestamp with time zone)", "ok");
     [Fact]
     public void tysb0030() => CorpusAssert.Parses(@"SELECT CAST('2024-01-01 12:00:00+00' AS timestamptz)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tysb0031() => CorpusAssert.Parses(@"SELECT CAST('2024-01-01 12:00:00+00' AS timestamp(3) with time zone)", "ok");
     [Fact]
     public void tysb0032() => CorpusAssert.Parses(@"SELECT CAST('2024-01-01' AS date)", "ok");
@@ -421,29 +421,29 @@ public class Corpus_TypeSyntax
     public void tysb0037() => CorpusAssert.Parses(@"SELECT CAST('12:00:00+00' AS timetz)", "ok");
     [Fact]
     public void tysb0038() => CorpusAssert.Parses(@"SELECT CAST('1 year 2 months' AS interval)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tysb0039() => CorpusAssert.Parses(@"SELECT CAST('1 year' AS interval year)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tysb0040() => CorpusAssert.Parses(@"SELECT CAST('2 months' AS interval month)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tysb0041() => CorpusAssert.Parses(@"SELECT CAST('3 days' AS interval day)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tysb0042() => CorpusAssert.Parses(@"SELECT CAST('4 hours' AS interval hour)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tysb0043() => CorpusAssert.Parses(@"SELECT CAST('5 minutes' AS interval minute)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tysb0044() => CorpusAssert.Parses(@"SELECT CAST('6 seconds' AS interval second)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tysb0045() => CorpusAssert.Parses(@"SELECT CAST('1 day 2 hours' AS interval day to hour)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tysb0046() => CorpusAssert.Parses(@"SELECT CAST('1 hour 30 minutes' AS interval hour to minute)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tysb0047() => CorpusAssert.Parses(@"SELECT CAST('1 minute 30 seconds' AS interval minute to second)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tysb0048() => CorpusAssert.Parses(@"SELECT CAST('1 year 2 months' AS interval year to month)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tysb0049() => CorpusAssert.Parses(@"SELECT CAST('30 seconds' AS interval second(3))", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tysb0050() => CorpusAssert.Parses(@"SELECT CAST('1 minute 30 seconds' AS interval minute to second(2))", "ok");
     [Fact]
     public void tysb0051() => CorpusAssert.Parses(@"SELECT CAST('true' AS boolean)", "ok");

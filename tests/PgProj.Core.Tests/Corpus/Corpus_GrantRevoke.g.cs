@@ -33,13 +33,13 @@ public class Corpus_GrantRevoke
     public void grva0013() => CorpusAssert.Parses(@"GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE s.t TO PUBLIC", "ok");
     [Fact]
     public void grva0014() => CorpusAssert.Parses(@"GRANT SELECT ON TABLE s.t, s.t2 TO PUBLIC", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void grva0015() => CorpusAssert.Parses(@"CREATE ROLE grva_wgo; GRANT SELECT ON TABLE s.t TO grva_wgo WITH GRANT OPTION", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void grva0016() => CorpusAssert.Parses(@"CREATE ROLE grva_r1; GRANT SELECT ON TABLE s.t TO grva_r1", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void grva0017() => CorpusAssert.Parses(@"CREATE ROLE grva_r2; GRANT SELECT ON TABLE s.t TO grva_r2 WITH GRANT OPTION", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void grva0018() => CorpusAssert.Parses(@"CREATE ROLE grva_r3; GRANT ALL PRIVILEGES ON TABLE s.t TO grva_r3", "ok");
     [Fact]
     public void grva0019() => CorpusAssert.Parses(@"GRANT SELECT ON TABLE s.t TO CURRENT_USER", "ok");
@@ -47,7 +47,7 @@ public class Corpus_GrantRevoke
     public void grva0020() => CorpusAssert.Parses(@"GRANT SELECT ON TABLE s.t TO CURRENT_ROLE", "ok");
     [Fact]
     public void grva0021() => CorpusAssert.Parses(@"GRANT SELECT ON TABLE s.t TO SESSION_USER", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void grva0022() => CorpusAssert.Parses(@"CREATE ROLE grva_r4; GRANT SELECT ON TABLE s.t TO GROUP grva_r4", "ok");
     [Fact]
     public void grva0023() => CorpusAssert.Parses(@"GRANT SELECT ON ALL TABLES IN SCHEMA s TO PUBLIC", "ok");
@@ -141,9 +141,9 @@ public class Corpus_GrantRevoke
     public void grva0067() => CorpusAssert.Parses(@"GRANT ALL ON LANGUAGE plpgsql TO PUBLIC", "ok");
     [Fact]
     public void grva0068() => CorpusAssert.Parses(@"GRANT USAGE ON LANGUAGE sql TO PUBLIC", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void grva0069() => CorpusAssert.Parses(@"CREATE ROLE grva_r5; GRANT SELECT ON TABLE s.t TO PUBLIC, grva_r5", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void grva0070() => CorpusAssert.Parses(@"CREATE ROLE grva_r6; CREATE ROLE grva_r7; GRANT SELECT ON TABLE s.t TO grva_r6, grva_r7", "ok");
     [Fact]
     public void grva0071() => CorpusAssert.Parses(@"GRANT CREATE ON TABLESPACE pg_default TO PUBLIC", "ok");
@@ -157,23 +157,23 @@ public class Corpus_GrantRevoke
     public void grva0075() => CorpusAssert.Parses(@"GRANT ALL ON PARAMETER work_mem TO PUBLIC", "ok");
     [Fact]
     public void grva0076() => CorpusAssert.Parses(@"GRANT SET, ALTER SYSTEM ON PARAMETER work_mem TO PUBLIC", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void grva0077() => CorpusAssert.Parses(@"CREATE ROLE grva_role1; CREATE ROLE grva_role2; GRANT grva_role1 TO grva_role2", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void grva0078() => CorpusAssert.Parses(@"CREATE ROLE grva_role3; CREATE ROLE grva_role3b; GRANT grva_role3 TO grva_role3b", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void grva0079() => CorpusAssert.Parses(@"CREATE ROLE grva_role4; CREATE ROLE grva_role5; GRANT grva_role4 TO grva_role5 WITH ADMIN OPTION", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void grva0080() => CorpusAssert.Parses(@"CREATE ROLE grva_role6; CREATE ROLE grva_role7; GRANT grva_role6 TO grva_role7 WITH INHERIT TRUE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void grva0081() => CorpusAssert.Parses(@"CREATE ROLE grva_role8; CREATE ROLE grva_role9; GRANT grva_role8 TO grva_role9 WITH INHERIT FALSE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void grva0082() => CorpusAssert.Parses(@"CREATE ROLE grva_role10; CREATE ROLE grva_role11; GRANT grva_role10 TO grva_role11 WITH SET TRUE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void grva0083() => CorpusAssert.Parses(@"CREATE ROLE grva_role12; CREATE ROLE grva_role13; GRANT grva_role12 TO grva_role13 WITH SET FALSE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void grva0084() => CorpusAssert.Parses(@"CREATE ROLE grva_role14; CREATE ROLE grva_role15; GRANT grva_role14 TO grva_role15 WITH ADMIN TRUE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void grva0085() => CorpusAssert.Parses(@"CREATE ROLE grva_role16; CREATE ROLE grva_role17; GRANT grva_role16 TO grva_role17 WITH ADMIN FALSE", "ok");
     [Fact]
     public void grva0086() => CorpusAssert.Parses(@"REVOKE SELECT ON TABLE s.t FROM PUBLIC", "ok");
@@ -197,7 +197,7 @@ public class Corpus_GrantRevoke
     public void grva0095() => CorpusAssert.Parses(@"REVOKE GRANT OPTION FOR SELECT ON TABLE s.t FROM PUBLIC CASCADE", "ok");
     [Fact]
     public void grva0096() => CorpusAssert.Parses(@"REVOKE GRANT OPTION FOR SELECT ON TABLE s.t FROM PUBLIC RESTRICT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void grva0097() => CorpusAssert.Parses(@"CREATE ROLE grva_rv1; REVOKE SELECT ON TABLE s.t FROM grva_rv1", "ok");
     [Fact]
     public void grva0098() => CorpusAssert.Parses(@"REVOKE SELECT ON s.t FROM PUBLIC", "ok");
@@ -229,13 +229,13 @@ public class Corpus_GrantRevoke
     public void grva0111() => CorpusAssert.Parses(@"REVOKE USAGE ON DOMAIN s.pos_int FROM PUBLIC", "ok");
     [Fact]
     public void grva0112() => CorpusAssert.Parses(@"REVOKE USAGE ON LANGUAGE plpgsql FROM PUBLIC", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void grva0113() => CorpusAssert.Parses(@"CREATE ROLE grva_role18; CREATE ROLE grva_role19; GRANT grva_role18 TO grva_role19; REVOKE grva_role18 FROM grva_role19", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void grva0114() => CorpusAssert.Parses(@"CREATE ROLE grva_role20; CREATE ROLE grva_role21; GRANT grva_role20 TO grva_role21 WITH ADMIN OPTION; REVOKE ADMIN OPTION FOR grva_role20 FROM grva_role21", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void grva0115() => CorpusAssert.Parses(@"CREATE ROLE grva_role22; CREATE ROLE grva_role22b; GRANT grva_role22 TO grva_role22b; REVOKE grva_role22 FROM grva_role22b CASCADE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void grva0116() => CorpusAssert.Parses(@"CREATE ROLE grva_role23; CREATE ROLE grva_role23b; GRANT grva_role23 TO grva_role23b; REVOKE grva_role23 FROM grva_role23b RESTRICT", "ok");
     [Fact]
     public void grva0117() => CorpusAssert.Parses(@"REVOKE SELECT(name) ON TABLE s.t FROM PUBLIC", "ok");
@@ -287,7 +287,7 @@ public class Corpus_GrantRevoke
     public void grva0140() => CorpusAssert.Parses(@"ALTER DEFAULT PRIVILEGES REVOKE USAGE ON TYPES FROM PUBLIC", "ok");
     [Fact]
     public void grva0141() => CorpusAssert.Parses(@"ALTER DEFAULT PRIVILEGES REVOKE GRANT OPTION FOR SELECT ON TABLES FROM PUBLIC", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void grva0142() => CorpusAssert.Parses(@"CREATE ROLE grva_adp_wgo; ALTER DEFAULT PRIVILEGES GRANT SELECT ON TABLES TO grva_adp_wgo WITH GRANT OPTION", "ok");
     [Fact]
     public void grva0143() => CorpusAssert.Parses(@"GRANT SELECT ON TABLE s.t TO PUBLIC; REVOKE SELECT ON TABLE s.t FROM PUBLIC", "ok");
@@ -371,10 +371,10 @@ public class Corpus_GrantRevoke
     public void grvb0012() => CorpusAssert.Parses(@"GRANT SELECT, INSERT, UPDATE, DELETE ON s.t TO PUBLIC", "ok");
     [Fact]
     public void grvb0013() => CorpusAssert.Parses(@"GRANT SELECT, INSERT, UPDATE, DELETE, TRUNCATE, REFERENCES, TRIGGER ON s.t TO PUBLIC", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void grvb0014() => CorpusAssert.Parses(@"CREATE ROLE grvb_wgo1;
 GRANT SELECT ON s.t TO grvb_wgo1 WITH GRANT OPTION", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void grvb0015() => CorpusAssert.Parses(@"CREATE ROLE grvb_wgo2;
 GRANT ALL ON s.t TO grvb_wgo2 WITH GRANT OPTION", "ok");
     [Fact]
@@ -477,46 +477,46 @@ GRANT ALL ON s.t TO grvb_wgo2 WITH GRANT OPTION", "ok");
     public void grvb0064() => CorpusAssert.Parses(@"GRANT EXECUTE ON ALL PROCEDURES IN SCHEMA s TO PUBLIC", "ok");
     [Fact]
     public void grvb0065() => CorpusAssert.Parses(@"GRANT EXECUTE ON ALL ROUTINES IN SCHEMA s TO PUBLIC", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void grvb0066() => CorpusAssert.Parses(@"CREATE ROLE grvb_r1;
 GRANT SELECT ON s.t TO grvb_r1", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void grvb0067() => CorpusAssert.Parses(@"CREATE ROLE grvb_r2;
 GRANT ALL ON s.t TO grvb_r2 WITH GRANT OPTION", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void grvb0068() => CorpusAssert.Parses(@"CREATE ROLE grvb_r3;
 GRANT SELECT ON s.t TO GROUP grvb_r3", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void grvb0069() => CorpusAssert.Parses(@"CREATE ROLE grvb_r4;
 CREATE ROLE grvb_r5;
 GRANT SELECT ON s.t TO grvb_r4, grvb_r5", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void grvb0070() => CorpusAssert.Parses(@"CREATE ROLE grvb_r6;
 GRANT SELECT ON s.t TO PUBLIC, grvb_r6", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void grvb0071() => CorpusAssert.Parses(@"CREATE ROLE grvb_r7;
 GRANT grvb_r7 TO PUBLIC", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void grvb0072() => CorpusAssert.Parses(@"CREATE ROLE grvb_r8;
 CREATE ROLE grvb_r9;
 GRANT grvb_r8 TO grvb_r9", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void grvb0073() => CorpusAssert.Parses(@"CREATE ROLE grvb_ra;
 CREATE ROLE grvb_rb;
 GRANT grvb_ra TO grvb_rb WITH ADMIN OPTION", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void grvb0074() => CorpusAssert.Parses(@"CREATE ROLE grvb_rc;
 CREATE ROLE grvb_rd;
 GRANT grvb_rc TO grvb_rd WITH INHERIT TRUE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void grvb0075() => CorpusAssert.Parses(@"CREATE ROLE grvb_re;
 CREATE ROLE grvb_rf;
 GRANT grvb_re TO grvb_rf WITH INHERIT FALSE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void grvb0076() => CorpusAssert.Parses(@"CREATE ROLE grvb_rg;
 CREATE ROLE grvb_rh;
 GRANT grvb_rg TO grvb_rh WITH SET TRUE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void grvb0077() => CorpusAssert.Parses(@"CREATE ROLE grvb_ri;
 CREATE ROLE grvb_rj;
 GRANT grvb_ri TO grvb_rj WITH SET FALSE", "ok");
@@ -562,16 +562,16 @@ GRANT grvb_ri TO grvb_rj WITH SET FALSE", "ok");
     public void grvb0097() => CorpusAssert.Parses(@"REVOKE ALL ON DATABASE postgres FROM PUBLIC", "ok");
     [Fact]
     public void grvb0098() => CorpusAssert.Parses(@"REVOKE USAGE ON LANGUAGE plpgsql FROM PUBLIC", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void grvb0099() => CorpusAssert.Parses(@"CREATE ROLE grvb_rk;
 GRANT grvb_rk TO CURRENT_USER;
 REVOKE grvb_rk FROM CURRENT_USER", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void grvb0100() => CorpusAssert.Parses(@"CREATE ROLE grvb_rl;
 CREATE ROLE grvb_rm;
 GRANT grvb_rl TO grvb_rm;
 REVOKE grvb_rl FROM grvb_rm", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void grvb0101() => CorpusAssert.Parses(@"CREATE ROLE grvb_rn;
 CREATE ROLE grvb_ro;
 GRANT grvb_rn TO grvb_ro WITH ADMIN OPTION;

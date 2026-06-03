@@ -40,6 +40,41 @@ public sealed partial class PgParser
         return q;
     }
 
+    private void ParseSearchCycle(TokenCursor c)
+    {
+        while (c.AtWord("SEARCH") || c.AtWord("CYCLE"))
+        {
+            if (c.MatchWord("SEARCH"))
+            {
+                if (!c.MatchWord("BREADTH")) c.ExpectWord("DEPTH");
+                c.ExpectWord("FIRST"); c.ExpectWord("BY");
+                do { c.ExpectIdentifier(); } while (c.MatchSymbol(','));
+                c.ExpectWord("SET"); c.ExpectIdentifier();
+            }
+            else
+            {
+                c.ExpectWord("CYCLE");
+                do { c.ExpectIdentifier(); } while (c.MatchSymbol(','));
+                c.ExpectWord("SET"); c.ExpectIdentifier();
+                if (c.MatchWord("TO")) { ParseExpression(c); c.ExpectWord("DEFAULT"); ParseExpression(c); }
+                c.ExpectWord("USING"); c.ExpectIdentifier();
+            }
+        }
+    }
+
+    private static string CaptureUntilCloseParen(TokenCursor c)
+    {
+        var toks = new List<Token>(); int depth = 1;
+        while (!c.AtEnd)
+        {
+            if (c.AtSymbol(')') && depth == 1) break;
+            var t = c.Advance();
+            if (t.IsSymbol('(')) depth++; else if (t.IsSymbol(')')) depth--;
+            toks.Add(t);
+        }
+        return Token.Render(toks);
+    }
+
     private CommonTableExpr ParseCte(TokenCursor c)
     {
         var cte = new CommonTableExpr { Name = c.ExpectIdentifier() };
@@ -48,18 +83,14 @@ public sealed partial class PgParser
         if (c.MatchWord("MATERIALIZED")) cte.Materialized = "MATERIALIZED";
         else if (c.MatchWords("NOT", "MATERIALIZED")) cte.Materialized = "NOT MATERIALIZED";
         c.ExpectSymbol('(');
-        if (c.AtAnyWord("SELECT", "WITH", "VALUES", "TABLE"))
-            cte.Query = ParseSelectStatement(c);
-        else
-            cte.RawBody = Token.Render(CaptureBalancedInner(c));   // data-modifying CTE (INSERT/UPDATE/DELETE)
-        if (cte.Query is not null) c.ExpectSymbol(')');
-        // SEARCH / CYCLE clauses (captured, rarely needed for accept)
-        while (c.AtAnyWord("SEARCH", "CYCLE"))
-        {
-            c.Advance();
-            while (!c.AtEnd && !c.AtSymbol(',') && !c.AtWord("SEARCH") && !c.AtWord("CYCLE")
-                   && !(c.CurrentOperator is null && c.Current!.Kind == TokenKind.Word && (c.AtWord("SELECT")))) c.Advance();
-        }
+        if (c.AtAnyWord("SELECT", "WITH", "VALUES", "TABLE")) cte.Query = ParseSelectStatement(c);
+        else if (c.AtWord("INSERT")) { ParseInsert(c, null, false); cte.RawBody = "INSERT"; }
+        else if (c.AtWord("UPDATE")) { ParseUpdate(c, null, false); cte.RawBody = "UPDATE"; }
+        else if (c.AtWord("DELETE")) { ParseDelete(c, null, false); cte.RawBody = "DELETE"; }
+        else if (c.AtWord("MERGE")) { ParseMerge(c, null, false); cte.RawBody = "MERGE"; }
+        else cte.RawBody = CaptureUntilCloseParen(c);
+        c.ExpectSymbol(')');
+        ParseSearchCycle(c);
         return cte;
     }
 
@@ -281,7 +312,7 @@ public sealed partial class PgParser
         {
             if (c.MatchWord("LIMIT")) { if (c.MatchWord("ALL")) q.Limit = "ALL"; else q.Limit = ExprText(c); }
             else if (c.MatchWord("OFFSET")) { q.Offset = ExprText(c); c.MatchWord("ROW"); c.MatchWord("ROWS"); }
-            else { c.MatchWord("FIRST"); c.MatchWord("NEXT"); if (!c.AtWord("ROW") && !c.AtWord("ROWS")) q.Limit = ExprText(c); c.MatchWord("ROW"); c.MatchWord("ROWS"); if (!c.MatchWord("ONLY")) c.MatchWords("WITH", "TIES"); }
+            else { c.ExpectWord("FETCH"); c.MatchWord("FIRST"); c.MatchWord("NEXT"); if (!c.AtWord("ROW") && !c.AtWord("ROWS")) q.Limit = ExprText(c); c.MatchWord("ROW"); c.MatchWord("ROWS"); if (!c.MatchWord("ONLY")) c.MatchWords("WITH", "TIES"); }
         }
 
         while (c.MatchWord("FOR"))

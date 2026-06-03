@@ -327,7 +327,7 @@ public class Corpus_SrfSetreturning
     public void srfa0160() => CorpusAssert.Parses(@"SELECT * FROM generate_series(1, 5) AS gs(n) JOIN s.t ON s.t.id = gs.n", "ok");
     [Fact]
     public void srfa0161() => CorpusAssert.Parses(@"SELECT t.id, gs.n FROM s.t CROSS JOIN LATERAL generate_series(1, 3) AS gs(n)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void srfa0162() => CorpusAssert.Parses(@"SELECT n FROM generate_series(1, 5) AS t(n) ORDER BY n FETCH FIRST 3 ROWS ONLY", "ok");
     [Fact]
     public void srfa0163() => CorpusAssert.Parses(@"SELECT * FROM generate_series(1, 3) AS g WHERE FALSE", "ok");

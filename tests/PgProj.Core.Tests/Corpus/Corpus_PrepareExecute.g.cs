@@ -201,11 +201,11 @@ public class Corpus_PrepareExecute
     public void prxa0097() => CorpusAssert.Parses(@"PREPARE q97 AS SELECT nextval('s.seq')", "ok");
     [Fact]
     public void prxa0098() => CorpusAssert.Parses(@"PREPARE q98 AS SELECT currval('s.seq')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void prxa0099() => CorpusAssert.Parses(@"PREPARE q99 AS SELECT id, name FROM s.t FETCH FIRST 5 ROWS ONLY", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void prxa0100() => CorpusAssert.Parses(@"PREPARE q100 AS SELECT id, name FROM s.t OFFSET 3 ROWS FETCH NEXT 5 ROWS ONLY", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void prxa0101() => CorpusAssert.Parses(@"PREPARE q101 AS SELECT id, name FROM s.t FETCH FIRST 1 ROW ONLY", "ok");
     [Fact]
     public void prxa0102() => CorpusAssert.Parses(@"PREPARE q102 (integer) AS SELECT * FROM s.t WHERE id = $1; EXPLAIN EXECUTE q102(1)", "ok");

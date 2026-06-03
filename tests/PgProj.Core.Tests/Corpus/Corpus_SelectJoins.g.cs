@@ -183,13 +183,13 @@ public class Corpus_SelectJoins
     public void selja0088() => CorpusAssert.Parses(@"SELECT t.id, t2.label FROM s.t JOIN s.t2 ON t.id = t2.t_id ORDER BY 1, 2", "ok");
     [Fact]
     public void selja0089() => CorpusAssert.Parses(@"SELECT t.*, t2.label FROM s.t JOIN s.t2 ON t.id = t2.t_id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0090() => CorpusAssert.Parses(@"SELECT t.id FROM s.t JOIN s.t2 ON t.id = t2.t_id FETCH FIRST 5 ROWS ONLY", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0091() => CorpusAssert.Parses(@"SELECT t.id FROM s.t JOIN s.t2 ON t.id = t2.t_id FETCH FIRST 1 ROW ONLY", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0092() => CorpusAssert.Parses(@"SELECT t.id FROM s.t JOIN s.t2 ON t.id = t2.t_id OFFSET 2 ROWS FETCH NEXT 3 ROWS ONLY", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selja0093() => CorpusAssert.Parses(@"SELECT t.id FROM s.t JOIN s.t2 ON t.id = t2.t_id ORDER BY t.id FETCH FIRST 5 ROWS WITH TIES", "ok");
     [Fact]
     public void selja0094() => CorpusAssert.Parses(@"SELECT t.id, t2.label FROM s.t JOIN s.t2 ON t.id = t2.t_id WHERE t.val BETWEEN 1 AND 100", "ok");
@@ -523,11 +523,11 @@ public class Corpus_SelectJoins
     public void seljb0088() => CorpusAssert.Parses(@"SELECT sub.id, s.t.name FROM (SELECT id FROM s.t2 WHERE amount > 0) AS sub JOIN s.t ON sub.id = s.t.id", "ok");
     [Fact]
     public void seljb0089() => CorpusAssert.Parses(@"SELECT a.id FROM s.t a JOIN s.t b ON a.id = b.id WHERE a.id = b.id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljb0090() => CorpusAssert.Parses(@"SELECT * FROM s.t JOIN s.t2 ON s.t.id = s.t2.t_id FETCH FIRST 5 ROWS ONLY", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljb0091() => CorpusAssert.Parses(@"SELECT * FROM s.t JOIN s.t2 ON s.t.id = s.t2.t_id FETCH FIRST 1 ROW ONLY", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seljb0092() => CorpusAssert.Parses(@"SELECT * FROM s.t JOIN s.t2 ON s.t.id = s.t2.t_id OFFSET 0 ROWS FETCH NEXT 10 ROWS ONLY", "ok");
     [Fact]
     public void seljb0093() => CorpusAssert.Parses(@"SELECT t.id, sum(t2.amount) FROM s.t JOIN s.t2 ON t.id = t2.t_id GROUP BY t.id ORDER BY sum(t2.amount) DESC", "ok");

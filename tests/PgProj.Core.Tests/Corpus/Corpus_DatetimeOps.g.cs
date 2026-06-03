@@ -41,9 +41,9 @@ public class Corpus_DatetimeOps
     public void dta0017() => CorpusAssert.Parses(@"SELECT TIMESTAMP '2024-01-15 12:30:00'", "ok");
     [Fact]
     public void dta0018() => CorpusAssert.Parses(@"SELECT TIMESTAMPTZ '2024-01-15 12:30:00+05'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0019() => CorpusAssert.Parses(@"SELECT TIMESTAMP WITH TIME ZONE '2024-01-15 12:30:00 UTC'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0020() => CorpusAssert.Parses(@"SELECT TIME WITH TIME ZONE '12:30:00+00'", "ok");
     [Fact]
     public void dta0021() => CorpusAssert.Parses(@"SELECT INTERVAL '1' YEAR", "ok");
@@ -213,13 +213,13 @@ public class Corpus_DatetimeOps
     public void dta0103() => CorpusAssert.Parses(@"SELECT TIMESTAMP '2024-01-15 10:00:00' AT TIME ZONE '+05:30'", "ok");
     [Fact]
     public void dta0104() => CorpusAssert.Parses(@"SELECT TIMESTAMP '2024-01-15 10:00:00' AT TIME ZONE INTERVAL '+05:30'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0105() => CorpusAssert.Parses(@"SELECT (DATE '2024-01-01', DATE '2024-12-31') OVERLAPS (DATE '2024-06-01', DATE '2025-01-01')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0106() => CorpusAssert.Parses(@"SELECT (TIMESTAMP '2024-01-01 00:00:00', TIMESTAMP '2024-06-01 00:00:00') OVERLAPS (TIMESTAMP '2024-05-01 00:00:00', TIMESTAMP '2024-12-31 00:00:00')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0107() => CorpusAssert.Parses(@"SELECT (DATE '2024-01-01', INTERVAL '6 months') OVERLAPS (DATE '2024-06-01', INTERVAL '6 months')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dta0108() => CorpusAssert.Parses(@"SELECT (TIMESTAMP '2024-01-01 00:00:00', INTERVAL '90 days') OVERLAPS (TIMESTAMP '2024-03-01 00:00:00', INTERVAL '60 days')", "ok");
     [Fact]
     public void dta0109() => CorpusAssert.Parses(@"SELECT age(TIMESTAMP '2024-01-01 00:00:00', TIMESTAMP '2020-01-01 00:00:00')", "ok");
@@ -353,15 +353,15 @@ public class Corpus_DatetimeOps
     public void dtb0003() => CorpusAssert.Parses(@"SELECT TIME '13:30:00.123456'", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void dtb0004() => CorpusAssert.Parses(@"SELECT TIMETZ '13:30:00+05:30'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0005() => CorpusAssert.Parses(@"SELECT TIME WITH TIME ZONE '13:30:00+02:00'", "ok");
     [Fact]
     public void dtb0006() => CorpusAssert.Parses(@"SELECT TIMESTAMP '2024-01-15 13:30:00'", "ok");
     [Fact]
     public void dtb0007() => CorpusAssert.Parses(@"SELECT TIMESTAMPTZ '2024-01-15 13:30:00+00'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0008() => CorpusAssert.Parses(@"SELECT TIMESTAMP WITH TIME ZONE '2024-01-15 13:30:00 UTC'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0009() => CorpusAssert.Parses(@"SELECT TIMESTAMP WITHOUT TIME ZONE '2024-01-15 13:30:00'", "ok");
     [Fact]
     public void dtb0010() => CorpusAssert.Parses(@"SELECT INTERVAL '1 year 2 months 3 days'", "ok");
@@ -509,13 +509,13 @@ public class Corpus_DatetimeOps
     public void dtb0081() => CorpusAssert.Parses(@"SELECT date_bin(INTERVAL '1 hour', TIMESTAMP '2024-07-15 14:37:00', TIMESTAMP '2024-07-15 00:00:00')", "ok");
     [Fact]
     public void dtb0082() => CorpusAssert.Parses(@"SELECT date_bin(INTERVAL '1 day', TIMESTAMPTZ '2024-07-15 14:37:00+00', TIMESTAMPTZ '2024-01-01 00:00:00+00')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0083() => CorpusAssert.Parses(@"SELECT (DATE '2024-03-15', DATE '2024-03-20') OVERLAPS (DATE '2024-03-18', DATE '2024-03-25')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0084() => CorpusAssert.Parses(@"SELECT (TIMESTAMP '2024-01-01 08:00:00', TIMESTAMP '2024-01-01 12:00:00') OVERLAPS (TIMESTAMP '2024-01-01 10:00:00', TIMESTAMP '2024-01-01 14:00:00')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0085() => CorpusAssert.Parses(@"SELECT (TIMESTAMP '2024-01-01 08:00:00', INTERVAL '4 hours') OVERLAPS (TIMESTAMP '2024-01-01 10:00:00', INTERVAL '3 hours')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtb0086() => CorpusAssert.Parses(@"SELECT (TIMESTAMPTZ '2024-01-01 08:00:00+00', TIMESTAMPTZ '2024-01-01 12:00:00+00') OVERLAPS (TIMESTAMPTZ '2024-01-01 10:00:00+00', TIMESTAMPTZ '2024-01-01 14:00:00+00')", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void dtb0087() => CorpusAssert.Parses(@"SELECT DATE '2024-03-15' + INTEGER '5'", "ok");
@@ -711,7 +711,7 @@ public class Corpus_DatetimeOps
     public void dtc0012() => CorpusAssert.Parses(@"SELECT date_trunc('hour', TIMESTAMPTZ '2024-06-15 10:30:45+00', 'America/New_York')", "ok");
     [Fact]
     public void dtc0013() => CorpusAssert.Parses(@"SELECT date_bin(INTERVAL '15 minutes', TIMESTAMP '2024-06-15 10:37:00', TIMESTAMP '2024-06-15 00:00:00')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void dtc0014() => CorpusAssert.Parses(@"SELECT (DATE '2024-03-15', DATE '2024-06-15') OVERLAPS (DATE '2024-05-01', DATE '2024-12-31')", "ok");
     [Fact]
     public void dtc0015() => CorpusAssert.Parses(@"SELECT TIMESTAMP '2024-01-01' + INTERVAL '30 days', TIMESTAMP '2024-03-15 12:00:00' - INTERVAL '2 hours', DATE '2024-06-01' - DATE '2024-01-01'", "ok");

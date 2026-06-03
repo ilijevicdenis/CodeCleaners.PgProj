@@ -123,6 +123,19 @@ public class CorpusTestGenerator
         }
     }
 
+    [Fact]
+    public void Dump_pending_positives()
+    {
+        var cat = Environment.GetEnvironmentVariable("PGPROJ_DUMP_CAT");
+        if (cat is null) return;
+        foreach (var c in CorpusData.LoadAll().Where(c => c.Category == cat && c.Expect == "ok" && !CorpusData.Passes(c)).Take(12))
+        {
+            var p = new Syntax.PgParser().Parse(c.Sql);
+            _out.WriteLine($"[{c.Id}] {c.Sql.Replace("\n", " ")}");
+            _out.WriteLine($"   recognized={p.FullyRecognized} stmts={p.Statements.Count} diag={string.Join(" | ", p.Diagnostics)}");
+        }
+    }
+
     private static string Pascal(string kebab) =>
         string.Concat(kebab.Split('-', '_', ' ')
             .Where(p => p.Length > 0)

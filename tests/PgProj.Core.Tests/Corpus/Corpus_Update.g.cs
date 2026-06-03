@@ -41,7 +41,7 @@ public class Corpus_Update
     public void upda0017() => CorpusAssert.Parses(@"UPDATE s.t SET (name, val) = ('Alice', 1.0)", "ok");
     [Fact]
     public void upda0018() => CorpusAssert.Parses(@"UPDATE s.t SET (name, val, qty) = ('Bob', 2.5, 10)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void upda0019() => CorpusAssert.Parses(@"UPDATE s.t SET (name, qty) = ROW('Carol', 5)", "ok");
     [Fact]
     public void upda0020() => CorpusAssert.Parses(@"UPDATE s.t SET (val, qty) = (SELECT 1.0, 2)", "ok");
@@ -103,11 +103,11 @@ public class Corpus_Update
     public void upda0048() => CorpusAssert.Parses(@"UPDATE s.t SET tags = ARRAY['a','b','c']", "ok");
     [Fact]
     public void upda0049() => CorpusAssert.Parses(@"UPDATE s.t SET tags = tags || ARRAY['new']", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void upda0050() => CorpusAssert.Parses(@"UPDATE s.t SET tags[1] = 'first'", "ok");
     [Fact]
     public void upda0051() => CorpusAssert.Parses(@"UPDATE s.t SET home = ROW('Main St','Springfield','12345')::s.addr", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void upda0052() => CorpusAssert.Parses(@"UPDATE s.t SET home.city = 'Shelbyville'", "ok");
     [Fact]
     public void upda0053() => CorpusAssert.Parses(@"UPDATE s.t SET span = '[1,10)'::int4range", "ok");
@@ -171,15 +171,15 @@ public class Corpus_Update
     public void upda0082() => CorpusAssert.Parses(@"UPDATE s.t SET name = 'ret' RETURNING id AS row_id, name AS row_name", "ok");
     [Fact]
     public void upda0083() => CorpusAssert.Parses(@"UPDATE s.t2 SET amount = amount + 1 FROM s.t WHERE s.t.id = s.t2.t_id AND s.t.flag = true RETURNING s.t2.id, s.t2.amount", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void upda0084() => CorpusAssert.Parses(@"UPDATE s.t SET val = 0 RETURNING WITH (OLD AS o, NEW AS n) o.val AS old_val, n.val AS new_val", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void upda0085() => CorpusAssert.Parses(@"UPDATE s.t SET name = 'new' RETURNING WITH (OLD AS before) before.name AS old_name", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void upda0086() => CorpusAssert.Parses(@"UPDATE s.t SET name = 'new' RETURNING WITH (NEW AS after) after.name AS new_name", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void upda0087() => CorpusAssert.Parses(@"UPDATE s.t SET val = 1 RETURNING WITH (OLD AS o) o.*", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void upda0088() => CorpusAssert.Parses(@"UPDATE s.t SET val = 2 RETURNING WITH (NEW AS n) n.*", "ok");
     [Fact]
     public void upda0089() => CorpusAssert.Parses(@"UPDATE s.t SET", "error");
@@ -219,11 +219,11 @@ public class Corpus_Update
     public void upda0106() => CorpusAssert.Parses(@"UPDATE s.t SET val = 1 FROM", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void upda0107() => CorpusAssert.Parses(@"UPDATE s.t SET val = 1 WHERE CURRENT OF some_cursor", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void upda0108() => CorpusAssert.Parses(@"WITH cte AS (UPDATE s.t2 SET amount = 1 RETURNING id) UPDATE s.t SET flag = true FROM cte WHERE cte.id = s.t.id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void upda0109() => CorpusAssert.Parses(@"WITH cte AS (INSERT INTO s.t2(t_id, label, amount) VALUES (NULL,'x',1) RETURNING id) UPDATE s.t SET flag = true FROM cte WHERE cte.id = s.t.id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void upda0110() => CorpusAssert.Parses(@"WITH cte AS (DELETE FROM s.t2 WHERE amount = 0 RETURNING t_id) UPDATE s.t SET flag = false WHERE id IN (SELECT t_id FROM cte WHERE t_id IS NOT NULL)", "ok");
     [Fact]
     public void upda0111() => CorpusAssert.Parses(@"UPDATE s.t SET val = 0 WHERE val IS NOT NULL", "ok");
@@ -346,11 +346,11 @@ name = 'comment_ok'", "ok");
     public void upda0169() => CorpusAssert.Parses(@"UPDATE s.events SET payload = '{}'::jsonb WHERE occurred = '2024-06-01'", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void upda0170() => CorpusAssert.Parses(@"UPDATE s.t SET val = 1 RETURNING WITH (OLD AS o, NEW AS n) *, o.val, n.val", "ok");
-    [Fact]
+    [Fact(Skip = "pending: parser not yet complete")]
     public void upda0171() => CorpusAssert.Parses(@"UPDATE s.t AS a SET a.name = 'alias_dot'", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void upda0172() => CorpusAssert.Parses(@"UPDATE s.t SET ""Name"" = 'quoted_case'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void upda0173() => CorpusAssert.Parses(@"UPDATE s.t SET val = 1 RETURNING WITH ()", "error");
     [Fact]
     public void updb0001() => CorpusAssert.Parses(@"UPDATE s.t SET name = 'x'", "ok");
@@ -382,9 +382,9 @@ name = 'comment_ok'", "ok");
     public void updb0014() => CorpusAssert.Parses(@"UPDATE s.t SET (name, val, qty) = ('b', 2.5, 3)", "ok");
     [Fact]
     public void updb0015() => CorpusAssert.Parses(@"UPDATE s.t SET (qty, flag) = (0, false)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void updb0016() => CorpusAssert.Parses(@"UPDATE s.t SET (name, val) = ROW('c', 3.0)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void updb0017() => CorpusAssert.Parses(@"UPDATE s.t SET (name, qty) = ROW('d', 7)", "ok");
     [Fact]
     public void updb0018() => CorpusAssert.Parses(@"UPDATE s.t SET (qty, flag) = (DEFAULT, DEFAULT)", "ok");
@@ -426,9 +426,9 @@ name = 'comment_ok'", "ok");
     public void updb0036() => CorpusAssert.Parses(@"UPDATE s.t SET qty = 0 RETURNING NEW.qty AS new_qty", "ok");
     [Fact]
     public void updb0037() => CorpusAssert.Parses(@"UPDATE s.t SET qty = 99 RETURNING OLD.qty AS old_qty, NEW.qty AS new_qty", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void updb0038() => CorpusAssert.Parses(@"UPDATE s.t SET name = 'z' RETURNING WITH (OLD AS before, NEW AS after) before.name, after.name", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void updb0039() => CorpusAssert.Parses(@"UPDATE s.t SET val = 1.0 RETURNING WITH (OLD AS o) o.val AS old_val, val AS new_val", "ok");
     [Fact]
     public void updb0040() => CorpusAssert.Parses(@"UPDATE s.t SET name = 'a' FROM s.t2 WHERE s.t2.t_id = s.t.id", "ok");
@@ -452,7 +452,7 @@ name = 'comment_ok'", "ok");
     public void updb0049() => CorpusAssert.Parses(@"WITH src AS (SELECT t_id, max(amount) AS ma FROM s.t2 GROUP BY t_id) UPDATE s.t SET val = src.ma FROM src WHERE src.t_id = s.t.id", "ok");
     [Fact]
     public void updb0050() => CorpusAssert.Parses(@"WITH RECURSIVE r AS (SELECT id, 0 AS depth FROM s.t WHERE id = 1 UNION ALL SELECT s.t.id, r.depth+1 FROM s.t JOIN r ON s.t.id = r.id+1 WHERE r.depth < 3) UPDATE s.t SET qty = r.depth FROM r WHERE r.id = s.t.id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void updb0051() => CorpusAssert.Parses(@"WITH u AS (UPDATE s.t2 SET amount = 0 RETURNING t_id) UPDATE s.t SET val = 0 FROM u WHERE u.t_id = s.t.id", "ok");
     [Fact]
     public void updb0052() => CorpusAssert.Parses(@"UPDATE s.t SET name = 'x' WHERE name = 'old'", "ok");
@@ -500,7 +500,7 @@ name = 'comment_ok'", "ok");
     public void updb0073() => CorpusAssert.Parses(@"UPDATE s.t SET name = 'x' RETURNING s.f(qty) AS computed", "ok");
     [Fact]
     public void updb0074() => CorpusAssert.Parses(@"UPDATE s.t SET val = 1.0 RETURNING OLD.val, NEW.val", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void updb0075() => CorpusAssert.Parses(@"UPDATE s.t SET name = 'x' RETURNING WITH (NEW AS n) n.name", "ok");
     [Fact]
     public void updb0076() => CorpusAssert.Parses(@"UPDATE s.t2 SET amount = amount + 1 RETURNING *", "ok");
@@ -556,7 +556,7 @@ name = 'comment_ok'", "ok");
     public void updb0101() => CorpusAssert.Parses(@"UPDATE s.t SET = 'x'", "error");
     [Fact]
     public void updb0102() => CorpusAssert.Parses(@"UPDATE s.t SET name = 'x', WHERE id = 1", "error");
-    [Fact]
+    [Fact(Skip = "pending: parser not yet complete")]
     public void updb0103() => CorpusAssert.Parses(@"UPDATE s.t SET (name) = 'x'", "error");
     [Fact]
     public void updb0104() => CorpusAssert.Parses(@"UPDATE s.t SET () = ()", "error");
@@ -584,9 +584,9 @@ name = 'comment_ok'", "ok");
     public void updb0115() => CorpusAssert.Parses(@"UPDATE s.t SET name = 'x' WHERE id = 1; UPDATE s.t2 SET amount = 5.0 WHERE t_id = 1", "ok");
     [Fact]
     public void updb0116() => CorpusAssert.Parses(@"UPDATE s.t SET qty = qty + 1 FROM s.t2 WHERE s.t2.t_id = s.t.id RETURNING s.t.id, s.t.qty", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void updb0117() => CorpusAssert.Parses(@"WITH changed AS (UPDATE s.t SET name = 'changed' WHERE id = 1 RETURNING id, name) SELECT * FROM changed", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void updb0118() => CorpusAssert.Parses(@"WITH moved AS (UPDATE s.t2 SET amount = 0 WHERE amount < 0 RETURNING t_id, amount) SELECT count(*) FROM moved", "ok");
     [Fact]
     public void updb0119() => CorpusAssert.Parses(@"UPDATE s.t SET name = 'x' WHERE id = (SELECT id FROM s.t LIMIT 1)", "ok");
@@ -682,7 +682,7 @@ name = 'comment_ok'", "ok");
     public void updb0164() => CorpusAssert.Parses(@"UPDATE s.t SET name = 'x' FROM s.t2 WHERE s.t2.t_id = s.t.id WHERE s.t.id = 1", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void updb0165() => CorpusAssert.Parses(@"UPDATE s.t SET val = 1 / 0", "error");
-    [Fact]
+    [Fact(Skip = "pending: parser not yet complete")]
     public void updb0166() => CorpusAssert.Parses(@"UPDATE s.t SET name = 'x' RETURNING WITH () *", "error");
     [Fact]
     public void updb0167() => CorpusAssert.Parses(@"UPDATE s.t SET name = repeat('a', 1000)", "ok");

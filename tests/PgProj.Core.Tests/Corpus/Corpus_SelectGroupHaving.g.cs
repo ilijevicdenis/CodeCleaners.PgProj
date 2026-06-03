@@ -309,7 +309,7 @@ public class Corpus_SelectGroupHaving
     public void selga0151() => CorpusAssert.Parses(@"SELECT name FROM s.t GROUP BY name, CUBE (status, flag)", "ok");
     [Fact]
     public void selga0152() => CorpusAssert.Parses(@"SELECT name, status, flag, count(*) FROM s.t GROUP BY GROUPING SETS ((name, status, flag), (name, status), (name), ())", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selga0153() => CorpusAssert.Parses(@"SELECT name, count(*) FROM s.t GROUP BY name HAVING count(*) > 0 FETCH FIRST 5 ROWS ONLY", "ok");
     [Fact]
     public void selga0154() => CorpusAssert.Parses(@"SELECT name, count(*) FROM s.t GROUP BY name HAVING count(*) > 0 OFFSET 2 ROWS", "ok");

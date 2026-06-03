@@ -31,6 +31,10 @@ public sealed class TokenCursor
     /// <summary>Position to report an error "here" (current token, or just past the end).</summary>
     public int Here => Current?.Position ?? (_tokens.Count > 0 ? _tokens[^1].Position + _tokens[^1].Value.Length : 0);
 
+    /// <summary>Save the current position for speculative parsing; restore with <see cref="Reset"/>.</summary>
+    public int Mark() => _i;
+    public void Reset(int mark) => _i = mark;
+
     public Token Advance()
     {
         if (AtEnd) throw new ParseException("unexpected end of input", Here);

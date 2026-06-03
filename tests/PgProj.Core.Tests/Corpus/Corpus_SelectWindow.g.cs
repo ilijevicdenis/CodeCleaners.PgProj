@@ -553,7 +553,7 @@ public class Corpus_SelectWindow
     public void selwb0103() => CorpusAssert.Parses(@"SELECT sum(val) OVER (PARTITION BY status ORDER BY id) FROM s.t LIMIT 5", "ok");
     [Fact]
     public void selwb0104() => CorpusAssert.Parses(@"SELECT sum(val) OVER (PARTITION BY status ORDER BY id) FROM s.t OFFSET 2", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selwb0105() => CorpusAssert.Parses(@"SELECT id, row_number() OVER (ORDER BY id) FROM s.t FETCH FIRST 3 ROWS ONLY", "ok");
     [Fact]
     public void selwb0106() => CorpusAssert.Parses(@"WITH cte AS (SELECT id, val, status FROM s.t) SELECT id, sum(val) OVER (PARTITION BY status) FROM cte", "ok");

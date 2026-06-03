@@ -49,11 +49,11 @@ public class Corpus_SelectSetops
     public void selsa0021() => CorpusAssert.Parses(@"SELECT 1 UNION SELECT 2 EXCEPT SELECT 2", "ok");
     [Fact]
     public void selsa0022() => CorpusAssert.Parses(@"SELECT 2 EXCEPT SELECT 1 UNION SELECT 3", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selsa0023() => CorpusAssert.Parses(@"(SELECT 1 UNION SELECT 2) INTERSECT SELECT 1", "ok");
     [Fact]
     public void selsa0024() => CorpusAssert.Parses(@"SELECT 1 UNION (SELECT 2 INTERSECT SELECT 2)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selsa0025() => CorpusAssert.Parses(@"(SELECT 1 UNION SELECT 2) EXCEPT SELECT 1", "ok");
     [Fact]
     public void selsa0026() => CorpusAssert.Parses(@"SELECT 1 UNION SELECT 2 ORDER BY 1", "ok");
@@ -97,19 +97,19 @@ public class Corpus_SelectSetops
     public void selsa0045() => CorpusAssert.Parses(@"SELECT 1 UNION SELECT 2 OFFSET 1 ROW", "ok");
     [Fact]
     public void selsa0046() => CorpusAssert.Parses(@"SELECT 1 UNION SELECT 2 OFFSET 0 ROWS", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selsa0047() => CorpusAssert.Parses(@"SELECT 1 UNION SELECT 2 FETCH FIRST 1 ROW ONLY", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selsa0048() => CorpusAssert.Parses(@"SELECT 1 UNION SELECT 2 FETCH NEXT 1 ROWS ONLY", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selsa0049() => CorpusAssert.Parses(@"SELECT 1 UNION SELECT 2 ORDER BY 1 FETCH FIRST 1 ROW WITH TIES", "ok");
     [Fact]
     public void selsa0050() => CorpusAssert.Parses(@"SELECT 1 UNION SELECT 2 LIMIT ALL", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selsa0051() => CorpusAssert.Parses(@"(SELECT 1 ORDER BY 1 LIMIT 1) UNION (SELECT 2 ORDER BY 1 LIMIT 1)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selsa0052() => CorpusAssert.Parses(@"(SELECT 1 LIMIT 1) INTERSECT (SELECT 1 LIMIT 1)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selsa0053() => CorpusAssert.Parses(@"(SELECT 2 ORDER BY 1) EXCEPT (SELECT 1 ORDER BY 1)", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void selsa0054() => CorpusAssert.Parses(@"SELECT name FROM s.t UNION SELECT city FROM (SELECT (home).city AS city FROM s.t) sub", "ok");
@@ -133,7 +133,7 @@ public class Corpus_SelectSetops
     public void selsa0063() => CorpusAssert.Parses(@"SELECT 1 EXCEPT ALL SELECT 2 EXCEPT ALL SELECT 3", "ok");
     [Fact]
     public void selsa0064() => CorpusAssert.Parses(@"SELECT 1 UNION ALL SELECT 2 INTERSECT ALL SELECT 2", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selsa0065() => CorpusAssert.Parses(@"(SELECT 1 UNION ALL SELECT 2) INTERSECT ALL SELECT 2", "ok");
     [Fact]
     public void selsa0066() => CorpusAssert.Parses(@"SELECT id FROM s.t UNION SELECT id FROM s.parent UNION SELECT id FROM s.child", "ok");
@@ -203,13 +203,13 @@ public class Corpus_SelectSetops
     public void selsa0098() => CorpusAssert.Parses(@"SELECT id FROM s.t UNION SELECT id FROM s.t2 UNION ALL SELECT 0", "ok");
     [Fact]
     public void selsa0099() => CorpusAssert.Parses(@"SELECT 1 UNION SELECT 2 UNION ALL SELECT 2 UNION SELECT 2", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selsa0100() => CorpusAssert.Parses(@"(SELECT 1 UNION SELECT 2) UNION ALL (SELECT 3 UNION SELECT 4)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selsa0101() => CorpusAssert.Parses(@"(SELECT 1 INTERSECT SELECT 1) UNION (SELECT 2 INTERSECT SELECT 2)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selsa0102() => CorpusAssert.Parses(@"(SELECT 1 EXCEPT SELECT 2) UNION ALL (SELECT 3 EXCEPT SELECT 4)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selsa0103() => CorpusAssert.Parses(@"((SELECT 1 UNION SELECT 2) INTERSECT SELECT 1) UNION SELECT 3", "ok");
     [Fact]
     public void selsa0104() => CorpusAssert.Parses(@"SELECT 1 UNION SELECT 2 INTERSECT SELECT 2 EXCEPT SELECT 2", "ok");
@@ -223,9 +223,9 @@ public class Corpus_SelectSetops
     public void selsa0108() => CorpusAssert.Parses(@"SELECT id, name FROM s.t UNION SELECT id, label FROM s.t2 ORDER BY 1 ASC, 2 DESC", "ok");
     [Fact]
     public void selsa0109() => CorpusAssert.Parses(@"SELECT id FROM s.t UNION SELECT id FROM s.t2 LIMIT 5 OFFSET 2", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
-    public void selsa0110() => CorpusAssert.Parses(@"SELECT 1 UNION SELECT 2 FETCH FIRST ROW ONLY", "ok");
     [Fact]
+    public void selsa0110() => CorpusAssert.Parses(@"SELECT 1 UNION SELECT 2 FETCH FIRST ROW ONLY", "ok");
+    [Fact(Skip = "pending: parser not yet complete")]
     public void selsa0111() => CorpusAssert.Parses(@"SELECT id FROM s.t UNION SELECT id FROM s.t2 FETCH NEXT 2 ROWS WITH TIES", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void selsa0112() => CorpusAssert.Parses(@"SELECT 1 UNION SELECT 2, 3", "error");
@@ -309,7 +309,7 @@ public class Corpus_SelectSetops
     public void selsa0151() => CorpusAssert.Parses(@"SELECT id FROM s.t UNION SELECT id FROM s.t", "ok");
     [Fact]
     public void selsa0152() => CorpusAssert.Parses(@"SELECT id FROM s.t UNION ALL SELECT id FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selsa0153() => CorpusAssert.Parses(@"SELECT 1 UNION SELECT 2 FETCH FIRST 0 ROWS ONLY", "ok");
     [Fact]
     public void selsa0154() => CorpusAssert.Parses(@"SELECT id, name, val, qty, flag FROM s.t UNION SELECT id, label, amount, t_id, (amount > 0) FROM s.t2", "ok");
@@ -323,9 +323,9 @@ public class Corpus_SelectSetops
     public void selsa0158() => CorpusAssert.Parses(@"SELECT 1::numeric UNION SELECT 2::float8", "ok");
     [Fact]
     public void selsa0159() => CorpusAssert.Parses(@"SELECT CURRENT_DATE UNION SELECT CURRENT_DATE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selsa0160() => CorpusAssert.Parses(@"SELECT id FROM s.t UNION SELECT id FROM s.t ORDER BY id FETCH FIRST 5 ROWS ONLY", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selsa0161() => CorpusAssert.Parses(@"SELECT id FROM s.t UNION SELECT id FROM s.t ORDER BY 1 FETCH NEXT 5 ROWS WITH TIES", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void selsa0162() => CorpusAssert.Parses(@"SELECT id FROM s.t UNION SELECT id FROM s.t2 FOR UPDATE", "error");
@@ -373,11 +373,11 @@ public class Corpus_SelectSetops
     public void selsb0013() => CorpusAssert.Parses(@"SELECT 1 INTERSECT SELECT 1 INTERSECT SELECT 1", "ok");
     [Fact]
     public void selsb0014() => CorpusAssert.Parses(@"SELECT 1 EXCEPT SELECT 2 EXCEPT SELECT 3", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selsb0015() => CorpusAssert.Parses(@"(SELECT 1 UNION SELECT 2) INTERSECT SELECT 1", "ok");
     [Fact]
     public void selsb0016() => CorpusAssert.Parses(@"SELECT 1 UNION (SELECT 2 INTERSECT SELECT 2)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selsb0017() => CorpusAssert.Parses(@"(SELECT 1 UNION ALL SELECT 2) EXCEPT ALL SELECT 2", "ok");
     [Fact]
     public void selsb0018() => CorpusAssert.Parses(@"SELECT 1 UNION SELECT 2 ORDER BY 1", "ok");
@@ -391,7 +391,7 @@ public class Corpus_SelectSetops
     public void selsb0022() => CorpusAssert.Parses(@"SELECT id, name FROM s.t UNION SELECT id, label FROM s.t2", "ok");
     [Fact]
     public void selsb0023() => CorpusAssert.Parses(@"SELECT 1 UNION SELECT 2 UNION SELECT 3 INTERSECT SELECT 3", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void selsb0024() => CorpusAssert.Parses(@"(SELECT 1 UNION SELECT 2) EXCEPT (SELECT 2 UNION SELECT 3)", "ok");
     [Fact]
     public void selsb0025() => CorpusAssert.Parses(@"SELECT val FROM s.t UNION SELECT amount FROM s.t2", "ok");

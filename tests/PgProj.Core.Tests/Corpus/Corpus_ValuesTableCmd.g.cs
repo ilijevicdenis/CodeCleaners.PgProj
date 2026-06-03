@@ -65,19 +65,19 @@ public class Corpus_ValuesTableCmd
     public void vala0029() => CorpusAssert.Parses(@"VALUES (1), (2), (3) LIMIT 2 OFFSET 1", "ok");
     [Fact]
     public void vala0030() => CorpusAssert.Parses(@"VALUES (3), (1), (2) ORDER BY 1 LIMIT 2 OFFSET 1", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vala0031() => CorpusAssert.Parses(@"VALUES (1), (2), (3) FETCH FIRST 2 ROWS ONLY", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vala0032() => CorpusAssert.Parses(@"VALUES (1), (2), (3) FETCH NEXT 2 ROWS ONLY", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vala0033() => CorpusAssert.Parses(@"VALUES (1), (2), (3) FETCH FIRST 1 ROW ONLY", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vala0034() => CorpusAssert.Parses(@"VALUES (1), (2), (3) FETCH NEXT 1 ROW ONLY", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vala0035() => CorpusAssert.Parses(@"VALUES (1), (2), (3) FETCH FIRST ROW ONLY", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vala0036() => CorpusAssert.Parses(@"VALUES (1), (2), (3) ORDER BY 1 FETCH FIRST 2 ROWS ONLY", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vala0037() => CorpusAssert.Parses(@"VALUES (1), (2), (3) OFFSET 1 ROWS FETCH NEXT 1 ROW ONLY", "ok");
     [Fact]
     public void vala0038() => CorpusAssert.Parses(@"SELECT * FROM (VALUES (1, 'a'), (2, 'b')) AS v(num, letter)", "ok");
@@ -167,11 +167,11 @@ public class Corpus_ValuesTableCmd
     public void vala0080() => CorpusAssert.Parses(@"TABLE s.t LIMIT 5 OFFSET 2", "ok");
     [Fact]
     public void vala0081() => CorpusAssert.Parses(@"TABLE s.t ORDER BY id LIMIT 3 OFFSET 1", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vala0082() => CorpusAssert.Parses(@"TABLE s.t FETCH FIRST 3 ROWS ONLY", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vala0083() => CorpusAssert.Parses(@"TABLE s.t FETCH NEXT 1 ROW ONLY", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vala0084() => CorpusAssert.Parses(@"TABLE s.t ORDER BY id FETCH FIRST 5 ROWS ONLY", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void vala0085() => CorpusAssert.Parses(@"TABLE ONLY s.parent", "ok");
@@ -243,6 +243,6 @@ public class Corpus_ValuesTableCmd
     public void vala0118() => CorpusAssert.Parses(@"VALUES (1),(NULL),(3) ORDER BY 1 ASC NULLS FIRST", "ok");
     [Fact]
     public void vala0119() => CorpusAssert.Parses(@"SELECT count(*) FROM (VALUES (1),(2),(3)) AS v", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vala0120() => CorpusAssert.Parses(@"VALUES (3),(1),(2) ORDER BY 1 FETCH FIRST 2 ROWS WITH TIES", "ok");
 }

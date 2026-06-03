@@ -65,6 +65,7 @@ public sealed partial class PgParser
             if (c.MatchWord("SIMILAR")) { c.ExpectWord("TO"); left = ParseLike(c, left, "SIMILAR TO", not); continue; }
             if (not) throw new ParseException("expected BETWEEN/IN/LIKE after NOT", c.Here);
 
+            if (c.MatchWord("OVERLAPS")) { left = new BinaryExpr { Op = "OVERLAPS", Left = left, Right = ParseGeneralOp(c) }; continue; }
             if (c.MatchWord("IS")) { left = ParseIs(c, left); continue; }
             if (c.MatchWord("ISNULL")) { left = new PostfixExpr { Op = "ISNULL", Operand = left }; continue; }
             if (c.MatchWord("NOTNULL")) { left = new PostfixExpr { Op = "NOTNULL", Operand = left }; continue; }
@@ -270,9 +271,16 @@ public sealed partial class PgParser
                 "JSON_VALUE", "JSON_EXISTS", "JSON_SCALAR", "JSON_SERIALIZE", "JSON_TABLE", "JSON"))
             return ParseKeywordCall(c);
 
-        // a bare type keyword immediately before a string is a typed literal: timestamp '…'
-        if (t.Kind == TokenKind.Word && c.Peek() is { Kind: TokenKind.String } && IsTypeKeyword(t.Value))
-        { c.Advance(); var s = c.Advance(); return new LiteralExpr { Kind = "typed", Text = $"{t.Value} '{s.Value}'" }; }
+        // typed literal: a (possibly multi-word) type name immediately before a string,
+        // e.g. timestamp '…', TIMESTAMP WITH TIME ZONE '…', numeric(10,2) '…'. Speculative: parse
+        // the type and require a following string, else restore and treat the word as a name.
+        if (t.Kind == TokenKind.Word && IsTypeKeyword(t.Value))
+        {
+            int mark = c.Mark();
+            var ty = ParseCastType(c);
+            if (c.Current is { Kind: TokenKind.String } sv) { c.Advance(); return new LiteralExpr { Kind = "typed", Text = $"{ty} '{sv.Value}'" }; }
+            c.Reset(mark);
+        }
 
         // identifier chain → column ref / function call / star
         return ParseNameOrCall(c);
@@ -484,10 +492,15 @@ public sealed partial class PgParser
             throw new ParseException("expected a type name", c.Here);
         toks.Add(c.Advance());
         if (c.AtSymbol('.')) { toks.Add(c.Advance()); toks.Add(c.Advance()); }   // schema.type
-        // multiword type continuations
-        while (c.Current is { Kind: TokenKind.Word } w && IsTypeContinuation(w.Value)) toks.Add(c.Advance());
-        if (c.AtSymbol('(')) toks.AddRange(WithParens(CaptureBalancedParens(c)));
-        while (c.AtSymbol('[')) toks.AddRange(CaptureBracketWith(c));
+        // modifiers (p[,s]), multiword continuations (with time zone / precision / varying / interval
+        // fields) and array suffixes, in any order: timestamp(3) with time zone, interval day to second.
+        while (true)
+        {
+            if (c.Current is { Kind: TokenKind.Word } w && IsTypeContinuation(w.Value)) { toks.Add(c.Advance()); continue; }
+            if (c.AtSymbol('(')) { toks.AddRange(WithParens(CaptureBalancedParens(c))); continue; }
+            if (c.AtSymbol('[')) { toks.AddRange(CaptureBracketWith(c)); continue; }
+            break;
+        }
         return Token.Render(toks);
     }
 
@@ -527,7 +540,8 @@ public sealed partial class PgParser
     private static bool IsTypeKeyword(string w) => TypeKeywords.Contains(w);
 
     private static readonly HashSet<string> TypeContinuations = new(StringComparer.OrdinalIgnoreCase)
-    { "varying", "precision", "with", "without", "time", "zone" };
+    { "varying", "precision", "with", "without", "time", "zone",
+      "year", "month", "day", "hour", "minute", "second", "to" };   // interval fields
     private static bool IsTypeContinuation(string w) => TypeContinuations.Contains(w);
 
     private static readonly HashSet<string> IntervalFields = new(StringComparer.OrdinalIgnoreCase)
