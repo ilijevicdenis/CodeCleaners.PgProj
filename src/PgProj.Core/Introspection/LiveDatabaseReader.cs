@@ -70,6 +70,8 @@ public sealed class LiveDatabaseReader
             Read(c => ReadConversionsAsync(c, ct)),
             Read(c => ReadForeignDataWrappersAsync(c, ct)),
             Read(c => ReadServersAsync(c, ct)),
+            Read(c => ReadStatisticsAsync(c, ct)),
+            Read(c => ReadCastsAsync(c, ct)),
             Read(c => ReadExistenceObjectsAsync(c, ct)),
         };
 
@@ -820,10 +822,11 @@ public sealed class LiveDatabaseReader
                 list.Add(MakeRaw(kind, "", r.GetString(0), $"{tag}:{r.GetString(0)}", string.Empty, bodyComparable: false));
         }
 
-        // Conversion, FDW, and Server now have real DDL reconstruction (below); the rest stay
-        // existence-only until they get a clean reconstruction too.
+        // Conversion, FDW, Server, Cast, and column-based Statistics now have real DDL reconstruction
+        // (below); the rest stay existence-only until they get a clean reconstruction too.
+        // Expression statistics (stxexprs set) we don't reconstruct yet → keep existence-only.
         await Schema(ObjectKind.Statistics, "statistics",
-            "SELECT n.nspname, s.stxname FROM pg_statistic_ext s JOIN pg_namespace n ON n.oid=s.stxnamespace");
+            "SELECT n.nspname, s.stxname FROM pg_statistic_ext s JOIN pg_namespace n ON n.oid=s.stxnamespace WHERE s.stxexprs IS NOT NULL");
         await Schema(ObjectKind.ForeignTable, "foreigntable",
             "SELECT n.nspname, c.relname FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE c.relkind='f'");
         await Schema(ObjectKind.TextSearchConfiguration, "textsearchconfiguration",
@@ -907,6 +910,86 @@ public sealed class LiveDatabaseReader
             body += $" FOREIGN DATA WRAPPER {r.GetString(1)}";
             body += OptionsClause(r.IsDBNull(4) ? null : r.GetFieldValue<string[]>(4));
             list.Add(MakeRaw(ObjectKind.Server, "", name, $"server:{name}", body + ";"));
+        }
+        return list;
+    }
+
+    private async Task<List<RawObjectDefinition>> ReadStatisticsAsync(NpgsqlConnection conn, CancellationToken ct)
+    {
+        // Column-based extended statistics only (stxexprs IS NULL); expression stats stay existence-only.
+        const string sql = @"
+            SELECT n.nspname, s.stxname,
+                   (s.stxrelid::regclass)::text AS tbl,
+                   (SELECT string_agg(a.attname, ', ' ORDER BY k.ord)
+                      FROM unnest(s.stxkeys) WITH ORDINALITY AS k(attnum, ord)
+                      JOIN pg_attribute a ON a.attrelid = s.stxrelid AND a.attnum = k.attnum) AS cols,
+                   ARRAY(SELECT CASE k WHEN 'd' THEN 'ndistinct' WHEN 'f' THEN 'dependencies'
+                                       WHEN 'm' THEN 'mcv' END
+                         FROM unnest(s.stxkind) AS k
+                         WHERE k IN ('d','f','m')) AS kinds
+            FROM pg_statistic_ext s
+            JOIN pg_namespace n ON n.oid = s.stxnamespace
+            WHERE s.stxexprs IS NULL
+              AND n.nspname NOT IN ('pg_catalog','information_schema') AND n.nspname NOT LIKE 'pg_%'
+            ORDER BY n.nspname, s.stxname;";
+
+        var list = new List<RawObjectDefinition>();
+        await using var cmd = new NpgsqlCommand(sql, conn);
+        await using var r = await cmd.ExecuteReaderAsync(ct);
+        while (await r.ReadAsync(ct))
+        {
+            var schema = r.GetString(0);
+            var name = r.GetString(1);
+            var tbl = r.GetString(2);
+            var cols = r.IsDBNull(3) ? "" : r.GetString(3);
+            var kinds = r.IsDBNull(4) ? Array.Empty<string>() : r.GetFieldValue<string[]>(4);
+            var kindList = kinds.Length > 0 ? $" ({string.Join(", ", kinds)})" : "";
+            var body = $"CREATE STATISTICS {schema}.{name}{kindList} ON {cols} FROM {tbl};";
+            list.Add(MakeRaw(ObjectKind.Statistics, schema, name, $"statistics:{schema}.{name}", body));
+        }
+        return list;
+    }
+
+    private async Task<List<RawObjectDefinition>> ReadCastsAsync(NpgsqlConnection conn, CancellationToken ct)
+    {
+        // User casts only: those touching a user-schema type or function (built-in casts are excluded).
+        const string sql = @"
+            SELECT format_type(c.castsource, NULL) AS src,
+                   format_type(c.casttarget, NULL) AS tgt,
+                   CASE WHEN c.castfunc <> 0 THEN c.castfunc::regprocedure::text END AS func,
+                   c.castcontext, c.castmethod
+            FROM pg_cast c
+            WHERE (EXISTS (SELECT 1 FROM pg_type t JOIN pg_namespace n ON n.oid = t.typnamespace
+                          WHERE t.oid IN (c.castsource, c.casttarget)
+                            AND n.nspname NOT IN ('pg_catalog','information_schema') AND n.nspname NOT LIKE 'pg_%')
+               OR EXISTS (SELECT 1 FROM pg_proc p JOIN pg_namespace n ON n.oid = p.pronamespace
+                          WHERE p.oid = c.castfunc
+                            AND n.nspname NOT IN ('pg_catalog','information_schema') AND n.nspname NOT LIKE 'pg_%'))
+              -- exclude casts PostgreSQL auto-creates (e.g. range↔multirange) or that belong to an
+              -- extension; those reappear on their own when the owning object is created.
+              AND NOT EXISTS (SELECT 1 FROM pg_depend d
+                              WHERE d.classid = 'pg_cast'::regclass AND d.objid = c.oid
+                                AND d.deptype IN ('i','a','e'))
+            ORDER BY 1, 2;";
+
+        var list = new List<RawObjectDefinition>();
+        await using var cmd = new NpgsqlCommand(sql, conn);
+        await using var r = await cmd.ExecuteReaderAsync(ct);
+        while (await r.ReadAsync(ct))
+        {
+            var src = r.GetString(0);
+            var tgt = r.GetString(1);
+            var method = ReadChar(r, 4, 'f');
+            var with = method switch
+            {
+                'b' => "WITHOUT FUNCTION",
+                'i' => "WITH INOUT",
+                _ => $"WITH FUNCTION {r.GetString(2)}",
+            };
+            var context = ReadChar(r, 3, 'e') switch { 'a' => " AS ASSIGNMENT", 'i' => " AS IMPLICIT", _ => "" };
+            var name = $"({src} AS {tgt})";   // also the DROP CAST target shape
+            var body = $"CREATE CAST {name} {with}{context};";
+            list.Add(MakeRaw(ObjectKind.Cast, "", name, $"cast:{src}->{tgt}", body));
         }
         return list;
     }

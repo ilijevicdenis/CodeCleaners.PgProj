@@ -49,6 +49,8 @@ public sealed class LiveReaderIntegrationTests
         Assert.Contains(live.Objects, o => o.Kind == ObjectKind.ForeignDataWrapper && o.Body.Contains("FOREIGN DATA WRAPPER"));
         Assert.Contains(live.Objects, o => o.Kind == ObjectKind.Server && o.Body.Contains("CREATE SERVER"));
         Assert.Contains(live.Objects, o => o.Kind == ObjectKind.Conversion && o.Body.Contains("CONVERSION"));
+        Assert.Contains(live.Objects, o => o.Kind == ObjectKind.Statistics && o.Body.Contains("CREATE STATISTICS"));
+        Assert.Contains(live.Objects, o => o.Kind == ObjectKind.Cast && o.Body.Contains("CREATE CAST"));
 
         // Every exported object's DDL must re-parse cleanly — this is the "complete the parser" check.
         var unparseable = DdlExporter.ExportFiles(live)
