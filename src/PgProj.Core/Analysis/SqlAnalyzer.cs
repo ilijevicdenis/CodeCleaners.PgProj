@@ -27,11 +27,19 @@ public sealed class SqlAnalyzer
     /// <summary>The built-in rule set, focused on function safety.</summary>
     public static SqlAnalyzer Default() => new(new IAnalysisRule[]
     {
+        // Function safety (header + body)
         new SecurityDefinerSearchPathRule(),
         new DynamicSqlRule(),
         new UnguardedMutationRule(),
         new SchemaMutationInFunctionRule(),
         new MissingVolatilityRule(),
+        // Query- and control-flow-structure rules (exploit the deep AST)
+        new JoinWithoutConditionRule(),
+        new SelectStarInViewRule(),
+        new NotInSubqueryRule(),
+        new LimitWithoutOrderByRule(),
+        new DmlInLoopRule(),
+        new SecurityDefinerWritesRule(),
     });
 
     public IReadOnlyList<IAnalysisRule> Rules => _rules;

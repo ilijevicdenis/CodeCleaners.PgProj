@@ -34,7 +34,7 @@ source, let the tool compute the migration.
 | serial, generated columns, CHECK/EXCLUDE, identity ALWAYS/BY DEFAULT, sequence options | ✅ |
 | **MSBuild SDK** — `dotnet build SampleDb.pgproj` builds the model (`src/PgProj.Sdk`) | ✅ |
 | **AST + tree-walker** (`PgProj.Core.Ast`) — real node tree, visitor, expression Pratt parser | ✅ |
-| **Static analysis** (`pgproj analyze`) — function safety rules PG001–PG005 | ✅ |
+| **Static analysis** (`pgproj analyze`) — 11 rules over the AST: function safety PG001–PG005 + query/control-flow PG006–PG011 | ✅ |
 | **Parallel read** (`BuildAsync`) + **phased parallel deploy** (`publish --parallel`) | ✅ |
 | 77 unit tests (parser / comparer / generator / loader / constraints / raw / AST / analysis / concurrency) | ✅ |
 
