@@ -99,7 +99,7 @@ public class Corpus_DropStatements
     public void drpa0046() => CorpusAssert.Parses(@"DROP SEQUENCE IF EXISTS s.seq", "ok");
     [Fact]
     public void drpa0047() => CorpusAssert.Parses(@"DROP SEQUENCE IF EXISTS s.no_such_seq", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpa0048() => CorpusAssert.Parses(@"DROP SEQUENCE s.no_such_seq", "error");
     [Fact]
     public void drpa0049() => CorpusAssert.Parses(@"DROP SEQUENCE s.seq CASCADE", "ok");
@@ -435,7 +435,7 @@ public class Corpus_DropStatements
     public void drpb0044() => CorpusAssert.Parses(@"CREATE SEQUENCE s.drop_seq2; DROP SEQUENCE s.drop_seq2 CASCADE", "ok");
     [Fact]
     public void drpb0045() => CorpusAssert.Parses(@"CREATE SEQUENCE s.drop_seq3; DROP SEQUENCE s.drop_seq3 RESTRICT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpb0046() => CorpusAssert.Parses(@"DROP SEQUENCE s.no_such_seq", "error");
     [Fact]
     public void drpb0047() => CorpusAssert.Parses(@"DROP SEQUENCE", "error");

@@ -192,7 +192,7 @@ public sealed class SemanticAnalyzer
     private void AnalyzeDrop(DropStatement drop)
     {
         if (drop.IfExists || _scriptRenames || _scriptAlters) return;   // an ALTER may have moved/renamed the target
-        if (drop.ObjectKind is not ("TABLE" or "VIEW" or "MATERIALIZED VIEW" or "FOREIGN TABLE")) return;
+        if (drop.ObjectKind is not ("TABLE" or "VIEW" or "MATERIALIZED VIEW" or "FOREIGN TABLE" or "SEQUENCE")) return;
         foreach (var raw in drop.Names)
         {
             var dot = raw.LastIndexOf('.');
