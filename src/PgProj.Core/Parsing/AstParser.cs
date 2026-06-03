@@ -287,7 +287,7 @@ public sealed class AstParser
             Security = security, Strict = strict, SetClauses = setClauses, IsProcedure = isProcedure,
             ArgTypes = string.Join(", ", parameters.Select(p => p.Type.Normalized)),
         };
-        var body = new FunctionBody { Language = language, RawText = bodyText, Statements = FunctionBodyClassifier.Classify(bodyText) };
+        var body = new FunctionBody { Language = language, RawText = bodyText, Statements = PlpgsqlParser.Parse(bodyText) };
         return new CreateFunctionStatement { Header = header, Body = body };
     }
 

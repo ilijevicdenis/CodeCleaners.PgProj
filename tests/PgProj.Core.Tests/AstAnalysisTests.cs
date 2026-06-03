@@ -46,10 +46,10 @@ public class AstAnalysisTests
             END; $$;
             """)).Single();
 
-        var dml = fn.Body.Statements.OfType<DmlStatementNode>().ToList();
+        var dml = SqlTree.Descendants<DmlStatementNode>(fn.Body).ToList();
         Assert.Contains(dml, d => d.Verb == "UPDATE" && !d.HasWhere);
         Assert.Contains(dml, d => d.Verb == "DELETE" && d.HasWhere);
-        Assert.Single(fn.Body.Statements.OfType<DynamicSqlStatementNode>());
+        Assert.Single(SqlTree.Descendants<DynamicSqlStatementNode>(fn.Body));
     }
 
     [Fact]

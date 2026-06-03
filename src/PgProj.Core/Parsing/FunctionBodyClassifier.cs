@@ -13,11 +13,13 @@ namespace PgProj.Core.Parsing;
 /// </summary>
 public static class FunctionBodyClassifier
 {
-    public static IReadOnlyList<BodyStatement> Classify(string body)
+    /// <summary>Flat split-and-classify — the fallback when the PL/pgSQL parser can't structure a body.</summary>
+    public static IReadOnlyList<BodyStatement> FlatClassify(string body) =>
+        FlatClassify(Tokenizer.Tokenize(body ?? string.Empty));
+
+    public static IReadOnlyList<BodyStatement> FlatClassify(IReadOnlyList<Token> tokens)
     {
         var result = new List<BodyStatement>();
-        var tokens = Tokenizer.Tokenize(body ?? string.Empty);
-
         var current = new List<Token>();
         var depth = 0;
         foreach (var t in tokens)
@@ -27,23 +29,24 @@ public static class FunctionBodyClassifier
 
             if (t.IsSymbol(';') && depth == 0)
             {
-                if (current.Count > 0) result.Add(ClassifyStatement(current));
+                if (current.Count > 0) result.Add(ClassifySimple(current));
                 current = new List<Token>();
                 continue;
             }
             current.Add(t);
         }
-        if (current.Count > 0) result.Add(ClassifyStatement(current));
+        if (current.Count > 0) result.Add(ClassifySimple(current));
         return result;
     }
 
-    private static readonly HashSet<string> Verbs = new(StringComparer.OrdinalIgnoreCase)
+    internal static readonly HashSet<string> Verbs = new(StringComparer.OrdinalIgnoreCase)
     {
         "SELECT", "INSERT", "UPDATE", "DELETE", "TRUNCATE", "PERFORM",
         "EXECUTE", "DROP", "ALTER", "CREATE", "GRANT", "REVOKE",
     };
 
-    private static BodyStatement ClassifyStatement(List<Token> tokens)
+    /// <summary>Classifies a single simple (non-control-flow) statement's tokens.</summary>
+    internal static BodyStatement ClassifySimple(List<Token> tokens)
     {
         var raw = Token.Render(tokens);
         var first = FirstVerb(tokens); // scans past BEGIN/DECLARE/IF/THEN/labels to the real verb

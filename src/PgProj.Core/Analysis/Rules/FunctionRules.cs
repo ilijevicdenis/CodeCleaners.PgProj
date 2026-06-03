@@ -39,7 +39,8 @@ public sealed class DynamicSqlRule : IAnalysisRule
     {
         foreach (var fn in SqlTree.Descendants<CreateFunctionStatement>(script))
         {
-            if (fn.Body.Statements.OfType<DynamicSqlStatementNode>().Any())
+            // Walk the whole body tree so EXECUTE nested inside an IF/loop is still caught.
+            if (SqlTree.Descendants<DynamicSqlStatementNode>(fn.Body).Any())
                 yield return new Diagnostic(Id, DiagnosticSeverity.Warning,
                     "Function builds/runs dynamic SQL via EXECUTE; ensure inputs are quoted with format()/quote_ident()/quote_literal().",
                     $"{fn.Header.Schema}.{fn.Header.Name}");
@@ -57,7 +58,7 @@ public sealed class UnguardedMutationRule : IAnalysisRule
     {
         foreach (var fn in SqlTree.Descendants<CreateFunctionStatement>(script))
         {
-            foreach (var dml in fn.Body.Statements.OfType<DmlStatementNode>())
+            foreach (var dml in SqlTree.Descendants<DmlStatementNode>(fn.Body))
             {
                 if (dml.Verb is "UPDATE" or "DELETE" && !dml.HasWhere)
                     yield return new Diagnostic(Id, DiagnosticSeverity.Warning,
@@ -78,7 +79,7 @@ public sealed class SchemaMutationInFunctionRule : IAnalysisRule
     {
         foreach (var fn in SqlTree.Descendants<CreateFunctionStatement>(script))
         {
-            foreach (var m in fn.Body.Statements.OfType<SchemaMutationStatementNode>())
+            foreach (var m in SqlTree.Descendants<SchemaMutationStatementNode>(fn.Body))
                 yield return new Diagnostic(Id, DiagnosticSeverity.Warning,
                     $"Function performs schema mutation ({m.Verb}); DDL from the data path is hard to audit and can break replication.",
                     $"{fn.Header.Schema}.{fn.Header.Name}");

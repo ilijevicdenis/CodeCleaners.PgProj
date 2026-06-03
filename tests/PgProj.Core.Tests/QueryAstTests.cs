@@ -56,7 +56,7 @@ public class QueryAstTests
             CREATE FUNCTION app.f() RETURNS void LANGUAGE plpgsql AS $$
             BEGIN UPDATE app.t SET x = 1 WHERE id = 5; END; $$;
             """)).Single();
-        var upd = fn.Body.Statements.OfType<DmlStatementNode>().Single(d => d.Verb == "UPDATE");
+        var upd = SqlTree.Descendants<DmlStatementNode>(fn.Body).Single(d => d.Verb == "UPDATE");
         Assert.True(upd.HasWhere);
         var w = Assert.IsType<BinaryExpr>(upd.WhereExpression);
         Assert.Equal("=", w.Op);
@@ -70,7 +70,7 @@ public class QueryAstTests
             CREATE FUNCTION app.f() RETURNS void LANGUAGE plpgsql AS $$
             BEGIN DELETE FROM app.t WHERE id IN (SELECT id FROM app.u); END; $$;
             """)).Single();
-        var del = fn.Body.Statements.OfType<DmlStatementNode>().Single();
+        var del = SqlTree.Descendants<DmlStatementNode>(fn.Body).Single();
         Assert.Equal("DELETE", del.Verb);
         Assert.True(del.HasWhere);
     }

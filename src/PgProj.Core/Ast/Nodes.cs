@@ -223,8 +223,86 @@ public sealed class DynamicSqlStatementNode : BodyStatement { }
 /// <summary>Schema mutation from inside a function body (DROP/ALTER/CREATE/GRANT/TRUNCATE).</summary>
 public sealed class SchemaMutationStatementNode : BodyStatement { public required string Verb { get; init; } }
 
-/// <summary>Procedural construct we don't classify further (IF/LOOP/assignment/RETURN/…).</summary>
+/// <summary>Procedural construct we don't classify further.</summary>
 public sealed class ProceduralStatementNode : BodyStatement { }
+
+// ---- PL/pgSQL control flow --------------------------------------------------------------
+
+/// <summary>A <c>[DECLARE …] BEGIN … [EXCEPTION …] END</c> block.</summary>
+public sealed class BlockStatement : BodyStatement
+{
+    public string? DeclarationsText { get; init; }
+    public IReadOnlyList<BodyStatement> Body { get; init; } = new List<BodyStatement>();
+    public IReadOnlyList<ExceptionHandler> Handlers { get; init; } = new List<ExceptionHandler>();
+    public override IEnumerable<SqlNode> Children => Body.Concat<SqlNode>(Handlers);
+}
+
+public sealed class ExceptionHandler : SqlNode
+{
+    public string ConditionText { get; init; } = "";   // e.g. "unique_violation OR foreign_key_violation"
+    public IReadOnlyList<BodyStatement> Body { get; init; } = new List<BodyStatement>();
+    public override IEnumerable<SqlNode> Children => Body;
+}
+
+public sealed class IfStatement : BodyStatement
+{
+    public Expression? Condition { get; init; }
+    public IReadOnlyList<BodyStatement> Then { get; init; } = new List<BodyStatement>();
+    public IReadOnlyList<ElsifBranch> Elsifs { get; init; } = new List<ElsifBranch>();
+    public IReadOnlyList<BodyStatement> Else { get; init; } = new List<BodyStatement>();
+    public override IEnumerable<SqlNode> Children
+    {
+        get
+        {
+            var n = new List<SqlNode>();
+            if (Condition is not null) n.Add(Condition);
+            n.AddRange(Then); n.AddRange(Elsifs); n.AddRange(Else);
+            return n;
+        }
+    }
+}
+
+public sealed class ElsifBranch : SqlNode
+{
+    public Expression? Condition { get; init; }
+    public IReadOnlyList<BodyStatement> Body { get; init; } = new List<BodyStatement>();
+    public override IEnumerable<SqlNode> Children =>
+        Condition is null ? Body : Body.Prepend<SqlNode>(Condition);
+}
+
+public sealed class LoopStatement : BodyStatement
+{
+    public required string Kind { get; init; }   // LOOP | WHILE | FOR | FOREACH
+    public Expression? Condition { get; init; }   // WHILE predicate
+    public string? HeaderText { get; init; }      // FOR/FOREACH header, raw
+    public IReadOnlyList<BodyStatement> Body { get; init; } = new List<BodyStatement>();
+    public override IEnumerable<SqlNode> Children =>
+        Condition is null ? Body : Body.Prepend<SqlNode>(Condition);
+}
+
+public sealed class AssignmentStatement : BodyStatement
+{
+    public required string Target { get; init; }
+    public Expression? Value { get; init; }
+    public override IEnumerable<SqlNode> Children => Value is null ? base.Children : new[] { Value };
+}
+
+public sealed class ReturnStatement : BodyStatement
+{
+    public string Kind { get; init; } = "RETURN";   // RETURN | RETURN NEXT | RETURN QUERY
+    public Expression? Value { get; init; }
+    public SelectQuery? Query { get; init; }
+    public override IEnumerable<SqlNode> Children
+    {
+        get
+        {
+            var n = new List<SqlNode>();
+            if (Value is not null) n.Add(Value);
+            if (Query is not null) n.Add(Query);
+            return n;
+        }
+    }
+}
 
 // ---- expressions ------------------------------------------------------------------------
 
