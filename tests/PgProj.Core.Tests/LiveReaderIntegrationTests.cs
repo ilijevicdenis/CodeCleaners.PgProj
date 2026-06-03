@@ -64,6 +64,30 @@ public sealed class LiveReaderIntegrationTests
         await deployer.ExecuteAsync(conn, script2);
     }
 
+    [Fact]
+    public async Task ShadowValidate_accepts_valid_sql_and_catches_broken_sql()
+    {
+        var conn = Conn;
+        if (string.IsNullOrWhiteSpace(conn)) return;
+        var validator = new ShadowValidator();
+
+        // Valid SQL applies (then rolls back + drops the scratch DB).
+        var ok = await validator.ValidateAsync(conn, "CREATE TABLE public.zzz_valid (id int PRIMARY KEY, name text);");
+        Assert.True(ok.Ok, ok.Error);
+
+        // A semantic error only PostgreSQL can catch (a column of a non-existent type) is reported.
+        var bad = await validator.ValidateAsync(conn, "CREATE TABLE public.zzz_bad (id nonexistent_type_xyz);");
+        Assert.False(bad.Ok);
+        Assert.Equal("42704", bad.SqlState);   // undefined_object
+
+        // The whole AllFeaturesDb project validates against a real server.
+        var built = DatabaseProject.Load(FindSampleProject()).Build();
+        var script = new DeployScriptGenerator().Generate(
+            new SchemaComparer().Compare(built.Model, new DatabaseModel()), new DeployOptions { WrapInTransaction = false });
+        var full = await validator.ValidateAsync(conn, script);
+        Assert.True(full.Ok, full.Error);
+    }
+
     private static string FindSampleProject()
     {
         var dir = AppContext.BaseDirectory;

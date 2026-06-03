@@ -29,6 +29,7 @@ public static class Program
                 "build" => Build(args),
                 "compare" => await Compare(args),
                 "publish" => await Publish(args),
+                "validate" => await Validate(args),
                 "extract" => await Extract(args),
                 "analyze" => Analyze(args),
                 "script" => Script(args),
@@ -153,6 +154,32 @@ public static class Program
             Console.WriteLine($"Published {changes.Count} change(s) successfully.");
         }
         return 0;
+    }
+
+    // ---- validate (apply to a throwaway temp DB in a rolled-back txn) --------------------
+
+    private static async Task<int> Validate(string[] args)
+    {
+        var (source, project) = BuildSourceOrThrow(args);
+
+        // Layer 1 (static, instant): the analysis gate. Layer 2 (below) runs it against real Postgres.
+        if (AnalysisGateBlocks(project, args)) return 1;
+
+        // Full create script with no BEGIN/COMMIT — ShadowValidator wraps it in its own transaction.
+        var changes = new SchemaComparer().Compare(source, new DatabaseModel());
+        var script = new DeployScriptGenerator().Generate(changes, new DeployOptions { WrapInTransaction = false });
+
+        Console.WriteLine($"Validating '{project.Name}' against a throwaway database…");
+        var outcome = await new ShadowValidator().ValidateAsync(RequireConnection(args), script);
+        if (outcome.Ok)
+        {
+            Console.WriteLine("Valid. ✓ The project applies cleanly to PostgreSQL (changes rolled back, scratch DB dropped).");
+            return 0;
+        }
+
+        Console.Error.WriteLine($"Invalid: {outcome.Error}" + (outcome.SqlState is null ? "" : $"  [{outcome.SqlState}]"));
+        if (outcome.Position > 0) Console.Error.WriteLine($"  near script position {outcome.Position}");
+        return 1;
     }
 
     // ---- extract ------------------------------------------------------------------------
@@ -333,6 +360,7 @@ public static class Program
           pgproj script  <project.pgproj> [-o create.sql] [--no-transaction]
           pgproj compare <project.pgproj> --connection <conn> [--allow-drops]
           pgproj publish <project.pgproj> --connection <conn> [--dry-run] [-o script.sql] [--allow-drops] [--no-transaction] [--parallel] [--strict] [--no-analyze]
+          pgproj validate <project.pgproj> --connection <conn> [--strict] [--no-analyze]   (apply to a throwaway temp DB, rolled back)
           pgproj extract --connection <conn> -o <outDir>
           pgproj analyze <project.pgproj> [--strict]    (static safety analysis over the AST)
 
