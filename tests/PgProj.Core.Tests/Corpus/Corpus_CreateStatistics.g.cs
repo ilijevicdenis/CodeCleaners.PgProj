@@ -136,7 +136,7 @@ ALTER STATISTICS s.st58 SET STATISTICS 10000", "ok");
     [Fact]
     public void staa0059() => CorpusAssert.Parses(@"CREATE STATISTICS s.st59 ON qty, flag FROM s.t;
 DROP STATISTICS s.st59", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void staa0060() => CorpusAssert.Parses(@"DROP STATISTICS IF EXISTS s.nonexistent_stat", "ok");
     [Fact]
     public void staa0061() => CorpusAssert.Parses(@"CREATE STATISTICS s.st61 ON qty, flag FROM s.t;
@@ -166,7 +166,7 @@ ALTER STATISTICS s.st69 SET STATISTIC 100", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void staa0070() => CorpusAssert.Parses(@"CREATE STATISTICS s.st70 ON qty, flag FROM s.t;
 ALTER STATISTICS s.st70 RENAME st70_new", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void staa0071() => CorpusAssert.Parses(@"DROP STATISTICS", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void staa0072() => CorpusAssert.Parses(@"DROP STATISTIC s.st72", "error");

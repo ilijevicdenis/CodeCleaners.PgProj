@@ -141,7 +141,7 @@ public class Corpus_CreateConversion
     public void cnva0067() => CorpusAssert.Parses(@"CREATE CONVERSION myconv FOR 'LATIN1' TO 'UTF8' FROM iso8859_1_to_utf8; DROP CONVERSION myconv", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void cnva0068() => CorpusAssert.Parses(@"DROP CONVERSION myconv", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void cnva0069() => CorpusAssert.Parses(@"DROP CONVERSION IF EXISTS myconv", "ok");
     [Fact]
     public void cnva0070() => CorpusAssert.Parses(@"CREATE CONVERSION myconv FOR 'LATIN1' TO 'UTF8' FROM iso8859_1_to_utf8; DROP CONVERSION IF EXISTS myconv", "ok");
@@ -151,11 +151,11 @@ public class Corpus_CreateConversion
     public void cnva0072() => CorpusAssert.Parses(@"CREATE CONVERSION myconv FOR 'LATIN1' TO 'UTF8' FROM iso8859_1_to_utf8; DROP CONVERSION myconv RESTRICT", "ok");
     [Fact]
     public void cnva0073() => CorpusAssert.Parses(@"CREATE CONVERSION s.myconv FOR 'LATIN1' TO 'UTF8' FROM iso8859_1_to_utf8; DROP CONVERSION s.myconv", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void cnva0074() => CorpusAssert.Parses(@"DROP CONVERSION IF EXISTS s.nonexistent_conv CASCADE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void cnva0075() => CorpusAssert.Parses(@"DROP CONVERSION", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void cnva0076() => CorpusAssert.Parses(@"DROP CONVERSION IF myconv", "error");
     [Fact]
     public void cnva0077() => CorpusAssert.Parses(@"CREATE CONVERSION myconv FOR 'LATIN1' TO 'UTF8' FROM iso8859_1_to_utf8; ALTER CONVERSION myconv RENAME TO myconv2", "ok");
@@ -173,15 +173,15 @@ public class Corpus_CreateConversion
     public void cnva0083() => CorpusAssert.Parses(@"CREATE CONVERSION s.myconv FOR 'LATIN1' TO 'UTF8' FROM iso8859_1_to_utf8; ALTER CONVERSION s.myconv SET SCHEMA public", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void cnva0084() => CorpusAssert.Parses(@"ALTER CONVERSION myconv SET SCHEMA s", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void cnva0085() => CorpusAssert.Parses(@"ALTER CONVERSION myconv RENAME", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void cnva0086() => CorpusAssert.Parses(@"ALTER CONVERSION myconv RENAME TO", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void cnva0087() => CorpusAssert.Parses(@"ALTER CONVERSION myconv OWNER", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void cnva0088() => CorpusAssert.Parses(@"ALTER CONVERSION myconv OWNER TO", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void cnva0089() => CorpusAssert.Parses(@"ALTER CONVERSION myconv SET SCHEMA", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void cnva0090() => CorpusAssert.Parses(@"ALTER CONVERSION myconv SET", "error");

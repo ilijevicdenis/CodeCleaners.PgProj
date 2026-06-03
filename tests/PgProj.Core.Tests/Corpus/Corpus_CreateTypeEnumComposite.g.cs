@@ -205,18 +205,18 @@ ALTER TYPE s.c27 DROP ATTRIBUTE nonexistent", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void tyeca0077() => CorpusAssert.Parses(@"CREATE TYPE s.c28 AS (x integer);
 ALTER TYPE s.c28 ADD ATTRIBUTE x text", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tyeca0078() => CorpusAssert.Parses(@"ALTER TYPE s.mood ADD VALUE 'ecstatic'", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void tyeca0079() => CorpusAssert.Parses(@"ALTER TYPE s.mood RENAME VALUE 'sad' TO 'unhappy'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tyeca0080() => CorpusAssert.Parses(@"ALTER TYPE s.addr ADD ATTRIBUTE country text", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tyeca0081() => CorpusAssert.Parses(@"ALTER TYPE s.addr DROP ATTRIBUTE zip", "ok");
     [Fact]
     public void tyeca0082() => CorpusAssert.Parses(@"CREATE TYPE s.addr2 AS (street text, city text, zip text);
 ALTER TYPE s.addr2 ALTER ATTRIBUTE city TYPE varchar(100)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tyeca0083() => CorpusAssert.Parses(@"ALTER TYPE s.addr RENAME ATTRIBUTE street TO address_line", "ok");
     [Fact]
     public void tyeca0084() => CorpusAssert.Parses(@"CREATE TYPE s.e17 AS ENUM ('a', 'b');
@@ -631,32 +631,32 @@ ALTER TYPE mycomp17 ALTER ATTRIBUTE x TYPE bigint RESTRICT", "ok");
     public void tyecb0058() => CorpusAssert.Parses(@"CREATE TYPE s.addr AS (x int)", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void tyecb0059() => CorpusAssert.Parses(@"ALTER TYPE nonexistent_type999 ADD VALUE 'x'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tyecb0060() => CorpusAssert.Parses(@"ALTER TYPE s.mood ADD VALUE 'excited'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tyecb0061() => CorpusAssert.Parses(@"ALTER TYPE s.mood ADD VALUE 'melancholy' BEFORE 'ok'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tyecb0062() => CorpusAssert.Parses(@"ALTER TYPE s.mood ADD VALUE IF NOT EXISTS 'sad'", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void tyecb0063() => CorpusAssert.Parses(@"ALTER TYPE s.mood RENAME VALUE 'sad' TO 'melancholy'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tyecb0064() => CorpusAssert.Parses(@"ALTER TYPE s.addr ADD ATTRIBUTE country text", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tyecb0065() => CorpusAssert.Parses(@"ALTER TYPE s.addr DROP ATTRIBUTE zip", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tyecb0066() => CorpusAssert.Parses(@"ALTER TYPE s.addr RENAME ATTRIBUTE street TO street_line", "ok");
     [Fact]
     public void tyecb0067() => CorpusAssert.Parses(@"CREATE TYPE alterable_comp AS (city text, zip text);
 ALTER TYPE alterable_comp ALTER ATTRIBUTE city TYPE varchar(200)", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void tyecb0068() => CorpusAssert.Parses(@"ALTER TYPE s.mood ADD VALUE", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tyecb0069() => CorpusAssert.Parses(@"ALTER TYPE s.mood RENAME VALUE 'sad' TO", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void tyecb0070() => CorpusAssert.Parses(@"ALTER TYPE s.mood DROP ATTRIBUTE street", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void tyecb0071() => CorpusAssert.Parses(@"ALTER TYPE s.addr ADD VALUE 'new_val'", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tyecb0072() => CorpusAssert.Parses(@"ALTER TYPE s.mood RENAME VALUE 'nonexistent' TO 'other'", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void tyecb0073() => CorpusAssert.Parses(@"CREATE TYPE myenum10 AS ENUM ('a');

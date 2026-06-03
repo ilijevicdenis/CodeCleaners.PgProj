@@ -87,29 +87,29 @@ REFRESH MATERIALIZED VIEW CONCURRENTLY mvwa_mv35", "ok");
     public void mvwa0037() => CorpusAssert.Parses(@"REFRESH MATERIALIZED VIEW s.mv WITH DATA", "ok");
     [Fact]
     public void mvwa0038() => CorpusAssert.Parses(@"REFRESH MATERIALIZED VIEW s.mv WITH NO DATA", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void mvwa0039() => CorpusAssert.Parses(@"ALTER MATERIALIZED VIEW s.mv RENAME TO mv_renamed;
 ALTER MATERIALIZED VIEW s.mv_renamed RENAME TO mv", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void mvwa0040() => CorpusAssert.Parses(@"ALTER MATERIALIZED VIEW s.mv RENAME COLUMN status TO mood_status;
 ALTER MATERIALIZED VIEW s.mv RENAME COLUMN mood_status TO status", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void mvwa0041() => CorpusAssert.Parses(@"ALTER MATERIALIZED VIEW s.mv SET (fillfactor=80)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void mvwa0042() => CorpusAssert.Parses(@"ALTER MATERIALIZED VIEW s.mv RESET (fillfactor)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void mvwa0043() => CorpusAssert.Parses(@"ALTER MATERIALIZED VIEW s.mv SET (autovacuum_enabled=false)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void mvwa0044() => CorpusAssert.Parses(@"ALTER MATERIALIZED VIEW s.mv SET TABLESPACE pg_default", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void mvwa0045() => CorpusAssert.Parses(@"ALTER MATERIALIZED VIEW s.mv SET WITHOUT CLUSTER", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void mvwa0046() => CorpusAssert.Parses(@"ALTER MATERIALIZED VIEW s.mv SET ACCESS METHOD heap", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void mvwa0047() => CorpusAssert.Parses(@"ALTER MATERIALIZED VIEW s.mv ALTER COLUMN status SET STATISTICS 100", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void mvwa0048() => CorpusAssert.Parses(@"ALTER MATERIALIZED VIEW s.mv ALTER COLUMN n SET STORAGE PLAIN", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void mvwa0049() => CorpusAssert.Parses(@"ALTER MATERIALIZED VIEW s.mv ALTER COLUMN status SET STORAGE PLAIN", "ok");
     [Fact]
     public void mvwa0050() => CorpusAssert.Parses(@"CREATE MATERIALIZED VIEW mvwa_mv50 AS SELECT id, name FROM s.t WITH NO DATA;
@@ -117,25 +117,25 @@ ALTER MATERIALIZED VIEW mvwa_mv50 ALTER COLUMN name SET STORAGE EXTENDED", "ok")
     [Fact]
     public void mvwa0051() => CorpusAssert.Parses(@"CREATE MATERIALIZED VIEW mvwa_mv51 AS SELECT id, name FROM s.t WITH NO DATA;
 ALTER MATERIALIZED VIEW mvwa_mv51 ALTER COLUMN name SET STORAGE MAIN", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void mvwa0052() => CorpusAssert.Parses(@"ALTER MATERIALIZED VIEW s.mv ALTER COLUMN status SET STORAGE DEFAULT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void mvwa0053() => CorpusAssert.Parses(@"ALTER MATERIALIZED VIEW s.mv OWNER TO CURRENT_USER", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void mvwa0054() => CorpusAssert.Parses(@"ALTER MATERIALIZED VIEW s.mv OWNER TO CURRENT_ROLE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void mvwa0055() => CorpusAssert.Parses(@"ALTER MATERIALIZED VIEW s.mv OWNER TO SESSION_USER", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void mvwa0056() => CorpusAssert.Parses(@"ALTER MATERIALIZED VIEW IF EXISTS s.mv SET (fillfactor=70)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void mvwa0057() => CorpusAssert.Parses(@"ALTER MATERIALIZED VIEW IF EXISTS mvwa_nonexistent_mv SET (fillfactor=70)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void mvwa0058() => CorpusAssert.Parses(@"ALTER MATERIALIZED VIEW IF EXISTS s.mv RENAME TO mv_x;
 ALTER MATERIALIZED VIEW IF EXISTS s.mv_x RENAME TO mv", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void mvwa0059() => CorpusAssert.Parses(@"ALTER MATERIALIZED VIEW IF EXISTS s.mv RENAME COLUMN status TO new_status;
 ALTER MATERIALIZED VIEW IF EXISTS s.mv RENAME COLUMN new_status TO status", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void mvwa0060() => CorpusAssert.Parses(@"ALTER MATERIALIZED VIEW s.mv SET SCHEMA public;
 ALTER MATERIALIZED VIEW public.mv SET SCHEMA s", "ok");
     [Fact]
@@ -147,9 +147,9 @@ DROP MATERIALIZED VIEW mvwa_mv62 RESTRICT", "ok");
     [Fact]
     public void mvwa0063() => CorpusAssert.Parses(@"CREATE MATERIALIZED VIEW mvwa_mv63 AS SELECT id FROM s.t WITH NO DATA;
 DROP MATERIALIZED VIEW mvwa_mv63 CASCADE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void mvwa0064() => CorpusAssert.Parses(@"DROP MATERIALIZED VIEW IF EXISTS mvwa_nonexistent_mv", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void mvwa0065() => CorpusAssert.Parses(@"DROP MATERIALIZED VIEW IF EXISTS mvwa_nonexistent_mv CASCADE", "ok");
     [Fact]
     public void mvwa0066() => CorpusAssert.Parses(@"CREATE MATERIALIZED VIEW mvwa_mv66a AS SELECT id FROM s.t WITH NO DATA;
@@ -207,16 +207,16 @@ CREATE UNIQUE INDEX ON mvwa_mv79 (col1)", "ok");
     public void mvwa0086() => CorpusAssert.Parses(@"CREATE MATERIALIZED VIEW mvwa_mv86 AS SELECT * FROM s.v", "ok");
     [Fact]
     public void mvwa0087() => CorpusAssert.Parses(@"CREATE MATERIALIZED VIEW mvwa_mv87 AS SELECT * FROM s.mv", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void mvwa0088() => CorpusAssert.Parses(@"ALTER MATERIALIZED VIEW s.mv ALTER COLUMN n SET STATISTICS -1", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void mvwa0089() => CorpusAssert.Parses(@"ALTER MATERIALIZED VIEW s.mv ALTER COLUMN n SET ( n_distinct = -0.5 )", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void mvwa0090() => CorpusAssert.Parses(@"ALTER MATERIALIZED VIEW s.mv ALTER COLUMN n RESET ( n_distinct )", "ok");
     [Fact]
     public void mvwa0091() => CorpusAssert.Parses(@"CREATE MATERIALIZED VIEW mvwa_mv91 AS SELECT id, name FROM s.t WITH NO DATA;
 ALTER MATERIALIZED VIEW mvwa_mv91 ALTER COLUMN name SET COMPRESSION lz4", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void mvwa0092() => CorpusAssert.Parses(@"ALTER MATERIALIZED VIEW s.mv ALTER COLUMN status SET COMPRESSION default", "ok");
     [Fact]
     public void mvwa0093() => CorpusAssert.Parses(@"CREATE MATERIALIZED VIEW mvwa_mv93 AS SELECT id FROM s.t WITH NO DATA;
@@ -224,7 +224,7 @@ ALTER MATERIALIZED VIEW mvwa_mv93 SET (fillfactor=80, autovacuum_enabled=true)",
     [Fact]
     public void mvwa0094() => CorpusAssert.Parses(@"CREATE MATERIALIZED VIEW mvwa_mv94 AS SELECT id FROM s.t WITH NO DATA;
 ALTER MATERIALIZED VIEW mvwa_mv94 RESET (fillfactor, autovacuum_enabled)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void mvwa0095() => CorpusAssert.Parses(@"ALTER MATERIALIZED VIEW s.mv SET (fillfactor = 90);
 ALTER MATERIALIZED VIEW s.mv RESET (fillfactor)", "ok");
     [Fact]
@@ -287,13 +287,13 @@ DROP MATERIALIZED VIEW mvwa_mv96_renamed", "ok");
     public void mvwa0118() => CorpusAssert.Parses(@"REFRESH MATERIALIZED VIEW CONCURRENTLY s.mv", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void mvwa0119() => CorpusAssert.Parses(@"REFRESH VIEW s.mv", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void mvwa0120() => CorpusAssert.Parses(@"DROP MATERIALIZED VIEW", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void mvwa0121() => CorpusAssert.Parses(@"DROP MATERIALIZED VIEW mvwa_nonexistent_drop", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void mvwa0122() => CorpusAssert.Parses(@"DROP MATERIALIZED VIEW s.mv CASCADE RESTRICT", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void mvwa0123() => CorpusAssert.Parses(@"ALTER MATERIALIZED VIEW s.mv RENAME TO", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void mvwa0124() => CorpusAssert.Parses(@"ALTER MATERIALIZED VIEW s.mv SET", "error");
@@ -309,9 +309,9 @@ DROP MATERIALIZED VIEW mvwa_mv96_renamed", "ok");
     public void mvwa0129() => CorpusAssert.Parses(@"CREATE MATERIALIZED VIEW s.mvwa_mv129 USING heap WITH (fillfactor=60) TABLESPACE pg_default AS SELECT id, name FROM s.t WITH NO DATA", "ok");
     [Fact]
     public void mvwa0130() => CorpusAssert.Parses(@"CREATE MATERIALIZED VIEW IF NOT EXISTS s.mvwa_mv130 (c1, c2) USING heap WITH (fillfactor=70) TABLESPACE pg_default AS SELECT id, name FROM s.t WITH DATA", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void mvwa0131() => CorpusAssert.Parses(@"ALTER MATERIALIZED VIEW s.mv ALTER COLUMN n SET STATISTICS 500", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void mvwa0132() => CorpusAssert.Parses(@"ALTER MATERIALIZED VIEW s.mv ALTER COLUMN status SET ( n_distinct = 5 )", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void mvwa0133() => CorpusAssert.Parses(@"ALTER MATERIALIZED VIEW s.mv CLUSTER ON t_name_idx", "error");
@@ -319,7 +319,7 @@ DROP MATERIALIZED VIEW mvwa_mv96_renamed", "ok");
     public void mvwa0134() => CorpusAssert.Parses(@"CREATE MATERIALIZED VIEW mvwa_mv134 AS SELECT id FROM s.t WITH NO DATA;
 CREATE INDEX mvwa_idx134 ON mvwa_mv134 (id);
 ALTER MATERIALIZED VIEW mvwa_mv134 CLUSTER ON mvwa_idx134", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void mvwa0135() => CorpusAssert.Parses(@"ALTER MATERIALIZED VIEW ALL IN TABLESPACE pg_default SET TABLESPACE pg_default", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void mvwa0136() => CorpusAssert.Parses(@"CREATE MATERIALIZED VIEW mvwa_mv136 AS SELECT id FROM s.t WITH NO DATA;
@@ -371,7 +371,7 @@ REFRESH MATERIALIZED VIEW mvwa_mv139 WITH NO DATA", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void mvwa0157() => CorpusAssert.Parses(@"CREATE MATERIALIZED VIEW mvwa_e57 USING heap AS SELECT id FROM s.t;
 CREATE MATERIALIZED VIEW mvwa_e57 AS SELECT id FROM s.t", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void mvwa0158() => CorpusAssert.Parses(@"ALTER MATERIALIZED VIEW s.mv SET (fillfactor = 50, parallel_workers = 1)", "ok");
     [Fact]
     public void mvwa0159() => CorpusAssert.Parses(@"CREATE MATERIALIZED VIEW mvwa_mv159 AS SELECT id FROM s.t WITH NO DATA;

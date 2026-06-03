@@ -237,7 +237,7 @@ ALTER OPERATOR FAMILY s.opca0097_fam USING btree ADD OPERATOR 1 <(integer, integ
     [Fact(Skip = "pending: parser not yet complete")]
     public void opca0098() => CorpusAssert.Parses(@"CREATE OPERATOR FAMILY opca0098_fam USING btree;
 ALTER OPERATOR FAMILY opca0098_fam USING hash ADD OPERATOR 1 <(integer, integer)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void opca0099() => CorpusAssert.Parses(@"DROP OPERATOR CLASS opca0099_ops USING btree", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void opca0100() => CorpusAssert.Parses(@"DROP OPERATOR CLASS IF EXISTS opca0100_ops USING btree", "ok");
@@ -255,12 +255,12 @@ DROP OPERATOR CLASS opca0103_ops USING btree RESTRICT", "ok");
 DROP OPERATOR CLASS IF EXISTS opca0104_ops USING btree", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void opca0105() => CorpusAssert.Parses(@"DROP OPERATOR CLASS opca0105_ops", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void opca0106() => CorpusAssert.Parses(@"DROP OPERATOR CLASS IF EXISTS USING btree", "error");
     [Fact]
     public void opca0107() => CorpusAssert.Parses(@"CREATE OPERATOR CLASS s.opca0107_ops FOR TYPE integer USING btree AS OPERATOR 1 <;
 DROP OPERATOR CLASS s.opca0107_ops USING btree", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void opca0108() => CorpusAssert.Parses(@"DROP OPERATOR FAMILY opca0108_fam USING btree", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void opca0109() => CorpusAssert.Parses(@"DROP OPERATOR FAMILY IF EXISTS opca0109_fam USING btree", "ok");
@@ -278,7 +278,7 @@ DROP OPERATOR FAMILY opca0112_fam USING btree RESTRICT", "ok");
 DROP OPERATOR FAMILY IF EXISTS opca0113_fam USING btree", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void opca0114() => CorpusAssert.Parses(@"DROP OPERATOR FAMILY opca0114_fam", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void opca0115() => CorpusAssert.Parses(@"DROP OPERATOR FAMILY IF EXISTS USING btree", "error");
     [Fact]
     public void opca0116() => CorpusAssert.Parses(@"CREATE OPERATOR FAMILY s.opca0116_fam USING btree;

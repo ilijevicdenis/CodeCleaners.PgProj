@@ -127,13 +127,13 @@ DROP EXTENSION hstore CASCADE", "ok");
     [Fact]
     public void exta0059() => CorpusAssert.Parses(@"CREATE EXTENSION IF NOT EXISTS hstore;
 DROP EXTENSION hstore RESTRICT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void exta0060() => CorpusAssert.Parses(@"DROP EXTENSION IF EXISTS nonexistent_ext_xyz", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void exta0061() => CorpusAssert.Parses(@"DROP EXTENSION nonexistent_ext_xyz", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void exta0062() => CorpusAssert.Parses(@"DROP EXTENSION", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void exta0063() => CorpusAssert.Parses(@"DROP EXTENSION IF NOT EXISTS hstore", "error");
     [Fact]
     public void exta0064() => CorpusAssert.Parses(@"CREATE EXTENSION IF NOT EXISTS hstore;
@@ -161,9 +161,9 @@ ALTER EXTENSION hstore SET SCHEMA public", "ok");
     public void exta0071() => CorpusAssert.Parses(@"ALTER EXTENSION nonexistent_ext_xyz UPDATE", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void exta0072() => CorpusAssert.Parses(@"ALTER EXTENSION nonexistent_ext_xyz SET SCHEMA public", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void exta0073() => CorpusAssert.Parses(@"ALTER EXTENSION", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void exta0074() => CorpusAssert.Parses(@"ALTER EXTENSION hstore", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void exta0075() => CorpusAssert.Parses(@"ALTER EXTENSION hstore RENAME TO hstore2", "error");
@@ -171,7 +171,7 @@ ALTER EXTENSION hstore SET SCHEMA public", "ok");
     public void exta0076() => CorpusAssert.Parses(@"ALTER EXTENSION plpgsql UPDATE TO", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void exta0077() => CorpusAssert.Parses(@"ALTER EXTENSION plpgsql SET", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void exta0078() => CorpusAssert.Parses(@"ALTER EXTENSION plpgsql SET SCHEMA", "error");
     [Fact]
     public void exta0079() => CorpusAssert.Parses(@"CREATE EXTENSION IF NOT EXISTS hstore;
@@ -243,14 +243,14 @@ ALTER EXTENSION hstore DROP MATERIALIZED VIEW s.mv", "ok");
     public void exta0098() => CorpusAssert.Parses(@"CREATE EXTENSION IF NOT EXISTS hstore;
 ALTER EXTENSION hstore ADD CONVERSION s.my_conv;
 ", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void exta0099() => CorpusAssert.Parses(@"ALTER EXTENSION plpgsql ADD FUNCTION s.f(integer)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void exta0100() => CorpusAssert.Parses(@"ALTER EXTENSION plpgsql ADD FUNCTION s.f(integer);
 ALTER EXTENSION plpgsql DROP FUNCTION s.f(integer)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void exta0101() => CorpusAssert.Parses(@"ALTER EXTENSION plpgsql ADD TABLE s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void exta0102() => CorpusAssert.Parses(@"ALTER EXTENSION plpgsql ADD TABLE s.t;
 ALTER EXTENSION plpgsql DROP TABLE s.t", "ok");
     [Fact]
@@ -282,9 +282,9 @@ ALTER EXTENSION hstore DROP TEXT SEARCH DICTIONARY pg_catalog.simple", "ok");
     public void exta0110() => CorpusAssert.Parses(@"CREATE EXTENSION IF NOT EXISTS hstore;
 CREATE LANGUAGE IF NOT EXISTS plperlu;
 ALTER EXTENSION hstore ADD LANGUAGE plperlu", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void exta0111() => CorpusAssert.Parses(@"ALTER EXTENSION plpgsql UPDATE TO '1.0'", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void exta0112() => CorpusAssert.Parses(@"ALTER EXTENSION plpgsql SET SCHEMA pg_catalog", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void exta0113() => CorpusAssert.Parses(@"CREATE EXTENSION", "error");
@@ -294,7 +294,7 @@ ALTER EXTENSION hstore ADD LANGUAGE plperlu", "error");
     public void exta0115() => CorpusAssert.Parses(@"CREATE EXTENSION IF NOT EXISTS hstore WITH SCHEMA s VERSION '1.8' CASCADE", "ok");
     [Fact]
     public void exta0116() => CorpusAssert.Parses(@"CREATE EXTENSION IF NOT EXISTS hstore SCHEMA s VERSION '1.8' CASCADE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void exta0117() => CorpusAssert.Parses(@"DROP EXTENSION IF EXISTS plpgsql CASCADE", "ok");
     [Fact]
     public void exta0118() => CorpusAssert.Parses(@"CREATE EXTENSION IF NOT EXISTS hstore;

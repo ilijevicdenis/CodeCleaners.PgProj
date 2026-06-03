@@ -5,23 +5,23 @@ namespace PgProj.Core.Tests.Corpus;
 
 public class Corpus_DropStatements
 {
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpa0001() => CorpusAssert.Parses(@"DROP TABLE s.t2", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpa0002() => CorpusAssert.Parses(@"DROP TABLE IF EXISTS s.t2", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpa0003() => CorpusAssert.Parses(@"DROP TABLE IF EXISTS s.no_such_table", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void drpa0004() => CorpusAssert.Parses(@"DROP TABLE s.no_such_table", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpa0005() => CorpusAssert.Parses(@"DROP TABLE s.t2 RESTRICT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpa0006() => CorpusAssert.Parses(@"DROP TABLE s.t2 CASCADE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpa0007() => CorpusAssert.Parses(@"DROP TABLE IF EXISTS s.t2 CASCADE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpa0008() => CorpusAssert.Parses(@"DROP TABLE IF EXISTS s.t2 RESTRICT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpa0009() => CorpusAssert.Parses(@"DROP TABLE s.t2 CASCADE RESTRICT", "error");
     [Fact]
     public void drpa0010() => CorpusAssert.Parses(@"CREATE TABLE s.drop_tmp (a int); DROP TABLE s.drop_tmp", "ok");
@@ -29,149 +29,149 @@ public class Corpus_DropStatements
     public void drpa0011() => CorpusAssert.Parses(@"CREATE TABLE s.drop_a (a int); CREATE TABLE s.drop_b (b int); DROP TABLE s.drop_a, s.drop_b", "ok");
     [Fact]
     public void drpa0012() => CorpusAssert.Parses(@"CREATE TABLE s.drop_a2 (a int); CREATE TABLE s.drop_b2 (b int); DROP TABLE IF EXISTS s.drop_a2, s.drop_b2", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpa0013() => CorpusAssert.Parses(@"DROP TABLE", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void drpa0014() => CorpusAssert.Parses(@"DROP TABLE s.t2, s.no_exist", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpa0015() => CorpusAssert.Parses(@"DROP TABLE IF EXISTS s.t2, s.no_exist", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpa0016() => CorpusAssert.Parses(@"drop table s.t2", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpa0017() => CorpusAssert.Parses(@"DROP TABLE IF EXISTS s.t2, s.no_exist CASCADE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpa0018() => CorpusAssert.Parses(@"DROP VIEW s.v", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpa0019() => CorpusAssert.Parses(@"DROP VIEW IF EXISTS s.v", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpa0020() => CorpusAssert.Parses(@"DROP VIEW IF EXISTS s.no_such_view", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void drpa0021() => CorpusAssert.Parses(@"DROP VIEW s.no_such_view", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpa0022() => CorpusAssert.Parses(@"DROP VIEW s.v CASCADE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpa0023() => CorpusAssert.Parses(@"DROP VIEW s.v RESTRICT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpa0024() => CorpusAssert.Parses(@"DROP VIEW", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpa0025() => CorpusAssert.Parses(@"DROP MATERIALIZED VIEW s.mv", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpa0026() => CorpusAssert.Parses(@"DROP MATERIALIZED VIEW IF EXISTS s.mv", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpa0027() => CorpusAssert.Parses(@"DROP MATERIALIZED VIEW IF EXISTS s.no_such_mv", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void drpa0028() => CorpusAssert.Parses(@"DROP MATERIALIZED VIEW s.no_such_mv", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpa0029() => CorpusAssert.Parses(@"DROP MATERIALIZED VIEW s.mv CASCADE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpa0030() => CorpusAssert.Parses(@"DROP MATERIALIZED VIEW s.mv RESTRICT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpa0031() => CorpusAssert.Parses(@"DROP MATERIALIZED VIEW", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpa0032() => CorpusAssert.Parses(@"DROP MATERIALIZED VIEW s.mv CASCADE RESTRICT", "error");
     [Fact]
     public void drpa0033() => CorpusAssert.Parses(@"CREATE INDEX drop_idx_tmp ON s.t (name); DROP INDEX s.drop_idx_tmp", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpa0034() => CorpusAssert.Parses(@"DROP INDEX s.t_name_idx", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpa0035() => CorpusAssert.Parses(@"DROP INDEX IF EXISTS s.t_name_idx", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpa0036() => CorpusAssert.Parses(@"DROP INDEX IF EXISTS s.no_such_idx", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void drpa0037() => CorpusAssert.Parses(@"DROP INDEX s.no_such_idx", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpa0038() => CorpusAssert.Parses(@"DROP INDEX s.t_name_idx CASCADE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpa0039() => CorpusAssert.Parses(@"DROP INDEX s.t_name_idx RESTRICT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpa0040() => CorpusAssert.Parses(@"DROP INDEX CONCURRENTLY s.t_name_idx", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpa0041() => CorpusAssert.Parses(@"DROP INDEX CONCURRENTLY IF EXISTS s.t_name_idx", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpa0042() => CorpusAssert.Parses(@"DROP INDEX CONCURRENTLY IF EXISTS s.no_such_idx", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpa0043() => CorpusAssert.Parses(@"DROP INDEX", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpa0044() => CorpusAssert.Parses(@"DROP INDEX CONCURRENTLY s.t_name_idx CASCADE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpa0045() => CorpusAssert.Parses(@"DROP SEQUENCE s.seq", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpa0046() => CorpusAssert.Parses(@"DROP SEQUENCE IF EXISTS s.seq", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpa0047() => CorpusAssert.Parses(@"DROP SEQUENCE IF EXISTS s.no_such_seq", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void drpa0048() => CorpusAssert.Parses(@"DROP SEQUENCE s.no_such_seq", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpa0049() => CorpusAssert.Parses(@"DROP SEQUENCE s.seq CASCADE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpa0050() => CorpusAssert.Parses(@"DROP SEQUENCE s.seq RESTRICT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpa0051() => CorpusAssert.Parses(@"DROP SEQUENCE", "error");
     [Fact]
     public void drpa0052() => CorpusAssert.Parses(@"CREATE SEQUENCE s.seq2 START 1; DROP SEQUENCE s.seq2", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpa0053() => CorpusAssert.Parses(@"DROP SCHEMA s CASCADE", "ok");
     [Fact]
     public void drpa0054() => CorpusAssert.Parses(@"CREATE SCHEMA s_tmp; DROP SCHEMA s_tmp", "ok");
     [Fact]
     public void drpa0055() => CorpusAssert.Parses(@"CREATE SCHEMA s_tmp2; DROP SCHEMA s_tmp2 RESTRICT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpa0056() => CorpusAssert.Parses(@"DROP SCHEMA IF EXISTS s CASCADE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpa0057() => CorpusAssert.Parses(@"DROP SCHEMA IF EXISTS no_such_schema", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void drpa0058() => CorpusAssert.Parses(@"DROP SCHEMA no_such_schema", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void drpa0059() => CorpusAssert.Parses(@"DROP SCHEMA s RESTRICT", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpa0060() => CorpusAssert.Parses(@"DROP SCHEMA", "error");
     [Fact]
     public void drpa0061() => CorpusAssert.Parses(@"CREATE SCHEMA s_a; CREATE SCHEMA s_b; DROP SCHEMA s_a, s_b", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpa0062() => CorpusAssert.Parses(@"DROP FUNCTION s.f(integer)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpa0063() => CorpusAssert.Parses(@"DROP FUNCTION IF EXISTS s.f(integer)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpa0064() => CorpusAssert.Parses(@"DROP FUNCTION IF EXISTS s.no_such_fn(integer)", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void drpa0065() => CorpusAssert.Parses(@"DROP FUNCTION s.no_such_fn(integer)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpa0066() => CorpusAssert.Parses(@"DROP FUNCTION s.f(integer) CASCADE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpa0067() => CorpusAssert.Parses(@"DROP FUNCTION s.f(integer) RESTRICT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpa0068() => CorpusAssert.Parses(@"DROP FUNCTION s.g(integer, integer)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpa0069() => CorpusAssert.Parses(@"DROP FUNCTION s.g(a integer, b integer)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpa0070() => CorpusAssert.Parses(@"DROP FUNCTION s.f", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpa0071() => CorpusAssert.Parses(@"DROP FUNCTION IF EXISTS s.f", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpa0072() => CorpusAssert.Parses(@"DROP FUNCTION s.rows_f()", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpa0073() => CorpusAssert.Parses(@"DROP FUNCTION", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpa0074() => CorpusAssert.Parses(@"DROP FUNCTION s.f(integer) CASCADE RESTRICT", "error");
     [Fact]
     public void drpa0075() => CorpusAssert.Parses(@"CREATE FUNCTION s.drop_fn(x int) RETURNS int LANGUAGE sql AS $$ SELECT x $$; DROP FUNCTION s.drop_fn(integer)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpa0076() => CorpusAssert.Parses(@"DROP PROCEDURE s.p(integer)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpa0077() => CorpusAssert.Parses(@"DROP PROCEDURE IF EXISTS s.p(integer)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpa0078() => CorpusAssert.Parses(@"DROP PROCEDURE IF EXISTS s.no_such_proc(integer)", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void drpa0079() => CorpusAssert.Parses(@"DROP PROCEDURE s.no_such_proc(integer)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpa0080() => CorpusAssert.Parses(@"DROP PROCEDURE s.p(integer) CASCADE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpa0081() => CorpusAssert.Parses(@"DROP PROCEDURE s.p(integer) RESTRICT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpa0082() => CorpusAssert.Parses(@"DROP PROCEDURE s.p", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpa0083() => CorpusAssert.Parses(@"DROP PROCEDURE", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpa0084() => CorpusAssert.Parses(@"DROP PROCEDURE s.p(IN integer)", "ok");
     [Fact]
     public void drpa0085() => CorpusAssert.Parses(@"CREATE PROCEDURE s.drop_proc(x int) LANGUAGE plpgsql AS $$ BEGIN END $$; DROP PROCEDURE s.drop_proc(integer)", "ok");
@@ -179,13 +179,13 @@ public class Corpus_DropStatements
     public void drpa0086() => CorpusAssert.Parses(@"CREATE TYPE s.drop_mood AS ENUM ('a','b'); DROP TYPE s.drop_mood", "ok");
     [Fact]
     public void drpa0087() => CorpusAssert.Parses(@"CREATE TYPE s.drop_mood2 AS ENUM ('x','y'); DROP TYPE IF EXISTS s.drop_mood2", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpa0088() => CorpusAssert.Parses(@"DROP TYPE IF EXISTS s.no_such_type", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void drpa0089() => CorpusAssert.Parses(@"DROP TYPE s.no_such_type", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpa0090() => CorpusAssert.Parses(@"DROP TYPE s.mood CASCADE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpa0091() => CorpusAssert.Parses(@"DROP TYPE s.addr CASCADE", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void drpa0092() => CorpusAssert.Parses(@"DROP TYPE s.addr RESTRICT", "error");
@@ -193,39 +193,39 @@ public class Corpus_DropStatements
     public void drpa0093() => CorpusAssert.Parses(@"CREATE TYPE s.drop_type_e AS ENUM ('a','b'); DROP TYPE s.drop_type_e", "ok");
     [Fact]
     public void drpa0094() => CorpusAssert.Parses(@"CREATE TYPE s.drop_type_c AS (x int, y text); DROP TYPE s.drop_type_c", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpa0095() => CorpusAssert.Parses(@"DROP TYPE", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpa0096() => CorpusAssert.Parses(@"DROP DOMAIN s.pos_int", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpa0097() => CorpusAssert.Parses(@"DROP DOMAIN IF EXISTS s.pos_int", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpa0098() => CorpusAssert.Parses(@"DROP DOMAIN IF EXISTS s.no_such_domain", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void drpa0099() => CorpusAssert.Parses(@"DROP DOMAIN s.no_such_domain", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpa0100() => CorpusAssert.Parses(@"DROP DOMAIN s.pos_int CASCADE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpa0101() => CorpusAssert.Parses(@"DROP DOMAIN s.pos_int RESTRICT", "ok");
     [Fact]
     public void drpa0102() => CorpusAssert.Parses(@"CREATE DOMAIN s.drop_dom AS integer CHECK (VALUE > 0); DROP DOMAIN s.drop_dom", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpa0103() => CorpusAssert.Parses(@"DROP DOMAIN", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpa0104() => CorpusAssert.Parses(@"DROP TRIGGER t_touch ON s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpa0105() => CorpusAssert.Parses(@"DROP TRIGGER IF EXISTS t_touch ON s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpa0106() => CorpusAssert.Parses(@"DROP TRIGGER IF EXISTS no_such_trig ON s.t", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void drpa0107() => CorpusAssert.Parses(@"DROP TRIGGER no_such_trig ON s.t", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpa0108() => CorpusAssert.Parses(@"DROP TRIGGER t_touch ON s.t CASCADE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpa0109() => CorpusAssert.Parses(@"DROP TRIGGER t_touch ON s.t RESTRICT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpa0110() => CorpusAssert.Parses(@"DROP TRIGGER", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpa0111() => CorpusAssert.Parses(@"DROP TRIGGER t_touch", "error");
     [Fact]
     public void drpa0112() => CorpusAssert.Parses(@"CREATE TABLE s.trg_tbl (a int); CREATE TRIGGER my_trg BEFORE INSERT ON s.trg_tbl FOR EACH ROW EXECUTE FUNCTION s.trg(); DROP TRIGGER my_trg ON s.trg_tbl", "ok");
@@ -241,9 +241,9 @@ public class Corpus_DropStatements
     public void drpa0117() => CorpusAssert.Parses(@"CREATE TABLE s.rl_tbl5 (a int); CREATE RULE my_rule5 AS ON INSERT TO s.rl_tbl5 DO NOTHING; DROP RULE my_rule5 ON s.rl_tbl5 CASCADE", "ok");
     [Fact]
     public void drpa0118() => CorpusAssert.Parses(@"CREATE TABLE s.rl_tbl6 (a int); CREATE RULE my_rule6 AS ON INSERT TO s.rl_tbl6 DO NOTHING; DROP RULE my_rule6 ON s.rl_tbl6 RESTRICT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpa0119() => CorpusAssert.Parses(@"DROP RULE", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpa0120() => CorpusAssert.Parses(@"DROP RULE my_rule ON", "error");
     [Fact]
     public void drpa0121() => CorpusAssert.Parses(@"CREATE TABLE s.pol_tbl (owner text); ALTER TABLE s.pol_tbl ENABLE ROW LEVEL SECURITY; CREATE POLICY my_pol ON s.pol_tbl USING (owner = current_user); DROP POLICY my_pol ON s.pol_tbl", "ok");
@@ -257,15 +257,15 @@ public class Corpus_DropStatements
     public void drpa0125() => CorpusAssert.Parses(@"CREATE TABLE s.pol_tbl5 (owner text); ALTER TABLE s.pol_tbl5 ENABLE ROW LEVEL SECURITY; CREATE POLICY my_pol5 ON s.pol_tbl5 USING (owner = current_user); DROP POLICY my_pol5 ON s.pol_tbl5 CASCADE", "ok");
     [Fact]
     public void drpa0126() => CorpusAssert.Parses(@"CREATE TABLE s.pol_tbl6 (owner text); ALTER TABLE s.pol_tbl6 ENABLE ROW LEVEL SECURITY; CREATE POLICY my_pol6 ON s.pol_tbl6 USING (owner = current_user); DROP POLICY my_pol6 ON s.pol_tbl6 RESTRICT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpa0127() => CorpusAssert.Parses(@"DROP POLICY", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpa0128() => CorpusAssert.Parses(@"DROP POLICY my_pol ON", "error");
     [Fact]
     public void drpa0129() => CorpusAssert.Parses(@"CREATE EXTENSION IF NOT EXISTS ""uuid-ossp""; DROP EXTENSION ""uuid-ossp""", "ok");
     [Fact]
     public void drpa0130() => CorpusAssert.Parses(@"CREATE EXTENSION IF NOT EXISTS ""uuid-ossp""; DROP EXTENSION IF EXISTS ""uuid-ossp""", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpa0131() => CorpusAssert.Parses(@"DROP EXTENSION IF EXISTS no_such_extension", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void drpa0132() => CorpusAssert.Parses(@"DROP EXTENSION no_such_extension", "error");
@@ -273,13 +273,13 @@ public class Corpus_DropStatements
     public void drpa0133() => CorpusAssert.Parses(@"CREATE EXTENSION IF NOT EXISTS ""uuid-ossp""; DROP EXTENSION ""uuid-ossp"" CASCADE", "ok");
     [Fact]
     public void drpa0134() => CorpusAssert.Parses(@"CREATE EXTENSION IF NOT EXISTS ""uuid-ossp""; DROP EXTENSION ""uuid-ossp"" RESTRICT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpa0135() => CorpusAssert.Parses(@"DROP EXTENSION", "error");
     [Fact]
     public void drpa0136() => CorpusAssert.Parses(@"CREATE AGGREGATE s.agg_sum(integer) (SFUNC = int4pl, STYPE = integer, INITCOND = '0'); DROP AGGREGATE s.agg_sum(integer)", "ok");
     [Fact]
     public void drpa0137() => CorpusAssert.Parses(@"CREATE AGGREGATE s.agg_sum2(integer) (SFUNC = int4pl, STYPE = integer, INITCOND = '0'); DROP AGGREGATE IF EXISTS s.agg_sum2(integer)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpa0138() => CorpusAssert.Parses(@"DROP AGGREGATE IF EXISTS s.no_such_agg(integer)", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void drpa0139() => CorpusAssert.Parses(@"DROP AGGREGATE s.no_such_agg(integer)", "error");
@@ -287,19 +287,19 @@ public class Corpus_DropStatements
     public void drpa0140() => CorpusAssert.Parses(@"CREATE AGGREGATE s.agg_sum3(integer) (SFUNC = int4pl, STYPE = integer, INITCOND = '0'); DROP AGGREGATE s.agg_sum3(integer) CASCADE", "ok");
     [Fact]
     public void drpa0141() => CorpusAssert.Parses(@"CREATE AGGREGATE s.agg_sum4(integer) (SFUNC = int4pl, STYPE = integer, INITCOND = '0'); DROP AGGREGATE s.agg_sum4(integer) RESTRICT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpa0142() => CorpusAssert.Parses(@"DROP AGGREGATE", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void drpa0143() => CorpusAssert.Parses(@"DROP AGGREGATE s.f", "error");
     [Fact]
     public void drpa0144() => CorpusAssert.Parses(@"CREATE AGGREGATE s.agg_cnt(*) (SFUNC = int8inc, STYPE = bigint, INITCOND = '0'); DROP AGGREGATE s.agg_cnt(*)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpa0145() => CorpusAssert.Parses(@"DROP AGGREGATE IF EXISTS s.no_such_agg(integer, integer)", "ok");
     [Fact]
     public void drpa0146() => CorpusAssert.Parses(@"CREATE TEXT SEARCH CONFIGURATION s.mycfg (COPY = pg_catalog.english); DROP TEXT SEARCH CONFIGURATION s.mycfg", "ok");
     [Fact]
     public void drpa0147() => CorpusAssert.Parses(@"CREATE TEXT SEARCH CONFIGURATION s.mycfg2 (COPY = pg_catalog.english); DROP TEXT SEARCH CONFIGURATION IF EXISTS s.mycfg2", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpa0148() => CorpusAssert.Parses(@"DROP TEXT SEARCH CONFIGURATION IF EXISTS s.no_such_cfg", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void drpa0149() => CorpusAssert.Parses(@"DROP TEXT SEARCH CONFIGURATION s.no_such_cfg", "error");
@@ -309,7 +309,7 @@ public class Corpus_DropStatements
     public void drpa0151() => CorpusAssert.Parses(@"CREATE TEXT SEARCH DICTIONARY s.mydict (TEMPLATE = pg_catalog.simple); DROP TEXT SEARCH DICTIONARY s.mydict", "ok");
     [Fact]
     public void drpa0152() => CorpusAssert.Parses(@"CREATE TEXT SEARCH DICTIONARY s.mydict2 (TEMPLATE = pg_catalog.simple); DROP TEXT SEARCH DICTIONARY IF EXISTS s.mydict2", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpa0153() => CorpusAssert.Parses(@"DROP TEXT SEARCH DICTIONARY IF EXISTS s.no_such_dict", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void drpa0154() => CorpusAssert.Parses(@"DROP TEXT SEARCH DICTIONARY s.no_such_dict", "error");
@@ -317,13 +317,13 @@ public class Corpus_DropStatements
     public void drpa0155() => CorpusAssert.Parses(@"CREATE TEXT SEARCH TEMPLATE s.mytmpl (LEXIZE = dsimple_lexize); DROP TEXT SEARCH TEMPLATE s.mytmpl", "ok");
     [Fact]
     public void drpa0156() => CorpusAssert.Parses(@"CREATE TEXT SEARCH TEMPLATE s.mytmpl2 (LEXIZE = dsimple_lexize); DROP TEXT SEARCH TEMPLATE IF EXISTS s.mytmpl2", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpa0157() => CorpusAssert.Parses(@"DROP TEXT SEARCH TEMPLATE IF EXISTS s.no_such_tmpl", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void drpa0158() => CorpusAssert.Parses(@"DROP TEXT SEARCH TEMPLATE s.no_such_tmpl", "error");
     [Fact]
     public void drpa0159() => CorpusAssert.Parses(@"CREATE TEXT SEARCH PARSER s.myparser (START = prsd_start, GETTOKEN = prsd_nexttoken, END = prsd_end, LEXTYPES = prsd_lextype); DROP TEXT SEARCH PARSER s.myparser", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpa0160() => CorpusAssert.Parses(@"DROP TEXT SEARCH PARSER IF EXISTS s.no_such_parser", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void drpa0161() => CorpusAssert.Parses(@"DROP TEXT SEARCH PARSER s.no_such_parser", "error");
@@ -331,7 +331,7 @@ public class Corpus_DropStatements
     public void drpa0162() => CorpusAssert.Parses(@"CREATE COLLATION s.mycollation (LOCALE = 'C'); DROP COLLATION s.mycollation", "ok");
     [Fact]
     public void drpa0163() => CorpusAssert.Parses(@"CREATE COLLATION s.mycollation2 (LOCALE = 'C'); DROP COLLATION IF EXISTS s.mycollation2", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpa0164() => CorpusAssert.Parses(@"DROP COLLATION IF EXISTS s.no_such_collation", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void drpa0165() => CorpusAssert.Parses(@"DROP COLLATION s.no_such_collation", "error");
@@ -341,11 +341,11 @@ public class Corpus_DropStatements
     public void drpa0167() => CorpusAssert.Parses(@"CREATE CONVERSION s.myconv FOR 'LATIN1' TO 'UTF8' FROM iso8859_1_to_utf8; DROP CONVERSION s.myconv", "ok");
     [Fact]
     public void drpa0168() => CorpusAssert.Parses(@"CREATE CONVERSION s.myconv2 FOR 'LATIN1' TO 'UTF8' FROM iso8859_1_to_utf8; DROP CONVERSION IF EXISTS s.myconv2", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpa0169() => CorpusAssert.Parses(@"DROP CONVERSION IF EXISTS s.no_such_conv", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void drpa0170() => CorpusAssert.Parses(@"DROP CONVERSION s.no_such_conv", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpb0001() => CorpusAssert.Parses(@"DROP TABLE IF EXISTS s.t_nodrop_x", "ok");
     [Fact]
     public void drpb0002() => CorpusAssert.Parses(@"CREATE TABLE s.drop_me (a int); DROP TABLE s.drop_me", "ok");
@@ -357,13 +357,13 @@ public class Corpus_DropStatements
     public void drpb0005() => CorpusAssert.Parses(@"CREATE TABLE s.drop_res (a int); DROP TABLE s.drop_res RESTRICT", "ok");
     [Fact]
     public void drpb0006() => CorpusAssert.Parses(@"CREATE TABLE s.drop_ie (a int); DROP TABLE IF EXISTS s.drop_ie", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpb0007() => CorpusAssert.Parses(@"DROP TABLE IF EXISTS s.no_such_table CASCADE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpb0008() => CorpusAssert.Parses(@"DROP TABLE IF EXISTS s.no_such_table RESTRICT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpb0009() => CorpusAssert.Parses(@"DROP TABLE", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpb0010() => CorpusAssert.Parses(@"DROP TABLE s.t CASCADE RESTRICT", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void drpb0011() => CorpusAssert.Parses(@"DROP TABLE s.no_such_table", "error");
@@ -371,11 +371,11 @@ public class Corpus_DropStatements
     public void drpb0012() => CorpusAssert.Parses(@"CREATE TABLE s.drop_parent (id int); CREATE TABLE s.drop_child (x int REFERENCES s.drop_parent(id)); DROP TABLE s.drop_parent RESTRICT", "error");
     [Fact]
     public void drpb0013() => CorpusAssert.Parses(@"CREATE TABLE s.drop_parent2 (id int PRIMARY KEY); CREATE TABLE s.drop_child2 (x int REFERENCES s.drop_parent2(id)); DROP TABLE s.drop_parent2 CASCADE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpb0014() => CorpusAssert.Parses(@"DROP TABLE IF EXISTS s.x1, s.x2, s.x3", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpb0015() => CorpusAssert.Parses(@"DROP TABLE IF EXISTS s.t_none1, s.t_none2 CASCADE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpb0016() => CorpusAssert.Parses(@"DROP VIEW IF EXISTS s.v_no_such", "ok");
     [Fact]
     public void drpb0017() => CorpusAssert.Parses(@"CREATE VIEW s.drop_v AS SELECT 1 AS x; DROP VIEW s.drop_v", "ok");
@@ -383,13 +383,13 @@ public class Corpus_DropStatements
     public void drpb0018() => CorpusAssert.Parses(@"CREATE VIEW s.drop_vcas AS SELECT 1 AS x; DROP VIEW s.drop_vcas CASCADE", "ok");
     [Fact]
     public void drpb0019() => CorpusAssert.Parses(@"CREATE VIEW s.drop_vres AS SELECT 1 AS x; DROP VIEW s.drop_vres RESTRICT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpb0020() => CorpusAssert.Parses(@"DROP VIEW", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void drpb0021() => CorpusAssert.Parses(@"DROP VIEW s.no_such_view", "error");
     [Fact]
     public void drpb0022() => CorpusAssert.Parses(@"CREATE VIEW s.drop_v1 AS SELECT 1; CREATE VIEW s.drop_v2 AS SELECT 2; DROP VIEW s.drop_v1, s.drop_v2", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpb0023() => CorpusAssert.Parses(@"DROP MATERIALIZED VIEW IF EXISTS s.mv_no_such", "ok");
     [Fact]
     public void drpb0024() => CorpusAssert.Parses(@"CREATE MATERIALIZED VIEW s.drop_mv AS SELECT 1 AS x; DROP MATERIALIZED VIEW s.drop_mv", "ok");
@@ -399,13 +399,13 @@ public class Corpus_DropStatements
     public void drpb0026() => CorpusAssert.Parses(@"CREATE MATERIALIZED VIEW s.drop_mvres AS SELECT 1 AS x; DROP MATERIALIZED VIEW s.drop_mvres RESTRICT", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void drpb0027() => CorpusAssert.Parses(@"DROP MATERIALIZED VIEW s.no_such_mv", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpb0028() => CorpusAssert.Parses(@"DROP MATERIALIZED VIEW", "error");
     [Fact]
     public void drpb0029() => CorpusAssert.Parses(@"CREATE MATERIALIZED VIEW s.drop_mv1 AS SELECT 1; CREATE MATERIALIZED VIEW s.drop_mv2 AS SELECT 2; DROP MATERIALIZED VIEW s.drop_mv1, s.drop_mv2", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpb0030() => CorpusAssert.Parses(@"DROP INDEX IF EXISTS s.no_such_idx", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpb0031() => CorpusAssert.Parses(@"DROP INDEX s.t_name_idx", "ok");
     [Fact]
     public void drpb0032() => CorpusAssert.Parses(@"CREATE INDEX s_drop_idx ON s.t (val); DROP INDEX s.s_drop_idx", "ok");
@@ -415,7 +415,7 @@ public class Corpus_DropStatements
     public void drpb0034() => CorpusAssert.Parses(@"CREATE INDEX s_drop_idx3 ON s.t (val); DROP INDEX s.s_drop_idx3 CASCADE", "ok");
     [Fact]
     public void drpb0035() => CorpusAssert.Parses(@"CREATE INDEX s_drop_idx4 ON s.t (val); DROP INDEX s.s_drop_idx4 RESTRICT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpb0036() => CorpusAssert.Parses(@"DROP INDEX", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void drpb0037() => CorpusAssert.Parses(@"DROP INDEX s.no_such_index", "error");
@@ -423,11 +423,11 @@ public class Corpus_DropStatements
     public void drpb0038() => CorpusAssert.Parses(@"CREATE INDEX s_drop_idxa ON s.t (val); CREATE INDEX s_drop_idxb ON s.t (qty); DROP INDEX s.s_drop_idxa, s.s_drop_idxb", "ok");
     [Fact]
     public void drpb0039() => CorpusAssert.Parses(@"CREATE INDEX s_drop_conc ON s.t (val); DROP INDEX CONCURRENTLY s_drop_conc", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpb0040() => CorpusAssert.Parses(@"DROP INDEX CONCURRENTLY IF EXISTS s.no_such_conc_idx", "ok");
     [Fact]
     public void drpb0041() => CorpusAssert.Parses(@"CREATE INDEX s_conc_idx2 ON s.t (val); DROP INDEX CONCURRENTLY IF EXISTS s.s_conc_idx2", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpb0042() => CorpusAssert.Parses(@"DROP SEQUENCE IF EXISTS s.seq_no_such", "ok");
     [Fact]
     public void drpb0043() => CorpusAssert.Parses(@"CREATE SEQUENCE s.drop_seq; DROP SEQUENCE s.drop_seq", "ok");
@@ -437,13 +437,13 @@ public class Corpus_DropStatements
     public void drpb0045() => CorpusAssert.Parses(@"CREATE SEQUENCE s.drop_seq3; DROP SEQUENCE s.drop_seq3 RESTRICT", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void drpb0046() => CorpusAssert.Parses(@"DROP SEQUENCE s.no_such_seq", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpb0047() => CorpusAssert.Parses(@"DROP SEQUENCE", "error");
     [Fact]
     public void drpb0048() => CorpusAssert.Parses(@"CREATE SEQUENCE s.drop_seq4; CREATE SEQUENCE s.drop_seq5; DROP SEQUENCE s.drop_seq4, s.drop_seq5", "ok");
     [Fact]
     public void drpb0049() => CorpusAssert.Parses(@"CREATE SEQUENCE s.drop_seqie; DROP SEQUENCE IF EXISTS s.drop_seqie", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpb0050() => CorpusAssert.Parses(@"DROP SCHEMA IF EXISTS s_no_such_schema", "ok");
     [Fact]
     public void drpb0051() => CorpusAssert.Parses(@"CREATE SCHEMA drop_schema_x; DROP SCHEMA drop_schema_x", "ok");
@@ -455,13 +455,13 @@ public class Corpus_DropStatements
     public void drpb0054() => CorpusAssert.Parses(@"CREATE SCHEMA drop_schema_ne; CREATE TABLE drop_schema_ne.t1 (a int); DROP SCHEMA drop_schema_ne RESTRICT", "error");
     [Fact]
     public void drpb0055() => CorpusAssert.Parses(@"CREATE SCHEMA drop_schema_cas; CREATE TABLE drop_schema_cas.t1 (a int); DROP SCHEMA drop_schema_cas CASCADE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpb0056() => CorpusAssert.Parses(@"DROP SCHEMA", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void drpb0057() => CorpusAssert.Parses(@"DROP SCHEMA s_no_exist", "error");
     [Fact]
     public void drpb0058() => CorpusAssert.Parses(@"CREATE SCHEMA drop_sch1; CREATE SCHEMA drop_sch2; DROP SCHEMA drop_sch1, drop_sch2", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpb0059() => CorpusAssert.Parses(@"DROP FUNCTION IF EXISTS s.f_no_such(int)", "ok");
     [Fact]
     public void drpb0060() => CorpusAssert.Parses(@"CREATE FUNCTION s.drop_fn(x int) RETURNS int LANGUAGE sql AS $$ SELECT x $$; DROP FUNCTION s.drop_fn(int)", "ok");
@@ -477,9 +477,9 @@ public class Corpus_DropStatements
     public void drpb0065() => CorpusAssert.Parses(@"CREATE FUNCTION s.drop_fn6(a int, b text) RETURNS text LANGUAGE sql AS $$ SELECT b $$; DROP FUNCTION s.drop_fn6(int, text)", "ok");
     [Fact]
     public void drpb0066() => CorpusAssert.Parses(@"CREATE FUNCTION s.drop_fn7() RETURNS void LANGUAGE sql AS $$ SELECT 1 $$; DROP FUNCTION s.drop_fn7()", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpb0067() => CorpusAssert.Parses(@"DROP FUNCTION IF EXISTS s.f_no_such", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpb0068() => CorpusAssert.Parses(@"DROP FUNCTION", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void drpb0069() => CorpusAssert.Parses(@"DROP FUNCTION s.no_such_fn(int)", "error");
@@ -489,7 +489,7 @@ public class Corpus_DropStatements
     public void drpb0071() => CorpusAssert.Parses(@"CREATE FUNCTION s.drop_fn_oe(x int) RETURNS int LANGUAGE sql AS $$ SELECT x $$; CREATE FUNCTION s.drop_fn_oe(x int, y int) RETURNS int LANGUAGE sql AS $$ SELECT x+y $$; DROP FUNCTION s.drop_fn_oe(int)", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void drpb0072() => CorpusAssert.Parses(@"CREATE FUNCTION s.drop_fn_oe2(x int) RETURNS int LANGUAGE sql AS $$ SELECT x $$; CREATE FUNCTION s.drop_fn_oe2(x int, y int) RETURNS int LANGUAGE sql AS $$ SELECT x+y $$; DROP FUNCTION s.drop_fn_oe2", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpb0073() => CorpusAssert.Parses(@"DROP PROCEDURE IF EXISTS s.p_no_such(int)", "ok");
     [Fact]
     public void drpb0074() => CorpusAssert.Parses(@"CREATE PROCEDURE s.drop_proc(IN n int) LANGUAGE plpgsql AS $$ BEGIN NULL; END $$; DROP PROCEDURE s.drop_proc(int)", "ok");
@@ -499,7 +499,7 @@ public class Corpus_DropStatements
     public void drpb0076() => CorpusAssert.Parses(@"CREATE PROCEDURE s.drop_proc3(IN n int) LANGUAGE plpgsql AS $$ BEGIN NULL; END $$; DROP PROCEDURE s.drop_proc3(int) CASCADE", "ok");
     [Fact]
     public void drpb0077() => CorpusAssert.Parses(@"CREATE PROCEDURE s.drop_proc4(IN n int) LANGUAGE plpgsql AS $$ BEGIN NULL; END $$; DROP PROCEDURE s.drop_proc4(int) RESTRICT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpb0078() => CorpusAssert.Parses(@"DROP PROCEDURE", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void drpb0079() => CorpusAssert.Parses(@"DROP PROCEDURE s.no_such_proc(int)", "error");
@@ -509,7 +509,7 @@ public class Corpus_DropStatements
     public void drpb0081() => CorpusAssert.Parses(@"CREATE PROCEDURE s.drop_proc6() LANGUAGE plpgsql AS $$ BEGIN NULL; END $$; DROP PROCEDURE s.drop_proc6()", "ok");
     [Fact]
     public void drpb0082() => CorpusAssert.Parses(@"CREATE PROCEDURE s.drop_proca(IN n int) LANGUAGE plpgsql AS $$ BEGIN NULL; END $$; CREATE PROCEDURE s.drop_procb(IN m int) LANGUAGE plpgsql AS $$ BEGIN NULL; END $$; DROP PROCEDURE s.drop_proca(int), s.drop_procb(int)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpb0083() => CorpusAssert.Parses(@"DROP AGGREGATE IF EXISTS s.no_such_agg(int)", "ok");
     [Fact]
     public void drpb0084() => CorpusAssert.Parses(@"CREATE AGGREGATE s.drop_agg(int) (sfunc = int4pl, stype = int); DROP AGGREGATE s.drop_agg(int)", "ok");
@@ -517,7 +517,7 @@ public class Corpus_DropStatements
     public void drpb0085() => CorpusAssert.Parses(@"CREATE AGGREGATE s.drop_agg2(int) (sfunc = int4pl, stype = int); DROP AGGREGATE s.drop_agg2(int) CASCADE", "ok");
     [Fact]
     public void drpb0086() => CorpusAssert.Parses(@"CREATE AGGREGATE s.drop_agg3(int) (sfunc = int4pl, stype = int); DROP AGGREGATE s.drop_agg3(int) RESTRICT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpb0087() => CorpusAssert.Parses(@"DROP AGGREGATE", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void drpb0088() => CorpusAssert.Parses(@"DROP AGGREGATE s.no_agg(int)", "error");
@@ -527,7 +527,7 @@ public class Corpus_DropStatements
     public void drpb0090() => CorpusAssert.Parses(@"CREATE AGGREGATE s.drop_agg_a(int) (sfunc = int4pl, stype = int); CREATE AGGREGATE s.drop_agg_b(int) (sfunc = int4pl, stype = int); DROP AGGREGATE s.drop_agg_a(int), s.drop_agg_b(int)", "ok");
     [Fact]
     public void drpb0091() => CorpusAssert.Parses(@"CREATE AGGREGATE s.drop_agg_star(*) (sfunc = int8inc, stype = int8, initcond = '0'); DROP AGGREGATE s.drop_agg_star(*)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpb0092() => CorpusAssert.Parses(@"DROP TYPE IF EXISTS s.no_such_type", "ok");
     [Fact]
     public void drpb0093() => CorpusAssert.Parses(@"CREATE TYPE s.drop_type1 AS (x int, y text); DROP TYPE s.drop_type1", "ok");
@@ -539,13 +539,13 @@ public class Corpus_DropStatements
     public void drpb0096() => CorpusAssert.Parses(@"CREATE TYPE s.drop_type4 AS (x int); DROP TYPE s.drop_type4 RESTRICT", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void drpb0097() => CorpusAssert.Parses(@"DROP TYPE s.no_such_type", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpb0098() => CorpusAssert.Parses(@"DROP TYPE", "error");
     [Fact]
     public void drpb0099() => CorpusAssert.Parses(@"CREATE TYPE s.drop_type5 AS (a int); CREATE TYPE s.drop_type6 AS (b text); DROP TYPE s.drop_type5, s.drop_type6", "ok");
     [Fact]
     public void drpb0100() => CorpusAssert.Parses(@"CREATE TYPE s.drop_type7 AS (a int); DROP TYPE IF EXISTS s.drop_type7", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpb0101() => CorpusAssert.Parses(@"DROP DOMAIN IF EXISTS s.no_such_dom", "ok");
     [Fact]
     public void drpb0102() => CorpusAssert.Parses(@"CREATE DOMAIN s.drop_dom1 AS integer CHECK (VALUE > 0); DROP DOMAIN s.drop_dom1", "ok");
@@ -555,13 +555,13 @@ public class Corpus_DropStatements
     public void drpb0104() => CorpusAssert.Parses(@"CREATE DOMAIN s.drop_dom3 AS text; DROP DOMAIN s.drop_dom3 RESTRICT", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void drpb0105() => CorpusAssert.Parses(@"DROP DOMAIN s.no_such_domain", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpb0106() => CorpusAssert.Parses(@"DROP DOMAIN", "error");
     [Fact]
     public void drpb0107() => CorpusAssert.Parses(@"CREATE DOMAIN s.drop_dom4 AS integer; CREATE DOMAIN s.drop_dom5 AS text; DROP DOMAIN s.drop_dom4, s.drop_dom5", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpb0108() => CorpusAssert.Parses(@"DROP TRIGGER IF EXISTS no_such_trigger ON s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpb0109() => CorpusAssert.Parses(@"DROP TRIGGER t_touch ON s.t", "ok");
     [Fact]
     public void drpb0110() => CorpusAssert.Parses(@"CREATE TRIGGER drop_trg BEFORE INSERT ON s.t FOR EACH ROW EXECUTE FUNCTION s.trg(); DROP TRIGGER drop_trg ON s.t", "ok");
@@ -569,23 +569,23 @@ public class Corpus_DropStatements
     public void drpb0111() => CorpusAssert.Parses(@"CREATE TRIGGER drop_trg2 BEFORE INSERT ON s.t FOR EACH ROW EXECUTE FUNCTION s.trg(); DROP TRIGGER drop_trg2 ON s.t CASCADE", "ok");
     [Fact]
     public void drpb0112() => CorpusAssert.Parses(@"CREATE TRIGGER drop_trg3 BEFORE INSERT ON s.t FOR EACH ROW EXECUTE FUNCTION s.trg(); DROP TRIGGER drop_trg3 ON s.t RESTRICT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpb0113() => CorpusAssert.Parses(@"DROP TRIGGER", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void drpb0114() => CorpusAssert.Parses(@"DROP TRIGGER no_trg ON s.no_such_table", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void drpb0115() => CorpusAssert.Parses(@"DROP TRIGGER no_such_trigger ON s.t", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpb0116() => CorpusAssert.Parses(@"DROP TRIGGER IF EXISTS t_touch ON s.t CASCADE", "ok");
     [Fact]
     public void drpb0117() => CorpusAssert.Parses(@"CREATE RULE drop_rule AS ON INSERT TO s.t DO ALSO NOTHING; DROP RULE drop_rule ON s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpb0118() => CorpusAssert.Parses(@"DROP RULE IF EXISTS no_such_rule ON s.t", "ok");
     [Fact]
     public void drpb0119() => CorpusAssert.Parses(@"CREATE RULE drop_rule2 AS ON INSERT TO s.t DO ALSO NOTHING; DROP RULE drop_rule2 ON s.t CASCADE", "ok");
     [Fact]
     public void drpb0120() => CorpusAssert.Parses(@"CREATE RULE drop_rule3 AS ON INSERT TO s.t DO ALSO NOTHING; DROP RULE drop_rule3 ON s.t RESTRICT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpb0121() => CorpusAssert.Parses(@"DROP RULE", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void drpb0122() => CorpusAssert.Parses(@"DROP RULE no_such_rule ON s.t", "error");
@@ -593,19 +593,19 @@ public class Corpus_DropStatements
     public void drpb0123() => CorpusAssert.Parses(@"DROP RULE no_rule ON s.no_such_table", "error");
     [Fact]
     public void drpb0124() => CorpusAssert.Parses(@"CREATE POLICY drop_pol ON s.t USING (true); DROP POLICY drop_pol ON s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpb0125() => CorpusAssert.Parses(@"DROP POLICY IF EXISTS no_such_pol ON s.t", "ok");
     [Fact]
     public void drpb0126() => CorpusAssert.Parses(@"CREATE POLICY drop_pol2 ON s.t USING (true); DROP POLICY drop_pol2 ON s.t CASCADE", "ok");
     [Fact]
     public void drpb0127() => CorpusAssert.Parses(@"CREATE POLICY drop_pol3 ON s.t USING (true); DROP POLICY drop_pol3 ON s.t RESTRICT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpb0128() => CorpusAssert.Parses(@"DROP POLICY", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void drpb0129() => CorpusAssert.Parses(@"DROP POLICY no_such_pol ON s.t", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void drpb0130() => CorpusAssert.Parses(@"DROP POLICY no_pol ON s.no_such_table", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpb0131() => CorpusAssert.Parses(@"DROP EXTENSION IF EXISTS no_such_ext", "ok");
     [Fact]
     public void drpb0132() => CorpusAssert.Parses(@"CREATE EXTENSION IF NOT EXISTS pg_trgm; DROP EXTENSION pg_trgm", "ok");
@@ -613,7 +613,7 @@ public class Corpus_DropStatements
     public void drpb0133() => CorpusAssert.Parses(@"CREATE EXTENSION IF NOT EXISTS pg_trgm; DROP EXTENSION pg_trgm CASCADE", "ok");
     [Fact]
     public void drpb0134() => CorpusAssert.Parses(@"CREATE EXTENSION IF NOT EXISTS pg_trgm; DROP EXTENSION pg_trgm RESTRICT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpb0135() => CorpusAssert.Parses(@"DROP EXTENSION", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void drpb0136() => CorpusAssert.Parses(@"DROP EXTENSION no_such_extension", "error");
@@ -621,11 +621,11 @@ public class Corpus_DropStatements
     public void drpb0137() => CorpusAssert.Parses(@"CREATE EXTENSION IF NOT EXISTS pg_trgm; DROP EXTENSION IF EXISTS pg_trgm", "ok");
     [Fact]
     public void drpb0138() => CorpusAssert.Parses(@"CREATE TABLE s.drop_rls (a int); ALTER TABLE s.drop_rls ENABLE ROW LEVEL SECURITY; CREATE POLICY drop_rls_pol ON s.drop_rls USING (true); DROP POLICY IF EXISTS drop_rls_pol ON s.drop_rls", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpb0139() => CorpusAssert.Parses(@"DROP TABLE IF EXISTS s.t CASCADE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpb0140() => CorpusAssert.Parses(@"DROP VIEW IF EXISTS s.v CASCADE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpb0141() => CorpusAssert.Parses(@"DROP SEQUENCE IF EXISTS s.seq CASCADE", "ok");
     [Fact]
     public void drpb0142() => CorpusAssert.Parses(@"CREATE FUNCTION s.drop_fn_noarg() RETURNS void LANGUAGE sql AS $$ SELECT 1 $$; DROP FUNCTION IF EXISTS s.drop_fn_noarg()", "ok");
@@ -649,9 +649,9 @@ public class Corpus_DropStatements
     public void drpb0151() => CorpusAssert.Parses(@"CREATE TABLE s.""Drp Mixed Case"" (a int); DROP TABLE s.""Drp Mixed Case""", "ok");
     [Fact]
     public void drpb0152() => CorpusAssert.Parses(@"CREATE VIEW s.""My View"" AS SELECT 1 AS x; DROP VIEW s.""My View""", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpb0153() => CorpusAssert.Parses(@"DROP TYPE s.mood CASCADE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpb0154() => CorpusAssert.Parses(@"DROP DOMAIN s.pos_int RESTRICT", "ok");
     [Fact]
     public void drpb0155() => CorpusAssert.Parses(@"CREATE TABLE s.drp_restrict_ok (a int); DROP TABLE IF EXISTS s.drp_restrict_ok RESTRICT", "ok");
@@ -663,25 +663,25 @@ public class Corpus_DropStatements
     public void drpb0158() => CorpusAssert.Parses(@"CREATE FUNCTION s.drop_fn_pint(x s.pos_int) RETURNS int LANGUAGE sql AS $$ SELECT x::int $$; DROP FUNCTION s.drop_fn_pint(s.pos_int)", "ok");
     [Fact]
     public void drpb0159() => CorpusAssert.Parses(@"CREATE TABLE s.drp_multi1 (a int); CREATE VIEW s.drp_multi_view AS SELECT a FROM s.drp_multi1; DROP VIEW s.drp_multi_view; DROP TABLE s.drp_multi1", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpb0160() => CorpusAssert.Parses(@"DROP TABLE IF EXISTS s.e1, IF EXISTS s.e2", "error");
     [Fact]
     public void drpb0161() => CorpusAssert.Parses(@"CREATE TABLE s.drp_comment (a int); /* drop it */ DROP TABLE s.drp_comment /* done */", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpb0162() => CorpusAssert.Parses(@"DROP MATERIALIZED VIEW IF EXISTS s.mv CASCADE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpb0163() => CorpusAssert.Parses(@"DROP INDEX IF EXISTS s.t_name_idx CASCADE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpb0164() => CorpusAssert.Parses(@"DROP FUNCTION s.f(integer) CASCADE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpb0165() => CorpusAssert.Parses(@"DROP PROCEDURE s.p(integer)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpb0166() => CorpusAssert.Parses(@"DROP TABLE IF EXISTS s.events CASCADE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpb0167() => CorpusAssert.Parses(@"DROP TABLE s.events_2024", "ok");
     [Fact]
     public void drpb0168() => CorpusAssert.Parses(@"CREATE TABLE s.drp_inh (x int) INHERITS (s.parent); DROP TABLE s.drp_inh", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpb0169() => CorpusAssert.Parses(@"DROP TABLE s.child CASCADE", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void drpb0170() => CorpusAssert.Parses(@"DROP TABLE RESTRICT", "error");
@@ -689,7 +689,7 @@ public class Corpus_DropStatements
     public void drpc0001() => CorpusAssert.Parses(@"CREATE TABLE drop_t1 (a int); DROP TABLE drop_t1;", "ok");
     [Fact]
     public void drpc0002() => CorpusAssert.Parses(@"CREATE TABLE drop_t2 (a int); DROP TABLE IF EXISTS drop_t2;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpc0003() => CorpusAssert.Parses(@"DROP TABLE IF EXISTS no_such_table_xyz;", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void drpc0004() => CorpusAssert.Parses(@"DROP TABLE no_such_table_xyz;", "error");
@@ -705,19 +705,19 @@ public class Corpus_DropStatements
     public void drpc0009() => CorpusAssert.Parses(@"CREATE TABLE drop_t9a (a int); CREATE TABLE drop_t9b (a int); DROP TABLE drop_t9a, drop_t9b CASCADE;", "ok");
     [Fact]
     public void drpc0010() => CorpusAssert.Parses(@"CREATE SCHEMA drop_s; CREATE TABLE drop_s.tbl (a int); DROP TABLE drop_s.tbl;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpc0011() => CorpusAssert.Parses(@"DROP TABLE;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpc0012() => CorpusAssert.Parses(@"DROP TABLE drop_t1 CASCADE RESTRICT;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpc0013() => CorpusAssert.Parses(@"DROP TABLE IF no_such_table_xyz;", "error");
     [Fact]
     public void drpc0014() => CorpusAssert.Parses(@"CREATE TABLE drop_dep (a int); CREATE VIEW drop_dep_v AS SELECT a FROM drop_dep; DROP TABLE drop_dep CASCADE;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpc0015() => CorpusAssert.Parses(@"DROP VIEW s.v;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpc0016() => CorpusAssert.Parses(@"DROP VIEW IF EXISTS s.v;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpc0017() => CorpusAssert.Parses(@"DROP VIEW IF EXISTS no_such_view_xyz;", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void drpc0018() => CorpusAssert.Parses(@"DROP VIEW no_such_view_xyz;", "error");
@@ -725,37 +725,37 @@ public class Corpus_DropStatements
     public void drpc0019() => CorpusAssert.Parses(@"CREATE VIEW drop_v2 AS SELECT 1 AS x; DROP VIEW drop_v2 CASCADE;", "ok");
     [Fact]
     public void drpc0020() => CorpusAssert.Parses(@"CREATE VIEW drop_v3 AS SELECT 1 AS x; DROP VIEW drop_v3 RESTRICT;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpc0021() => CorpusAssert.Parses(@"DROP MATERIALIZED VIEW s.mv;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpc0022() => CorpusAssert.Parses(@"DROP MATERIALIZED VIEW IF EXISTS s.mv;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpc0023() => CorpusAssert.Parses(@"DROP MATERIALIZED VIEW IF EXISTS no_such_mv_xyz;", "ok");
     [Fact]
     public void drpc0024() => CorpusAssert.Parses(@"CREATE MATERIALIZED VIEW drop_mv2 AS SELECT 1 AS x; DROP MATERIALIZED VIEW drop_mv2 CASCADE;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpc0025() => CorpusAssert.Parses(@"DROP MATERIALIZED VIEW;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpc0026() => CorpusAssert.Parses(@"DROP INDEX s.t_name_idx;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpc0027() => CorpusAssert.Parses(@"DROP INDEX IF EXISTS s.t_name_idx;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpc0028() => CorpusAssert.Parses(@"DROP INDEX IF EXISTS no_such_idx_xyz;", "ok");
     [Fact]
     public void drpc0029() => CorpusAssert.Parses(@"CREATE INDEX drop_idx1 ON s.t (val); DROP INDEX s.drop_idx1 CASCADE;", "ok");
     [Fact]
     public void drpc0030() => CorpusAssert.Parses(@"CREATE INDEX drop_idx2 ON s.t (val); DROP INDEX CONCURRENTLY s.drop_idx2;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpc0031() => CorpusAssert.Parses(@"DROP INDEX CONCURRENTLY IF EXISTS no_such_idx_xyz;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpc0032() => CorpusAssert.Parses(@"DROP SEQUENCE s.seq;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpc0033() => CorpusAssert.Parses(@"DROP SEQUENCE IF EXISTS s.seq;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpc0034() => CorpusAssert.Parses(@"DROP SEQUENCE IF EXISTS no_such_seq_xyz;", "ok");
     [Fact]
     public void drpc0035() => CorpusAssert.Parses(@"CREATE SEQUENCE drop_seq1; DROP SEQUENCE drop_seq1 CASCADE;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpc0036() => CorpusAssert.Parses(@"DROP SCHEMA IF EXISTS no_such_schema_xyz;", "ok");
     [Fact]
     public void drpc0037() => CorpusAssert.Parses(@"CREATE SCHEMA drop_sc1; DROP SCHEMA drop_sc1;", "ok");
@@ -763,54 +763,54 @@ public class Corpus_DropStatements
     public void drpc0038() => CorpusAssert.Parses(@"CREATE SCHEMA drop_sc2; DROP SCHEMA drop_sc2 RESTRICT;", "ok");
     [Fact]
     public void drpc0039() => CorpusAssert.Parses(@"CREATE SCHEMA drop_sc3; CREATE TABLE drop_sc3.x (a int); DROP SCHEMA drop_sc3 CASCADE;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpc0040() => CorpusAssert.Parses(@"DROP FUNCTION s.f(integer);", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpc0041() => CorpusAssert.Parses(@"DROP FUNCTION IF EXISTS s.f(integer);", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpc0042() => CorpusAssert.Parses(@"DROP FUNCTION IF EXISTS no_such_fn_xyz(integer);", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpc0043() => CorpusAssert.Parses(@"DROP FUNCTION s.g(integer, integer);", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpc0044() => CorpusAssert.Parses(@"DROP FUNCTION s.rows_f();", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpc0045() => CorpusAssert.Parses(@"DROP FUNCTION s.f(integer) CASCADE;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpc0046() => CorpusAssert.Parses(@"DROP FUNCTION s.f(integer) RESTRICT;", "ok");
     [Fact]
     public void drpc0047() => CorpusAssert.Parses(@"CREATE FUNCTION drop_fn1(x int) RETURNS int LANGUAGE sql AS $$ SELECT x $$; CREATE FUNCTION drop_fn1(x text) RETURNS text LANGUAGE sql AS $$ SELECT x $$; DROP FUNCTION drop_fn1(int), drop_fn1(text);", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpc0048() => CorpusAssert.Parses(@"DROP FUNCTION;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpc0049() => CorpusAssert.Parses(@"DROP PROCEDURE s.p(integer);", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpc0050() => CorpusAssert.Parses(@"DROP PROCEDURE IF EXISTS s.p(integer);", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpc0051() => CorpusAssert.Parses(@"DROP PROCEDURE IF EXISTS no_such_proc_xyz(integer);", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpc0052() => CorpusAssert.Parses(@"DROP PROCEDURE s.p(integer) CASCADE;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpc0053() => CorpusAssert.Parses(@"DROP TYPE s.mood CASCADE;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpc0054() => CorpusAssert.Parses(@"DROP TYPE IF EXISTS s.mood CASCADE;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpc0055() => CorpusAssert.Parses(@"DROP TYPE IF EXISTS no_such_type_xyz;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpc0056() => CorpusAssert.Parses(@"DROP TYPE s.addr CASCADE;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpc0057() => CorpusAssert.Parses(@"DROP DOMAIN s.pos_int;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpc0058() => CorpusAssert.Parses(@"DROP DOMAIN IF EXISTS s.pos_int;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpc0059() => CorpusAssert.Parses(@"DROP DOMAIN IF EXISTS no_such_domain_xyz;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpc0060() => CorpusAssert.Parses(@"DROP TRIGGER t_touch ON s.t;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpc0061() => CorpusAssert.Parses(@"DROP TRIGGER IF EXISTS t_touch ON s.t;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpc0062() => CorpusAssert.Parses(@"DROP TRIGGER IF EXISTS no_such_trg_xyz ON s.t;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpc0063() => CorpusAssert.Parses(@"DROP TRIGGER t_touch ON s.t CASCADE;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void drpc0064() => CorpusAssert.Parses(@"DROP TRIGGER t_touch;", "error");
 }

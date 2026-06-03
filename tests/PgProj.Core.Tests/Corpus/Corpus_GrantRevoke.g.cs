@@ -243,49 +243,49 @@ public class Corpus_GrantRevoke
     public void grva0118() => CorpusAssert.Parses(@"REVOKE SELECT(id, name) ON TABLE s.t FROM PUBLIC", "ok");
     [Fact]
     public void grva0119() => CorpusAssert.Parses(@"REVOKE ALL ON ALL TABLES IN SCHEMA s FROM PUBLIC", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void grva0120() => CorpusAssert.Parses(@"ALTER DEFAULT PRIVILEGES GRANT SELECT ON TABLES TO PUBLIC", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void grva0121() => CorpusAssert.Parses(@"ALTER DEFAULT PRIVILEGES GRANT INSERT ON TABLES TO PUBLIC", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void grva0122() => CorpusAssert.Parses(@"ALTER DEFAULT PRIVILEGES GRANT ALL ON TABLES TO PUBLIC", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void grva0123() => CorpusAssert.Parses(@"ALTER DEFAULT PRIVILEGES GRANT ALL PRIVILEGES ON TABLES TO PUBLIC", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void grva0124() => CorpusAssert.Parses(@"ALTER DEFAULT PRIVILEGES GRANT USAGE ON SEQUENCES TO PUBLIC", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void grva0125() => CorpusAssert.Parses(@"ALTER DEFAULT PRIVILEGES GRANT ALL ON SEQUENCES TO PUBLIC", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void grva0126() => CorpusAssert.Parses(@"ALTER DEFAULT PRIVILEGES GRANT EXECUTE ON FUNCTIONS TO PUBLIC", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void grva0127() => CorpusAssert.Parses(@"ALTER DEFAULT PRIVILEGES GRANT ALL ON FUNCTIONS TO PUBLIC", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void grva0128() => CorpusAssert.Parses(@"ALTER DEFAULT PRIVILEGES GRANT EXECUTE ON ROUTINES TO PUBLIC", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void grva0129() => CorpusAssert.Parses(@"ALTER DEFAULT PRIVILEGES GRANT USAGE ON TYPES TO PUBLIC", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void grva0130() => CorpusAssert.Parses(@"ALTER DEFAULT PRIVILEGES GRANT USAGE ON SCHEMAS TO PUBLIC", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void grva0131() => CorpusAssert.Parses(@"ALTER DEFAULT PRIVILEGES IN SCHEMA s GRANT SELECT ON TABLES TO PUBLIC", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void grva0132() => CorpusAssert.Parses(@"ALTER DEFAULT PRIVILEGES FOR ROLE CURRENT_USER GRANT SELECT ON TABLES TO PUBLIC", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void grva0133() => CorpusAssert.Parses(@"ALTER DEFAULT PRIVILEGES FOR USER CURRENT_USER GRANT SELECT ON TABLES TO PUBLIC", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void grva0134() => CorpusAssert.Parses(@"ALTER DEFAULT PRIVILEGES FOR ROLE CURRENT_USER IN SCHEMA s GRANT SELECT ON TABLES TO PUBLIC", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void grva0135() => CorpusAssert.Parses(@"ALTER DEFAULT PRIVILEGES REVOKE SELECT ON TABLES FROM PUBLIC", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void grva0136() => CorpusAssert.Parses(@"ALTER DEFAULT PRIVILEGES REVOKE ALL ON TABLES FROM PUBLIC", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void grva0137() => CorpusAssert.Parses(@"ALTER DEFAULT PRIVILEGES REVOKE USAGE ON SEQUENCES FROM PUBLIC", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void grva0138() => CorpusAssert.Parses(@"ALTER DEFAULT PRIVILEGES REVOKE EXECUTE ON FUNCTIONS FROM PUBLIC", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void grva0139() => CorpusAssert.Parses(@"ALTER DEFAULT PRIVILEGES REVOKE EXECUTE ON ROUTINES FROM PUBLIC", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void grva0140() => CorpusAssert.Parses(@"ALTER DEFAULT PRIVILEGES REVOKE USAGE ON TYPES FROM PUBLIC", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void grva0141() => CorpusAssert.Parses(@"ALTER DEFAULT PRIVILEGES REVOKE GRANT OPTION FOR SELECT ON TABLES FROM PUBLIC", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void grva0142() => CorpusAssert.Parses(@"CREATE ROLE grva_adp_wgo; ALTER DEFAULT PRIVILEGES GRANT SELECT ON TABLES TO grva_adp_wgo WITH GRANT OPTION", "ok");
@@ -588,37 +588,37 @@ REVOKE ADMIN OPTION FOR grvb_rn FROM grvb_ro", "ok");
     public void grvb0106() => CorpusAssert.Parses(@"REVOKE EXECUTE ON ALL PROCEDURES IN SCHEMA s FROM PUBLIC", "ok");
     [Fact]
     public void grvb0107() => CorpusAssert.Parses(@"REVOKE EXECUTE ON ALL ROUTINES IN SCHEMA s FROM PUBLIC", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void grvb0108() => CorpusAssert.Parses(@"ALTER DEFAULT PRIVILEGES GRANT SELECT ON TABLES TO PUBLIC", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void grvb0109() => CorpusAssert.Parses(@"ALTER DEFAULT PRIVILEGES GRANT INSERT ON TABLES TO PUBLIC", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void grvb0110() => CorpusAssert.Parses(@"ALTER DEFAULT PRIVILEGES GRANT ALL ON TABLES TO PUBLIC", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void grvb0111() => CorpusAssert.Parses(@"ALTER DEFAULT PRIVILEGES GRANT USAGE ON SEQUENCES TO PUBLIC", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void grvb0112() => CorpusAssert.Parses(@"ALTER DEFAULT PRIVILEGES GRANT EXECUTE ON FUNCTIONS TO PUBLIC", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void grvb0113() => CorpusAssert.Parses(@"ALTER DEFAULT PRIVILEGES GRANT EXECUTE ON ROUTINES TO PUBLIC", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void grvb0114() => CorpusAssert.Parses(@"ALTER DEFAULT PRIVILEGES GRANT USAGE ON TYPES TO PUBLIC", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void grvb0115() => CorpusAssert.Parses(@"ALTER DEFAULT PRIVILEGES IN SCHEMA s GRANT SELECT ON TABLES TO PUBLIC", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void grvb0116() => CorpusAssert.Parses(@"ALTER DEFAULT PRIVILEGES IN SCHEMA s GRANT EXECUTE ON FUNCTIONS TO PUBLIC", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void grvb0117() => CorpusAssert.Parses(@"ALTER DEFAULT PRIVILEGES FOR ROLE CURRENT_USER GRANT SELECT ON TABLES TO PUBLIC", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void grvb0118() => CorpusAssert.Parses(@"ALTER DEFAULT PRIVILEGES FOR ROLE CURRENT_USER IN SCHEMA s GRANT ALL ON TABLES TO PUBLIC", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void grvb0119() => CorpusAssert.Parses(@"ALTER DEFAULT PRIVILEGES REVOKE SELECT ON TABLES FROM PUBLIC", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void grvb0120() => CorpusAssert.Parses(@"ALTER DEFAULT PRIVILEGES REVOKE ALL ON TABLES FROM PUBLIC", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void grvb0121() => CorpusAssert.Parses(@"ALTER DEFAULT PRIVILEGES REVOKE EXECUTE ON FUNCTIONS FROM PUBLIC", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void grvb0122() => CorpusAssert.Parses(@"ALTER DEFAULT PRIVILEGES IN SCHEMA s REVOKE SELECT ON TABLES FROM PUBLIC", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void grvb0123() => CorpusAssert.Parses(@"ALTER DEFAULT PRIVILEGES REVOKE GRANT OPTION FOR SELECT ON TABLES FROM PUBLIC", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void grvb0124() => CorpusAssert.Parses(@"GRANT BOGUSPRIVILEGE ON s.t TO PUBLIC", "error");

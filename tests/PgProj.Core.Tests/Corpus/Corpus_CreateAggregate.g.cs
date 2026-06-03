@@ -201,7 +201,7 @@ CREATE AGGREGATE agga0078_myagg (integer) (SFUNC = int4pl, STYPE = integer)", "e
     public void agga0094() => CorpusAssert.Parses(@"CREATE AGGREGATE agga0094_myagg (integer) (SFUNC = int4pl, STYPE = integer, INITCOND = '0'); DROP AGGREGATE agga0094_myagg(integer) RESTRICT", "ok");
     [Fact]
     public void agga0095() => CorpusAssert.Parses(@"CREATE AGGREGATE agga0095_myagg (integer) (SFUNC = int4pl, STYPE = integer); DROP AGGREGATE IF EXISTS agga0095_myagg(integer)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void agga0096() => CorpusAssert.Parses(@"DROP AGGREGATE IF EXISTS agga0096_nonexistent(integer)", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void agga0097() => CorpusAssert.Parses(@"DROP AGGREGATE agga0097_nonexistent(integer)", "error");

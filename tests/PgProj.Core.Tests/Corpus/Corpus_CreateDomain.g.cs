@@ -151,39 +151,39 @@ public class Corpus_CreateDomain
     public void doma0072() => CorpusAssert.Parses(@"CREATE DOMAIN s.d_check_false AS integer CHECK (false)", "ok");
     [Fact]
     public void doma0073() => CorpusAssert.Parses(@"CREATE DOMAIN s.d_int4range_check AS int4range CHECK (lower(VALUE) >= 0)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void doma0074() => CorpusAssert.Parses(@"ALTER DOMAIN s.pos_int SET DEFAULT 1", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void doma0075() => CorpusAssert.Parses(@"ALTER DOMAIN s.pos_int DROP DEFAULT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void doma0076() => CorpusAssert.Parses(@"ALTER DOMAIN s.pos_int SET NOT NULL", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void doma0077() => CorpusAssert.Parses(@"ALTER DOMAIN s.pos_int DROP NOT NULL", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void doma0078() => CorpusAssert.Parses(@"ALTER DOMAIN s.pos_int ADD CHECK (VALUE < 10000)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void doma0079() => CorpusAssert.Parses(@"ALTER DOMAIN s.pos_int ADD CONSTRAINT upper_bound CHECK (VALUE < 10000)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void doma0080() => CorpusAssert.Parses(@"ALTER DOMAIN s.pos_int ADD CHECK (VALUE < 10000) NOT VALID", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void doma0081() => CorpusAssert.Parses(@"ALTER DOMAIN s.pos_int ADD CONSTRAINT ub CHECK (VALUE < 10000) NOT VALID;
 ALTER DOMAIN s.pos_int VALIDATE CONSTRAINT ub", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void doma0082() => CorpusAssert.Parses(@"ALTER DOMAIN s.pos_int ADD CONSTRAINT named_c CHECK (VALUE < 9999);
 ALTER DOMAIN s.pos_int DROP CONSTRAINT named_c", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void doma0083() => CorpusAssert.Parses(@"ALTER DOMAIN s.pos_int ADD CONSTRAINT named_d CHECK (VALUE < 9999);
 ALTER DOMAIN s.pos_int DROP CONSTRAINT IF EXISTS named_d", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void doma0084() => CorpusAssert.Parses(@"ALTER DOMAIN s.pos_int DROP CONSTRAINT IF EXISTS nonexistent_constraint", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void doma0085() => CorpusAssert.Parses(@"ALTER DOMAIN s.pos_int ADD CONSTRAINT to_rename CHECK (VALUE < 9999);
 ALTER DOMAIN s.pos_int RENAME CONSTRAINT to_rename TO renamed_c;
 ALTER DOMAIN s.pos_int DROP CONSTRAINT renamed_c", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void doma0086() => CorpusAssert.Parses(@"ALTER DOMAIN s.pos_int ADD CONSTRAINT cascadable CHECK (VALUE < 9999);
 ALTER DOMAIN s.pos_int DROP CONSTRAINT cascadable CASCADE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void doma0087() => CorpusAssert.Parses(@"ALTER DOMAIN s.pos_int ADD CONSTRAINT restrictable CHECK (VALUE < 9999);
 ALTER DOMAIN s.pos_int DROP CONSTRAINT restrictable RESTRICT", "ok");
     [Fact]
@@ -210,9 +210,9 @@ DROP DOMAIN s.d_drop_restrict RESTRICT", "ok");
     [Fact]
     public void doma0095() => CorpusAssert.Parses(@"CREATE DOMAIN s.d_drop_cascade AS integer;
 DROP DOMAIN s.d_drop_cascade CASCADE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void doma0096() => CorpusAssert.Parses(@"DROP DOMAIN IF EXISTS s.nonexistent_domain", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void doma0097() => CorpusAssert.Parses(@"DROP DOMAIN IF EXISTS s.nonexistent_domain CASCADE", "ok");
     [Fact]
     public void doma0098() => CorpusAssert.Parses(@"CREATE DOMAIN s.d_drop1 AS integer;
@@ -259,7 +259,7 @@ DROP DOMAIN IF EXISTS s.d_drop5, s.nonexistent99", "ok");
     public void doma0116() => CorpusAssert.Parses(@"ALTER DOMAIN s.nonexistent_domain_xyz SET DEFAULT 1", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void doma0117() => CorpusAssert.Parses(@"DROP DOMAIN s.nonexistent_domain_xyz", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void doma0118() => CorpusAssert.Parses(@"DROP DOMAIN", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void doma0119() => CorpusAssert.Parses(@"CREATE DOMAIN s.d_bad11 AS integer NOT NULL NULL", "error");
@@ -373,9 +373,9 @@ ALTER DOMAIN s.d_validate_c VALIDATE CONSTRAINT vc", "ok");
     public void doma0167() => CorpusAssert.Parses(@"CREATE DOMAIN s.d_bad_collate_int AS integer COLLATE ""C""", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void doma0168() => CorpusAssert.Parses(@"CREATE DOMAIN s.d_bad_check_subquery AS integer CHECK (VALUE > (SELECT 1))", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void doma0169() => CorpusAssert.Parses(@"ALTER DOMAIN s.pos_int SET SCHEMA", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void doma0170() => CorpusAssert.Parses(@"ALTER DOMAIN s.pos_int RENAME TO", "error");
     [Fact]
     public void domb0001() => CorpusAssert.Parses(@"CREATE DOMAIN d1 AS integer", "ok");
@@ -449,7 +449,7 @@ ALTER DOMAIN s.d_validate_c VALIDATE CONSTRAINT vc", "ok");
     public void domb0035() => CorpusAssert.Parses(@"CREATE DOMAIN d35 AS integer; ALTER DOMAIN d35 SET SCHEMA s", "ok");
     [Fact]
     public void domb0036() => CorpusAssert.Parses(@"CREATE DOMAIN d36 AS integer; DROP DOMAIN d36", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void domb0037() => CorpusAssert.Parses(@"DROP DOMAIN IF EXISTS nonexistent_domain_xyz", "ok");
     [Fact]
     public void domb0038() => CorpusAssert.Parses(@"CREATE DOMAIN d38a AS integer; CREATE DOMAIN d38b AS text; DROP DOMAIN d38a, d38b", "ok");

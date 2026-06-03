@@ -288,27 +288,27 @@ WHERE qty > 0", "ok");
     public void vwa0138() => CorpusAssert.Parses(@"CREATE VIEW vwa_badkw REPLACE AS SELECT 1", "error");
     [Fact]
     public void vwa0139() => CorpusAssert.Parses(@"CREATE VIEW vwa_rec_no_collist_2 (n) AS SELECT 1", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vwa0140() => CorpusAssert.Parses(@"ALTER VIEW s.v RENAME TO vwa_renamed; ALTER VIEW s.vwa_renamed RENAME TO v", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vwa0141() => CorpusAssert.Parses(@"ALTER VIEW s.v SET (security_barrier = true)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vwa0142() => CorpusAssert.Parses(@"ALTER VIEW s.v SET (security_invoker = false)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vwa0143() => CorpusAssert.Parses(@"ALTER VIEW s.v SET (check_option = cascaded)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vwa0144() => CorpusAssert.Parses(@"ALTER VIEW s.v RESET (security_barrier)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vwa0145() => CorpusAssert.Parses(@"ALTER VIEW s.v RESET (security_invoker)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vwa0146() => CorpusAssert.Parses(@"ALTER VIEW s.v RESET (check_option)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vwa0147() => CorpusAssert.Parses(@"ALTER VIEW s.v RESET (security_barrier, security_invoker)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vwa0148() => CorpusAssert.Parses(@"ALTER VIEW s.v OWNER TO CURRENT_USER", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vwa0149() => CorpusAssert.Parses(@"ALTER VIEW s.v OWNER TO CURRENT_ROLE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vwa0150() => CorpusAssert.Parses(@"ALTER VIEW s.v OWNER TO SESSION_USER", "ok");
     [Fact]
     public void vwa0151() => CorpusAssert.Parses(@"CREATE VIEW vwa_altercol AS SELECT id, name FROM s.t; ALTER VIEW vwa_altercol ALTER COLUMN name SET DEFAULT 'anon'", "ok");
@@ -320,21 +320,21 @@ WHERE qty > 0", "ok");
     public void vwa0154() => CorpusAssert.Parses(@"CREATE VIEW vwa_renamecol AS SELECT id, name FROM s.t; ALTER VIEW vwa_renamecol RENAME COLUMN name TO myname", "ok");
     [Fact]
     public void vwa0155() => CorpusAssert.Parses(@"CREATE VIEW vwa_renamecol2 AS SELECT id, name FROM s.t; ALTER VIEW vwa_renamecol2 RENAME name TO myname", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vwa0156() => CorpusAssert.Parses(@"ALTER VIEW IF EXISTS s.v SET (security_barrier = false)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vwa0157() => CorpusAssert.Parses(@"ALTER VIEW IF EXISTS vwa_nonexistent SET (security_barrier = false)", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void vwa0158() => CorpusAssert.Parses(@"ALTER VIEW vwa_nonexistent2 SET (security_barrier = false)", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void vwa0159() => CorpusAssert.Parses(@"ALTER VIEW s.v SET (bad_option = true)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vwa0160() => CorpusAssert.Parses(@"ALTER VIEW s.v RESET (bad_option)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vwa0161() => CorpusAssert.Parses(@"ALTER VIEW s.v RENAME TO", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void vwa0162() => CorpusAssert.Parses(@"DROP VIEW vwa_nonexistent_drop", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vwa0163() => CorpusAssert.Parses(@"DROP VIEW IF EXISTS vwa_nonexistent_drop", "ok");
     [Fact]
     public void vwa0164() => CorpusAssert.Parses(@"CREATE VIEW vwa_todrop AS SELECT 1; DROP VIEW vwa_todrop", "ok");
@@ -348,7 +348,7 @@ WHERE qty > 0", "ok");
     public void vwa0168() => CorpusAssert.Parses(@"CREATE VIEW vwa_dep3 AS SELECT id FROM s.t; CREATE VIEW vwa_dep4 AS SELECT id FROM vwa_dep3; DROP VIEW vwa_dep3 CASCADE", "ok");
     [Fact]
     public void vwa0169() => CorpusAssert.Parses(@"CREATE VIEW vwa_or_replace_add_col AS SELECT id FROM s.t; CREATE OR REPLACE VIEW vwa_or_replace_add_col AS SELECT id, name FROM s.t", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vwa0170() => CorpusAssert.Parses(@"ALTER VIEW s.v SET SCHEMA public", "ok");
     [Fact]
     public void vwb0001() => CorpusAssert.Parses(@"CREATE VIEW s.v2 AS SELECT id, name FROM s.t", "ok");
@@ -437,7 +437,7 @@ ALTER VIEW s.v2 RENAME COLUMN a TO myid", "ok");
     [Fact]
     public void vwb0038() => CorpusAssert.Parses(@"CREATE VIEW s.v2 AS SELECT id, name FROM s.t;
 ALTER VIEW s.v2 ALTER name DROP DEFAULT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void vwb0039() => CorpusAssert.Parses(@"ALTER VIEW IF EXISTS s.nonexistent_view RENAME TO foo", "ok");
     [Fact]
     public void vwb0040() => CorpusAssert.Parses(@"CREATE VIEW s.v2 AS SELECT id, name FROM s.t;

@@ -159,7 +159,7 @@ ALTER PUBLICATION pub66 OWNER TO SESSION_USER", "ok");
 ALTER PUBLICATION pub67 SET (publish = 'insert, update, delete')", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void puba0068() => CorpusAssert.Parses(@"ALTER PUBLICATION nonexistent_pub ADD TABLE s.t", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void puba0069() => CorpusAssert.Parses(@"ALTER PUBLICATION", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void puba0070() => CorpusAssert.Parses(@"CREATE PUBLICATION pub70 FOR TABLE s.t;
@@ -179,7 +179,7 @@ DROP PUBLICATION pub74", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void puba0075() => CorpusAssert.Parses(@"CREATE PUBLICATION pub75 FOR TABLE s.t;
 DROP PUBLICATION IF EXISTS pub75", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void puba0076() => CorpusAssert.Parses(@"DROP PUBLICATION IF EXISTS nonexistent_pub", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void puba0077() => CorpusAssert.Parses(@"DROP PUBLICATION nonexistent_pub", "error");
@@ -193,7 +193,7 @@ DROP PUBLICATION pub79 CASCADE", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void puba0080() => CorpusAssert.Parses(@"CREATE PUBLICATION pub80 FOR TABLE s.t;
 DROP PUBLICATION pub80 RESTRICT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void puba0081() => CorpusAssert.Parses(@"DROP PUBLICATION", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void puba0082() => CorpusAssert.Parses(@"CREATE SUBSCRIPTION sub82 CONNECTION 'host=localhost' PUBLICATION pub82 WITH (connect = false)", "ok");
@@ -251,7 +251,7 @@ DROP SUBSCRIPTION sub107", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void puba0108() => CorpusAssert.Parses(@"CREATE SUBSCRIPTION sub108 CONNECTION 'host=localhost' PUBLICATION pub108 WITH (connect = false);
 DROP SUBSCRIPTION IF EXISTS sub108", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void puba0109() => CorpusAssert.Parses(@"DROP SUBSCRIPTION IF EXISTS nonexistent_sub", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void puba0110() => CorpusAssert.Parses(@"DROP SUBSCRIPTION nonexistent_sub", "error");
@@ -261,7 +261,7 @@ DROP SUBSCRIPTION sub111 CASCADE", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void puba0112() => CorpusAssert.Parses(@"CREATE SUBSCRIPTION sub112 CONNECTION 'host=localhost' PUBLICATION pub112 WITH (connect = false);
 DROP SUBSCRIPTION sub112 RESTRICT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void puba0113() => CorpusAssert.Parses(@"DROP SUBSCRIPTION", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void puba0114() => CorpusAssert.Parses(@"CREATE SUBSCRIPTION sub114 CONNECTION 'host=localhost' PUBLICATION pub114 WITH (connect = false);
@@ -308,7 +308,7 @@ ALTER SUBSCRIPTION sub127 RENAME TO sub127_renamed;
 ALTER SUBSCRIPTION sub127_renamed RENAME TO sub127", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void puba0128() => CorpusAssert.Parses(@"ALTER SUBSCRIPTION nonexistent_sub DISABLE", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void puba0129() => CorpusAssert.Parses(@"ALTER SUBSCRIPTION", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void puba0130() => CorpusAssert.Parses(@"CREATE SUBSCRIPTION sub130 CONNECTION 'host=localhost' PUBLICATION pub130 WITH (connect = false);

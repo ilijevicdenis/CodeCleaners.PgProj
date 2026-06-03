@@ -70,6 +70,7 @@ public sealed partial class PgParser
     {
         if (c.AtAnyWord("SELECT", "WITH", "VALUES", "TABLE", "INSERT", "UPDATE", "DELETE", "MERGE", "TRUNCATE")) return "QUERY";
         if (c.Current is { Kind: TokenKind.Word } cw && CommandKeywords.Contains(cw.Value)) return "QUERY";
+        if (c.AtAnyWord("ALTER", "DROP")) return "QUERY";
         if (!c.AtWord("CREATE")) return null;
         int k = 1;
         while (c.Peek(k) is { } t && t.Kind == TokenKind.Word
@@ -101,6 +102,8 @@ public sealed partial class PgParser
         if (c.AtWord("MERGE")) return ParseMerge(c, null, false);
         if (c.AtWord("TRUNCATE")) return ParseTruncate(c);
         if (c.Current is { Kind: TokenKind.Word } cw && CommandKeywords.Contains(cw.Value)) return ParseCommand(c);
+        if (c.AtWord("ALTER")) return ParseAlter(c);
+        if (c.AtWord("DROP")) return ParseDrop(c);
 
         c.ExpectWord("CREATE");
         string? persistence = null;

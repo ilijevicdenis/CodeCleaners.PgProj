@@ -85,59 +85,59 @@ public class Corpus_CreateSequence
     public void seqa0039() => CorpusAssert.Parses(@"CREATE SEQUENCE myseq39 START WITH 1; SELECT setval('myseq39', 100, true)", "ok");
     [Fact]
     public void seqa0040() => CorpusAssert.Parses(@"CREATE SEQUENCE myseq40 START WITH 1; SELECT setval('myseq40', 100, false)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seqa0041() => CorpusAssert.Parses(@"ALTER SEQUENCE s.seq RESTART", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seqa0042() => CorpusAssert.Parses(@"ALTER SEQUENCE s.seq RESTART WITH 1", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seqa0043() => CorpusAssert.Parses(@"ALTER SEQUENCE s.seq RESTART 200", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seqa0044() => CorpusAssert.Parses(@"ALTER SEQUENCE s.seq INCREMENT BY 3", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seqa0045() => CorpusAssert.Parses(@"ALTER SEQUENCE s.seq INCREMENT 3", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seqa0046() => CorpusAssert.Parses(@"ALTER SEQUENCE s.seq MINVALUE 50", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seqa0047() => CorpusAssert.Parses(@"ALTER SEQUENCE s.seq MAXVALUE 9999", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seqa0048() => CorpusAssert.Parses(@"ALTER SEQUENCE s.seq NO MINVALUE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seqa0049() => CorpusAssert.Parses(@"ALTER SEQUENCE s.seq NO MAXVALUE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seqa0050() => CorpusAssert.Parses(@"ALTER SEQUENCE s.seq CYCLE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seqa0051() => CorpusAssert.Parses(@"ALTER SEQUENCE s.seq NO CYCLE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seqa0052() => CorpusAssert.Parses(@"ALTER SEQUENCE s.seq CACHE 5", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seqa0053() => CorpusAssert.Parses(@"ALTER SEQUENCE s.seq START WITH 200", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seqa0054() => CorpusAssert.Parses(@"ALTER SEQUENCE s.seq AS integer", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seqa0055() => CorpusAssert.Parses(@"ALTER SEQUENCE s.seq OWNED BY s.t.id", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seqa0056() => CorpusAssert.Parses(@"ALTER SEQUENCE s.seq OWNED BY NONE", "ok");
     [Fact]
     public void seqa0057() => CorpusAssert.Parses(@"CREATE SEQUENCE myseq57; ALTER SEQUENCE myseq57 RENAME TO myseq57_renamed", "ok");
     [Fact]
     public void seqa0058() => CorpusAssert.Parses(@"CREATE SEQUENCE myseq58; ALTER SEQUENCE myseq58 SET SCHEMA s", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seqa0059() => CorpusAssert.Parses(@"ALTER SEQUENCE s.seq OWNER TO CURRENT_USER", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seqa0060() => CorpusAssert.Parses(@"ALTER SEQUENCE s.seq OWNER TO CURRENT_ROLE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seqa0061() => CorpusAssert.Parses(@"ALTER SEQUENCE s.seq OWNER TO SESSION_USER", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seqa0062() => CorpusAssert.Parses(@"ALTER SEQUENCE s.seq SET LOGGED", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seqa0063() => CorpusAssert.Parses(@"ALTER SEQUENCE s.seq SET UNLOGGED", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seqa0064() => CorpusAssert.Parses(@"ALTER SEQUENCE IF EXISTS s.seq RESTART WITH 1", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seqa0065() => CorpusAssert.Parses(@"ALTER SEQUENCE IF EXISTS nonexistent_seq RESTART WITH 1", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seqa0066() => CorpusAssert.Parses(@"ALTER SEQUENCE s.seq INCREMENT BY 5 MINVALUE 5 MAXVALUE 10000 RESTART WITH 5 CACHE 2 CYCLE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seqa0067() => CorpusAssert.Parses(@"ALTER SEQUENCE s.seq NO MINVALUE NO MAXVALUE NO CYCLE CACHE 1", "ok");
     [Fact]
     public void seqa0068() => CorpusAssert.Parses(@"CREATE SEQUENCE myseq68 AS smallint; ALTER SEQUENCE myseq68 AS bigint", "ok");
@@ -181,11 +181,11 @@ public class Corpus_CreateSequence
     public void seqa0087() => CorpusAssert.Parses(@"ALTER SEQUENCE nonexistent_seq RESTART WITH 1", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void seqa0088() => CorpusAssert.Parses(@"ALTER SEQUENCE s.seq CACHE 0", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seqa0089() => CorpusAssert.Parses(@"ALTER SEQUENCE s.seq RENAME TO", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seqa0090() => CorpusAssert.Parses(@"ALTER SEQUENCE s.seq SET SCHEMA", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seqa0091() => CorpusAssert.Parses(@"ALTER SEQUENCE s.seq OWNER TO", "error");
     [Fact]
     public void seqa0092() => CorpusAssert.Parses(@"CREATE SEQUENCE myseq92 CYCLE MINVALUE 1 MAXVALUE 10 START WITH 1 INCREMENT BY 1", "ok");
@@ -240,9 +240,9 @@ public class Corpus_CreateSequence
     public void seqa0116() => CorpusAssert.Parses(@"SELECT setval('nonexistent_seq_xyz', 100)", "error");
     [Fact]
     public void seqa0117() => CorpusAssert.Parses(@"CREATE SEQUENCE myseq117 START WITH 100 MINVALUE 100 MAXVALUE 200 CYCLE; SELECT nextval('myseq117')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seqa0118() => CorpusAssert.Parses(@"ALTER SEQUENCE s.seq INCREMENT BY 2 RESTART WITH 100 CACHE 3 CYCLE OWNED BY NONE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seqa0119() => CorpusAssert.Parses(@"ALTER SEQUENCE s.seq AS smallint MINVALUE 1 MAXVALUE 32767 START WITH 1", "ok");
     [Fact]
     public void seqa0120() => CorpusAssert.Parses(@"CREATE SEQUENCE myseq120; ALTER SEQUENCE myseq120 SET SCHEMA s; SELECT nextval('s.myseq120')", "ok");
@@ -280,7 +280,7 @@ public class Corpus_CreateSequence
     public void seqa0136() => CorpusAssert.Parses(@"CREATE SEQUENCE myseq136 INCREMENT BY 1 START WITH 1; ALTER SEQUENCE myseq136 INCREMENT BY 5; SELECT nextval('myseq136')", "ok");
     [Fact]
     public void seqa0137() => CorpusAssert.Parses(@"CREATE SEQUENCE myseq137; ALTER SEQUENCE myseq137 RESTART; SELECT nextval('myseq137')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seqa0138() => CorpusAssert.Parses(@"ALTER SEQUENCE IF EXISTS s.seq AS bigint NO MINVALUE NO MAXVALUE NO CYCLE", "ok");
     [Fact]
     public void seqa0139() => CorpusAssert.Parses(@"CREATE SEQUENCE myseq139 START 1 CACHE 1 NO CYCLE OWNED BY NONE INCREMENT 1 MINVALUE 1 MAXVALUE 100", "ok");
@@ -296,11 +296,11 @@ public class Corpus_CreateSequence
     public void seqa0144() => CorpusAssert.Parses(@"CREATE SEQUENCE myseq144 OWNED BY", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void seqa0145() => CorpusAssert.Parses(@"CREATE SEQUENCE myseq145 START WITH INCREMENT BY 5", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seqa0146() => CorpusAssert.Parses(@"ALTER SEQUENCE", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void seqa0147() => CorpusAssert.Parses(@"ALTER SEQUENCE s.seq SET", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seqa0148() => CorpusAssert.Parses(@"ALTER SEQUENCE s.seq RENAME", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void seqa0149() => CorpusAssert.Parses(@"CREATE SEQUENCE myseq149 USING btree", "error");
@@ -316,7 +316,7 @@ public class Corpus_CreateSequence
     public void seqa0154() => CorpusAssert.Parses(@"CREATE SEQUENCE myseq154 AS integer INCREMENT BY -1 MINVALUE 1 MAXVALUE 2147483647 START WITH 2147483647", "ok");
     [Fact]
     public void seqa0155() => CorpusAssert.Parses(@"CREATE SEQUENCE myseq155 AS smallint INCREMENT BY -1 MINVALUE -32767 MAXVALUE -1 START WITH -1", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seqa0156() => CorpusAssert.Parses(@"ALTER SEQUENCE s.seq START WITH 500 RESTART", "ok");
     [Fact]
     public void seqa0157() => CorpusAssert.Parses(@"CREATE SEQUENCE myseq157; SELECT sequence_name FROM information_schema.sequences WHERE sequence_name = 'myseq157'", "ok");
@@ -328,7 +328,7 @@ public class Corpus_CreateSequence
     public void seqa0160() => CorpusAssert.Parses(@"CREATE SEQUENCE myseq160 START WITH 1 MAXVALUE 2 NO CYCLE; SELECT nextval('myseq160'); SELECT nextval('myseq160'); SELECT nextval('myseq160')", "error");
     [Fact]
     public void seqa0161() => CorpusAssert.Parses(@"CREATE SEQUENCE myseq161 START WITH 1 MAXVALUE 3 CYCLE; SELECT nextval('myseq161'); SELECT nextval('myseq161'); SELECT nextval('myseq161'); SELECT nextval('myseq161')", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void seqa0162() => CorpusAssert.Parses(@"ALTER SEQUENCE s.seq SET LOGGED; ALTER SEQUENCE s.seq SET UNLOGGED", "ok");
     [Fact]
     public void seqa0163() => CorpusAssert.Parses(@"CREATE SEQUENCE myseq163; ALTER SEQUENCE myseq163 OWNER TO SESSION_USER; ALTER SEQUENCE myseq163 RENAME TO myseq163_new; DROP SEQUENCE myseq163_new", "ok");

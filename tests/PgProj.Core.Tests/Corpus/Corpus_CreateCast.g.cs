@@ -287,13 +287,13 @@ DROP CAST (integer AS text)", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void csta0123() => CorpusAssert.Parses(@"CREATE CAST (text AS date) WITH INOUT;
 CREATE CAST (text AS date) WITH INOUT", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void csta0124() => CorpusAssert.Parses(@"DROP CAST (text AS date)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void csta0125() => CorpusAssert.Parses(@"DROP CAST (text AS integer)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void csta0126() => CorpusAssert.Parses(@"DROP CAST (bigint AS nonexistent_type)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void csta0127() => CorpusAssert.Parses(@"DROP CAST (nonexistent_type AS text)", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void csta0128() => CorpusAssert.Parses(@"CREATE CAST bigint AS integer WITH INOUT", "error");
@@ -325,11 +325,11 @@ CREATE CAST (text AS date) WITH INOUT", "error");
     public void csta0141() => CorpusAssert.Parses(@"CREATE CAST (integer AS text) FUNCTION myfn(integer)", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void csta0142() => CorpusAssert.Parses(@"CREATE CAST (integer text) WITH INOUT", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void csta0143() => CorpusAssert.Parses(@"DROP CAST (integer AS text) CASCADES", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void csta0144() => CorpusAssert.Parses(@"DROP CAST IF (integer AS text)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void csta0145() => CorpusAssert.Parses(@"DROP CAST integer AS text", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void csta0146() => CorpusAssert.Parses(@"CREATE CAST (integer AS text) WITH FUNCTION nonexistent_fn(integer)", "error");

@@ -87,7 +87,7 @@ CREATE EVENT TRIGGER EVTA_TRG26 ON DDL_COMMAND_START EXECUTE FUNCTION evta_fn26(
     public void evta0027() => CorpusAssert.Parses(@"CREATE FUNCTION evta_fn27() RETURNS event_trigger LANGUAGE plpgsql AS $$ BEGIN END $$;
 CREATE EVENT TRIGGER evta_trg27 ON ddl_command_start WHEN TAG IN ('CREATE TABLE') EXECUTE FUNCTION evta_fn27();
 DROP EVENT TRIGGER evta_trg27;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void evta0028() => CorpusAssert.Parses(@"DROP EVENT TRIGGER IF EXISTS evta_nonexistent;", "ok");
     [Fact]
     public void evta0029() => CorpusAssert.Parses(@"CREATE FUNCTION evta_fn29() RETURNS event_trigger LANGUAGE plpgsql AS $$ BEGIN END $$;
@@ -228,7 +228,7 @@ CREATE EVENT TRIGGER evta_trg68 ON ddl_command_start WHEN TAG IN ('CREATE TABLE'
     [Fact(Skip = "pending: parser not yet complete")]
     public void evta0069() => CorpusAssert.Parses(@"CREATE FUNCTION evta_fn69() RETURNS event_trigger LANGUAGE plpgsql AS $$ BEGIN END $$;
 CREATE EVENT TRIGGER evta_trg69 ON ddl_command_start WHEN TAG IN (CREATE TABLE) EXECUTE FUNCTION evta_fn69();", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void evta0070() => CorpusAssert.Parses(@"ALTER EVENT TRIGGER DISABLE;", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void evta0071() => CorpusAssert.Parses(@"CREATE FUNCTION evta_fn71() RETURNS event_trigger LANGUAGE plpgsql AS $$ BEGIN END $$;
@@ -242,7 +242,7 @@ ALTER EVENT TRIGGER evta_trg72 RENAME;", "error");
     public void evta0073() => CorpusAssert.Parses(@"CREATE FUNCTION evta_fn73() RETURNS event_trigger LANGUAGE plpgsql AS $$ BEGIN END $$;
 CREATE EVENT TRIGGER evta_trg73 ON ddl_command_start EXECUTE FUNCTION evta_fn73();
 ALTER EVENT TRIGGER evta_trg73 OWNER;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void evta0074() => CorpusAssert.Parses(@"DROP EVENT TRIGGER;", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void evta0075() => CorpusAssert.Parses(@"CREATE FUNCTION evta_fn75() RETURNS event_trigger LANGUAGE plpgsql AS $$ BEGIN END $$;

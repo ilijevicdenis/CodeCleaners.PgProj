@@ -257,7 +257,7 @@ CALL s.p85(1)", "error");
     [Fact]
     public void proca0123() => CorpusAssert.Parses(@"CREATE PROCEDURE s.p116() LANGUAGE plpgsql AS $$ BEGIN END $$;
 DROP PROCEDURE s.p116()", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void proca0124() => CorpusAssert.Parses(@"DROP PROCEDURE IF EXISTS s.p999()", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void proca0125() => CorpusAssert.Parses(@"DROP PROCEDURE s.p999()", "error");

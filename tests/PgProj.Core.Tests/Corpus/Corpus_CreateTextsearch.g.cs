@@ -90,11 +90,11 @@ DROP TEXT SEARCH CONFIGURATION s.dropcfg2 RESTRICT", "ok");
     [Fact]
     public void tsa0030() => CorpusAssert.Parses(@"CREATE TEXT SEARCH CONFIGURATION s.dropcfg3 (PARSER = pg_catalog.default);
 DROP TEXT SEARCH CONFIGURATION s.dropcfg3 CASCADE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tsa0031() => CorpusAssert.Parses(@"DROP TEXT SEARCH CONFIGURATION IF EXISTS s.nonexistent_cfg", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void tsa0032() => CorpusAssert.Parses(@"DROP TEXT SEARCH CONFIGURATION s.nonexistent_cfg2", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tsa0033() => CorpusAssert.Parses(@"DROP TEXT SEARCH CONFIGURATION IF EXISTS s.nonexistent_cfg3 CASCADE", "ok");
     [Fact]
     public void tsa0034() => CorpusAssert.Parses(@"CREATE TEXT SEARCH DICTIONARY s.mydict (TEMPLATE = pg_catalog.simple)", "ok");
@@ -129,7 +129,7 @@ ALTER TEXT SEARCH DICTIONARY s.dictschema SET SCHEMA public", "ok");
     [Fact]
     public void tsa0047() => CorpusAssert.Parses(@"CREATE TEXT SEARCH DICTIONARY s.dictparams (TEMPLATE = pg_catalog.simple);
 ALTER TEXT SEARCH DICTIONARY s.dictparams (STOPWORDS = english)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tsa0048() => CorpusAssert.Parses(@"DROP TEXT SEARCH DICTIONARY s.dropdict (TEMPLATE = pg_catalog.simple)", "error");
     [Fact]
     public void tsa0049() => CorpusAssert.Parses(@"CREATE TEXT SEARCH DICTIONARY s.dropd1 (TEMPLATE = pg_catalog.simple);
@@ -140,11 +140,11 @@ DROP TEXT SEARCH DICTIONARY s.dropd2 CASCADE", "ok");
     [Fact]
     public void tsa0051() => CorpusAssert.Parses(@"CREATE TEXT SEARCH DICTIONARY s.dropd3 (TEMPLATE = pg_catalog.simple);
 DROP TEXT SEARCH DICTIONARY s.dropd3 RESTRICT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tsa0052() => CorpusAssert.Parses(@"DROP TEXT SEARCH DICTIONARY IF EXISTS s.nosuchdict", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void tsa0053() => CorpusAssert.Parses(@"DROP TEXT SEARCH DICTIONARY s.nosuchdict2", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tsa0054() => CorpusAssert.Parses(@"DROP TEXT SEARCH DICTIONARY IF EXISTS s.nosuchdict3 CASCADE", "ok");
     [Fact]
     public void tsa0055() => CorpusAssert.Parses(@"CREATE TEXT SEARCH PARSER s.myparser (START = prsd_start, GETTOKEN = prsd_nexttoken, END = prsd_end, LEXTYPES = prsd_lextype, HEADLINE = prsd_headline)", "ok");
@@ -184,11 +184,11 @@ DROP TEXT SEARCH PARSER s.dropparser2 CASCADE", "ok");
     [Fact]
     public void tsa0070() => CorpusAssert.Parses(@"CREATE TEXT SEARCH PARSER s.dropparser3 (START = prsd_start, GETTOKEN = prsd_nexttoken, END = prsd_end, LEXTYPES = prsd_lextype);
 DROP TEXT SEARCH PARSER s.dropparser3 RESTRICT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tsa0071() => CorpusAssert.Parses(@"DROP TEXT SEARCH PARSER IF EXISTS s.nosuchparser", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void tsa0072() => CorpusAssert.Parses(@"DROP TEXT SEARCH PARSER s.nosuchparser2", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tsa0073() => CorpusAssert.Parses(@"DROP TEXT SEARCH PARSER IF EXISTS s.nosuchparser3 CASCADE", "ok");
     [Fact]
     public void tsa0074() => CorpusAssert.Parses(@"CREATE TEXT SEARCH TEMPLATE s.mytempl (LEXIZE = dsimple_lexize)", "ok");
@@ -224,11 +224,11 @@ DROP TEXT SEARCH TEMPLATE s.droptempl2 CASCADE", "ok");
     [Fact]
     public void tsa0087() => CorpusAssert.Parses(@"CREATE TEXT SEARCH TEMPLATE s.droptempl3 (LEXIZE = dsimple_lexize);
 DROP TEXT SEARCH TEMPLATE s.droptempl3 RESTRICT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tsa0088() => CorpusAssert.Parses(@"DROP TEXT SEARCH TEMPLATE IF EXISTS s.nosuchtempl", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void tsa0089() => CorpusAssert.Parses(@"DROP TEXT SEARCH TEMPLATE s.nosuchtempl2", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tsa0090() => CorpusAssert.Parses(@"DROP TEXT SEARCH TEMPLATE IF EXISTS s.nosuchtempl3 CASCADE", "ok");
     [Fact]
     public void tsa0091() => CorpusAssert.Parses(@"CREATE TEXT SEARCH CONFIGURATION s.fullcfg (PARSER = pg_catalog.default);
@@ -440,7 +440,7 @@ ALTER TEXT SEARCH CONFIGURATION s.cfg_owner_session OWNER TO SESSION_USER", "ok"
     [Fact]
     public void tsa0167() => CorpusAssert.Parses(@"CREATE TEXT SEARCH DICTIONARY s.dict_owner_crole (TEMPLATE = pg_catalog.simple);
 ALTER TEXT SEARCH DICTIONARY s.dict_owner_crole OWNER TO CURRENT_ROLE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tsa0168() => CorpusAssert.Parses(@"DROP TEXT SEARCH CONFIGURATION IF EXISTS s.nosuchcfg CASCADE", "ok");
     [Fact]
     public void tsa0169() => CorpusAssert.Parses(@"CREATE TEXT SEARCH CONFIGURATION s.cfg_delim (PARSER = pg_catalog.default);
@@ -476,7 +476,7 @@ DROP TEXT SEARCH CONFIGURATION myconf", "ok");
     [Fact]
     public void tsb0011() => CorpusAssert.Parses(@"CREATE TEXT SEARCH CONFIGURATION myconf (PARSER = pg_catalog.default);
 DROP TEXT SEARCH CONFIGURATION IF EXISTS myconf", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tsb0012() => CorpusAssert.Parses(@"DROP TEXT SEARCH CONFIGURATION IF EXISTS no_such_config_xyz", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void tsb0013() => CorpusAssert.Parses(@"DROP TEXT SEARCH CONFIGURATION no_such_config_xyz", "error");
@@ -542,7 +542,7 @@ ALTER TEXT SEARCH CONFIGURATION myconf SET SCHEMA s", "ok");
     [Fact]
     public void tsb0037() => CorpusAssert.Parses(@"CREATE TEXT SEARCH DICTIONARY mydict (TEMPLATE = pg_catalog.simple);
 DROP TEXT SEARCH DICTIONARY mydict", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tsb0038() => CorpusAssert.Parses(@"DROP TEXT SEARCH DICTIONARY IF EXISTS no_such_dict_xyz", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void tsb0039() => CorpusAssert.Parses(@"DROP TEXT SEARCH DICTIONARY no_such_dict_xyz", "error");
@@ -569,7 +569,7 @@ DROP TEXT SEARCH DICTIONARY mydict RESTRICT", "ok");
     [Fact]
     public void tsb0049() => CorpusAssert.Parses(@"CREATE TEXT SEARCH PARSER myparser (START = prsd_start, GETTOKEN = prsd_nexttoken, END = prsd_end, LEXTYPES = prsd_lextype);
 DROP TEXT SEARCH PARSER myparser", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tsb0050() => CorpusAssert.Parses(@"DROP TEXT SEARCH PARSER IF EXISTS no_such_parser_xyz", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void tsb0051() => CorpusAssert.Parses(@"DROP TEXT SEARCH PARSER no_such_parser_xyz", "error");
@@ -586,7 +586,7 @@ DROP TEXT SEARCH PARSER myparser", "ok");
     [Fact]
     public void tsb0057() => CorpusAssert.Parses(@"CREATE TEXT SEARCH TEMPLATE mytempl (LEXIZE = dsimple_lexize);
 DROP TEXT SEARCH TEMPLATE mytempl", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void tsb0058() => CorpusAssert.Parses(@"DROP TEXT SEARCH TEMPLATE IF EXISTS no_such_template_xyz", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void tsb0059() => CorpusAssert.Parses(@"DROP TEXT SEARCH TEMPLATE no_such_template_xyz", "error");

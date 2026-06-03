@@ -304,7 +304,7 @@ ALTER FOREIGN TABLE ft35 ALTER COLUMN name OPTIONS (DROP col_opt)", "ok");
 CREATE SERVER ft_srv36 FOREIGN DATA WRAPPER dummy;
 CREATE FOREIGN TABLE ft36 (id integer, name text) SERVER ft_srv36;
 ALTER FOREIGN TABLE IF EXISTS ft36 ADD COLUMN extra text", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void fdwa0080() => CorpusAssert.Parses(@"ALTER FOREIGN TABLE IF EXISTS ft_nonexistent ADD COLUMN extra text", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void fdwa0081() => CorpusAssert.Parses(@"ALTER FOREIGN TABLE ft_nonexistent2 ADD COLUMN extra text", "error");
@@ -423,7 +423,7 @@ DROP SERVER drop_srv", "ok");
     public void fdwa0107() => CorpusAssert.Parses(@"CREATE FOREIGN DATA WRAPPER dummy;
 CREATE SERVER drop_srv2 FOREIGN DATA WRAPPER dummy;
 DROP SERVER IF EXISTS drop_srv2", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void fdwa0108() => CorpusAssert.Parses(@"DROP SERVER IF EXISTS nonexistent_server", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void fdwa0109() => CorpusAssert.Parses(@"DROP SERVER nonexistent_server", "error");
@@ -447,7 +447,7 @@ DROP FOREIGN DATA WRAPPER drop_fdw2", "ok");
     [Fact]
     public void fdwa0115() => CorpusAssert.Parses(@"CREATE FOREIGN DATA WRAPPER drop_fdw3;
 DROP FOREIGN DATA WRAPPER IF EXISTS drop_fdw3", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void fdwa0116() => CorpusAssert.Parses(@"DROP FOREIGN DATA WRAPPER IF EXISTS nonexistent_fdw", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void fdwa0117() => CorpusAssert.Parses(@"DROP FOREIGN DATA WRAPPER nonexistent_fdw2", "error");
@@ -469,7 +469,7 @@ CREATE USER MAPPING FOR PUBLIC SERVER drop_um_srv2;
 DROP USER MAPPING IF EXISTS FOR PUBLIC SERVER drop_um_srv2", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void fdwa0122() => CorpusAssert.Parses(@"DROP USER MAPPING IF EXISTS FOR CURRENT_USER SERVER nonexistent_srv", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void fdwa0123() => CorpusAssert.Parses(@"DROP USER MAPPING FOR CURRENT_USER SERVER nonexistent_srv2", "error");
     [Fact]
     public void fdwa0124() => CorpusAssert.Parses(@"CREATE FOREIGN DATA WRAPPER dummy;
@@ -486,7 +486,7 @@ DROP FOREIGN TABLE ft_to_drop", "ok");
 CREATE SERVER ft_drop_srv2 FOREIGN DATA WRAPPER dummy;
 CREATE FOREIGN TABLE ft_to_drop2 (id integer) SERVER ft_drop_srv2;
 DROP FOREIGN TABLE IF EXISTS ft_to_drop2", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void fdwa0127() => CorpusAssert.Parses(@"DROP FOREIGN TABLE IF EXISTS ft_nonexistent_drop", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void fdwa0128() => CorpusAssert.Parses(@"DROP FOREIGN TABLE ft_nonexistent_drop2", "error");
@@ -686,11 +686,11 @@ DROP FOREIGN DATA WRAPPER dummy CASCADE", "ok");
     [Fact]
     public void fdwb0014() => CorpusAssert.Parses(@"CREATE FOREIGN DATA WRAPPER dummy;
 DROP FOREIGN DATA WRAPPER dummy RESTRICT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void fdwb0015() => CorpusAssert.Parses(@"DROP FOREIGN DATA WRAPPER IF EXISTS nonexistent_fdw_xyz", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void fdwb0016() => CorpusAssert.Parses(@"DROP FOREIGN DATA WRAPPER nonexistent_fdw_xyz", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void fdwb0017() => CorpusAssert.Parses(@"DROP FOREIGN DATA WRAPPER", "error");
     [Fact]
     public void fdwb0018() => CorpusAssert.Parses(@"CREATE FOREIGN DATA WRAPPER dummy;
@@ -712,7 +712,7 @@ ALTER FOREIGN DATA WRAPPER dummy NO HANDLER", "ok");
 ALTER FOREIGN DATA WRAPPER dummy NO VALIDATOR", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void fdwb0024() => CorpusAssert.Parses(@"ALTER FOREIGN DATA WRAPPER nonexistent_xyz OPTIONS (ADD x 'y')", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void fdwb0025() => CorpusAssert.Parses(@"ALTER FOREIGN DATA WRAPPER", "error");
     [Fact]
     public void fdwb0026() => CorpusAssert.Parses(@"CREATE FOREIGN DATA WRAPPER dummy;
@@ -763,11 +763,11 @@ DROP SERVER myserver CASCADE", "ok");
     public void fdwb0041() => CorpusAssert.Parses(@"CREATE FOREIGN DATA WRAPPER dummy;
 CREATE SERVER myserver FOREIGN DATA WRAPPER dummy;
 DROP SERVER myserver RESTRICT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void fdwb0042() => CorpusAssert.Parses(@"DROP SERVER IF EXISTS nonexistent_server_xyz", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void fdwb0043() => CorpusAssert.Parses(@"DROP SERVER nonexistent_server_xyz", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void fdwb0044() => CorpusAssert.Parses(@"DROP SERVER", "error");
     [Fact]
     public void fdwb0045() => CorpusAssert.Parses(@"CREATE FOREIGN DATA WRAPPER dummy;
@@ -799,7 +799,7 @@ CREATE SERVER myserver FOREIGN DATA WRAPPER dummy;
 ALTER SERVER myserver RENAME TO myserver2", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void fdwb0052() => CorpusAssert.Parses(@"ALTER SERVER nonexistent_server_xyz OPTIONS (ADD x 'y')", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void fdwb0053() => CorpusAssert.Parses(@"ALTER SERVER", "error");
     [Fact]
     public void fdwb0054() => CorpusAssert.Parses(@"CREATE FOREIGN DATA WRAPPER dummy;
@@ -844,9 +844,9 @@ CREATE USER MAPPING FOR PUBLIC SERVER myserver;
 DROP USER MAPPING FOR PUBLIC SERVER myserver", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void fdwb0065() => CorpusAssert.Parses(@"DROP USER MAPPING IF EXISTS FOR CURRENT_USER SERVER nonexistent_server_xyz", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void fdwb0066() => CorpusAssert.Parses(@"DROP USER MAPPING FOR CURRENT_USER SERVER nonexistent_server_xyz", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void fdwb0067() => CorpusAssert.Parses(@"DROP USER MAPPING FOR SERVER myserver", "error");
     [Fact]
     public void fdwb0068() => CorpusAssert.Parses(@"CREATE FOREIGN DATA WRAPPER dummy;
@@ -929,11 +929,11 @@ DROP FOREIGN TABLE ft1 CASCADE", "ok");
 CREATE SERVER myserver FOREIGN DATA WRAPPER dummy;
 CREATE FOREIGN TABLE ft1 (id integer) SERVER myserver;
 DROP FOREIGN TABLE ft1 RESTRICT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void fdwb0089() => CorpusAssert.Parses(@"DROP FOREIGN TABLE IF EXISTS nonexistent_ft_xyz", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void fdwb0090() => CorpusAssert.Parses(@"DROP FOREIGN TABLE nonexistent_ft_xyz", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void fdwb0091() => CorpusAssert.Parses(@"DROP FOREIGN TABLE", "error");
     [Fact]
     public void fdwb0092() => CorpusAssert.Parses(@"CREATE FOREIGN DATA WRAPPER dummy;
@@ -1003,7 +1003,7 @@ CREATE FOREIGN TABLE ft1 (id integer) SERVER myserver;
 ALTER FOREIGN TABLE ft1 SET SCHEMA s", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void fdwb0105() => CorpusAssert.Parses(@"ALTER FOREIGN TABLE nonexistent_ft_xyz ADD COLUMN x text", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void fdwb0106() => CorpusAssert.Parses(@"ALTER FOREIGN TABLE", "error");
     [Fact]
     public void fdwb0107() => CorpusAssert.Parses(@"CREATE FOREIGN DATA WRAPPER dummy;
@@ -1045,6 +1045,6 @@ ALTER FOREIGN TABLE ft1 DROP COLUMN name CASCADE", "ok");
 CREATE SERVER myserver FOREIGN DATA WRAPPER dummy;
 CREATE FOREIGN TABLE ft1 (id integer) SERVER myserver;
 ALTER FOREIGN TABLE IF EXISTS ft1 ADD COLUMN extra text", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void fdwb0115() => CorpusAssert.Parses(@"ALTER FOREIGN TABLE IF EXISTS nonexistent_ft_xyz ADD COLUMN x text", "ok");
 }

@@ -27,7 +27,7 @@ public class Corpus_CreateLanguage
     public void lnga0010() => CorpusAssert.Parses(@"DROP LANGUAGE plpgsql", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void lnga0011() => CorpusAssert.Parses(@"DROP LANGUAGE IF EXISTS plpgsql", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lnga0012() => CorpusAssert.Parses(@"DROP LANGUAGE IF EXISTS no_such_language_xyz", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void lnga0013() => CorpusAssert.Parses(@"DROP LANGUAGE no_such_language_xyz", "error");
@@ -41,13 +41,13 @@ public class Corpus_CreateLanguage
     public void lnga0017() => CorpusAssert.Parses(@"ALTER LANGUAGE plpgsql RENAME TO plpgsql", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void lnga0018() => CorpusAssert.Parses(@"ALTER PROCEDURAL LANGUAGE plpgsql RENAME TO plpgsql", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lnga0019() => CorpusAssert.Parses(@"ALTER LANGUAGE plpgsql OWNER TO CURRENT_USER", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lnga0020() => CorpusAssert.Parses(@"ALTER LANGUAGE plpgsql OWNER TO CURRENT_ROLE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lnga0021() => CorpusAssert.Parses(@"ALTER LANGUAGE plpgsql OWNER TO SESSION_USER", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lnga0022() => CorpusAssert.Parses(@"ALTER PROCEDURAL LANGUAGE plpgsql OWNER TO CURRENT_USER", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void lnga0023() => CorpusAssert.Parses(@"ALTER LANGUAGE no_such_language_xyz RENAME TO foo", "error");
@@ -63,17 +63,17 @@ public class Corpus_CreateLanguage
     public void lnga0028() => CorpusAssert.Parses(@"CREATE LANGUAGE plpgsql HANDLER", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void lnga0029() => CorpusAssert.Parses(@"CREATE LANGUAGE HANDLER plpgsql_call_handler", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lnga0030() => CorpusAssert.Parses(@"DROP LANGUAGE", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lnga0031() => CorpusAssert.Parses(@"DROP LANGUAGE IF EXISTS", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void lnga0032() => CorpusAssert.Parses(@"ALTER LANGUAGE RENAME TO newname", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lnga0033() => CorpusAssert.Parses(@"ALTER LANGUAGE plpgsql RENAME", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void lnga0034() => CorpusAssert.Parses(@"ALTER LANGUAGE plpgsql OWNER", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lnga0035() => CorpusAssert.Parses(@"ALTER LANGUAGE plpgsql OWNER TO", "error");
     [Fact]
     public void lnga0036() => CorpusAssert.Parses(@"CREATE LANGUAGE my_lang_test HANDLER plpgsql_call_handler", "ok");
@@ -103,7 +103,7 @@ public class Corpus_CreateLanguage
     public void lnga0048() => CorpusAssert.Parses(@"CREATE OR REPLACE LANGUAGE ""plpgsql""", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void lnga0049() => CorpusAssert.Parses(@"DROP LANGUAGE IF EXISTS ""plpgsql""", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lnga0050() => CorpusAssert.Parses(@"ALTER LANGUAGE ""plpgsql"" OWNER TO CURRENT_USER", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void lnga0051() => CorpusAssert.Parses(@"ALTER LANGUAGE ""plpgsql"" RENAME TO ""plpgsql""", "error");
@@ -117,13 +117,13 @@ OR
 REPLACE
 LANGUAGE
 plpgsql", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lnga0055() => CorpusAssert.Parses(@"DROP LANGUAGE IF EXISTS no_such_language_xyz CASCADE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lnga0056() => CorpusAssert.Parses(@"DROP LANGUAGE IF EXISTS no_such_language_xyz RESTRICT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lnga0057() => CorpusAssert.Parses(@"DROP PROCEDURAL LANGUAGE plpgsql CASCADE", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lnga0058() => CorpusAssert.Parses(@"DROP PROCEDURAL LANGUAGE plpgsql RESTRICT", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void lnga0059() => CorpusAssert.Parses(@"DROP LANGUAGE plpgsql CASCADE", "error");
@@ -133,10 +133,10 @@ DROP LANGUAGE my_drop_test", "ok");
     [Fact]
     public void lnga0061() => CorpusAssert.Parses(@"CREATE LANGUAGE my_drop_cascade HANDLER plpgsql_call_handler;
 DROP LANGUAGE my_drop_cascade CASCADE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lnga0062() => CorpusAssert.Parses(@"ALTER LANGUAGE plpgsql RENAME TO mypgsql;
 ALTER LANGUAGE mypgsql RENAME TO plpgsql", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lnga0063() => CorpusAssert.Parses(@"ALTER PROCEDURAL LANGUAGE plpgsql RENAME TO mypgsql;
 ALTER PROCEDURAL LANGUAGE mypgsql RENAME TO plpgsql", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
@@ -167,19 +167,19 @@ ALTER PROCEDURAL LANGUAGE mypgsql RENAME TO plpgsql", "ok");
     public void lnga0076() => CorpusAssert.Parses(@"CREATE OR OR REPLACE LANGUAGE plpgsql", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void lnga0077() => CorpusAssert.Parses(@"CREATE OR REPLACE OR REPLACE LANGUAGE plpgsql", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lnga0078() => CorpusAssert.Parses(@"DROP LANGUAGE plpgsql CASCADE RESTRICT", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lnga0079() => CorpusAssert.Parses(@"DROP LANGUAGE IF plpgsql", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lnga0080() => CorpusAssert.Parses(@"DROP IF EXISTS LANGUAGE plpgsql", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void lnga0081() => CorpusAssert.Parses(@"ALTER LANGUAGE plpgsql TO newname", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void lnga0082() => CorpusAssert.Parses(@"ALTER LANGUAGE plpgsql SET OWNER TO CURRENT_USER", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lnga0083() => CorpusAssert.Parses(@"ALTER LANGUAGE plpgsql RENAME TO", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lnga0084() => CorpusAssert.Parses(@"ALTER LANGUAGE plpgsql RENAME TO 'newname'", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void lnga0085() => CorpusAssert.Parses(@"CREATE REPLACE LANGUAGE plpgsql", "error");
@@ -187,10 +187,10 @@ ALTER PROCEDURAL LANGUAGE mypgsql RENAME TO plpgsql", "ok");
     public void lnga0086() => CorpusAssert.Parses(@"CREATE LANGUAGE my_roundtrip HANDLER plpgsql_call_handler;
 DROP LANGUAGE my_roundtrip CASCADE;
 CREATE LANGUAGE my_roundtrip2 HANDLER plpgsql_call_handler", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lnga0087() => CorpusAssert.Parses(@"DROP LANGUAGE IF EXISTS no_such_language_xyz;
 DROP LANGUAGE IF EXISTS no_such_language_xyz", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void lnga0088() => CorpusAssert.Parses(@"ALTER LANGUAGE plpgsql OWNER TO CURRENT_USER;
 ALTER LANGUAGE plpgsql OWNER TO SESSION_USER", "ok");
     [Fact]

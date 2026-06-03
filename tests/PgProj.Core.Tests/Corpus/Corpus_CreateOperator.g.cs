@@ -159,7 +159,7 @@ DROP OPERATOR ##?? (integer, integer) CASCADE", "ok");
     [Fact]
     public void opra0074() => CorpusAssert.Parses(@"CREATE OPERATOR ##?? (FUNCTION = int4pl, LEFTARG = integer, RIGHTARG = integer);
 DROP OPERATOR ##?? (integer, integer) RESTRICT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void opra0075() => CorpusAssert.Parses(@"DROP OPERATOR ##!? (integer, integer)", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void opra0076() => CorpusAssert.Parses(@"DROP OPERATOR IF EXISTS ##?? (integer, integer), ##?? (NONE, integer)", "ok");
@@ -167,13 +167,13 @@ DROP OPERATOR ##?? (integer, integer) RESTRICT", "ok");
     public void opra0077() => CorpusAssert.Parses(@"CREATE OPERATOR ##?? (FUNCTION = int4pl, LEFTARG = integer, RIGHTARG = integer);
 CREATE OPERATOR ##?? (FUNCTION = int8pl, LEFTARG = bigint, RIGHTARG = bigint);
 DROP OPERATOR ##?? (integer, integer), ##?? (bigint, bigint)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void opra0078() => CorpusAssert.Parses(@"DROP OPERATOR ## (integer, integer)", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void opra0079() => CorpusAssert.Parses(@"DROP OPERATOR integer (integer, integer)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void opra0080() => CorpusAssert.Parses(@"DROP OPERATOR ##?? (integer)", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void opra0081() => CorpusAssert.Parses(@"DROP OPERATOR ##?? (NONE, NONE)", "error");
     [Fact]
     public void opra0082() => CorpusAssert.Parses(@"CREATE OPERATOR ##?? (FUNCTION = int4eq, LEFTARG = integer, RIGHTARG = integer);
@@ -211,12 +211,12 @@ ALTER OPERATOR ##?? (integer, integer) SET (HASHES, MERGES)", "ok");
     [Fact]
     public void opra0093() => CorpusAssert.Parses(@"CREATE OPERATOR ##?? (FUNCTION = int4eq, LEFTARG = integer, RIGHTARG = integer);
 ALTER OPERATOR ##?? (integer, integer) SET (RESTRICT = eqsel, JOIN = eqjoinsel, HASHES, MERGES)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void opra0094() => CorpusAssert.Parses(@"ALTER OPERATOR ##!? (integer, integer) SET (RESTRICT = eqsel)", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void opra0095() => CorpusAssert.Parses(@"CREATE OPERATOR ##?? (FUNCTION = int4pl, LEFTARG = integer, RIGHTARG = integer);
 ALTER OPERATOR ##?? (integer, integer) SET ()", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void opra0096() => CorpusAssert.Parses(@"ALTER OPERATOR ##?? (integer) SET (RESTRICT = eqsel)", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void opra0097() => CorpusAssert.Parses(@"CREATE OPERATOR ##?? (FUNCTION = int4eq, LEFTARG = integer, RIGHTARG = integer);
@@ -321,7 +321,7 @@ ALTER OPERATOR ##?? (integer, integer) SET SCHEMA s", "ok");
     [Fact]
     public void opra0132() => CorpusAssert.Parses(@"CREATE OPERATOR ##?? (FUNCTION = int4um, RIGHTARG = integer);
 ALTER OPERATOR ##?? (NONE, integer) OWNER TO SESSION_USER", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void opra0133() => CorpusAssert.Parses(@"ALTER OPERATOR ##!? (NONE, integer) SET (COMMUTATOR = ##!?)", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void opra0134() => CorpusAssert.Parses(@"CREATE OPERATOR ##?? (FUNCTION = int4pl, LEFTARG = integer, RIGHTARG = integer);
@@ -338,7 +338,7 @@ DROP OPERATOR ##~= (integer, integer)", "ok");
     public void opra0137() => CorpusAssert.Parses(@"CREATE SCHEMA op_schema;
 CREATE OPERATOR op_schema.##~= (FUNCTION = int4pl, LEFTARG = integer, RIGHTARG = integer);
 DROP OPERATOR op_schema.##~= (integer, integer)", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void opra0138() => CorpusAssert.Parses(@"DROP OPERATOR (integer, integer)", "error");
     [Fact]
     public void opra0139() => CorpusAssert.Parses(@"CREATE OPERATOR ##~= (FUNCTION = int4eq, LEFTARG = integer, RIGHTARG = integer, RESTRICT = eqsel, JOIN = eqjoinsel);

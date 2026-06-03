@@ -77,13 +77,13 @@ public class Corpus_CreateSchema
     public void scma0035() => CorpusAssert.Parses(@"ALTER SCHEMA s RENAME TO pg_bad", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void scma0036() => CorpusAssert.Parses(@"ALTER SCHEMA nonexistent_scma RENAME TO something", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void scma0037() => CorpusAssert.Parses(@"ALTER SCHEMA s RENAME", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void scma0038() => CorpusAssert.Parses(@"ALTER SCHEMA s OWNER", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void scma0039() => CorpusAssert.Parses(@"ALTER SCHEMA s OWNER TO", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void scma0040() => CorpusAssert.Parses(@"ALTER SCHEMA", "error");
     [Fact]
     public void scma0041() => CorpusAssert.Parses(@"CREATE SCHEMA scma_drop1; DROP SCHEMA scma_drop1", "ok");
@@ -95,21 +95,21 @@ public class Corpus_CreateSchema
     public void scma0044() => CorpusAssert.Parses(@"CREATE SCHEMA scma_drop4; CREATE TABLE scma_drop4.orphan (id int); DROP SCHEMA scma_drop4 CASCADE", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void scma0045() => CorpusAssert.Parses(@"CREATE SCHEMA scma_drop5; CREATE TABLE scma_drop5.orphan (id int); DROP SCHEMA scma_drop5 RESTRICT", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void scma0046() => CorpusAssert.Parses(@"DROP SCHEMA IF EXISTS scma_nonexist", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void scma0047() => CorpusAssert.Parses(@"DROP SCHEMA IF EXISTS s CASCADE", "ok");
     [Fact]
     public void scma0048() => CorpusAssert.Parses(@"CREATE SCHEMA scma_m1; CREATE SCHEMA scma_m2; DROP SCHEMA scma_m1, scma_m2", "ok");
     [Fact]
     public void scma0049() => CorpusAssert.Parses(@"CREATE SCHEMA scma_m3; CREATE SCHEMA scma_m4; DROP SCHEMA scma_m3, scma_m4 CASCADE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void scma0050() => CorpusAssert.Parses(@"DROP SCHEMA IF EXISTS scma_nx1, scma_nx2 CASCADE", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void scma0051() => CorpusAssert.Parses(@"DROP SCHEMA", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void scma0052() => CorpusAssert.Parses(@"DROP SCHEMA scma_nodrop", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void scma0053() => CorpusAssert.Parses(@"DROP SCHEMA s CASCADE RESTRICT", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void scma0054() => CorpusAssert.Parses(@"CREATE SCHEMA pg_bad_name", "error");
@@ -147,7 +147,7 @@ public class Corpus_CreateSchema
     public void scma0070() => CorpusAssert.Parses(@"ALTER SCHEMA s RENAME TO s", "error");
     [Fact]
     public void scma0071() => CorpusAssert.Parses(@"CREATE SCHEMA scma_ren1; ALTER SCHEMA scma_ren1 RENAME TO scma_ren2; ALTER SCHEMA scma_ren2 RENAME TO scma_ren3", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void scma0072() => CorpusAssert.Parses(@"ALTER SCHEMA s RENAME TO 123bad", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void scma0073() => CorpusAssert.Parses(@"ALTER SCHEMA s SET SCHEMA public", "error");
@@ -159,7 +159,7 @@ public class Corpus_CreateSchema
     public void scma0076() => CorpusAssert.Parses(@"DROP SCHEMA IF EXISTS s RESTRICT", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void scma0077() => CorpusAssert.Parses(@"DROP SCHEMA CASCADE", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void scma0078() => CorpusAssert.Parses(@"DROP SCHEMA IF EXISTS CASCADE", "ok");
     [Fact]
     public void scma0079() => CorpusAssert.Parses(@"CREATE SCHEMA scma_inline_seq CREATE SEQUENCE scma_inline_seq.myseq START 10 INCREMENT 5 MINVALUE 1 MAXVALUE 1000", "ok");
@@ -183,7 +183,7 @@ public class Corpus_CreateSchema
     public void scma0088() => CorpusAssert.Parses(@"CREATE SCHEMA scma_mixed_kw AUTHORIZATION current_user", "ok");
     [Fact]
     public void scma0089() => CorpusAssert.Parses(@"CREATE SCHEMA scma_public_obj CREATE TABLE scma_public_obj.pub_t (id int) GRANT SELECT ON TABLE scma_public_obj.pub_t TO PUBLIC", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void scma0090() => CorpusAssert.Parses(@"ALTER SCHEMA s RENAME TO scma_s_renamed; ALTER SCHEMA scma_s_renamed RENAME TO s", "ok");
     [Fact]
     public void scma0091() => CorpusAssert.Parses(@"CREATE SCHEMA IF NOT EXISTS scma_ifne_auth AUTHORIZATION CURRENT_ROLE", "ok");
@@ -201,7 +201,7 @@ public class Corpus_CreateSchema
     public void scma0097() => CorpusAssert.Parses(@"CREATE SCHEMA scma_viewfwd CREATE VIEW scma_viewfwd.v AS SELECT * FROM scma_viewfwd.t CREATE TABLE scma_viewfwd.t (id int)", "ok");
     [Fact]
     public void scma0098() => CorpusAssert.Parses(@"CREATE SCHEMA scma_grant_seq CREATE SEQUENCE scma_grant_seq.s1 GRANT USAGE ON SEQUENCE scma_grant_seq.s1 TO PUBLIC", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void scma0099() => CorpusAssert.Parses(@"ALTER SCHEMA s RENAME TO ""new name with spaces""", "ok");
     [Fact]
     public void scma0100() => CorpusAssert.Parses(@"CREATE SCHEMA ""scma name spaces""; ALTER SCHEMA ""scma name spaces"" RENAME TO scma_from_spaces", "ok");
@@ -209,7 +209,7 @@ public class Corpus_CreateSchema
     public void scma0101() => CorpusAssert.Parses(@"CREATE SCHEMA IF NOT EXISTS scma_ne_tbl CREATE TABLE scma_ne_tbl.t (id int)", "error");
     [Fact]
     public void scma0102() => CorpusAssert.Parses(@"CREATE SCHEMA scma_drop_ne; DROP SCHEMA IF EXISTS scma_drop_ne; DROP SCHEMA IF EXISTS scma_drop_ne", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void scma0103() => CorpusAssert.Parses(@"DROP SCHEMA s CASCADE, s", "error");
     [Fact]
     public void scma0104() => CorpusAssert.Parses(@"CREATE SCHEMA scma_cmt; COMMENT ON SCHEMA scma_cmt IS 'my schema'; DROP SCHEMA scma_cmt", "ok");

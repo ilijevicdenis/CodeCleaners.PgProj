@@ -245,7 +245,7 @@ DROP POLICY p_drop_cascade ON s.t CASCADE;", "ok");
     public void pola0076() => CorpusAssert.Parses(@"ALTER TABLE s.t ENABLE ROW LEVEL SECURITY;
 CREATE POLICY p_drop_restrict ON s.t;
 DROP POLICY p_drop_restrict ON s.t RESTRICT;", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pola0077() => CorpusAssert.Parses(@"DROP POLICY IF EXISTS p_noexist ON s.t;", "ok");
     [Fact]
     public void pola0078() => CorpusAssert.Parses(@"ALTER TABLE s.t ENABLE ROW LEVEL SECURITY;
@@ -485,11 +485,11 @@ CREATE POLICY p_matview_err ON s.mv USING (true);", "error");
     [Fact(Skip = "pending: parser not yet complete")]
     public void pola0157() => CorpusAssert.Parses(@"ALTER TABLE s.t ENABLE ROW LEVEL SECURITY;
 CREATE POLICY p_seq_err ON s.seq USING (true);", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pola0158() => CorpusAssert.Parses(@"ALTER POLICY ON s.t RENAME TO p_x;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pola0159() => CorpusAssert.Parses(@"DROP POLICY p_x;", "error");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void pola0160() => CorpusAssert.Parses(@"DROP POLICY IF p_x ON s.t;", "error");
     [Fact]
     public void pola0161() => CorpusAssert.Parses(@"ALTER TABLE s.t ENABLE ROW LEVEL SECURITY;
@@ -606,7 +606,7 @@ DROP POLICY p_drop_cascade ON s.t CASCADE", "ok");
     public void polb0025() => CorpusAssert.Parses(@"ALTER TABLE s.t ENABLE ROW LEVEL SECURITY;
 CREATE POLICY p_drop_restrict ON s.t USING (true);
 DROP POLICY p_drop_restrict ON s.t RESTRICT", "ok");
-    [Fact(Skip = "pending: parser not yet complete")]
+    [Fact]
     public void polb0026() => CorpusAssert.Parses(@"DROP POLICY IF EXISTS p_no_such ON s.t", "ok");
     [Fact(Skip = "pending: parser not yet complete")]
     public void polb0027() => CorpusAssert.Parses(@"ALTER TABLE s.t ENABLE ROW LEVEL SECURITY;
