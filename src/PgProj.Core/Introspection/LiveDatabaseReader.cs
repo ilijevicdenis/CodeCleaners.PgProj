@@ -74,6 +74,8 @@ public sealed class LiveDatabaseReader
             Read(c => ReadCastsAsync(c, ct)),
             Read(c => ReadForeignTablesAsync(c, ct)),
             Read(c => ReadOperatorsAsync(c, ct)),
+            Read(c => ReadOperatorFamiliesAsync(c, ct)),
+            Read(c => ReadOperatorClassesAsync(c, ct)),
             Read(c => ReadTextSearchDictionariesAsync(c, ct)),
             Read(c => ReadTextSearchConfigurationsAsync(c, ct)),
             Read(c => ReadExistenceObjectsAsync(c, ct)),
@@ -879,6 +881,116 @@ public sealed class LiveDatabaseReader
             var dropName = $"{schema}.{op} ({left ?? "NONE"}, {right ?? "NONE"})";
             var body = $"CREATE OPERATOR {schema}.{op} ({string.Join(", ", opts)});";
             list.Add(MakeRaw(ObjectKind.Operator, "", dropName, $"operator:{schema}.{op}({left},{right})", body));
+        }
+        return list;
+    }
+
+    // Standalone operator families only — families PostgreSQL auto-creates for a bare CREATE OPERATOR
+    // CLASS (the class carries an 'a' dep on them) are skipped; that class re-creates its family itself.
+    private async Task<List<RawObjectDefinition>> ReadOperatorFamiliesAsync(NpgsqlConnection conn, CancellationToken ct)
+    {
+        const string sql = @"
+            SELECT n.nspname, f.opfname, am.amname
+            FROM pg_opfamily f
+            JOIN pg_namespace n ON n.oid = f.opfnamespace
+            JOIN pg_am am ON am.oid = f.opfmethod
+            WHERE n.nspname NOT IN ('pg_catalog','information_schema') AND n.nspname NOT LIKE 'pg_%'
+              AND NOT EXISTS (SELECT 1 FROM pg_depend d WHERE d.classid='pg_opclass'::regclass
+                                AND d.refobjid=f.oid AND d.deptype='a')
+              AND NOT EXISTS (SELECT 1 FROM pg_depend d WHERE d.classid='pg_opfamily'::regclass
+                                AND d.objid=f.oid AND d.deptype='e')
+            ORDER BY n.nspname, f.opfname;";
+
+        var list = new List<RawObjectDefinition>();
+        await using var cmd = new NpgsqlCommand(sql, conn);
+        await using var r = await cmd.ExecuteReaderAsync(ct);
+        while (await r.ReadAsync(ct))
+        {
+            var schema = r.GetString(0);
+            var name = r.GetString(1);
+            var method = r.GetString(2);
+            list.Add(MakeRaw(ObjectKind.OperatorFamily, "", $"{schema}.{name} USING {method}",
+                $"operatorfamily:{schema}.{name} using {method}",
+                $"CREATE OPERATOR FAMILY {schema}.{name} USING {method};"));
+        }
+        return list;
+    }
+
+    private async Task<List<RawObjectDefinition>> ReadOperatorClassesAsync(NpgsqlConnection conn, CancellationToken ct)
+    {
+        const string sql = @"
+            SELECT n.nspname, c.opcname, c.opcdefault,
+                   format_type(c.opcintype, NULL) AS intype,
+                   am.amname AS method,
+                   c.opcfamily, c.opcintype,
+                   fn.nspname AS famschema, f.opfname AS famname,
+                   EXISTS(SELECT 1 FROM pg_depend d WHERE d.classid='pg_opclass'::regclass
+                            AND d.objid=c.oid AND d.refobjid=c.opcfamily AND d.deptype='a') AS autofam
+            FROM pg_opclass c
+            JOIN pg_namespace n  ON n.oid  = c.opcnamespace
+            JOIN pg_am am        ON am.oid = c.opcmethod
+            JOIN pg_opfamily f   ON f.oid  = c.opcfamily
+            JOIN pg_namespace fn ON fn.oid = f.opfnamespace
+            WHERE n.nspname NOT IN ('pg_catalog','information_schema') AND n.nspname NOT LIKE 'pg_%'
+              AND NOT EXISTS (SELECT 1 FROM pg_depend d WHERE d.classid='pg_opclass'::regclass
+                                AND d.objid=c.oid AND d.deptype='e')   -- skip extension opclasses
+            ORDER BY n.nspname, c.opcname;";
+
+        var headers = new List<(string Schema, string Name, bool Default, string IntType, string Method,
+                                uint Family, uint OpcIntType, string FamSchema, string FamName, bool AutoFam)>();
+        await using (var cmd = new NpgsqlCommand(sql, conn))
+        await using (var r = await cmd.ExecuteReaderAsync(ct))
+            while (await r.ReadAsync(ct))
+                headers.Add((r.GetString(0), r.GetString(1), r.GetBoolean(2), r.GetString(3), r.GetString(4),
+                             r.GetFieldValue<uint>(5), r.GetFieldValue<uint>(6), r.GetString(7), r.GetString(8), r.GetBoolean(9)));
+
+        var list = new List<RawObjectDefinition>();
+        foreach (var h in headers)
+        {
+            var members = new List<string>();
+
+            const string amopSql = @"
+                SELECT amopstrategy, amopopr::regoperator::text, amoppurpose,
+                       NULLIF(amopsortfamily,0)::regclass::text
+                FROM pg_amop
+                WHERE amopfamily=@fam AND amoplefttype=@t AND amoprighttype=@t
+                ORDER BY amoppurpose, amopstrategy;";
+            await using (var oc = new NpgsqlCommand(amopSql, conn))
+            {
+                oc.Parameters.AddWithValue("fam", NpgsqlTypes.NpgsqlDbType.Oid, h.Family);
+                oc.Parameters.AddWithValue("t", NpgsqlTypes.NpgsqlDbType.Oid, h.OpcIntType);
+                await using var or = await oc.ExecuteReaderAsync(ct);
+                while (await or.ReadAsync(ct))
+                {
+                    var opr = or.GetString(1);
+                    var paren = opr.IndexOf('(');                       // "<(integer,integer)" -> "< (integer,integer)"
+                    var named = paren > 0 ? opr[..paren] + " " + opr[paren..] : opr;
+                    var orderBy = ReadChar(or, 2, 's') == 'o' && !or.IsDBNull(3)
+                        ? $" FOR ORDER BY {or.GetString(3)}" : "";
+                    members.Add($"OPERATOR {or.GetInt32(0)} {named}{orderBy}");
+                }
+            }
+
+            const string amprocSql = @"
+                SELECT amprocnum, amproc::regprocedure::text
+                FROM pg_amproc
+                WHERE amprocfamily=@fam AND amproclefttype=@t AND amprocrighttype=@t
+                ORDER BY amprocnum;";
+            await using (var pc = new NpgsqlCommand(amprocSql, conn))
+            {
+                pc.Parameters.AddWithValue("fam", NpgsqlTypes.NpgsqlDbType.Oid, h.Family);
+                pc.Parameters.AddWithValue("t", NpgsqlTypes.NpgsqlDbType.Oid, h.OpcIntType);
+                await using var pr = await pc.ExecuteReaderAsync(ct);
+                while (await pr.ReadAsync(ct))
+                    members.Add($"FUNCTION {pr.GetInt32(0)} {pr.GetString(1)}");
+            }
+
+            var header = $"CREATE OPERATOR CLASS {h.Schema}.{h.Name}{(h.Default ? " DEFAULT" : "")} " +
+                         $"FOR TYPE {h.IntType} USING {h.Method}" +
+                         (h.AutoFam ? "" : $" FAMILY {h.FamSchema}.{h.FamName}") + " AS\n    ";
+            var body = header + string.Join(",\n    ", members) + ";";
+            list.Add(MakeRaw(ObjectKind.OperatorClass, "", $"{h.Schema}.{h.Name} USING {h.Method}",
+                $"operatorclass:{h.Schema}.{h.Name} using {h.Method}", body));
         }
         return list;
     }

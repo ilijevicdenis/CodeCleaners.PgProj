@@ -30,8 +30,8 @@ public static class RawObjectMeta
         ObjectKind.Statistics => 66,
         ObjectKind.Aggregate => 82, // needs its state/final functions
         ObjectKind.Operator => 82,
-        ObjectKind.OperatorClass => 82,
         ObjectKind.OperatorFamily => 82,
+        ObjectKind.OperatorClass => 83,   // after operators/functions/families it references in AS …
         ObjectKind.Cast => 82,
         ObjectKind.Transform => 82,
         ObjectKind.Trigger => 85,
