@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Reflection;
 using PgProj.Core.Analysis;
 using PgProj.Core.Comparison;
+using PgProj.Core.Contracts;
 using PgProj.Core.Deployment;
 using PgProj.Core.Introspection;
 using PgProj.Core.Model;
@@ -37,6 +38,7 @@ public static class Program
                 "drift" => await Drift(args),
                 "pull" => await Pull(args),
                 "analyze" => Analyze(args),
+                "model-tree" => await ModelTree(args),
                 "script" => await Script(args),
                 "pkg" => await Pkg(args),
                 "help" or "--help" or "-h" => PrintUsageReturn(0),
@@ -55,6 +57,14 @@ public static class Program
     private static async Task<int> Build(string[] args)
     {
         var project = DatabaseProject.Load(RequirePositional(args, "project file"));
+
+        if (WantsJson(args))
+        {
+            var report = await ContractBuilder.BuildAsync(project, includeTree: true);
+            EmitJson(report);
+            return report.Success ? 0 : 1;
+        }
+
         var result = await project.BuildAsync();
 
         Console.WriteLine($"Building project '{project.Name}' ({result.Files.Count} file(s), default schema '{project.DefaultSchema}')");
@@ -96,8 +106,15 @@ public static class Program
 
     private static async Task<int> Compare(string[] args)
     {
-        var (source, _) = await BuildSourceOrThrowAsync(args);
+        var (source, project) = await BuildSourceOrThrowAsync(args);
         var target = await ReadTarget(args);
+
+        if (WantsJson(args))
+        {
+            EmitJson(ContractBuilder.Compare(source, target, SourceName(project), HasFlag(args, "--allow-drops")));
+            return 0;
+        }
+
         var changes = new SchemaComparer().Compare(source, target, new ComparerOptions
         {
             DropObjectsNotInSource = HasFlag(args, "--allow-drops"),
@@ -124,6 +141,15 @@ public static class Program
     private static async Task<int> Publish(string[] args)
     {
         var (source, project) = await BuildSourceOrThrowAsync(args);
+
+        // JSON dry-run: emit the plan + script, no server mutation, no text gate output to pollute stdout.
+        if (WantsJson(args) && HasFlag(args, "--dry-run"))
+        {
+            var target0 = await ReadTarget(args);
+            EmitJson(ContractBuilder.PublishPlan(source, target0, SourceName(project),
+                HasFlag(args, "--allow-drops"), wrapInTransaction: !HasFlag(args, "--no-transaction")));
+            return 0;
+        }
 
         // Gate before touching the database: a failing analysis must not reach the server.
         if (AnalysisGateBlocks(project, args)) return 1;
@@ -293,9 +319,40 @@ public static class Program
     private static int Analyze(string[] args)
     {
         var project = DatabaseProject.Load(RequirePositional(args, "project file"));
+
+        if (WantsJson(args))
+        {
+            var report = ContractBuilder.Analyze(project, HasFlag(args, "--strict"));
+            EmitJson(report);
+            return report.Blocked ? 1 : 0;
+        }
+
         var findings = RunAnalysis(project, out var ruleCount);
         Console.WriteLine($"Analyzed '{project.Name}': {ruleCount} rule(s).");
         return ReportFindings(findings, HasFlag(args, "--strict"), alwaysReport: true) ? 1 : 0;
+    }
+
+    // ---- model-tree (editor endpoint: objects + source positions) -----------------------
+
+    private static async Task<int> ModelTree(string[] args)
+    {
+        var project = DatabaseProject.Load(RequirePositional(args, "project file"));
+        var tree = await ContractBuilder.ModelTreeAsync(project);
+
+        if (WantsJson(args))
+        {
+            EmitJson(tree);
+            return 0;
+        }
+
+        // Human fallback: a flat outline. The JSON form is the contract; this is a convenience.
+        Console.WriteLine($"Model tree for '{project.Name}' ({tree.Nodes.Count} object(s)):");
+        foreach (var n in tree.Nodes)
+        {
+            var loc = n.Line > 0 ? $"  ({n.File}:{n.Line})" : "";
+            Console.WriteLine($"  [{n.Kind}] {n.QualifiedName}{loc}");
+        }
+        return 0;
     }
 
     // ---- shared analysis gate -----------------------------------------------------------
@@ -516,6 +573,9 @@ public static class Program
         return (result.Model, project);
     }
 
+    /// <summary>Display name for the source: the project name, or "(package)" when the source was a pre-built .pgpkg.</summary>
+    private static string SourceName(DatabaseProject? project) => project?.Name ?? "(package)";
+
     private static async Task<DatabaseModel> ReadTarget(string[] args) =>
         await new LiveDatabaseReader().ReadAsync(RequireConnection(args));
 
@@ -545,6 +605,13 @@ public static class Program
 
     private static bool HasFlag(string[] args, string name) =>
         args.Any(a => a.Equals(name, StringComparison.OrdinalIgnoreCase));
+
+    /// <summary>True when the caller asked for machine-readable output (<c>--format json</c>).</summary>
+    private static bool WantsJson(string[] args) =>
+        string.Equals(GetOption(args, "--format"), "json", StringComparison.OrdinalIgnoreCase);
+
+    /// <summary>Writes a contract payload to stdout as stable JSON.</summary>
+    private static void EmitJson<T>(T payload) => Console.WriteLine(JsonContract.Serialize(payload));
 
     private static int Fail(string message)
     {
@@ -584,8 +651,10 @@ public static class Program
           pgproj drift   <project.pgproj> --connection <conn>                          (preview project files that differ from the DB)
           pgproj pull    <project.pgproj> --connection <conn> [--dry-run] [--allow-deletes]   (rewrite project files FROM the DB — scenario 3)
           pgproj analyze <project.pgproj> [--strict]    (static safety analysis over the AST)
+          pgproj model-tree <project.pgproj> [--format json]   (objects + source positions, for editors)
 
         Options:
+          --format json      Machine-readable, versioned JSON (build/analyze/compare/publish --dry-run/model-tree)
           -c, --connection   Postgres connection string (or set PGPROJ_CONNECTION)
           -o, --output       Output file or directory
           --dry-run          Generate the deploy script but do not execute it
