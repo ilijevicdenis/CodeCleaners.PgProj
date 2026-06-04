@@ -1,4 +1,5 @@
 using System;
+using System.Buffers;
 using System.Collections.Generic;
 using System.Text;
 
@@ -15,6 +16,9 @@ public sealed class Tokenizer
     private readonly string _s;
     private int _i;
 
+    // PG16 non-decimal integer prefixes (0x/0o/0b); vectorized membership beats "xXoObB".IndexOf per number.
+    private static readonly SearchValues<char> RadixPrefix = SearchValues.Create("xXoObB");
+
     private Tokenizer(string s) => _s = s;
 
     public static List<Token> Tokenize(string sql)
@@ -25,7 +29,9 @@ public sealed class Tokenizer
 
     private List<Token> Run()
     {
-        var tokens = new List<Token>();
+        // Pre-size: SQL averages roughly a token every ~4 chars, so this avoids the 1→4→8→…
+        // doubling reallocations of the backing array as the list grows to thousands of entries.
+        var tokens = new List<Token>(_s.Length / 4 + 16);
         while (_i < _s.Length)
         {
             var c = _s[_i];
@@ -141,7 +147,7 @@ public sealed class Tokenizer
         // PG16 non-decimal integer literals: 0x… (hex), 0o… (octal), 0b… (binary), with optional '_'
         // separators. Only consume when at least one radix-valid digit follows; otherwise fall through to
         // decimal so malformed forms (0x, 0b2, 0o9) surface as a parse error like Postgres rejects them.
-        if (_s[_i] == '0' && _i + 1 < _s.Length && "xXoObB".IndexOf(_s[_i + 1]) >= 0)
+        if (_s[_i] == '0' && _i + 1 < _s.Length && RadixPrefix.Contains(_s[_i + 1]))
         {
             char radix = char.ToLowerInvariant(_s[_i + 1]);
             int j = _i + 2, digits = 0;

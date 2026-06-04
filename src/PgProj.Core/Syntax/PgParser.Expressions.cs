@@ -1,4 +1,5 @@
 using System;
+using System.Buffers;
 using System.Collections.Generic;
 using System.Linq;
 using PgProj.Core.Parsing;
@@ -144,13 +145,8 @@ public sealed partial class PgParser
     }
 
     // general (named/symbolic) binary operators: ||, @>, ->, ->>, #>, &, |, #, <<, >>, ~, !~, etc.
-    private const string OperatorChars = "+-*/<>=~!@#%^&|?:";
-    private static bool IsOperatorSymbol(string v)
-    {
-        if (v.Length == 0) return false;
-        foreach (var ch in v) if (OperatorChars.IndexOf(ch) < 0) return false;
-        return true;
-    }
+    private static readonly SearchValues<char> OperatorChars = SearchValues.Create("+-*/<>=~!@#%^&|?:");
+    private static bool IsOperatorSymbol(string v) => v.Length > 0 && !v.AsSpan().ContainsAnyExcept(OperatorChars);
 
     private Expr ParseGeneralOp(TokenCursor c)
     {

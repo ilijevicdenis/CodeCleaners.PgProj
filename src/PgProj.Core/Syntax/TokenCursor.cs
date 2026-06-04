@@ -58,6 +58,16 @@ public sealed class TokenCursor
         return false;
     }
 
+    // Fixed-arity overloads for the common small cases: the compiler prefers these over the
+    // params version, so the pervasive AtAnyWord("A","B")/MatchWords("IF","NOT","EXISTS") call
+    // sites no longer allocate a string[] per call. (Audit §1f.) Pass a cached static string[]
+    // to the params overload for higher arities to stay allocation-free there too.
+    public bool AtAnyWord(string a, string b) => AtWord(a) || AtWord(b);
+    public bool AtAnyWord(string a, string b, string c) => AtWord(a) || AtWord(b) || AtWord(c);
+    public bool AtAnyWord(string a, string b, string c, string d) => AtWord(a) || AtWord(b) || AtWord(c) || AtWord(d);
+
+    private bool WordAt(int ahead, string w) => (ahead == 0 ? Current : Peek(ahead))?.IsWord(w) == true;
+
     /// <summary>True if the next tokens are these words in order (case-insensitive), not consuming.</summary>
     public bool LookaheadWords(params string[] words)
     {
@@ -68,6 +78,9 @@ public sealed class TokenCursor
         }
         return true;
     }
+
+    public bool LookaheadWords(string a, string b) => WordAt(0, a) && WordAt(1, b);
+    public bool LookaheadWords(string a, string b, string c) => WordAt(0, a) && WordAt(1, b) && WordAt(2, c);
 
     /// <summary>The current token as an operator (merged multi-char symbol), or null.</summary>
     public string? CurrentOperator => Current is { Kind: TokenKind.Symbol } t ? t.Value : null;
@@ -85,6 +98,9 @@ public sealed class TokenCursor
         _i += words.Length;
         return true;
     }
+
+    public bool MatchWords(string a, string b) { if (LookaheadWords(a, b)) { _i += 2; return true; } return false; }
+    public bool MatchWords(string a, string b, string c) { if (LookaheadWords(a, b, c)) { _i += 3; return true; } return false; }
 
     // ---- required matches (throw if absent) ---------------------------------
     public void ExpectWord(string word)

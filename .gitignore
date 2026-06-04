@@ -23,3 +23,6 @@ extracted/
 # OS
 Thumbs.db
 .DS_Store
+
+# Claude Code scheduled-task lock
+.claude/scheduled_tasks.lock

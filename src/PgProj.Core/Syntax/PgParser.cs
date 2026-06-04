@@ -71,9 +71,12 @@ public sealed partial class PgParser
 
     // ---- statement dispatch -------------------------------------------------
 
+    // Cached so the per-statement dispatch check doesn't allocate a 9-element string[] each call (audit §1f).
+    private static readonly string[] QueryLeaders = { "SELECT", "WITH", "VALUES", "TABLE", "INSERT", "UPDATE", "DELETE", "MERGE", "TRUNCATE" };
+
     private static string? ClassifyLeading(TokenCursor c)
     {
-        if (c.AtAnyWord("SELECT", "WITH", "VALUES", "TABLE", "INSERT", "UPDATE", "DELETE", "MERGE", "TRUNCATE")) return "QUERY";
+        if (c.AtAnyWord(QueryLeaders)) return "QUERY";
         if (c.AtSymbol('(')) return "QUERY";   // parenthesised set-op query
         if (c.Current is { Kind: TokenKind.Word } cw && CommandKeywords.Contains(cw.Value)) return "QUERY";
         if (c.AtAnyWord("ALTER", "DROP")) return "QUERY";

@@ -1,3 +1,4 @@
+using System.Buffers;
 using System.Collections.Generic;
 using PgProj.Core.Parsing;
 
@@ -13,9 +14,10 @@ namespace PgProj.Core.Syntax;
 public static class OperatorLexer
 {
     // PostgreSQL operator characters, plus ':' so "::" merges (lone ':' for array slices stays single).
-    private const string OpChars = "+-*/<>=~!@#%^&|?:";
+    // SearchValues gives a vectorized, allocation-free membership test on this per-symbol hot path.
+    private static readonly SearchValues<char> OpChars = SearchValues.Create("+-*/<>=~!@#%^&|?:");
 
-    private static bool IsOpChar(char c) => OpChars.IndexOf(c) >= 0;
+    private static bool IsOpChar(char c) => OpChars.Contains(c);
 
     public static List<Token> Merge(IReadOnlyList<Token> tokens)
     {
