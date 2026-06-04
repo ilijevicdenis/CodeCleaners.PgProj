@@ -15,7 +15,7 @@ namespace PgProj.Core.Project;
 /// <c>.sql</c> files it globs in. This is the Postgres analogue of an SSDT <c>.sqlproj</c> — the
 /// unit you "build" into a model and then compare/publish against a live server.
 /// </summary>
-public sealed class DatabaseProject
+public sealed record DatabaseProject
 {
     public required string ProjectFilePath { get; init; }
     public required string ProjectDirectory { get; init; }
@@ -23,6 +23,41 @@ public sealed class DatabaseProject
     public string DefaultSchema { get; init; } = "public";
     public string? TargetPostgresVersion { get; init; }
     public IReadOnlyList<string> IncludePatterns { get; init; } = new[] { "**/*.sql" };
+
+    /// <summary>
+    /// Absolute path of the single pre-deployment script (SSDT <c>BuildAction=PreDeploy</c>), or null.
+    /// Spliced before the schema diff in the generated deploy script.
+    /// </summary>
+    public string? PreDeployScriptPath { get; init; }
+
+    /// <summary>
+    /// Absolute path of the single post-deployment script (SSDT <c>BuildAction=PostDeploy</c>), or null.
+    /// Spliced after the schema diff in the generated deploy script.
+    /// </summary>
+    public string? PostDeployScriptPath { get; init; }
+
+    /// <summary>
+    /// SQLCMD-style project variables and their project-level default values
+    /// (<c>&lt;SqlCmdVariable Include="Name"&gt;&lt;DefaultValue&gt;…&lt;/DefaultValue&gt;&lt;/SqlCmdVariable&gt;</c>).
+    /// Overridden at publish time by profile/CLI; see <see cref="Deployment.SqlCmdVariableResolver"/>.
+    /// </summary>
+    public IReadOnlyDictionary<string, string> SqlCmdVariableDefaults { get; init; } =
+        new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>
+    /// Optional opt-in transform applied to each object file's text <em>before</em> parsing
+    /// (args: relative-path, raw-text → transformed-text). Used to substitute SQLCMD <c>$(Var)</c>
+    /// tokens into object files — disabled by default (deploy-script substitution is the default scope);
+    /// the CLI wires this only when <c>--substitute-objects</c> is passed. Left null → files parse verbatim.
+    /// </summary>
+    public Func<string, string, string>? ObjectContentTransform { get; init; }
+
+    private string ReadSource(string file)
+    {
+        var text = File.ReadAllText(file);
+        if (ObjectContentTransform is null) return text;
+        return ObjectContentTransform(Path.GetRelativePath(ProjectDirectory, file), text);
+    }
 
     public static DatabaseProject Load(string projectFilePath)
     {
@@ -47,6 +82,9 @@ public sealed class DatabaseProject
         if (includes.Count == 0)
             includes.Add("**/*.sql");
 
+        var (preDeploy, postDeploy) = LoadDeployScripts(root, dir);
+        var variables = LoadSqlCmdVariables(root);
+
         return new DatabaseProject
         {
             ProjectFilePath = fullPath,
@@ -56,7 +94,67 @@ public sealed class DatabaseProject
             TargetPostgresVersion = root.Descendants().Any(e => e.Name.LocalName.Equals("TargetPostgresVersion", StringComparison.OrdinalIgnoreCase))
                 ? Prop("TargetPostgresVersion", "") : null,
             IncludePatterns = includes,
+            PreDeployScriptPath = preDeploy,
+            PostDeployScriptPath = postDeploy,
+            SqlCmdVariableDefaults = variables,
         };
+    }
+
+    /// <summary>
+    /// Reads SSDT-style <c>&lt;None Include="…"&gt;&lt;BuildAction&gt;PreDeploy|PostDeploy&lt;/BuildAction&gt;&lt;/None&gt;</c>
+    /// items (any item element carrying a BuildAction child is honoured, mirroring SSDT). At most one of
+    /// each is allowed; a second of either kind is a hard error so the deploy order stays unambiguous.
+    /// </summary>
+    private static (string? Pre, string? Post) LoadDeployScripts(XElement root, string dir)
+    {
+        string? pre = null, post = null;
+        foreach (var item in root.Descendants())
+        {
+            var include = item.Attribute("Include")?.Value?.Trim();
+            if (string.IsNullOrWhiteSpace(include)) continue;
+
+            var action = item.Elements()
+                .FirstOrDefault(e => e.Name.LocalName.Equals("BuildAction", StringComparison.OrdinalIgnoreCase))
+                ?.Value?.Trim();
+            if (string.IsNullOrWhiteSpace(action)) continue;
+
+            var resolved = Path.GetFullPath(Path.Combine(dir, include.Replace('\\', '/')));
+            if (action.Equals("PreDeploy", StringComparison.OrdinalIgnoreCase))
+            {
+                if (pre is not null)
+                    throw new InvalidOperationException(
+                        "Multiple PreDeploy scripts declared; exactly one BuildAction=PreDeploy item is allowed.");
+                pre = resolved;
+            }
+            else if (action.Equals("PostDeploy", StringComparison.OrdinalIgnoreCase))
+            {
+                if (post is not null)
+                    throw new InvalidOperationException(
+                        "Multiple PostDeploy scripts declared; exactly one BuildAction=PostDeploy item is allowed.");
+                post = resolved;
+            }
+        }
+        return (pre, post);
+    }
+
+    /// <summary>
+    /// Reads <c>&lt;SqlCmdVariable Include="Name"&gt;&lt;DefaultValue&gt;…&lt;/DefaultValue&gt;&lt;/SqlCmdVariable&gt;</c>
+    /// items into a case-insensitive name→default map (a missing DefaultValue defaults to empty string).
+    /// </summary>
+    private static IReadOnlyDictionary<string, string> LoadSqlCmdVariables(XElement root)
+    {
+        var vars = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var item in root.Descendants()
+            .Where(e => e.Name.LocalName.Equals("SqlCmdVariable", StringComparison.OrdinalIgnoreCase)))
+        {
+            var name = item.Attribute("Include")?.Value?.Trim();
+            if (string.IsNullOrWhiteSpace(name)) continue;
+            var def = item.Elements()
+                .FirstOrDefault(e => e.Name.LocalName.Equals("DefaultValue", StringComparison.OrdinalIgnoreCase))
+                ?.Value ?? string.Empty;
+            vars[name] = def;
+        }
+        return vars;
     }
 
     /// <summary>Resolves all .sql files the project includes, de-duplicated and ordered deterministically.</summary>
@@ -84,12 +182,19 @@ public sealed class DatabaseProject
             }
         }
 
+        // Pre/post-deploy scripts are data/seed scripts spliced around the diff at publish time, not
+        // schema-object sources — exclude them from the model build even if a glob would catch them.
+        var deployScripts = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        if (PreDeployScriptPath is not null) deployScripts.Add(PreDeployScriptPath);
+        if (PostDeployScriptPath is not null) deployScripts.Add(PostDeployScriptPath);
+
         return files
             .Select(Path.GetFullPath)
             // Files whose name starts with '_' are treated as non-source (generated artifacts,
             // scratch, dependency-order manifests). Lets a project keep e.g. a generated
             // _full_create.sql concatenation in-tree without it being parsed twice.
             .Where(f => !Path.GetFileName(f).StartsWith('_'))
+            .Where(f => !deployScripts.Contains(f))
             .Distinct(StringComparer.OrdinalIgnoreCase)
             .OrderBy(f => f, StringComparer.OrdinalIgnoreCase)
             .ToList();
@@ -105,7 +210,7 @@ public sealed class DatabaseProject
 
         foreach (var file in files)
         {
-            var parsed = new Syntax.PgParser().Parse(File.ReadAllText(file));
+            var parsed = new Syntax.PgParser().Parse(ReadSource(file));
             var rel = Path.GetRelativePath(ProjectDirectory, file);
             foreach (var d in parsed.Diagnostics) diagnostics.Add($"{rel}: {d}");   // attribute to the project file to fix
             builder.Build(parsed, model);
@@ -139,7 +244,7 @@ public sealed class DatabaseProject
             {
                 try
                 {
-                    var parsed = new Syntax.PgParser().Parse(File.ReadAllText(files[0]));
+                    var parsed = new Syntax.PgParser().Parse(ReadSource(files[0]));
                     var rel = Path.GetRelativePath(ProjectDirectory, files[0]);
                     foreach (var d in parsed.Diagnostics) diagnostics.Add($"{rel}: {d}");
                     new Syntax.ModelBuilder(DefaultSchema).Build(parsed, model);
@@ -174,7 +279,7 @@ public sealed class DatabaseProject
     {
         try
         {
-            var parsed = new Syntax.PgParser().Parse(File.ReadAllText(path)); // fresh instance → isolated per worker
+            var parsed = new Syntax.PgParser().Parse(ReadSource(path)); // fresh instance → isolated per worker
             var model = new Syntax.ModelBuilder(DefaultSchema).Build(parsed);
             var rel = Path.GetRelativePath(ProjectDirectory, path);
             return new PartialParse(model, parsed.Diagnostics.Select(d => $"{rel}: {d}").ToList());
