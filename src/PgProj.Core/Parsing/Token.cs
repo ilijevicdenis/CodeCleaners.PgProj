@@ -32,8 +32,9 @@ public sealed record Token(TokenKind Kind, string Value, int Position)
     /// <summary>Re-serialise a token to valid SQL source (used to rebuild view/function bodies).</summary>
     public string Render() => Kind switch
     {
-        TokenKind.QuotedIdent => "\"" + Value.Replace("\"", "\"\"") + "\"",
-        TokenKind.String => "'" + Value.Replace("'", "''") + "'",
+        // Guard the Replace: it allocates a fresh string even when nothing needs escaping (the common case).
+        TokenKind.QuotedIdent => "\"" + (Value.Contains('"') ? Value.Replace("\"", "\"\"") : Value) + "\"",
+        TokenKind.String => "'" + (Value.Contains('\'') ? Value.Replace("'", "''") : Value) + "'",
         TokenKind.DollarString => Value,
         _ => Value,
     };
@@ -45,7 +46,16 @@ public sealed record Token(TokenKind Kind, string Value, int Position)
     /// </summary>
     public static string Render(IReadOnlyList<Token> tokens)
     {
-        var sb = new StringBuilder();
+        // Fast paths: the overwhelming majority of Render calls are a single token (a column type like
+        // "bigint"/"jsonb", a one-word identifier) — return its text directly, no StringBuilder/ToString.
+        if (tokens.Count == 0) return "";
+        if (tokens.Count == 1) return tokens[0].Render();
+
+        // Pre-size: without a capacity hint the builder block-expands from 16 chars repeatedly (the #1
+        // allocation source in the alloc trace). Sum of token lengths + a space each is a safe estimate.
+        var cap = 0;
+        for (var i = 0; i < tokens.Count; i++) cap += tokens[i].Value.Length + 1;
+        var sb = new StringBuilder(cap);
         Token? prev = null;
         foreach (var t in tokens)
         {
