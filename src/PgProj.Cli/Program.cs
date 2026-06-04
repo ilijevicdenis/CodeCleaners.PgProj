@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Reflection;
 using PgProj.Core.Analysis;
 using PgProj.Core.Comparison;
 using PgProj.Core.Introspection;
 using PgProj.Core.Model;
+using PgProj.Core.Packaging;
 using PgProj.Core.Project;
 
 namespace PgProj.Cli;
@@ -35,6 +37,7 @@ public static class Program
                 "pull" => await Pull(args),
                 "analyze" => Analyze(args),
                 "script" => await Script(args),
+                "pkg" => await Pkg(args),
                 "help" or "--help" or "-h" => PrintUsageReturn(0),
                 _ => Fail($"Unknown command '{args[0]}'."),
             };
@@ -72,6 +75,18 @@ public static class Program
         Directory.CreateDirectory(Path.GetDirectoryName(outPath)!);
         File.WriteAllText(outPath, ModelJson.Serialize(result.Model));
         Console.WriteLine($"Model written to {outPath}");
+
+        // Emit the portable .pgpkg artifact alongside the model (default on; --no-package to skip).
+        if (!HasFlag(args, "--no-package"))
+        {
+            var pkgPath = GetOption(args, "--package")
+                          ?? Path.Combine(Path.GetDirectoryName(outPath)!, $"{project.Name}{PgPkg.Extension}");
+            Directory.CreateDirectory(Path.GetDirectoryName(pkgPath)!);
+            var pkg = PgPkgBuilder.FromBuild(project, result.Model, result.Files, ToolVersion, UtcStamp());
+            pkg.Write(pkgPath);
+            Console.WriteLine($"Package written to {pkgPath} ({pkg.Sources.Count} source(s), checksum {pkg.Manifest.SourceChecksum}).");
+        }
+
         Console.WriteLine("Build succeeded.");
         return 0;
     }
@@ -171,7 +186,7 @@ public static class Program
         var changes = new SchemaComparer().Compare(source, new DatabaseModel());
         var script = new DeployScriptGenerator().Generate(changes, new DeployOptions { WrapInTransaction = false });
 
-        Console.WriteLine($"Validating '{project.Name}' against a throwaway database…");
+        Console.WriteLine($"Validating '{project?.Name ?? source.Schemas.Count + " schema(s) from package"}' against a throwaway database…");
         var outcome = await new ShadowValidator().ValidateAsync(RequireConnection(args), script);
         if (outcome.Ok)
         {
@@ -309,8 +324,10 @@ public static class Program
     }
 
     /// <summary>The build/publish gate. Returns true if the operation must abort.</summary>
-    private static bool AnalysisGateBlocks(DatabaseProject project, string[] args)
+    private static bool AnalysisGateBlocks(DatabaseProject? project, string[] args)
     {
+        // No project (source was a pre-built .pgpkg) → nothing to re-analyze; it was gated at build time.
+        if (project is null) return false;
         if (HasFlag(args, "--no-analyze")) return false;
         var findings = RunAnalysis(project, out _);
         var blocked = ReportFindings(findings, HasFlag(args, "--strict"), alwaysReport: false);
@@ -342,11 +359,83 @@ public static class Program
         return 0;
     }
 
+    // ---- pkg (inspect a .pgpkg) ---------------------------------------------------------
+
+    private static async Task<int> Pkg(string[] args)
+    {
+        var sub = args.Skip(1).FirstOrDefault(a => !a.StartsWith('-'))?.ToLowerInvariant();
+        return sub switch
+        {
+            "inspect" => PkgInspect(args),
+            null => Fail("Expected a 'pkg' subcommand (inspect)."),
+            _ => Fail($"Unknown 'pkg' subcommand '{sub}'."),
+        };
+        // (async signature kept uniform with the other verbs; inspect is synchronous.)
+    }
+
+    private static int PkgInspect(string[] args)
+    {
+        // Positional after the "inspect" subcommand.
+        var path = args.Skip(2).FirstOrDefault(a => !a.StartsWith('-'))
+                   ?? throw new InvalidOperationException("Expected a .pgpkg path argument.");
+        path = Path.GetFullPath(path);
+
+        // Read() verifies the integrity checksum; a tampered/corrupt package throws PgPkgFormatException.
+        var pkg = PgPkg.Read(path);
+        var m = pkg.Manifest;
+
+        Console.WriteLine($"Package: {path}");
+        Console.WriteLine("Manifest:");
+        Console.WriteLine($"  name           {m.Name}");
+        Console.WriteLine($"  formatVersion  {m.FormatVersion}");
+        Console.WriteLine($"  pgVersion      {m.PgVersion ?? "(unspecified)"}");
+        Console.WriteLine($"  toolVersion    {m.ToolVersion}");
+        Console.WriteLine($"  createdUtc     {m.CreatedUtc}");
+        Console.WriteLine($"  sourceChecksum {m.SourceChecksum}");
+        Console.WriteLine($"  sources        {pkg.Sources.Count} file(s)");
+
+        var inventory = PgPkgInventory.Of(pkg.Model);
+        Console.WriteLine($"Objects ({inventory.Count}):");
+        foreach (var item in inventory)
+            Console.WriteLine($"  [{item.Kind}] {item.Identity}");
+        return 0;
+    }
+
     // ---- helpers ------------------------------------------------------------------------
 
-    private static async Task<(DatabaseModel Model, DatabaseProject Project)> BuildSourceOrThrowAsync(string[] args)
+    /// <summary>The tool version stamped into packages. Injected here at the CLI boundary so core build
+    /// code stays deterministic (never reads version/clock itself).</summary>
+    private static string ToolVersion =>
+        Assembly.GetExecutingAssembly().GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion
+        is { Length: > 0 } v
+            ? v
+            : Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "0.0.0";
+
+    /// <summary>The build timestamp, formatted ISO-8601 UTC. Read once here (the only DateTime.Now in the
+    /// package pipeline) and injected into the manifest; override with PGPROJ_BUILD_STAMP for reproducible
+    /// builds.</summary>
+    private static string UtcStamp() =>
+        Environment.GetEnvironmentVariable("PGPROJ_BUILD_STAMP") is { Length: > 0 } s
+            ? s
+            : DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ", System.Globalization.CultureInfo.InvariantCulture);
+
+    /// <summary>
+    /// Resolves the source model from EITHER a <c>.pgproj</c> (build it) OR a <c>.pgpkg</c> (load the
+    /// embedded model — no re-parse). When the source is a package, <c>Project</c> is null: there is no
+    /// project to run the static-analysis gate against (the package was already gated at build time), so
+    /// callers must treat a null project as "skip the gate".
+    /// </summary>
+    private static async Task<(DatabaseModel Model, DatabaseProject? Project)> BuildSourceOrThrowAsync(string[] args)
     {
-        var project = DatabaseProject.Load(RequirePositional(args, "project file"));
+        var sourcePath = RequirePositional(args, "project file or package");
+        if (PgPkg.IsPackagePath(sourcePath))
+        {
+            var pkg = PgPkg.Read(Path.GetFullPath(sourcePath));   // verifies integrity (checksum) on read
+            Console.WriteLine($"Using package '{pkg.Manifest.Name}' (built {pkg.Manifest.CreatedUtc} by pgproj {pkg.Manifest.ToolVersion}).");
+            return (pkg.Model, null);
+        }
+
+        var project = DatabaseProject.Load(sourcePath);
         var result = await project.BuildAsync();
         if (result.Diagnostics.Count > 0)
         {
@@ -415,11 +504,12 @@ public static class Program
         pgproj — PostgreSQL database project tool
 
         Usage:
-          pgproj build   <project.pgproj> [-o model.json] [--strict] [--no-analyze]
-          pgproj script  <project.pgproj> [-o create.sql] [--no-transaction]
-          pgproj compare <project.pgproj> --connection <conn> [--allow-drops]
-          pgproj publish <project.pgproj> --connection <conn> [--dry-run] [-o script.sql] [--allow-drops] [--no-transaction] [--parallel] [--strict] [--no-analyze]
-          pgproj validate <project.pgproj> --connection <conn> [--strict] [--no-analyze]   (apply to a throwaway temp DB, rolled back)
+          pgproj build   <project.pgproj> [-o model.json] [--package <out.pgpkg> | --no-package] [--strict] [--no-analyze]
+          pgproj script  <project.pgproj|.pgpkg> [-o create.sql] [--no-transaction]
+          pgproj compare <project.pgproj|.pgpkg> --connection <conn> [--allow-drops]
+          pgproj publish <project.pgproj|.pgpkg> --connection <conn> [--dry-run] [-o script.sql] [--allow-drops] [--no-transaction] [--parallel] [--strict] [--no-analyze]
+          pgproj validate <project.pgproj|.pgpkg> --connection <conn> [--strict] [--no-analyze]   (apply to a throwaway temp DB, rolled back)
+          pgproj pkg inspect <file.pgpkg>                                              (dump the manifest + object inventory)
           pgproj extract --connection <conn> -o <outDir>
           pgproj drift   <project.pgproj> --connection <conn>                          (preview project files that differ from the DB)
           pgproj pull    <project.pgproj> --connection <conn> [--dry-run] [--allow-deletes]   (rewrite project files FROM the DB — scenario 3)
@@ -431,6 +521,8 @@ public static class Program
           --dry-run          Generate the deploy script but do not execute it
           --allow-drops      Allow destructive changes (drop tables/columns/etc. not in the project)
           --allow-deletes    pull: delete project files for objects dropped from the database
+          --package          build: write the .pgpkg to this path (default bin/<Name>.pgpkg)
+          --no-package       build: skip writing the portable .pgpkg artifact
           --no-transaction   Do not wrap the deploy script in BEGIN/COMMIT
           --parallel         Publish with intra-phase parallelism (phase-level atomicity)
           --strict           Analysis gate: treat warnings as errors (build/publish fail on warnings)
