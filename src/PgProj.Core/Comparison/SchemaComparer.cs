@@ -25,6 +25,30 @@ public sealed class SchemaComparer
 {
     private static readonly Regex Whitespace = new(@"\s+", RegexOptions.Compiled);
 
+    // Schema-qualified-name key with the model's identifier semantics (OrdinalIgnoreCase, mirroring
+    // DatabaseModel.NameEquals). Used to pre-index target/source collections so the per-object lookups
+    // are O(1) instead of a linear FirstOrDefault scan — the comparer was O(n·m) over object counts.
+    private static readonly IEqualityComparer<(string, string)> QualifiedName = new QualifiedNameComparer();
+
+    private sealed class QualifiedNameComparer : IEqualityComparer<(string, string)>
+    {
+        public bool Equals((string, string) a, (string, string) b) =>
+            DatabaseModel.NameEquals(a.Item1, b.Item1) && DatabaseModel.NameEquals(a.Item2, b.Item2);
+
+        public int GetHashCode((string, string) v) => HashCode.Combine(
+            StringComparer.OrdinalIgnoreCase.GetHashCode(v.Item1 ?? ""),
+            StringComparer.OrdinalIgnoreCase.GetHashCode(v.Item2 ?? ""));
+    }
+
+    // Index a collection by (schema, name). TryAdd keeps the FIRST occurrence, matching the old
+    // FirstOrDefault/Find behavior when a model contains duplicate-named objects.
+    private static Dictionary<(string, string), T> IndexByName<T>(IReadOnlyList<T> items, Func<T, (string, string)> key)
+    {
+        var d = new Dictionary<(string, string), T>(items.Count, QualifiedName);
+        foreach (var it in items) d.TryAdd(key(it), it);
+        return d;
+    }
+
     public IReadOnlyList<SchemaChange> Compare(DatabaseModel source, DatabaseModel target, ComparerOptions? options = null)
     {
         options ??= new ComparerOptions();
@@ -53,10 +77,10 @@ public sealed class SchemaComparer
 
     private static void CompareSequences(DatabaseModel source, DatabaseModel target, List<SchemaChange> changes)
     {
+        var tgtByName = IndexByName(target.Sequences, t => (t.Schema, t.Name));
         foreach (var s in source.Sequences)
         {
-            var tgt = target.Sequences.FirstOrDefault(t =>
-                DatabaseModel.NameEquals(t.Schema, s.Schema) && DatabaseModel.NameEquals(t.Name, s.Name));
+            tgtByName.TryGetValue((s.Schema, s.Name), out var tgt);
             if (tgt is null)
                 changes.Add(new CreateSequenceChange(s));
             else if (SequenceOptionsDiffer(s, tgt) && SqlEmitter.SequenceOptions(s).Length > 0)
@@ -79,9 +103,10 @@ public sealed class SchemaComparer
 
     private void CompareTables(DatabaseModel source, DatabaseModel target, List<SchemaChange> changes, ComparerOptions options)
     {
+        var tgtByName = IndexByName(target.Tables, t => (t.Schema, t.Name));
         foreach (var src in source.Tables)
         {
-            var tgt = target.FindTable(src.Schema, src.Name);
+            tgtByName.TryGetValue((src.Schema, src.Name), out var tgt);
             if (tgt is null)
             {
                 changes.Add(new CreateTableChange(src));
@@ -114,8 +139,10 @@ public sealed class SchemaComparer
 
         if (options.DropObjectsNotInSource)
         {
-            foreach (var tgt in target.Tables.Where(t => source.FindTable(t.Schema, t.Name) is null))
-                changes.Add(new DropTableChange(tgt.Schema, tgt.Name));
+            var srcByName = IndexByName(source.Tables, t => (t.Schema, t.Name));
+            foreach (var tgt in target.Tables)
+                if (!srcByName.ContainsKey((tgt.Schema, tgt.Name)))
+                    changes.Add(new DropTableChange(tgt.Schema, tgt.Name));
         }
     }
 
@@ -183,13 +210,16 @@ public sealed class SchemaComparer
 
     private void CompareIndexes(DatabaseModel source, DatabaseModel target, List<SchemaChange> changes, ComparerOptions options)
     {
+        // Relations (schema, name) of source materialized views — an index on one must deploy after it.
+        var matviews = new HashSet<(string, string)>(QualifiedName);
+        foreach (var v in source.Views)
+            if (v.IsMaterialized) matviews.Add((v.Schema, v.Name));
+
+        var tgtByName = IndexByName(target.Indexes, i => (i.Schema, i.Name));
         foreach (var src in source.Indexes)
         {
-            // An index whose relation is a materialized view must deploy after that view is created.
-            var onMv = source.Views.Any(v => v.IsMaterialized
-                && DatabaseModel.NameEquals(v.Schema, src.Schema) && DatabaseModel.NameEquals(v.Name, src.Table));
-            var tgt = target.Indexes.FirstOrDefault(i =>
-                DatabaseModel.NameEquals(i.Schema, src.Schema) && DatabaseModel.NameEquals(i.Name, src.Name));
+            var onMv = matviews.Contains((src.Schema, src.Table));
+            tgtByName.TryGetValue((src.Schema, src.Name), out var tgt);
             if (tgt is null)
             {
                 changes.Add(new CreateIndexChange(src, onMv));
@@ -203,42 +233,52 @@ public sealed class SchemaComparer
 
         if (options.DropObjectsNotInSource)
         {
-            foreach (var tgt in target.Indexes.Where(t =>
-                !source.Indexes.Any(s => DatabaseModel.NameEquals(s.Schema, t.Schema) && DatabaseModel.NameEquals(s.Name, t.Name))))
-                changes.Add(new DropIndexChange(tgt.Schema, tgt.Name));
+            var srcByName = IndexByName(source.Indexes, i => (i.Schema, i.Name));
+            foreach (var tgt in target.Indexes)
+                if (!srcByName.ContainsKey((tgt.Schema, tgt.Name)))
+                    changes.Add(new DropIndexChange(tgt.Schema, tgt.Name));
         }
     }
 
     private void CompareViews(DatabaseModel source, DatabaseModel target, List<SchemaChange> changes, ComparerOptions options)
     {
+        var tgtByName = IndexByName(target.Views, v => (v.Schema, v.Name));
         foreach (var src in source.Views)
         {
-            var tgt = target.Views.FirstOrDefault(v =>
-                DatabaseModel.NameEquals(v.Schema, src.Schema) && DatabaseModel.NameEquals(v.Name, src.Name));
+            tgtByName.TryGetValue((src.Schema, src.Name), out var tgt);
             if (tgt is null || NormalizeBody(src.Body) != NormalizeBody(tgt.Body))
                 changes.Add(new CreateOrReplaceViewChange(src));
         }
 
         if (options.DropObjectsNotInSource)
         {
-            foreach (var tgt in target.Views.Where(t =>
-                !source.Views.Any(s => DatabaseModel.NameEquals(s.Schema, t.Schema) && DatabaseModel.NameEquals(s.Name, t.Name))))
-                changes.Add(new DropViewChange(tgt.Schema, tgt.Name));
+            var srcByName = IndexByName(source.Views, v => (v.Schema, v.Name));
+            foreach (var tgt in target.Views)
+                if (!srcByName.ContainsKey((tgt.Schema, tgt.Name)))
+                    changes.Add(new DropViewChange(tgt.Schema, tgt.Name));
         }
     }
 
     private void CompareFunctions(DatabaseModel source, DatabaseModel target, List<SchemaChange> changes)
     {
+        // Group target overloads by schema.name once, preserving target order within each group so
+        // FirstOrDefault still picks the same candidate as the old linear Where(...).ToList().
+        var tgtByName = new Dictionary<(string, string), List<FunctionDefinition>>(QualifiedName);
+        foreach (var f in target.Functions)
+        {
+            if (!tgtByName.TryGetValue((f.Schema, f.Name), out var group)) { group = new List<FunctionDefinition>(); tgtByName[(f.Schema, f.Name)] = group; }
+            group.Add(f);
+        }
+
         foreach (var src in source.Functions)
         {
             // Match by schema.name (reliable for the common, non-overloaded case); when a name has
             // multiple overloads, disambiguate by normalized argument types.
-            var candidates = target.Functions
-                .Where(f => DatabaseModel.NameEquals(f.Schema, src.Schema) && DatabaseModel.NameEquals(f.Name, src.Name))
-                .ToList();
-            var tgt = candidates.Count <= 1
-                ? candidates.FirstOrDefault()
-                : candidates.FirstOrDefault(c => NormalizeText(c.ArgTypes) == NormalizeText(src.ArgTypes));
+            tgtByName.TryGetValue((src.Schema, src.Name), out var candidates);
+            FunctionDefinition? tgt = candidates is null ? null
+                : candidates.Count <= 1
+                    ? candidates.FirstOrDefault()
+                    : candidates.FirstOrDefault(c => NormalizeText(c.ArgTypes) == NormalizeText(src.ArgTypes));
 
             if (tgt is null || NormalizeBody(src.Body) != NormalizeBody(tgt.Body))
                 changes.Add(new CreateOrReplaceFunctionChange(src));
@@ -247,9 +287,13 @@ public sealed class SchemaComparer
 
     private void CompareRawObjects(DatabaseModel source, DatabaseModel target, List<SchemaChange> changes, ComparerOptions options)
     {
+        // FindObject matches Identity case-insensitively (first occurrence) — mirror that with a dict.
+        var tgtByIdentity = new Dictionary<string, RawObjectDefinition>(StringComparer.OrdinalIgnoreCase);
+        foreach (var o in target.Objects) tgtByIdentity.TryAdd(o.Identity, o);
+
         foreach (var src in source.Objects)
         {
-            var tgt = target.FindObject(src.Identity);
+            tgtByIdentity.TryGetValue(src.Identity, out var tgt);
             if (tgt is null)
             {
                 changes.Add(new CreateRawObjectChange(src));
@@ -266,8 +310,11 @@ public sealed class SchemaComparer
 
         if (options.DropObjectsNotInSource)
         {
-            foreach (var tgt in target.Objects.Where(o => o.Kind != ObjectKind.Comment && source.FindObject(o.Identity) is null))
-                changes.Add(new DropRawObjectChange(tgt));
+            var srcByIdentity = new Dictionary<string, RawObjectDefinition>(StringComparer.OrdinalIgnoreCase);
+            foreach (var o in source.Objects) srcByIdentity.TryAdd(o.Identity, o);
+            foreach (var tgt in target.Objects)
+                if (tgt.Kind != ObjectKind.Comment && !srcByIdentity.ContainsKey(tgt.Identity))
+                    changes.Add(new DropRawObjectChange(tgt));
         }
     }
 
