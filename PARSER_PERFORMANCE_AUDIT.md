@@ -1,6 +1,8 @@
 # Parser Performance Audit — pgproj DDL/DML Parser
 
-**Goal:** make parsing as fast as possible. This is an audit + concrete proposal; no code changed.
+**Goal:** make parsing as fast as possible. Originally an audit + proposal (sections 1–5); **it has
+since been acted on — see [section 6](#6-implementation-status--findings-updated-2026-06-04) for what
+shipped, what was measured and rejected, and the benchmark methodology.**
 
 **Date:** 2026-06-04
 
@@ -117,6 +119,58 @@ Use **BenchmarkDotNet** (add a `PgProj.Benchmarks` console project; `[MemoryDiag
 **Corpus:** the repo already has a **PG18 test-corpus effort** (oracle/fixture/harness, `CorpusData.cs`, `CorpusTestGenerator.cs`) — feed those corpus `.sql` cases straight into the tokenize/parse benchmarks as the representative workload. Bucket by statement kind (CREATE TABLE vs raw/COMMENT/GRANT vs SELECT-heavy) since the re-tokenization win (#4) is concentrated in the raw/unsupported bucket and the expression-allocation wins (#6/#7/#9) in the SELECT/expression bucket. Establish a baseline commit, then gate each optimization on a measured `bytes/op` and `ns/op` delta — no merge without numbers.
 
 ---
+
+## 6. Implementation status & findings (updated 2026-06-04)
+
+This section supersedes the "no code changed" note above — the audit was acted on and several
+recommendations were measured to completion. All work is benchmark-gated via `bench/PgProj.Benchmarks`
+(added for this effort) and verified against the full unit suite (19310 passing).
+
+### Shipped (on `main`)
+- **#1 — parallel build wiring.** The CLI build/compare/publish/validate/script + ReverseSync now call
+  the (previously dead) `BuildAsync`; `MapProjectFiles`→`MapProjectFilesAsync`. Measured **2.85× @ 50
+  files, 4.70× @ 200** (24 cores); parity test asserts `Build()`≡`BuildAsync()`.
+- **Small-N guard** (refinement of #1, from a separate TPL-pitfalls audit): `BuildAsync`/
+  `MapProjectFilesAsync` short-circuit the `Parallel.ForEachAsync` machinery for ≤1 files and
+  accumulate directly into one model. A true single-file build went **1.43× → 0.98×** (penalty gone);
+  multi-file speedup unchanged.
+- **#5 / #6 / #8 — allocation wins.** Pre-sized token `List`, fixed-arity `AtAnyWord`/`MatchWords`
+  overloads (+ cached dispatch array), `SearchValues<char>` on the operator-merge/radix paths.
+  Measured: **Tokenize −20.5% alloc / −9.5% time; Parse −14.3% alloc.**
+
+### Tried, measured, and REJECTED (do not re-attempt)
+- **#3 (`Token`→`readonly record struct`) and #2 (`ReadOnlyMemory<char>` tokens) — net negative.**
+  #3 was fully implemented (incl. the prerequisite `Token.Value`→`Token.Text` rename, 254 sites — `Value`
+  collides with `Nullable<Token>.Value`) and benchmarked. It improved **standalone Tokenize (−30% alloc,
+  −38% time)** but **regressed end-to-end Build/Parse (+~10% alloc, +1–4% time)** because the grammar
+  re-captures tokens into many transient `List<Token>`, and a list of 24-byte structs has 3× larger
+  backing arrays than a list of 8-byte references. The audit's "High impact" rating for #3 is **wrong for
+  this codebase.** Both the struct and the rename were reverted.
+- **#4 (remove redundant re-tokenization) — unsafe here.** `Parse` builds statement segments from
+  **merged** tokens (`OperatorLexer.Merge`), but `ModelBuilder.DeriveRaw` re-tokenizes with **un-merged**
+  `Tokenizer.Tokenize`. Feeding the merged segment in would change operator/cast raw-object identity
+  strings (`<=>` vs `< = >`) and break round-trip zero-diff. The audit rated this "Low risk" but missed
+  the merged/un-merged mismatch.
+
+### Deferred (low ROI)
+- **#7 (`FrozenSet`)** and **#9 (drop `ToUpper`-to-switch)**: lookups/case-folding are ns/op-only or
+  per-statement; the workload is allocation-bound, so the expected gain sits below the benchmark noise
+  floor. Not worth the churn.
+
+### Parallel-code audit (vs .NET TPL pitfalls)
+All concurrency sites (`BuildAsync`, `MapProjectFilesAsync`, `PhasedDeployer`, `LiveDatabaseReader`)
+follow TPL best practices: bounded `MaxDegreeOfParallelism`, no shared-write races in the build paths
+(per-index slot + ordered merge), order-independent results, no sync-over-async (`.Result` only after
+`WhenAll`), connection-per-worker, culture-invariant parsing. Documented the one latent hazard:
+`LiveDatabaseReader`'s wave-2 readers mutate shared `TableDefinition`s and are safe **only** because they
+write disjoint members (constraints→PK/Unique, checks→Checks, fks→ForeignKeys).
+
+### Benchmark methodology notes
+- `BuildBenchmarks` `FileCount=N` writes **N+1** `.sql` files (`00_schema.sql` is always present), so
+  `FileCount=0` is the true single-file case (exercises the small-N guard); `FileCount=1` is two files
+  (the crossover region). Earlier "1-file slower" readings were really the 2-file crossover.
+- The benchmark host's throughput varied run-to-run (observed ~1.8× swings under load) — **compare
+  ratios within a single run**, not absolute ns/op across runs.
 
 ## Relevant files
 - `src/PgProj.Core/Parsing/Tokenizer.cs` — hot loop, per-token `Substring`/`c.ToString()` allocations (lines 28, 65, 102, 108, 114, 135, 144, 149, 155, 162)
