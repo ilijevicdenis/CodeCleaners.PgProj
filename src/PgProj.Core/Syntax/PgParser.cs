@@ -45,7 +45,9 @@ public sealed partial class PgParser
             if (lead is null)
             {
                 result.FullyRecognized = false;
-                result.Statements.Add(new UnsupportedStatement { LeadingKeyword = c.Current?.Value ?? "", SourceText = Token.Render(segment) });
+                var u = new UnsupportedStatement { LeadingKeyword = c.Current?.Value ?? "" };
+                u.SetSourceSegment(segment);   // render lazily — DeriveRaw reads it, so it materialises once there
+                result.Statements.Add(u);
                 continue;
             }
             try
@@ -53,7 +55,7 @@ public sealed partial class PgParser
                 var stmt = ParseStatement(c);
                 if (!c.AtEnd)
                     throw new ParseException($"unexpected '{c.Current!.Value}' after statement", c.Here);
-                stmt.SourceText = Token.Render(segment);
+                stmt.SetSourceSegment(segment);   // defer Token.Render; most structured statements never read SourceText
                 result.Statements.Add(stmt);
             }
             catch (ParseException pe)

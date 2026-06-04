@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using PgProj.Core.Parsing;
 
 namespace PgProj.Core.Syntax;
 
@@ -26,7 +27,30 @@ public sealed class ParseResult
     public bool FullyRecognized { get; set; } = true;
 }
 
-public abstract class SqlStatement { public int Position { get; init; } public string? SourceText { get; set; } }
+public abstract class SqlStatement
+{
+    public int Position { get; init; }
+
+    private string? _sourceText;
+    private IReadOnlyList<Token>? _sourceSegment;
+
+    /// <summary>
+    /// The statement's source text. Rendered lazily from its token segment on first read and cached.
+    /// Rendering is deferred because the model builder only reads SourceText for a minority of statement
+    /// kinds (functions, raw/unsupported, partition/typed tables); for the common structured statements —
+    /// plain tables, views, indexes, sequences, queries — it is never read, so eager <c>Token.Render</c>
+    /// was pure waste (≈ the bulk of the parser's "grammar+render" allocation). Setting it explicitly
+    /// (tests, synthetic statements) still works and overrides the deferred segment.
+    /// </summary>
+    public string? SourceText
+    {
+        get => _sourceText ??= (_sourceSegment is null ? null : Token.Render(_sourceSegment));
+        set { _sourceText = value; _sourceSegment = null; }
+    }
+
+    /// <summary>Defer SourceText materialisation: keep the token segment and render only on first read.</summary>
+    public void SetSourceSegment(IReadOnlyList<Token> segment) => _sourceSegment = segment;
+}
 
 /// <summary>A statement kind PgParser does not implement yet (caller falls back to legacy).</summary>
 public sealed class UnsupportedStatement : SqlStatement { public string LeadingKeyword { get; init; } = ""; }
