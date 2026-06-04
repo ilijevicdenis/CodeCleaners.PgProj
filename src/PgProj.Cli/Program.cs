@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using PgProj.Core.Analysis;
 using PgProj.Core.Comparison;
+using PgProj.Core.Deployment;
 using PgProj.Core.Introspection;
 using PgProj.Core.Model;
 using PgProj.Core.Project;
@@ -119,9 +120,12 @@ public static class Program
             DropObjectsNotInSource = HasFlag(args, "--allow-drops"),
         });
 
+        var variables = BuildVariableResolver(project, args);
         var script = new DeployScriptGenerator().Generate(changes, new DeployOptions
         {
             WrapInTransaction = !HasFlag(args, "--no-transaction"),
+            Scripts = LoadDeployScripts(project),
+            Variables = variables,
         });
 
         var outPath = GetOption(args, "-o", "--output");
@@ -137,13 +141,17 @@ public static class Program
             return 0;
         }
 
-        if (changes.Count == 0)
+        var scripts = LoadDeployScripts(project);
+        if (changes.Count == 0 && (scripts is null || scripts.IsEmpty))
         {
             Console.WriteLine("Nothing to publish — target already matches the project.");
             return 0;
         }
 
-        if (HasFlag(args, "--parallel"))
+        // --parallel runs the diff phase-by-phase, but pre/post deploy scripts have no phase model and
+        // must bracket the diff inside one transaction — so fall back to the whole-script deployer when
+        // deploy scripts are present (still strict all-or-nothing).
+        if (HasFlag(args, "--parallel") && (scripts is null || scripts.IsEmpty))
         {
             // Intra-phase parallelism with phase barriers (phase-level atomicity).
             await new PhasedDeployer(RequireConnection(args)).ExecuteAsync(changes);
@@ -322,11 +330,13 @@ public static class Program
 
     private static async Task<int> Script(string[] args)
     {
-        var (source, _) = await BuildSourceOrThrowAsync(args);
+        var (source, project) = await BuildSourceOrThrowAsync(args);
         var changes = new SchemaComparer().Compare(source, new DatabaseModel());
         var script = new DeployScriptGenerator().Generate(changes, new DeployOptions
         {
             WrapInTransaction = !HasFlag(args, "--no-transaction"),
+            Scripts = LoadDeployScripts(project),
+            Variables = BuildVariableResolver(project, args),
         });
 
         var outPath = GetOption(args, "-o", "--output");
@@ -344,9 +354,65 @@ public static class Program
 
     // ---- helpers ------------------------------------------------------------------------
 
+    // ---- deploy-script + variable helpers (EP-DEPLOYSCRIPTS / EP-VARS) -------------------
+
+    /// <summary>Loads the project's pre/post-deploy script bodies (verbatim) into a bundle, or null if none.</summary>
+    private static DeployScriptBundle? LoadDeployScripts(DatabaseProject project)
+    {
+        DeployScript? Read(string? path)
+        {
+            if (path is null) return null;
+            if (!File.Exists(path))
+                throw new FileNotFoundException($"Deploy script not found: {path}");
+            return new DeployScript(Path.GetFileName(path), File.ReadAllText(path));
+        }
+
+        var pre = Read(project.PreDeployScriptPath);
+        var post = Read(project.PostDeployScriptPath);
+        return pre is null && post is null ? null : new DeployScriptBundle(pre, post);
+    }
+
+    /// <summary>
+    /// Builds the resolved SQLCMD-variable map: project DefaultValues overlaid by CLI <c>--var N=V</c>
+    /// (repeatable). Precedence: CLI &gt; publish profile (future) &gt; project default.
+    /// </summary>
+    private static SqlCmdVariableResolver BuildVariableResolver(DatabaseProject project, string[] args) =>
+        SqlCmdVariableResolver.Build(
+            defaults: project.SqlCmdVariableDefaults,
+            profile: null,                          // EP-PROFILE — not yet wired
+            cliOverrides: ParseCliVars(args));
+
+    /// <summary>Parses every <c>--var Name=Value</c> occurrence into a case-insensitive override map.</summary>
+    private static IReadOnlyDictionary<string, string> ParseCliVars(string[] args)
+    {
+        var map = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        for (var i = 0; i < args.Length - 1; i++)
+        {
+            if (!args[i].Equals("--var", StringComparison.OrdinalIgnoreCase)) continue;
+            var pair = args[i + 1];
+            var eq = pair.IndexOf('=');
+            if (eq <= 0)
+                throw new InvalidOperationException($"--var expects Name=Value (got '{pair}').");
+            map[pair[..eq].Trim()] = pair[(eq + 1)..];
+        }
+        return map;
+    }
+
     private static async Task<(DatabaseModel Model, DatabaseProject Project)> BuildSourceOrThrowAsync(string[] args)
     {
         var project = DatabaseProject.Load(RequirePositional(args, "project file"));
+
+        // Opt-in: substitute $(Var) tokens into object files too (default scope is deploy-scripts only).
+        // Documented under --substitute-objects; unresolved tokens fail the build with a file:line diagnostic.
+        if (HasFlag(args, "--substitute-objects"))
+        {
+            var resolver = BuildVariableResolver(project, args);
+            project = project with
+            {
+                ObjectContentTransform = (rel, text) => resolver.Substitute(text, rel),
+            };
+        }
+
         var result = await project.BuildAsync();
         if (result.Diagnostics.Count > 0)
         {
@@ -415,10 +481,10 @@ public static class Program
         pgproj — PostgreSQL database project tool
 
         Usage:
-          pgproj build   <project.pgproj> [-o model.json] [--strict] [--no-analyze]
-          pgproj script  <project.pgproj> [-o create.sql] [--no-transaction]
+          pgproj build   <project.pgproj> [-o model.json] [--strict] [--no-analyze] [--var N=V] [--substitute-objects]
+          pgproj script  <project.pgproj> [-o create.sql] [--no-transaction] [--var N=V]
           pgproj compare <project.pgproj> --connection <conn> [--allow-drops]
-          pgproj publish <project.pgproj> --connection <conn> [--dry-run] [-o script.sql] [--allow-drops] [--no-transaction] [--parallel] [--strict] [--no-analyze]
+          pgproj publish <project.pgproj> --connection <conn> [--dry-run] [-o script.sql] [--allow-drops] [--no-transaction] [--parallel] [--strict] [--no-analyze] [--var N=V] [--substitute-objects]
           pgproj validate <project.pgproj> --connection <conn> [--strict] [--no-analyze]   (apply to a throwaway temp DB, rolled back)
           pgproj extract --connection <conn> -o <outDir>
           pgproj drift   <project.pgproj> --connection <conn>                          (preview project files that differ from the DB)
@@ -435,6 +501,17 @@ public static class Program
           --parallel         Publish with intra-phase parallelism (phase-level atomicity)
           --strict           Analysis gate: treat warnings as errors (build/publish fail on warnings)
           --no-analyze       Skip the static-analysis gate on build/publish
+          --var Name=Value   Override a SqlCmdVariable (repeatable; CLI beats the project DefaultValue)
+          --substitute-objects  Also expand $(Var) tokens in object .sql files (default: deploy-scripts only)
+
+        Pre/post-deploy scripts & variables:
+          Declare in the .pgproj:
+            <None Include="Scripts/PreDeploy.sql"><BuildAction>PreDeploy</BuildAction></None>
+            <None Include="Scripts/PostDeploy.sql"><BuildAction>PostDeploy</BuildAction></None>
+            <SqlCmdVariable Include="EnvSuffix"><DefaultValue>dev</DefaultValue></SqlCmdVariable>
+          The deploy script is spliced pre -> schema-diff -> post (all in one BEGIN/COMMIT unless
+          --no-transaction). $(Name) tokens in the deploy scripts are substituted; an unresolved token
+          fails with a file:line diagnostic. Write a literal "$(" as "$$(".
         """);
     }
 }

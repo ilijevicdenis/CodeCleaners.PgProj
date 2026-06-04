@@ -72,6 +72,86 @@ public class ProjectLoaderTests : IDisposable
     }
 
     [Fact]
+    public void Loads_pre_and_post_deploy_scripts_and_excludes_them_from_the_build()
+    {
+        var proj = Write("D.pgproj", """
+            <Project>
+              <PropertyGroup><Name>D</Name></PropertyGroup>
+              <ItemGroup>
+                <Build Include="**/*.sql" />
+                <None Include="Scripts/PreDeploy.sql"><BuildAction>PreDeploy</BuildAction></None>
+                <None Include="Scripts/PostDeploy.sql"><BuildAction>PostDeploy</BuildAction></None>
+              </ItemGroup>
+            </Project>
+            """);
+        Write("Tables/t.sql", "CREATE TABLE public.t (id int);");
+        Write("Scripts/PreDeploy.sql", "SELECT 'pre';");
+        Write("Scripts/PostDeploy.sql", "SELECT 'post';");
+
+        var project = DatabaseProject.Load(proj);
+        Assert.NotNull(project.PreDeployScriptPath);
+        Assert.NotNull(project.PostDeployScriptPath);
+        Assert.EndsWith("PreDeploy.sql", project.PreDeployScriptPath);
+        Assert.EndsWith("PostDeploy.sql", project.PostDeployScriptPath);
+
+        // Even though "**/*.sql" would glob them, deploy scripts must not be parsed as object sources.
+        var result = project.Build();
+        Assert.Single(result.Files);
+        Assert.Single(result.Model.Tables);
+        Assert.Empty(result.Diagnostics);
+    }
+
+    [Fact]
+    public void Rejects_more_than_one_pre_deploy_script()
+    {
+        var proj = Write("Dup.pgproj", """
+            <Project>
+              <PropertyGroup><Name>Dup</Name></PropertyGroup>
+              <ItemGroup>
+                <None Include="a.sql"><BuildAction>PreDeploy</BuildAction></None>
+                <None Include="b.sql"><BuildAction>PreDeploy</BuildAction></None>
+              </ItemGroup>
+            </Project>
+            """);
+        var ex = Assert.Throws<InvalidOperationException>(() => DatabaseProject.Load(proj));
+        Assert.Contains("PreDeploy", ex.Message);
+    }
+
+    [Fact]
+    public void Rejects_more_than_one_post_deploy_script()
+    {
+        var proj = Write("Dup2.pgproj", """
+            <Project>
+              <PropertyGroup><Name>Dup2</Name></PropertyGroup>
+              <ItemGroup>
+                <None Include="a.sql"><BuildAction>PostDeploy</BuildAction></None>
+                <None Include="b.sql"><BuildAction>PostDeploy</BuildAction></None>
+              </ItemGroup>
+            </Project>
+            """);
+        var ex = Assert.Throws<InvalidOperationException>(() => DatabaseProject.Load(proj));
+        Assert.Contains("PostDeploy", ex.Message);
+    }
+
+    [Fact]
+    public void Loads_sqlcmd_variable_defaults()
+    {
+        var proj = Write("V.pgproj", """
+            <Project>
+              <PropertyGroup><Name>V</Name></PropertyGroup>
+              <ItemGroup>
+                <SqlCmdVariable Include="EnvSuffix"><DefaultValue>dev</DefaultValue></SqlCmdVariable>
+                <SqlCmdVariable Include="NoDefault" />
+              </ItemGroup>
+            </Project>
+            """);
+        var project = DatabaseProject.Load(proj);
+        Assert.Equal("dev", project.SqlCmdVariableDefaults["EnvSuffix"]);
+        Assert.True(project.SqlCmdVariableDefaults.ContainsKey("NoDefault"));
+        Assert.Equal("", project.SqlCmdVariableDefaults["NoDefault"]);
+    }
+
+    [Fact]
     public void Underscore_prefixed_files_are_excluded_from_the_build()
     {
         var proj = Write("U.pgproj", """
