@@ -1,0 +1,37 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    `dotnet new` template pack for PgProj: an empty project (`dotnet new pgproj`) plus per-object
+    item templates (`dotnet new pgproj-table`, …). Packs into a NuGet template package that a user
+    installs with `dotnet new install CodeCleaners.PgProj.Templates`.
+
+    NOTE (follow-up): a project created OUTSIDE this repo cannot yet resolve the PgProj SDK/parser —
+    that depends on EP-PKG #13 (engine NuGet) / EP-VS #25 (SDK package). Until those land, the
+    generated `.pgproj` references `PgProj.Sdk/0.1.0` and is built via the in-repo CLI. This pack is
+    deliberately NOT auto-published; publishing is gated on EP-PKG. It is excluded from PgProj.slnx.
+  -->
+  <PropertyGroup>
+    <PackageType>Template</PackageType>
+    <PackageId>CodeCleaners.PgProj.Templates</PackageId>
+    <Version>0.1.0</Version>
+    <Title>CodeCleaners.PgProj database-project templates</Title>
+    <Authors>CodeCleaners d.o.o.</Authors>
+    <Description>dotnet new templates for PostgreSQL declarative database projects (pgproj): an empty project and per-object .sql scaffolds (table, view, function, procedure, trigger, sequence, type, schema, policy).</Description>
+    <PackageTags>dotnet-new;templates;postgresql;pgproj;database;ssdt</PackageTags>
+
+    <TargetFramework>net10.0</TargetFramework>
+    <IncludeContentInPack>true</IncludeContentInPack>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <ContentTargetFolders>content</ContentTargetFolders>
+    <NoWarn>$(NoWarn);NU5128</NoWarn>
+    <NoDefaultExcludes>true</NoDefaultExcludes>
+    <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="content\**\*" Exclude="content\**\bin\**;content\**\obj\**" />
+    <Compile Remove="**\*.cs" />
+  </ItemGroup>
+
+</Project>

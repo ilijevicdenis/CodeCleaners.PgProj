@@ -1,0 +1,27 @@
+{
+  "$schema": "http://json.schemastore.org/template",
+  "author": "CodeCleaners d.o.o.",
+  "classifications": [ "Database", "PostgreSQL", "PgProj" ],
+  "identity": "CodeCleaners.PgProj.Object.Sequence",
+  "name": "PgProj Sequence (object .sql)",
+  "shortName": "pgproj-sequence",
+  "tags": { "language": "SQL", "type": "item" },
+  "symbols": {
+    "Schema": {
+      "type": "parameter",
+      "datatype": "string",
+      "defaultValue": "public",
+      "replaces": "PGPROJ_SCHEMA",
+      "fileRename": "PGPROJ_SCHEMA",
+      "description": "The object's schema."
+    },
+    "Name": {
+      "type": "parameter",
+      "datatype": "string",
+      "defaultValue": "Sequence",
+      "replaces": "PGPROJ_NAME",
+      "fileRename": "PGPROJ_NAME",
+      "description": "The object's name."
+    }
+  }
+}

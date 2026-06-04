@@ -1,0 +1,10 @@
+<Project Sdk="PgProj.Sdk/0.1.0">
+  <PropertyGroup>
+    <Name>PgProjProject</Name>
+    <DefaultSchema>PGPROJ_DEFAULT_SCHEMA</DefaultSchema>
+    <TargetPostgresVersion>PGPROJ_TARGET_VERSION</TargetPostgresVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <Build Include="**/*.sql" />
+  </ItemGroup>
+</Project>
