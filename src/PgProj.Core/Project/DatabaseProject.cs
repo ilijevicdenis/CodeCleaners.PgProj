@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 using PgProj.Core.Model;
 using PgProj.Core.Parsing;
+using Refs = PgProj.Core.Project.References;
 
 namespace PgProj.Core.Project;
 
@@ -51,6 +52,14 @@ public sealed record DatabaseProject
     /// the CLI wires this only when <c>--substitute-objects</c> is passed. Left null → files parse verbatim.
     /// </summary>
     public Func<string, string, string>? ObjectContentTransform { get; init; }
+
+    /// <summary>
+    /// The project / artifact / package references declared in the <c>.pgproj</c> ItemGroups (EP-REF).
+    /// Their Include paths are resolved relative to <see cref="ProjectDirectory"/>; resolution into
+    /// external models is the job of <see cref="References.ReferenceResolver"/>, not the loader.
+    /// </summary>
+    public IReadOnlyList<Refs.ProjectReferenceItem> References { get; init; } =
+        System.Array.Empty<Refs.ProjectReferenceItem>();
 
     private string ReadSource(string file)
     {
@@ -97,6 +106,7 @@ public sealed record DatabaseProject
             PreDeployScriptPath = preDeploy,
             PostDeployScriptPath = postDeploy,
             SqlCmdVariableDefaults = variables,
+            References = ParseReferences(root, dir),
         };
     }
 
@@ -155,6 +165,35 @@ public sealed record DatabaseProject
             vars[name] = def;
         }
         return vars;
+    }
+
+    /// <summary>
+    /// Reads <c>&lt;ProjectReference/&gt;</c>, <c>&lt;ArtifactReference/&gt;</c> and
+    /// <c>&lt;PackageReference/&gt;</c> items from any ItemGroup. The reference KIND is the element's local
+    /// name; <c>Include</c> is the path (project/artifact) or package id (package). Package references also
+    /// carry an optional <c>Version</c> attribute.
+    /// </summary>
+    private static IReadOnlyList<Refs.ProjectReferenceItem> ParseReferences(XElement root, string projectDir)
+    {
+        var refs = new List<Refs.ProjectReferenceItem>();
+        foreach (var e in root.Descendants())
+        {
+            var kind = e.Name.LocalName switch
+            {
+                var n when n.Equals("ProjectReference", StringComparison.OrdinalIgnoreCase) => Refs.ReferenceKind.Project,
+                var n when n.Equals("ArtifactReference", StringComparison.OrdinalIgnoreCase) => Refs.ReferenceKind.Artifact,
+                var n when n.Equals("PackageReference", StringComparison.OrdinalIgnoreCase) => Refs.ReferenceKind.Package,
+                _ => (Refs.ReferenceKind?)null,
+            };
+            if (kind is null) continue;
+
+            var include = e.Attribute("Include")?.Value?.Trim();
+            if (string.IsNullOrWhiteSpace(include)) continue;
+
+            var version = e.Attribute("Version")?.Value?.Trim();
+            refs.Add(new Refs.ProjectReferenceItem(kind.Value, include, version, projectDir));
+        }
+        return refs;
     }
 
     /// <summary>Resolves all .sql files the project includes, de-duplicated and ordered deterministically.</summary>

@@ -1,0 +1,9 @@
+<Project>
+  <PropertyGroup>
+    <Name>Common</Name>
+    <DefaultSchema>common</DefaultSchema>
+  </PropertyGroup>
+  <ItemGroup>
+    <Build Include="**/*.sql" />
+  </ItemGroup>
+</Project>
