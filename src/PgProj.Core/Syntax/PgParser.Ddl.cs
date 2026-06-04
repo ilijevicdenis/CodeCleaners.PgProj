@@ -15,7 +15,7 @@ public sealed partial class PgParser
         var node = new CreateViewStatement { Schema = s, Name = n, Materialized = materialized };
 
         // skip pre-AS clauses: column list, WITH (options), USING method, TABLESPACE
-        while (!c.AtEnd && !c.AtWord("AS")) { if (c.AtSymbol('(')) CaptureBalancedParens(c); else c.Advance(); }
+        while (!c.AtEnd && !c.AtWord("AS")) { if (c.AtSymbol('(')) c.SkipBalancedParens(); else c.Advance(); }
         c.ExpectWord("AS");
 
         var body = new List<Token>();
@@ -106,7 +106,7 @@ public sealed partial class PgParser
         int m = c.Mark();
         ParseExpression(c);                                  // COLLATE is absorbed here as a postfix
         if (c.Current is { Kind: TokenKind.Word } w && !w.IsWord("ASC") && !w.IsWord("DESC") && !w.IsWord("NULLS"))
-        { c.Advance(); while (c.MatchSymbol('.')) c.ExpectIdentifier(); if (c.AtSymbol('(')) CaptureBalancedParens(c); }   // opclass [schema-qualified] [(params)]
+        { c.Advance(); while (c.MatchSymbol('.')) c.ExpectIdentifier(); if (c.AtSymbol('(')) c.SkipBalancedParens(); }   // opclass [schema-qualified] [(params)]
         bool asc = c.MatchWord("ASC"), desc = !asc && c.MatchWord("DESC");
         if (((asc || desc) && c.AtAnyWord("ASC", "DESC"))) throw new ParseException("ASC and DESC are mutually exclusive", c.Here);
         if (c.MatchWord("NULLS"))
@@ -155,7 +155,7 @@ public sealed partial class PgParser
 
     // Validate the captured argument tokens: one mode per arg, VARIADIC must be an array, defaults must be
     // trailing, no empty/trailing-comma entries. Returns whether any OUT/INOUT parameter is present.
-    private bool ValidateFunctionArgs(List<Token> argInner)
+    private bool ValidateFunctionArgs(IReadOnlyList<Token> argInner)
     {
         if (argInner.Count == 0) return false;
         var a = new TokenCursor(argInner);
@@ -181,7 +181,7 @@ public sealed partial class PgParser
             if (mode == "VARIADIC" && !IsArrayOrAnyType(type)) throw new ParseException("a VARIADIC parameter must be an array type", a.Here);
 
             bool thisDefault = false;
-            if (a.MatchWord("DEFAULT") || a.MatchOperator("=")) { thisDefault = true; while (!a.AtEnd && !a.AtSymbol(',')) { if (a.AtSymbol('(')) CaptureBalancedParens(a); else a.Advance(); } }
+            if (a.MatchWord("DEFAULT") || a.MatchOperator("=")) { thisDefault = true; while (!a.AtEnd && !a.AtSymbol(',')) { if (a.AtSymbol('(')) a.SkipBalancedParens(); else a.Advance(); } }
             if (mode is null or "IN" or "INOUT" or "VARIADIC")
             {
                 if (seenDefault && !thisDefault) throw new ParseException("input parameters after one with a default value must also have defaults", a.Here);
@@ -223,7 +223,7 @@ public sealed partial class PgParser
         bool returnsSet = false, returnsTable = false;
         if (o.MatchWord("RETURNS"))
         {
-            if (o.MatchWord("TABLE")) { returnsTable = true; returnsSet = true; if (!o.AtSymbol('(')) throw new ParseException("expected '(' after RETURNS TABLE", o.Here); CaptureBalancedParens(o); }
+            if (o.MatchWord("TABLE")) { returnsTable = true; returnsSet = true; if (!o.AtSymbol('(')) throw new ParseException("expected '(' after RETURNS TABLE", o.Here); o.SkipBalancedParens(); }
             else { if (o.MatchWord("SETOF")) returnsSet = true; var rt = ParseCastType(o); if (rt.Trim().Equals("void", System.StringComparison.OrdinalIgnoreCase)) node.ReturnsVoid = true; }
         }
         node.ReturnsSetof = returnsSet;
@@ -278,7 +278,7 @@ public sealed partial class PgParser
 
 
     /// <summary>Best-effort argument-type list for a function signature (modes/names/defaults stripped).</summary>
-    private static string ExtractArgTypes(List<Token> argInner)
+    private static string ExtractArgTypes(IReadOnlyList<Token> argInner)
     {
         var args = new List<string>();
         foreach (var part in SplitTopLevel(argInner))
@@ -301,7 +301,7 @@ public sealed partial class PgParser
         return string.Join(", ", args);
     }
 
-    private static IEnumerable<List<Token>> SplitTopLevel(List<Token> tokens)
+    private static IEnumerable<List<Token>> SplitTopLevel(IReadOnlyList<Token> tokens)
     {
         var cur = new List<Token>(); int depth = 0;
         foreach (var t in tokens)

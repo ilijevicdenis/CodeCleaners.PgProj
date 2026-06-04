@@ -66,13 +66,13 @@ public sealed partial class PgParser
             else throw new ParseException("expected ROW or STATEMENT", c.Here);
         }
 
-        if (c.MatchWord("WHEN")) { if (!c.AtSymbol('(')) throw new ParseException("expected '(' after WHEN", c.Here); CaptureBalancedParens(c); }
+        if (c.MatchWord("WHEN")) { if (!c.AtSymbol('(')) throw new ParseException("expected '(' after WHEN", c.Here); c.SkipBalancedParens(); }
 
         c.ExpectWord("EXECUTE");
         if (!c.MatchWord("FUNCTION")) c.ExpectWord("PROCEDURE");
         ParseQualifiedName(c);
         if (!c.AtSymbol('(')) throw new ParseException("expected '(' for the trigger function arguments", c.Here);
-        CaptureBalancedParens(c);
+        c.SkipBalancedParens();
 
         // cross-field rules (no catalog needed)
         if (timing == "INSTEAD OF")

@@ -31,7 +31,7 @@ public sealed partial class PgParser
 
         // Old single-paren form puts "key = value" options directly after the name; the modern form has
         // an argument paren followed by a separate definition paren. A top-level '=' marks the old form.
-        List<Token> definition;
+        IReadOnlyList<Token> definition;
         if (HasTopLevelEquals(first)) definition = first;
         else
         {
@@ -43,7 +43,7 @@ public sealed partial class PgParser
         return node;
     }
 
-    private static bool HasTopLevelEquals(List<Token> toks)
+    private static bool HasTopLevelEquals(IReadOnlyList<Token> toks)
     {
         int depth = 0;
         foreach (var t in toks)
@@ -55,7 +55,7 @@ public sealed partial class PgParser
         return false;
     }
 
-    private void ValidateAggregateDefinition(List<Token> tokens)
+    private void ValidateAggregateDefinition(IReadOnlyList<Token> tokens)
     {
         var d = new TokenCursor(tokens);
         if (d.AtEnd) throw new ParseException("aggregate definition cannot be empty", d.Here);

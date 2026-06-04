@@ -88,7 +88,7 @@ public sealed partial class PgParser
         if (c.MatchWords("SET", "TABLESPACE")) { c.ExpectIdentifier(); return "SET TABLESPACE"; }
         if (c.MatchWords("SET", "LOGGED") || c.MatchWords("SET", "UNLOGGED")) return "SET LOGGED";
         if (c.MatchWord("SET")) { if (c.AtSymbol('(')) CaptureNonEmptyParens(c); else ConsumeActionRest(c); return "SET"; }
-        if (c.MatchWord("RESET")) { if (c.AtSymbol('(')) CaptureBalancedParens(c); return "RESET"; }
+        if (c.MatchWord("RESET")) { if (c.AtSymbol('(')) c.SkipBalancedParens(); return "RESET"; }
         if (c.AtAnyWord("ENABLE", "DISABLE", "FORCE")) { ConsumeActionRest(c); return "ENABLE/DISABLE"; }
         if (c.MatchWords("NO", "FORCE")) { ConsumeActionRest(c); return "NO FORCE"; }
         if (c.MatchWord("INHERIT")) { ParseQualifiedName(c); return "INHERIT"; }
@@ -154,7 +154,7 @@ public sealed partial class PgParser
         if (c.MatchWords("SET", "STORAGE")) { var v = c.ExpectIdentifier(); if (!StorageModes.Contains(v)) throw new ParseException($"invalid storage mode \"{v}\"", c.Here); return "SET STORAGE"; }
         if (c.MatchWords("SET", "COMPRESSION")) { c.ExpectIdentifier(); return "SET COMPRESSION"; }
         if (c.MatchWord("SET")) { if (c.AtSymbol('(')) CaptureNonEmptyParens(c); else ConsumeActionRest(c); return "SET opts"; }
-        if (c.MatchWord("RESET")) { if (c.AtSymbol('(')) CaptureBalancedParens(c); return "RESET"; }
+        if (c.MatchWord("RESET")) { if (c.AtSymbol('(')) c.SkipBalancedParens(); return "RESET"; }
         if (c.MatchWord("RESTART")) { ConsumeActionRest(c); return "RESTART"; }
         throw new ParseException($"unknown ALTER COLUMN action at {Render(c.Current)}", c.Here);
     }
@@ -227,7 +227,7 @@ public sealed partial class PgParser
             case "FUNCTION" or "PROCEDURE" or "AGGREGATE":
                 c.MatchWords("IF", "NOT", "EXISTS");
                 (node.Schema, node.Name) = ParseQualifiedName(c);
-                if (c.AtSymbol('(')) CaptureBalancedParens(c);
+                if (c.AtSymbol('(')) c.SkipBalancedParens();
                 ConsumeRest(c);
                 return node;
             case "INDEX":
@@ -272,7 +272,7 @@ public sealed partial class PgParser
         // the name may be a qualified identifier OR an operator symbol; the signature is the "(types)"
         while (!c.AtEnd && !c.AtSymbol('(') && !c.AtSymbol(',')
                && !c.AtAnyWord("CASCADE", "RESTRICT", "RENAME", "OWNER", "SET", "DEPENDS")) c.Advance();
-        if (c.AtSymbol('(')) CaptureBalancedParens(c);
+        if (c.AtSymbol('(')) c.SkipBalancedParens();
     }
 
     private static string? MatchCascadeRestrict(TokenCursor c)
@@ -281,7 +281,7 @@ public sealed partial class PgParser
     private void CaptureNonEmptyParens(TokenCursor c)
     {
         if (c.AtSymbol('(') && c.Peek()?.IsSymbol(')') == true) throw new ParseException("option list cannot be empty", c.Here);
-        CaptureBalancedParens(c);
+        c.SkipBalancedParens();
     }
 
     private static void ExpectStringLit(TokenCursor c, string what)
@@ -315,7 +315,7 @@ public sealed partial class PgParser
         }
         if (c.MatchWords("OWNER", "TO")) { ParseRoleSpec(c); alter.Actions.Add("OWNER"); return; }
         if (c.MatchWords("SET", "SCHEMA")) { c.ExpectIdentifier(); alter.Actions.Add("SET SCHEMA"); return; }
-        if (c.MatchWord("SET")) { if (c.AtSymbol('(')) CaptureBalancedParens(c); else ConsumeRest(c); alter.Actions.Add("SET"); return; }
+        if (c.MatchWord("SET")) { if (c.AtSymbol('(')) c.SkipBalancedParens(); else ConsumeRest(c); alter.Actions.Add("SET"); return; }
 
         // attribute mutations — one or a comma-separated list
         if (c.AtAnyWord("ADD", "DROP", "ALTER"))

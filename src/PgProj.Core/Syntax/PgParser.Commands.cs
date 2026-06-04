@@ -124,7 +124,7 @@ public sealed partial class PgParser
     private CommandStatement ParseExplain(TokenCursor c)
     {
         c.ExpectWord("EXPLAIN");
-        if (c.AtSymbol('(')) CaptureBalancedParens(c);           // ( ANALYZE, VERBOSE, FORMAT … )
+        if (c.AtSymbol('(')) c.SkipBalancedParens();           // ( ANALYZE, VERBOSE, FORMAT … )
         else while (c.AtAnyWord("ANALYZE", "VERBOSE")) c.Advance();
         var inner = ParseStatement(c);
         return new CommandStatement { Kind = "EXPLAIN", Inner = inner };
@@ -151,7 +151,7 @@ public sealed partial class PgParser
     {
         c.ExpectWord("PREPARE");
         var name = c.ExpectIdentifier();
-        if (c.AtSymbol('(')) CaptureBalancedParens(c);           // (type, …)
+        if (c.AtSymbol('(')) c.SkipBalancedParens();           // (type, …)
         c.ExpectWord("AS");
         var inner = ParseStatement(c);
         return new CommandStatement { Kind = "PREPARE", Detail = name, Inner = inner };
@@ -161,7 +161,7 @@ public sealed partial class PgParser
     {
         c.ExpectWord("EXECUTE");
         var name = c.ExpectIdentifier();
-        if (c.AtSymbol('(')) CaptureBalancedParens(c);
+        if (c.AtSymbol('(')) c.SkipBalancedParens();
         return new CommandStatement { Kind = "EXECUTE", Detail = name };
     }
 
@@ -261,8 +261,8 @@ public sealed partial class PgParser
     private CommandStatement ParseCopy(TokenCursor c)
     {
         c.ExpectWord("COPY");
-        if (c.AtSymbol('(')) CaptureBalancedParens(c);           // COPY ( query ) TO …
-        else { ParseQualifiedName(c); if (c.AtSymbol('(')) CaptureBalancedParens(c); }   // table [(cols)]
+        if (c.AtSymbol('(')) c.SkipBalancedParens();           // COPY ( query ) TO …
+        else { ParseQualifiedName(c); if (c.AtSymbol('(')) c.SkipBalancedParens(); }   // table [(cols)]
         if (!(c.MatchWord("FROM") || c.MatchWord("TO")))
             throw new ParseException("expected FROM or TO in COPY", c.Here);
         if (c.MatchWord("PROGRAM")) { if (c.Current is not { Kind: TokenKind.String }) throw new ParseException("expected a program string", c.Here); c.Advance(); }

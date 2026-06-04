@@ -44,24 +44,34 @@ public sealed record Token(TokenKind Kind, string Value, int Position)
     /// between two value-like tokens (so "numeric ( 12 , 2 )" round-trips tightly while
     /// "timestamp without time zone" keeps its spaces).
     /// </summary>
-    public static string Render(IReadOnlyList<Token> tokens)
+    public static string Render(IReadOnlyList<Token> tokens) => Render(tokens, 0, tokens.Count);
+
+    /// <summary>
+    /// Render the <paramref name="count"/> tokens starting at <paramref name="start"/> directly from
+    /// <paramref name="tokens"/>, without copying them into an intermediate list first. The grammar's
+    /// capture helpers (CaptureRest / CaptureExpression / a balanced-paren body) used to collect a run
+    /// into a fresh <c>List&lt;Token&gt;</c> purely to feed <see cref="Render(IReadOnlyList{Token})"/>;
+    /// they now track [start, start+count) over the cursor's own token list and call this — killing the
+    /// per-capture List + its doubling-grown <c>Token[]</c> backing array (AllocProbe-driven).
+    /// </summary>
+    public static string Render(IReadOnlyList<Token> tokens, int start, int count)
     {
         // Fast paths: the overwhelming majority of Render calls are a single token (a column type like
         // "bigint"/"jsonb", a one-word identifier) — return its text directly, no StringBuilder/ToString.
-        if (tokens.Count == 0) return "";
-        if (tokens.Count == 1) return tokens[0].Render();
+        if (count <= 0) return "";
+        if (count == 1) return tokens[start].Render();
 
         // Pre-size: without a capacity hint the builder block-expands from 16 chars repeatedly (the #1
         // allocation source in the alloc trace). Sum of token lengths + a space each is a safe estimate.
         var cap = 0;
-        for (var i = 0; i < tokens.Count; i++) cap += tokens[i].Value.Length + 1;
+        for (var i = 0; i < count; i++) cap += tokens[start + i].Value.Length + 1;
         var sb = new StringBuilder(cap);
         Token? prev = null;
         // Indexed, not foreach: a segment may be an IReadOnlyList view (TokenSegment) whose enumerator
         // would allocate; indexing is allocation-free for every IReadOnlyList including List<Token>.
-        for (var i = 0; i < tokens.Count; i++)
+        for (var i = 0; i < count; i++)
         {
-            var t = tokens[i];
+            var t = tokens[start + i];
             // Separate a value token from a preceding value token or a closing bracket, so
             // "count(o.id) AS x" and "timestamp without time zone" both read naturally while
             // "numeric(12, 2)" stays tight.

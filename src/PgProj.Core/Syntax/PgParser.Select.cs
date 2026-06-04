@@ -205,8 +205,8 @@ public sealed partial class PgParser
 
     private void ParseGroupingElement(TokenCursor c, SelectQuery q)
     {
-        if (c.AtAnyWord("ROLLUP", "CUBE")) { q.GroupByKind = c.Advance().Value.ToUpperInvariant(); CaptureBalancedParens(c); return; }
-        if (c.MatchWords("GROUPING", "SETS")) { q.GroupByKind = "GROUPING SETS"; CaptureBalancedParens(c); return; }
+        if (c.AtAnyWord("ROLLUP", "CUBE")) { q.GroupByKind = c.Advance().Value.ToUpperInvariant(); c.SkipBalancedParens(); return; }
+        if (c.MatchWords("GROUPING", "SETS")) { q.GroupByKind = "GROUPING SETS"; c.SkipBalancedParens(); return; }
         if (c.AtSymbol('(') && c.Peek()?.IsSymbol(')') == true) { c.Advance(); c.Advance(); return; }   // GROUP BY () — grand total
         q.GroupBy.Add(ParseExpression(c));
     }
@@ -271,7 +271,7 @@ public sealed partial class PgParser
             if (c.AtSymbol('('))
             {
                 if (n.Equals("xmltable", StringComparison.OrdinalIgnoreCase) || n.Equals("json_table", StringComparison.OrdinalIgnoreCase))
-                { var f = new FuncCallExpr(); f.Name.Add(n); CaptureBalancedParens(c); rel.Function = f; }
+                { var f = new FuncCallExpr(); f.Name.Add(n); c.SkipBalancedParens(); rel.Function = f; }
                 else rel.Function = ParseCallTail(c, s is null ? new List<string> { n } : new List<string> { s, n });
             }
             else { rel.Schema = s; rel.TableName = n; c.MatchSymbol('*'); }
@@ -288,7 +288,7 @@ public sealed partial class PgParser
         if (c.MatchWord("TABLESAMPLE"))
         {
             c.ExpectIdentifier();
-            if (c.AtSymbol('(')) CaptureBalancedParens(c);
+            if (c.AtSymbol('(')) c.SkipBalancedParens();
             if (c.MatchWord("REPEATABLE")) { c.ExpectSymbol('('); ParseExpression(c); c.ExpectSymbol(')'); }
         }
 
@@ -300,7 +300,7 @@ public sealed partial class PgParser
     private void ParseRelAliasCols(TokenCursor c, TableRef rel)
     {
         if (!c.AtSymbol('(')) return;
-        if (rel.Function is not null) CaptureBalancedParens(c);
+        if (rel.Function is not null) c.SkipBalancedParens();
         else rel.ColumnAliases.AddRange(ParseColumnNameList(c));
     }
 
@@ -406,7 +406,7 @@ public sealed partial class PgParser
         return e;
     }
 
-    private static List<Token> WithParensList(List<Token> inner)
+    private static List<Token> WithParensList(IReadOnlyList<Token> inner)
     {
         var o = new List<Token> { new(TokenKind.Symbol, "(", 0) };
         o.AddRange(inner);

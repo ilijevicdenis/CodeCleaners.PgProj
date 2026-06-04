@@ -211,7 +211,7 @@ public sealed partial class PgParser
     private void ParseReturning(TokenCursor c, DmlStatement s)
     {
         if (!c.MatchWord("RETURNING")) return;
-        if (c.MatchWord("WITH") && c.AtSymbol('(')) CaptureBalancedParens(c);   // PG18: RETURNING WITH (OLD/NEW AS …)
+        if (c.MatchWord("WITH") && c.AtSymbol('(')) c.SkipBalancedParens();   // PG18: RETURNING WITH (OLD/NEW AS …)
         if (c.MatchSymbol('*')) { s.ReturningStar = true; if (!c.MatchSymbol(',')) return; }   // *, o.val, n.val — more items may follow
         s.Returning.Add(ParseSelectItem(c));
         while (c.MatchSymbol(',')) s.Returning.Add(ParseSelectItem(c));

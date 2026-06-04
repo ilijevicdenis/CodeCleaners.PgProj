@@ -43,6 +43,26 @@ public sealed class TokenCursor
         return list;
     }
 
+    /// <summary>Re-serialise the consumed run [from, to) straight from the source list — no intermediate copy.</summary>
+    public string RenderRange(int from, int to) => Token.Render(_tokens, from, to - from);
+
+    /// <summary>A read-only window over the source tokens in [from, to), for sub-parsing without copying.</summary>
+    public TokenSegment Segment(int from, int to) => new TokenSegment(_tokens, from, to - from);
+
+    /// <summary>Consume a balanced (...) and discard the inner tokens — no allocation (outer parens consumed).</summary>
+    public void SkipBalancedParens()
+    {
+        ExpectSymbol('(');
+        int depth = 1;
+        while (!AtEnd)
+        {
+            var t = Advance();
+            if (t.IsSymbol(')')) { if (--depth == 0) return; }
+            else if (t.IsSymbol('(')) depth++;
+        }
+        throw new ParseException("unbalanced '('", Here);
+    }
+
     public Token Advance()
     {
         if (AtEnd) throw new ParseException("unexpected end of input", Here);

@@ -280,7 +280,7 @@ public sealed partial class PgParser
         return stmt;
     }
 
-    private void ParseTableBody(List<Token> inner, CreateTableStatement table)
+    private void ParseTableBody(IReadOnlyList<Token> inner, CreateTableStatement table)
     {
         var b = new TokenCursor(inner);
         if (b.AtEnd) return;                                  // CREATE TABLE x () is legal
@@ -518,13 +518,13 @@ public sealed partial class PgParser
                     return new GeneratedStored { Expression = expr };
                 }
                 b.ExpectWord("IDENTITY");
-                if (b.AtSymbol('(')) CaptureBalancedParens(b);
+                if (b.AtSymbol('(')) b.SkipBalancedParens();
                 return new GeneratedIdentity { Kind = "ALWAYS" };
             }
             b.MatchWords("BY", "DEFAULT");
             b.ExpectWord("AS");
             b.ExpectWord("IDENTITY");
-            if (b.AtSymbol('(')) CaptureBalancedParens(b);
+            if (b.AtSymbol('(')) b.SkipBalancedParens();
             return new GeneratedIdentity { Kind = "BY DEFAULT" };
         }
 
@@ -616,7 +616,7 @@ public sealed partial class PgParser
     private void ParseIndexTrailing(TokenCursor b, List<string> include, Deferrability defer)
     {
         if (b.MatchWord("INCLUDE")) include.AddRange(ParseColumnNameList(b));
-        if (b.MatchWord("WITH") && b.AtSymbol('(')) CaptureBalancedParens(b);
+        if (b.MatchWord("WITH") && b.AtSymbol('(')) b.SkipBalancedParens();
         if (b.MatchWords("USING", "INDEX", "TABLESPACE")) b.ExpectIdentifier();
         while (TryDeferrable(b, defer)) { }
         ValidateDeferrability(defer, b);
@@ -773,7 +773,7 @@ public sealed partial class PgParser
         return cols;
     }
 
-    private static List<string> ParseIdentifierList(List<Token> inner)
+    private static List<string> ParseIdentifierList(IReadOnlyList<Token> inner)
     {
         var b = new TokenCursor(inner);
         var ids = new List<string>();
@@ -789,18 +789,23 @@ public sealed partial class PgParser
         return ids;
     }
 
-    /// <summary>Capture a balanced (...) and return the inner tokens (outer parens consumed).</summary>
-    private static List<Token> CaptureBalancedParens(TokenCursor c)
+    /// <summary>
+    /// Capture a balanced (...) and return the inner tokens as a read-only window over the cursor's own
+    /// token list (outer parens consumed) — no copy. The run is contiguous, so a <see cref="TokenSegment"/>
+    /// view replaces the old per-call <c>List&lt;Token&gt;</c>; callers either re-parse it through a fresh
+    /// cursor or render it, both of which only read.
+    /// </summary>
+    private static IReadOnlyList<Token> CaptureBalancedParens(TokenCursor c)
     {
         c.ExpectSymbol('(');
-        var inner = new List<Token>();
+        int start = c.Mark();
         int depth = 1;
         while (!c.AtEnd)
         {
             var t = c.Advance();
-            if (t.IsSymbol(')')) { depth--; if (depth == 0) return inner; }
+            // c.Mark() now points just past this token; the closing ')' is excluded from the window.
+            if (t.IsSymbol(')')) { if (--depth == 0) return c.Segment(start, c.Mark() - 1); }
             else if (t.IsSymbol('(')) depth++;
-            inner.Add(t);
         }
         throw new ParseException("unbalanced '('", c.Here);
     }
@@ -815,30 +820,30 @@ public sealed partial class PgParser
     /// <summary>A scalar expression (DEFAULT value) up to a top-level comma or column-constraint keyword.</summary>
     private static string CaptureExpression(TokenCursor b)
     {
-        var toks = new List<Token>();
+        int start = b.Mark();
         int depth = 0;
         while (!b.AtEnd)
         {
             var t = b.Current!;
             // Stop at a top-level comma or a column-constraint keyword, but only AFTER consuming the
             // first token — so a literal default like NULL/TRUE/FALSE is taken as the value.
-            if (depth == 0 && toks.Count > 0)
+            if (depth == 0 && b.Mark() > start)
             {
                 if (t.IsSymbol(',')) break;
                 if (t.Kind == TokenKind.Word && ColumnConstraintStart.Contains(t.Value)) break;
             }
-            if (depth == 0 && toks.Count == 0 && t.IsSymbol(',')) break;
+            if (depth == 0 && b.Mark() == start && t.IsSymbol(',')) break;
             if (t.IsSymbol('(') || t.IsSymbol('[')) depth++;
             else if (t.IsSymbol(')') || t.IsSymbol(']')) depth = Math.Max(0, depth - 1);
-            toks.Add(b.Advance());
+            b.Advance();
         }
-        if (toks.Count == 0) throw new ParseException("expected an expression", b.Here);
-        return Token.Render(toks);
+        if (b.Mark() == start) throw new ParseException("expected an expression", b.Here);
+        return b.RenderRange(start, b.Mark());
     }
 
     private static string CaptureToElementEnd(TokenCursor b)
     {
-        var toks = new List<Token>();
+        int start = b.Mark();
         int depth = 0;
         while (!b.AtEnd)
         {
@@ -846,16 +851,16 @@ public sealed partial class PgParser
             if (depth == 0 && t.IsSymbol(',')) break;
             if (t.IsSymbol('(') || t.IsSymbol('[')) depth++;
             else if (t.IsSymbol(')') || t.IsSymbol(']')) depth = Math.Max(0, depth - 1);
-            toks.Add(b.Advance());
+            b.Advance();
         }
-        return Token.Render(toks);
+        return b.RenderRange(start, b.Mark());
     }
 
     private static string CaptureRest(TokenCursor c)
     {
-        var toks = new List<Token>();
-        while (!c.AtEnd) toks.Add(c.Advance());
-        return Token.Render(toks);
+        int start = c.Mark();
+        while (!c.AtEnd) c.Advance();
+        return c.RenderRange(start, c.Mark());
     }
 
     private static string Render(Token? t) => t is null ? "end of input" : $"'{t.Value}'";

@@ -453,7 +453,7 @@ public sealed partial class PgParser
     {
         var call = new FuncCallExpr();
         call.Name.Add(c.Advance().Value);
-        CaptureBalancedParens(c);
+        c.SkipBalancedParens();
         // aggregate/window tails also apply to keyword-calls like xmlagg(...) FILTER (WHERE …) OVER (…)
         if (c.MatchWord("FILTER")) { c.ExpectSymbol('('); c.ExpectWord("WHERE"); call.Filter = ParseExpression(c); c.ExpectSymbol(')'); }
         if (c.MatchWord("OVER")) call.Over = ParseWindowSpecOrName(c);
@@ -534,7 +534,7 @@ public sealed partial class PgParser
         return Token.Render(toks);
     }
 
-    private static IEnumerable<Token> WithParens(List<Token> inner)
+    private static IEnumerable<Token> WithParens(IReadOnlyList<Token> inner)
     {
         yield return new Token(TokenKind.Symbol, "(", 0);
         foreach (var t in inner) yield return t;
