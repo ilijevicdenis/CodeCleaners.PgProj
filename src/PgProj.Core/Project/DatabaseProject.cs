@@ -125,6 +125,34 @@ public sealed class DatabaseProject
     public async Task<ProjectBuildResult> BuildAsync(CancellationToken ct = default)
     {
         var files = ResolveSqlFiles();                 // already sorted → defines merge order
+
+        // Small-N short-circuit: for 0–1 files the Parallel.ForEachAsync machinery is pure overhead
+        // (crossover ≈10 files — see PgProj.Benchmarks). Accumulate directly into one model — exactly
+        // like the serial Build() (no PartialParse/Merge copy) — so a single-file build is as cheap as
+        // serial, while keeping BuildAsync's per-file error isolation (a bad file → diagnostic, not throw).
+        if (files.Count <= 1)
+        {
+            ct.ThrowIfCancellationRequested();
+            var model = new DatabaseModel();
+            var diagnostics = new List<string>();
+            if (files.Count == 1)
+            {
+                try
+                {
+                    var parsed = new Syntax.PgParser().Parse(File.ReadAllText(files[0]));
+                    var rel = Path.GetRelativePath(ProjectDirectory, files[0]);
+                    foreach (var d in parsed.Diagnostics) diagnostics.Add($"{rel}: {d}");
+                    new Syntax.ModelBuilder(DefaultSchema).Build(parsed, model);
+                }
+                catch (Exception ex)
+                {
+                    diagnostics.Add($"Failed to read/parse '{Path.GetFileName(files[0])}': {ex.Message}");
+                }
+            }
+            diagnostics.AddRange(FindDuplicates(model));
+            return new ProjectBuildResult(model, diagnostics, files);
+        }
+
         var parts = new PartialParse[files.Count];     // one slot per file; index = order
 
         var options = new ParallelOptions

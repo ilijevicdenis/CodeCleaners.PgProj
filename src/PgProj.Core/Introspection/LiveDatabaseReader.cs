@@ -83,6 +83,11 @@ public sealed class LiveDatabaseReader
         };
 
         // ---- wave 2: table-dependent reads, started as soon as the table map is ready ----
+        // INVARIANT: these run concurrently and mutate the SAME shared TableDefinition objects, so
+        // each must write a DISJOINT member — constraints→PrimaryKey/Unique, checks→Checks,
+        // fks→ForeignKeys. They never touch the same list, so no lock is needed. A new wave-2 reader
+        // that writes a member another already writes would be a data race: gate it or give it its
+        // own wave.
         var (tables, byKey) = await tablesTask;
         var constraintsTask = ReadVoid(c => ReadConstraintsAsync(c, byKey, ct));
         var checksTask      = ReadVoid(c => ReadChecksAsync(c, byKey, ct));

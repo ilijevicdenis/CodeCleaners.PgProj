@@ -125,19 +125,20 @@ public static class ReverseSync
         var files = project.ResolveSqlFiles();             // already sorted → defines merge order
         var perFile = new (string Rel, List<string>? Units)[files.Count];
 
-        var options = new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount };
-        await Parallel.ForEachAsync(EnumerateIndexed(files), options, (item, _) =>
+        if (files.Count <= 1)
         {
-            var rel = Path.GetRelativePath(project.ProjectDirectory, item.Path);
-            try
+            // Small-N short-circuit: skip the parallel machinery for 0–1 files (pure overhead there).
+            if (files.Count == 1) perFile[0] = MapOne(project, files[0]);
+        }
+        else
+        {
+            var options = new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount };
+            await Parallel.ForEachAsync(EnumerateIndexed(files), options, (item, _) =>
             {
-                var parsed = new PgParser().Parse(File.ReadAllText(item.Path)); // fresh instance per worker
-                var model = new ModelBuilder(project.DefaultSchema).Build(parsed);
-                perFile[item.Index] = (rel, DdlExporter.ExportFiles(model).Keys.ToList());
-            }
-            catch { perFile[item.Index] = (rel, null); }    // unreadable/odd file → not a mapping source
-            return ValueTask.CompletedTask;                 // CPU-bound body — no real awaiting
-        });
+                perFile[item.Index] = MapOne(project, item.Path);
+                return ValueTask.CompletedTask;             // CPU-bound body — no real awaiting
+            });
+        }
 
         var unitToFile = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         var fileToUnits = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
@@ -149,6 +150,20 @@ public static class ReverseSync
                 if (!unitToFile.ContainsKey(u)) unitToFile[u] = rel;   // first definition wins
         }
         return (unitToFile, fileToUnits);
+    }
+
+    // Parse one project file in isolation (fresh parser + builder) and return the canonical units it
+    // would emit, keyed by its project-relative path. An unreadable/odd file maps to null units.
+    private static (string Rel, List<string>? Units) MapOne(DatabaseProject project, string path)
+    {
+        var rel = Path.GetRelativePath(project.ProjectDirectory, path);
+        try
+        {
+            var parsed = new PgParser().Parse(File.ReadAllText(path)); // fresh instance per worker
+            var model = new ModelBuilder(project.DefaultSchema).Build(parsed);
+            return (rel, DdlExporter.ExportFiles(model).Keys.ToList());
+        }
+        catch { return (rel, null); }                       // unreadable/odd file → not a mapping source
     }
 
     private static IEnumerable<(int Index, string Path)> EnumerateIndexed(IReadOnlyList<string> files)

@@ -15,7 +15,9 @@ namespace PgProj.Benchmarks;
 [MemoryDiagnoser]
 public class BuildBenchmarks
 {
-    [Params(1, 10, 50, 200)]
+    // Note: Setup always writes 00_schema.sql, so the project has FileCount+1 .sql files.
+    // FileCount=0 → exactly 1 file → exercises BuildAsync's small-N (≤1) short-circuit.
+    [Params(0, 1, 10, 50, 200)]
     public int FileCount;
 
     private string _dir = "";

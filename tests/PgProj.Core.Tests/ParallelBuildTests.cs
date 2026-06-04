@@ -52,6 +52,39 @@ public class ParallelBuildTests : IDisposable
     }
 
     [Fact]
+    public async Task Single_file_project_takes_the_small_N_path_and_matches_sequential()
+    {
+        var project = MakeProject(0);                 // just schema.sql → exactly one .sql file
+        Assert.Single(project.ResolveSqlFiles());     // confirm we exercise the count==1 guard
+
+        var sequential = project.Build();
+        var parallel = await project.BuildAsync();
+
+        Assert.Equal(ModelJson.Serialize(sequential.Model), ModelJson.Serialize(parallel.Model));
+        Assert.Equal(sequential.Diagnostics, parallel.Diagnostics);
+        Assert.Equal(sequential.Files, parallel.Files);
+    }
+
+    [Fact]
+    public async Task Empty_project_takes_the_small_N_path_and_matches_sequential()
+    {
+        var proj = Path.Combine(_dir, "Empty.pgproj");
+        File.WriteAllText(proj, """
+            <Project><PropertyGroup><Name>Empty</Name><DefaultSchema>app</DefaultSchema></PropertyGroup>
+            <ItemGroup><Build Include="**/*.sql" /></ItemGroup></Project>
+            """);
+        var project = DatabaseProject.Load(proj);
+        Assert.Empty(project.ResolveSqlFiles());      // confirm we exercise the count==0 guard
+
+        var sequential = project.Build();
+        var parallel = await project.BuildAsync();
+
+        Assert.Equal(ModelJson.Serialize(sequential.Model), ModelJson.Serialize(parallel.Model));
+        Assert.Equal(sequential.Diagnostics, parallel.Diagnostics);
+        Assert.Empty(parallel.Model.Tables);
+    }
+
+    [Fact]
     public async Task Parallel_build_is_byte_identical_to_sequential_over_a_diverse_corpus()
     {
         // A representative spread of object kinds across many files, plus a re-declared schema and a
