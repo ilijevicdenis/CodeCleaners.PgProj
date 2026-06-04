@@ -87,9 +87,11 @@ public sealed class ProjectReferenceIntegrationTests : IDisposable
         Assert.False(resolution.HasErrors, string.Join("\n", resolution.Diagnostics));
         Assert.Empty(ReferenceValidator.Validate(b, resolution));
 
-        // B's deploy script must NOT contain A's table (it belongs to A).
+        // B's deploy script must NOT create A's table (it belongs to A) — B owns only the view.
+        // (The view body legitimately *references* common.customer, so assert no table is CREATEd,
+        // not that the substring is absent.)
         var bScript = FullCreate(builtB.Model);
-        Assert.DoesNotContain("common.customer", bScript, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("CREATE TABLE", bScript, StringComparison.OrdinalIgnoreCase);
         Assert.Contains("customer_names", bScript, StringComparison.OrdinalIgnoreCase);
 
         var deployer = new DatabaseDeployer();
