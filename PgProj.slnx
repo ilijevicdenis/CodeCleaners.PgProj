@@ -6,4 +6,7 @@
   <Folder Name="/tests/">
     <Project Path="tests/PgProj.Core.Tests/PgProj.Core.Tests.csproj" />
   </Folder>
+  <Folder Name="/bench/">
+    <Project Path="bench/PgProj.Benchmarks/PgProj.Benchmarks.csproj" />
+  </Folder>
 </Solution>

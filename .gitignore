@@ -9,6 +9,9 @@ obj/
 TestResults/
 *.trx
 
+# BenchmarkDotNet run output
+BenchmarkDotNet.Artifacts/
+
 # Rider / VS
 .idea/
 .vs/
