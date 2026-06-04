@@ -215,7 +215,7 @@
     "lint": "eslint src test --ext .ts",
     "test:unit": "vitest run",
     "test:e2e": "node ./out-test/runTest.js",
-    "pretest:e2e": "tsc -p ./tsconfig.e2e.json"
+    "pretest:e2e": "npm run compile && tsc -p ./tsconfig.e2e.json"
   },
   "devDependencies": {
     "@types/mocha": "^10.0.6",
