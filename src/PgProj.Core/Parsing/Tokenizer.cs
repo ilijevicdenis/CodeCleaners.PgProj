@@ -19,7 +19,51 @@ public sealed class Tokenizer
     // PG16 non-decimal integer prefixes (0x/0o/0b); vectorized membership beats "xXoObB".IndexOf per number.
     private static readonly SearchValues<char> RadixPrefix = SearchValues.Create("xXoObB");
 
-    private Tokenizer(string s) => _s = s;
+    // Word/Number text is ~91% duplicated within a parse (measured: "integer"/"SELECT"/"id" recur
+    // thousands of times, each an eager Substring). Intern per-Tokenizer so each distinct spelling is
+    // allocated once; the span alternate-lookup keys on the source slice so a hit costs no string at all.
+    // Per-instance (not static), so the parallel per-file build never shares this dictionary — thread-safe.
+    // The dictionary is lazy + size-gated: interning a whole file amortises it heavily, but the many tiny
+    // re-tokenisations (DeriveRaw of one raw statement, table tails) repeat too little to pay it back, so
+    // below the threshold Intern just substrings. (AllocProbe: gate keeps the win without the per-call dict.)
+    private const int InternThreshold = 1024;
+    private readonly bool _intern;
+    private Dictionary<string, string>? _interner;
+    private Dictionary<string, string>.AlternateLookup<ReadOnlySpan<char>> _lookup;
+
+    // Single-character symbol text is a tiny fixed alphabet ('(' ')' ',' ';' '.' operators); cache the
+    // ASCII strings once so a punctuation token costs no allocation (was c.ToString() per symbol).
+    private static readonly string[] SingleChar = BuildSingleChar();
+    private static string[] BuildSingleChar()
+    {
+        var a = new string[128];
+        for (int i = 0; i < a.Length; i++) a[i] = ((char)i).ToString();
+        return a;
+    }
+
+    private Tokenizer(string s)
+    {
+        _s = s;
+        _intern = s.Length >= InternThreshold;
+    }
+
+    /// <summary>Return the canonical string for source slice [start, start+length), allocating it only on
+    /// first sight within this parse (span-keyed lookup → no string is built for a cache hit). Below the
+    /// size gate (or before the first distinct word) it is a plain substring — no dictionary is built.</summary>
+    private string Intern(int start, int length)
+    {
+        if (!_intern) return _s.Substring(start, length);
+        if (_interner is null)
+        {
+            _interner = new Dictionary<string, string>(StringComparer.Ordinal);
+            _lookup = _interner.GetAlternateLookup<ReadOnlySpan<char>>();
+        }
+        var span = _s.AsSpan(start, length);
+        if (_lookup.TryGetValue(span, out var cached)) return cached;
+        var s = _s.Substring(start, length);
+        _interner[s] = s;
+        return s;
+    }
 
     public static List<Token> Tokenize(string sql)
     {
@@ -66,9 +110,9 @@ public sealed class Tokenizer
                 continue;
             }
 
-            // Anything else is a single-character symbol.
+            // Anything else is a single-character symbol — reuse the cached ASCII string.
             _i++;
-            tokens.Add(new Token(TokenKind.Symbol, c.ToString(), start));
+            tokens.Add(new Token(TokenKind.Symbol, c < 128 ? SingleChar[c] : c.ToString(), start));
         }
         return tokens;
     }
@@ -152,20 +196,20 @@ public sealed class Tokenizer
             char radix = char.ToLowerInvariant(_s[_i + 1]);
             int j = _i + 2, digits = 0;
             while (j < _s.Length && (IsRadixDigit(_s[j], radix) || (_s[j] == '_' && digits > 0))) { if (_s[j] != '_') digits++; j++; }
-            if (digits > 0) { _i = j; return _s.Substring(start, _i - start); }
+            if (digits > 0) { _i = j; return Intern(start, _i - start); }
         }
         while (_i < _s.Length && (char.IsDigit(_s[_i]) || _s[_i] == '.' || _s[_i] == 'e' || _s[_i] == 'E'
                                   || ((_s[_i] == '+' || _s[_i] == '-') && (_s[_i - 1] == 'e' || _s[_i - 1] == 'E'))
                                   || (_s[_i] == '_' && _i > start && char.IsDigit(_s[_i - 1]) && char.IsDigit(Peek(1)))))  // digit group separators (PG16)
             _i++;
-        return _s.Substring(start, _i - start);
+        return Intern(start, _i - start);
     }
 
     private string ReadWord()
     {
         var start = _i;
         while (_i < _s.Length && IsIdentPart(_s[_i])) _i++;
-        return _s.Substring(start, _i - start);
+        return Intern(start, _i - start);
     }
 
     private static bool IsRadixDigit(char c, char radix) => radix switch
