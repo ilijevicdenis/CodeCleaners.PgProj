@@ -19,7 +19,7 @@ public sealed partial class PgParser
 
     private SqlStatement ParseCommand(TokenCursor c)
     {
-        var kw = c.Current!.Value.ToUpperInvariant();
+        var kw = c.CurrentText!.ToUpperInvariant();
         return kw switch
         {
             "DO" => ParseDo(c),
@@ -108,7 +108,7 @@ public sealed partial class PgParser
     // SHOW takes only a name — never a value. Reject any `=`/`TO`/leftover token.
     private static void RejectShowValue(TokenCursor c)
     {
-        if (!c.AtEnd) throw new ParseException($"unexpected '{c.Current!.Value}' — SHOW does not take a value", c.Here);
+        if (!c.AtEnd) throw new ParseException($"unexpected '{c.CurrentText!}' — SHOW does not take a value", c.Here);
     }
 
     private CommandStatement ParseReset(TokenCursor c)

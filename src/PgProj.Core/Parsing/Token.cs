@@ -14,7 +14,7 @@ public enum TokenKind
     Symbol,       // a single punctuation char
 }
 
-public sealed record Token(TokenKind Kind, string Value, int Position)
+public readonly record struct Token(TokenKind Kind, string Value, int Position)
 {
     public bool IsWord(string keyword) =>
         Kind == TokenKind.Word && string.Equals(Value, keyword, StringComparison.OrdinalIgnoreCase);
@@ -75,8 +75,8 @@ public sealed record Token(TokenKind Kind, string Value, int Position)
             // Separate a value token from a preceding value token or a closing bracket, so
             // "count(o.id) AS x" and "timestamp without time zone" both read naturally while
             // "numeric(12, 2)" stays tight.
-            if (prev is not null && t.IsValueLike
-                && (prev.IsValueLike || prev.IsSymbol(')') || prev.IsSymbol(']')))
+            if (prev is { } pv && t.IsValueLike
+                && (pv.IsValueLike || pv.IsSymbol(')') || pv.IsSymbol(']')))
                 sb.Append(' ');
             sb.Append(t.Render());
             prev = t;

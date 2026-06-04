@@ -25,6 +25,8 @@ public sealed class TokenCursor
     public TokenCursor(IReadOnlyList<Token> tokens) => _tokens = tokens;
 
     public Token? Current => _i < _tokens.Count ? _tokens[_i] : null;
+    /// <summary>The current token's text, or null at end — avoids unwrapping the Nullable&lt;Token&gt; at call sites.</summary>
+    public string? CurrentText => _i < _tokens.Count ? _tokens[_i].Value : null;
     public Token? Peek(int ahead = 1) => _i + ahead < _tokens.Count ? _tokens[_i + ahead] : null;
     public bool AtEnd => _i >= _tokens.Count;
 
@@ -97,7 +99,7 @@ public sealed class TokenCursor
         for (int k = 0; k < words.Length; k++)
         {
             var t = k == 0 ? Current : Peek(k);
-            if (t is null || !t.IsWord(words[k])) return false;
+            if (t is not { } tv || !tv.IsWord(words[k])) return false;
         }
         return true;
     }
@@ -142,12 +144,10 @@ public sealed class TokenCursor
     public string ExpectIdentifier()
     {
         var t = Current;
-        if (t is { Kind: TokenKind.Word or TokenKind.QuotedIdent }) { _i++; return t.Value; }
+        if (t is { Kind: TokenKind.Word or TokenKind.QuotedIdent } tv) { _i++; return tv.Value; }
         throw new ParseException($"expected an identifier but found {Describe(t)}", Here);
     }
 
     private static string Describe(Token? t) =>
-        t is null ? "end of input"
-        : t.Kind == TokenKind.Symbol ? $"'{t.Value}'"
-        : $"'{t.Value}'";
+        t is { } tv ? $"'{tv.Value}'" : "end of input";
 }

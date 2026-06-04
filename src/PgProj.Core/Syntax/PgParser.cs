@@ -54,7 +54,7 @@ public sealed partial class PgParser
             {
                 var stmt = ParseStatement(c);
                 if (!c.AtEnd)
-                    throw new ParseException($"unexpected '{c.Current!.Value}' after statement", c.Here);
+                    throw new ParseException($"unexpected '{c.CurrentText!}' after statement", c.Here);
                 stmt.SetSourceSegment(segment);   // defer Token.Render; most structured statements never read SourceText
                 result.Statements.Add(stmt);
             }
@@ -230,7 +230,7 @@ public sealed partial class PgParser
                 continue;
             }
             if (t.MatchWord("INHERITS")) { hasInherits = true; EmptyParensError("INHERITS parent list"); continue; }
-            if (t.AtWord("UNLOGGED") || t.AtWord("TEMP") || t.AtWord("TEMPORARY")) throw new ParseException($"{t.Current!.Value} must appear before TABLE, not after the definition", here);
+            if (t.AtWord("UNLOGGED") || t.AtWord("TEMP") || t.AtWord("TEMPORARY")) throw new ParseException($"{t.CurrentText!} must appear before TABLE, not after the definition", here);
             if (t.MatchWord("OF")) { hasOf = true; continue; }
             if (t.MatchWord("WITH") && t.AtSymbol('(')) { EmptyParensError("storage parameter list"); continue; }
             if (t.MatchWord("fillfactor") && t.MatchOperator("=") && t.Current is { Kind: TokenKind.Number } n
@@ -266,7 +266,7 @@ public sealed partial class PgParser
             int mark = c.Mark();
             stmt.Source = ParseSelectStatement(c);                 // parse the query → surfaces its syntax errors
             if (c.MatchWord("WITH")) { if (c.MatchWord("NO")) { c.ExpectWord("DATA"); stmt.WithData = false; } else { c.ExpectWord("DATA"); stmt.WithData = true; } }
-            if (!c.AtEnd) throw new ParseException($"unexpected '{c.Current!.Value}' after the CREATE TABLE AS query", c.Here);
+            if (!c.AtEnd) throw new ParseException($"unexpected '{c.CurrentText!}' after the CREATE TABLE AS query", c.Here);
             c.Reset(mark);
             stmt.QueryText = CaptureRest(c);                       // preserve the original verbatim capture
         }
@@ -289,7 +289,7 @@ public sealed partial class PgParser
             ParseTableElement(b, table);
             if (!b.MatchSymbol(',')) break;
         }
-        if (!b.AtEnd) throw new ParseException($"unexpected '{b.Current!.Value}' in table definition", b.Here);
+        if (!b.AtEnd) throw new ParseException($"unexpected '{b.CurrentText!}' in table definition", b.Here);
 
         // case-sensitive: quoted "a"/"A" are distinct columns; comparing ordinally avoids any false positive
         var seenCols = new HashSet<string>(StringComparer.Ordinal);
@@ -354,7 +354,7 @@ public sealed partial class PgParser
         int depth = 0;
         while (!b.AtEnd)
         {
-            var t = b.Current!;
+            var t = b.Current!.Value;
             if (depth == 0)
             {
                 if (t.IsSymbol(',')) break;
@@ -785,7 +785,7 @@ public sealed partial class PgParser
             ids.Add(id);
             if (!b.MatchSymbol(',')) break;
         }
-        if (!b.AtEnd) throw new ParseException($"unexpected '{b.Current!.Value}' in column-alias list", b.Here);
+        if (!b.AtEnd) throw new ParseException($"unexpected '{b.CurrentText!}' in column-alias list", b.Here);
         return ids;
     }
 
@@ -824,7 +824,7 @@ public sealed partial class PgParser
         int depth = 0;
         while (!b.AtEnd)
         {
-            var t = b.Current!;
+            var t = b.Current!.Value;
             // Stop at a top-level comma or a column-constraint keyword, but only AFTER consuming the
             // first token — so a literal default like NULL/TRUE/FALSE is taken as the value.
             if (depth == 0 && b.Mark() > start)
@@ -847,7 +847,7 @@ public sealed partial class PgParser
         int depth = 0;
         while (!b.AtEnd)
         {
-            var t = b.Current!;
+            var t = b.Current!.Value;
             if (depth == 0 && t.IsSymbol(',')) break;
             if (t.IsSymbol('(') || t.IsSymbol('[')) depth++;
             else if (t.IsSymbol(')') || t.IsSymbol(']')) depth = Math.Max(0, depth - 1);

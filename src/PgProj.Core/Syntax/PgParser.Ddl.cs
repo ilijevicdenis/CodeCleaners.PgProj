@@ -198,7 +198,7 @@ public sealed partial class PgParser
         int m = a.Mark(), depth = 0;
         while (!a.AtEnd)
         {
-            var t = a.Current!;
+            var t = a.Current!.Value;
             if (depth == 0 && (t.IsSymbol(',') || t.IsWord("DEFAULT") || t.IsSymbol('='))) break;
             if (t.IsSymbol('(') || t.IsSymbol('[')) depth++;
             else if (t.IsSymbol(')') || t.IsSymbol(']')) depth--;
