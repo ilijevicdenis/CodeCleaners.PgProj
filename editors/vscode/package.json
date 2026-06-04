@@ -1,0 +1,234 @@
+{
+  "name": "pgproj-vscode",
+  "displayName": "PostgreSQL Database Projects",
+  "description": "SSDT-style declarative database projects for PostgreSQL — projects panel, build, publish, code analysis, and Problems integration, powered by the pgproj engine.",
+  "version": "0.1.0",
+  "publisher": "codecleaners",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "categories": [
+    "Programming Languages",
+    "Other"
+  ],
+  "keywords": [
+    "postgresql",
+    "postgres",
+    "database",
+    "ssdt",
+    "pgproj"
+  ],
+  "main": "./dist/extension.js",
+  "activationEvents": [
+    "workspaceContains:**/*.pgproj",
+    "onView:pgproj.projects"
+  ],
+  "contributes": {
+    "configuration": {
+      "title": "PostgreSQL Database Projects",
+      "properties": {
+        "pgproj.cliPath": {
+          "type": "string",
+          "default": "pgproj",
+          "description": "Path to the pgproj CLI executable. Defaults to 'pgproj' (resolved on PATH). Set an absolute path if the engine is not on PATH."
+        },
+        "pgproj.dotnetPath": {
+          "type": "string",
+          "default": "dotnet",
+          "description": "Path to the dotnet host. Used when 'pgproj.cliPath' points at a .dll. Defaults to 'dotnet' (resolved on PATH)."
+        }
+      }
+    },
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "pgproj",
+          "title": "PostgreSQL Database Projects",
+          "icon": "media/db.svg"
+        }
+      ]
+    },
+    "views": {
+      "pgproj": [
+        {
+          "id": "pgproj.projects",
+          "name": "Projects",
+          "icon": "media/db.svg",
+          "contextualTitle": "PostgreSQL Database Projects"
+        }
+      ]
+    },
+    "viewsWelcome": [
+      {
+        "view": "pgproj.projects",
+        "contents": "No PostgreSQL database projects found in this workspace.\n[New Project](command:pgproj.newProject)\n[Open Project](command:pgproj.openProject)"
+      }
+    ],
+    "commands": [
+      {
+        "command": "pgproj.refresh",
+        "title": "Refresh",
+        "category": "PgProj",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "pgproj.newProject",
+        "title": "New Project",
+        "category": "PgProj",
+        "icon": "$(new-folder)"
+      },
+      {
+        "command": "pgproj.openProject",
+        "title": "Open Project",
+        "category": "PgProj",
+        "icon": "$(folder-opened)"
+      },
+      {
+        "command": "pgproj.build",
+        "title": "Build",
+        "category": "PgProj",
+        "icon": "$(tools)"
+      },
+      {
+        "command": "pgproj.publish",
+        "title": "Publish",
+        "category": "PgProj",
+        "icon": "$(cloud-upload)"
+      },
+      {
+        "command": "pgproj.generateScript",
+        "title": "Generate Script",
+        "category": "PgProj"
+      },
+      {
+        "command": "pgproj.validate",
+        "title": "Validate",
+        "category": "PgProj"
+      },
+      {
+        "command": "pgproj.analyze",
+        "title": "Run Code Analysis",
+        "category": "PgProj"
+      },
+      {
+        "command": "pgproj.schemaCompare",
+        "title": "Schema Compare",
+        "category": "PgProj"
+      },
+      {
+        "command": "pgproj.addObject",
+        "title": "Add Object…",
+        "category": "PgProj",
+        "icon": "$(add)"
+      },
+      {
+        "command": "pgproj.openProjectFile",
+        "title": "Edit Project File",
+        "category": "PgProj"
+      },
+      {
+        "command": "pgproj.setTargetVersion",
+        "title": "Set Target Version",
+        "category": "PgProj"
+      }
+    ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "pgproj.newProject",
+          "when": "view == pgproj.projects",
+          "group": "navigation@1"
+        },
+        {
+          "command": "pgproj.openProject",
+          "when": "view == pgproj.projects",
+          "group": "navigation@2"
+        },
+        {
+          "command": "pgproj.refresh",
+          "when": "view == pgproj.projects",
+          "group": "navigation@3"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "pgproj.build",
+          "when": "view == pgproj.projects && viewItem == pgprojProject",
+          "group": "1_build@1"
+        },
+        {
+          "command": "pgproj.publish",
+          "when": "view == pgproj.projects && viewItem == pgprojProject",
+          "group": "1_build@2"
+        },
+        {
+          "command": "pgproj.generateScript",
+          "when": "view == pgproj.projects && viewItem == pgprojProject",
+          "group": "1_build@3"
+        },
+        {
+          "command": "pgproj.validate",
+          "when": "view == pgproj.projects && viewItem == pgprojProject",
+          "group": "2_analyze@1"
+        },
+        {
+          "command": "pgproj.analyze",
+          "when": "view == pgproj.projects && viewItem == pgprojProject",
+          "group": "2_analyze@2"
+        },
+        {
+          "command": "pgproj.schemaCompare",
+          "when": "view == pgproj.projects && viewItem == pgprojProject",
+          "group": "2_analyze@3"
+        },
+        {
+          "command": "pgproj.addObject",
+          "when": "view == pgproj.projects && viewItem == pgprojProject",
+          "group": "3_edit@1"
+        },
+        {
+          "command": "pgproj.setTargetVersion",
+          "when": "view == pgproj.projects && viewItem == pgprojProject",
+          "group": "3_edit@2"
+        },
+        {
+          "command": "pgproj.openProjectFile",
+          "when": "view == pgproj.projects && viewItem == pgprojProject",
+          "group": "9_open@1"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "pgproj.refresh",
+          "when": "false"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run package",
+    "compile": "tsc -p ./ && npm run esbuild",
+    "esbuild": "esbuild ./src/extension.ts --bundle --outfile=dist/extension.js --external:vscode --format=cjs --platform=node",
+    "package": "npm run esbuild -- --minify",
+    "watch": "tsc -watch -p ./",
+    "lint": "eslint src test --ext .ts",
+    "test:unit": "vitest run",
+    "test:e2e": "node ./out-test/runTest.js",
+    "pretest:e2e": "tsc -p ./tsconfig.e2e.json"
+  },
+  "devDependencies": {
+    "@types/mocha": "^10.0.6",
+    "@types/node": "^20.14.0",
+    "@types/vscode": "^1.90.0",
+    "@typescript-eslint/eslint-plugin": "^7.13.0",
+    "@typescript-eslint/parser": "^7.13.0",
+    "@vscode/test-electron": "^2.4.0",
+    "esbuild": "^0.21.5",
+    "eslint": "^8.57.0",
+    "glob": "^10.4.1",
+    "mocha": "^10.4.0",
+    "typescript": "^5.4.5",
+    "vitest": "^1.6.0"
+  }
+}
