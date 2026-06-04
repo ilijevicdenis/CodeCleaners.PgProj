@@ -29,8 +29,10 @@ Tokenize/Parse are driven by the repo's PG18 corpus (`tests/corpus/*.jsonl`), bu
 kind (`Table` / `Raw` / `Select` / `All`) via the `Bucket` param so each optimization is attributable
 to the workload shape it targets. Build generates a synthetic project sized by the `FileCount` param.
 
-## Baseline (rec #1, 13900 / 24 physical cores, `--job short`)
+## Baseline (rec #1, i9-13900 / 24 physical cores, full run)
 
-End-to-end build, serial → parallel: ~0.6× at 1 file (scheduling overhead), 1.5× at 10, **3.7× at 50,
-4.5× at 200**. Allocation is within ~5% either way — parallelism buys wall-clock, not bytes. Numbers
-scale with core count and project size; re-run on the target box for ground truth.
+End-to-end build, serial → parallel: 0.74× at 1 file (scheduling overhead), 1.36× at 10, **2.85× at 50,
+4.70× at 200** (error bars ~1–5%). Allocation is within ~5% either way — parallelism buys wall-clock,
+not bytes. The crossover is ~10 files; the gain keeps climbing with size but stays short of linear
+(serial `Merge` + file reads). Numbers scale with core count and project size; re-run on the target
+box for ground truth.
