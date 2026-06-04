@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -42,11 +43,23 @@ public static class TypeNormalizer
 
     private static readonly Regex Whitespace = new(@"\s+", RegexOptions.Compiled);
 
+    // Memoize raw -> canonical. Type spellings repeat massively (every "bigint"/"text"/"jsonb"
+    // column across a project), so this both skips the regex/substring/ToLower/concat work on the
+    // hot path AND hands back the SAME string instance for identical inputs — deduping the type
+    // strings retained in every ColumnDefinition. The build parses files in parallel, so the cache
+    // must be thread-safe. Distinct spellings are bounded (dozens), so it never grows unbounded.
+    private static readonly ConcurrentDictionary<string, string> Cache = new(StringComparer.Ordinal);
+
     public static string Normalize(string raw)
     {
         if (string.IsNullOrWhiteSpace(raw))
             return string.Empty;
 
+        return Cache.GetOrAdd(raw, static key => NormalizeCore(key));
+    }
+
+    private static string NormalizeCore(string raw)
+    {
         var text = Whitespace.Replace(raw.Trim(), " ");
 
         // Split off a trailing array marker so "int[]" -> base "int", suffix "[]".

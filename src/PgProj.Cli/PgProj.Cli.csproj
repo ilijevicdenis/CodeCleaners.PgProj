@@ -9,6 +9,13 @@
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <!-- Server GC (non-concurrent) — measured 1.85x faster on a 258k-object build (4.82s->2.62s)
+         vs the workstation default; the build is allocation-bound (dtrace: kernel time dominated by
+         demand-zero page faults servicing GC heap commits — tools/profiling/PROFILING_PLAN.md Tier 3).
+         Cost on a small interactive build is ~6 ms (imperceptible). Non-concurrent: this is a batch
+         job, so background GC only adds overhead. -->
+    <ServerGarbageCollection>true</ServerGarbageCollection>
+    <ConcurrentGarbageCollection>false</ConcurrentGarbageCollection>
   </PropertyGroup>
 
 </Project>
