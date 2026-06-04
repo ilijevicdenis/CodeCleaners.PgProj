@@ -52,16 +52,19 @@ public sealed class TokenCursor
     // ---- predicates ---------------------------------------------------------
     public bool AtWord(string word) => Current?.IsWord(word) == true;
     public bool AtSymbol(char c) => Current?.IsSymbol(c) == true;
-    public bool AtAnyWord(params string[] words)
+    // params ReadOnlySpan<string> (not params string[]): for a call with constant string literals the
+    // C# 13 compiler materialises the argument list as a cached static array wrapped in a span, so even
+    // the 5+-word call sites (e.g. the 13-word clause-terminator check in the SELECT target loop) no
+    // longer allocate a string[] per call — the largest remaining String[] source (AllocProbe §1f).
+    public bool AtAnyWord(params ReadOnlySpan<string> words)
     {
         foreach (var w in words) if (AtWord(w)) return true;
         return false;
     }
 
     // Fixed-arity overloads for the common small cases: the compiler prefers these over the
-    // params version, so the pervasive AtAnyWord("A","B")/MatchWords("IF","NOT","EXISTS") call
-    // sites no longer allocate a string[] per call. (Audit §1f.) Pass a cached static string[]
-    // to the params overload for higher arities to stay allocation-free there too.
+    // span version, so the pervasive AtAnyWord("A","B")/MatchWords("IF","NOT","EXISTS") call
+    // sites resolve to a branch-only check with no argument packing at all.
     public bool AtAnyWord(string a, string b) => AtWord(a) || AtWord(b);
     public bool AtAnyWord(string a, string b, string c) => AtWord(a) || AtWord(b) || AtWord(c);
     public bool AtAnyWord(string a, string b, string c, string d) => AtWord(a) || AtWord(b) || AtWord(c) || AtWord(d);
@@ -69,7 +72,7 @@ public sealed class TokenCursor
     private bool WordAt(int ahead, string w) => (ahead == 0 ? Current : Peek(ahead))?.IsWord(w) == true;
 
     /// <summary>True if the next tokens are these words in order (case-insensitive), not consuming.</summary>
-    public bool LookaheadWords(params string[] words)
+    public bool LookaheadWords(params ReadOnlySpan<string> words)
     {
         for (int k = 0; k < words.Length; k++)
         {
@@ -92,7 +95,7 @@ public sealed class TokenCursor
     public bool MatchOperator(string op) { if (AtOperator(op)) { _i++; return true; } return false; }
 
     /// <summary>Consume a sequence of words only if all are present in order.</summary>
-    public bool MatchWords(params string[] words)
+    public bool MatchWords(params ReadOnlySpan<string> words)
     {
         if (!LookaheadWords(words)) return false;
         _i += words.Length;
