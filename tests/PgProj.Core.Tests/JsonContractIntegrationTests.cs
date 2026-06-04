@@ -36,7 +36,7 @@ public sealed class JsonContractIntegrationTests
         var deployer = new DatabaseDeployer();
         var create = new SchemaComparer().Compare(source, new DatabaseModel());
         var script = new DeployScriptGenerator().Generate(create, new DeployOptions { WrapInTransaction = true });
-        await deployer.ExecuteAsync(conn, "DROP PUBLICATION IF EXISTS customer_pub; DROP SCHEMA IF EXISTS afd CASCADE; DROP SCHEMA IF EXISTS reporting CASCADE; DROP FOREIGN DATA WRAPPER IF EXISTS dummy_fdw CASCADE;");
+        await deployer.ExecuteAsync(conn, "DROP PUBLICATION IF EXISTS customer_pub; DROP SCHEMA IF EXISTS afd CASCADE; DROP SCHEMA IF EXISTS reporting CASCADE; DROP FOREIGN DATA WRAPPER IF EXISTS dummy_fdw CASCADE; DROP EXTENSION IF EXISTS btree_gist CASCADE;");
         await deployer.ExecuteAsync(conn, script);
 
         var live = await new LiveDatabaseReader().ReadAsync(conn);
