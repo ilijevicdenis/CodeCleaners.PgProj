@@ -17,6 +17,11 @@ public sealed class Catalog
     private readonly HashSet<string> _types = new(StringComparer.OrdinalIgnoreCase);
     private readonly HashSet<string> _functions = new(StringComparer.OrdinalIgnoreCase);
 
+    // Schemas contributed by EXTERNAL references (EP-REF). A schema may be both managed (defined in
+    // this project) and external (also defined in a referenced project) — membership here only widens
+    // resolution; it never narrows what the project itself manages.
+    private readonly HashSet<string> _externalSchemas = new(StringComparer.OrdinalIgnoreCase);
+
     public string DefaultSchema { get; init; } = "public";
 
     public bool SchemaManaged(string schema) => _schemas.Contains(schema);
@@ -36,6 +41,16 @@ public sealed class Catalog
     public void AddType(string? schema, string name) { if (schema is not null) { _schemas.Add(schema); _types.Add($"{schema}.{name}"); } _types.Add(name); }
     public void AddFunction(string name) => _functions.Add(StripSchema(name));
 
+    /// <summary>
+    /// Marks <paramref name="schema"/> as resolvable via an external reference (EP-REF). External schemas
+    /// are <see cref="SchemaManaged"/> (so qualified references into them resolve at build time) but the
+    /// objects they hold are never emitted — they live in a referenced project, not this one.
+    /// </summary>
+    public void AddExternalSchema(string name) { _schemas.Add(name); _externalSchemas.Add(name); }
+
+    /// <summary>True if <paramref name="schema"/> was contributed by a reference (vs defined locally).</summary>
+    public bool SchemaIsExternal(string schema) => _externalSchemas.Contains(schema);
+
     /// <summary>A copy plus everything in <paramref name="other"/> (used for per-script scope).</summary>
     public Catalog Extend(Catalog other)
     {
@@ -44,6 +59,7 @@ public sealed class Catalog
         foreach (var kv in other._relations) c._relations[kv.Key] = kv.Value;
         c._types.UnionWith(other._types);
         c._functions.UnionWith(other._functions);
+        c._externalSchemas.UnionWith(other._externalSchemas);
         return c;
     }
 
@@ -54,6 +70,7 @@ public sealed class Catalog
         foreach (var kv in _relations) c._relations[kv.Key] = kv.Value;
         c._types.UnionWith(_types);
         c._functions.UnionWith(_functions);
+        c._externalSchemas.UnionWith(_externalSchemas);
         return c;
     }
 

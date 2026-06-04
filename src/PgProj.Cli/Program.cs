@@ -10,6 +10,7 @@ using PgProj.Core.Introspection;
 using PgProj.Core.Model;
 using PgProj.Core.Packaging;
 using PgProj.Core.Project;
+using PgProj.Core.Project.References;
 
 namespace PgProj.Cli;
 
@@ -66,6 +67,10 @@ public static class Program
             foreach (var d in result.Diagnostics) Console.Error.WriteLine($"  - {d}");
             return 1;
         }
+
+        // Resolve references (EP-REF): build/read each referenced model into the semantic catalog, then
+        // validate cross-schema names. External objects never enter the model, so they are never emitted.
+        if (ResolveAndValidateReferencesBlocks(project)) return 1;
 
         // Static-analysis gate (skip with --no-analyze; escalate warnings with --strict).
         if (AnalysisGateBlocks(project, args)) return 1;
@@ -335,6 +340,43 @@ public static class Program
         return blocked;
     }
 
+    // ---- references (EP-REF) ------------------------------------------------------------
+
+    /// <summary>
+    /// Resolves the project's references and validates cross-schema names against them. Returns true if the
+    /// build/operation must abort (a reference failed to resolve, or a name in a managed schema is
+    /// unresolved). Referenced objects are catalog-only — they are never added to the model, so the
+    /// comparer never emits them into the deploy script.
+    /// </summary>
+    private static bool ResolveAndValidateReferencesBlocks(DatabaseProject project)
+    {
+        var resolution = new ReferenceResolver().Resolve(project);
+        if (project.References.Count > 0)
+            Console.WriteLine($"Resolved {resolution.References.Count} reference(s) " +
+                              $"({project.References.Count} declared) → external schemas: " +
+                              string.Join(", ", resolution.ExternalModel.Schemas.Select(s => s.Name).DefaultIfEmpty("(none)")));
+
+        var blocked = false;
+        foreach (var d in resolution.Diagnostics)
+        {
+            // A not-yet-restored PackageReference is a warning, not a hard failure — it's an explicitly
+            // documented follow-up. Every other reference diagnostic is an error.
+            var isError = d.Code != ReferenceErrorCodes.PackageRestoreNotImplemented;
+            (isError ? Console.Error : Console.Out).WriteLine($"  {(isError ? "error" : "warning")} {d}");
+            blocked |= isError;
+        }
+
+        var refDiags = ReferenceValidator.Validate(project, resolution);
+        foreach (var d in refDiags)
+        {
+            Console.Error.WriteLine($"  error {d}");
+            blocked = true;
+        }
+
+        if (blocked) Console.Error.WriteLine("Aborted: unresolved or invalid references.");
+        return blocked;
+    }
+
     // ---- script (full create from project, no server) -----------------------------------
 
     private static async Task<int> Script(string[] args)
@@ -443,6 +485,12 @@ public static class Program
             foreach (var d in result.Diagnostics) Console.Error.WriteLine($"  - {d}");
             throw new InvalidOperationException("Fix the build problems before continuing.");
         }
+
+        // EP-REF: resolve/validate references before the model is used for compare/publish/script. A broken
+        // cross-schema reference must fail here, not silently produce an invalid deploy.
+        if (ResolveAndValidateReferencesBlocks(project))
+            throw new InvalidOperationException("Fix the reference problems before continuing.");
+
         return (result.Model, project);
     }
 
@@ -505,6 +553,8 @@ public static class Program
 
         Usage:
           pgproj build   <project.pgproj> [-o model.json] [--package <out.pgpkg> | --no-package] [--strict] [--no-analyze]
+                         (resolves <ProjectReference>/<ArtifactReference> into the build's catalog so
+                          cross-schema names resolve; referenced objects are never emitted)
           pgproj script  <project.pgproj|.pgpkg> [-o create.sql] [--no-transaction]
           pgproj compare <project.pgproj|.pgpkg> --connection <conn> [--allow-drops]
           pgproj publish <project.pgproj|.pgpkg> --connection <conn> [--dry-run] [-o script.sql] [--allow-drops] [--no-transaction] [--parallel] [--strict] [--no-analyze]

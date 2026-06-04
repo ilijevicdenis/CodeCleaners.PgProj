@@ -1,0 +1,13 @@
+<Project>
+  <PropertyGroup>
+    <Name>Sales</Name>
+    <DefaultSchema>sales</DefaultSchema>
+  </PropertyGroup>
+  <ItemGroup>
+    <Build Include="**/*.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- B references A so sales.* views resolve common.* objects at build time, without copying them. -->
+    <ProjectReference Include="../Common/Common.pgproj" />
+  </ItemGroup>
+</Project>
