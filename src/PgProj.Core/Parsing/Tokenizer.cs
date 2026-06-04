@@ -52,13 +52,17 @@ public sealed class Tokenizer
     /// size gate (or before the first distinct word) it is a plain substring — no dictionary is built.</summary>
     private string Intern(int start, int length)
     {
+        var span = _s.AsSpan(start, length);
+        // Static vocabulary first: keywords + built-in types recur in every file, so canonicalise them from
+        // one shared immutable table — no per-file dict, no size gate, dedupes across the whole build.
+        if (TokenVocabulary.Canonical.TryGetValue(span, out var known)) return known;
+        // Then the per-file interner for this file's own identifiers (gated: only large inputs amortise it).
         if (!_intern) return _s.Substring(start, length);
         if (_interner is null)
         {
             _interner = new Dictionary<string, string>(StringComparer.Ordinal);
             _lookup = _interner.GetAlternateLookup<ReadOnlySpan<char>>();
         }
-        var span = _s.AsSpan(start, length);
         if (_lookup.TryGetValue(span, out var cached)) return cached;
         var s = _s.Substring(start, length);
         _interner[s] = s;
