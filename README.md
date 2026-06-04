@@ -113,6 +113,8 @@ The connection string can also be supplied via the `PGPROJ_CONNECTION` environme
 ## Commands
 
 ```
+pgproj new project <name> [-o <dir>] [--default-schema public] [--target-version 18]   # scaffold an empty buildable project
+pgproj add <kind> <schema.name> [-p <project|dir>] [--force]   # scaffold an object .sql from a template (kinds: table, view, function, procedure, trigger, sequence, type, schema, policy)
 pgproj build    <project.pgproj> [-o model.json] [--strict] [--no-analyze]
 pgproj script   <project.pgproj> [-o create.sql] [--no-transaction]
 pgproj compare  <project.pgproj> --connection <conn> [--allow-drops]

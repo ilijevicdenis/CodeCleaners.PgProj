@@ -1,0 +1,19 @@
+{
+  "$schema": "http://json.schemastore.org/template",
+  "author": "CodeCleaners d.o.o.",
+  "classifications": [ "Database", "PostgreSQL", "PgProj" ],
+  "identity": "CodeCleaners.PgProj.Object.Schema",
+  "name": "PgProj Schema (object .sql)",
+  "shortName": "pgproj-schema",
+  "tags": { "language": "SQL", "type": "item" },
+  "symbols": {
+    "Name": {
+      "type": "parameter",
+      "datatype": "string",
+      "defaultValue": "app",
+      "replaces": "PGPROJ_NAME",
+      "fileRename": "PGPROJ_NAME",
+      "description": "The schema name."
+    }
+  }
+}

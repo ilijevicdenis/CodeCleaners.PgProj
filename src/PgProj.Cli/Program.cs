@@ -8,6 +8,7 @@ using PgProj.Core.Comparison;
 using PgProj.Core.Introspection;
 using PgProj.Core.Model;
 using PgProj.Core.Project;
+using PgProj.Core.Templates;
 
 namespace PgProj.Cli;
 
@@ -26,6 +27,8 @@ public static class Program
 
             return args[0].ToLowerInvariant() switch
             {
+                "new" => New(args),
+                "add" => Add(args),
                 "build" => await Build(args),
                 "compare" => await Compare(args),
                 "publish" => await Publish(args),
@@ -44,6 +47,49 @@ public static class Program
             Console.Error.WriteLine($"error: {ex.Message}");
             return 2;
         }
+    }
+
+    // ---- new project (scaffold an empty, buildable project) -----------------------------
+
+    private static int New(string[] args)
+    {
+        // Only "new project <name>" is defined today; "new <name>" is a friendly alias.
+        var positionals = args.Skip(1).Where(a => !a.StartsWith('-')).ToList();
+        if (positionals.Count > 0 && positionals[0].Equals("project", StringComparison.OrdinalIgnoreCase))
+            positionals.RemoveAt(0);
+
+        var name = positionals.FirstOrDefault()
+            ?? throw new InvalidOperationException("Usage: pgproj new project <name> [-o <dir>] [--default-schema public] [--target-version 18]");
+
+        var outDir = GetOption(args, "-o", "--output") ?? ".";
+        var schema = GetOption(args, "--default-schema") ?? "public";
+        var version = GetOption(args, "--target-version") ?? "18";
+
+        var result = Scaffolder.NewProject(name, outDir, schema, version);
+        Console.WriteLine($"Created project '{name}' at {result.ProjectDirectory}");
+        Console.WriteLine($"  manifest: {Path.GetFileName(result.ProjectFilePath)} (default schema '{schema}', target PostgreSQL {version})");
+        Console.WriteLine($"Next: pgproj add table {schema}.MyTable && pgproj build \"{result.ProjectFilePath}\"");
+        return 0;
+    }
+
+    // ---- add (scaffold an object file from a template) ----------------------------------
+
+    private static int Add(string[] args)
+    {
+        var positionals = args.Skip(1).Where(a => !a.StartsWith('-')).ToList();
+        if (positionals.Count < 2)
+            throw new InvalidOperationException(
+                $"Usage: pgproj add <kind> <schema.name> [-p <project|dir>] [--force]   (kinds: {TemplateCatalog.KindWords})");
+
+        var kind = positionals[0];
+        var nameArg = positionals[1];
+        // Project location: -p/--project, or the current directory (must contain one .pgproj).
+        var projectArg = GetOption(args, "-p", "--project") ?? positionals.ElementAtOrDefault(2) ?? ".";
+        var force = HasFlag(args, "--force");
+
+        var result = Scaffolder.Add(projectArg, kind, nameArg, force);
+        Console.WriteLine($"Added {kind} → {result.RelativePath}");
+        return 0;
     }
 
     // ---- build --------------------------------------------------------------------------
@@ -415,6 +461,8 @@ public static class Program
         pgproj — PostgreSQL database project tool
 
         Usage:
+          pgproj new project <name> [-o <dir>] [--default-schema public] [--target-version 18]   (scaffold an empty buildable project)
+          pgproj add <kind> <schema.name> [-p <project|dir>] [--force]                            (scaffold an object file from a template)
           pgproj build   <project.pgproj> [-o model.json] [--strict] [--no-analyze]
           pgproj script  <project.pgproj> [-o create.sql] [--no-transaction]
           pgproj compare <project.pgproj> --connection <conn> [--allow-drops]
@@ -435,6 +483,12 @@ public static class Program
           --parallel         Publish with intra-phase parallelism (phase-level atomicity)
           --strict           Analysis gate: treat warnings as errors (build/publish fail on warnings)
           --no-analyze       Skip the static-analysis gate on build/publish
+          --force            add: overwrite an existing object file
+          --default-schema   new project: default schema for the manifest (default 'public')
+          --target-version   new project: target PostgreSQL major version (default 18)
+          -p, --project      add: the project (.pgproj) or directory to scaffold into (default: current dir)
+
+        Object kinds for 'add': table, view, function, procedure, trigger, sequence, type, schema, policy
         """);
     }
 }
