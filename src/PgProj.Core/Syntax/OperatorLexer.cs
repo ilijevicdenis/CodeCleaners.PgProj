@@ -19,10 +19,19 @@ public static class OperatorLexer
 
     private static bool IsOpChar(char c) => OpChars.Contains(c);
 
-    public static List<Token> Merge(IReadOnlyList<Token> tokens)
+    /// <summary>
+    /// Merges adjacent operator-character runs into single Symbol tokens, in place. The merged stream is
+    /// never longer than the input, so it is compacted into the same <see cref="List{Token}"/> with a
+    /// write pointer (output index ≤ read index throughout) and the tail trimmed — eliminating the second
+    /// full <c>List&lt;Token&gt;</c>/<c>Token[]</c> the old copy-into-a-new-list version allocated (the
+    /// largest remaining reducible Token[] source — AllocProbe). All callers pass a freshly-tokenized,
+    /// unshared list (<c>Tokenizer.Tokenize(...)</c>), so mutating it is safe; the same list is returned.
+    /// When nothing merges (the common case for a non-operator-heavy statement) it is a single rewrite
+    /// pass with zero allocation.
+    /// </summary>
+    public static List<Token> Merge(List<Token> tokens)
     {
-        var result = new List<Token>(tokens.Count);
-        int i = 0;
+        int write = 0, i = 0;
         while (i < tokens.Count)
         {
             var t = tokens[i];
@@ -42,15 +51,18 @@ public static class OperatorLexer
                     endPos++;
                     j++;
                 }
-                result.Add(new Token(TokenKind.Symbol, run, start));
+                // Allocate a new Token only when a run actually merged; a lone operator is kept as-is
+                // (the old version re-allocated even single operators).
+                tokens[write++] = j == i + 1 ? t : new Token(TokenKind.Symbol, run, start);
                 i = j;
             }
             else
             {
-                result.Add(t);
+                tokens[write++] = t;
                 i++;
             }
         }
-        return result;
+        if (write < tokens.Count) tokens.RemoveRange(write, tokens.Count - write);
+        return tokens;
     }
 }
