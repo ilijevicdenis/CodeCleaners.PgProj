@@ -1,0 +1,59 @@
+{
+  "schemaVersion": "1.0",
+  "verb": "analyze",
+  "project": "AllFeaturesDb",
+  "ruleCount": 7,
+  "blocked": false,
+  "summary": {
+    "errors": 0,
+    "warnings": 1,
+    "infos": 4,
+    "total": 5
+  },
+  "diagnostics": [
+    {
+      "ruleId": "PG001",
+      "severity": "Warning",
+      "message": "SECURITY DEFINER without SET search_path is a privilege-escalation risk.",
+      "target": "afd.active_customers",
+      "file": "Functions/afd.active_customers.sql",
+      "line": 1,
+      "col": 1
+    },
+    {
+      "ruleId": "PG005",
+      "severity": "Info",
+      "message": "No volatility declared; defaults to VOLATILE, which the planner cannot optimize or inline.",
+      "target": "afd.log_ddl",
+      "file": "Functions/afd.log_ddl.sql",
+      "line": 1,
+      "col": 1
+    },
+    {
+      "ruleId": "PG005",
+      "severity": "Info",
+      "message": "No volatility declared; defaults to VOLATILE, which the planner cannot optimize or inline.",
+      "target": "afd.touch_updated_at",
+      "file": "Functions/afd.touch_updated_at.sql",
+      "line": 1,
+      "col": 1
+    },
+    {
+      "ruleId": "PG005",
+      "severity": "Info",
+      "message": "No volatility declared; defaults to VOLATILE, which the planner cannot optimize or inline.",
+      "target": "afd.archive_customer",
+      "line": 0,
+      "col": 0
+    },
+    {
+      "ruleId": "PG007",
+      "severity": "Info",
+      "message": "SELECT * in a view body is brittle to underlying column changes.",
+      "target": "reporting.customer_mv",
+      "file": "Views/reporting.customer_mv.sql",
+      "line": 1,
+      "col": 1
+    }
+  ]
+}

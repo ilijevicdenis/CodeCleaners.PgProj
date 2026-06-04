@@ -1,0 +1,1216 @@
+{
+  "schemaVersion": "1.0",
+  "verb": "model-tree",
+  "project": "AllFeaturesDb",
+  "summary": {
+    "schemas": 2,
+    "tables": 7,
+    "indexes": 6,
+    "views": 3,
+    "sequences": 1,
+    "functions": 10,
+    "objects": 39
+  },
+  "nodes": [
+    {
+      "kind": "schema",
+      "schema": "afd",
+      "name": "afd",
+      "qualifiedName": "afd",
+      "file": "Schemas/afd.sql",
+      "line": 1,
+      "col": 15,
+      "children": []
+    },
+    {
+      "kind": "schema",
+      "schema": "reporting",
+      "name": "reporting",
+      "qualifiedName": "reporting",
+      "file": "Schemas/reporting.sql",
+      "line": 1,
+      "col": 15,
+      "children": []
+    },
+    {
+      "kind": "table",
+      "schema": "afd",
+      "name": "base_entity",
+      "qualifiedName": "afd.base_entity",
+      "file": "Tables/afd.base_entity.sql",
+      "line": 2,
+      "col": 14,
+      "children": [
+        {
+          "kind": "column",
+          "schema": "afd",
+          "name": "id",
+          "qualifiedName": "afd.base_entity.id bigint",
+          "line": 0,
+          "col": 0,
+          "children": []
+        },
+        {
+          "kind": "column",
+          "schema": "afd",
+          "name": "created_at",
+          "qualifiedName": "afd.base_entity.created_at timestamp with time zone",
+          "line": 0,
+          "col": 0,
+          "children": []
+        },
+        {
+          "kind": "column",
+          "schema": "afd",
+          "name": "kind",
+          "qualifiedName": "afd.base_entity.kind text",
+          "line": 0,
+          "col": 0,
+          "children": []
+        }
+      ]
+    },
+    {
+      "kind": "table",
+      "schema": "afd",
+      "name": "customers",
+      "qualifiedName": "afd.customers",
+      "file": "Tables/afd.customers.sql",
+      "line": 2,
+      "col": 14,
+      "children": [
+        {
+          "kind": "column",
+          "schema": "afd",
+          "name": "id",
+          "qualifiedName": "afd.customers.id bigint",
+          "line": 0,
+          "col": 0,
+          "children": []
+        },
+        {
+          "kind": "column",
+          "schema": "afd",
+          "name": "tenant_id",
+          "qualifiedName": "afd.customers.tenant_id integer",
+          "line": 0,
+          "col": 0,
+          "children": []
+        },
+        {
+          "kind": "column",
+          "schema": "afd",
+          "name": "email",
+          "qualifiedName": "afd.customers.email afd.email",
+          "line": 0,
+          "col": 0,
+          "children": []
+        },
+        {
+          "kind": "column",
+          "schema": "afd",
+          "name": "full_name",
+          "qualifiedName": "afd.customers.full_name text",
+          "line": 0,
+          "col": 0,
+          "children": []
+        },
+        {
+          "kind": "column",
+          "schema": "afd",
+          "name": "code",
+          "qualifiedName": "afd.customers.code character(8)",
+          "line": 0,
+          "col": 0,
+          "children": []
+        },
+        {
+          "kind": "column",
+          "schema": "afd",
+          "name": "short_name",
+          "qualifiedName": "afd.customers.short_name character varying(50)",
+          "line": 0,
+          "col": 0,
+          "children": []
+        },
+        {
+          "kind": "column",
+          "schema": "afd",
+          "name": "notes",
+          "qualifiedName": "afd.customers.notes text",
+          "line": 0,
+          "col": 0,
+          "children": []
+        },
+        {
+          "kind": "column",
+          "schema": "afd",
+          "name": "balance_cents",
+          "qualifiedName": "afd.customers.balance_cents bigint",
+          "line": 0,
+          "col": 0,
+          "children": []
+        },
+        {
+          "kind": "column",
+          "schema": "afd",
+          "name": "score",
+          "qualifiedName": "afd.customers.score numeric(10, 2)",
+          "line": 0,
+          "col": 0,
+          "children": []
+        },
+        {
+          "kind": "column",
+          "schema": "afd",
+          "name": "rating",
+          "qualifiedName": "afd.customers.rating real",
+          "line": 0,
+          "col": 0,
+          "children": []
+        },
+        {
+          "kind": "column",
+          "schema": "afd",
+          "name": "big_rating",
+          "qualifiedName": "afd.customers.big_rating double precision",
+          "line": 0,
+          "col": 0,
+          "children": []
+        },
+        {
+          "kind": "column",
+          "schema": "afd",
+          "name": "qty",
+          "qualifiedName": "afd.customers.qty afd.pos_int",
+          "line": 0,
+          "col": 0,
+          "children": []
+        },
+        {
+          "kind": "column",
+          "schema": "afd",
+          "name": "serial_no",
+          "qualifiedName": "afd.customers.serial_no integer",
+          "line": 0,
+          "col": 0,
+          "children": []
+        },
+        {
+          "kind": "column",
+          "schema": "afd",
+          "name": "big_serial_no",
+          "qualifiedName": "afd.customers.big_serial_no bigint",
+          "line": 0,
+          "col": 0,
+          "children": []
+        },
+        {
+          "kind": "column",
+          "schema": "afd",
+          "name": "is_active",
+          "qualifiedName": "afd.customers.is_active boolean",
+          "line": 0,
+          "col": 0,
+          "children": []
+        },
+        {
+          "kind": "column",
+          "schema": "afd",
+          "name": "created_at",
+          "qualifiedName": "afd.customers.created_at timestamp with time zone",
+          "line": 0,
+          "col": 0,
+          "children": []
+        },
+        {
+          "kind": "column",
+          "schema": "afd",
+          "name": "born_on",
+          "qualifiedName": "afd.customers.born_on date",
+          "line": 0,
+          "col": 0,
+          "children": []
+        },
+        {
+          "kind": "column",
+          "schema": "afd",
+          "name": "wake_time",
+          "qualifiedName": "afd.customers.wake_time time without time zone",
+          "line": 0,
+          "col": 0,
+          "children": []
+        },
+        {
+          "kind": "column",
+          "schema": "afd",
+          "name": "duration",
+          "qualifiedName": "afd.customers.duration interval",
+          "line": 0,
+          "col": 0,
+          "children": []
+        },
+        {
+          "kind": "column",
+          "schema": "afd",
+          "name": "ip_addr",
+          "qualifiedName": "afd.customers.ip_addr inet",
+          "line": 0,
+          "col": 0,
+          "children": []
+        },
+        {
+          "kind": "column",
+          "schema": "afd",
+          "name": "mac",
+          "qualifiedName": "afd.customers.mac macaddr",
+          "line": 0,
+          "col": 0,
+          "children": []
+        },
+        {
+          "kind": "column",
+          "schema": "afd",
+          "name": "flags",
+          "qualifiedName": "afd.customers.flags bit(8)",
+          "line": 0,
+          "col": 0,
+          "children": []
+        },
+        {
+          "kind": "column",
+          "schema": "afd",
+          "name": "varflags",
+          "qualifiedName": "afd.customers.varflags bit varying(16)",
+          "line": 0,
+          "col": 0,
+          "children": []
+        },
+        {
+          "kind": "column",
+          "schema": "afd",
+          "name": "ext_id",
+          "qualifiedName": "afd.customers.ext_id uuid",
+          "line": 0,
+          "col": 0,
+          "children": []
+        },
+        {
+          "kind": "column",
+          "schema": "afd",
+          "name": "wallet",
+          "qualifiedName": "afd.customers.wallet money",
+          "line": 0,
+          "col": 0,
+          "children": []
+        },
+        {
+          "kind": "column",
+          "schema": "afd",
+          "name": "tags",
+          "qualifiedName": "afd.customers.tags text[]",
+          "line": 0,
+          "col": 0,
+          "children": []
+        },
+        {
+          "kind": "column",
+          "schema": "afd",
+          "name": "scores",
+          "qualifiedName": "afd.customers.scores integer[]",
+          "line": 0,
+          "col": 0,
+          "children": []
+        },
+        {
+          "kind": "column",
+          "schema": "afd",
+          "name": "matrix",
+          "qualifiedName": "afd.customers.matrix numeric(6, 2)[][]",
+          "line": 0,
+          "col": 0,
+          "children": []
+        },
+        {
+          "kind": "column",
+          "schema": "afd",
+          "name": "profile",
+          "qualifiedName": "afd.customers.profile jsonb",
+          "line": 0,
+          "col": 0,
+          "children": []
+        },
+        {
+          "kind": "column",
+          "schema": "afd",
+          "name": "legacy_doc",
+          "qualifiedName": "afd.customers.legacy_doc json",
+          "line": 0,
+          "col": 0,
+          "children": []
+        },
+        {
+          "kind": "column",
+          "schema": "afd",
+          "name": "xml_doc",
+          "qualifiedName": "afd.customers.xml_doc xml",
+          "line": 0,
+          "col": 0,
+          "children": []
+        },
+        {
+          "kind": "column",
+          "schema": "afd",
+          "name": "home",
+          "qualifiedName": "afd.customers.home afd.address",
+          "line": 0,
+          "col": 0,
+          "children": []
+        },
+        {
+          "kind": "column",
+          "schema": "afd",
+          "name": "status",
+          "qualifiedName": "afd.customers.status afd.mood",
+          "line": 0,
+          "col": 0,
+          "children": []
+        },
+        {
+          "kind": "column",
+          "schema": "afd",
+          "name": "valid_period",
+          "qualifiedName": "afd.customers.valid_period tstzrange",
+          "line": 0,
+          "col": 0,
+          "children": []
+        },
+        {
+          "kind": "column",
+          "schema": "afd",
+          "name": "temp_range",
+          "qualifiedName": "afd.customers.temp_range afd.float_range",
+          "line": 0,
+          "col": 0,
+          "children": []
+        },
+        {
+          "kind": "column",
+          "schema": "afd",
+          "name": "region",
+          "qualifiedName": "afd.customers.region circle",
+          "line": 0,
+          "col": 0,
+          "children": []
+        },
+        {
+          "kind": "column",
+          "schema": "afd",
+          "name": "search",
+          "qualifiedName": "afd.customers.search tsvector",
+          "line": 0,
+          "col": 0,
+          "children": []
+        },
+        {
+          "kind": "column",
+          "schema": "afd",
+          "name": "order_no",
+          "qualifiedName": "afd.customers.order_no bigint",
+          "line": 0,
+          "col": 0,
+          "children": []
+        },
+        {
+          "kind": "column",
+          "schema": "afd",
+          "name": "name_upper",
+          "qualifiedName": "afd.customers.name_upper text",
+          "line": 0,
+          "col": 0,
+          "children": []
+        },
+        {
+          "kind": "column",
+          "schema": "afd",
+          "name": "balance_dollars",
+          "qualifiedName": "afd.customers.balance_dollars numeric(20, 2)",
+          "line": 0,
+          "col": 0,
+          "children": []
+        },
+        {
+          "kind": "column",
+          "schema": "afd",
+          "name": "discount",
+          "qualifiedName": "afd.customers.discount integer",
+          "line": 0,
+          "col": 0,
+          "children": []
+        },
+        {
+          "kind": "column",
+          "schema": "afd",
+          "name": "referral_email",
+          "qualifiedName": "afd.customers.referral_email afd.email",
+          "line": 0,
+          "col": 0,
+          "children": []
+        }
+      ]
+    },
+    {
+      "kind": "table",
+      "schema": "afd",
+      "name": "customers_archive",
+      "qualifiedName": "afd.customers_archive",
+      "file": "Tables/afd.customers_archive.sql",
+      "line": 2,
+      "col": 14,
+      "children": [
+        {
+          "kind": "column",
+          "schema": "afd",
+          "name": "archived_at",
+          "qualifiedName": "afd.customers_archive.archived_at timestamp with time zone",
+          "line": 0,
+          "col": 0,
+          "children": []
+        }
+      ]
+    },
+    {
+      "kind": "table",
+      "schema": "afd",
+      "name": "document",
+      "qualifiedName": "afd.document",
+      "file": "Tables/afd.document.sql",
+      "line": 2,
+      "col": 14,
+      "children": [
+        {
+          "kind": "column",
+          "schema": "afd",
+          "name": "title",
+          "qualifiedName": "afd.document.title text",
+          "line": 0,
+          "col": 0,
+          "children": []
+        },
+        {
+          "kind": "column",
+          "schema": "afd",
+          "name": "body",
+          "qualifiedName": "afd.document.body text",
+          "line": 0,
+          "col": 0,
+          "children": []
+        }
+      ]
+    },
+    {
+      "kind": "table",
+      "schema": "afd",
+      "name": "events",
+      "qualifiedName": "afd.events",
+      "file": "Tables/afd.events.sql",
+      "line": 2,
+      "col": 14,
+      "children": [
+        {
+          "kind": "column",
+          "schema": "afd",
+          "name": "id",
+          "qualifiedName": "afd.events.id bigint",
+          "line": 0,
+          "col": 0,
+          "children": []
+        },
+        {
+          "kind": "column",
+          "schema": "afd",
+          "name": "occurred",
+          "qualifiedName": "afd.events.occurred date",
+          "line": 0,
+          "col": 0,
+          "children": []
+        },
+        {
+          "kind": "column",
+          "schema": "afd",
+          "name": "kind",
+          "qualifiedName": "afd.events.kind text",
+          "line": 0,
+          "col": 0,
+          "children": []
+        },
+        {
+          "kind": "column",
+          "schema": "afd",
+          "name": "payload",
+          "qualifiedName": "afd.events.payload jsonb",
+          "line": 0,
+          "col": 0,
+          "children": []
+        }
+      ]
+    },
+    {
+      "kind": "table",
+      "schema": "afd",
+      "name": "orders",
+      "qualifiedName": "afd.orders",
+      "file": "Tables/afd.orders.sql",
+      "line": 2,
+      "col": 14,
+      "children": [
+        {
+          "kind": "column",
+          "schema": "afd",
+          "name": "id",
+          "qualifiedName": "afd.orders.id bigint",
+          "line": 0,
+          "col": 0,
+          "children": []
+        },
+        {
+          "kind": "column",
+          "schema": "afd",
+          "name": "tenant_id",
+          "qualifiedName": "afd.orders.tenant_id integer",
+          "line": 0,
+          "col": 0,
+          "children": []
+        },
+        {
+          "kind": "column",
+          "schema": "afd",
+          "name": "customer_id",
+          "qualifiedName": "afd.orders.customer_id bigint",
+          "line": 0,
+          "col": 0,
+          "children": []
+        },
+        {
+          "kind": "column",
+          "schema": "afd",
+          "name": "total_cents",
+          "qualifiedName": "afd.orders.total_cents integer",
+          "line": 0,
+          "col": 0,
+          "children": []
+        },
+        {
+          "kind": "column",
+          "schema": "afd",
+          "name": "placed_at",
+          "qualifiedName": "afd.orders.placed_at timestamp with time zone",
+          "line": 0,
+          "col": 0,
+          "children": []
+        }
+      ]
+    },
+    {
+      "kind": "table",
+      "schema": "afd",
+      "name": "room_booking",
+      "qualifiedName": "afd.room_booking",
+      "file": "Tables/afd.room_booking.sql",
+      "line": 3,
+      "col": 14,
+      "children": [
+        {
+          "kind": "column",
+          "schema": "afd",
+          "name": "id",
+          "qualifiedName": "afd.room_booking.id bigint",
+          "line": 0,
+          "col": 0,
+          "children": []
+        },
+        {
+          "kind": "column",
+          "schema": "afd",
+          "name": "room_id",
+          "qualifiedName": "afd.room_booking.room_id integer",
+          "line": 0,
+          "col": 0,
+          "children": []
+        },
+        {
+          "kind": "column",
+          "schema": "afd",
+          "name": "during",
+          "qualifiedName": "afd.room_booking.during tstzrange",
+          "line": 0,
+          "col": 0,
+          "children": []
+        }
+      ]
+    },
+    {
+      "kind": "index",
+      "schema": "afd",
+      "name": "customers_active_idx",
+      "qualifiedName": "afd.customers_active_idx",
+      "file": "Indexes/afd.customers_active_idx.sql",
+      "line": 1,
+      "col": 1,
+      "children": []
+    },
+    {
+      "kind": "index",
+      "schema": "afd",
+      "name": "customers_email_idx",
+      "qualifiedName": "afd.customers_email_idx",
+      "file": "Indexes/afd.customers_email_idx.sql",
+      "line": 1,
+      "col": 1,
+      "children": []
+    },
+    {
+      "kind": "index",
+      "schema": "afd",
+      "name": "customers_name_lower_idx",
+      "qualifiedName": "afd.customers_name_lower_idx",
+      "file": "Indexes/afd.customers_name_lower_idx.sql",
+      "line": 1,
+      "col": 1,
+      "children": []
+    },
+    {
+      "kind": "index",
+      "schema": "afd",
+      "name": "customers_profile_gin",
+      "qualifiedName": "afd.customers_profile_gin",
+      "file": "Indexes/afd.customers_profile_gin.sql",
+      "line": 1,
+      "col": 1,
+      "children": []
+    },
+    {
+      "kind": "index",
+      "schema": "afd",
+      "name": "customers_region_gist",
+      "qualifiedName": "afd.customers_region_gist",
+      "file": "Indexes/afd.customers_region_gist.sql",
+      "line": 1,
+      "col": 1,
+      "children": []
+    },
+    {
+      "kind": "index",
+      "schema": "afd",
+      "name": "customers_tags_gin",
+      "qualifiedName": "afd.customers_tags_gin",
+      "file": "Indexes/afd.customers_tags_gin.sql",
+      "line": 1,
+      "col": 1,
+      "children": []
+    },
+    {
+      "kind": "view",
+      "schema": "afd",
+      "name": "active_customers_v",
+      "qualifiedName": "afd.active_customers_v",
+      "file": "Views/afd.active_customers_v.sql",
+      "line": 1,
+      "col": 1,
+      "children": []
+    },
+    {
+      "kind": "view",
+      "schema": "afd",
+      "name": "customer_orders",
+      "qualifiedName": "afd.customer_orders",
+      "file": "Views/afd.customer_orders.sql",
+      "line": 1,
+      "col": 1,
+      "children": []
+    },
+    {
+      "kind": "materializedView",
+      "schema": "reporting",
+      "name": "customer_mv",
+      "qualifiedName": "reporting.customer_mv",
+      "file": "Views/reporting.customer_mv.sql",
+      "line": 1,
+      "col": 1,
+      "children": []
+    },
+    {
+      "kind": "sequence",
+      "schema": "afd",
+      "name": "order_no_seq",
+      "qualifiedName": "afd.order_no_seq",
+      "file": "Sequences/afd.order_no_seq.sql",
+      "line": 1,
+      "col": 1,
+      "children": []
+    },
+    {
+      "kind": "function",
+      "schema": "afd",
+      "name": "accumulate",
+      "qualifiedName": "afd.accumulate(bigint, integer[])",
+      "file": "Functions/afd.accumulate.sql",
+      "line": 1,
+      "col": 1,
+      "children": []
+    },
+    {
+      "kind": "function",
+      "schema": "afd",
+      "name": "active_customers",
+      "qualifiedName": "afd.active_customers()",
+      "file": "Functions/afd.active_customers.sql",
+      "line": 1,
+      "col": 1,
+      "children": []
+    },
+    {
+      "kind": "function",
+      "schema": "afd",
+      "name": "add",
+      "qualifiedName": "afd.add(integer, integer)",
+      "file": "Functions/afd.add.sql",
+      "line": 1,
+      "col": 1,
+      "children": []
+    },
+    {
+      "kind": "function",
+      "schema": "afd",
+      "name": "customer_stats",
+      "qualifiedName": "afd.customer_stats(numeric)",
+      "file": "Functions/afd.customer_stats.sql",
+      "line": 1,
+      "col": 1,
+      "children": []
+    },
+    {
+      "kind": "function",
+      "schema": "afd",
+      "name": "log_ddl",
+      "qualifiedName": "afd.log_ddl()",
+      "file": "Functions/afd.log_ddl.sql",
+      "line": 1,
+      "col": 1,
+      "children": []
+    },
+    {
+      "kind": "function",
+      "schema": "afd",
+      "name": "mood_eq",
+      "qualifiedName": "afd.mood_eq(afd.mood, afd.mood)",
+      "file": "Functions/afd.mood_eq.sql",
+      "line": 1,
+      "col": 1,
+      "children": []
+    },
+    {
+      "kind": "function",
+      "schema": "afd",
+      "name": "mood_to_int",
+      "qualifiedName": "afd.mood_to_int(afd.mood)",
+      "file": "Functions/afd.mood_to_int.sql",
+      "line": 1,
+      "col": 1,
+      "children": []
+    },
+    {
+      "kind": "function",
+      "schema": "afd",
+      "name": "split_name",
+      "qualifiedName": "afd.split_name(text, text, text)",
+      "file": "Functions/afd.split_name.sql",
+      "line": 1,
+      "col": 1,
+      "children": []
+    },
+    {
+      "kind": "function",
+      "schema": "afd",
+      "name": "touch_updated_at",
+      "qualifiedName": "afd.touch_updated_at()",
+      "file": "Functions/afd.touch_updated_at.sql",
+      "line": 1,
+      "col": 1,
+      "children": []
+    },
+    {
+      "kind": "function",
+      "schema": "afd",
+      "name": "archive_customer",
+      "qualifiedName": "afd.archive_customer(integer, bigint, boolean)",
+      "file": "Procedures/afd.archive_customer.sql",
+      "line": 1,
+      "col": 1,
+      "children": []
+    },
+    {
+      "kind": "aggregate",
+      "schema": "afd",
+      "name": "afd.sum_int(integer)",
+      "qualifiedName": "afd.afd.sum_int(integer)",
+      "line": 0,
+      "col": 0,
+      "children": []
+    },
+    {
+      "kind": "cast",
+      "schema": "",
+      "name": "(afd.mood AS integer)",
+      "qualifiedName": "(afd.mood AS integer)",
+      "line": 0,
+      "col": 0,
+      "children": []
+    },
+    {
+      "kind": "collation",
+      "schema": "afd",
+      "name": "case_insensitive",
+      "qualifiedName": "afd.case_insensitive",
+      "file": "Collations/afd.case_insensitive.sql",
+      "line": 1,
+      "col": 1,
+      "children": []
+    },
+    {
+      "kind": "comment",
+      "schema": "",
+      "name": "",
+      "qualifiedName": "",
+      "line": 0,
+      "col": 0,
+      "children": []
+    },
+    {
+      "kind": "comment",
+      "schema": "",
+      "name": "",
+      "qualifiedName": "",
+      "line": 0,
+      "col": 0,
+      "children": []
+    },
+    {
+      "kind": "comment",
+      "schema": "",
+      "name": "",
+      "qualifiedName": "",
+      "line": 0,
+      "col": 0,
+      "children": []
+    },
+    {
+      "kind": "comment",
+      "schema": "",
+      "name": "",
+      "qualifiedName": "",
+      "line": 0,
+      "col": 0,
+      "children": []
+    },
+    {
+      "kind": "comment",
+      "schema": "",
+      "name": "",
+      "qualifiedName": "",
+      "line": 0,
+      "col": 0,
+      "children": []
+    },
+    {
+      "kind": "comment",
+      "schema": "",
+      "name": "",
+      "qualifiedName": "",
+      "line": 0,
+      "col": 0,
+      "children": []
+    },
+    {
+      "kind": "comment",
+      "schema": "",
+      "name": "",
+      "qualifiedName": "",
+      "line": 0,
+      "col": 0,
+      "children": []
+    },
+    {
+      "kind": "comment",
+      "schema": "",
+      "name": "",
+      "qualifiedName": "",
+      "line": 0,
+      "col": 0,
+      "children": []
+    },
+    {
+      "kind": "comment",
+      "schema": "",
+      "name": "",
+      "qualifiedName": "",
+      "line": 0,
+      "col": 0,
+      "children": []
+    },
+    {
+      "kind": "comment",
+      "schema": "",
+      "name": "",
+      "qualifiedName": "",
+      "line": 0,
+      "col": 0,
+      "children": []
+    },
+    {
+      "kind": "comment",
+      "schema": "",
+      "name": "",
+      "qualifiedName": "",
+      "line": 0,
+      "col": 0,
+      "children": []
+    },
+    {
+      "kind": "conversion",
+      "schema": "afd",
+      "name": "latin1_to_utf8",
+      "qualifiedName": "afd.latin1_to_utf8",
+      "line": 0,
+      "col": 0,
+      "children": []
+    },
+    {
+      "kind": "domain",
+      "schema": "afd",
+      "name": "email",
+      "qualifiedName": "afd.email",
+      "file": "Domains/afd.email.sql",
+      "line": 1,
+      "col": 1,
+      "children": []
+    },
+    {
+      "kind": "domain",
+      "schema": "afd",
+      "name": "pos_int",
+      "qualifiedName": "afd.pos_int",
+      "file": "Domains/afd.pos_int.sql",
+      "line": 1,
+      "col": 1,
+      "children": []
+    },
+    {
+      "kind": "eventTrigger",
+      "schema": "",
+      "name": "audit_ddl",
+      "qualifiedName": "audit_ddl",
+      "line": 0,
+      "col": 0,
+      "children": []
+    },
+    {
+      "kind": "extension",
+      "schema": "",
+      "name": "btree_gist",
+      "qualifiedName": "btree_gist",
+      "line": 0,
+      "col": 0,
+      "children": []
+    },
+    {
+      "kind": "foreignDataWrapper",
+      "schema": "",
+      "name": "dummy_fdw",
+      "qualifiedName": "dummy_fdw",
+      "line": 0,
+      "col": 0,
+      "children": []
+    },
+    {
+      "kind": "server",
+      "schema": "",
+      "name": "dummy_server",
+      "qualifiedName": "dummy_server",
+      "line": 0,
+      "col": 0,
+      "children": []
+    },
+    {
+      "kind": "foreignTable",
+      "schema": "afd",
+      "name": "remote_customers",
+      "qualifiedName": "afd.remote_customers",
+      "file": "ForeignTables/afd.remote_customers.sql",
+      "line": 1,
+      "col": 1,
+      "children": []
+    },
+    {
+      "kind": "operatorClass",
+      "schema": "afd",
+      "name": "afd.int_minmax_ops USING btree",
+      "qualifiedName": "afd.afd.int_minmax_ops USING btree",
+      "line": 0,
+      "col": 0,
+      "children": []
+    },
+    {
+      "kind": "operator",
+      "schema": "",
+      "name": "afd.===(FUNCTION=afd.mood_eq,LEFTARG=afd.mood,RIGHTARG=afd.mood,COMMUTATOR=OPERATOR(afd.===),HASHES,MERGES)",
+      "qualifiedName": "afd.===(FUNCTION=afd.mood_eq,LEFTARG=afd.mood,RIGHTARG=afd.mood,COMMUTATOR=OPERATOR(afd.===),HASHES,MERGES)",
+      "line": 0,
+      "col": 0,
+      "children": []
+    },
+    {
+      "kind": "policy",
+      "schema": "afd",
+      "name": "customers_tenant_isolation",
+      "qualifiedName": "afd.customers_tenant_isolation",
+      "line": 0,
+      "col": 0,
+      "children": []
+    },
+    {
+      "kind": "publication",
+      "schema": "",
+      "name": "customer_pub",
+      "qualifiedName": "customer_pub",
+      "line": 0,
+      "col": 0,
+      "children": []
+    },
+    {
+      "kind": "rule",
+      "schema": "afd",
+      "name": "orders_no_delete",
+      "qualifiedName": "afd.orders_no_delete",
+      "line": 0,
+      "col": 0,
+      "children": []
+    },
+    {
+      "kind": "statistics",
+      "schema": "afd",
+      "name": "customers_stats",
+      "qualifiedName": "afd.customers_stats",
+      "line": 0,
+      "col": 0,
+      "children": []
+    },
+    {
+      "kind": "table",
+      "schema": "afd",
+      "name": "address_row",
+      "qualifiedName": "afd.address_row",
+      "line": 0,
+      "col": 0,
+      "children": []
+    },
+    {
+      "kind": "table",
+      "schema": "afd",
+      "name": "events_2024",
+      "qualifiedName": "afd.events_2024",
+      "line": 0,
+      "col": 0,
+      "children": []
+    },
+    {
+      "kind": "table",
+      "schema": "afd",
+      "name": "events_default",
+      "qualifiedName": "afd.events_default",
+      "line": 0,
+      "col": 0,
+      "children": []
+    },
+    {
+      "kind": "textSearchConfiguration",
+      "schema": "afd",
+      "name": "english_cfg",
+      "qualifiedName": "afd.english_cfg",
+      "file": "TextSearch/afd.english_cfg.sql",
+      "line": 1,
+      "col": 1,
+      "children": []
+    },
+    {
+      "kind": "textSearchDictionary",
+      "schema": "afd",
+      "name": "english_dict",
+      "qualifiedName": "afd.english_dict",
+      "file": "TextSearch/afd.english_dict.sql",
+      "line": 1,
+      "col": 1,
+      "children": []
+    },
+    {
+      "kind": "trigger",
+      "schema": "afd",
+      "name": "customers_touch",
+      "qualifiedName": "afd.customers_touch",
+      "file": "Triggers/afd.customers_touch.sql",
+      "line": 1,
+      "col": 1,
+      "children": []
+    },
+    {
+      "kind": "trigger",
+      "schema": "afd",
+      "name": "orders_stmt_audit",
+      "qualifiedName": "afd.orders_stmt_audit",
+      "file": "Triggers/afd.orders_stmt_audit.sql",
+      "line": 1,
+      "col": 1,
+      "children": []
+    },
+    {
+      "kind": "type",
+      "schema": "afd",
+      "name": "address",
+      "qualifiedName": "afd.address",
+      "file": "Types/afd.address.sql",
+      "line": 1,
+      "col": 1,
+      "children": []
+    },
+    {
+      "kind": "type",
+      "schema": "afd",
+      "name": "float_range",
+      "qualifiedName": "afd.float_range",
+      "file": "Types/afd.float_range.sql",
+      "line": 1,
+      "col": 1,
+      "children": []
+    },
+    {
+      "kind": "type",
+      "schema": "afd",
+      "name": "mood",
+      "qualifiedName": "afd.mood",
+      "file": "Types/afd.mood.sql",
+      "line": 1,
+      "col": 1,
+      "children": []
+    },
+    {
+      "kind": "type",
+      "schema": "afd",
+      "name": "shell_type",
+      "qualifiedName": "afd.shell_type",
+      "file": "Types/afd.shell_type.sql",
+      "line": 1,
+      "col": 1,
+      "children": []
+    }
+  ]
+}
