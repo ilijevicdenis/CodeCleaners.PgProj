@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using PgProj.Core.Model;
 using PgProj.Core.Project;
 using PgProj.Core.Syntax;
@@ -37,20 +38,20 @@ public sealed class ReverseSyncTests : IDisposable
     private static DatabaseModel Live(string sql) => new ModelBuilder("public").Build(new PgParser().Parse(sql));
 
     [Fact]
-    public void No_drift_when_project_matches_database()
+    public async Task No_drift_when_project_matches_database()
     {
         var project = Project(("Tables/public.t.sql", "CREATE TABLE public.t (id int);"));
-        var plan = ReverseSync.Plan(project, Live("CREATE TABLE public.t (id int);"));
+        var plan = await ReverseSync.PlanAsync(project, Live("CREATE TABLE public.t (id int);"));
         Assert.False(plan.HasDrift);
         Assert.Empty(plan.FileChanges);
     }
 
     [Fact]
-    public void Captures_a_prod_hotfix_column_into_the_owning_file()
+    public async Task Captures_a_prod_hotfix_column_into_the_owning_file()
     {
         // Project has a 1-column table; the DB has gained a column (the "urgent production fix").
         var project = Project(("Tables/public.t.sql", "CREATE TABLE public.t (id int);"));
-        var plan = ReverseSync.Plan(project, Live("CREATE TABLE public.t (id int, name text);"));
+        var plan = await ReverseSync.PlanAsync(project, Live("CREATE TABLE public.t (id int, name text);"));
 
         var edit = Assert.Single(plan.FileChanges);
         Assert.Equal(ProjectFileChangeKind.Update, edit.Kind);
@@ -65,10 +66,10 @@ public sealed class ReverseSyncTests : IDisposable
     }
 
     [Fact]
-    public void Creates_a_file_for_an_object_new_in_the_database()
+    public async Task Creates_a_file_for_an_object_new_in_the_database()
     {
         var project = Project(("Tables/public.t.sql", "CREATE TABLE public.t (id int);"));
-        var plan = ReverseSync.Plan(project, Live("CREATE TABLE public.t (id int); CREATE TABLE public.t2 (id int);"));
+        var plan = await ReverseSync.PlanAsync(project, Live("CREATE TABLE public.t (id int); CREATE TABLE public.t2 (id int);"));
 
         var created = Assert.Single(plan.FileChanges, f => f.Kind == ProjectFileChangeKind.Create);
         Assert.Equal("Tables/public.t2.sql", created.RelativePath.Replace('\\', '/'));
@@ -79,7 +80,7 @@ public sealed class ReverseSyncTests : IDisposable
     }
 
     [Fact]
-    public void Drop_in_database_deletes_the_file_only_with_AllowDeletes()
+    public async Task Drop_in_database_deletes_the_file_only_with_AllowDeletes()
     {
         var files = new[]
         {
@@ -89,12 +90,12 @@ public sealed class ReverseSyncTests : IDisposable
 
         // Default: no deletes — the file survives even though the object is gone from the DB.
         var p1 = Project(files);
-        var safe = ReverseSync.Plan(p1, Live("CREATE TABLE public.keep (id int);"));
+        var safe = await ReverseSync.PlanAsync(p1, Live("CREATE TABLE public.keep (id int);"));
         Assert.DoesNotContain(safe.FileChanges, f => f.Kind == ProjectFileChangeKind.Delete);
 
         // Opt in: the orphaned file is deleted.
         var p2 = Project(files);
-        var plan = ReverseSync.Plan(p2, Live("CREATE TABLE public.keep (id int);"), new DriftOptions { AllowDeletes = true });
+        var plan = await ReverseSync.PlanAsync(p2, Live("CREATE TABLE public.keep (id int);"), new DriftOptions { AllowDeletes = true });
         var del = Assert.Single(plan.FileChanges, f => f.Kind == ProjectFileChangeKind.Delete);
         Assert.Equal(Path.Combine("Tables", "public.gone.sql"), del.RelativePath);
         Assert.True(del.IsDestructive);
@@ -105,12 +106,12 @@ public sealed class ReverseSyncTests : IDisposable
     }
 
     [Fact]
-    public void Edit_preserves_a_nonconventional_file_name()
+    public async Task Edit_preserves_a_nonconventional_file_name()
     {
         // The object lives in a file NOT named by the canonical convention; pull must rewrite THAT file,
         // not scatter a second canonical copy (which would double-define the object).
         var project = Project(("schema/my_table.sql", "CREATE TABLE public.t (id int);"));
-        var plan = ReverseSync.Plan(project, Live("CREATE TABLE public.t (id int, extra text);"));
+        var plan = await ReverseSync.PlanAsync(project, Live("CREATE TABLE public.t (id int, extra text);"));
 
         var edit = Assert.Single(plan.FileChanges);
         Assert.Equal(ProjectFileChangeKind.Update, edit.Kind);

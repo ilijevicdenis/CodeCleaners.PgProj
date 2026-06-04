@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using PgProj.Core.Comparison;
 using PgProj.Core.Model;
 using PgProj.Core.Project;
@@ -24,10 +25,10 @@ public static class ReverseSync
     /// Computes how to rewrite the project's files so they match <paramref name="live"/>. Reads the
     /// project's files and the supplied live model only — no disk writes, no server calls.
     /// </summary>
-    public static DriftPlan Plan(DatabaseProject project, DatabaseModel live, DriftOptions? options = null)
+    public static async Task<DriftPlan> PlanAsync(DatabaseProject project, DatabaseModel live, DriftOptions? options = null)
     {
         options ??= new DriftOptions();
-        var projectModel = project.Build().Model;
+        var projectModel = (await project.BuildAsync()).Model;
 
         // The authoritative semantic diff: steps that would make the project (target) match the DB
         // (source). Reuses the same comparer publish trusts, so "drift" never reports phantom changes.
@@ -41,7 +42,7 @@ public static class ReverseSync
         // Canonical one-object-per-file rendering of the DB, plus a map from each canonical file unit
         // to the real project file that currently defines it (so edits preserve the user's layout).
         var liveByUnit = DdlExporter.ExportFiles(live);
-        var (unitToFile, fileToUnits) = MapProjectFiles(project);
+        var (unitToFile, fileToUnits) = await MapProjectFilesAsync(project);
 
         // The canonical file units the drift touches (a table's columns/indexes/FKs all roll up to its file).
         var touchedUnits = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -115,29 +116,44 @@ public static class ReverseSync
     /// isolation and asking <see cref="DdlExporter"/> what canonical unit(s) it would emit — so the
     /// keying matches the live side exactly even when a file is named differently from the convention.
     /// </summary>
-    private static (Dictionary<string, string> UnitToFile, Dictionary<string, List<string>> FileToUnits)
-        MapProjectFiles(DatabaseProject project)
+    private static async Task<(Dictionary<string, string> UnitToFile, Dictionary<string, List<string>> FileToUnits)>
+        MapProjectFilesAsync(DatabaseProject project)
     {
-        var unitToFile = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-        var fileToUnits = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
+        // Same shape as DatabaseProject.BuildAsync: parse each file in isolation with bounded
+        // concurrency into a per-file slot (index = sorted position), then merge in order so the
+        // "first definition wins" tie-break is byte-identical to the old sequential loop.
+        var files = project.ResolveSqlFiles();             // already sorted → defines merge order
+        var perFile = new (string Rel, List<string>? Units)[files.Count];
 
-        foreach (var file in project.ResolveSqlFiles())
+        var options = new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount };
+        await Parallel.ForEachAsync(EnumerateIndexed(files), options, (item, _) =>
         {
-            var rel = Path.GetRelativePath(project.ProjectDirectory, file);
-            List<string> units;
+            var rel = Path.GetRelativePath(project.ProjectDirectory, item.Path);
             try
             {
-                var parsed = new PgParser().Parse(File.ReadAllText(file));
-                var perFile = new ModelBuilder(project.DefaultSchema).Build(parsed);
-                units = DdlExporter.ExportFiles(perFile).Keys.ToList();
+                var parsed = new PgParser().Parse(File.ReadAllText(item.Path)); // fresh instance per worker
+                var model = new ModelBuilder(project.DefaultSchema).Build(parsed);
+                perFile[item.Index] = (rel, DdlExporter.ExportFiles(model).Keys.ToList());
             }
-            catch { continue; }                              // unreadable/odd file → not a mapping source
+            catch { perFile[item.Index] = (rel, null); }    // unreadable/odd file → not a mapping source
+            return ValueTask.CompletedTask;                 // CPU-bound body — no real awaiting
+        });
 
+        var unitToFile = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        var fileToUnits = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
+        foreach (var (rel, units) in perFile)               // ordered walk → matches sequential
+        {
+            if (units is null) continue;
             fileToUnits[rel] = units;
             foreach (var u in units)
                 if (!unitToFile.ContainsKey(u)) unitToFile[u] = rel;   // first definition wins
         }
         return (unitToFile, fileToUnits);
+    }
+
+    private static IEnumerable<(int Index, string Path)> EnumerateIndexed(IReadOnlyList<string> files)
+    {
+        for (var i = 0; i < files.Count; i++) yield return (i, files[i]);
     }
 
     /// <summary>The canonical file unit a single change rolls up to (matches <see cref="DdlExporter"/> keys).</summary>

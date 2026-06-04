@@ -26,7 +26,7 @@ public static class Program
 
             return args[0].ToLowerInvariant() switch
             {
-                "build" => Build(args),
+                "build" => await Build(args),
                 "compare" => await Compare(args),
                 "publish" => await Publish(args),
                 "validate" => await Validate(args),
@@ -34,7 +34,7 @@ public static class Program
                 "drift" => await Drift(args),
                 "pull" => await Pull(args),
                 "analyze" => Analyze(args),
-                "script" => Script(args),
+                "script" => await Script(args),
                 "help" or "--help" or "-h" => PrintUsageReturn(0),
                 _ => Fail($"Unknown command '{args[0]}'."),
             };
@@ -48,10 +48,10 @@ public static class Program
 
     // ---- build --------------------------------------------------------------------------
 
-    private static int Build(string[] args)
+    private static async Task<int> Build(string[] args)
     {
         var project = DatabaseProject.Load(RequirePositional(args, "project file"));
-        var result = project.Build();
+        var result = await project.BuildAsync();
 
         Console.WriteLine($"Building project '{project.Name}' ({result.Files.Count} file(s), default schema '{project.DefaultSchema}')");
         PrintModelSummary(result.Model);
@@ -80,7 +80,7 @@ public static class Program
 
     private static async Task<int> Compare(string[] args)
     {
-        var (source, _) = BuildSourceOrThrow(args);
+        var (source, _) = await BuildSourceOrThrowAsync(args);
         var target = await ReadTarget(args);
         var changes = new SchemaComparer().Compare(source, target, new ComparerOptions
         {
@@ -107,7 +107,7 @@ public static class Program
 
     private static async Task<int> Publish(string[] args)
     {
-        var (source, project) = BuildSourceOrThrow(args);
+        var (source, project) = await BuildSourceOrThrowAsync(args);
 
         // Gate before touching the database: a failing analysis must not reach the server.
         if (AnalysisGateBlocks(project, args)) return 1;
@@ -162,7 +162,7 @@ public static class Program
 
     private static async Task<int> Validate(string[] args)
     {
-        var (source, project) = BuildSourceOrThrow(args);
+        var (source, project) = await BuildSourceOrThrowAsync(args);
 
         // Layer 1 (static, instant): the analysis gate. Layer 2 (below) runs it against real Postgres.
         if (AnalysisGateBlocks(project, args)) return 1;
@@ -215,7 +215,7 @@ public static class Program
         var project = DatabaseProject.Load(RequirePositional(args, "project file"));
         var live = await ReadTarget(args);
         // Report everything, including would-be deletes, so the user sees the full picture.
-        var plan = PgProj.Core.Sync.ReverseSync.Plan(project, live, new PgProj.Core.Sync.DriftOptions { AllowDeletes = true });
+        var plan = await PgProj.Core.Sync.ReverseSync.PlanAsync(project, live, new PgProj.Core.Sync.DriftOptions { AllowDeletes = true });
 
         if (!plan.HasDrift)
         {
@@ -237,7 +237,7 @@ public static class Program
         var project = DatabaseProject.Load(RequirePositional(args, "project file"));
         var live = await ReadTarget(args);
         var allowDeletes = HasFlag(args, "--allow-deletes");
-        var plan = PgProj.Core.Sync.ReverseSync.Plan(project, live, new PgProj.Core.Sync.DriftOptions { AllowDeletes = allowDeletes });
+        var plan = await PgProj.Core.Sync.ReverseSync.PlanAsync(project, live, new PgProj.Core.Sync.DriftOptions { AllowDeletes = allowDeletes });
 
         if (!plan.HasDrift)
         {
@@ -320,9 +320,9 @@ public static class Program
 
     // ---- script (full create from project, no server) -----------------------------------
 
-    private static int Script(string[] args)
+    private static async Task<int> Script(string[] args)
     {
-        var (source, _) = BuildSourceOrThrow(args);
+        var (source, _) = await BuildSourceOrThrowAsync(args);
         var changes = new SchemaComparer().Compare(source, new DatabaseModel());
         var script = new DeployScriptGenerator().Generate(changes, new DeployOptions
         {
@@ -344,10 +344,10 @@ public static class Program
 
     // ---- helpers ------------------------------------------------------------------------
 
-    private static (DatabaseModel Model, DatabaseProject Project) BuildSourceOrThrow(string[] args)
+    private static async Task<(DatabaseModel Model, DatabaseProject Project)> BuildSourceOrThrowAsync(string[] args)
     {
         var project = DatabaseProject.Load(RequirePositional(args, "project file"));
-        var result = project.Build();
+        var result = await project.BuildAsync();
         if (result.Diagnostics.Count > 0)
         {
             Console.Error.WriteLine("Project has build problems:");
