@@ -44,7 +44,15 @@ public abstract class SqlStatement
     /// </summary>
     public string? SourceText
     {
-        get => _sourceText ??= (_sourceSegment is null ? null : Token.Render(_sourceSegment));
+        get
+        {
+            if (_sourceText is null && _sourceSegment is not null)
+            {
+                _sourceText = Token.Render(_sourceSegment);
+                _sourceSegment = null;   // release the view (and its hold on the whole token list) once rendered
+            }
+            return _sourceText;
+        }
         set { _sourceText = value; _sourceSegment = null; }
     }
 

@@ -862,23 +862,25 @@ public sealed partial class PgParser
 
     // ---- statement splitting + diagnostics ---------------------------------
 
-    private static IEnumerable<List<Token>> SplitStatements(IReadOnlyList<Token> tokens)
+    // Yields a read-only window per top-level-';'-delimited statement instead of copying each
+    // statement's tokens into a fresh List<Token>. Those lists' Token[] backing arrays (churned by
+    // doubling growth) were ~7 MB/op on the All bucket; a window has none. Segments are read-only
+    // (consumed via TokenCursor + lazy render), so a view is sufficient. (AllocProbe-driven.)
+    private static IEnumerable<TokenSegment> SplitStatements(IReadOnlyList<Token> tokens)
     {
-        var current = new List<Token>();
-        int depth = 0;
-        foreach (var t in tokens)
+        int depth = 0, start = 0;
+        for (int i = 0; i < tokens.Count; i++)
         {
+            var t = tokens[i];
             if (t.IsSymbol('(')) depth++;
             else if (t.IsSymbol(')')) depth = Math.Max(0, depth - 1);
             if (t.IsSymbol(';') && depth == 0)
             {
-                if (current.Count > 0) yield return current;
-                current = new List<Token>();
-                continue;
+                if (i > start) yield return new TokenSegment(tokens, start, i - start);  // exclude the ';'
+                start = i + 1;
             }
-            current.Add(t);
         }
-        if (current.Count > 0) yield return current;
+        if (tokens.Count > start) yield return new TokenSegment(tokens, start, tokens.Count - start);
     }
 
     private static ParseDiagnostic ToDiagnostic(ParseException pe, string sql)

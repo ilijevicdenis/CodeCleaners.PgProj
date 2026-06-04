@@ -57,8 +57,11 @@ public sealed record Token(TokenKind Kind, string Value, int Position)
         for (var i = 0; i < tokens.Count; i++) cap += tokens[i].Value.Length + 1;
         var sb = new StringBuilder(cap);
         Token? prev = null;
-        foreach (var t in tokens)
+        // Indexed, not foreach: a segment may be an IReadOnlyList view (TokenSegment) whose enumerator
+        // would allocate; indexing is allocation-free for every IReadOnlyList including List<Token>.
+        for (var i = 0; i < tokens.Count; i++)
         {
+            var t = tokens[i];
             // Separate a value token from a preceding value token or a closing bracket, so
             // "count(o.id) AS x" and "timestamp without time zone" both read naturally while
             // "numeric(12, 2)" stays tight.
