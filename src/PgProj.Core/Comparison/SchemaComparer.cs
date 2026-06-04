@@ -296,9 +296,16 @@ public sealed class SchemaComparer
             tgtByIdentity.TryGetValue(src.Identity, out var tgt);
             if (tgt is null)
             {
+                // A typed/partition table (CREATE TABLE … OF type / PARTITION OF) is modeled in the
+                // project as a raw `table:` object, but the live reader returns it as a real
+                // TableDefinition — so treat it as present when the catalog has that table.
+                if (src.Kind == ObjectKind.Table
+                    && target.Tables.Any(t => string.Equals(t.Schema, src.Schema, StringComparison.OrdinalIgnoreCase)
+                                           && string.Equals(t.Name, src.Name, StringComparison.OrdinalIgnoreCase)))
+                    continue;
                 changes.Add(new CreateRawObjectChange(src));
             }
-            else if (src.BodyComparable && tgt.BodyComparable && NormalizeBody(src.Body) != NormalizeBody(tgt.Body))
+            else if (src.BodyComparable && tgt.BodyComparable && NormalizeRawBody(src.Body) != NormalizeRawBody(tgt.Body))
             {
                 // A destructive recreate (type/domain/foreign table can cascade-drop columns) is
                 // only emitted when drops are allowed; in-place redefinitions always proceed.
@@ -356,6 +363,10 @@ public sealed class SchemaComparer
     /// <summary>Body comparison for verbatim objects: case-, whitespace-, punctuation-spacing-, dollar-tag-, literal-cast- and trailing-`;`-agnostic.</summary>
     private static string NormalizeBody(string s)
         => PunctSpace.Replace(LiteralCast.Replace(NormalizeText(DollarTag.Replace(s, "$$$$")), "$1"), "$1").TrimEnd(';', ' ');
+
+    /// <summary>Raw single-statement DDL additionally ignores identifier quoting — the catalog reader
+    /// quotes names (e.g. <c>CREATE EXTENSION "btree_gist"</c>) that a project usually writes bare.</summary>
+    private static string NormalizeRawBody(string s) => NormalizeBody(s.Replace("\"", ""));
 
     private static bool IndexesEqual(IndexDefinition a, IndexDefinition b) =>
         a.IsUnique == b.IsUnique
