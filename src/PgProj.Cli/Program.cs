@@ -46,6 +46,7 @@ public static class Program
                 "model-tree" => await ModelTree(args),
                 "script" => await Script(args),
                 "pkg" => await Pkg(args),
+                "profile" => Profile(args),
                 "help" or "--help" or "-h" => PrintUsageReturn(ExitCode.Success),
                 _ => Fail($"Unknown command '{args[0]}'."),
             };
@@ -165,18 +166,20 @@ public static class Program
 
     private static async Task<int> Compare(string[] args)
     {
+        var profile = LoadProfile(args);            // EP-PROFILE: CLI flags override profile values.
         var (source, project) = await BuildSourceOrThrowAsync(args);
         var target = await ReadTarget(args);
+        var allowDrops = ResolveAllowDrops(args, profile);
 
         if (WantsJson(args))
         {
-            EmitJson(ContractBuilder.Compare(source, target, SourceName(project), HasFlag(args, "--allow-drops")));
+            EmitJson(ContractBuilder.Compare(source, target, SourceName(project), allowDrops));
             return 0;
         }
 
         var changes = new SchemaComparer().Compare(source, target, new ComparerOptions
         {
-            DropObjectsNotInSource = HasFlag(args, "--allow-drops"),
+            DropObjectsNotInSource = allowDrops,
         });
 
         if (changes.Count == 0)
@@ -199,14 +202,17 @@ public static class Program
 
     private static async Task<int> Publish(string[] args)
     {
+        var profile = LoadProfile(args);            // EP-PROFILE: CLI flags override profile values.
         var (source, project) = await BuildSourceOrThrowAsync(args);
+        var allowDrops = ResolveAllowDrops(args, profile);
+        var wrapInTransaction = ResolveWrapInTransaction(args, profile);
 
         // JSON dry-run: emit the plan + script, no server mutation, no text gate output to pollute stdout.
         if (WantsJson(args) && HasFlag(args, "--dry-run"))
         {
             var target0 = await ReadTarget(args);
             EmitJson(ContractBuilder.PublishPlan(source, target0, SourceName(project),
-                HasFlag(args, "--allow-drops"), wrapInTransaction: !HasFlag(args, "--no-transaction")));
+                allowDrops, wrapInTransaction: wrapInTransaction));
             return 0;
         }
 
@@ -217,13 +223,13 @@ public static class Program
 
         var changes = new SchemaComparer().Compare(source, target, new ComparerOptions
         {
-            DropObjectsNotInSource = HasFlag(args, "--allow-drops"),
+            DropObjectsNotInSource = allowDrops,
         });
 
-        var variables = BuildVariableResolver(project, args);
+        var variables = BuildVariableResolver(project, args, profile);
         var script = new DeployScriptGenerator().Generate(changes, new DeployOptions
         {
-            WrapInTransaction = !HasFlag(args, "--no-transaction"),
+            WrapInTransaction = wrapInTransaction,
             Scripts = LoadDeployScripts(project),
             Variables = variables,
         });
@@ -500,13 +506,14 @@ public static class Program
 
     private static async Task<int> Script(string[] args)
     {
+        var profile = LoadProfile(args);            // EP-PROFILE: CLI flags override profile values.
         var (source, project) = await BuildSourceOrThrowAsync(args);
         var changes = new SchemaComparer().Compare(source, new DatabaseModel());
         var script = new DeployScriptGenerator().Generate(changes, new DeployOptions
         {
-            WrapInTransaction = !HasFlag(args, "--no-transaction"),
+            WrapInTransaction = ResolveWrapInTransaction(args, profile),
             Scripts = LoadDeployScripts(project),
-            Variables = BuildVariableResolver(project, args),
+            Variables = BuildVariableResolver(project, args, profile),
         });
 
         var outPath = GetOption(args, "-o", "--output");
@@ -564,6 +571,48 @@ public static class Program
         return 0;
     }
 
+    // ---- profile (EP-PROFILE: create a .pgpublish.json from current CLI flags) -----------
+
+    private static int Profile(string[] args)
+    {
+        var sub = args.Skip(1).FirstOrDefault(a => !a.StartsWith('-'))?.ToLowerInvariant();
+        return sub switch
+        {
+            "create" => ProfileCreate(args),
+            null => Fail("Expected a 'profile' subcommand (create)."),
+            _ => Fail($"Unknown 'profile' subcommand '{sub}'."),
+        };
+    }
+
+    private static int ProfileCreate(string[] args)
+    {
+        // Positional after the "create" subcommand: the output .pgpublish.json path.
+        var outPath = args.Skip(2).FirstOrDefault(a => !a.StartsWith('-'))
+                      ?? throw new CliUsageException("Expected an output .pgpublish.json path argument.");
+
+        var a = new CliArgs(args);
+
+        // Build the profile purely from the current flags. The connection STRING is never captured (secret);
+        // only an optional non-secret --connection-name label is recorded.
+        var profile = new PublishProfile
+        {
+            TargetPostgresVersion = a.GetOption("--target-version"),
+            ConnectionName = a.GetOption("--connection-name"),
+            Variables = a.GetKeyValues("--var"),
+            Options = new PublishProfileOptions
+            {
+                // Only record an option the user explicitly set, so the profile asserts nothing it wasn't told.
+                AllowDrops = a.HasFlag("--allow-drops") ? true : null,
+                WrapInTransaction = a.HasFlag("--no-transaction") ? false : null,
+            },
+        };
+
+        profile.Save(outPath);
+        Console.WriteLine($"Wrote publish profile to {outPath}");
+        Console.WriteLine("  (the connection string is never stored — pass --connection / PGPROJ_CONNECTION at publish time)");
+        return ExitCode.Success;
+    }
+
     // ---- helpers ------------------------------------------------------------------------
 
     /// <summary>The tool version stamped into packages. Injected here at the CLI boundary so core build
@@ -604,15 +653,43 @@ public static class Program
     }
 
     /// <summary>
-    /// Builds the resolved SQLCMD-variable map: project DefaultValues overlaid by CLI <c>--var N=V</c>
-    /// (repeatable). Precedence: CLI &gt; publish profile (future) &gt; project default. When the source was a
-    /// pre-built package (no project), only the CLI overrides apply.
+    /// Builds the resolved SQLCMD-variable map: project DefaultValues overlaid by the <c>--profile</c>
+    /// variable block overlaid by CLI <c>--var N=V</c> (repeatable). Precedence: CLI &gt; publish profile &gt;
+    /// project default. When the source was a pre-built package (no project), only profile + CLI apply.
     /// </summary>
     private static SqlCmdVariableResolver BuildVariableResolver(DatabaseProject? project, string[] args) =>
+        BuildVariableResolver(project, args, LoadProfile(args));
+
+    /// <summary>Overload taking an already-loaded profile (so a verb loads the profile once).</summary>
+    private static SqlCmdVariableResolver BuildVariableResolver(DatabaseProject? project, string[] args, PublishProfile? profile) =>
         SqlCmdVariableResolver.Build(
             defaults: project?.SqlCmdVariableDefaults ?? new Dictionary<string, string>(),
-            profile: null,                          // EP-PROFILE — not yet wired
+            profile: profile?.Variables,            // EP-PROFILE — profile variable overrides
             cliOverrides: ParseCliVars(args));
+
+    /// <summary>
+    /// Loads the <c>--profile &lt;file&gt;</c> publish profile, or null when none was supplied (EP-PROFILE).
+    /// A malformed/missing profile surfaces as a <see cref="PublishProfileException"/> (→ exit 1).
+    /// </summary>
+    private static PublishProfile? LoadProfile(string[] args)
+    {
+        var path = GetOption(args, "--profile");
+        return path is null ? null : PublishProfile.Load(path);
+    }
+
+    /// <summary>
+    /// Resolves the allow-drops publish option with EP-PROFILE precedence: an explicit CLI <c>--allow-drops</c>
+    /// flag wins; otherwise the profile's value; otherwise the built-in default (false).
+    /// </summary>
+    private static bool ResolveAllowDrops(string[] args, PublishProfile? profile) =>
+        HasFlag(args, "--allow-drops") || (profile?.Options.AllowDrops ?? false);
+
+    /// <summary>
+    /// Resolves wrap-in-transaction with EP-PROFILE precedence: an explicit CLI <c>--no-transaction</c> wins
+    /// (→ false); otherwise the profile's value; otherwise the built-in default (true).
+    /// </summary>
+    private static bool ResolveWrapInTransaction(string[] args, PublishProfile? profile) =>
+        !HasFlag(args, "--no-transaction") && (profile?.Options.WrapInTransaction ?? true);
 
     /// <summary>Parses every <c>--var Name=Value</c> occurrence into a case-insensitive override map.</summary>
     private static IReadOnlyDictionary<string, string> ParseCliVars(string[] args) =>
@@ -726,11 +803,13 @@ public static class Program
           pgproj build   <project.pgproj> [-o model.json] [--package <out.pgpkg> | --no-package] [--strict] [--no-analyze] [--var N=V] [--substitute-objects]
                          (resolves <ProjectReference>/<ArtifactReference> into the build's catalog so
                           cross-schema names resolve; referenced objects are never emitted)
-          pgproj script  <project.pgproj|.pgpkg> [-o create.sql] [--no-transaction] [--var N=V]
-          pgproj compare <project.pgproj|.pgpkg> --connection <conn> [--allow-drops]
-          pgproj publish <project.pgproj|.pgpkg> --connection <conn> [--dry-run] [-o script.sql] [--allow-drops] [--no-transaction] [--parallel] [--strict] [--no-analyze] [--var N=V] [--substitute-objects]
+          pgproj script  <project.pgproj|.pgpkg> [-o create.sql] [--no-transaction] [--var N=V] [--profile <file>]
+          pgproj compare <project.pgproj|.pgpkg> --connection <conn> [--allow-drops] [--profile <file>]
+          pgproj publish <project.pgproj|.pgpkg> --connection <conn> [--dry-run] [-o script.sql] [--allow-drops] [--no-transaction] [--parallel] [--strict] [--no-analyze] [--var N=V] [--substitute-objects] [--profile <file>]
           pgproj validate <project.pgproj|.pgpkg> --connection <conn> [--strict] [--no-analyze]   (apply to a throwaway temp DB, rolled back)
           pgproj pkg inspect <file.pgpkg>                                              (dump the manifest + object inventory)
+          pgproj profile create <out.pgpublish.json> [--target-version 18] [--connection-name <label>] [--var N=V] [--allow-drops] [--no-transaction]
+                         (write a reusable publish profile from the current flags; the connection string is never stored)
           pgproj extract --connection <conn> -o <outDir>
           pgproj drift   <project.pgproj> --connection <conn>                          (preview project files that differ from the DB)
           pgproj pull    <project.pgproj> --connection <conn> [--dry-run] [--allow-deletes]   (rewrite project files FROM the DB — scenario 3)
@@ -750,7 +829,9 @@ public static class Program
           --parallel         Publish with intra-phase parallelism (phase-level atomicity)
           --strict           Analysis gate: treat warnings as errors (build/publish fail on warnings)
           --no-analyze       Skip the static-analysis gate on build/publish
-          --var Name=Value   Override a SqlCmdVariable (repeatable; CLI beats the project DefaultValue)
+          --var Name=Value   Override a SqlCmdVariable (repeatable; CLI beats the profile, profile beats the project DefaultValue)
+          --profile <file>   compare/script/publish: load options + variable overrides from a .pgpublish.json (CLI flags win)
+          --connection-name  profile create: a non-secret connection label/hint to record (never a connection string)
           --substitute-objects  Also expand $(Var) tokens in object .sql files (default: deploy-scripts only)
           --force            add: overwrite an existing object file
           --default-schema   new project: default schema for the manifest (default 'public')
