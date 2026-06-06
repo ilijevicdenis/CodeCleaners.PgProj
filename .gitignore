@@ -15,6 +15,7 @@ BenchmarkDotNet.Artifacts/
 # Rider / VS
 .idea/
 .vs/
+.vscode/
 
 # PgProj build artifacts
 *.model.json
