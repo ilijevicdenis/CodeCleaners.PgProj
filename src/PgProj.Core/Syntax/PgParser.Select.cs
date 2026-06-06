@@ -77,7 +77,7 @@ public sealed partial class PgParser
     private CommonTableExpr ParseCte(TokenCursor c)
     {
         var cte = new CommonTableExpr { Name = c.ExpectIdentifier() };
-        if (c.AtSymbol('(')) cte.Columns.AddRange(ParseColumnNameList(c));
+        if (c.AtSymbol('(')) cte.AddColumns(ParseColumnNameList(c));
         c.ExpectWord("AS");
         if (c.MatchWord("MATERIALIZED")) cte.Materialized = "MATERIALIZED";
         else if (c.MatchWords("NOT", "MATERIALIZED")) cte.Materialized = "NOT MATERIALIZED";
@@ -241,10 +241,10 @@ public sealed partial class PgParser
             if (jt != "CROSS" && !natural)
             {
                 if (c.MatchWord("ON")) join.On = ParseExpression(c);
-                else if (c.MatchWord("USING")) join.Using.AddRange(ParseColumnNameList(c));
+                else if (c.MatchWord("USING")) join.AddUsing(ParseColumnNameList(c));
                 else throw new ParseException("JOIN requires ON or USING (unless CROSS/NATURAL)", c.Here);
             }
-            rel.Joins.Add(join);
+            rel.AddJoin(join);
         }
         return rel;
     }
@@ -257,7 +257,7 @@ public sealed partial class PgParser
         {
             c.Advance();
             if (c.AtAnyWord("SELECT", "WITH", "VALUES", "TABLE")) { rel.Subquery = ParseSelectStatement(c); c.ExpectSymbol(')'); }
-            else { var nested = ParseTableRefWithJoins(c); c.ExpectSymbol(')'); rel.Subquery = null; rel.RawText = "(joined)"; rel.Schema = nested.Schema; rel.TableName = nested.TableName; rel.Joins.AddRange(nested.Joins); }
+            else { var nested = ParseTableRefWithJoins(c); c.ExpectSymbol(')'); rel.Subquery = null; rel.RawText = "(joined)"; rel.Schema = nested.Schema; rel.TableName = nested.TableName; rel.AddJoins(nested.Joins); }
         }
         else if (c.AtWord("ROWS") && c.Peek()?.IsWord("FROM") == true)
         {
@@ -300,7 +300,7 @@ public sealed partial class PgParser
     {
         if (!c.AtSymbol('(')) return;
         if (rel.Function is not null) c.SkipBalancedParens();
-        else rel.ColumnAliases.AddRange(ParseColumnNameList(c));
+        else rel.AddColumnAliases(ParseColumnNameList(c));
     }
 
     // Set while parsing a DML source/FROM/USING list, where a trailing RETURNING must not be
@@ -325,7 +325,7 @@ public sealed partial class PgParser
 
     private void ParseSelectTail(TokenCursor c, SelectQuery q)
     {
-        if (c.MatchWords("ORDER", "BY")) q.OrderBy.AddRange(ParseOrderByList(c));
+        if (c.MatchWords("ORDER", "BY")) q.AddOrderBy(ParseOrderByList(c));
 
         while (c.AtAnyWord("LIMIT", "OFFSET", "FETCH"))
         {
@@ -381,8 +381,8 @@ public sealed partial class PgParser
         if (c.Current is { Kind: TokenKind.Word } && !c.AtWord("PARTITION") && !c.AtWord("ORDER")
             && !c.AtWord("ROWS") && !c.AtWord("RANGE") && !c.AtWord("GROUPS"))
             w.RefName = c.Advance().Value;
-        if (c.MatchWords("PARTITION", "BY")) { w.PartitionBy.Add(ParseExpression(c)); while (c.MatchSymbol(',')) w.PartitionBy.Add(ParseExpression(c)); }
-        if (c.MatchWords("ORDER", "BY")) w.OrderBy.AddRange(ParseOrderByList(c));
+        if (c.MatchWords("PARTITION", "BY")) { w.AddPartitionBy(ParseExpression(c)); while (c.MatchSymbol(',')) w.AddPartitionBy(ParseExpression(c)); }
+        if (c.MatchWords("ORDER", "BY")) w.AddOrderBy(ParseOrderByList(c));
         if (c.AtAnyWord("ROWS", "RANGE", "GROUPS"))
         {
             int fm = c.Mark();

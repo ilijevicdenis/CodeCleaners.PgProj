@@ -48,7 +48,9 @@ public sealed class SelectQuery
 
     public SetOperation? SetOp { get; set; }                 // UNION/INTERSECT/EXCEPT chain
 
-    public List<OrderByItem> OrderBy { get; } = new();
+    private List<OrderByItem>? _orderBy;
+    public IReadOnlyList<OrderByItem> OrderBy => _orderBy ?? (IReadOnlyList<OrderByItem>)System.Array.Empty<OrderByItem>();
+    public void AddOrderBy(IEnumerable<OrderByItem> items) => (_orderBy ??= new()).AddRange(items);
     public string? Limit { get; set; }
     public string? Offset { get; set; }
     public Expr? LimitExpr { get; set; }    // parsed LIMIT / FETCH count, for constant-folding validation
@@ -61,7 +63,9 @@ public sealed class SelectQuery
 public sealed class CommonTableExpr
 {
     public string Name { get; init; } = "";
-    public List<string> Columns { get; } = new();
+    private List<string>? _columns;
+    public IReadOnlyList<string> Columns => _columns ?? (IReadOnlyList<string>)System.Array.Empty<string>();
+    public void AddColumns(IEnumerable<string> cols) => (_columns ??= new()).AddRange(cols);
     public string? Materialized { get; set; }                // MATERIALIZED / NOT MATERIALIZED
     public SelectQuery Query { get; set; } = null!;
     public string? RawBody { get; set; }                     // for data-modifying CTEs captured verbatim
@@ -86,10 +90,15 @@ public sealed class TableRef
     public FuncCallExpr? Function { get; set; }              // function-in-FROM
     public bool Lateral { get; set; }
     public string? Alias { get; set; }
-    public List<string> ColumnAliases { get; } = new();
+    private List<string>? _columnAliases;
+    public IReadOnlyList<string> ColumnAliases => _columnAliases ?? (IReadOnlyList<string>)System.Array.Empty<string>();
+    public void AddColumnAliases(IEnumerable<string> cols) => (_columnAliases ??= new()).AddRange(cols);
     public bool WithOrdinality { get; set; }
     public string? RawText { get; set; }                     // ROWS FROM / TABLESAMPLE / unparsed tail
-    public List<JoinClause> Joins { get; } = new();
+    private List<JoinClause>? _joins;
+    public IReadOnlyList<JoinClause> Joins => _joins ?? (IReadOnlyList<JoinClause>)System.Array.Empty<JoinClause>();
+    public void AddJoin(JoinClause j) => (_joins ??= new()).Add(j);
+    public void AddJoins(IEnumerable<JoinClause> js) => (_joins ??= new()).AddRange(js);
     public bool Only { get; set; }
 }
 
@@ -98,7 +107,9 @@ public sealed class JoinClause
     public string JoinType { get; init; } = "";              // INNER / LEFT / RIGHT / FULL / CROSS [+ NATURAL]
     public TableRef Right { get; init; } = null!;
     public Expr? On { get; set; }
-    public List<string> Using { get; } = new();
+    private List<string>? _using;
+    public IReadOnlyList<string> Using => _using ?? (IReadOnlyList<string>)System.Array.Empty<string>();
+    public void AddUsing(IEnumerable<string> cols) => (_using ??= new()).AddRange(cols);
 }
 
 public sealed class OrderByItem
@@ -114,8 +125,12 @@ public sealed class WindowSpec
 {
     public string? Name { get; set; }                        // OVER window_name
     public string? RefName { get; set; }                     // existing window referenced inside (…)
-    public List<Expr> PartitionBy { get; } = new();
-    public List<OrderByItem> OrderBy { get; } = new();
+    private List<Expr>? _partitionBy;
+    public IReadOnlyList<Expr> PartitionBy => _partitionBy ?? (IReadOnlyList<Expr>)System.Array.Empty<Expr>();
+    public void AddPartitionBy(Expr e) => (_partitionBy ??= new()).Add(e);
+    private List<OrderByItem>? _orderBy;
+    public IReadOnlyList<OrderByItem> OrderBy => _orderBy ?? (IReadOnlyList<OrderByItem>)System.Array.Empty<OrderByItem>();
+    public void AddOrderBy(IEnumerable<OrderByItem> items) => (_orderBy ??= new()).AddRange(items);
     public string? FrameText { get; set; }                   // ROWS/RANGE/GROUPS … captured
 }
 

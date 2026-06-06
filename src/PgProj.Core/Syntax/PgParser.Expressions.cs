@@ -360,11 +360,11 @@ public sealed partial class PgParser
                 c.MatchWord("VARIADIC");
                 call.Args.Add(ParseExpression(c));
             }
-            if (c.MatchWords("ORDER", "BY")) call.OrderBy.AddRange(ParseOrderByList(c));
+            if (c.MatchWords("ORDER", "BY")) call.AddOrderBy(ParseOrderByList(c));
             c.ExpectSymbol(')');
         }
         // post-call: WITHIN GROUP (ORDER BY …), FILTER (WHERE …), OVER (…)
-        if (c.MatchWords("WITHIN", "GROUP")) { c.ExpectSymbol('('); c.ExpectWord("ORDER"); c.ExpectWord("BY"); call.WithinGroup.AddRange(ParseOrderByList(c)); c.ExpectSymbol(')'); }
+        if (c.MatchWords("WITHIN", "GROUP")) { c.ExpectSymbol('('); c.ExpectWord("ORDER"); c.ExpectWord("BY"); call.AddWithinGroup(ParseOrderByList(c)); c.ExpectSymbol(')'); }
         if (c.MatchWord("FILTER")) { c.ExpectSymbol('('); c.ExpectWord("WHERE"); call.Filter = ParseExpression(c); c.ExpectSymbol(')'); }
         if (c.MatchWord("OVER")) call.Over = ParseWindowSpecOrName(c);
         return call;

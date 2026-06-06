@@ -8,7 +8,7 @@ namespace PgProj.Core.Syntax;
 public abstract class Expr { }
 
 public sealed class LiteralExpr : Expr { public string Kind { get; init; } = ""; public string Text { get; init; } = ""; }   // number/string/bool/null/typed
-public sealed class StarExpr : Expr { public List<string> Qualifier { get; init; } = new(); }                                 // *  or  t.*
+public sealed class StarExpr : Expr { public List<string>? Qualifier { get; init; } }                                         // *  or  t.* (null for a bare *, never read; see ColumnRef)
 // Parts is informational only (never read by the comparer/emitter/validator — they work off captured
 // SourceText, not the Expr tree), so it is left null for an unqualified single-name ref to avoid a per-ref
 // List<string> + String[] on the hot expression path; it is populated only for a qualified t.a / s.t.a.
@@ -40,8 +40,13 @@ public sealed class FuncCallExpr : Expr
     public bool Distinct { get; set; }
     public bool Star { get; set; }                            // count(*)
     public bool Variadic { get; set; }
-    public List<OrderByItem> OrderBy { get; } = new();        // agg ORDER BY
-    public List<OrderByItem> WithinGroup { get; } = new();    // ordered-set agg
+    // agg ORDER BY / ordered-set WITHIN GROUP — empty on almost every call → lazy (shared Array.Empty).
+    private List<OrderByItem>? _orderBy;
+    public IReadOnlyList<OrderByItem> OrderBy => _orderBy ?? (IReadOnlyList<OrderByItem>)System.Array.Empty<OrderByItem>();
+    public void AddOrderBy(IEnumerable<OrderByItem> items) => (_orderBy ??= new()).AddRange(items);
+    private List<OrderByItem>? _withinGroup;
+    public IReadOnlyList<OrderByItem> WithinGroup => _withinGroup ?? (IReadOnlyList<OrderByItem>)System.Array.Empty<OrderByItem>();
+    public void AddWithinGroup(IEnumerable<OrderByItem> items) => (_withinGroup ??= new()).AddRange(items);
     public Expr? Filter { get; set; }                         // FILTER (WHERE …)
     public WindowSpec? Over { get; set; }                     // OVER (…) or OVER name
 }
