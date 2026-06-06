@@ -38,10 +38,11 @@ public sealed partial class PgParser
         catch (Exception ex) { result.Diagnostics.Add(new ParseDiagnostic("tokenize failed: " + ex.Message, 1, 1, 0)); return result; }
         result.SetTokens(tokens);   // hand the pooled buffer to the result for ReleaseTokens after build
 
+        var c = new TokenCursor(System.Array.Empty<Token>());   // reused per statement (Reset) — not retained
         foreach (var segment in SplitStatements(tokens))
         {
             if (segment.Count == 0) continue;
-            var c = new TokenCursor(segment);
+            c.Reset(segment);
             var lead = ClassifyLeading(c);
             if (lead is null)
             {

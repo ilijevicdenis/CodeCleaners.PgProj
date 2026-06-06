@@ -19,10 +19,16 @@ public sealed class ParseException : Exception
 /// </summary>
 public sealed class TokenCursor
 {
-    private readonly IReadOnlyList<Token> _tokens;
+    private IReadOnlyList<Token> _tokens;
     private int _i;
 
     public TokenCursor(IReadOnlyList<Token> tokens) => _tokens = tokens;
+
+    /// <summary>Re-point this cursor at a new token window and rewind to the start. Lets the per-statement
+    /// parse loop reuse one cursor instance instead of allocating a fresh one per statement — safe because
+    /// a cursor is never retained (only the statement's segment is); the previous statement is fully parsed
+    /// before the next Reset.</summary>
+    internal void Reset(IReadOnlyList<Token> tokens) { _tokens = tokens; _i = 0; }
 
     public Token? Current => _i < _tokens.Count ? _tokens[_i] : null;
     /// <summary>The current token's text, or null at end — avoids unwrapping the Nullable&lt;Token&gt; at call sites.</summary>
