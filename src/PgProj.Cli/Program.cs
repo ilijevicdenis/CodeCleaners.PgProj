@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Reflection;
 using PgProj.Core.Analysis;
+using PgProj.Core.Cli;
 using PgProj.Core.Comparison;
 using PgProj.Core.Contracts;
 using PgProj.Core.Deployment;
@@ -28,7 +29,7 @@ public static class Program
     {
         try
         {
-            if (args.Length == 0) { PrintUsage(); return 1; }
+            if (args.Length == 0) { PrintUsage(); return ExitCode.Usage; }
 
             return args[0].ToLowerInvariant() switch
             {
@@ -45,14 +46,21 @@ public static class Program
                 "model-tree" => await ModelTree(args),
                 "script" => await Script(args),
                 "pkg" => await Pkg(args),
-                "help" or "--help" or "-h" => PrintUsageReturn(0),
+                "help" or "--help" or "-h" => PrintUsageReturn(ExitCode.Success),
                 _ => Fail($"Unknown command '{args[0]}'."),
             };
+        }
+        catch (CliUsageException ex)
+        {
+            // A user mistake (missing/malformed argument, unknown option) — distinct from a runtime failure.
+            Console.Error.WriteLine($"error: {ex.Message}");
+            PrintUsage();
+            return ExitCode.Usage;
         }
         catch (Exception ex)
         {
             Console.Error.WriteLine($"error: {ex.Message}");
-            return 2;
+            return ExitCode.Error;
         }
     }
 
@@ -109,7 +117,7 @@ public static class Program
         {
             var report = await ContractBuilder.BuildAsync(project, includeTree: true);
             EmitJson(report);
-            return report.Success ? 0 : 1;
+            return report.Success ? ExitCode.Success : ExitCode.BuildError;
         }
 
         var result = await project.BuildAsync();
@@ -122,15 +130,15 @@ public static class Program
             Console.Error.WriteLine();
             Console.Error.WriteLine($"Build failed with {result.Diagnostics.Count} problem(s):");
             foreach (var d in result.Diagnostics) Console.Error.WriteLine($"  - {d}");
-            return 1;
+            return ExitCode.BuildError;
         }
 
         // Resolve references (EP-REF): build/read each referenced model into the semantic catalog, then
         // validate cross-schema names. External objects never enter the model, so they are never emitted.
-        if (ResolveAndValidateReferencesBlocks(project)) return 1;
+        if (ResolveAndValidateReferencesBlocks(project)) return ExitCode.ReferenceError;
 
         // Static-analysis gate (skip with --no-analyze; escalate warnings with --strict).
-        if (AnalysisGateBlocks(project, args)) return 1;
+        if (AnalysisGateBlocks(project, args)) return ExitCode.AnalysisBlocked;
 
         var outPath = GetOption(args, "-o", "--output")
                       ?? Path.Combine(project.ProjectDirectory, "bin", $"{project.Name}.model.json");
@@ -203,7 +211,7 @@ public static class Program
         }
 
         // Gate before touching the database: a failing analysis must not reach the server.
-        if (AnalysisGateBlocks(project, args)) return 1;
+        if (AnalysisGateBlocks(project, args)) return ExitCode.AnalysisBlocked;
 
         var target = await ReadTarget(args);
 
@@ -265,7 +273,7 @@ public static class Program
         var (source, project) = await BuildSourceOrThrowAsync(args);
 
         // Layer 1 (static, instant): the analysis gate. Layer 2 (below) runs it against real Postgres.
-        if (AnalysisGateBlocks(project, args)) return 1;
+        if (AnalysisGateBlocks(project, args)) return ExitCode.AnalysisBlocked;
 
         // Full create script with no BEGIN/COMMIT — ShadowValidator wraps it in its own transaction.
         var changes = new SchemaComparer().Compare(source, new DatabaseModel());
@@ -281,7 +289,7 @@ public static class Program
 
         Console.Error.WriteLine($"Invalid: {outcome.Error}" + (outcome.SqlState is null ? "" : $"  [{outcome.SqlState}]"));
         if (outcome.Position > 0) Console.Error.WriteLine($"  near script position {outcome.Position}");
-        return 1;
+        return ExitCode.ValidationFailed;
     }
 
     // ---- extract ------------------------------------------------------------------------
@@ -375,12 +383,12 @@ public static class Program
         {
             var report = ContractBuilder.Analyze(project, HasFlag(args, "--strict"));
             EmitJson(report);
-            return report.Blocked ? 1 : 0;
+            return report.Blocked ? ExitCode.AnalysisBlocked : ExitCode.Success;
         }
 
         var findings = RunAnalysis(project, out var ruleCount);
         Console.WriteLine($"Analyzed '{project.Name}': {ruleCount} rule(s).");
-        return ReportFindings(findings, HasFlag(args, "--strict"), alwaysReport: true) ? 1 : 0;
+        return ReportFindings(findings, HasFlag(args, "--strict"), alwaysReport: true) ? ExitCode.AnalysisBlocked : ExitCode.Success;
     }
 
     // ---- model-tree (editor endpoint: objects + source positions) -----------------------
@@ -607,20 +615,8 @@ public static class Program
             cliOverrides: ParseCliVars(args));
 
     /// <summary>Parses every <c>--var Name=Value</c> occurrence into a case-insensitive override map.</summary>
-    private static IReadOnlyDictionary<string, string> ParseCliVars(string[] args)
-    {
-        var map = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-        for (var i = 0; i < args.Length - 1; i++)
-        {
-            if (!args[i].Equals("--var", StringComparison.OrdinalIgnoreCase)) continue;
-            var pair = args[i + 1];
-            var eq = pair.IndexOf('=');
-            if (eq <= 0)
-                throw new InvalidOperationException($"--var expects Name=Value (got '{pair}').");
-            map[pair[..eq].Trim()] = pair[(eq + 1)..];
-        }
-        return map;
-    }
+    private static IReadOnlyDictionary<string, string> ParseCliVars(string[] args) =>
+        new CliArgs(args).GetKeyValues("--var");
 
     /// <summary>
     /// Resolves the source model from EITHER a <c>.pgproj</c> (build it) OR a <c>.pgpkg</c> (load the
@@ -678,31 +674,21 @@ public static class Program
                           $"indexes={m.Indexes.Count} views={m.Views.Count} " +
                           $"sequences={m.Sequences.Count} functions={m.Functions.Count}");
 
-    private static string RequireConnection(string[] args) =>
-        GetOption(args, "-c", "--connection")
-        ?? Environment.GetEnvironmentVariable("PGPROJ_CONNECTION")
-        ?? throw new InvalidOperationException("A connection string is required (--connection or PGPROJ_CONNECTION).");
+    // ---- argument parsing -----------------------------------------------------------------
+    // These delegate to the shared, unit-tested CliArgs/OutputFormat primitives in PgProj.Core.Cli so the
+    // whole CLI (and a future `pgproj serve` host) parses one grammar. Verbs call these thin wrappers or
+    // `new CliArgs(args)` directly — new options should not re-implement parsing.
 
-    private static string RequirePositional(string[] args, string what)
-    {
-        var value = args.Skip(1).FirstOrDefault(a => !a.StartsWith('-'));
-        return value ?? throw new InvalidOperationException($"Expected a {what} argument.");
-    }
+    private static string RequireConnection(string[] args) => new CliArgs(args).RequireConnection();
 
-    private static string? GetOption(string[] args, params string[] names)
-    {
-        for (var i = 0; i < args.Length - 1; i++)
-            if (names.Contains(args[i], StringComparer.OrdinalIgnoreCase))
-                return args[i + 1];
-        return null;
-    }
+    private static string RequirePositional(string[] args, string what) => new CliArgs(args).RequirePositional(what);
 
-    private static bool HasFlag(string[] args, string name) =>
-        args.Any(a => a.Equals(name, StringComparison.OrdinalIgnoreCase));
+    private static string? GetOption(string[] args, params string[] names) => new CliArgs(args).GetOption(names);
+
+    private static bool HasFlag(string[] args, string name) => new CliArgs(args).HasFlag(name);
 
     /// <summary>True when the caller asked for machine-readable output (<c>--format json</c>).</summary>
-    private static bool WantsJson(string[] args) =>
-        string.Equals(GetOption(args, "--format"), "json", StringComparison.OrdinalIgnoreCase);
+    private static bool WantsJson(string[] args) => new CliArgs(args).WantsJson;
 
     /// <summary>Writes a contract payload to stdout as stable JSON.</summary>
     private static void EmitJson<T>(T payload) => Console.WriteLine(JsonContract.Serialize(payload));
@@ -711,7 +697,7 @@ public static class Program
     {
         Console.Error.WriteLine(message);
         PrintUsage();
-        return 1;
+        return ExitCode.Usage;
     }
 
     private static int PrintUsageReturn(int code) { PrintUsage(); return code; }
