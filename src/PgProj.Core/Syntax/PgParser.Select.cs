@@ -20,7 +20,7 @@ public sealed partial class PgParser
         bool recursive = false;
         if (c.AtWord("WITH")) (ctes, recursive) = ParseCteList(c);
         var q = ParseSelectBody(c);
-        if (ctes is not null) { q.With.AddRange(ctes); q.WithRecursive = recursive; }
+        if (ctes is not null) { q.AddWith(ctes); q.WithRecursive = recursive; }
         return q;
     }
 
@@ -131,7 +131,7 @@ public sealed partial class PgParser
             var row = new List<Expr> { ParseExpression(c) };
             while (c.MatchSymbol(',')) row.Add(ParseExpression(c));
             c.ExpectSymbol(')');
-            q.ValuesRows.Add(row);
+            q.AddValuesRow(row);
         } while (c.MatchSymbol(','));
         return q;
     }
@@ -144,7 +144,7 @@ public sealed partial class PgParser
         else if (c.MatchWord("DISTINCT"))
         {
             q.Distinct = true;
-            if (c.MatchWord("ON")) { c.ExpectSymbol('('); q.DistinctOn.Add(ParseExpression(c)); while (c.MatchSymbol(',')) q.DistinctOn.Add(ParseExpression(c)); c.ExpectSymbol(')'); }
+            if (c.MatchWord("ON")) { c.ExpectSymbol('('); q.AddDistinctOn(ParseExpression(c)); while (c.MatchSymbol(',')) q.AddDistinctOn(ParseExpression(c)); c.ExpectSymbol(')'); }
         }
 
         // target list (may be empty only for SELECT INTO-ish? require at least one normally)
@@ -162,7 +162,7 @@ public sealed partial class PgParser
         if (c.MatchWord("HAVING")) q.Having = ParseExpression(c);
         if (c.MatchWord("WINDOW"))
         {
-            do { var name = c.ExpectIdentifier(); c.ExpectWord("AS"); q.Windows.Add(new NamedWindow { Name = name, Spec = ParseWindowDetails(c) }); }
+            do { var name = c.ExpectIdentifier(); c.ExpectWord("AS"); q.AddWindow(new NamedWindow { Name = name, Spec = ParseWindowDetails(c) }); }
             while (c.MatchSymbol(','));
         }
         return q;
@@ -207,7 +207,7 @@ public sealed partial class PgParser
         if (c.AtAnyWord("ROLLUP", "CUBE")) { q.GroupByKind = c.Advance().Value.ToUpperInvariant(); c.SkipBalancedParens(); return; }
         if (c.MatchWords("GROUPING", "SETS")) { q.GroupByKind = "GROUPING SETS"; c.SkipBalancedParens(); return; }
         if (c.AtSymbol('(') && c.Peek()?.IsSymbol(')') == true) { c.Advance(); c.Advance(); return; }   // GROUP BY () — grand total
-        q.GroupBy.Add(ParseExpression(c));
+        q.AddGroupBy(ParseExpression(c));
     }
 
     private FromClause ParseFromClause(TokenCursor c)
@@ -340,7 +340,7 @@ public sealed partial class PgParser
             if (c.MatchWord("OF")) { lk.Of.Add(c.ExpectIdentifier()); while (c.MatchSymbol(',')) lk.Of.Add(c.ExpectIdentifier()); }
             if (c.MatchWord("NOWAIT")) lk.Wait = "NOWAIT";
             else if (c.MatchWords("SKIP", "LOCKED")) lk.Wait = "SKIP LOCKED";
-            q.Locking.Add(lk);
+            q.AddLocking(lk);
         }
     }
 

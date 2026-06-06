@@ -11,25 +11,40 @@ public sealed class QueryStatement : SqlStatement { public SelectQuery Query { g
 /// </summary>
 public sealed class SelectQuery
 {
-    public List<CommonTableExpr> With { get; } = new();
+    // These clause lists are EMPTY on most queries (a plain SELECT has no WITH / VALUES / DISTINCT ON /
+    // GROUP BY / WINDOW / FOR-locking). Eagerly `= new()`-ing them allocated ~6 empty List objects per
+    // SelectQuery (and SelectQuery is one of the top allocated types). So they are lazy: the reader sees a
+    // shared zero-alloc Array.Empty<T> until the parser writes via Add*, which allocates the real list on
+    // first use. Readers only foreach/index/Single() them, which IReadOnlyList supports. (AllocProbe.)
+    private List<CommonTableExpr>? _with;
+    public IReadOnlyList<CommonTableExpr> With => _with ?? (IReadOnlyList<CommonTableExpr>)System.Array.Empty<CommonTableExpr>();
+    public void AddWith(IEnumerable<CommonTableExpr> ctes) => (_with ??= new()).AddRange(ctes);
     public bool WithRecursive { get; set; }
 
     // primary kind
     public bool IsValues { get; set; }
-    public List<List<Expr>> ValuesRows { get; } = new();
+    private List<List<Expr>>? _valuesRows;
+    public IReadOnlyList<List<Expr>> ValuesRows => _valuesRows ?? (IReadOnlyList<List<Expr>>)System.Array.Empty<List<Expr>>();
+    public void AddValuesRow(List<Expr> row) => (_valuesRows ??= new()).Add(row);
     public bool IsTableCommand { get; set; }                 // TABLE name
     public string? TableName { get; set; }
 
     public bool Distinct { get; set; }
-    public List<Expr> DistinctOn { get; } = new();
-    public List<SelectItem> Items { get; } = new();
+    private List<Expr>? _distinctOn;
+    public IReadOnlyList<Expr> DistinctOn => _distinctOn ?? (IReadOnlyList<Expr>)System.Array.Empty<Expr>();
+    public void AddDistinctOn(Expr e) => (_distinctOn ??= new()).Add(e);
+    public List<SelectItem> Items { get; } = new();         // ~always non-empty → kept eager
 
     public FromClause? From { get; set; }
     public Expr? Where { get; set; }
-    public List<Expr> GroupBy { get; } = new();
+    private List<Expr>? _groupBy;
+    public IReadOnlyList<Expr> GroupBy => _groupBy ?? (IReadOnlyList<Expr>)System.Array.Empty<Expr>();
+    public void AddGroupBy(Expr e) => (_groupBy ??= new()).Add(e);
     public string? GroupByKind { get; set; }                 // ROLLUP / CUBE / GROUPING SETS / null
     public Expr? Having { get; set; }
-    public List<NamedWindow> Windows { get; } = new();
+    private List<NamedWindow>? _windows;
+    public IReadOnlyList<NamedWindow> Windows => _windows ?? (IReadOnlyList<NamedWindow>)System.Array.Empty<NamedWindow>();
+    public void AddWindow(NamedWindow w) => (_windows ??= new()).Add(w);
 
     public SetOperation? SetOp { get; set; }                 // UNION/INTERSECT/EXCEPT chain
 
@@ -38,7 +53,9 @@ public sealed class SelectQuery
     public string? Offset { get; set; }
     public Expr? LimitExpr { get; set; }    // parsed LIMIT / FETCH count, for constant-folding validation
     public Expr? OffsetExpr { get; set; }   // parsed OFFSET count
-    public List<LockingClause> Locking { get; } = new();
+    private List<LockingClause>? _locking;
+    public IReadOnlyList<LockingClause> Locking => _locking ?? (IReadOnlyList<LockingClause>)System.Array.Empty<LockingClause>();
+    public void AddLocking(LockingClause lk) => (_locking ??= new()).Add(lk);
 }
 
 public sealed class CommonTableExpr

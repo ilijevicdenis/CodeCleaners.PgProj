@@ -95,7 +95,7 @@ public sealed partial class PgParser
             if (c.AtWord("DELETE")) return ParseDelete(c, ctes, recursive);
             if (c.AtWord("MERGE")) return ParseMerge(c, ctes, recursive);
             var q = ParseSelectBody(c);
-            q.With.AddRange(ctes); q.WithRecursive = recursive;
+            q.AddWith(ctes); q.WithRecursive = recursive;
             return new QueryStatement { Query = q };
         }
         if (c.AtAnyWord("SELECT", "VALUES", "TABLE") || c.AtSymbol('('))
