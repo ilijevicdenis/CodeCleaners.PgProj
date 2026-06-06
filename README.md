@@ -63,6 +63,13 @@ static engine resolves the vast majority instantly and offline (with **zero fals
 never rejects valid SQL), and the remaining runtime-only cases (errors that only surface on
 execution) are verified by executing them against PostgreSQL.
 
+## Performance
+
+The parser/model engine is allocation-tuned: parsing + building the corpus now allocates **≈70% less**
+than the pre-optimization baseline (66.28 → 19.95 MB/op, BenchmarkDotNet `PipelineBenchmarks.ParseAndBuild`),
+across 16 merged optimizations — culminating in `Token[]` array pooling. See the progress dashboard with
+per-stage and per-bucket charts: **[docs/parser-performance.md](docs/parser-performance.md)**.
+
 ## Install / build
 
 Requires the **.NET 10 SDK**. (A live **PostgreSQL** server — or Docker `postgres:18` — is only
