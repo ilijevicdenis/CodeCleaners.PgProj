@@ -97,6 +97,6 @@ public sealed partial class PgParser
             else if (t.IsSymbol(')') || t.IsSymbol(']')) depth--;
             c.Advance();
         }
-        return Token.Render(c.Range(m, c.Mark()));
+        return c.RenderRange(m, c.Mark());
     }
 }

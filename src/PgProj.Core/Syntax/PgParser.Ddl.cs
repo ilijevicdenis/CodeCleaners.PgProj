@@ -18,15 +18,15 @@ public sealed partial class PgParser
         while (!c.AtEnd && !c.AtWord("AS")) { if (c.AtSymbol('(')) c.SkipBalancedParens(); else c.Advance(); }
         c.ExpectWord("AS");
 
-        var body = new List<Token>();
+        int bm = c.Mark();
         while (!c.AtEnd)
         {
             if (c.AtWord("WITH") && c.Peek() is { } p && (p.IsWord("CHECK") || p.IsWord("CASCADED") || p.IsWord("LOCAL") || p.IsWord("DATA") || p.IsWord("NO")))
                 break;
-            body.Add(c.Advance());
+            c.Advance();
         }
-        if (body.Count == 0) throw new ParseException("expected a query after AS", c.Here);
-        node.BodyText = Token.Render(body);
+        if (c.Mark() == bm) throw new ParseException("expected a query after AS", c.Here);
+        node.BodyText = c.RenderRange(bm, c.Mark());
         ConsumeRest(c);                          // WITH CHECK OPTION / WITH [NO] DATA
         return node;
     }
@@ -88,7 +88,7 @@ public sealed partial class PgParser
         if (c.MatchWord("NULLS")) { c.MatchWord("NOT"); c.ExpectWord("DISTINCT"); }   // INCLUDE precedes NULLS [NOT] DISTINCT
         if (c.MatchWord("WITH")) ParseRelOptions(c);
         if (c.MatchWord("TABLESPACE")) c.ExpectIdentifier();
-        if (c.MatchWord("WHERE")) { int m = c.Mark(); ParseExpression(c); node.Where = Token.Render(c.Range(m, c.Mark())); }   // a real predicate is required
+        if (c.MatchWord("WHERE")) { int m = c.Mark(); ParseExpression(c); node.Where = c.RenderRange(m, c.Mark()); }   // a real predicate is required
 
         // Only btree supports UNIQUE among the built-in access methods.
         if (unique && node.Method is { } am && NonUniqueBuiltinAm.Contains(am))
@@ -114,7 +114,7 @@ public sealed partial class PgParser
             if (!c.MatchWord("FIRST")) c.ExpectWord("LAST");
             if (c.AtWord("NULLS")) throw new ParseException("duplicate NULLS ordering", c.Here);
         }
-        return Token.Render(c.Range(m, c.Mark()));
+        return c.RenderRange(m, c.Mark());
     }
 
     // WITH ( key [= value] [, …] ) reloptions — reject an empty list and out-of-range fillfactor.
@@ -149,7 +149,7 @@ public sealed partial class PgParser
         // RETURNS … and the option/body tail — captured as before, validated via a sub-cursor.
         int m = c.Mark();
         ConsumeRest(c);
-        ValidateFunctionTail(c.Range(m, c.Mark()), hasOut, node);
+        ValidateFunctionTail(c.Segment(m, c.Mark()), hasOut, node);
         return node;
     }
 
@@ -204,7 +204,7 @@ public sealed partial class PgParser
             else if (t.IsSymbol(')') || t.IsSymbol(']')) depth--;
             a.Advance();
         }
-        return Token.Render(a.Range(m, a.Mark()));
+        return a.RenderRange(m, a.Mark());
     }
 
     private static bool IsArrayOrAnyType(string type)
@@ -217,7 +217,7 @@ public sealed partial class PgParser
     // Validate RETURNS + the option/body tail: at most one of each option category, valid PARALLEL value,
     // COST > 0, ROWS only for set-returning functions, OUT params incompatible with RETURNS TABLE, and a
     // body must be present. Unknown trailing tokens fall back to lenient acceptance (no false positives).
-    private void ValidateFunctionTail(List<Token> tail, bool hasOut, CreateFunctionStatement node)
+    private void ValidateFunctionTail(IReadOnlyList<Token> tail, bool hasOut, CreateFunctionStatement node)
     {
         var o = new TokenCursor(tail);
         bool returnsSet = false, returnsTable = false;
@@ -283,7 +283,7 @@ public sealed partial class PgParser
         var args = new List<string>();
         foreach (var part in SplitTopLevel(argInner))
         {
-            var toks = new List<Token>(part);
+            var toks = part;   // freshly yielded per-arg list — safe to splice in place, no defensive copy
             // strip a leading mode keyword
             if (toks.Count > 0 && toks[0].Kind == TokenKind.Word &&
                 (toks[0].IsWord("IN") || toks[0].IsWord("OUT") || toks[0].IsWord("INOUT") || toks[0].IsWord("VARIADIC")))

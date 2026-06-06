@@ -99,7 +99,17 @@ public sealed class Tokenizer
                 continue;
             }
 
-            if (c == '\'') { tokens.Add(new Token(TokenKind.String, ReadQuoted('\''), start)); continue; }
+            if (c == '\'')
+            {
+                // Escape-string constant: a standalone E/e immediately before the quote (PG: "E'…'") turns on
+                // C-style backslash escapes, so an escaped quote \' does NOT end the string. We require the
+                // e/E to be a lone prefix (the char before it is not identifier-like — otherwise it is the tail
+                // of a word/number such as TRUE'x' or 1e'x', which are a plain identifier/number + normal '…').
+                bool eString = _i >= 1 && (_s[_i - 1] == 'e' || _s[_i - 1] == 'E')
+                               && (_i < 2 || !IsIdentPart(_s[_i - 2]));
+                tokens.Add(new Token(TokenKind.String, ReadQuoted('\'', eString), start));
+                continue;
+            }
             if (c == '"') { tokens.Add(new Token(TokenKind.QuotedIdent, ReadQuoted('"'), start)); continue; }
 
             if (char.IsDigit(c) || (c == '.' && char.IsDigit(Peek(1))))
@@ -170,13 +180,20 @@ public sealed class Tokenizer
         return true;
     }
 
-    private string ReadQuoted(char quote)
+    private string ReadQuoted(char quote, bool backslashEscapes = false)
     {
         var sb = new StringBuilder();
         _i++; // opening quote
         while (_i < _s.Length)
         {
             var c = _s[_i];
+            // E-string backslash escape: take the backslash and the following char verbatim so that \' does
+            // not terminate the literal. We preserve the raw two-char sequence (not decode \n etc.) — correct
+            // tokenisation is all that's needed, and keeping it raw round-trips the captured expression text.
+            if (backslashEscapes && c == '\\' && _i + 1 < _s.Length)
+            {
+                sb.Append(c); sb.Append(_s[_i + 1]); _i += 2; continue;
+            }
             if (c == quote)
             {
                 if (Peek(1) == quote) { sb.Append(quote); _i += 2; continue; } // doubled escape
@@ -203,7 +220,7 @@ public sealed class Tokenizer
             if (digits > 0) { _i = j; return Intern(start, _i - start); }
         }
         while (_i < _s.Length && (char.IsDigit(_s[_i]) || _s[_i] == '.' || _s[_i] == 'e' || _s[_i] == 'E'
-                                  || ((_s[_i] == '+' || _s[_i] == '-') && (_s[_i - 1] == 'e' || _s[_i - 1] == 'E'))
+                                  || ((_s[_i] == '+' || _s[_i] == '-') && _i > start && (_s[_i - 1] == 'e' || _s[_i - 1] == 'E'))
                                   || (_s[_i] == '_' && _i > start && char.IsDigit(_s[_i - 1]) && char.IsDigit(Peek(1)))))  // digit group separators (PG16)
             _i++;
         return Intern(start, _i - start);

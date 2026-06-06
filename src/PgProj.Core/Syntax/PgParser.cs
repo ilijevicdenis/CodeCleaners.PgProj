@@ -350,7 +350,11 @@ public sealed partial class PgParser
 
     private TypeName ParseTypeName(TokenCursor b)
     {
-        var toks = new List<Token>();
+        // Track [start, b.Mark()) over the cursor's own token list and render that range directly, rather
+        // than copying each token into a throwaway List<Token>. Token is a 24-byte struct, so that list's
+        // backing array was 3x heavier than a list of references — and ParseTypeName runs for every column
+        // of every table (the hottest capture site). The renderer is identical, so Text is byte-for-byte.
+        int start = b.Mark();
         int depth = 0;
         while (!b.AtEnd)
         {
@@ -362,10 +366,10 @@ public sealed partial class PgParser
             }
             if (t.IsSymbol('(') || t.IsSymbol('[')) depth++;
             else if (t.IsSymbol(')') || t.IsSymbol(']')) depth = Math.Max(0, depth - 1);
-            toks.Add(b.Advance());
+            b.Advance();
         }
-        if (toks.Count == 0) throw new ParseException("expected a column data type", b.Here);
-        var tn = new TypeName { Text = Token.Render(toks) };
+        if (b.Mark() == start) throw new ParseException("expected a column data type", b.Here);
+        var tn = new TypeName { Text = b.RenderRange(start, b.Mark()) };
         ValidateTypeModifiers(tn.Text, b);
         return tn;
     }
