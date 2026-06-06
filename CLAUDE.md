@@ -31,3 +31,23 @@ dotnet test  tests/PgProj.Core.Tests -c Release   # full suite; keep 100% green 
 Parser/engine performance work is benchmark-gated: `bench/PgProj.Benchmarks` (BenchmarkDotNet,
 `[MemoryDiagnoser]`); `dotnet run --project bench/PgProj.Benchmarks -c Release -- alloc` is a fast
 bytes/op probe. No perf change ships without a measured allocation delta.
+
+## Performance dashboard — publish gains on commit
+
+The progress dashboard lives at **`docs/parser-performance.md`** (GitHub-rendered, with the
+`docs/parser-perf-*.svg` charts) and is linked from the README.
+
+**When a commit produces a measured allocation gain, update the dashboard in that same commit:**
+
+1. Confirm the gain with numbers — the `bench -- alloc` probe and/or a BDN A/B
+   (`PipelineBenchmarks`); allocation (bytes/op) is the metric, not noisy ShortRun wall-clock.
+2. Append the new stage to the §1 "All"-bucket journey (tag + MB/op) and refresh the §2 per-bucket
+   chart + both tables and the cumulative % / headline. Regenerate the SVGs the same way they were
+   produced (PowerShell emitting `docs/parser-perf-journey.svg` / `parser-perf-buckets.svg`).
+3. Keep the [[parser-perf-optimizations]] memory's win log in sync.
+
+No measured gain, or a delta within benchmark noise → **do not touch** the dashboard. This is a
+**manual step performed as part of the commit** — do NOT add a git hook, GitHub Action, or any CI
+job to run benchmarks or publish stats automatically (benchmarks take minutes, and the CI/CD hard
+rule above stands). "Publish" here means committing the updated Markdown + SVGs to the repo, which
+renders on GitHub; it does not mean any online CI/CD.
