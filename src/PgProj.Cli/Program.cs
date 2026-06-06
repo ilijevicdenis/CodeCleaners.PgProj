@@ -377,18 +377,35 @@ public static class Program
 
     private static int Analyze(string[] args)
     {
+        var cli = new CliArgs(args);
         var project = DatabaseProject.Load(RequirePositional(args, "project file"));
+        var config = LoadAnalysisConfig(project, cli);
+        var strict = HasFlag(args, "--strict");
 
-        if (WantsJson(args))
+        switch (cli.Format)
         {
-            var report = ContractBuilder.Analyze(project, HasFlag(args, "--strict"));
-            EmitJson(report);
-            return report.Blocked ? ExitCode.AnalysisBlocked : ExitCode.Success;
+            case OutputFormat.Json:
+            {
+                var report = ContractBuilder.Analyze(project, strict, config);
+                EmitJson(report);
+                return report.Blocked ? ExitCode.AnalysisBlocked : ExitCode.Success;
+            }
+            case OutputFormat.Sarif:
+            {
+                var positions = SourcePositionIndex.Build(project);
+                var findings = RunAnalysis(project, config, out _);
+                Console.WriteLine(new SarifWriter().Write(findings, positions));
+                var blocked = findings.Any(f => f.Severity == DiagnosticSeverity.Error)
+                              || (strict && findings.Any(f => f.Severity == DiagnosticSeverity.Warning));
+                return blocked ? ExitCode.AnalysisBlocked : ExitCode.Success;
+            }
+            default:
+            {
+                var findings = RunAnalysis(project, config, out var ruleCount);
+                Console.WriteLine($"Analyzed '{project.Name}': {ruleCount} rule(s).");
+                return ReportFindings(findings, strict, alwaysReport: true) ? ExitCode.AnalysisBlocked : ExitCode.Success;
+            }
         }
-
-        var findings = RunAnalysis(project, out var ruleCount);
-        Console.WriteLine($"Analyzed '{project.Name}': {ruleCount} rule(s).");
-        return ReportFindings(findings, HasFlag(args, "--strict"), alwaysReport: true) ? ExitCode.AnalysisBlocked : ExitCode.Success;
     }
 
     // ---- model-tree (editor endpoint: objects + source positions) -----------------------
@@ -416,14 +433,32 @@ public static class Program
 
     // ---- shared analysis gate -----------------------------------------------------------
 
-    private static IReadOnlyList<Diagnostic> RunAnalysis(DatabaseProject project, out int ruleCount)
+    private static IReadOnlyList<Diagnostic> RunAnalysis(DatabaseProject project, AnalysisConfig config, out int ruleCount)
     {
         ruleCount = PgAnalyzer.RuleCount;
-        var analyzer = new PgAnalyzer();
+        var analyzer = new PgAnalyzer(config);
         var findings = new List<Diagnostic>();
         foreach (var file in project.ResolveSqlFiles())
             findings.AddRange(analyzer.Analyze(new PgProj.Core.Syntax.PgParser().Parse(File.ReadAllText(file))));
         return findings;
+    }
+
+    /// <summary>
+    /// Resolves the analysis configuration for a verb: the <c>.pgproj.analysis.json</c> sidecar next to the
+    /// project, with CLI <c>--rule RULEID=off|on|severity</c> overrides layered on top (CLI wins).
+    /// A malformed <c>--rule</c> surfaces as a usage error.
+    /// </summary>
+    private static AnalysisConfig LoadAnalysisConfig(DatabaseProject project, CliArgs cli)
+    {
+        try
+        {
+            return AnalysisConfig.LoadForProject(project.ProjectFilePath)
+                                 .WithCliOverrides(cli.GetKeyValues("--rule"));
+        }
+        catch (CliRuleException ex)
+        {
+            throw new CliUsageException(ex.Message);
+        }
     }
 
     /// <summary>Prints findings and returns true if the gate should block (errors, or warnings under --strict).</summary>
@@ -453,7 +488,8 @@ public static class Program
         // No project (source was a pre-built .pgpkg) → nothing to re-analyze; it was gated at build time.
         if (project is null) return false;
         if (HasFlag(args, "--no-analyze")) return false;
-        var findings = RunAnalysis(project, out _);
+        var config = LoadAnalysisConfig(project, new CliArgs(args));
+        var findings = RunAnalysis(project, config, out _);
         var blocked = ReportFindings(findings, HasFlag(args, "--strict"), alwaysReport: false);
         if (blocked) Console.Error.WriteLine("Aborted by analysis gate (pass --no-analyze to skip).");
         return blocked;
