@@ -161,9 +161,71 @@ public static class Program
         return 0;
     }
 
-    // ---- compare ------------------------------------------------------------------------
+    // ---- compare (EP-SCHEMACOMPARE: first-class two-way Schema Compare) ------------------
 
     private static async Task<int> Compare(string[] args)
+    {
+        var cli = new CliArgs(args);
+
+        // Two-way form (--source X --target Y): each endpoint ∈ {project, .pgpkg, live DB}, resolved through
+        // the shared EndpointResolver so the full {project,pkg,live}² matrix is one code path. When --source/
+        // --target are absent we fall back to the legacy form below for back-compat.
+        if (cli.GetOption("--source") is { } sourceSpec)
+            return await CompareTwoWay(cli, sourceSpec);
+
+        return await CompareLegacy(args);
+    }
+
+    /// <summary>The two-way Schema Compare: source &amp; target each a project/package/live DB.</summary>
+    private static async Task<int> CompareTwoWay(CliArgs cli, string sourceSpec)
+    {
+        var targetSpec = cli.GetOption("--target")
+            ?? throw new CliUsageException("compare --source <X> requires --target <Y> (a .pgproj, .pgpkg, or connection string).");
+
+        var options = new ComparerOptions { DropObjectsNotInSource = cli.HasFlag("--allow-drops") };
+        var excludes = ParseExcludeObjectTypes(cli);
+
+        var result = await SchemaCompare.RunAsync(sourceSpec, targetSpec, options, excludes);
+        var changeSet = result.ChangeSet;
+
+        // --output diff.json: write the structured, selectable diff for a UI to render (always JSON, regardless
+        // of --format, since the consumer is a tool). --format json mirrors it to stdout for piping.
+        var report = SchemaCompareReport.Build(result);
+        var outPath = cli.GetOption("-o", "--output");
+        if (outPath is not null)
+        {
+            File.WriteAllText(outPath, SchemaCompareReport.Serialize(report));
+            if (!cli.WantsJson) Console.WriteLine($"Schema-compare diff written to {outPath}");
+        }
+
+        if (cli.WantsJson)
+        {
+            Console.WriteLine(SchemaCompareReport.Serialize(report));
+            return FailOnChangesGate(cli, changeSet);
+        }
+
+        PrintCompareBanner(result);
+        if (changeSet.InSync)
+        {
+            Console.WriteLine("No differences. Source and target are in sync.");
+            return FailOnChangesGate(cli, changeSet);
+        }
+
+        var shown = changeSet.Included;
+        var excluded = changeSet.Count - shown.Count;
+        Console.WriteLine($"{shown.Count} change(s) would bring the target in line with the source" +
+                          (excluded > 0 ? $" ({excluded} excluded by filter):" : ":"));
+        foreach (var c in shown)
+            Console.WriteLine($"  [{(c.IsDestructive ? "!" : "+")}] ({c.ObjectType}) {c.Description}  #{c.Id}");
+
+        var destructive = shown.Count(c => c.IsDestructive);
+        if (destructive > 0)
+            Console.WriteLine($"\n{destructive} included change(s) are destructive (marked with !).");
+        return FailOnChangesGate(cli, changeSet);
+    }
+
+    /// <summary>The legacy one-way form: <c>compare &lt;project|pkg&gt; --connection &lt;conn&gt;</c> (project → live DB).</summary>
+    private static async Task<int> CompareLegacy(string[] args)
     {
         var (source, project) = await BuildSourceOrThrowAsync(args);
         var target = await ReadTarget(args);
@@ -193,6 +255,25 @@ public static class Program
         if (destructive > 0)
             Console.WriteLine($"\n{destructive} change(s) are destructive (marked with !).");
         return 0;
+    }
+
+    /// <summary>Parses repeatable/comma-joined <c>--exclude</c> object-type tokens for the two-way compare.</summary>
+    private static IReadOnlyList<string> ParseExcludeObjectTypes(CliArgs cli) =>
+        cli.GetOptionValues("--exclude")
+            .SelectMany(v => v.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+            .ToList();
+
+    /// <summary>Optional drift gate: with <c>--fail-on-changes</c>, a non-empty diff returns <see cref="ExitCode.Drift"/>.</summary>
+    private static int FailOnChangesGate(CliArgs cli, SchemaChangeSet changeSet) =>
+        cli.HasFlag("--fail-on-changes") && changeSet.IncludedCount > 0 ? ExitCode.Drift : ExitCode.Success;
+
+    private static void PrintCompareBanner(SchemaCompareResult result)
+    {
+        static string Label(PgProj.Core.Cli.ResolvedEndpoint e) =>
+            $"{e.DisplayName} [{e.Kind.ToString().ToLowerInvariant()}]";
+        Console.WriteLine($"Schema compare: {Label(result.Source)}  →  {Label(result.Target)}");
+        foreach (var d in result.Source.BuildDiagnostics) Console.Error.WriteLine($"  source build: {d}");
+        foreach (var d in result.Target.BuildDiagnostics) Console.Error.WriteLine($"  target build: {d}");
     }
 
     // ---- publish ------------------------------------------------------------------------
@@ -763,7 +844,9 @@ public static class Program
                          (resolves <ProjectReference>/<ArtifactReference> into the build's catalog so
                           cross-schema names resolve; referenced objects are never emitted)
           pgproj script  <project.pgproj|.pgpkg> [-o create.sql] [--no-transaction] [--var N=V]
-          pgproj compare <project.pgproj|.pgpkg> --connection <conn> [--allow-drops]
+          pgproj compare <project.pgproj|.pgpkg> --connection <conn> [--allow-drops]                 (one-way: project/package → live DB)
+          pgproj compare --source <X> --target <Y> [-o diff.json] [--format json] [--exclude <type,...>] [--allow-drops] [--fail-on-changes]
+                         (two-way Schema Compare; X and Y each a .pgproj, .pgpkg, or connection string)
           pgproj publish <project.pgproj|.pgpkg> --connection <conn> [--dry-run] [-o script.sql] [--allow-drops] [--no-transaction] [--parallel] [--strict] [--no-analyze] [--var N=V] [--substitute-objects]
           pgproj validate <project.pgproj|.pgpkg> --connection <conn> [--strict] [--no-analyze]   (apply to a throwaway temp DB, rolled back)
           pgproj pkg inspect <file.pgpkg>                                              (dump the manifest + object inventory)
@@ -779,6 +862,10 @@ public static class Program
           -o, --output       Output file or directory
           --dry-run          Generate the deploy script but do not execute it
           --allow-drops      Allow destructive changes (drop tables/columns/etc. not in the project)
+          --source           compare (two-way): the left/source endpoint (.pgproj, .pgpkg, or connection string)
+          --target           compare (two-way): the right/target endpoint (.pgproj, .pgpkg, or connection string)
+          --exclude          compare (two-way): object-type(s) to skip, comma-separated/repeatable (e.g. extension,permission)
+          --fail-on-changes  compare (two-way): exit with the Drift code (6) when any change remains
           --allow-deletes    pull: delete project files for objects dropped from the database
           --package          build: write the .pgpkg to this path (default bin/<Name>.pgpkg)
           --no-package       build: skip writing the portable .pgpkg artifact
