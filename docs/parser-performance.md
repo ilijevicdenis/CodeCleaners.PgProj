@@ -1,6 +1,6 @@
 # Parser Performance — Allocation Reduction
 
-**Headline: the pgproj parser now allocates `19.95 MB/op` to parse + build the corpus, down from `66.28 MB/op` — a `−69.9%` cut in managed allocations across 16 merged optimizations.**
+**Headline: the pgproj parser now allocates `18.94 MB/op` to parse + build the corpus, down from `66.28 MB/op` — a `−71.4%` cut in managed allocations across 18 merged optimizations.**
 
 Metric: **BenchmarkDotNet `PipelineBenchmarks.ParseAndBuild` allocated bytes/op (MB, lower is better)** over a corpus of PostgreSQL DDL/DML. Allocation is the deterministic, reportable number; wall-clock is omitted as noise (see [Caveats](#caveats)).
 
@@ -8,27 +8,27 @@ Metric: **BenchmarkDotNet `PipelineBenchmarks.ParseAndBuild` allocated bytes/op 
 
 ## 1. The full journey — "All" corpus bucket
 
-Every merged optimization, in order. Allocation falls monotonically from baseline to the ArrayPool win.
+Every merged optimization, in order. Allocation falls monotonically from baseline to the latest win.
 
-![ParseAndBuild allocation, All corpus — 66.28 to 19.95 MB/op (−69.9%) over 16 optimizations; each stage labelled vertically inside its bar, prior session in grey, this session in blue.](parser-perf-journey.svg)
+![ParseAndBuild allocation, All corpus — 66.28 to 18.94 MB/op (−71.4%) over 18 optimizations; each stage labelled vertically inside its bar, prior effort in grey, recent in blue.](parser-perf-journey.svg)
 
-> **Two efforts in one line.** Wins **1–10 (`Base` → `ResCap`)** were a prior session that took allocation from `66.28` to `31.22 MB/op`. Wins **11–16 (`NameList` → `Pool`)** are the most recent session, taking it the rest of the way to `19.95 MB/op` — an additional `−36.1%` on top of an already-optimized parser. The single biggest step is the final `Pool` win (`25.88 → 19.95`, `−22.9%` in one move).
+> **Two efforts in one line.** Wins **1–10 (`Base` → `ResCap`)** were a prior effort that took allocation from `66.28` to `31.22 MB/op`. Wins **11–18 (`NameList` → `Cursor`)** are the recent effort, taking it the rest of the way to `18.94 MB/op` — an additional `−39.3%` on top of an already-optimized parser. The single biggest step is the `Pool` win (`25.88 → 19.95`, `−22.9%` in one move).
 
 | Effort | Stages | Start → End (MB/op) | Reduction |
 |---|---|---:|---:|
-| Prior session | `Base` → `ResCap` (1–10) | 66.28 → 31.22 | −52.9% |
-| **Recent session** | `NameList` → `Pool` (11–16) | 31.22 → 19.95 | **−36.1%** |
-| **Total** | `Base` → `Pool` (1–16) | **66.28 → 19.95** | **−69.9%** |
+| Prior effort | `Base` → `ResCap` (1–10) | 66.28 → 31.22 | −52.9% |
+| **Recent effort** | `NameList` → `Cursor` (11–18) | 31.22 → 18.94 | **−39.3%** |
+| **Total** | `Base` → `Cursor` (1–18) | **66.28 → 18.94** | **−71.4%** |
 
 ---
 
-## 2. Recent session across all four corpus buckets
+## 2. Recent effort across all four corpus buckets
 
-The last six wins (11–16) improved **every workload shape**, not just the aggregate. The four buckets' absolute magnitudes differ by ~10× (`All` ≈ 31 MB vs `Table` ≈ 3 MB), so each is shown as **before (start) vs after the six wins, normalized to its own start = 100%** — the shorter the coloured bar, the bigger the reduction.
+The recent wins (11–18) improved **every workload shape**, not just the aggregate. The four buckets' absolute magnitudes differ by ~10× (`All` ≈ 31 MB vs `Table` ≈ 3 MB), so each is shown as **before (start) vs after the recent wins, normalized to its own start = 100%** — the shorter the coloured bar, the bigger the reduction.
 
-![Recent session — allocation per corpus bucket, before (start, grey) vs after the six wins (coloured), normalized to each bucket's start = 100%; the bucket name is labelled vertically inside each coloured bar.](parser-perf-buckets.svg)
+![Recent effort — allocation per corpus bucket, before (start, grey) vs after the recent wins (coloured), normalized to each bucket's start = 100%; the bucket name is labelled vertically inside each coloured bar.](parser-perf-buckets.svg)
 
-Each coloured bar is the allocation **remaining** after the six wins, as a % of that bucket's start (lower = better): `Select` 47% · `All` 64% · `Raw` 64% · `Table` 76%. `Select` benefits most (lazy clause lists + pooling hit it hardest); `Table` is already lean so it moves least.
+Each coloured bar is the allocation **remaining** after the recent wins, as a % of that bucket's start (lower = better): `Select` 46% · `All` 61% · `Raw` 61% · `Table` 72%. `Select` benefits most (lazy clause lists + pooling hit it hardest); `Table` is already lean so it moves least.
 
 Absolute MB/op behind the normalized chart:
 
@@ -40,8 +40,9 @@ Absolute MB/op behind the normalized chart:
 | DeadCR | 28.48 | 17.70 | 9.94 | 3.04 |
 | LazySelQ | 26.79 | 17.02 | 8.95 | 3.02 |
 | LazyAST | 25.88 | 16.71 | 8.37 | 3.00 |
-| **Pool** | **19.95** | **12.40** | **5.23** | **2.43** |
-| **Δ vs start** | **−36.1%** | **−35.6%** | **−52.8%** | **−24.1%** |
+| Pool | 19.95 | 12.40 | 5.23 | 2.43 |
+| **Render2+Cursor** | **18.94** | **11.73** | **5.06** | **2.31** |
+| **Δ vs start** | **−39.3%** | **−39.1%** | **−54.4%** | **−27.8%** |
 
 ---
 
@@ -67,14 +68,16 @@ Each tag in the charts, the change it represents, and the resulting "All" alloca
 | 14 | `LazySelQ` | lazy `SelectQuery` clause lists | 26.79 |
 | 15 | `LazyAST` | lazy lists across AST nodes | 25.88 |
 | 16 | `Pool` | `Token[]` `ArrayPool` pooling | 19.95 |
+| 17 | `Render2` | `string.Create` render for all runs (no `StringBuilder` fallback) | 19.59 |
+| 18 | `Cursor` | reuse the per-statement `TokenCursor` across the parse loop | 18.94 |
 
-Rows 11–16 are the most recent session.
+Rows 11–18 are the recent effort.
 
 ---
 
 ## Caveats
 
-- **Values are measured BenchmarkDotNet allocated bytes/op**, converted to MB. Each journey point (§1) is that round's post-merge **"All"** number.
-- **The `Pool` point is the warm-pool `ParseAndBuild_Pooled` measurement** — a real multi-file build with the `ArrayPool` already populated, not a synthetic micro-benchmark.
+- **Values are measured BenchmarkDotNet allocated bytes/op**, converted to MB. Each journey point (§1) is that round's post-merge **"All"** number. (`Render2`, #17, is the one exception — its intermediate "All" value is derived by chaining the in-process probe ratio onto the measured `Pool` point; `Cursor`, #18 = 18.94, is the directly-measured combined BDN value for #17+#18.)
+- **The `Pool`, `Render2`, and `Cursor` points are warm-pool `ParseAndBuild_Pooled` measurements** — a real multi-file build with the `ArrayPool` already populated, not a synthetic micro-benchmark.
 - **Wall-clock is intentionally not charted.** ShortRun timings are noisy and unreliable for trend tracking. For context only: several of these wins were also ~5% faster in wall-clock, with large Gen2-collection reductions — but allocation is the metric we hold ourselves to here.
 - **Allocation ≠ working set.** Lower bytes/op reduces GC pressure and Gen2 collections; it is not a direct memory-footprint or throughput guarantee.

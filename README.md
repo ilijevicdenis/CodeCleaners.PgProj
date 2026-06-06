@@ -65,10 +65,10 @@ execution) are verified by executing them against PostgreSQL.
 
 ## Performance
 
-The parser/model engine is allocation-tuned: parsing + building the corpus now allocates **≈70% less**
-than the pre-optimization baseline (66.28 → 19.95 MB/op, BenchmarkDotNet `PipelineBenchmarks.ParseAndBuild`),
-across 16 merged optimizations — culminating in `Token[]` array pooling. See the progress dashboard with
-per-stage and per-bucket charts: **[docs/parser-performance.md](docs/parser-performance.md)**.
+The parser/model engine is allocation-tuned: parsing + building the corpus now allocates **≈71% less**
+than the pre-optimization baseline (66.28 → 18.94 MB/op, BenchmarkDotNet `PipelineBenchmarks.ParseAndBuild`),
+across 18 merged optimizations — `Token[]` array pooling, lazy AST collections, and more. See the progress
+dashboard with per-stage and per-bucket charts: **[docs/parser-performance.md](docs/parser-performance.md)**.
 
 ## Install / build
 
