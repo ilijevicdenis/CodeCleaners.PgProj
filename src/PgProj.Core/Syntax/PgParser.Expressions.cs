@@ -327,20 +327,22 @@ public sealed partial class PgParser
     private Expr ParseNameOrCall(TokenCursor c)
     {
         if (c.AtSymbol('*')) { c.Advance(); return new StarExpr(); }
+        // Build the dotted name once and hand the list straight to the node (init-setter), instead of
+        // AddRange-copying it into a second list — every column ref / call hit that double-allocation
+        // (List<string> + its String[] backing were ~10% of pipeline alloc; AllocProbe).
         var parts = new List<string> { c.ExpectIdentifier() };
         while (c.MatchSymbol('.'))
         {
-            if (c.MatchSymbol('*')) { var star = new StarExpr(); star.Qualifier.AddRange(parts); return star; }
+            if (c.MatchSymbol('*')) return new StarExpr { Qualifier = parts };
             parts.Add(c.ExpectIdentifier());
         }
         if (c.AtSymbol('(')) return ParseCallTail(c, parts);
-        return new ColumnRef { Parts = { } }.With(parts);
+        return new ColumnRef { Parts = parts };
     }
 
     private FuncCallExpr ParseCallTail(TokenCursor c, List<string> name)
     {
-        var call = new FuncCallExpr();
-        call.Name.AddRange(name);
+        var call = new FuncCallExpr { Name = name };
         c.ExpectSymbol('(');
         if (c.MatchSymbol('*')) { call.Star = true; c.ExpectSymbol(')'); }
         else if (c.AtSymbol(')')) { c.Advance(); }
@@ -583,9 +585,4 @@ public sealed partial class PgParser
     private static readonly HashSet<string> IntervalFields = new(StringComparer.OrdinalIgnoreCase)
     { "year", "month", "day", "hour", "minute", "second", "to" };
     private static bool IsIntervalField(string w) => IntervalFields.Contains(w);
-}
-
-internal static class ColumnRefExt
-{
-    public static ColumnRef With(this ColumnRef r, List<string> parts) { r.Parts.AddRange(parts); return r; }
 }

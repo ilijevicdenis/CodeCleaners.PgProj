@@ -8,8 +8,8 @@ namespace PgProj.Core.Syntax;
 public abstract class Expr { }
 
 public sealed class LiteralExpr : Expr { public string Kind { get; init; } = ""; public string Text { get; init; } = ""; }   // number/string/bool/null/typed
-public sealed class StarExpr : Expr { public List<string> Qualifier { get; } = new(); }                                       // *  or  t.*
-public sealed class ColumnRef : Expr { public List<string> Parts { get; } = new(); }                                          // a / t.a / s.t.a
+public sealed class StarExpr : Expr { public List<string> Qualifier { get; init; } = new(); }                                 // *  or  t.*
+public sealed class ColumnRef : Expr { public List<string> Parts { get; init; } = new(); }                                    // a / t.a / s.t.a
 public sealed class ParamExpr : Expr { public string Text { get; init; } = ""; }                                              // $1
 public sealed class UnaryExpr : Expr { public string Op { get; init; } = ""; public Expr Operand { get; init; } = null!; }
 public sealed class BinaryExpr : Expr { public string Op { get; init; } = ""; public Expr Left { get; init; } = null!; public Expr Right { get; init; } = null!; }
@@ -32,7 +32,7 @@ public sealed class CaseExpr : Expr
 
 public sealed class FuncCallExpr : Expr
 {
-    public List<string> Name { get; } = new();
+    public List<string> Name { get; init; } = new();
     public List<Expr> Args { get; } = new();
     public bool Distinct { get; set; }
     public bool Star { get; set; }                            // count(*)
