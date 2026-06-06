@@ -1,0 +1,5 @@
+{
+  "//": "Local dev: point the pgproj VS Code extension at the engine DLL built from this repo.",
+  "pgproj.cliPath": "C:/pgproj-engine/PgProj.Cli.dll",
+  "pgproj.dotnetPath": "dotnet"
+}
