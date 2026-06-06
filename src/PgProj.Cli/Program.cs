@@ -141,6 +141,9 @@ public static class Program
         // Static-analysis gate (skip with --no-analyze; escalate warnings with --strict).
         if (AnalysisGateBlocks(project, args)) return ExitCode.AnalysisBlocked;
 
+        // Target-platform gate (EP-TARGET): block syntax newer than <TargetPostgresVersion>.
+        if (TargetVersionGateBlocks(project, args)) return ExitCode.AnalysisBlocked;
+
         var outPath = GetOption(args, "-o", "--output")
                       ?? Path.Combine(project.ProjectDirectory, "bin", $"{project.Name}.model.json");
         Directory.CreateDirectory(Path.GetDirectoryName(outPath)!);
@@ -300,6 +303,9 @@ public static class Program
         // Gate before touching the database: a failing analysis must not reach the server.
         if (AnalysisGateBlocks(project, args)) return ExitCode.AnalysisBlocked;
 
+        // Target-platform gate (EP-TARGET): never publish syntax newer than <TargetPostgresVersion>.
+        if (TargetVersionGateBlocks(project, args)) return ExitCode.AnalysisBlocked;
+
         var target = await ReadTarget(args);
 
         var changes = new SchemaComparer().Compare(source, target, new ComparerOptions
@@ -361,6 +367,10 @@ public static class Program
 
         // Layer 1 (static, instant): the analysis gate. Layer 2 (below) runs it against real Postgres.
         if (AnalysisGateBlocks(project, args)) return ExitCode.AnalysisBlocked;
+
+        // Target-platform gate (EP-TARGET): a project that uses syntax newer than <TargetPostgresVersion>
+        // fails validation statically, before the (possibly mismatched) shadow database is spun up.
+        if (TargetVersionGateBlocks(project, args)) return ExitCode.AnalysisBlocked;
 
         // Full create script with no BEGIN/COMMIT — ShadowValidator wraps it in its own transaction.
         var changes = new SchemaComparer().Compare(source, new DatabaseModel());
@@ -580,6 +590,30 @@ public static class Program
         var blocked = ReportFindings(findings, HasFlag(args, "--strict"), alwaysReport: false);
         if (blocked) Console.Error.WriteLine("Aborted by analysis gate (pass --no-analyze to skip).");
         return blocked;
+    }
+
+    // ---- target-platform gate (EP-TARGET) -----------------------------------------------
+
+    /// <summary>
+    /// The target-version enforcement gate. When the project declares a <c>TargetPostgresVersion</c>, flags
+    /// any syntax newer than that target (<c>PGV###</c> findings) and returns true if the operation must
+    /// abort. With no target set, or a pre-built package source, or <c>--no-analyze</c>, it is a no-op.
+    /// Runs alongside (not inside) <see cref="AnalysisGateBlocks"/> — a separate analyzer from PgAnalyzer.
+    /// </summary>
+    private static bool TargetVersionGateBlocks(DatabaseProject? project, string[] args)
+    {
+        if (project is null) return false;                       // package source — gated at build time
+        if (HasFlag(args, "--no-analyze")) return false;         // same skip switch as the static gate
+        if (TargetVersionAnalyzer.ParseMajorVersion(project.TargetPostgresVersion) is not { } target)
+            return false;                                        // no/blank target → default behavior unchanged
+
+        var findings = TargetVersionAnalyzer.AnalyzeProject(project);
+        if (findings.Count == 0) return false;
+
+        Console.Error.WriteLine($"Target PostgreSQL {target}: {findings.Count} feature(s) newer than the target:");
+        foreach (var d in findings) Console.Error.WriteLine($"  {d}");
+        Console.Error.WriteLine("Aborted by target-version gate (raise <TargetPostgresVersion>, or pass --no-analyze to skip).");
+        return true;
     }
 
     // ---- references (EP-REF) ------------------------------------------------------------
