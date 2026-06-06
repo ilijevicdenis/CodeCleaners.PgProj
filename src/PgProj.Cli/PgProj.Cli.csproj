@@ -16,6 +16,15 @@
          job, so background GC only adds overhead. -->
     <ServerGarbageCollection>true</ServerGarbageCollection>
     <ConcurrentGarbageCollection>false</ConcurrentGarbageCollection>
+
+    <!-- Startup tax (dotnet-trace audit, 2026-06-07): GetLocaleInfoCore (culture init) + JIT/static-init.
+         InvariantGlobalization removes culture/locale loading — safe here because the engine is already
+         culture-invariant (OrdinalIgnoreCase comparisons, ToLowerInvariant / InvariantCulture throughout);
+         CLI model output is byte-identical (checksum verified before/after). PublishReadyToRun precompiles
+         to native so the runtime JITs far less at startup (pure codegen-ahead, no behaviour change; applies
+         on `dotnet publish`). -->
+    <InvariantGlobalization>true</InvariantGlobalization>
+    <PublishReadyToRun>true</PublishReadyToRun>
   </PropertyGroup>
 
 </Project>
