@@ -1,0 +1,84 @@
+# Example pipeline showing the recommended pgproj CI/CD shape:
+#   1. build  — produce + upload the model artifact, gated by static analysis (every push/PR).
+#   2. preview — on PRs, a publish --dry-run against the target (no changes applied).
+#   3. deploy  — only on the default branch, behind a protected Environment that requires manual
+#                approval before any change reaches the server.
+#
+# Copy this into your own repo and adjust paths/secrets. See docs/CICD.md for the full rationale
+# and the exit-code contract pipelines branch on.
+name: pgproj example
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+env:
+  PROJECT: sample/SampleDb/SampleDb.pgproj
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      # Publish the CLI once so the composite action can invoke `pgproj`.
+      - name: Publish pgproj CLI
+        run: |
+          dotnet publish src/PgProj.Cli/PgProj.Cli.csproj -c Release -o "$RUNNER_TEMP/pgproj"
+          echo "$RUNNER_TEMP/pgproj" >> "$GITHUB_PATH"
+      - name: Build database project
+        uses: ./.github/actions/pgproj
+        with:
+          project: ${{ env.PROJECT }}
+          command: build
+          strict: 'true'
+          pgproj-command: dotnet ${{ runner.temp }}/pgproj/PgProj.Cli.dll
+          upload-artifact: 'true'
+
+  # PR safety net: show what WOULD change, never apply it.
+  preview:
+    if: github.event_name == 'pull_request'
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Publish pgproj CLI
+        run: |
+          dotnet publish src/PgProj.Cli/PgProj.Cli.csproj -c Release -o "$RUNNER_TEMP/pgproj"
+      - name: Preview deploy (dry-run)
+        uses: ./.github/actions/pgproj
+        with:
+          project: ${{ env.PROJECT }}
+          command: publish
+          dry-run: 'true'
+          connection: ${{ secrets.PGPROJ_CONNECTION }}
+          pgproj-command: dotnet ${{ runner.temp }}/pgproj/PgProj.Cli.dll
+
+  # Real deploy: default branch only, behind a protected environment (configure required reviewers
+  # in repo Settings → Environments → "production"). The job will not start until approved.
+  deploy:
+    if: github.ref == 'refs/heads/main'
+    needs: build
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Publish pgproj CLI
+        run: |
+          dotnet publish src/PgProj.Cli/PgProj.Cli.csproj -c Release -o "$RUNNER_TEMP/pgproj"
+      - name: Publish to production
+        uses: ./.github/actions/pgproj
+        with:
+          project: ${{ env.PROJECT }}
+          command: publish
+          connection: ${{ secrets.PGPROJ_CONNECTION }}
+          pgproj-command: dotnet ${{ runner.temp }}/pgproj/PgProj.Cli.dll

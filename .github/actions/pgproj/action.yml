@@ -1,0 +1,149 @@
+name: pgproj
+description: >-
+  Build a PostgreSQL declarative database project with the pgproj CLI, run the static-analysis
+  gate, emit the build artifact (model.json), and optionally publish it to a target server. Exit
+  codes are the stable contract documented in docs/CICD.md.
+author: pgproj
+
+# Composite action: it shells out to the pgproj CLI. The caller is responsible for having the
+# .NET 10 SDK on PATH (use actions/setup-dotnet before this step) OR for running this action inside
+# the pgproj container image (see docs/CICD.md → "Container image").
+inputs:
+  project:
+    description: Path to the .pgproj project file to build/publish.
+    required: true
+  command:
+    description: >-
+      Which pgproj verb to run: "build" (default — produce the model artifact) or "publish"
+      (generate + apply a deploy script against --connection). For approval-gated production
+      deploys, run a "build" job, then a separate "publish" job behind a GitHub Environment that
+      requires reviewers (see docs/CICD.md → "Approval & dry-run gating").
+    required: false
+    default: build
+  connection:
+    description: >-
+      PostgreSQL connection string. Required for "publish". Pass it from a secret, never inline.
+      Equivalent to the PGPROJ_CONNECTION env var the CLI also reads.
+    required: false
+    default: ''
+  output:
+    description: >-
+      Output path. For "build" this is the model.json file (default <project-dir>/bin/<name>.model.json,
+      which is what gets uploaded as the artifact). For "publish" it is the generated deploy script.
+    required: false
+    default: ''
+  dry-run:
+    description: >-
+      publish only. "true" generates the deploy script and prints it WITHOUT executing it — the safe
+      preview for pull-request validation. Defaults to "false".
+    required: false
+    default: 'false'
+  strict:
+    description: 'Treat analyzer warnings as errors in the analysis gate ("true"/"false").'
+    required: false
+    default: 'false'
+  no-analyze:
+    description: 'Skip the static-analysis gate entirely ("true"/"false"). Not recommended in CI.'
+    required: false
+    default: 'false'
+  allow-drops:
+    description: 'publish only. Allow destructive changes (drop objects not in the project).'
+    required: false
+    default: 'false'
+  extra-args:
+    description: 'Any additional raw arguments appended verbatim to the pgproj invocation.'
+    required: false
+    default: ''
+  pgproj-command:
+    description: >-
+      How to invoke the CLI. Default "dotnet PgProj.Cli.dll" assumes the published CLI is on PATH or
+      the working directory. Override with e.g. "pgproj" when using the container image entrypoint.
+    required: false
+    default: pgproj
+  upload-artifact:
+    description: 'build only. Upload the produced model.json as a workflow artifact ("true"/"false").'
+    required: false
+    default: 'true'
+  artifact-name:
+    description: 'Name of the uploaded artifact (build only).'
+    required: false
+    default: pgproj-model
+
+outputs:
+  model-path:
+    description: 'Absolute path to the produced model.json (build only).'
+    value: ${{ steps.run.outputs.model-path }}
+  exit-code:
+    description: 'The classified pgproj exit code (see docs/CICD.md).'
+    value: ${{ steps.run.outputs.exit-code }}
+
+runs:
+  using: composite
+  steps:
+    - id: run
+      shell: bash
+      env:
+        PGPROJ_CONNECTION: ${{ inputs.connection }}
+      run: |
+        set -uo pipefail
+
+        cmd="${{ inputs.command }}"
+        args=("$cmd" "${{ inputs.project }}")
+
+        if [ -n "${{ inputs.output }}" ]; then
+          args+=("-o" "${{ inputs.output }}")
+        fi
+        [ "${{ inputs.strict }}"      = "true" ] && args+=("--strict")
+        [ "${{ inputs.no-analyze }}"  = "true" ] && args+=("--no-analyze")
+
+        if [ "$cmd" = "publish" ]; then
+          [ "${{ inputs.dry-run }}"     = "true" ] && args+=("--dry-run")
+          [ "${{ inputs.allow-drops }}" = "true" ] && args+=("--allow-drops")
+          # Connection comes from PGPROJ_CONNECTION (env) so it never appears in the command line/log.
+        fi
+
+        if [ -n "${{ inputs.extra-args }}" ]; then
+          # shellcheck disable=SC2206
+          extra=(${{ inputs.extra-args }})
+          args+=("${extra[@]}")
+        fi
+
+        echo "::group::pgproj ${args[*]}"
+        ${{ inputs.pgproj-command }} "${args[@]}"
+        code=$?
+        echo "::endgroup::"
+        echo "exit-code=$code" >> "$GITHUB_OUTPUT"
+
+        # Surface the model path for the artifact upload step (default location if -o not given).
+        if [ "$cmd" = "build" ]; then
+          model="${{ inputs.output }}"
+          if [ -z "$model" ]; then
+            dir="$(dirname "${{ inputs.project }}")"
+            name="$(basename "${{ inputs.project }}" .pgproj)"
+            model="$dir/bin/$name.model.json"
+          fi
+          echo "model-path=$model" >> "$GITHUB_OUTPUT"
+        fi
+
+        # Map the classified code to a human label in the log, then propagate it as the step result.
+        case $code in
+          0)  echo "pgproj: success" ;;
+          1)  echo "::error::pgproj: unexpected error (exit 1)" ;;
+          2)  echo "::error::pgproj: usage error (exit 2)" ;;
+          3)  echo "::error::pgproj: build error (exit 3)" ;;
+          4)  echo "::error::pgproj: analysis blocked (exit 4)" ;;
+          5)  echo "::error::pgproj: reference error (exit 5)" ;;
+          6)  echo "::warning::pgproj: drift detected (exit 6)" ;;
+          7)  echo "::error::pgproj: deploy failed (exit 7)" ;;
+          8)  echo "::error::pgproj: validation failed (exit 8)" ;;
+          *)  echo "::error::pgproj: exit $code" ;;
+        esac
+        exit $code
+
+    - name: Upload model artifact
+      if: ${{ inputs.command == 'build' && inputs.upload-artifact == 'true' && steps.run.outputs.model-path != '' }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ inputs.artifact-name }}
+        path: ${{ steps.run.outputs.model-path }}
+        if-no-files-found: error

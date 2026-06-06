@@ -1,0 +1,12 @@
+# Keep the Docker build context small and reproducible: never ship build outputs, IDE/VCS metadata,
+# or the test corpus into the image build.
+**/bin/
+**/obj/
+.git/
+.github/
+.vs/
+.vscode/
+tests/corpus/
+docs/
+sample/
+*.user

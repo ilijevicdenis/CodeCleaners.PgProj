@@ -269,9 +269,11 @@ public static class Program
             .SelectMany(v => v.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
             .ToList();
 
-    /// <summary>Optional drift gate: with <c>--fail-on-changes</c>, a non-empty diff returns <see cref="ExitCode.Drift"/>.</summary>
+    /// <summary>Optional drift gate: with <c>--fail-on-changes</c> (alias <c>--fail-on-drift</c>), a
+    /// non-empty diff returns <see cref="ExitCode.Drift"/>.</summary>
     private static int FailOnChangesGate(CliArgs cli, SchemaChangeSet changeSet) =>
-        cli.HasFlag("--fail-on-changes") && changeSet.IncludedCount > 0 ? ExitCode.Drift : ExitCode.Success;
+        (cli.HasFlag("--fail-on-changes") || cli.HasFlag("--fail-on-drift")) && changeSet.IncludedCount > 0
+            ? ExitCode.Drift : ExitCode.Success;
 
     private static void PrintCompareBanner(SchemaCompareResult result)
     {
@@ -341,20 +343,31 @@ public static class Program
             return 0;
         }
 
-        // --parallel runs the diff phase-by-phase, but pre/post deploy scripts have no phase model and
-        // must bracket the diff inside one transaction — so fall back to the whole-script deployer when
-        // deploy scripts are present (still strict all-or-nothing).
-        if (HasFlag(args, "--parallel") && (scripts is null || scripts.IsEmpty))
+        // A server-side failure while applying the script is a distinct CI failure class (EP-CICD):
+        // map it to ExitCode.DeployError so a pipeline can alert specifically on a failed deploy
+        // (vs a build/analysis problem that never touched the target).
+        try
         {
-            // Intra-phase parallelism with phase barriers (phase-level atomicity).
-            await new PhasedDeployer(RequireConnection(args)).ExecuteAsync(changes);
-            Console.WriteLine($"Published {changes.Count} change(s) successfully (parallel, phased).");
+            // --parallel runs the diff phase-by-phase, but pre/post deploy scripts have no phase model and
+            // must bracket the diff inside one transaction — so fall back to the whole-script deployer when
+            // deploy scripts are present (still strict all-or-nothing).
+            if (HasFlag(args, "--parallel") && (scripts is null || scripts.IsEmpty))
+            {
+                // Intra-phase parallelism with phase barriers (phase-level atomicity).
+                await new PhasedDeployer(RequireConnection(args)).ExecuteAsync(changes);
+                Console.WriteLine($"Published {changes.Count} change(s) successfully (parallel, phased).");
+            }
+            else
+            {
+                // Default: whole script in one transaction (strict all-or-nothing).
+                await new DatabaseDeployer().ExecuteAsync(RequireConnection(args), script);
+                Console.WriteLine($"Published {changes.Count} change(s) successfully.");
+            }
         }
-        else
+        catch (Npgsql.NpgsqlException ex)
         {
-            // Default: whole script in one transaction (strict all-or-nothing).
-            await new DatabaseDeployer().ExecuteAsync(RequireConnection(args), script);
-            Console.WriteLine($"Published {changes.Count} change(s) successfully.");
+            Console.Error.WriteLine($"Deploy failed: {ex.Message}");
+            return ExitCode.DeployError;
         }
         return 0;
     }
@@ -434,7 +447,8 @@ public static class Program
         if (plan.DestructiveCount > 0)
             Console.WriteLine($"\n{plan.DestructiveCount} change(s) delete files (apply with: pull --allow-deletes).");
         Console.WriteLine("\nRun 'pull' to write these changes into the project.");
-        return 0;
+        // Pure report by default; with --fail-on-drift the detected drift becomes a CI gate (EP-CICD).
+        return HasFlag(args, "--fail-on-drift") ? ExitCode.Drift : ExitCode.Success;
     }
 
     private static async Task<int> Pull(string[] args)
@@ -964,7 +978,7 @@ public static class Program
           pgproj profile create <out.pgpublish.json> [--target-version 18] [--connection-name <label>] [--var N=V] [--allow-drops] [--no-transaction]
                          (write a reusable publish profile from the current flags; the connection string is never stored)
           pgproj extract --connection <conn> -o <outDir>
-          pgproj drift   <project.pgproj> --connection <conn>                          (preview project files that differ from the DB)
+          pgproj drift   <project.pgproj> --connection <conn> [--fail-on-drift]         (preview project files that differ from the DB; --fail-on-drift exits 6 on drift)
           pgproj pull    <project.pgproj> --connection <conn> [--dry-run] [--allow-deletes]   (rewrite project files FROM the DB — scenario 3)
           pgproj analyze <project.pgproj> [--strict]    (static safety analysis over the AST)
           pgproj model-tree <project.pgproj> [--format json]   (objects + source positions, for editors)
