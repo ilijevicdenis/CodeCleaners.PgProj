@@ -24,11 +24,11 @@ Every merged optimization, in order. Allocation falls monotonically from baselin
 
 ## 2. Recent session across all four corpus buckets
 
-The last six wins (11–16) improved **every workload shape**, not just the aggregate. To compare four series whose absolute magnitudes differ by ~10× (`All` ≈ 31 MB vs `Table` ≈ 3 MB), the trends are normalized to **% of each bucket's starting allocation** — so all four start at 100% and the slope is the win.
+The last six wins (11–16) improved **every workload shape**, not just the aggregate. The four buckets' absolute magnitudes differ by ~10× (`All` ≈ 31 MB vs `Table` ≈ 3 MB), so each is shown as **before (start) vs after the six wins, normalized to its own start = 100%** — the shorter the coloured bar, the bigger the reduction.
 
-![Recent session — allocation as % of each bucket's start, four lines (All, Raw, Select, Table) with a colour legend on the right showing endpoint percentages.](parser-perf-buckets.svg)
+![Recent session — allocation per corpus bucket, before (start, grey) vs after the six wins (coloured), normalized to each bucket's start = 100%; the bucket name is labelled vertically inside each coloured bar.](parser-perf-buckets.svg)
 
-The chart's right-hand **legend** labels each line with its endpoint percentage: `Select` 47% · `All` 64% · `Raw` 64% · `Table` 76%. `Select` benefits most (lazy clause lists + pooling hit it hardest); `Table` is already lean so it moves least.
+Each coloured bar is the allocation **remaining** after the six wins, as a % of that bucket's start (lower = better): `Select` 47% · `All` 64% · `Raw` 64% · `Table` 76%. `Select` benefits most (lazy clause lists + pooling hit it hardest); `Table` is already lean so it moves least.
 
 Absolute MB/op behind the normalized chart:
 
