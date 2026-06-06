@@ -16,8 +16,7 @@ namespace PgProj.Benchmarks;
 /// per-table column/PK/FK/check compare for every table — the realistic worst case for the scan cost,
 /// and the one that produces zero changes yet still does all the work.
 /// </summary>
-[MemoryDiagnoser]
-[MediumRunJob]
+[MemoryDiagnoser]   // GC mode + iteration counts come from BenchConfig (shared across all suites)
 public class CompareBenchmarks
 {
     [Params(10, 100, 500)]

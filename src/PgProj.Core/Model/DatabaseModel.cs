@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 
 namespace PgProj.Core.Model;
 
@@ -23,11 +22,27 @@ public sealed class DatabaseModel
     public RawObjectDefinition? FindObject(string identity) =>
         Objects.Find(o => string.Equals(o.Identity, identity, System.StringComparison.OrdinalIgnoreCase));
 
-    public TableDefinition? FindTable(string schema, string name) =>
-        Tables.FirstOrDefault(t => NameEquals(t.Schema, schema) && NameEquals(t.Name, name));
+    // Manual index walks rather than LINQ FirstOrDefault/Any: ModelBuilder.EnsureSchema calls HasSchema
+    // for every statement and the comparer calls FindTable per source table, so the per-call lambda-closure
+    // + iterator allocations LINQ adds were pure gen0 churn on a hot path. Same O(n) scan, zero allocation.
+    // (Tables/Schemas stay public mutable lists — callers Add/AddRange directly — so a dictionary index
+    // can't be kept in sync without breaking that contract; the loop is the allocation-free win that can.)
+    public TableDefinition? FindTable(string schema, string name)
+    {
+        for (int i = 0; i < Tables.Count; i++)
+        {
+            var t = Tables[i];
+            if (NameEquals(t.Schema, schema) && NameEquals(t.Name, name)) return t;
+        }
+        return null;
+    }
 
-    public bool HasSchema(string name) =>
-        Schemas.Any(s => NameEquals(s.Name, name));
+    public bool HasSchema(string name)
+    {
+        for (int i = 0; i < Schemas.Count; i++)
+            if (NameEquals(Schemas[i].Name, name)) return true;
+        return false;
+    }
 
     /// <summary>
     /// Postgres folds unquoted identifiers to lower case, so identifier comparison is

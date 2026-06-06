@@ -31,6 +31,7 @@ public static class OperatorLexer
     /// </summary>
     public static List<Token> Merge(List<Token> tokens)
     {
+        Span<char> scratch = stackalloc char[ScratchLen];   // reused across runs; no per-token string growth
         int write = 0, i = 0;
         while (i < tokens.Count)
         {
@@ -38,7 +39,6 @@ public static class OperatorLexer
             if (t.Kind == TokenKind.Symbol && t.Value.Length == 1 && IsOpChar(t.Value[0]))
             {
                 int start = t.Position;
-                var run = t.Value;
                 int j = i + 1;
                 int endPos = t.Position + 1;
                 while (j < tokens.Count
@@ -47,13 +47,12 @@ public static class OperatorLexer
                        && IsOpChar(tokens[j].Value[0])
                        && tokens[j].Position == endPos)   // adjacent (no whitespace/comment between)
                 {
-                    run += tokens[j].Value;
                     endPos++;
                     j++;
                 }
-                // Allocate a new Token only when a run actually merged; a lone operator is kept as-is
-                // (the old version re-allocated even single operators).
-                tokens[write++] = j == i + 1 ? t : new Token(TokenKind.Symbol, run, start);
+                // Allocate a new Token only when a run actually merged; a lone operator is kept as-is.
+                // Build the merged value once via a span (one final string), not char-by-char string +=.
+                tokens[write++] = j == i + 1 ? t : new Token(TokenKind.Symbol, BuildRun(tokens, i, j, scratch), start);
                 i = j;
             }
             else
@@ -66,12 +65,35 @@ public static class OperatorLexer
         return tokens;
     }
 
+    // Longest run we build on the stack; PostgreSQL operator names cap at NAMEDATALEN-1 (63). A run that
+    // somehow exceeds this falls back to a heap span — correctness preserved, just not stack-allocated.
+    private const int ScratchLen = 64;
+
+    // Materialize the merged operator [i, j) — each source token is a single op char — as one string,
+    // writing into the caller's reused scratch span (or a heap span for the rare over-long run).
+    private static string BuildRun(List<Token> tokens, int i, int j, Span<char> scratch)
+    {
+        int len = j - i;
+        Span<char> buf = len <= scratch.Length ? scratch[..len] : new char[len];
+        for (int k = 0; k < len; k++) buf[k] = tokens[i + k].Value[0];
+        return new string(buf);
+    }
+
+    private static string BuildRun(Token[] arr, int i, int j, Span<char> scratch)
+    {
+        int len = j - i;
+        Span<char> buf = len <= scratch.Length ? scratch[..len] : new char[len];
+        for (int k = 0; k < len; k++) buf[k] = arr[i + k].Value[0];
+        return new string(buf);
+    }
+
     /// <summary>Same in-place operator merge as <see cref="Merge"/>, but over a pooled token buffer
     /// (the main parse path) — compacts the rented array and trims the logical Count, no new list.</summary>
     public static PooledTokens MergeInPlace(PooledTokens tokens)
     {
         var arr = tokens.Array;
         int count = tokens.Count;
+        Span<char> scratch = stackalloc char[ScratchLen];   // reused across runs; no per-token string growth
         int write = 0, i = 0;
         while (i < count)
         {
@@ -79,7 +101,6 @@ public static class OperatorLexer
             if (t.Kind == TokenKind.Symbol && t.Value.Length == 1 && IsOpChar(t.Value[0]))
             {
                 int start = t.Position;
-                var run = t.Value;
                 int j = i + 1;
                 int endPos = t.Position + 1;
                 while (j < count
@@ -88,11 +109,10 @@ public static class OperatorLexer
                        && IsOpChar(arr[j].Value[0])
                        && arr[j].Position == endPos)
                 {
-                    run += arr[j].Value;
                     endPos++;
                     j++;
                 }
-                arr[write++] = j == i + 1 ? t : new Token(TokenKind.Symbol, run, start);
+                arr[write++] = j == i + 1 ? t : new Token(TokenKind.Symbol, BuildRun(arr, i, j, scratch), start);
                 i = j;
             }
             else

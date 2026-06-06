@@ -12,11 +12,11 @@ namespace PgProj.Benchmarks;
 /// Tokenize nor Parse suites cover. <c>Table</c> is the meaningful bucket (AddTable); <c>Raw</c> shows
 /// the DeriveRaw re-tokenization, <c>All</c> the representative mix.
 ///
-/// MediumRun (15 iterations) rather than ShortRun: the All bucket is large and its time was
-/// noise-dominated under ShortRun — bytes/op is the gate, but a stable ns/op needs more iterations.
+/// Iteration counts (5 warmup / 15 measured) and GC mode come from BenchConfig — uniform across all
+/// suites, so this no longer carries its own [MediumRunJob]. The large All bucket needs the higher
+/// iteration count for a stable ns/op; bytes/op is the gate either way.
 /// </summary>
 [MemoryDiagnoser]
-[MediumRunJob]
 public class ModelBuildBenchmarks
 {
     [Params("Table", "Raw", "Select", "All")]

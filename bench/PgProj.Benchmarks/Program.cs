@@ -15,8 +15,10 @@ namespace PgProj.Benchmarks;
 ///   dotnet run -c Release -- --filter *Parse*    # full grammar (layer 2)
 ///   dotnet run -c Release -- --filter *          # everything
 ///   dotnet run -c Release -- alloc               # fast bytes/op + ns/op probe (no BenchmarkDotNet)
+///   dotnet run -c Release -- retention           # steady-state heap-flatness probe (LOH/gen2 leak check)
 ///
-/// MemoryDiagnoser is on every suite, so each result reports bytes/op alongside ns/op — the gate the
+/// All BenchmarkDotNet suites run under <see cref="BenchConfig"/> (Workstation GC + uniform rigor), so
+/// each result reports bytes/op alongside ns/op under the runtime the CLI actually ships — the gate the
 /// audit asks for ("no merge without numbers").
 /// </summary>
 public static class Program
@@ -25,7 +27,8 @@ public static class Program
     {
         if (args.Length > 0 && args[0] == "alloc") { AllocProbe(); return; }
         if (args.Length > 0 && args[0] == "alloctypes") { AllocTypes(args.Length > 1 ? args[1] : "All"); return; }
-        BenchmarkSwitcher.FromAssembly(typeof(Program).Assembly).Run(args);
+        if (args.Length > 0 && args[0] == "retention") { RetentionProbe(args.Length > 1 ? args[1] : "All"); return; }
+        BenchmarkSwitcher.FromAssembly(typeof(Program).Assembly).Run(args, new BenchConfig());
     }
 
     // Allocation-by-TYPE for the parse+model pipeline, via the runtime's GC AllocationTick events
@@ -83,6 +86,44 @@ public static class Program
                     Console.WriteLine($"  {100.0 * kv.Value.bytes / total,5:N1}%  {kv.Value.bytes / 1024.0 / 1024.0,9:N2}  {kv.Value.count,5}  {kv.Key}");
             }
         }
+    }
+
+    // Steady-state stability probe (audit Rec 3): parse+build+release the same large bucket many times,
+    // forcing a full blocking gen2 compacting collection before and after, then read the LOH/UOH and total
+    // heap size via GC.GetGCMemoryInfo() (GC-mode-independent, the modern way to see what's RETAINED rather
+    // than merely allocated). A healthy result is FLAT — after-delta ≈ the pool's steady working set, not
+    // growing with the iteration count. A growing LOH/heap delta is the signal of a leak or a broken
+    // ReleaseTokens pooling contract that no per-op bytes/op number can catch. Runs in seconds.
+    private static void RetentionProbe(string bucket)
+    {
+        const int iters = 1000;
+        var sql = CorpusWorkload.Buckets[bucket];
+        Console.WriteLine($"Retention probe — Parse+Model+Release, bucket '{bucket}' ({sql.Length:N0} chars) × {iters:N0}");
+
+        static void Run(string s) { var p = new PgParser().Parse(s); new ModelBuilder().Build(p); p.ReleaseTokens(); }
+
+        for (int i = 0; i < 20; i++) Run(sql);                        // warm + settle the ArrayPool buckets
+        var before = Settle();
+        for (int i = 0; i < iters; i++) Run(sql);
+        var after = Settle();
+
+        double MB(long b) => b / 1024.0 / 1024.0;
+        long lohBefore = before.GenerationInfo[^1].SizeAfterBytes;    // last generation = LOH/UOH
+        long lohAfter = after.GenerationInfo[^1].SizeAfterBytes;
+        Console.WriteLine($"  LOH/UOH  before={MB(lohBefore),8:N1} MB  after={MB(lohAfter),8:N1} MB  delta={MB(lohAfter - lohBefore),7:N1} MB");
+        Console.WriteLine($"  Heap     before={MB(before.HeapSizeBytes),8:N1} MB  after={MB(after.HeapSizeBytes),8:N1} MB  delta={MB(after.HeapSizeBytes - before.HeapSizeBytes),7:N1} MB");
+        Console.WriteLine($"  Fragmented after={MB(after.FragmentedBytes),8:N1} MB   (gen2 collections during run: {GC.CollectionCount(2)})");
+        Console.WriteLine("  PASS when LOH + heap deltas stay flat across iteration counts (re-run with a larger bucket to confirm).");
+    }
+
+    // Full blocking, compacting gen2 collection + finalizer drain, then snapshot. This is the only place a
+    // forced GC.Collect is legitimate: we want to observe what survives a real collection, not allocations.
+    private static GCMemoryInfo Settle()
+    {
+        GC.Collect(2, GCCollectionMode.Forced, blocking: true, compacting: true);
+        GC.WaitForPendingFinalizers();
+        GC.Collect(2, GCCollectionMode.Forced, blocking: true, compacting: true);
+        return GC.GetGCMemoryInfo();
     }
 
     // A lightweight allocation/time probe so before/after deltas can be read in seconds rather than a

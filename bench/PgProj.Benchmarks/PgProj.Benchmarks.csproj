@@ -7,7 +7,13 @@
     <Nullable>enable</Nullable>
     <!-- BenchmarkDotNet refuses to run a non-optimized build; keep this honest. -->
     <Optimize>true</Optimize>
-    <ServerGarbageCollection>true</ServerGarbageCollection>
+    <!--
+      GC mode is declared PER JOB in BenchConfig (Workstation = what PgProj.Cli ships), NOT baked into
+      the host process here. Server GC in the host silently degrades [MemoryDiagnoser]'s bytes/op
+      accounting and measures a runtime the CLI never runs. See BenchConfig.cs and the audit (F1).
+    -->
+    <ServerGarbageCollection>false</ServerGarbageCollection>
+    <ConcurrentGarbageCollection>false</ConcurrentGarbageCollection>
   </PropertyGroup>
 
   <ItemGroup>
