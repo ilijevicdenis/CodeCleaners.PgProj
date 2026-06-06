@@ -9,7 +9,10 @@ public abstract class Expr { }
 
 public sealed class LiteralExpr : Expr { public string Kind { get; init; } = ""; public string Text { get; init; } = ""; }   // number/string/bool/null/typed
 public sealed class StarExpr : Expr { public List<string> Qualifier { get; init; } = new(); }                                 // *  or  t.*
-public sealed class ColumnRef : Expr { public List<string> Parts { get; init; } = new(); }                                    // a / t.a / s.t.a
+// Parts is informational only (never read by the comparer/emitter/validator — they work off captured
+// SourceText, not the Expr tree), so it is left null for an unqualified single-name ref to avoid a per-ref
+// List<string> + String[] on the hot expression path; it is populated only for a qualified t.a / s.t.a.
+public sealed class ColumnRef : Expr { public List<string>? Parts { get; init; } }                                            // a / t.a / s.t.a
 public sealed class ParamExpr : Expr { public string Text { get; init; } = ""; }                                              // $1
 public sealed class UnaryExpr : Expr { public string Op { get; init; } = ""; public Expr Operand { get; init; } = null!; }
 public sealed class BinaryExpr : Expr { public string Op { get; init; } = ""; public Expr Left { get; init; } = null!; public Expr Right { get; init; } = null!; }

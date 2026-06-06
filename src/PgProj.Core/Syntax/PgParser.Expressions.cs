@@ -327,10 +327,14 @@ public sealed partial class PgParser
     private Expr ParseNameOrCall(TokenCursor c)
     {
         if (c.AtSymbol('*')) { c.Advance(); return new StarExpr(); }
-        // Build the dotted name once and hand the list straight to the node (init-setter), instead of
-        // AddRange-copying it into a second list — every column ref / call hit that double-allocation
-        // (List<string> + its String[] backing were ~10% of pipeline alloc; AllocProbe).
-        var parts = new List<string> { c.ExpectIdentifier() };
+        var first = c.ExpectIdentifier();
+        // Common case — a single unqualified name. A bare column ref stores nothing (Parts is unused dead
+        // data, see ColumnRef), so we allocate no List at all; only a call needs its name as a list.
+        if (!c.AtSymbol('.'))
+            return c.AtSymbol('(') ? ParseCallTail(c, new List<string> { first }) : new ColumnRef();
+        // Qualified name (t.a / s.t.a): accumulate the dotted parts once and hand the list to the node
+        // directly (init-setter), instead of AddRange-copying into a second list.
+        var parts = new List<string> { first };
         while (c.MatchSymbol('.'))
         {
             if (c.MatchSymbol('*')) return new StarExpr { Qualifier = parts };
