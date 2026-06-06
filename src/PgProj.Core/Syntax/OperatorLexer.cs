@@ -65,4 +65,43 @@ public static class OperatorLexer
         if (write < tokens.Count) tokens.RemoveRange(write, tokens.Count - write);
         return tokens;
     }
+
+    /// <summary>Same in-place operator merge as <see cref="Merge"/>, but over a pooled token buffer
+    /// (the main parse path) — compacts the rented array and trims the logical Count, no new list.</summary>
+    public static PooledTokens MergeInPlace(PooledTokens tokens)
+    {
+        var arr = tokens.Array;
+        int count = tokens.Count;
+        int write = 0, i = 0;
+        while (i < count)
+        {
+            var t = arr[i];
+            if (t.Kind == TokenKind.Symbol && t.Value.Length == 1 && IsOpChar(t.Value[0]))
+            {
+                int start = t.Position;
+                var run = t.Value;
+                int j = i + 1;
+                int endPos = t.Position + 1;
+                while (j < count
+                       && arr[j].Kind == TokenKind.Symbol
+                       && arr[j].Value.Length == 1
+                       && IsOpChar(arr[j].Value[0])
+                       && arr[j].Position == endPos)
+                {
+                    run += arr[j].Value;
+                    endPos++;
+                    j++;
+                }
+                arr[write++] = j == i + 1 ? t : new Token(TokenKind.Symbol, run, start);
+                i = j;
+            }
+            else
+            {
+                arr[write++] = t;
+                i++;
+            }
+        }
+        tokens.SetCount(write);
+        return tokens;
+    }
 }

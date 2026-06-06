@@ -16,6 +16,17 @@ public sealed class Tokenizer
     private readonly string _s;
     private int _i;
 
+    // Output buffer rented from ArrayPool (see PooledTokens). Filled via Emit with manual grow, so the
+    // per-parse token array can be returned to the pool after the model is built — Token[] was the single
+    // largest allocated type (~26%). Grows by re-rent+copy (rare: the len/4 pre-size usually suffices).
+    private Token[] _buf = System.Array.Empty<Token>();
+    private int _n;
+    private bool _pooled;
+    // Below this input size the token array is small and short-lived; ArrayPool rent/return + the
+    // ReleaseTokens segment-drop overhead isn't worth it, so small inputs (single small files, the CLI
+    // interactive case, and the secondary DeriveRaw/table-tail re-tokenizations) use a plain array.
+    private const int PoolThreshold = 2048;
+
     // PG16 non-decimal integer prefixes (0x/0o/0b); vectorized membership beats "xXoObB".IndexOf per number.
     private static readonly SearchValues<char> RadixPrefix = SearchValues.Create("xXoObB");
 
@@ -69,17 +80,51 @@ public sealed class Tokenizer
         return s;
     }
 
+    /// <summary>Tokenize to a plain List — for the secondary, transient re-tokenizations (DeriveRaw, table
+    /// tails) that are small, infrequent, and not worth pooling. Copies out of the pooled buffer then returns it.</summary>
     public static List<Token> Tokenize(string sql)
     {
+        // The buffer is pooled and returned immediately (no deferred lifetime), so pool regardless of size:
+        // only the retained List copy allocates, not the transient scan buffer.
         var t = new Tokenizer(sql ?? string.Empty);
-        return t.Run();
+        var p = t.Run(pool: true);
+        var list = new List<Token>(p.Count);
+        for (var i = 0; i < p.Count; i++) list.Add(p[i]);
+        p.Return();
+        return list;
     }
 
-    private List<Token> Run()
+    /// <summary>Tokenize to a pooled buffer — the main PgParser.Parse path. The caller owns the returned
+    /// <see cref="PooledTokens"/> and releases it (ParseResult.ReleaseTokens) once the model is built.
+    /// Small inputs skip pooling (PoolThreshold) so a single small/CLI parse pays no rent/return overhead.</summary>
+    public static PooledTokens TokenizePooled(string sql)
     {
-        // Pre-size: SQL averages roughly a token every ~4 chars, so this avoids the 1→4→8→…
-        // doubling reallocations of the backing array as the list grows to thousands of entries.
-        var tokens = new List<Token>(_s.Length / 4 + 16);
+        var t = new Tokenizer(sql ?? string.Empty);
+        return t.Run(pool: t._s.Length >= PoolThreshold);
+    }
+
+    private void Emit(Token t)
+    {
+        if (_n == _buf.Length)
+        {
+            var newCap = _buf.Length == 0 ? 16 : _buf.Length * 2;
+            var bigger = _pooled ? ArrayPool<Token>.Shared.Rent(newCap) : new Token[newCap];
+            System.Array.Copy(_buf, bigger, _n);
+            if (_pooled) ArrayPool<Token>.Shared.Return(_buf);
+            _buf = bigger;
+        }
+        _buf[_n++] = t;
+    }
+
+    private PooledTokens Run(bool pool)
+    {
+        // Pre-size: SQL averages roughly a token every ~4 chars, so this avoids re-rent+copy growth as the
+        // buffer fills. The caller decides whether to rent from the pool (large main parses) or use a plain
+        // array (small main parses); the secondary List path always pools its transient buffer.
+        var cap = _s.Length / 4 + 16;
+        _pooled = pool;
+        _buf = _pooled ? ArrayPool<Token>.Shared.Rent(cap) : new Token[cap];
+        _n = 0;
         while (_i < _s.Length)
         {
             var c = _s[_i];
@@ -95,7 +140,7 @@ public sealed class Tokenizer
             // Dollar-quoted string (or a bare '$' symbol if it isn't a valid open tag).
             if (c == '$' && TryReadDollarString(out var dollar))
             {
-                tokens.Add(new Token(TokenKind.DollarString, dollar, start));
+                Emit(new Token(TokenKind.DollarString, dollar, start));
                 continue;
             }
 
@@ -107,28 +152,28 @@ public sealed class Tokenizer
                 // of a word/number such as TRUE'x' or 1e'x', which are a plain identifier/number + normal '…').
                 bool eString = _i >= 1 && (_s[_i - 1] == 'e' || _s[_i - 1] == 'E')
                                && (_i < 2 || !IsIdentPart(_s[_i - 2]));
-                tokens.Add(new Token(TokenKind.String, ReadQuoted('\'', eString), start));
+                Emit(new Token(TokenKind.String, ReadQuoted('\'', eString), start));
                 continue;
             }
-            if (c == '"') { tokens.Add(new Token(TokenKind.QuotedIdent, ReadQuoted('"'), start)); continue; }
+            if (c == '"') { Emit(new Token(TokenKind.QuotedIdent, ReadQuoted('"'), start)); continue; }
 
             if (char.IsDigit(c) || (c == '.' && char.IsDigit(Peek(1))))
             {
-                tokens.Add(new Token(TokenKind.Number, ReadNumber(), start));
+                Emit(new Token(TokenKind.Number, ReadNumber(), start));
                 continue;
             }
 
             if (IsIdentStart(c))
             {
-                tokens.Add(new Token(TokenKind.Word, ReadWord(), start));
+                Emit(new Token(TokenKind.Word, ReadWord(), start));
                 continue;
             }
 
             // Anything else is a single-character symbol — reuse the cached ASCII string.
             _i++;
-            tokens.Add(new Token(TokenKind.Symbol, c < 128 ? SingleChar[c] : c.ToString(), start));
+            Emit(new Token(TokenKind.Symbol, c < 128 ? SingleChar[c] : c.ToString(), start));
         }
-        return tokens;
+        return new PooledTokens(_buf, _n, _pooled);
     }
 
     private char Peek(int ahead)

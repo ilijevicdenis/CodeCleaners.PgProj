@@ -25,6 +25,26 @@ public sealed class ParseResult
     /// ownership and its verdict (Statements + Diagnostics) is authoritative.
     /// </summary>
     public bool FullyRecognized { get; set; } = true;
+
+    // The pooled token buffer that backs the statements' lazy SourceText segments (main parse path only).
+    private PooledTokens? _tokens;
+    internal void SetTokens(PooledTokens tokens) => _tokens = tokens;
+
+    /// <summary>
+    /// Return the pooled token buffer to <see cref="System.Buffers.ArrayPool{Token}"/>. Drop-then-return:
+    /// every statement's source-segment view is nulled FIRST (statements that still hold one never needed
+    /// their SourceText — the ones that did were already rendered during model build), THEN the array is
+    /// returned, so no live reader can observe a recycled buffer. Call ONLY after the model is built and
+    /// SourceText will not be read again (the build pipeline does). Optional: callers that skip it just let
+    /// the GC reclaim the array — correct, only unpooled. Idempotent.
+    /// </summary>
+    public void ReleaseTokens()
+    {
+        if (_tokens is null) return;
+        foreach (var s in Statements) s.DropSegment();
+        _tokens.Return();
+        _tokens = null;
+    }
 }
 
 public abstract class SqlStatement
@@ -58,6 +78,11 @@ public abstract class SqlStatement
 
     /// <summary>Defer SourceText materialisation: keep the token segment and render only on first read.</summary>
     public void SetSourceSegment(IReadOnlyList<Token> segment) => _sourceSegment = segment;
+
+    /// <summary>Drop the deferred segment view (used by ParseResult.ReleaseTokens before the pooled token
+    /// buffer is returned). A statement still holding a segment here never had its SourceText read, so the
+    /// text is simply discarded; statements that needed it rendered + cached + cleared the segment already.</summary>
+    internal void DropSegment() => _sourceSegment = null;
 }
 
 /// <summary>A statement kind PgParser does not implement yet (caller falls back to legacy).</summary>

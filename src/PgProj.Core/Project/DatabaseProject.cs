@@ -253,6 +253,7 @@ public sealed record DatabaseProject
             var rel = Path.GetRelativePath(ProjectDirectory, file);
             foreach (var d in parsed.Diagnostics) diagnostics.Add($"{rel}: {d}");   // attribute to the project file to fix
             builder.Build(parsed, model);
+            parsed.ReleaseTokens();   // model built → return the pooled token buffer (no SourceText read after this)
         }
 
         diagnostics.AddRange(FindDuplicates(model));
@@ -287,6 +288,7 @@ public sealed record DatabaseProject
                     var rel = Path.GetRelativePath(ProjectDirectory, files[0]);
                     foreach (var d in parsed.Diagnostics) diagnostics.Add($"{rel}: {d}");
                     new Syntax.ModelBuilder(DefaultSchema).Build(parsed, model);
+                    parsed.ReleaseTokens();
                 }
                 catch (Exception ex)
                 {
@@ -321,7 +323,9 @@ public sealed record DatabaseProject
             var parsed = new Syntax.PgParser().Parse(ReadSource(path)); // fresh instance → isolated per worker
             var model = new Syntax.ModelBuilder(DefaultSchema).Build(parsed);
             var rel = Path.GetRelativePath(ProjectDirectory, path);
-            return new PartialParse(model, parsed.Diagnostics.Select(d => $"{rel}: {d}").ToList());
+            var diags = parsed.Diagnostics.Select(d => $"{rel}: {d}").ToList();
+            parsed.ReleaseTokens();   // model built → return the pooled token buffer (per-worker, ArrayPool is thread-safe)
+            return new PartialParse(model, diags);
         }
         catch (Exception ex) // unreadable file / catastrophic parser failure → isolate to this file
         {

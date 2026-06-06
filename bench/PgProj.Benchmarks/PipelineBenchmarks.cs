@@ -24,10 +24,21 @@ public class PipelineBenchmarks
     [GlobalSetup]
     public void Setup() => _sql = CorpusWorkload.Buckets[Bucket];
 
-    [Benchmark]
+    [Benchmark(Baseline = true)]
     public int ParseAndBuild()
     {
         var parsed = new PgParser().Parse(_sql);
         return new ModelBuilder("public").Build(parsed).Tables.Count;
+    }
+
+    // Same pipeline, but returns the pooled token buffer after build (what DatabaseProject does per file).
+    // The Allocated delta vs the baseline above is the Token[]-pooling win (warm pool, as in a real build).
+    [Benchmark]
+    public int ParseAndBuild_Pooled()
+    {
+        var parsed = new PgParser().Parse(_sql);
+        int n = new ModelBuilder("public").Build(parsed).Tables.Count;
+        parsed.ReleaseTokens();
+        return n;
     }
 }

@@ -33,9 +33,10 @@ public sealed partial class PgParser
     public ParseResult Parse(string sql)
     {
         var result = new ParseResult();
-        List<Token> tokens;
-        try { tokens = OperatorLexer.Merge(Tokenizer.Tokenize(sql)); }
+        PooledTokens tokens;
+        try { tokens = OperatorLexer.MergeInPlace(Tokenizer.TokenizePooled(sql)); }
         catch (Exception ex) { result.Diagnostics.Add(new ParseDiagnostic("tokenize failed: " + ex.Message, 1, 1, 0)); return result; }
+        result.SetTokens(tokens);   // hand the pooled buffer to the result for ReleaseTokens after build
 
         foreach (var segment in SplitStatements(tokens))
         {

@@ -92,9 +92,9 @@ public static class Program
         var sql = CorpusWorkload.All;
         var tk = Tokenizer.Tokenize(sql);
         Console.WriteLine($"Corpus 'All' bucket: {sql.Length:N0} chars; tokens={tk.Count:N0}; chars/token={sql.Length/(double)tk.Count:N2}; presize(len/4+16)={sql.Length/4+16:N0} (slack {100.0*((sql.Length/4+16)-tk.Count)/tk.Count:N0}%)");
-        Measure("Tokenize+Merge", () => OperatorLexer.Merge(Tokenizer.Tokenize(sql)).Count);
-        Measure("Parse         ", () => new PgParser().Parse(sql).Statements.Count);
-        Measure("Parse+Model   ", () => new ModelBuilder().Build(new PgParser().Parse(sql)).Tables.Count);
+        Measure("Tokenize+Merge", () => { var p = OperatorLexer.MergeInPlace(Tokenizer.TokenizePooled(sql)); var c = p.Count; p.Return(); return c; });
+        Measure("Parse         ", () => { var p = new PgParser().Parse(sql); var c = p.Statements.Count; p.ReleaseTokens(); return c; });
+        Measure("Parse+Model   ", () => { var p = new PgParser().Parse(sql); var c = new ModelBuilder().Build(p).Tables.Count; p.ReleaseTokens(); return c; });
     }
 
     private static void Measure(string label, Func<int> op)
