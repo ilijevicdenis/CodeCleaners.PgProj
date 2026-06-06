@@ -64,15 +64,14 @@ public sealed partial class PgParser
 
     private static string CaptureUntilCloseParen(TokenCursor c)
     {
-        var toks = new List<Token>(); int depth = 1;
+        int m = c.Mark(); int depth = 1;
         while (!c.AtEnd)
         {
             if (c.AtSymbol(')') && depth == 1) break;
             var t = c.Advance();
             if (t.IsSymbol('(')) depth++; else if (t.IsSymbol(')')) depth--;
-            toks.Add(t);
         }
-        return Token.Render(toks);
+        return c.RenderRange(m, c.Mark());
     }
 
     private CommonTableExpr ParseCte(TokenCursor c)
@@ -262,7 +261,7 @@ public sealed partial class PgParser
         }
         else if (c.AtWord("ROWS") && c.Peek()?.IsWord("FROM") == true)
         {
-            c.Advance(); c.Advance(); rel.RawText = "ROWS FROM " + Token.Render(WithParensList(CaptureBalancedParens(c)));
+            c.Advance(); c.Advance(); int rm = c.Mark(); c.SkipBalancedParens(); rel.RawText = "ROWS FROM " + c.RenderRange(rm, c.Mark());
         }
         else
         {
@@ -386,9 +385,9 @@ public sealed partial class PgParser
         if (c.MatchWords("ORDER", "BY")) w.OrderBy.AddRange(ParseOrderByList(c));
         if (c.AtAnyWord("ROWS", "RANGE", "GROUPS"))
         {
-            var frame = new List<Token>();
-            while (!c.AtEnd && !c.AtSymbol(')')) frame.Add(c.Advance());
-            w.FrameText = Token.Render(frame);
+            int fm = c.Mark();
+            while (!c.AtEnd && !c.AtSymbol(')')) c.Advance();
+            w.FrameText = c.RenderRange(fm, c.Mark());
         }
         c.ExpectSymbol(')');
         return w;
@@ -402,23 +401,7 @@ public sealed partial class PgParser
     {
         int m = c.Mark();
         var e = ParseExpression(c);
-        text = Token.Render(c.Range(m, c.Mark()));
+        text = c.RenderRange(m, c.Mark());
         return e;
-    }
-
-    private static List<Token> WithParensList(IReadOnlyList<Token> inner)
-    {
-        var o = new List<Token> { new(TokenKind.Symbol, "(", 0) };
-        o.AddRange(inner);
-        o.Add(new Token(TokenKind.Symbol, ")", 0));
-        return o;
-    }
-
-    private static List<Token> CaptureBalancedInner(TokenCursor c)
-    {
-        c.ExpectSymbol('(');
-        var inner = new List<Token>(); int depth = 1;
-        while (!c.AtEnd) { var t = c.Advance(); if (t.IsSymbol(')')) { depth--; if (depth == 0) return inner; } else if (t.IsSymbol('(')) depth++; inner.Add(t); }
-        throw new ParseException("unbalanced '('", c.Here);
     }
 }

@@ -112,9 +112,9 @@ public sealed class ModelBuilder
         if (cur.AtWord("COMMENT"))
         {
             cur.MatchWord("COMMENT"); cur.MatchWord("ON");
-            var target = new List<Token>();
-            while (!cur.AtEnd && !cur.AtWord("IS")) target.Add(cur.Advance());
-            return new RawObjectDefinition(ObjectKind.Comment, "", "", $"comment:{Normalize(Token.Render(target))}", sourceText);
+            int m = cur.Mark();
+            while (!cur.AtEnd && !cur.AtWord("IS")) cur.Advance();
+            return new RawObjectDefinition(ObjectKind.Comment, "", "", $"comment:{Normalize(cur.RenderRange(m, cur.Mark()))}", sourceText);
         }
         if (cur.AtWord("SECURITY"))
             return new RawObjectDefinition(ObjectKind.Comment, "", "", $"securitylabel:{Normalize(sourceText)}", sourceText, BodyComparable: true);
@@ -242,25 +242,26 @@ public sealed class ModelBuilder
 
     private static string CaptureUntilOpenParen(TokenCursor c)
     {
-        var toks = new List<Token>();
-        while (!c.AtEnd && !c.AtSymbol('(')) toks.Add(c.Advance());
-        return Token.Render(toks);
+        int m = c.Mark();
+        while (!c.AtEnd && !c.AtSymbol('(')) c.Advance();
+        return c.RenderRange(m, c.Mark());
     }
 
     private static string CaptureUntilWord(TokenCursor c, string kw)
     {
-        var toks = new List<Token>();
-        while (!c.AtEnd && !c.AtWord(kw)) toks.Add(c.Advance());
-        return Token.Render(toks);
+        int m = c.Mark();
+        while (!c.AtEnd && !c.AtWord(kw)) c.Advance();
+        return c.RenderRange(m, c.Mark());
     }
 
     private static string ParenArgs(TokenCursor c)
     {
         if (!c.AtSymbol('(')) return "";
-        var toks = new List<Token> { c.Advance() };
+        int m = c.Mark();
+        c.Advance();
         int depth = 1;
-        while (!c.AtEnd && depth > 0) { var t = c.Advance(); toks.Add(t); if (t.IsSymbol('(')) depth++; else if (t.IsSymbol(')')) depth--; }
-        return Token.Render(toks);
+        while (!c.AtEnd && depth > 0) { var t = c.Advance(); if (t.IsSymbol('(')) depth++; else if (t.IsSymbol(')')) depth--; }
+        return c.RenderRange(m, c.Mark());
     }
 
     private static string Normalize(string s)

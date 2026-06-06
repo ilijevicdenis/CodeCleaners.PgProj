@@ -436,13 +436,13 @@ public sealed partial class PgParser
         var kw = c.Advance().Value;                          // INTERVAL
         if (c.Current is not { Kind: TokenKind.String }) throw new ParseException($"expected a string literal after {kw}", c.Here);
         var s = c.Advance();
-        // optional interval fields / precision
-        var tail = new List<Token>();
-        while (c.Current is { } n && (n.Kind == TokenKind.Word || n.IsSymbol('(') )
+        // Consume the optional interval fields / precision so the cursor lands past them. They are not part
+        // of the literal Text (kept as-is for round-trip parity), so just advance — no token list, no LINQ.
+        while (c.Current is { } n && (n.Kind == TokenKind.Word || n.IsSymbol('('))
                && (n.Kind != TokenKind.Word || IsIntervalField(n.Value)))
         {
-            if (c.AtSymbol('(')) tail.AddRange(CaptureBalancedParens(c).Prepend(new Token(TokenKind.Symbol, "(", 0)).Append(new Token(TokenKind.Symbol, ")", 0)));
-            else tail.Add(c.Advance());
+            if (c.AtSymbol('(')) c.SkipBalancedParens();
+            else c.Advance();
         }
         return new LiteralExpr { Kind = "typed", Text = $"{kw} '{s.Value}'" };
     }
@@ -516,29 +516,25 @@ public sealed partial class PgParser
 
     private string ParseCastType(TokenCursor c)
     {
-        var toks = new List<Token>();
         if (c.Current is not { Kind: TokenKind.Word or TokenKind.QuotedIdent })
             throw new ParseException("expected a type name", c.Here);
-        toks.Add(c.Advance());
-        if (c.AtSymbol('.')) { toks.Add(c.Advance()); toks.Add(c.Advance()); }   // schema.type
+        // Mark the start and render [start, c.Mark()) straight from the source list — no throwaway
+        // List<Token>, no synthetic '(' / '[' tokens. Skipping a balanced paren/bracket advances the
+        // cursor past the real delimiters, so they render from source and the text is byte-identical.
+        int start = c.Mark();
+        c.Advance();
+        if (c.AtSymbol('.')) { c.Advance(); c.Advance(); }   // schema.type
         // modifiers (p[,s]), multiword continuations (with time zone / precision / varying / interval
         // fields) and array suffixes, in any order: timestamp(3) with time zone, interval day to second.
         while (true)
         {
-            if (c.Current is { Kind: TokenKind.Word } w && IsTypeContinuation(w.Value)) { toks.Add(c.Advance()); continue; }
-            if (c.AtWord("ARRAY")) { toks.Add(c.Advance()); continue; }   // integer ARRAY / integer ARRAY[3] (the [n] is caught next loop)
-            if (c.AtSymbol('(')) { toks.AddRange(WithParens(CaptureBalancedParens(c))); continue; }
-            if (c.AtSymbol('[')) { toks.AddRange(CaptureBracketWith(c)); continue; }
+            if (c.Current is { Kind: TokenKind.Word } w && IsTypeContinuation(w.Value)) { c.Advance(); continue; }
+            if (c.AtWord("ARRAY")) { c.Advance(); continue; }   // integer ARRAY / integer ARRAY[3] (the [n] is caught next loop)
+            if (c.AtSymbol('(')) { c.SkipBalancedParens(); continue; }
+            if (c.AtSymbol('[')) { SkipBracket(c); continue; }
             break;
         }
-        return Token.Render(toks);
-    }
-
-    private static IEnumerable<Token> WithParens(IReadOnlyList<Token> inner)
-    {
-        yield return new Token(TokenKind.Symbol, "(", 0);
-        foreach (var t in inner) yield return t;
-        yield return new Token(TokenKind.Symbol, ")", 0);
+        return c.RenderRange(start, c.Mark());
     }
 
     private static List<Token> CaptureBracket(TokenCursor c)
@@ -556,13 +552,17 @@ public sealed partial class PgParser
         return toks;
     }
 
-    private static List<Token> CaptureBracketWith(TokenCursor c)
+    /// <summary>Consume a balanced [...] (outer brackets included), discarding the inner tokens — no alloc.</summary>
+    private static void SkipBracket(TokenCursor c)
     {
-        var inner = CaptureBracket(c);
-        var outp = new List<Token> { new(TokenKind.Symbol, "[", 0) };
-        outp.AddRange(inner);
-        outp.Add(new Token(TokenKind.Symbol, "]", 0));
-        return outp;
+        c.ExpectSymbol('[');
+        int depth = 1;
+        while (!c.AtEnd)
+        {
+            var t = c.Advance();
+            if (t.IsSymbol(']')) { if (--depth == 0) return; }
+            else if (t.IsSymbol('[')) depth++;
+        }
     }
 
     private static readonly HashSet<string> TypeKeywords = new(StringComparer.OrdinalIgnoreCase)
