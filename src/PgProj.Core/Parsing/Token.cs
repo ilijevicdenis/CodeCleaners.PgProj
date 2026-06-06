@@ -61,58 +61,68 @@ public readonly record struct Token(TokenKind Kind, string Value, int Position)
         if (count <= 0) return "";
         if (count == 1) return tokens[start].Render();
 
-        // Fast path: when every token renders verbatim as its Value (i.e. none is a quote-wrapped
-        // QuotedIdent/String that Render() would re-quote/escape), the exact output length is knowable in
-        // one pass, so we write straight into the result string via string.Create — no StringBuilder and no
-        // char[] backing buffer (together ~7.6% of pipeline alloc; AllocProbe). Type names, default/CHECK
-        // expressions and most captured runs are all-plain and hit this. Spacing logic is identical to the
-        // StringBuilder path below, so the text is byte-for-byte the same.
-        var len = 0; var simple = true; Token? p = null;
+        // Compute the EXACT output length in one pass — including quote-wrapping + embedded-quote doubling
+        // for QuotedIdent/String, and the inter-token spacing — then write straight into the result string
+        // via string.Create. No StringBuilder, no char[] buffer, for ALL runs (the earlier version fell back
+        // to StringBuilder whenever a run contained a quoted identifier / string literal; that fallback was
+        // ~5% of pipeline alloc — Char[] + StringBuilder — AllocProbe). Byte-identical to per-token Render().
+        var len = 0; Token? p = null;
         for (var i = 0; i < count; i++)
         {
             var t = tokens[start + i];
-            if (t.Kind is TokenKind.QuotedIdent or TokenKind.String) { simple = false; break; }
             if (p is { } pv && t.IsValueLike && (pv.IsValueLike || pv.IsSymbol(')') || pv.IsSymbol(']'))) len++;
-            len += t.Value.Length;
+            len += RenderedLength(t);
             p = t;
         }
-        if (simple)
+        return string.Create(len, (tokens, start, count), static (span, st) =>
         {
-            return string.Create(len, (tokens, start, count), static (span, st) =>
+            var (tk, s, c) = st;
+            int pos = 0; Token? prev = null;
+            // Indexed, not foreach: a segment may be an IReadOnlyList view (TokenSegment) whose enumerator
+            // would allocate; indexing is allocation-free for every IReadOnlyList including List<Token>.
+            for (var i = 0; i < c; i++)
             {
-                var (tk, s, c) = st;
-                int pos = 0; Token? prev = null;
-                for (var i = 0; i < c; i++)
-                {
-                    var t = tk[s + i];
-                    if (prev is { } pv && t.IsValueLike && (pv.IsValueLike || pv.IsSymbol(')') || pv.IsSymbol(']')))
-                        span[pos++] = ' ';
-                    t.Value.AsSpan().CopyTo(span[pos..]); pos += t.Value.Length;
-                    prev = t;
-                }
-            });
-        }
+                var t = tk[s + i];
+                if (prev is { } pv && t.IsValueLike && (pv.IsValueLike || pv.IsSymbol(')') || pv.IsSymbol(']')))
+                    span[pos++] = ' ';
+                pos = WriteToken(span, pos, t);
+                prev = t;
+            }
+        });
+    }
 
-        // Fallback (run contains a quoted identifier / string literal): StringBuilder, since Render() re-quotes
-        // and may double embedded quotes, so the exact length isn't a simple sum of Value lengths.
-        var cap = 0;
-        for (var i = 0; i < count; i++) cap += tokens[start + i].Value.Length + 2;
-        var sb = new StringBuilder(cap);
-        Token? prev = null;
-        // Indexed, not foreach: a segment may be an IReadOnlyList view (TokenSegment) whose enumerator
-        // would allocate; indexing is allocation-free for every IReadOnlyList including List<Token>.
-        for (var i = 0; i < count; i++)
+    /// <summary>Rendered length of one token: Value verbatim, except QuotedIdent/String add their two quotes
+    /// plus one extra char per embedded quote that gets doubled — matching <see cref="Render()"/> exactly.</summary>
+    private static int RenderedLength(Token t) => t.Kind switch
+    {
+        TokenKind.QuotedIdent => 2 + t.Value.Length + CountChar(t.Value, '"'),
+        TokenKind.String      => 2 + t.Value.Length + CountChar(t.Value, '\''),
+        _                     => t.Value.Length,
+    };
+
+    private static int CountChar(string s, char ch)
+    {
+        var n = 0;
+        foreach (var c in s) if (c == ch) n++;
+        return n;
+    }
+
+    /// <summary>Write one token's rendered text into <paramref name="span"/> at <paramref name="pos"/>,
+    /// returning the new position. Quote-wraps + doubles embedded quotes for QuotedIdent/String.</summary>
+    private static int WriteToken(System.Span<char> span, int pos, Token t)
+    {
+        char q;
+        switch (t.Kind)
         {
-            var t = tokens[start + i];
-            // Separate a value token from a preceding value token or a closing bracket, so
-            // "count(o.id) AS x" and "timestamp without time zone" both read naturally while
-            // "numeric(12, 2)" stays tight.
-            if (prev is { } pv && t.IsValueLike
-                && (pv.IsValueLike || pv.IsSymbol(')') || pv.IsSymbol(']')))
-                sb.Append(' ');
-            sb.Append(t.Render());
-            prev = t;
+            case TokenKind.QuotedIdent: q = '"'; break;
+            case TokenKind.String: q = '\''; break;
+            default:
+                t.Value.AsSpan().CopyTo(span[pos..]);
+                return pos + t.Value.Length;
         }
-        return sb.ToString();
+        span[pos++] = q;
+        foreach (var c in t.Value) { span[pos++] = c; if (c == q) span[pos++] = q; }
+        span[pos++] = q;
+        return pos;
     }
 }

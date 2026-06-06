@@ -36,9 +36,9 @@ public static class Program
         var sql = CorpusWorkload.Buckets[bucket];
         Console.WriteLine($"Alloc-by-type — Parse+Model, bucket '{bucket}' ({sql.Length:N0} chars)");
         using var listener = new TypeAllocListener();
-        for (int i = 0; i < 10; i++) new ModelBuilder().Build(new PgParser().Parse(sql));   // warm
+        for (int i = 0; i < 10; i++) { var p = new PgParser().Parse(sql); new ModelBuilder().Build(p); p.ReleaseTokens(); }   // warm + pool
         listener.Reset();
-        for (int i = 0; i < 400; i++) new ModelBuilder().Build(new PgParser().Parse(sql));
+        for (int i = 0; i < 400; i++) { var p = new PgParser().Parse(sql); new ModelBuilder().Build(p); p.ReleaseTokens(); }
         System.Threading.Thread.Sleep(300);                                                 // flush events
         listener.Report(25);
     }
