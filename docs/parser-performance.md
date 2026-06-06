@@ -10,14 +10,7 @@ Metric: **BenchmarkDotNet `PipelineBenchmarks.ParseAndBuild` allocated bytes/op 
 
 Every merged optimization, in order. Allocation falls monotonically from baseline to the ArrayPool win.
 
-```mermaid
-xychart-beta
-    title "ParseAndBuild allocation (All corpus) — 66.28 → 19.95 MB/op, −69.9%"
-    x-axis ["Base", "Lazy", "Views", "Spans", "OpLex", "Intern", "Static", "Capture", "Struct", "ResCap", "NameList", "Render", "DeadCR", "LazySelQ", "LazyAST", "Pool"]
-    y-axis "MB allocated per parse+build (lower is better)" 0 --> 70
-    bar [66.28, 60.41, 53.66, 50.93, 48.44, 40.82, 40.22, 39.36, 32.97, 31.22, 30.48, 29.39, 28.48, 26.79, 25.88, 19.95]
-    line [66.28, 60.41, 53.66, 50.93, 48.44, 40.82, 40.22, 39.36, 32.97, 31.22, 30.48, 29.39, 28.48, 26.79, 25.88, 19.95]
-```
+![ParseAndBuild allocation, All corpus — 66.28 to 19.95 MB/op (−69.9%) over 16 optimizations; each stage labelled vertically inside its bar, prior session in grey, this session in blue.](parser-perf-journey.svg)
 
 > **Two efforts in one line.** Wins **1–10 (`Base` → `ResCap`)** were a prior session that took allocation from `66.28` to `31.22 MB/op`. Wins **11–16 (`NameList` → `Pool`)** are the most recent session, taking it the rest of the way to `19.95 MB/op` — an additional `−36.1%` on top of an already-optimized parser. The single biggest step is the final `Pool` win (`25.88 → 19.95`, `−22.9%` in one move).
 
@@ -33,18 +26,9 @@ xychart-beta
 
 The last six wins (11–16) improved **every workload shape**, not just the aggregate. To compare four series whose absolute magnitudes differ by ~10× (`All` ≈ 31 MB vs `Table` ≈ 3 MB), the trends are normalized to **% of each bucket's starting allocation** — so all four start at 100% and the slope is the win.
 
-```mermaid
-xychart-beta
-    title "Recent session — allocation as % of start, by corpus bucket (lower is better)"
-    x-axis ["start", "NameList", "Render", "DeadCR", "LazySelQ", "LazyAST", "Pool"]
-    y-axis "% of starting allocation" 0 --> 100
-    line [100.0, 97.6, 94.1, 91.2, 85.8, 82.9, 63.9]
-    line [100.0, 98.5, 93.6, 91.9, 88.4, 86.8, 64.4]
-    line [100.0, 95.9, 94.9, 89.6, 80.7, 75.5, 47.2]
-    line [100.0, 99.7, 95.9, 95.0, 94.4, 93.8, 75.9]
-```
+![Recent session — allocation as % of each bucket's start, four lines (All, Raw, Select, Table) with a colour legend on the right showing endpoint percentages.](parser-perf-buckets.svg)
 
-**Series (top to bottom at the `Pool` endpoint): `Table` 75.9% · `Raw` 64.4% · `All` 63.9% · `Select` 47.2%.** GitHub's `xychart-beta` does not render a legend, so the series are identified here and in the absolute table below. `Select` benefits most (lazy clause lists + pooling hit it hardest); `Table` is already lean so it moves least.
+The chart's right-hand **legend** labels each line with its endpoint percentage: `Select` 47% · `All` 64% · `Raw` 64% · `Table` 76%. `Select` benefits most (lazy clause lists + pooling hit it hardest); `Table` is already lean so it moves least.
 
 Absolute MB/op behind the normalized chart:
 
