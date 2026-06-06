@@ -44,11 +44,14 @@ public static class ContractBuilder
         return ModelTreeBuilder.Build(result.Model, project.Name, positions);
     }
 
-    /// <summary>Builds the <c>analyze --format json</c> report. <paramref name="strict"/> mirrors the gate.</summary>
-    public static AnalyzeReportDto Analyze(DatabaseProject project, bool strict)
+    /// <summary>
+    /// Builds the <c>analyze --format json</c> report. <paramref name="strict"/> mirrors the gate;
+    /// <paramref name="config"/> applies per-rule enable/severity overrides (null → all rules at defaults).
+    /// </summary>
+    public static AnalyzeReportDto Analyze(DatabaseProject project, bool strict, AnalysisConfig? config = null)
     {
         var positions = SourcePositionIndex.Build(project);
-        var analyzer = new PgAnalyzer();
+        var analyzer = new PgAnalyzer(config);
         var findings = new List<Diagnostic>();
         foreach (var file in project.ResolveSqlFiles())
             findings.AddRange(analyzer.Analyze(new PgParser().Parse(File.ReadAllText(file))));
