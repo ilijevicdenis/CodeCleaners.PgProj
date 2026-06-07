@@ -54,7 +54,7 @@ public sealed class LiveDatabaseReader
         ReadCommentsAsync, ReadConversionsAsync, ReadForeignDataWrappersAsync, ReadServersAsync,
         ReadUserMappingsAsync, ReadStatisticsAsync, ReadCastsAsync, ReadForeignTablesAsync, ReadOperatorsAsync,
         ReadOperatorFamiliesAsync, ReadOperatorClassesAsync, ReadTextSearchDictionariesAsync,
-        ReadTextSearchConfigurationsAsync, ReadPublicationsAsync, ReadExistenceObjectsAsync,
+        ReadTextSearchConfigurationsAsync, ReadPublicationsAsync, ReadExpressionStatisticsAsync,
     ];
 
     public async Task<DatabaseModel> ReadAsync(string connectionString, CancellationToken ct = default)
@@ -797,26 +797,22 @@ public sealed class LiveDatabaseReader
         return list;
     }
 
-    // Existence-only introspection for kinds without a clean reconstruction yet: record the identity
-    // (so live compare/extract know they exist) with no body, so they are never spuriously recreated
-    // or body-diffed. Runs its small queries on one connection (this whole method is one parallel task).
-    private async Task<List<RawObjectDefinition>> ReadExistenceObjectsAsync(NpgsqlConnection conn, CancellationToken ct)
+    // Expression extended statistics (stxexprs set): full DDL via pg_get_statisticsobjdef (#110), replacing
+    // the former existence-only handling. Column-only stats are read by ReadStatisticsAsync (stxexprs NULL),
+    // so the two are mutually exclusive — no double-read.
+    private async Task<List<RawObjectDefinition>> ReadExpressionStatisticsAsync(NpgsqlConnection conn, CancellationToken ct)
     {
-        var list = new List<RawObjectDefinition>();
-        async Task Schema(ObjectKind kind, string tag, string baseSql)
-        {
-            var sql = baseSql + (baseSql.Contains("WHERE", StringComparison.OrdinalIgnoreCase) ? " AND" : " WHERE")
-                      + " n.nspname NOT IN ('pg_catalog','information_schema') AND n.nspname NOT LIKE 'pg_%'";
-            await using var cmd = new NpgsqlCommand(sql, conn);
-            await using var r = await cmd.ExecuteReaderAsync(ct);
-            while (await r.ReadAsync(ct))
-                list.Add(MakeRaw(kind, r.GetString(0), r.GetString(1), $"{tag}:{r.GetString(0)}.{r.GetString(1)}", string.Empty, bodyComparable: false));
-        }
+        var sql = _q.ExpressionStatistics;
 
-        // Conversion, FDW, Server, Cast, and column-based Statistics now have real DDL reconstruction
-        // (below); the rest stay existence-only until they get a clean reconstruction too.
-        // Expression statistics (stxexprs set) we don't reconstruct yet → keep existence-only.
-        await Schema(ObjectKind.Statistics, "statistics", _q.StatisticsExistence);
+        var list = new List<RawObjectDefinition>();
+        await using var cmd = new NpgsqlCommand(sql, conn);
+        await using var r = await cmd.ExecuteReaderAsync(ct);
+        while (await r.ReadAsync(ct))
+        {
+            var schema = r.GetString(0);
+            var name = r.GetString(1);
+            list.Add(MakeRaw(ObjectKind.Statistics, schema, name, $"statistics:{schema}.{name}", r.GetString(2) + ";"));
+        }
         return list;
     }
 

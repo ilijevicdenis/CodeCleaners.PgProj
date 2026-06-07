@@ -56,6 +56,9 @@ public sealed class LiveReaderIntegrationTests : IClassFixture<ThrowawayDatabase
         Assert.Contains(live.Objects, o => o.Kind == ObjectKind.Server && o.Body.Contains("CREATE SERVER"));
         Assert.Contains(live.Objects, o => o.Kind == ObjectKind.Conversion && o.Body.Contains("CONVERSION"));
         Assert.Contains(live.Objects, o => o.Kind == ObjectKind.Statistics && o.Body.Contains("CREATE STATISTICS"));
+        // #110: expression statistics (stxexprs set) reconstructed in full via pg_get_statisticsobjdef.
+        Assert.Contains(live.Objects, o => o.Kind == ObjectKind.Statistics
+            && DatabaseModel.NameEquals(o.Name, "customers_expr_stats") && o.Body.Contains("lower"));
         Assert.Contains(live.Objects, o => o.Kind == ObjectKind.Cast && o.Body.Contains("CREATE CAST"));
         Assert.Contains(live.Objects, o => o.Kind == ObjectKind.ForeignTable && o.Body.Contains("CREATE FOREIGN TABLE"));
         Assert.Contains(live.Objects, o => o.Kind == ObjectKind.Operator && o.Body.Contains("CREATE OPERATOR"));

@@ -990,6 +990,14 @@
     {
       "Kind": 15,
       "Schema": "afd",
+      "Name": "customers_expr_stats",
+      "Identity": "statistics:afd.customers_expr_stats",
+      "Body": "CREATE STATISTICS afd.customers_expr_stats ON(lower(full_name)),tenant_id FROM afd.customers",
+      "BodyComparable": true
+    },
+    {
+      "Kind": 15,
+      "Schema": "afd",
       "Name": "customers_stats",
       "Identity": "statistics:afd.customers_stats",
       "Body": "CREATE STATISTICS afd.customers_stats(ndistinct,dependencies,mcv) ON tenant_id,status,is_active FROM afd.customers",

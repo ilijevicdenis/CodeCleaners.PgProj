@@ -1,6 +1,6 @@
 -- ============================================================
 -- PgProj deployment script
--- 70 change(s)
+-- 71 change(s)
 -- ============================================================
 
 BEGIN;
@@ -184,6 +184,9 @@ CREATE INDEX "customers_region_gist" ON "afd"."customers" USING gist (region);
 
 -- Create index afd.customers_tags_gin
 CREATE INDEX "customers_tags_gin" ON "afd"."customers" USING gin (tags);
+
+-- Create statistics afd.customers_expr_stats
+CREATE STATISTICS afd.customers_expr_stats ON(lower(full_name)),tenant_id FROM afd.customers;
 
 -- Create statistics afd.customers_stats
 CREATE STATISTICS afd.customers_stats(ndistinct,dependencies,mcv) ON tenant_id,status,is_active FROM afd.customers;

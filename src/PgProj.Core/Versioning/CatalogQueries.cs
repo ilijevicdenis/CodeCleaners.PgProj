@@ -408,9 +408,15 @@ public sealed record CatalogQueries
               AND n.nspname NOT IN ('pg_catalog','information_schema') AND n.nspname NOT LIKE 'pg_%'
             ORDER BY n.nspname, s.stxname;";
 
-    /// <summary>Existence-only expression statistics (stxexprs set); reused with a schema-filter suffix.</summary>
-    public string StatisticsExistence { get; init; } =
-        "SELECT n.nspname, s.stxname FROM pg_statistic_ext s JOIN pg_namespace n ON n.oid=s.stxnamespace WHERE s.stxexprs IS NOT NULL";
+    // Expression extended statistics (stxexprs set), reconstructed in full via pg_get_statisticsobjdef
+    // (PG13+) rather than existence-only (#110). Column-only stats are handled by Statistics above.
+    public string ExpressionStatistics { get; init; } = @"
+            SELECT n.nspname, s.stxname, pg_get_statisticsobjdef(s.oid) AS def
+            FROM pg_statistic_ext s
+            JOIN pg_namespace n ON n.oid = s.stxnamespace
+            WHERE s.stxexprs IS NOT NULL
+              AND n.nspname NOT IN ('pg_catalog','information_schema') AND n.nspname NOT LIKE 'pg_%'
+            ORDER BY n.nspname, s.stxname;";
 
     public string Casts { get; init; } = @"
             SELECT format_type(c.castsource, NULL) AS src,
