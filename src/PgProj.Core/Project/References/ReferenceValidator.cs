@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using PgProj.Core.Semantics;
+using PgProj.Core.Semantics.Binding;
 using PgProj.Core.Syntax;
 
 namespace PgProj.Core.Project.References;
@@ -90,6 +91,23 @@ public static class ReferenceValidator
                 foreach (var d in found)
                     diagnostics.Add(new ReferenceValidationDiagnostic(d.File ?? rel, d.Line, d.Column, d.Message));
             }
+        }
+
+        // Phase 5 type-aware validation (#48) over the Typed Semantic Model: view/trigger/constraint validity,
+        // type safety, overload resolution. It consumes the SAME projectCatalog (project ∪ external objects) so
+        // it is conservative on unmanaged/external schemas, and is additive — never re-reporting the existence
+        // problems the SemanticAnalyzer pass above already covers.
+        var validator = new SemanticValidator(projectCatalog);
+        foreach (var file in files)
+        {
+            var rel = Path.GetRelativePath(project.ProjectDirectory, file).Replace('\\', '/');
+            validator.IndexFile(rel, SourceReader.ReadAllText(file), parsedByFile[file]);
+        }
+        foreach (var file in files)
+        {
+            var rel = Path.GetRelativePath(project.ProjectDirectory, file).Replace('\\', '/');
+            foreach (var d in validator.Validate(rel, SourceReader.ReadAllText(file), parsedByFile[file]))
+                diagnostics.Add(new ReferenceValidationDiagnostic(d.File ?? rel, d.Line, d.Column, d.Message));
         }
 
         return diagnostics;
