@@ -34,14 +34,25 @@ public sealed class AnalysisConfig
     public const string SidecarFileName = ".pgproj.analysis.json";
 
     private readonly Dictionary<string, RuleOverride> _overrides;
+    private readonly IReadOnlyList<string> _rulePackPaths;
 
     /// <summary>An empty config: every rule keeps its built-in default. The analyzer's no-arg behaviour.</summary>
     public static AnalysisConfig Empty { get; } = new(new Dictionary<string, RuleOverride>());
 
-    private AnalysisConfig(Dictionary<string, RuleOverride> overrides) => _overrides = overrides;
+    private AnalysisConfig(Dictionary<string, RuleOverride> overrides, IReadOnlyList<string>? rulePackPaths = null)
+    {
+        _overrides = overrides;
+        _rulePackPaths = rulePackPaths ?? Array.Empty<string>();
+    }
 
     /// <summary>The per-rule overrides, keyed by rule id (case-insensitive). For tests/inspection.</summary>
     public IReadOnlyDictionary<string, RuleOverride> Overrides => _overrides;
+
+    /// <summary>
+    /// External rule-pack DLL paths declared by the project's <c>rulePacks</c> array (EP-ANALYSIS+ #79),
+    /// in declaration order. Resolved relative to the <c>.pgproj</c> directory by the analysis setup.
+    /// </summary>
+    public IReadOnlyList<string> RulePackPaths => _rulePackPaths;
 
     /// <summary>Builds a config from an explicit override map (the in-memory form; used by tests + merging).</summary>
     public static AnalysisConfig FromOverrides(IReadOnlyDictionary<string, RuleOverride> overrides)
@@ -56,26 +67,31 @@ public sealed class AnalysisConfig
     /// or returns <see cref="Empty"/> when the file is absent. A malformed file yields an empty config
     /// (analysis stays best-effort); unknown rule ids and unparsable severities are skipped silently.
     /// </summary>
-    public static AnalysisConfig LoadForProject(string projectFilePath)
+    public static AnalysisConfig LoadForProject(string projectFilePath, IReadOnlySet<string>? extraKnownRuleIds = null)
     {
         var dir = Path.GetDirectoryName(Path.GetFullPath(projectFilePath));
         if (dir is null) return Empty;
         var sidecar = Path.Combine(dir, SidecarFileName);
-        return File.Exists(sidecar) ? LoadFile(sidecar) : Empty;
+        return File.Exists(sidecar) ? LoadFile(sidecar, extraKnownRuleIds) : Empty;
     }
 
     /// <summary>Parses a sidecar file at an explicit path (used by <see cref="LoadForProject"/> and tests).</summary>
-    public static AnalysisConfig LoadFile(string path)
+    public static AnalysisConfig LoadFile(string path, IReadOnlySet<string>? extraKnownRuleIds = null)
     {
-        try { return Parse(File.ReadAllText(path)); }
+        try { return Parse(File.ReadAllText(path), extraKnownRuleIds); }
         catch (IOException) { return Empty; }
         catch (UnauthorizedAccessException) { return Empty; }
     }
 
-    /// <summary>Parses the sidecar JSON text into a config (malformed JSON → <see cref="Empty"/>).</summary>
-    public static AnalysisConfig Parse(string json)
+    /// <summary>
+    /// Parses the sidecar JSON text into a config (malformed JSON → <see cref="Empty"/>). <paramref name="extraKnownRuleIds"/>
+    /// (the loaded external rule-pack ids) are accepted in the <c>rules</c> block alongside the built-in ids,
+    /// so an external rule can be enabled/re-severitied; any other unknown id is ignored.
+    /// </summary>
+    public static AnalysisConfig Parse(string json, IReadOnlySet<string>? extraKnownRuleIds = null)
     {
         var map = new Dictionary<string, RuleOverride>(StringComparer.OrdinalIgnoreCase);
+        var packPaths = new List<string>();
         if (string.IsNullOrWhiteSpace(json)) return Empty;
 
         JsonDocument doc;
@@ -85,32 +101,38 @@ public sealed class AnalysisConfig
         using (doc)
         {
             if (doc.RootElement.ValueKind != JsonValueKind.Object) return Empty;
-            if (!doc.RootElement.TryGetProperty("rules", out var rules) || rules.ValueKind != JsonValueKind.Object)
-                return Empty;
 
-            foreach (var rule in rules.EnumerateObject())
-            {
-                var id = rule.Name.Trim();
-                if (id.Length == 0 || !PgAnalyzer.IsKnownRule(id)) continue; // ignore unknown rule ids
-                if (rule.Value.ValueKind != JsonValueKind.Object) continue;
+            // rulePacks: external rule-pack DLL paths (EP-ANALYSIS+ #79).
+            if (doc.RootElement.TryGetProperty("rulePacks", out var packs) && packs.ValueKind == JsonValueKind.Array)
+                foreach (var p in packs.EnumerateArray())
+                    if (p.ValueKind == JsonValueKind.String && p.GetString() is { Length: > 0 } path)
+                        packPaths.Add(path);
 
-                bool? enabled = null;
-                DiagnosticSeverity? severity = null;
+            if (doc.RootElement.TryGetProperty("rules", out var rules) && rules.ValueKind == JsonValueKind.Object)
+                foreach (var rule in rules.EnumerateObject())
+                {
+                    var id = rule.Name.Trim();
+                    if (id.Length == 0) continue;
+                    if (!PgAnalyzer.IsKnownRule(id) && !(extraKnownRuleIds?.Contains(id) ?? false)) continue; // ignore unknown ids
+                    if (rule.Value.ValueKind != JsonValueKind.Object) continue;
 
-                if (rule.Value.TryGetProperty("enabled", out var en) &&
-                    (en.ValueKind == JsonValueKind.True || en.ValueKind == JsonValueKind.False))
-                    enabled = en.GetBoolean();
+                    bool? enabled = null;
+                    DiagnosticSeverity? severity = null;
 
-                if (rule.Value.TryGetProperty("severity", out var sev) && sev.ValueKind == JsonValueKind.String &&
-                    TryParseSeverity(sev.GetString(), out var parsed))
-                    severity = parsed;
+                    if (rule.Value.TryGetProperty("enabled", out var en) &&
+                        (en.ValueKind == JsonValueKind.True || en.ValueKind == JsonValueKind.False))
+                        enabled = en.GetBoolean();
 
-                if (enabled is not null || severity is not null)
-                    map[id] = new RuleOverride(enabled, severity);
-            }
+                    if (rule.Value.TryGetProperty("severity", out var sev) && sev.ValueKind == JsonValueKind.String &&
+                        TryParseSeverity(sev.GetString(), out var parsed))
+                        severity = parsed;
+
+                    if (enabled is not null || severity is not null)
+                        map[id] = new RuleOverride(enabled, severity);
+                }
         }
 
-        return map.Count == 0 ? Empty : new AnalysisConfig(map);
+        return map.Count == 0 && packPaths.Count == 0 ? Empty : new AnalysisConfig(map, packPaths);
     }
 
     /// <summary>
@@ -120,7 +142,7 @@ public sealed class AnalysisConfig
     /// A severity value also implies enabled. Unknown rule ids and unparsable values throw
     /// <see cref="CliRuleException"/> so the CLI reports a usage error (unlike the lenient file).
     /// </summary>
-    public AnalysisConfig WithCliOverrides(IReadOnlyDictionary<string, string> ruleArgs)
+    public AnalysisConfig WithCliOverrides(IReadOnlyDictionary<string, string> ruleArgs, IReadOnlySet<string>? extraKnownRuleIds = null)
     {
         if (ruleArgs.Count == 0) return this;
         var map = new Dictionary<string, RuleOverride>(_overrides, StringComparer.OrdinalIgnoreCase);
@@ -128,7 +150,7 @@ public sealed class AnalysisConfig
         foreach (var (rawId, rawVal) in ruleArgs)
         {
             var id = rawId.Trim();
-            if (!PgAnalyzer.IsKnownRule(id))
+            if (!PgAnalyzer.IsKnownRule(id) && !(extraKnownRuleIds?.Contains(id) ?? false))
                 throw new CliRuleException($"Unknown analysis rule '{id}'. Known rules: {string.Join(", ", PgAnalyzer.RuleIds)}.");
 
             var val = (rawVal ?? string.Empty).Trim().ToLowerInvariant();
@@ -152,7 +174,7 @@ public sealed class AnalysisConfig
             }
         }
 
-        return new AnalysisConfig(map);
+        return new AnalysisConfig(map, _rulePackPaths);
     }
 
     /// <summary>True when <paramref name="ruleId"/> should run (its override enabled flag, else its default).</summary>

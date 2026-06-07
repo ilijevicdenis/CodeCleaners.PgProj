@@ -50,13 +50,20 @@ public static class ContractBuilder
     /// Builds the <c>analyze --format json</c> report. <paramref name="strict"/> mirrors the gate;
     /// <paramref name="config"/> applies per-rule enable/severity overrides (null → all rules at defaults).
     /// </summary>
-    public static AnalyzeReportDto Analyze(DatabaseProject project, bool strict, AnalysisConfig? config = null)
+    public static AnalyzeReportDto Analyze(DatabaseProject project, bool strict, AnalysisConfig? config = null,
+        IReadOnlyList<IPgRule>? externalRules = null)
     {
         var positions = SourcePositionIndex.Build(project);
         var analyzer = new PgAnalyzer(config);
+        var cfg = config ?? AnalysisConfig.Empty;
+        var rules = externalRules ?? (IReadOnlyList<IPgRule>)System.Array.Empty<IPgRule>();
         var findings = new List<Diagnostic>();
         foreach (var file in project.ResolveSqlFiles())
-            findings.AddRange(analyzer.Analyze(new PgParser().Parse(SourceReader.ReadAllText(file))));
+        {
+            var parsed = new PgParser().Parse(SourceReader.ReadAllText(file));
+            findings.AddRange(analyzer.Analyze(parsed));
+            findings.AddRange(ExternalRules.Run(rules, parsed, cfg));   // EP-ANALYSIS+ #79 external rule packs
+        }
 
         var diags = findings.Select(f => ContractMappers.ToDto(f, positions)).ToList();
         var summary = ContractMappers.SummaryOf(diags);
@@ -65,7 +72,7 @@ public static class ContractBuilder
         return new AnalyzeReportDto
         {
             Project = project.Name,
-            RuleCount = PgAnalyzer.RuleCount,
+            RuleCount = PgAnalyzer.RuleCount + rules.Count,
             Blocked = blocked,
             Summary = summary,
             Diagnostics = diags,

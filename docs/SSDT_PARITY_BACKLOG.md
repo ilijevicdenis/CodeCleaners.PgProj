@@ -183,7 +183,7 @@ SQL2017 target. Mirrors matrix row *Target platform*.
 
 ### EP-ANALYSIS+ — Configurable code analysis & extensibility — **P1**
 
-> 🟡 **PARTLY DELIVERED** (M7 audit 2026-06-07, issue #67). Done: per-rule config `Analysis/AnalysisConfig.cs` (`.pgproj.analysis.json`), CLI `--rule`, SARIF (`Analysis/SarifWriter.cs`). **Open: #79** external rule-pack discovery (no assembly loading yet), **#81** grow the rule set.
+> 🟡 **MOSTLY DELIVERED** (M7, issue #67). Done: per-rule config `Analysis/AnalysisConfig.cs` (`.pgproj.analysis.json`), CLI `--rule`, SARIF (`Analysis/SarifWriter.cs`), and **#79 external rule packs** (`IPgRule` + `RulePackLoader` isolated-`AssemblyLoadContext` discovery + `rulePacks` config; doc `docs/ANALYSIS_RULES.md`). **Open: #81** grow the rule set.
 
 Matrix rows *Code analysis enable/disable GUI* + *run code analysis*. Today rules are all-or-nothing.
 SSDT lets you enable/disable rules and set severity, plus third-party rule packs.
