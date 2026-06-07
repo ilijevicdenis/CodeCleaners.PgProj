@@ -83,6 +83,86 @@ dotnet build PgProj.slnx
 
 The CLI is `pgproj` (run via `dotnet run --project src/PgProj.Cli -- <command>`).
 
+## Build & install the tools locally
+
+Four pieces ship from this repo: the **CLI/engine**, the **MSBuild SDK** (build `.pgproj` like any
+project), the **VS Code extension**, and a **Visual Studio** integration. None of this needs a database
+except the DB-touching commands.
+
+### 1. The CLI (`pgproj`)
+
+```bash
+dotnet build PgProj.slnx -c Release          # builds the engine + CLI
+dotnet run --project src/PgProj.Cli -- build myschema/MySchema.pgproj   # run from source
+```
+
+To get a `pgproj` you can call from anywhere, publish a self-contained/framework-dependent build and put
+it on your `PATH`:
+
+```bash
+dotnet publish src/PgProj.Cli -c Release -o "$HOME/.pgproj/bin"
+# then add ~/.pgproj/bin to PATH  (Windows: setx PATH "%USERPROFILE%\.pgproj\bin;%PATH%")
+pgproj --help
+```
+
+### 2. The MSBuild SDK (`PgProj.Sdk`) — build a `.pgproj` like a normal project
+
+Pack the SDK and consume it from a **local NuGet feed**, so a `.pgproj` can just say
+`Sdk="PgProj.Sdk/<version>"` and `dotnet build` produces the model + `.pgpkg`:
+
+```bash
+dotnet pack src/PgProj.Sdk -c Release -o ./artifacts/sdk            # → PgProj.Sdk.<ver>.nupkg
+dotnet nuget add source "$(pwd)/artifacts/sdk" -n pgproj-local      # register the local feed (once)
+# in your project's nuget.config, or globally; then:
+dotnet build path/to/MyDb.pgproj -c Release                        # emits bin/MyDb.model.json + MyDb.pgpkg
+dotnet build path/to/MyDb.pgproj -t:Publish --p:Connection="Host=...;Database=..."   # deploy via the SDK
+```
+
+A minimal project file:
+
+```xml
+<Project Sdk="PgProj.Sdk/0.1.0" DefaultTargets="Build">
+  <PropertyGroup><Name>MyDb</Name><DefaultSchema>public</DefaultSchema><TargetPostgresVersion>18</TargetPostgresVersion></PropertyGroup>
+</Project>
+```
+
+### 3. The VS Code extension (`editors/vscode`)
+
+Requires **Node 18+** (and the .NET SDK for the engine it drives). Build, package, and install the `.vsix`:
+
+```bash
+cd editors/vscode
+npm install
+npm run compile          # tsc + esbuild → dist/extension.js  (the runtime entry)
+npm run package          # → pgproj-vscode-<ver>.vsix
+code --install-extension pgproj-vscode-0.1.0.vsix
+```
+
+Or press **F5** in VS Code with `editors/vscode` open to launch an Extension Development Host. Point it at
+your engine with the `pgproj.cliPath` setting (the built `PgProj.Cli.dll`) if `pgproj` isn't on `PATH`.
+The extension's live features (squiggles/hover/go-to-definition/completion) are powered by `pgproj serve`
+(see [`docs/LSP_LANGUAGE_SERVER.md`](docs/LSP_LANGUAGE_SERVER.md)).
+
+Run its tests:
+
+```bash
+npm run test:unit        # vitest, no VS Code host — the fast gate
+npm run test:e2e         # @vscode/test-electron: downloads VS Code and runs a real host
+```
+
+> **E2E note:** `test:e2e` needs a desktop session (on headless Linux wrap it: `xvfb-run -a npm run
+> test:e2e`). `runTest.ts` automatically mirrors the build to a space-free temp dir if your checkout path
+> contains a space (a `@vscode/test-electron` limitation), so it works from any path. Always let it run
+> `npm run compile` first (it does, via `pretest:e2e`) so the `dist/` bundle is current.
+
+### 4. Visual Studio (`editors/vs`)
+
+- **Route A (works today):** the `PgProj.Sdk` above makes a `.pgproj` build/clean/publish inside Visual
+  Studio via generic project handling — open the project and Build/Publish from Solution Explorer.
+- **Route B (scaffold):** a full VSIX project system lives under `editors/vs/` in its own solution; it
+  requires **Visual Studio + the "Visual Studio extension development" workload** to build. See
+  [`docs/VISUAL_STUDIO.md`](docs/VISUAL_STUDIO.md).
+
 ## Test your own SQL scripts
 
 You don't need a full project to check your scripts — point a one-line `.pgproj` at them.
