@@ -21,6 +21,9 @@ BenchmarkDotNet.Artifacts/
 *.model.json
 extracted/
 
+# Golden test fixtures are committed even if their extension matches a build-artifact pattern
+!tests/**/golden/*.model.json
+
 # OS
 Thumbs.db
 .DS_Store
