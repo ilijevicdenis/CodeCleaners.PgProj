@@ -267,9 +267,15 @@ public sealed record CatalogQueries
             WHERE d.classoid = 'pg_namespace'::regclass
               AND n.nspname NOT IN ('pg_catalog','information_schema') AND n.nspname NOT LIKE 'pg_%'
           UNION ALL
-            -- function / procedure (identity args spell the overload, matching a hand-written signature)
+            -- function / procedure: a TYPES-ONLY input signature, matching a hand-written
+            -- COMMENT ON FUNCTION name(type, type). pg_get_function_identity_arguments would include
+            -- parameter names (e.g. 'a integer, b integer'), which a source comment omits — so derive
+            -- the input arg types from proargtypes instead (issue #61 round-trip).
             SELECT (CASE WHEN p.prokind = 'p' THEN 'PROCEDURE ' ELSE 'FUNCTION ' END)
-                   || n.nspname || '.' || p.proname || '(' || pg_get_function_identity_arguments(p.oid) || ')' AS target,
+                   || n.nspname || '.' || p.proname || '('
+                   || COALESCE((SELECT string_agg(format_type(at.oid, NULL), ', ' ORDER BY at.ord)
+                                FROM unnest(p.proargtypes) WITH ORDINALITY AS at(oid, ord)), '')
+                   || ')' AS target,
                    d.description
             FROM pg_description d
             JOIN pg_proc p ON p.oid = d.objoid

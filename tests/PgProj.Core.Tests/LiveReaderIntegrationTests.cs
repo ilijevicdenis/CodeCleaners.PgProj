@@ -81,20 +81,17 @@ public sealed class LiveReaderIntegrationTests : IClassFixture<ThrowawayDatabase
         // cast / operator / operator-class / operator-family (raw) and the finely-modelled functions /
         // generated columns / BETWEEN / EXCLUDE — so the guard now covers nearly all raw kinds in
         // AllFeaturesDb. Cast/operator/operator-class are reconciled by the kind-canonical comparison key.
-        // STILL OPEN (verified against PG18, tracked under #61): two reconstruction-fidelity gaps remain —
-        //   • Trigger: pg_get_triggerdef event ordering / rendering vs source isn't fully canonicalized.
-        //   • Comment on a function: the comment identity embeds the function arg-signature whose spelling
-        //     ((integer, integer) vs (integer,integer)) isn't normalized, so it reads as a phantom add.
-        // These two are deliberately NOT in the guard so it reflects what genuinely round-trips, rather
-        // than masking the gaps.
+        // #61 closed the last two gaps verified against PG18: Trigger (event order is canonicalized — the
+        // catalog renders insert/delete/update in a fixed order) and function/procedure Comment (the
+        // reconstruction now uses a types-only signature from proargtypes, matching a hand-written
+        // COMMENT ON FUNCTION name(type,type)). The guard now covers ALL raw kinds AllFeaturesDb exercises.
         var scoped = new HashSet<ObjectKind>
         {
             ObjectKind.Extension, ObjectKind.TextSearchDictionary, ObjectKind.TextSearchConfiguration,
             ObjectKind.ForeignDataWrapper, ObjectKind.Server, ObjectKind.Statistics,
             ObjectKind.Aggregate, ObjectKind.Table,
-            // #61 additions that round-trip clean against PG18:
             ObjectKind.Cast, ObjectKind.Operator, ObjectKind.OperatorClass, ObjectKind.OperatorFamily,
-            // other raw kinds AllFeaturesDb exercises that must also round-trip clean:
+            ObjectKind.Trigger, ObjectKind.Comment,
             ObjectKind.Type, ObjectKind.Domain, ObjectKind.Collation, ObjectKind.Conversion,
             ObjectKind.Rule, ObjectKind.Policy, ObjectKind.EventTrigger, ObjectKind.ForeignTable,
             ObjectKind.Publication, ObjectKind.Language,
