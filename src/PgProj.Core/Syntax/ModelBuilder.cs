@@ -152,35 +152,37 @@ public sealed class ModelBuilder
             string schema = "", name = "", onObject = "";
             try
             {
-                switch (kind)
+                // Name-parse strategy comes from the object-kind registry (issue #44), not a per-kind
+                // switch: a kind that reuses an existing style needs only its registry row. The branch
+                // below is keyed by NameParseStyle (the genuinely distinct CREATE-syntax shapes).
+                switch (Extensibility.ObjectKindRegistry.Get(kind.Value).NameParse)
                 {
-                    case ObjectKind.Type or ObjectKind.Domain or ObjectKind.Collation or ObjectKind.Conversion
-                        or ObjectKind.Statistics or ObjectKind.ForeignTable or ObjectKind.TextSearchConfiguration
-                        or ObjectKind.TextSearchDictionary or ObjectKind.TextSearchParser or ObjectKind.TextSearchTemplate:
+                    case Extensibility.NameParseStyle.SchemaQualified:
                         SkipIfNotExists(cur); (schema, name) = Qual(cur); break;
-                    case ObjectKind.Extension or ObjectKind.Language or ObjectKind.Server
-                        or ObjectKind.ForeignDataWrapper or ObjectKind.EventTrigger or ObjectKind.Publication:
+                    case Extensibility.NameParseStyle.GlobalName:
                         SkipIfNotExists(cur); name = cur.ExpectIdentifier(); break;
-                    case ObjectKind.Trigger or ObjectKind.Policy:
+                    case Extensibility.NameParseStyle.TableScopedOn:
                         name = cur.ExpectIdentifier(); onObject = ScanThenQual(cur, "ON"); schema = SchemaOf(onObject); break;
-                    case ObjectKind.Rule:
+                    case Extensibility.NameParseStyle.TableScopedTo:
                         name = cur.ExpectIdentifier(); onObject = ScanThenQual(cur, "TO"); schema = SchemaOf(onObject); break;
-                    case ObjectKind.Aggregate:
+                    case Extensibility.NameParseStyle.Aggregate:
                         // Leave `schema` empty and fold it into `name` (like Operator/Cast): the name must
                         // carry the schema + arg signature so the identity is `aggregate:<schema>.<name>(<args>)`,
                         // matching the live reader. Setting `schema` here too would double it via BuildIdentity
                         // (`aggregate:afd.afd.sum_int(integer)`) and make every aggregate read as a phantom create.
                         { var (sc, an) = Qual(cur); name = $"{sc}.{an}" + ParenArgs(cur); break; }
-                    case ObjectKind.Operator:
+                    case Extensibility.NameParseStyle.Operator:
                         name = CaptureUntilOpenParen(cur) + ParenArgs(cur); break;
-                    case ObjectKind.OperatorClass or ObjectKind.OperatorFamily:
+                    case Extensibility.NameParseStyle.OperatorClassFamily:
                         { var (sc, ocn) = Qual(cur); var method = ScanThenIdent(cur, "USING"); schema = sc; name = $"{sc}.{ocn}" + (method.Length > 0 ? $" USING {method}" : ""); break; }
-                    case ObjectKind.Cast:
+                    case Extensibility.NameParseStyle.Cast:
                         name = ParenArgs(cur); break;
-                    case ObjectKind.Transform:
+                    case Extensibility.NameParseStyle.Transform:
                         cur.MatchWord("FOR"); var type = CaptureUntilWord(cur, "LANGUAGE"); var lang = cur.MatchWord("LANGUAGE") ? cur.ExpectIdentifier() : ""; name = $"FOR {type} LANGUAGE {lang}"; break;
-                    case ObjectKind.UserMapping:
+                    case Extensibility.NameParseStyle.UserMapping:
                         SkipIfNotExists(cur); cur.MatchWord("FOR"); var usr = cur.ExpectIdentifier(); var srv = ScanThenIdent(cur, "SERVER"); name = $"FOR {usr} SERVER {srv}"; break;
+                    case Extensibility.NameParseStyle.BodyBased:
+                        break; // no structured name → body-based identity (table/comment)
                 }
             }
             catch (ParseException) { /* fall back to body-based identity */ }
