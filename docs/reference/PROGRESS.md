@@ -4,8 +4,8 @@
 > SSDT-for-PostgreSQL parity and is the single place to read "where are we now". It is **updated on
 > every delivered milestone** (see [Update contract](#update-contract) below).
 
-**Last updated:** 2026-06-07 (all milestones M1–M6 complete) · **Streams:** semantic core (EP-SEMCORE #41) ·
-SSDT parity (#27) · performance (#12)
+**Last updated:** 2026-06-07 (M1–M6 complete; **M7 backlog opened** — 55 issues #66–#120) ·
+**Streams:** semantic core (EP-SEMCORE #41) · SSDT parity (#27) · performance (#12)
 
 Legend: ✅ delivered · 🟡 in progress · ⬜ not started · ⛔ blocked · ⏸️ deferred.
 
@@ -24,6 +24,7 @@ deliverable subtasks; **complex issues are broken into smaller subtasks when imp
 | **M4** | Diff, Risk, Deploy & Incremental | EP-SEMCORE | #52, #53, #54, #55, #56, #57, #58, #61, #64 | 9 / 9 | ✅ | [milestone/4](https://github.com/ilijevicdenis/CodeCleaners.PgProj/milestone/4) |
 | **M5** | SSDT Parity — Editor UI | parity #27 | #31, #24, #25, #26 | 4 / 4 | ✅ | [milestone/5](https://github.com/ilijevicdenis/CodeCleaners.PgProj/milestone/5) |
 | **M6** | Performance & Engine Backlog | perf #12 | #8, #10 | 2 / 2 | ✅ | [milestone/6](https://github.com/ilijevicdenis/CodeCleaners.PgProj/milestone/6) |
+| **M7** | SSDT Parity — Engine, Tooling & Coverage | parity #27 / coverage | 9 epics #66–#72,#111,#112 + 46 tasks #73–#110,#113–#120 | 0 / 9 | ⬜ | [milestone/7](https://github.com/ilijevicdenis/CodeCleaners.PgProj/milestone/7) |
 
 **Already shipped (not milestoned — do not rebuild):** the headless engine — `build`, `compare`,
 `publish`, `validate`, `extract`, `drift`, `analyze`, `PgProj.Sdk`, and **100% parser accept/reject
@@ -143,6 +144,43 @@ Open items from the perf/deploy-sync tracker (#12). Benchmark-gated (bytes/op); 
 
 - ✅ **#8** — reduce `ModelBuilder` allocation *(delivered; lazy table-constraint lists — All 16.16→16.06 MB/op, Table bucket 1.77→1.66; dashboard stage #24. Safe-by-construction, no footgun.)*
 - ✅ **#10** — profile the comparer / diff path (`CompareBenchmarks`) *(delivered; representative `CompareBenchmarks` + comparer fast-paths — −19% to −40% allocated/op across the compare path; behavior-preserving.)*
+
+### M7 · SSDT Parity — Engine, Tooling & Coverage ⬜
+
+The **genuinely-open** parity work after M1–M6. Sourced from [`docs/SSDT_PARITY_BACKLOG.md`](../SSDT_PARITY_BACKLOG.md)
+§3 (gap epics not marked landed in §2) + the open live-server **Introspect** rows in
+[`COVERAGE.md`](./COVERAGE.md). **Not started (0/9 epics).** Each epic is a `tracking` issue; its task
+bullets are linked child issues.
+
+- ⬜ **#66** — **EP-TARGET**: target-platform enforcement (version-aware validation) — children #73–#76
+  *(capability table · build validation pass · `PGV###` analyzer category · wire into `validate`)*
+- ⬜ **#67** — **EP-ANALYSIS+**: configurable code analysis & extensibility — children #77–#81
+  *(per-rule config · CLI overrides · external rule packs · SARIF output · grow rule set)*
+- ⬜ **#68** — **EP-PROFILE**: publish profiles (`.pgpublish.json`) — children #82–#85
+  *(schema · `--profile` on publish/script/compare · `profile create` · secret handling)*
+- ⬜ **#69** — **EP-SCHEMACOMPARE**: first-class two-way Schema Compare (engine) — children #86–#89
+  *(unify `compare`/`drift` API · selectable change set · `--output diff.json` · object-type filters)*
+- ⬜ **#70** — **EP-TEMPLATES**: new-object templates & `dotnet new` — children #90–#93
+  *(object templates · `pgproj add` · `dotnet new` pack · `new project` / from-existing-DB)*
+- ⬜ **#71** — **EP-CICD**: CI/CD integration (**planning only** — GitHub CI/CD is a user decision, see
+  `CLAUDE.md`) — children #94–#97 *(GitHub Action [design] · Azure DevOps task [design] · container
+  image · stable exit codes)*
+- ⬜ **#72** — **EP-COVERAGE**: live-server introspection coverage completion — children #98–#110
+  *(EXCLUDE · partitioning/inheritance · matview flag · index opclass · range/base types · policy TO
+  roles · event-trigger tags · COMMENT ON · aggregate · cast/operator/op-class · language/transform/
+  user-mapping · text-search parser/template · existence-only→full for statistics/collation/conversion/
+  TS config/foreign table/FDW)*
+- ⬜ **#111** — **EP-VS**: Visual Studio experience — Route B VSIX + solution grouping — children #113–#118
+  *(M5 shipped Route A SDK build/publish + LSP client; this is the open tail: VSIX project system/flavor,
+  the four property pages, Publish dialog, Schema Compare window, `.vsct`/manifest, slngen-style grouping.
+  Route B needs VS + the VS SDK — not buildable headless.)*
+- ⬜ **#112** — **EP-DESIGNER**: graphical table designer — editable + PG-specific surfaces — children #119–#120
+  *(M5 #26 shipped the read/round-trip designer; this deepens it to fully editable end-to-end + Postgres
+  surfaces: partitioning, identity/generated, RLS, EXCLUDE.)*
+
+> M7 is a **backlog opened**, not delivered — the §3 log below records deliveries only. As each child
+> ships, follow the [Update contract](#update-contract): tick its box here, recompute the M7 `Done`
+> count in §1, add a §3 row, and close the issue.
 
 ---
 
