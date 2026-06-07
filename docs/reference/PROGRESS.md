@@ -4,8 +4,9 @@
 > SSDT-for-PostgreSQL parity and is the single place to read "where are we now". It is **updated on
 > every delivered milestone** (see [Update contract](#update-contract) below).
 
-**Last updated:** 2026-06-07 (M1–M6 complete; **M7 opened then audited** — 4 of 9 epics were already
-delivered in the M-waves and are now closed; 27 redundant issues closed with evidence) ·
+**Last updated:** 2026-06-08 (M1–M6 complete; **M7 substantially delivered** — audit closed 27 redundant
+issues; then EP-COVERAGE introspection, EP-ANALYSIS+ external rule packs + new rules, and a complete SQLSTATE
+table all shipped & verified vs PG18; EP-CICD removed; base types/transforms backlogged) ·
 **Streams:** semantic core (EP-SEMCORE #41) · SSDT parity (#27) · performance (#12)
 
 Legend: ✅ delivered · 🟡 in progress · ⬜ not started · ⛔ blocked · ⏸️ deferred.
@@ -25,7 +26,7 @@ deliverable subtasks; **complex issues are broken into smaller subtasks when imp
 | **M4** | Diff, Risk, Deploy & Incremental | EP-SEMCORE | #52, #53, #54, #55, #56, #57, #58, #61, #64 | 9 / 9 | ✅ | [milestone/4](https://github.com/ilijevicdenis/CodeCleaners.PgProj/milestone/4) |
 | **M5** | SSDT Parity — Editor UI | parity #27 | #31, #24, #25, #26 | 4 / 4 | ✅ | [milestone/5](https://github.com/ilijevicdenis/CodeCleaners.PgProj/milestone/5) |
 | **M6** | Performance & Engine Backlog | perf #12 | #8, #10 | 2 / 2 | ✅ | [milestone/6](https://github.com/ilijevicdenis/CodeCleaners.PgProj/milestone/6) |
-| **M7** | SSDT Parity — Engine, Tooling & Coverage | parity #27 / coverage | 9 epics #66–#72,#111,#112 | 4 / 9 | 🟡 | [milestone/7](https://github.com/ilijevicdenis/CodeCleaners.PgProj/milestone/7) |
+| **M7** | SSDT Parity — Engine, Tooling & Coverage | parity #27 / coverage | 8 epics in scope (EP-CICD #71 removed); #66–#70,#72,#111,#112 | 6 / 8 | 🟡 | [milestone/7](https://github.com/ilijevicdenis/CodeCleaners.PgProj/milestone/7) |
 
 **Already shipped (not milestoned — do not rebuild):** the headless engine — `build`, `compare`,
 `publish`, `validate`, `extract`, `drift`, `analyze`, `PgProj.Sdk`, and **100% parser accept/reject
@@ -152,16 +153,18 @@ Opened as a 55-issue backlog from [`docs/SSDT_PARITY_BACKLOG.md`](../SSDT_PARITY
 open **Introspect** rows in [`COVERAGE.md`](./COVERAGE.md), then **audited against the code**: both source
 docs were stale — **4 of the 9 epics had already been delivered during the M-waves** (the boxes were never
 checked). Those 4 epics + the already-done child tasks of the partial epics were **closed with evidence
-comments** (27 issues). **4/9 epics done.** Each epic is a `tracking` issue; tasks are linked children.
+comments** (27 issues). Then the remaining engine work was built & verified vs PG18, EP-CICD was removed,
+and base types/transforms were backlogged → **6 of 8 in-scope epics done** (EP-CICD #71 removed). Each epic
+is a `tracking` issue; tasks are linked children.
 
 **Delivered (already on `main`; closed after audit):**
 - ✅ **#66** — **EP-TARGET**: target-platform enforcement — `TargetVersionAnalyzer` + `PgVersionCapabilities`/`SupportedFeatures` table + `PGV###`; gate wired into build/publish/validate. Tests `TargetVersionTests`/`VersionProfileTests`.
 - ✅ **#68** — **EP-PROFILE**: publish profiles — `Deployment/PublishProfile.cs` (secret-whitelisted) + `profile create` + `--profile` (CLI>profile>default). Tests `PublishProfileTests`.
 - ✅ **#69** — **EP-SCHEMACOMPARE**: unified two-way `Comparison/SchemaCompare.cs` + selectable `SchemaChangeSet` + `--output diff.json` + `--exclude`. Tests `SchemaCompareTests`.
 - ✅ **#70** — **EP-TEMPLATES**: `Templates/*` + `add`/`new project` verbs + `dotnet new` pack at `templates/`. Tests `TemplateTests`/`TemplateIntegrationTests`.
+- ✅ **#67** — **EP-ANALYSIS+**: config (#77), `--rule` (#78), SARIF (#80), **external rule packs (#79** — `IPgRule` + `RulePackLoader`), and rules **PG006/PG008**. Doc `docs/ANALYSIS_RULES.md`. Epic closed; **#81** (grow the rule set) stays open as ongoing backlog.
 
-**Open (genuinely remaining):**
-- 🟡 **#67** — **EP-ANALYSIS+**: config (#77 ✅), `--rule` (#78 ✅), SARIF (#80 ✅), **external rule packs (#79 ✅** — `IPgRule` + `RulePackLoader` + `rulePacks` config, doc `docs/ANALYSIS_RULES.md`**)** done; **open: #81** grow the rule set.
+**Open / in progress:**
 - 🟡 **#72** — **EP-COVERAGE**: live-server introspection. **Done:** matview (#100), COMMENT ON (#105), aggregate (#106), cast/operator/op-class/family (#107), EXCLUDE (#98), EVENT TRIGGER tags (#104), POLICY `TO` roles (#103), USER MAPPING + **LANGUAGE** (#108), PARTITION/INHERITS (#99), index opclass/ordering (#101), expression statistics (#110), **TEXT SEARCH PARSER/TEMPLATE (#109)** — plus (already in code) collation/conversion/FDW/server/foreign-table/TS-config+dict/range/column-statistics/publications. **Backlog (genuinely need C functions in the PG server — in practice shipped via an extension):** base types (#102), transforms (#108 tail). All shipped work verified against PG18 on `milestone/m7-ssdt-parity`.
 - ❌ **#71** — **EP-CICD**: **removed from M7 scope** (user decision). #97 (stable exit-code contract) was already delivered (`ExitCode.cs` + `ExitCodeContractTests` + `docs/CICD.md`) → closed done; the unbuilt GitHub Action / Azure DevOps task / container-image tickets (#94/#95/#96) closed as not-planned; the opt-in `ci/azure-devops/` template removed. The CLI stays CI-friendly via the documented exit codes + `--fail-on-changes`/`--dry-run`.
 - ⬜ **#111** — **EP-VS**: Visual Studio Route B VSIX + slngen grouping — children #113–#118 (M5 shipped Route A SDK build/publish + LSP client; Route B needs VS + the VS SDK, not buildable headless).
@@ -179,6 +182,10 @@ Newest first. One line per delivered issue/milestone; this is the audit trail of
 
 | Date | Milestone | Item | Commit | Notes |
 |------|-----------|------|--------|-------|
+| 2026-06-08 | M7 | **EP-COVERAGE introspection** — EXCLUDE (#98), EVENT TRIGGER tags (#104), POLICY `TO` roles (#103), USER MAPPING + LANGUAGE (#108), PARTITION/INHERITS (#99), index opclass/ordering (#101), expression statistics (#110), TS PARSER/TEMPLATE (#109) | `8e2c387`…`ff1de45` on `milestone/m7-ssdt-parity` | One reader per kind (+ a parser fix for `CREATE USER MAPPING`); each verified vs PG18 by the deploy→read-back→reparse→re-deploy round-trip; goldens regenerated. #104 (event-trigger tags) and #101 (index ordering) also fixed latent silent phantom diffs. Full suite 25,044 pass / 0 fail. |
+| 2026-06-08 | M7 | **EP-ANALYSIS+ done** — external rule packs (#79: `IPgRule`+`RulePackLoader`) + PG006 missing-PK / PG008 untyped-numeric (#81 partial); epic #67 closed | `f3a7639`, `f734255` | 7 rule-pack tests + analyzer tests; doc `docs/ANALYSIS_RULES.md`. #81 stays open as ongoing rule backlog. |
+| 2026-06-08 | M7 | **Complete SQLSTATE table** — `PgErrorCodes` (262 codes / 43 classes from PostgreSQL `errcodes.txt`); `validate`/`publish` errors now enriched (`42704 undefined_object (class 42: …)`) | `e0a28ef` | 11 tests; central test `DropSampleSql` now drops the global `afd_plpgsql` language. Full suite 25,055 pass / 0 fail. |
+| 2026-06-08 | M7 | **EP-CICD removed** (user decision) — closed #71/#94/#95/#96 (not planned); #97 exit-code contract closed done; opt-in `ci/azure-devops/` template removed | `37309d8` | Exit-code contract kept (`ExitCode.cs` + `ExitCodeContractTests` + `docs/CICD.md`). **Backlog:** base types (#102) + transforms (#108 tail) — need C functions in the PG server (labelled `blocked`). |
 | 2026-06-07 | M7 | **Audit & reconcile** — 4 epics (#66 TARGET, #68 PROFILE, #69 SCHEMACOMPARE, #70 TEMPLATES) + done child tasks were already on `main`; closed 27 redundant issues with evidence | branch `milestone/m7-ssdt-parity` | The opened M7 backlog was sourced from stale `SSDT_PARITY_BACKLOG.md`/`COVERAGE.md`; audit against the code found most of it shipped in the M-waves. Docs refreshed (this file + COVERAGE.md + backlog). Remaining open: #67 (#79,#81), #72 (#98,#99,#101–104,#108–110), #71, #111, #112. |
 | 2026-06-07 | M5 | #24 VS Code extension + #25 Visual Studio + #26 table designer (**completes M5 & SSDT parity**) | merge of `milestone/m5-editor-clients` | Two waves of worktree agents + hand-resolved merges. VS Code extension finished (LSP client, webviews, 62 vitest tests, .vsix, E2E green via a space-free-temp runner shim); VS Route-A SDK build/publish/pack validated + Route-B VSIX scaffolded; designer with engine-backed `.sql` round-trip (.NET 22,477 pass). Editor UIs validated to the extent runnable here. |
 | 2026-06-07 | M6 | #8 lazy table-constraint lists + #10 comparer fast-paths (**completes M6**) | merge of `milestone/m6-performance` | Two safe, BDN-measured allocation wins: parse+build All 16.16→16.06 MB/op (dashboard stage #24); comparer −19..−40%/op on a now-representative CompareBenchmarks. Corpus + goldens byte-identical; full suite green vs PG18. |
