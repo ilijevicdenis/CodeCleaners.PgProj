@@ -19,6 +19,20 @@ public class TypeNormalizerTests
     [InlineData("int[]", "integer[]")]
     [InlineData("decimal(10,0)", "numeric(10, 0)")]
     [InlineData("double precision", "double precision")]
+    // --- #51 additions: new aliases + documented pass-throughs --------------------------------------
+    [InlineData("varbit", "bit varying")]
+    [InlineData("VARBIT (8)", "bit varying(8)")]
+    [InlineData("dec(10,2)", "numeric(10, 2)")]
+    [InlineData("jsonb", "jsonb")]      // already canonical → pass through
+    [InlineData("JSONB", "jsonb")]
+    [InlineData("bytea", "bytea")]
+    [InlineData("xml", "xml")]
+    [InlineData("money", "money")]
+    [InlineData("uuid", "uuid")]
+    [InlineData("UUID[]", "uuid[]")]
+    [InlineData("inet", "inet")]
+    [InlineData("tsvector", "tsvector")]
+    [InlineData("my_domain", "my_domain")]   // user-defined/domain passes through unchanged
     public void Normalizes_common_types(string input, string expected) =>
         Assert.Equal(expected, TypeNormalizer.Normalize(input));
 }

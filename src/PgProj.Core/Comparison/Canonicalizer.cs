@@ -60,4 +60,53 @@ public static class Canonicalizer
     /// <summary>Canonicalize a column/expression default: drop explicit casts, then <see cref="NormalizeText"/>.</summary>
     public static string NormalizeDefault(string? d) =>
         string.IsNullOrWhiteSpace(d) ? string.Empty : NormalizeText(CastSuffix.Replace(d, string.Empty));
+
+    /// <summary>
+    /// Canonical form of a scalar SQL EXPRESSION (a column/expression default or a CHECK predicate),
+    /// for the semantic CanonicalHash (issue #51). Beyond <see cref="NormalizeDefault"/> it additionally:
+    /// <list type="bullet">
+    /// <item>strips a <em>redundant balanced outer paren pair</em> repeatedly, so <c>a&gt;0</c>,
+    ///   <c>(a&gt;0)</c> and <c>((a&gt;0))</c> collapse to one form;</item>
+    /// <item>normalises punctuation spacing (<c>a &gt; 0</c> ⇒ <c>a&gt;0</c>) via the same
+    ///   <see cref="PunctSpace"/> rule the body normalizer uses.</item>
+    /// </list>
+    /// Deterministic and idempotent: only an <em>enclosing</em> pair whose match is the final char is
+    /// removed (never <c>(a) + (b)</c>, whose first '(' closes mid-string), so meaning is preserved.
+    /// <para>NOTE: this is intentionally NOT wired into <see cref="SchemaComparer"/> — the comparer's
+    /// verdicts (and the golden deploy script / model JSON) stay byte-identical. It feeds only the
+    /// model's canonical-form accessors / CanonicalHash, where <c>a&gt;0</c> ≡ <c>(a&gt;0)</c> is desired.</para>
+    /// </summary>
+    public static string NormalizeExpression(string? e)
+    {
+        if (string.IsNullOrWhiteSpace(e)) return string.Empty;
+        // Reuse the default pipeline (cast-strip + whitespace/case) then tighten punctuation spacing and
+        // peel redundant outer parens. Order matters: strip parens AFTER spacing so " ( a > 0 ) " trims.
+        var s = PunctSpace.Replace(NormalizeDefault(e), "$1");
+        return StripRedundantOuterParens(s);
+    }
+
+    // Remove an enclosing '(' ... ')' pair iff the '(' at index 0 is matched by the ')' at the last
+    // index (i.e. the whole string is parenthesised). Repeats for nested redundant pairs. A string like
+    // "(a)>(b)" is left untouched because the opening paren closes before the end.
+    private static string StripRedundantOuterParens(string s)
+    {
+        while (s.Length >= 2 && s[0] == '(' && s[^1] == ')')
+        {
+            var depth = 0;
+            var enclosing = true;
+            for (var i = 0; i < s.Length; i++)
+            {
+                if (s[i] == '(') depth++;
+                else if (s[i] == ')')
+                {
+                    depth--;
+                    // Depth hit 0 before the final char ⇒ the leading '(' is NOT the outermost wrapper.
+                    if (depth == 0 && i < s.Length - 1) { enclosing = false; break; }
+                }
+            }
+            if (!enclosing || depth != 0) break;
+            s = s[1..^1];
+        }
+        return s;
+    }
 }
