@@ -2,9 +2,11 @@
   <Folder Name="/src/">
     <Project Path="src/PgProj.Cli/PgProj.Cli.csproj" />
     <Project Path="src/PgProj.Core/PgProj.Core.csproj" />
+    <Project Path="src/PgProj.Lsp/PgProj.Lsp.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/PgProj.Core.Tests/PgProj.Core.Tests.csproj" />
+    <Project Path="tests/PgProj.Lsp.Tests/PgProj.Lsp.Tests.csproj" />
   </Folder>
   <Folder Name="/bench/">
     <Project Path="bench/PgProj.Benchmarks/PgProj.Benchmarks.csproj" />

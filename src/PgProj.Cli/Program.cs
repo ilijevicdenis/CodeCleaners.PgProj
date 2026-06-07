@@ -49,6 +49,7 @@ public static class Program
                 "script" => await Script(args),
                 "pkg" => await Pkg(args),
                 "profile" => Profile(args),
+                "serve" => await Serve(args),
                 "help" or "--help" or "-h" => PrintUsageReturn(ExitCode.Success),
                 _ => Fail($"Unknown command '{args[0]}'."),
             };
@@ -614,6 +615,29 @@ public static class Program
         return 0;
     }
 
+    // ---- serve (EP-LSP: resident language service over STDIO) ----------------------------
+
+    /// <summary>
+    /// Runs the resident language service: a long-running LSP host speaking JSON-RPC over STDIO with the
+    /// standard <c>Content-Length</c> framing (issue #31). stdout is the LSP wire, so this verb writes NOTHING
+    /// else to it — any stray <see cref="Console.Out"/> use is redirected to stderr for the lifetime of the
+    /// loop. All parsing/analysis is reused from the engine via <c>PgProj.Lsp</c> (handlers are a separate,
+    /// unit-tested library; this is only the transport boundary). The optional first positional may name the
+    /// workspace root so the server can resolve the <c>.pgproj</c> without waiting for an <c>initialize</c>
+    /// rootUri; otherwise the root comes from the LSP handshake.
+    /// </summary>
+    private static async Task<int> Serve(string[] args)
+    {
+        // Protect the wire: redirect any accidental Console.Out writes (deep in the engine) to stderr.
+        var realOut = Console.OpenStandardOutput();
+        Console.SetOut(Console.Error);
+
+        var debounce = int.TryParse(GetOption(args, "--debounce"), out var d) ? d : 150;
+        using var input = Console.OpenStandardInput();
+        using var server = new PgProj.Lsp.Server.LspServer(input, realOut, debounce);
+        return await server.RunAsync();
+    }
+
     // ---- shared analysis gate -----------------------------------------------------------
 
     private static IReadOnlyList<Diagnostic> RunAnalysis(DatabaseProject project, AnalysisConfig config, out int ruleCount)
@@ -1064,6 +1088,7 @@ public static class Program
           pgproj pull    <project.pgproj> --connection <conn> [--dry-run] [--allow-deletes]   (rewrite project files FROM the DB — scenario 3)
           pgproj analyze <project.pgproj> [--strict]    (static safety analysis over the AST)
           pgproj model-tree <project.pgproj> [--format json]   (objects + source positions, for editors)
+          pgproj serve [<workspace-dir>] [--debounce <ms>]     (resident LSP language server over STDIO — live diagnostics/definition/hover/completion)
 
         Options:
           --format json      Machine-readable, versioned JSON (build/analyze/compare/publish --dry-run/model-tree)
