@@ -16,15 +16,17 @@ namespace PgProj.Core.Tests;
 /// <see cref="ShadowValidator"/> path the <c>validate</c> verb uses (apply to a throwaway DB inside a
 /// transaction, then roll back and drop it). Env-var gated on <c>PGPROJ_TEST_CONNECTION</c> — like
 /// <see cref="LiveReaderIntegrationTests"/>, this is the repo's real harness; with no DB it skips.
+///
+/// Each run gets its OWN throwaway database (via <see cref="ThrowawayDatabaseFixture"/>).
 /// </summary>
-public sealed class TemplateIntegrationTests : IDisposable
+public sealed class TemplateIntegrationTests : IClassFixture<ThrowawayDatabaseFixture>, IDisposable
 {
-    private static string? Conn => Environment.GetEnvironmentVariable("PGPROJ_TEST_CONNECTION");
-
+    private readonly ThrowawayDatabaseFixture _fixture;
     private readonly string _dir;
 
-    public TemplateIntegrationTests()
+    public TemplateIntegrationTests(ThrowawayDatabaseFixture fixture)
     {
+        _fixture = fixture;
         _dir = Path.Combine(Path.GetTempPath(), "pgproj_tmpl_it_" + Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(_dir);
     }
@@ -37,7 +39,7 @@ public sealed class TemplateIntegrationTests : IDisposable
     [Fact]
     public async Task Scaffolded_table_and_function_validate_against_postgres()
     {
-        var conn = Conn;
+        var conn = _fixture.ConnectionString;
         if (string.IsNullOrWhiteSpace(conn)) return;   // no live DB available — treated as a skip
 
         // Scaffold a real project from the templates, exactly as `new project` + `add` would.
