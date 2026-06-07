@@ -9,10 +9,22 @@ public abstract class Expr { }
 
 public sealed class LiteralExpr : Expr { public string Kind { get; init; } = ""; public string Text { get; init; } = ""; }   // number/string/bool/null/typed
 public sealed class StarExpr : Expr { public List<string>? Qualifier { get; init; } }                                         // *  or  t.* (null for a bare *, never read; see ColumnRef)
-// Parts is informational only (never read by the comparer/emitter/validator — they work off captured
-// SourceText, not the Expr tree), so it is left null for an unqualified single-name ref to avoid a per-ref
-// List<string> + String[] on the hot expression path; it is populated only for a qualified t.a / s.t.a.
-public sealed class ColumnRef : Expr { public List<string>? Parts { get; init; } }                                            // a / t.a / s.t.a
+// Parts is informational only for the comparer/emitter (they work off captured SourceText, not the Expr
+// tree), so it is left null for an unqualified single-name ref to avoid a per-ref List<string> + String[]
+// on the hot expression path; it is populated only for a qualified t.a / s.t.a. The bare single-name case
+// instead stores the name in <see cref="Name"/> — a single already-interned string reference, no List — so
+// the semantic binder (issue #47) can resolve an unqualified column ref without re-parsing. Setting one
+// string field on an object that is allocated anyway adds no heap allocation (no List, no new string), so
+// the parser allocation budget is unaffected.
+public sealed class ColumnRef : Expr
+{
+    public List<string>? Parts { get; init; }      // qualified: t.a / s.t.a
+    public string? Name { get; init; }             // bare unqualified single name: a
+
+    /// <summary>The dotted name parts, however the ref was stored (qualified list or bare name); empty if neither.</summary>
+    public IReadOnlyList<string> NameParts =>
+        Parts ?? (Name is null ? (IReadOnlyList<string>)System.Array.Empty<string>() : new[] { Name });
+}
 public sealed class ParamExpr : Expr { public string Text { get; init; } = ""; }                                              // $1
 public sealed class UnaryExpr : Expr { public string Op { get; init; } = ""; public Expr Operand { get; init; } = null!; }
 public sealed class BinaryExpr : Expr { public string Op { get; init; } = ""; public Expr Left { get; init; } = null!; public Expr Right { get; init; } = null!; }
