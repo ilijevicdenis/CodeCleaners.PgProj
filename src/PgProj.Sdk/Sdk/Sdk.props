@@ -16,5 +16,25 @@
 
     <!-- So IDEs that key off these don't choke on an unfamiliar project type. -->
     <DefaultLanguageSourceExtension>.sql</DefaultLanguageSourceExtension>
+
+    <!--
+      Auto-include opt-out: set <EnableDefaultSqlItems>false</EnableDefaultSqlItems> in your
+      project to manage <Build Include="..." /> entries yourself (e.g. when you want only a subset
+      of .sql files, or when you need full control over item order).  Mirrors the
+      MSBuild.Sdk.SqlProj / .NET SDK DefaultItems escape hatch.
+    -->
+    <EnableDefaultSqlItems Condition="'$(EnableDefaultSqlItems)' == ''">true</EnableDefaultSqlItems>
   </PropertyGroup>
+
+  <!--
+    Default glob: auto-include every **.sql in the project tree when EnableDefaultSqlItems is
+    true.  Placed in Sdk.props (evaluated before the user's ItemGroups) so that if the user also
+    declares <Build Include="**/*.sql" /> the two entries share the same resolved item identities
+    and MSBuild silently deduplicates them — no file is parsed twice.  If the user includes a
+    more-specific glob or explicit file paths those items union correctly with this catch-all.
+    bin/** and obj/** are excluded to keep generated artefacts out of the model.
+  -->
+  <ItemGroup Condition="'$(EnableDefaultSqlItems)' == 'true'">
+    <Build Include="**/*.sql" Exclude="bin/**/*.sql;obj/**/*.sql" />
+  </ItemGroup>
 </Project>

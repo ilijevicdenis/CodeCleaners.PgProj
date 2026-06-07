@@ -88,8 +88,16 @@ public sealed record DatabaseProject
             .Where(v => !string.IsNullOrWhiteSpace(v))
             .Select(v => v!.Trim())
             .ToList();
-        if (includes.Count == 0)
+
+        // Apply the default "**/*.sql" glob when no explicit <Build Include> items are declared
+        // AND EnableDefaultSqlItems is not explicitly set to false.  This mirrors the Sdk.props
+        // default at the MSBuild level so the engine produces the same result when called directly
+        // (e.g. from tests or the CLI) as when MSBuild evaluates the project.
+        if (includes.Count == 0 &&
+            !Prop("EnableDefaultSqlItems", "true").Equals("false", StringComparison.OrdinalIgnoreCase))
+        {
             includes.Add("**/*.sql");
+        }
 
         var (preDeploy, postDeploy) = LoadDeployScripts(root, dir);
         var variables = LoadSqlCmdVariables(root);

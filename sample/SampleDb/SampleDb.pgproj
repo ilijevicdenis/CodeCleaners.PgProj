@@ -5,8 +5,7 @@
     <DefaultSchema>app</DefaultSchema>
     <TargetPostgresVersion>16</TargetPostgresVersion>
   </PropertyGroup>
-  <ItemGroup>
-    <Build Include="**/*.sql" />
-  </ItemGroup>
+  <!-- No <Build Include="**/*.sql" /> needed — the SDK auto-includes all *.sql files.
+       Set <EnableDefaultSqlItems>false</EnableDefaultSqlItems> to opt out. -->
   <Import Project="..\..\src\PgProj.Sdk\Sdk\Sdk.targets" />
 </Project>
