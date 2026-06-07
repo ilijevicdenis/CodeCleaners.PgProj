@@ -38,7 +38,7 @@ internal sealed class SchemaProjectObject(SchemaDefinition def, ObjectIdentityCo
     public override string Kind => "schema";
     public override string QualifiedName => def.Name;
     protected override ObjectIdentity ComputeIdentity() => Computer.Identify(def);
-    public override string Canonicalize() => Canonicalizer.NormalizeText(GenerateSql(PostgresVersionProfile.Latest));
+    public override string Canonicalize() => Computer.CanonicalFormOf(def);
     public override CanonicalHash Hash() => Computer.CanonicalHashOf(def);
     public override string GenerateSql(PostgresVersionProfile profile) => $"CREATE SCHEMA IF NOT EXISTS {SqlEmitter.Quote(def.Name)};";
 }
@@ -48,7 +48,11 @@ internal sealed class TableProjectObject(TableDefinition def, ObjectIdentityComp
     public override string Kind => "table";
     public override string QualifiedName => def.QualifiedName;
     protected override ObjectIdentity ComputeIdentity() => Computer.Identify(def);
-    public override string Canonicalize() => Canonicalizer.NormalizeBody(GenerateSql(PostgresVersionProfile.Latest));
+    // The canonical form is the structural fingerprint CanonicalHash hashes (columns w/ normalized types,
+    // keys, paren-folded CHECK/default expressions) — NOT re-normalized emitted SQL. This guarantees a
+    // ColumnDefinition's type/expression is canonicalized even if the value was constructed bypassing
+    // TypeNormalizer, and that Canonicalize() and Hash() can never diverge (issue #51, point 3).
+    public override string Canonicalize() => Computer.CanonicalFormOf(def);
     public override CanonicalHash Hash() => Computer.CanonicalHashOf(def);
     public override string GenerateSql(PostgresVersionProfile profile) => SqlEmitter.CreateTable(def);
 }
@@ -58,7 +62,7 @@ internal sealed class ViewProjectObject(ViewDefinition def, ObjectIdentityComput
     public override string Kind => "view";
     public override string QualifiedName => $"{def.Schema}.{def.Name}";
     protected override ObjectIdentity ComputeIdentity() => Computer.Identify(def);
-    public override string Canonicalize() => Canonicalizer.NormalizeBody(GenerateSql(PostgresVersionProfile.Latest));
+    public override string Canonicalize() => Computer.CanonicalFormOf(def);
     public override CanonicalHash Hash() => Computer.CanonicalHashOf(def);
     public override string GenerateSql(PostgresVersionProfile profile) => SqlEmitter.CreateOrReplaceView(def);
 }
@@ -68,7 +72,7 @@ internal sealed class IndexProjectObject(IndexDefinition def, ObjectIdentityComp
     public override string Kind => "index";
     public override string QualifiedName => $"{def.Schema}.{def.Name}";
     protected override ObjectIdentity ComputeIdentity() => Computer.Identify(def);
-    public override string Canonicalize() => Canonicalizer.NormalizeBody(GenerateSql(PostgresVersionProfile.Latest));
+    public override string Canonicalize() => Computer.CanonicalFormOf(def);
     public override CanonicalHash Hash() => Computer.CanonicalHashOf(def);
     public override string GenerateSql(PostgresVersionProfile profile) => SqlEmitter.CreateIndex(def);
 }
@@ -78,7 +82,7 @@ internal sealed class SequenceProjectObject(SequenceDefinition def, ObjectIdenti
     public override string Kind => "sequence";
     public override string QualifiedName => $"{def.Schema}.{def.Name}";
     protected override ObjectIdentity ComputeIdentity() => Computer.Identify(def);
-    public override string Canonicalize() => Canonicalizer.NormalizeBody(GenerateSql(PostgresVersionProfile.Latest));
+    public override string Canonicalize() => Computer.CanonicalFormOf(def);
     public override CanonicalHash Hash() => Computer.CanonicalHashOf(def);
     public override string GenerateSql(PostgresVersionProfile profile) => SqlEmitter.CreateSequence(def);
 }
@@ -88,7 +92,7 @@ internal sealed class FunctionProjectObject(FunctionDefinition def, ObjectIdenti
     public override string Kind => "function";
     public override string QualifiedName => $"{def.Schema}.{def.Name}";
     protected override ObjectIdentity ComputeIdentity() => Computer.Identify(def);
-    public override string Canonicalize() => Canonicalizer.NormalizeBody(GenerateSql(PostgresVersionProfile.Latest));
+    public override string Canonicalize() => Computer.CanonicalFormOf(def);
     public override CanonicalHash Hash() => Computer.CanonicalHashOf(def);
     public override string GenerateSql(PostgresVersionProfile profile) => SqlEmitter.Function(def);
 }
@@ -105,7 +109,7 @@ internal sealed class RawProjectObject(RawObjectDefinition def, ObjectIdentityCo
     public override string Kind => ProjectObjectKind.For(def.Kind).TypeToken;
     public override string QualifiedName => string.IsNullOrEmpty(def.Schema) ? def.Name : $"{def.Schema}.{def.Name}";
     protected override ObjectIdentity ComputeIdentity() => Computer.Identify(def);
-    public override string Canonicalize() => Canonicalizer.NormalizeRawBody(def.Body);
+    public override string Canonicalize() => Computer.CanonicalFormOf(def);
     public override CanonicalHash Hash() => Computer.CanonicalHashOf(def);
     public override string GenerateSql(PostgresVersionProfile profile) => def.Body;
 }

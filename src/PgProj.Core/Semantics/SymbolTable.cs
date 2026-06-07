@@ -69,6 +69,12 @@ public sealed class SymbolEntry
     /// type-safety reads). Null for other kinds or when the type is unknown.</summary>
     public string? ColumnType { get; }
 
+    /// <summary>For a <see cref="SymbolKind.Function"/>: its declared/normalized RETURNS type (e.g.
+    /// <c>trigger</c>, <c>integer</c>), when known. Null for other kinds, RETURNS TABLE, or when the
+    /// return type was not captured. Read by the semantic validator (#48) for trigger validity + return-type
+    /// type-safety; never asserted when null (conservative).</summary>
+    public string? ReturnType { get; }
+
     /// <summary>The source file this symbol was defined in, when available (project builds attribute it).</summary>
     public string? SourceFile { get; }
 
@@ -76,30 +82,30 @@ public sealed class SymbolEntry
     public bool IsExternal { get; }
 
     private SymbolEntry(ObjectId objectId, StableId stableId, SymbolKind kind, string schema, string name,
-        string fqn, FunctionSignature? signature, string? columnType, string? sourceFile, bool isExternal)
+        string fqn, FunctionSignature? signature, string? columnType, string? returnType, string? sourceFile, bool isExternal)
     {
         ObjectId = objectId; StableId = stableId; Kind = kind; Schema = schema; Name = name;
-        Fqn = fqn; Signature = signature; ColumnType = columnType; SourceFile = sourceFile; IsExternal = isExternal;
+        Fqn = fqn; Signature = signature; ColumnType = columnType; ReturnType = returnType; SourceFile = sourceFile; IsExternal = isExternal;
     }
 
     public static SymbolEntry ForSchema(string name, ObjectId id = default, StableId stableId = default, bool external = false) =>
-        new(id, stableId, SymbolKind.Schema, name, name, name, null, null, null, external);
+        new(id, stableId, SymbolKind.Schema, name, name, name, null, null, null, null, external);
 
     public static SymbolEntry ForRelation(string schema, string name, ObjectId id = default, StableId stableId = default,
         string? sourceFile = null, bool external = false) =>
-        new(id, stableId, SymbolKind.Relation, schema, name, $"{schema}.{name}", null, null, sourceFile, external);
+        new(id, stableId, SymbolKind.Relation, schema, name, $"{schema}.{name}", null, null, null, sourceFile, external);
 
     public static SymbolEntry ForColumn(string schema, string relation, string name, string? columnType,
         ObjectId id = default, string? sourceFile = null, bool external = false) =>
-        new(id, default, SymbolKind.Column, schema, name, $"{schema}.{relation}.{name}", null, columnType, sourceFile, external);
+        new(id, default, SymbolKind.Column, schema, name, $"{schema}.{relation}.{name}", null, columnType, null, sourceFile, external);
 
     public static SymbolEntry ForType(string schema, string name, ObjectId id = default, StableId stableId = default,
         string? sourceFile = null, bool external = false) =>
-        new(id, stableId, SymbolKind.Type, schema, name, $"{schema}.{name}", null, null, sourceFile, external);
+        new(id, stableId, SymbolKind.Type, schema, name, $"{schema}.{name}", null, null, null, sourceFile, external);
 
     public static SymbolEntry ForFunction(string schema, string name, FunctionSignature signature, ObjectId id = default,
-        StableId stableId = default, string? sourceFile = null, bool external = false) =>
-        new(id, stableId, SymbolKind.Function, schema, name, $"{schema}.{name}", signature, null, sourceFile, external);
+        StableId stableId = default, string? sourceFile = null, bool external = false, string? returnType = null) =>
+        new(id, stableId, SymbolKind.Function, schema, name, $"{schema}.{name}", signature, null, returnType, sourceFile, external);
 
     /// <summary>The dictionary key: FQN (case-insensitive) plus, for a function, its overload signature.</summary>
     public string Key => Signature is { } s ? $"{Fqn}({s.ArgTypes})".ToLowerInvariant() : Fqn.ToLowerInvariant();

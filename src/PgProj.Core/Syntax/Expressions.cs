@@ -9,10 +9,27 @@ public abstract class Expr { }
 
 public sealed class LiteralExpr : Expr { public string Kind { get; init; } = ""; public string Text { get; init; } = ""; }   // number/string/bool/null/typed
 public sealed class StarExpr : Expr { public List<string>? Qualifier { get; init; } }                                         // *  or  t.* (null for a bare *, never read; see ColumnRef)
-// Parts is informational only (never read by the comparer/emitter/validator — they work off captured
-// SourceText, not the Expr tree), so it is left null for an unqualified single-name ref to avoid a per-ref
-// List<string> + String[] on the hot expression path; it is populated only for a qualified t.a / s.t.a.
-public sealed class ColumnRef : Expr { public List<string>? Parts { get; init; } }                                            // a / t.a / s.t.a
+// ColumnRef is one of the most numerous AST nodes (every `a` / `t.a` in every expression), so it keeps a
+// SINGLE storage slot to avoid growing the per-ref footprint: `_ref` holds either a bare name (string) for
+// an unqualified `a`, or a List<string> for a qualified `t.a` / `s.t.a`. A bare ref allocates NO List (the
+// hot case) and adds NO extra field over the original single-field node; only a qualified ref allocates its
+// parts list. The semantic binder (issue #47) reads the name(s) via NameParts; the comparer/emitter never
+// read it (they work off captured SourceText).
+public sealed class ColumnRef : Expr   // a / t.a / s.t.a
+{
+    private readonly object? _ref;
+    public ColumnRef() { }
+    public ColumnRef(string name) => _ref = name;                 // bare unqualified single name
+    public ColumnRef(List<string> parts) => _ref = parts;         // qualified dotted parts
+
+    /// <summary>The dotted parts, however the ref was stored (bare name or qualified list); empty if neither.</summary>
+    public IReadOnlyList<string> NameParts => _ref switch
+    {
+        List<string> p => p,
+        string n => new[] { n },
+        _ => System.Array.Empty<string>(),
+    };
+}
 public sealed class ParamExpr : Expr { public string Text { get; init; } = ""; }                                              // $1
 public sealed class UnaryExpr : Expr { public string Op { get; init; } = ""; public Expr Operand { get; init; } = null!; }
 public sealed class BinaryExpr : Expr { public string Op { get; init; } = ""; public Expr Left { get; init; } = null!; public Expr Right { get; init; } = null!; }

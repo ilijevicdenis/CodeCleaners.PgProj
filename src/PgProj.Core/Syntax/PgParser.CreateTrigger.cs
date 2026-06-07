@@ -11,7 +11,7 @@ public sealed partial class PgParser
 {
     private SqlStatement ParseCreateTrigger(TokenCursor c, bool constraint)
     {
-        var node = new RawCreateStatement { ObjectKind = "TRIGGER" };
+        var node = new RawCreateStatement { ObjectKind = "TRIGGER", Position = c.Here };
 
         if (c.AtAnyWord("BEFORE", "AFTER", "INSTEAD")) throw new ParseException("missing trigger name", c.Here);
         node.Name = c.ExpectIdentifier();
@@ -34,7 +34,8 @@ public sealed partial class PgParser
         } while (c.MatchWord("OR"));
 
         c.ExpectWord("ON");
-        ParseQualifiedName(c);
+        var (onSchema, onTable) = ParseQualifiedName(c);
+        node.OnObject = onSchema is null ? onTable : $"{onSchema}.{onTable}";
 
         if (constraint)                                  // CONSTRAINT trigger: optional FROM table, deferrability
         {
@@ -70,7 +71,12 @@ public sealed partial class PgParser
 
         c.ExpectWord("EXECUTE");
         if (!c.MatchWord("FUNCTION")) c.ExpectWord("PROCEDURE");
-        ParseQualifiedName(c);
+        var (fnSchema, fnName) = ParseQualifiedName(c);
+        node.Trigger = new TriggerDetail
+        {
+            OnSchema = onSchema, OnTable = onTable,
+            FunctionSchema = fnSchema, FunctionName = fnName,
+        };
         if (!c.AtSymbol('(')) throw new ParseException("expected '(' for the trigger function arguments", c.Here);
         c.SkipBalancedParens();
 

@@ -328,12 +328,12 @@ public sealed partial class PgParser
     {
         if (c.AtSymbol('*')) { c.Advance(); return new StarExpr(); }
         var first = c.ExpectIdentifier();
-        // Common case — a single unqualified name. A bare column ref stores nothing (Parts is unused dead
-        // data, see ColumnRef), so we allocate no List at all; only a call needs its name as a list.
+        // Common case — a single unqualified name. The bare ref stores just the name in ColumnRef's single
+        // slot (no List), so we allocate no List at all; only a call needs its name as a list.
         if (!c.AtSymbol('.'))
-            return c.AtSymbol('(') ? ParseCallTail(c, new List<string> { first }) : new ColumnRef();
+            return c.AtSymbol('(') ? ParseCallTail(c, new List<string> { first }) : new ColumnRef(first);
         // Qualified name (t.a / s.t.a): accumulate the dotted parts once and hand the list to the node
-        // directly (init-setter), instead of AddRange-copying into a second list.
+        // directly, instead of AddRange-copying into a second list.
         var parts = new List<string> { first };
         while (c.MatchSymbol('.'))
         {
@@ -341,7 +341,7 @@ public sealed partial class PgParser
             parts.Add(c.ExpectIdentifier());
         }
         if (c.AtSymbol('(')) return ParseCallTail(c, parts);
-        return new ColumnRef { Parts = parts };
+        return new ColumnRef(parts);
     }
 
     private FuncCallExpr ParseCallTail(TokenCursor c, List<string> name)
