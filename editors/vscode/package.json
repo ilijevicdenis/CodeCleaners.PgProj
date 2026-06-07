@@ -22,7 +22,8 @@
   "main": "./dist/extension.js",
   "activationEvents": [
     "workspaceContains:**/*.pgproj",
-    "onView:pgproj.projects"
+    "onView:pgproj.projects",
+    "onCommand:pgproj.designTable"
   ],
   "contributes": {
     "configuration": {
@@ -123,6 +124,12 @@
         "icon": "$(add)"
       },
       {
+        "command": "pgproj.designTable",
+        "title": "Design Table",
+        "category": "PgProj",
+        "icon": "$(table)"
+      },
+      {
         "command": "pgproj.openProjectFile",
         "title": "Edit Project File",
         "category": "PgProj"
@@ -196,6 +203,20 @@
           "command": "pgproj.openProjectFile",
           "when": "view == pgproj.projects && viewItem == pgprojProject",
           "group": "9_open@1"
+        }
+      ],
+      "editor/context": [
+        {
+          "command": "pgproj.designTable",
+          "when": "resourceExtname == .sql",
+          "group": "pgproj@1"
+        }
+      ],
+      "explorer/context": [
+        {
+          "command": "pgproj.designTable",
+          "when": "resourceExtname == .sql",
+          "group": "pgproj@1"
         }
       ],
       "commandPalette": [

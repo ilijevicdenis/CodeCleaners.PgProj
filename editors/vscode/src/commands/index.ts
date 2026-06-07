@@ -17,12 +17,15 @@ import {
   templateRelativePath,
 } from "../templates";
 import { readDefaultSchemaFromXml, setTargetVersionInProjectXml } from "../projectFile";
+import { TableDesignerPanel } from "../designer/designerPanel";
 
 export interface CommandContext {
   engine: PgProjEngine;
   diagnostics: DiagnosticsController;
   tree: ProjectsTreeProvider;
   output: vscode.OutputChannel;
+  /** The extension context, for webview-owning commands (the table designer). */
+  extensionContext: vscode.ExtensionContext;
 }
 
 /** Resolve the project file path from a context-menu node, else prompt across discovered projects. */
@@ -253,6 +256,40 @@ export async function schemaCompareCommand(ctx: CommandContext, node?: TreeNode)
       `${report.changeCount} difference(s). Full Schema Compare UI is a follow-up (#19) — see output.`
     );
   });
+}
+
+// ---- Design table (EP-DESIGNER #26: graphical table designer webview) -----------------------------
+
+export async function designTableCommand(
+  ctx: CommandContext,
+  arg?: TreeNode | vscode.Uri
+): Promise<void> {
+  const sqlFile = await resolveTableSqlFile(arg);
+  if (!sqlFile) {
+    return;
+  }
+  await TableDesignerPanel.show(ctx.extensionContext, ctx.engine, ctx.output, sqlFile);
+}
+
+/** Resolve the .sql file to design: a passed Uri / the active editor / a tree node, else a quick pick. */
+async function resolveTableSqlFile(arg?: TreeNode | vscode.Uri): Promise<string | undefined> {
+  if (arg instanceof vscode.Uri && arg.fsPath.toLowerCase().endsWith(".sql")) {
+    return arg.fsPath;
+  }
+  const active = vscode.window.activeTextEditor?.document;
+  if (active && active.fileName.toLowerCase().endsWith(".sql")) {
+    return active.fileName;
+  }
+  const files = await vscode.workspace.findFiles("**/*.sql", "**/{node_modules,bin,obj}/**");
+  if (files.length === 0) {
+    void vscode.window.showWarningMessage("No .sql files found in this workspace.");
+    return undefined;
+  }
+  const pick = await vscode.window.showQuickPick(
+    files.map((f) => ({ label: path.basename(f.fsPath), description: f.fsPath, fsPath: f.fsPath })),
+    { placeHolder: "Select a table .sql file to design" }
+  );
+  return pick?.fsPath;
 }
 
 // ---- Add object ----------------------------------------------------------------------------------

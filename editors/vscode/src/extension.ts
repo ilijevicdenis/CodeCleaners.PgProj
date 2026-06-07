@@ -22,7 +22,7 @@ export function activate(context: vscode.ExtensionContext): void {
   const diagnostics = new DiagnosticsController();
   const tree = new ProjectsTreeProvider(engine, output);
 
-  const ctx: cmd.CommandContext = { engine, diagnostics, tree, output };
+  const ctx: cmd.CommandContext = { engine, diagnostics, tree, output, extensionContext: context };
 
   // Re-read the engine config (cliPath/dotnetPath) when the user changes it.
   context.subscriptions.push(
@@ -55,6 +55,11 @@ export function activate(context: vscode.ExtensionContext): void {
   register("pgproj.generateScript", (node) => cmd.generateScriptCommand(ctx, node));
   register("pgproj.schemaCompare", (node) => cmd.schemaCompareCommand(ctx, node));
   register("pgproj.addObject", (node) => cmd.addObjectCommand(ctx, node));
+  context.subscriptions.push(
+    vscode.commands.registerCommand("pgproj.designTable", (arg?: TreeNode | vscode.Uri) =>
+      cmd.designTableCommand(ctx, arg)
+    )
+  );
   register("pgproj.openProjectFile", (node) => cmd.openProjectFileCommand(ctx, node));
   register("pgproj.setTargetVersion", (node) => cmd.setTargetVersionCommand(ctx, node));
   register("pgproj.newProject", () => cmd.newProjectCommand(ctx));
