@@ -50,7 +50,7 @@ Legend: ✅ full · ◑ partial · ⬜ not yet · `raw` = handled by the generic
 | CREATE TEXT SEARCH PARSER/TEMPLATE | `raw` | `raw` | ⬜ | (#109) |
 | CREATE FOREIGN TABLE | `raw` | `raw` | ✅ | introspected (`ReadForeignTablesAsync`: columns/server/options) |
 | CREATE FOREIGN DATA WRAPPER / SERVER | `raw` | `raw` | ✅ | full DDL reconstruction (`ReadForeignDataWrappers/ServersAsync`) |
-| CREATE USER MAPPING | `raw` | `raw` | ⬜ | references a role but defines schema (#108) |
+| CREATE USER MAPPING | `raw` | `raw` | ✅ | parser fix + `ReadUserMappingsAsync` (FOR user SERVER server +OPTIONS) (#108) |
 | COMMENT ON … | `raw` | `raw` | ✅ | introspected across all object classes (`ReadCommentsAsync`) |
 
 ## Raw-object mechanism
@@ -70,6 +70,7 @@ Diff rule: missing on target → emit body; body changed → `DROP … IF EXISTS
 The introspection column is where the remaining work concentrates: project-side build/script/
 project-vs-project compare already cover everything; live-server compare/publish/extract already cover
 all ✅ rows. The remaining ⬜/◑ are tracked under **EP-COVERAGE (#72)** on milestone M7. **Done:** EXCLUDE
-constraints (#98), EVENT TRIGGER tags (#104), POLICY `TO` roles (#103). **Open:** PARTITION/INHERITS
-(#99), index opclass structured (#101), base types (#102), LANGUAGE/TRANSFORM/USER MAPPING (#108), TEXT
-SEARCH PARSER/TEMPLATE (#109), and the expression-statistics tail (#110). See also BUGS.md LIM-1xx.
+constraints (#98), EVENT TRIGGER tags (#104), POLICY `TO` roles (#103), USER MAPPING (#108). **Open:**
+PARTITION/INHERITS (#99), index opclass structured (#101), base types (#102), LANGUAGE/TRANSFORM (#108 tail
+— need C-backed objects), TEXT SEARCH PARSER/TEMPLATE (#109 — C-backed), expression-statistics tail (#110).
+See also BUGS.md LIM-1xx.
