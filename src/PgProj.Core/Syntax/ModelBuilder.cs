@@ -107,62 +107,73 @@ public sealed class ModelBuilder
     private static RawObjectDefinition? DeriveRaw(string sourceText)
     {
         if (string.IsNullOrWhiteSpace(sourceText)) return null;
-        var cur = new TokenCursor(Tokenizer.Tokenize(sourceText));
-
-        if (cur.AtWord("COMMENT"))
-        {
-            cur.MatchWord("COMMENT"); cur.MatchWord("ON");
-            int m = cur.Mark();
-            while (!cur.AtEnd && !cur.AtWord("IS")) cur.Advance();
-            return new RawObjectDefinition(ObjectKind.Comment, "", "", $"comment:{Normalize(cur.RenderRange(m, cur.Mark()))}", sourceText);
-        }
-        if (cur.AtWord("SECURITY"))
-            return new RawObjectDefinition(ObjectKind.Comment, "", "", $"securitylabel:{Normalize(sourceText)}", sourceText, BodyComparable: true);
-
-        if (!cur.MatchWord("CREATE")) return null;
-        cur.MatchWords("OR", "REPLACE");
-        while (cur.AtAnyWord("GLOBAL", "LOCAL", "TEMP", "TEMPORARY", "UNLOGGED", "TRUSTED", "PROCEDURAL", "RECURSIVE")) cur.Advance();
-
-        var kind = DetectRawKind(cur);
-        if (kind is null) return null;
-
-        string schema = "", name = "", onObject = "";
+        // Re-tokenize to an always-pooled buffer returned immediately. DeriveRaw only *reads* the stream
+        // through the cursor (RenderRange/ExpectIdentifier materialise their own strings — nothing retains
+        // the buffer), so the rented Token[] goes straight back to the pool (≈0 retained) instead of the old
+        // copied-out List<Token>+backing array. Tokens are unmerged (identical to the old Tokenizer.Tokenize
+        // path): a pure container swap. TokenizeTransient (not TokenizePooled) so small raw statements — the
+        // majority — still pool rather than allocating a one-shot heap array.
+        var pooled = Tokenizer.TokenizeTransient(sourceText);
         try
         {
-            switch (kind)
-            {
-                case ObjectKind.Type or ObjectKind.Domain or ObjectKind.Collation or ObjectKind.Conversion
-                    or ObjectKind.Statistics or ObjectKind.ForeignTable or ObjectKind.TextSearchConfiguration
-                    or ObjectKind.TextSearchDictionary or ObjectKind.TextSearchParser or ObjectKind.TextSearchTemplate:
-                    SkipIfNotExists(cur); (schema, name) = Qual(cur); break;
-                case ObjectKind.Extension or ObjectKind.Language or ObjectKind.Server
-                    or ObjectKind.ForeignDataWrapper or ObjectKind.EventTrigger or ObjectKind.Publication:
-                    SkipIfNotExists(cur); name = cur.ExpectIdentifier(); break;
-                case ObjectKind.Trigger or ObjectKind.Policy:
-                    name = cur.ExpectIdentifier(); onObject = ScanThenQual(cur, "ON"); schema = SchemaOf(onObject); break;
-                case ObjectKind.Rule:
-                    name = cur.ExpectIdentifier(); onObject = ScanThenQual(cur, "TO"); schema = SchemaOf(onObject); break;
-                case ObjectKind.Aggregate:
-                    { var (sc, an) = Qual(cur); schema = sc; name = $"{sc}.{an}" + ParenArgs(cur); break; }
-                case ObjectKind.Operator:
-                    name = CaptureUntilOpenParen(cur) + ParenArgs(cur); break;
-                case ObjectKind.OperatorClass or ObjectKind.OperatorFamily:
-                    { var (sc, ocn) = Qual(cur); var method = ScanThenIdent(cur, "USING"); schema = sc; name = $"{sc}.{ocn}" + (method.Length > 0 ? $" USING {method}" : ""); break; }
-                case ObjectKind.Cast:
-                    name = ParenArgs(cur); break;
-                case ObjectKind.Transform:
-                    cur.MatchWord("FOR"); var type = CaptureUntilWord(cur, "LANGUAGE"); var lang = cur.MatchWord("LANGUAGE") ? cur.ExpectIdentifier() : ""; name = $"FOR {type} LANGUAGE {lang}"; break;
-                case ObjectKind.UserMapping:
-                    SkipIfNotExists(cur); cur.MatchWord("FOR"); var usr = cur.ExpectIdentifier(); var srv = ScanThenIdent(cur, "SERVER"); name = $"FOR {usr} SERVER {srv}"; break;
-            }
-        }
-        catch (ParseException) { /* fall back to body-based identity */ }
+            var cur = new TokenCursor(pooled);
 
-        var identity = !string.IsNullOrEmpty(name)
-            ? BuildIdentity(kind.Value, schema, name, onObject)
-            : $"{kind}:{Normalize(sourceText)}".ToLowerInvariant();
-        return new RawObjectDefinition(kind.Value, schema, name, identity, sourceText,
-            string.IsNullOrEmpty(onObject) ? null : onObject);
+            if (cur.AtWord("COMMENT"))
+            {
+                cur.MatchWord("COMMENT"); cur.MatchWord("ON");
+                int m = cur.Mark();
+                while (!cur.AtEnd && !cur.AtWord("IS")) cur.Advance();
+                return new RawObjectDefinition(ObjectKind.Comment, "", "", $"comment:{Normalize(cur.RenderRange(m, cur.Mark()))}", sourceText);
+            }
+            if (cur.AtWord("SECURITY"))
+                return new RawObjectDefinition(ObjectKind.Comment, "", "", $"securitylabel:{Normalize(sourceText)}", sourceText, BodyComparable: true);
+
+            if (!cur.MatchWord("CREATE")) return null;
+            cur.MatchWords("OR", "REPLACE");
+            while (cur.AtAnyWord("GLOBAL", "LOCAL", "TEMP", "TEMPORARY", "UNLOGGED", "TRUSTED", "PROCEDURAL", "RECURSIVE")) cur.Advance();
+
+            var kind = DetectRawKind(cur);
+            if (kind is null) return null;
+
+            string schema = "", name = "", onObject = "";
+            try
+            {
+                switch (kind)
+                {
+                    case ObjectKind.Type or ObjectKind.Domain or ObjectKind.Collation or ObjectKind.Conversion
+                        or ObjectKind.Statistics or ObjectKind.ForeignTable or ObjectKind.TextSearchConfiguration
+                        or ObjectKind.TextSearchDictionary or ObjectKind.TextSearchParser or ObjectKind.TextSearchTemplate:
+                        SkipIfNotExists(cur); (schema, name) = Qual(cur); break;
+                    case ObjectKind.Extension or ObjectKind.Language or ObjectKind.Server
+                        or ObjectKind.ForeignDataWrapper or ObjectKind.EventTrigger or ObjectKind.Publication:
+                        SkipIfNotExists(cur); name = cur.ExpectIdentifier(); break;
+                    case ObjectKind.Trigger or ObjectKind.Policy:
+                        name = cur.ExpectIdentifier(); onObject = ScanThenQual(cur, "ON"); schema = SchemaOf(onObject); break;
+                    case ObjectKind.Rule:
+                        name = cur.ExpectIdentifier(); onObject = ScanThenQual(cur, "TO"); schema = SchemaOf(onObject); break;
+                    case ObjectKind.Aggregate:
+                        { var (sc, an) = Qual(cur); schema = sc; name = $"{sc}.{an}" + ParenArgs(cur); break; }
+                    case ObjectKind.Operator:
+                        name = CaptureUntilOpenParen(cur) + ParenArgs(cur); break;
+                    case ObjectKind.OperatorClass or ObjectKind.OperatorFamily:
+                        { var (sc, ocn) = Qual(cur); var method = ScanThenIdent(cur, "USING"); schema = sc; name = $"{sc}.{ocn}" + (method.Length > 0 ? $" USING {method}" : ""); break; }
+                    case ObjectKind.Cast:
+                        name = ParenArgs(cur); break;
+                    case ObjectKind.Transform:
+                        cur.MatchWord("FOR"); var type = CaptureUntilWord(cur, "LANGUAGE"); var lang = cur.MatchWord("LANGUAGE") ? cur.ExpectIdentifier() : ""; name = $"FOR {type} LANGUAGE {lang}"; break;
+                    case ObjectKind.UserMapping:
+                        SkipIfNotExists(cur); cur.MatchWord("FOR"); var usr = cur.ExpectIdentifier(); var srv = ScanThenIdent(cur, "SERVER"); name = $"FOR {usr} SERVER {srv}"; break;
+                }
+            }
+            catch (ParseException) { /* fall back to body-based identity */ }
+
+            var identity = !string.IsNullOrEmpty(name)
+                ? BuildIdentity(kind.Value, schema, name, onObject)
+                : $"{kind}:{Normalize(sourceText)}".ToLowerInvariant();
+            return new RawObjectDefinition(kind.Value, schema, name, identity, sourceText,
+                string.IsNullOrEmpty(onObject) ? null : onObject);
+        }
+        finally { pooled.Return(); }
     }
 
     private static ObjectKind? DetectRawKind(TokenCursor c)
@@ -210,10 +221,14 @@ public sealed class ModelBuilder
 
     private static string BuildIdentity(ObjectKind kind, string schema, string name, string onObject)
     {
-        var tag = kind.ToString().ToLowerInvariant();
+        // The whole result is lowercased once at the end, so `tag` is left mixed-case (its own
+        // ToLowerInvariant was redundant) and the intermediate `qualified` string is folded into the
+        // interpolation — one interpolation + one ToLowerInvariant per identity instead of up to three strings.
+        var tag = kind.ToString();
         if (!string.IsNullOrEmpty(onObject)) return $"{tag}:{name} on {onObject}".ToLowerInvariant();
-        var qualified = string.IsNullOrEmpty(schema) ? name : $"{schema}.{name}";
-        return $"{tag}:{qualified}".ToLowerInvariant();
+        return string.IsNullOrEmpty(schema)
+            ? $"{tag}:{name}".ToLowerInvariant()
+            : $"{tag}:{schema}.{name}".ToLowerInvariant();
     }
 
     private static (string, string) Qual(TokenCursor c)
@@ -268,7 +283,7 @@ public sealed class ModelBuilder
     {
         var sb = new StringBuilder(s.Length);
         bool prevSpace = false;
-        foreach (var ch in s.Trim())
+        foreach (var ch in s.AsSpan().Trim())   // span Trim: no intermediate trimmed-string allocation
         {
             if (char.IsWhiteSpace(ch)) { if (!prevSpace) sb.Append(' '); prevSpace = true; }
             else { sb.Append(char.ToLowerInvariant(ch)); prevSpace = false; }

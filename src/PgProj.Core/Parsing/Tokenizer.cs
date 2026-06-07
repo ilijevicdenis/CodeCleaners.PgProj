@@ -103,6 +103,19 @@ public sealed class Tokenizer
         return t.Run(pool: t._s.Length >= PoolThreshold);
     }
 
+    /// <summary>Tokenize to an <b>always-pooled</b> buffer the caller returns immediately — for the
+    /// transient, read-only re-tokenizations (DeriveRaw identity, CREATE TABLE tail validation) that scan
+    /// through a cursor and then drop the stream. Unlike <see cref="TokenizePooled"/> it does NOT fall back
+    /// to a heap array below <see cref="PoolThreshold"/>: these paths are dominated by small inputs, and for
+    /// them rent+return (≈0 retained) beats both a one-shot <c>new Token[]</c> and the old copied-out
+    /// <c>List&lt;Token&gt;</c>. The buffer must be returned (a <c>finally</c> at the call site) once the
+    /// cursor work is done — same drop-then-return contract as the main path.</summary>
+    public static PooledTokens TokenizeTransient(string sql)
+    {
+        var t = new Tokenizer(sql ?? string.Empty);
+        return t.Run(pool: true);
+    }
+
     private void Emit(Token t)
     {
         if (_n == _buf.Length)

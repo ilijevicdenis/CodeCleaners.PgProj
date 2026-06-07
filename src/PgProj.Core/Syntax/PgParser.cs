@@ -200,51 +200,59 @@ public sealed partial class PgParser
     private void ValidateTableTail(string? tail, string? persistence, int here)
     {
         if (string.IsNullOrWhiteSpace(tail)) return;
-        List<Token> toks;
-        try { toks = OperatorLexer.Merge(Tokenizer.Tokenize(tail)); } catch { return; }
-        var t = new TokenCursor(toks);
-        bool hasPartitionBy = false, hasInherits = false, hasOf = false;
-
-        void EmptyParensError(string what) { if (t.AtSymbol('(') && t.Peek()?.IsSymbol(')') == true) throw new ParseException($"{what} cannot be empty", here); }
-
-        while (!t.AtEnd)
+        // Re-tokenize the tail to an always-pooled buffer returned immediately (validation only reads it,
+        // never retains or renders it), instead of allocating a retained List<Token>. MergeInPlace compacts
+        // the pooled array — same merged stream as OperatorLexer.Merge over a List, no second backing array.
+        // TokenizeTransient (not TokenizePooled): table tails are short, so pool+return beats a one-shot array.
+        PooledTokens toks;
+        try { toks = OperatorLexer.MergeInPlace(Tokenizer.TokenizeTransient(tail)); } catch { return; }
+        try
         {
-            if (t.MatchWords("PARTITION", "OF")) { continue; }           // partition child — not a PARTITION BY
-            if (t.MatchWords("PARTITION", "BY"))
-            {
-                hasPartitionBy = true;
-                if (!t.AtAnyWord("RANGE", "LIST", "HASH")) throw new ParseException("PARTITION BY requires RANGE, LIST or HASH", here);
-                t.Advance();
-                EmptyParensError("partition key");
-                continue;
-            }
-            if (t.MatchWords("FOR", "VALUES"))
-            {
-                if (t.MatchWord("IN")) EmptyParensError("partition value list");
-                else if (t.MatchWord("FROM")) { EmptyParensError("FROM bound"); SkipBalanced(t); if (t.MatchWord("TO")) EmptyParensError("TO bound"); }
-                continue;
-            }
-            if (t.MatchWords("ON", "COMMIT"))
-            {
-                if (persistence != "TEMP") throw new ParseException("ON COMMIT can only be used on a temporary table", here);
-                if (!(t.MatchWord("DROP") || t.MatchWords("DELETE", "ROWS") || t.MatchWords("PRESERVE", "ROWS")))
-                    throw new ParseException("ON COMMIT must be DROP, DELETE ROWS or PRESERVE ROWS", here);
-                continue;
-            }
-            if (t.MatchWord("INHERITS")) { hasInherits = true; EmptyParensError("INHERITS parent list"); continue; }
-            if (t.AtWord("UNLOGGED") || t.AtWord("TEMP") || t.AtWord("TEMPORARY")) throw new ParseException($"{t.CurrentText!} must appear before TABLE, not after the definition", here);
-            if (t.MatchWord("OF")) { hasOf = true; continue; }
-            if (t.MatchWord("WITH") && t.AtSymbol('(')) { EmptyParensError("storage parameter list"); continue; }
-            if (t.MatchWord("fillfactor") && t.MatchOperator("=") && t.Current is { Kind: TokenKind.Number } n
-                && long.TryParse(n.Value, out var ff) && (ff < 10 || ff > 100))
-                throw new ParseException($"fillfactor must be between 10 and 100, got {ff}", here);
-            if (!t.AtEnd) t.Advance();
-        }
+            var t = new TokenCursor(toks);
+            bool hasPartitionBy = false, hasInherits = false, hasOf = false;
 
-        // cross-clause combinations PostgreSQL forbids
-        if (persistence == "UNLOGGED" && hasPartitionBy) throw new ParseException("partitioned tables cannot be UNLOGGED", here);
-        if (hasInherits && hasPartitionBy) throw new ParseException("cannot create a partitioned table that also INHERITS", here);
-        if (hasOf && hasInherits) throw new ParseException("a typed table (OF) cannot use INHERITS", here);
+            void EmptyParensError(string what) { if (t.AtSymbol('(') && t.Peek()?.IsSymbol(')') == true) throw new ParseException($"{what} cannot be empty", here); }
+
+            while (!t.AtEnd)
+            {
+                if (t.MatchWords("PARTITION", "OF")) { continue; }           // partition child — not a PARTITION BY
+                if (t.MatchWords("PARTITION", "BY"))
+                {
+                    hasPartitionBy = true;
+                    if (!t.AtAnyWord("RANGE", "LIST", "HASH")) throw new ParseException("PARTITION BY requires RANGE, LIST or HASH", here);
+                    t.Advance();
+                    EmptyParensError("partition key");
+                    continue;
+                }
+                if (t.MatchWords("FOR", "VALUES"))
+                {
+                    if (t.MatchWord("IN")) EmptyParensError("partition value list");
+                    else if (t.MatchWord("FROM")) { EmptyParensError("FROM bound"); SkipBalanced(t); if (t.MatchWord("TO")) EmptyParensError("TO bound"); }
+                    continue;
+                }
+                if (t.MatchWords("ON", "COMMIT"))
+                {
+                    if (persistence != "TEMP") throw new ParseException("ON COMMIT can only be used on a temporary table", here);
+                    if (!(t.MatchWord("DROP") || t.MatchWords("DELETE", "ROWS") || t.MatchWords("PRESERVE", "ROWS")))
+                        throw new ParseException("ON COMMIT must be DROP, DELETE ROWS or PRESERVE ROWS", here);
+                    continue;
+                }
+                if (t.MatchWord("INHERITS")) { hasInherits = true; EmptyParensError("INHERITS parent list"); continue; }
+                if (t.AtWord("UNLOGGED") || t.AtWord("TEMP") || t.AtWord("TEMPORARY")) throw new ParseException($"{t.CurrentText!} must appear before TABLE, not after the definition", here);
+                if (t.MatchWord("OF")) { hasOf = true; continue; }
+                if (t.MatchWord("WITH") && t.AtSymbol('(')) { EmptyParensError("storage parameter list"); continue; }
+                if (t.MatchWord("fillfactor") && t.MatchOperator("=") && t.Current is { Kind: TokenKind.Number } n
+                    && long.TryParse(n.Value, out var ff) && (ff < 10 || ff > 100))
+                    throw new ParseException($"fillfactor must be between 10 and 100, got {ff}", here);
+                if (!t.AtEnd) t.Advance();
+            }
+
+            // cross-clause combinations PostgreSQL forbids
+            if (persistence == "UNLOGGED" && hasPartitionBy) throw new ParseException("partitioned tables cannot be UNLOGGED", here);
+            if (hasInherits && hasPartitionBy) throw new ParseException("cannot create a partitioned table that also INHERITS", here);
+            if (hasOf && hasInherits) throw new ParseException("a typed table (OF) cannot use INHERITS", here);
+        }
+        finally { toks.Return(); }
     }
 
     private static void SkipBalanced(TokenCursor t)
