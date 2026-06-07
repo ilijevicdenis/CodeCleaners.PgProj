@@ -41,12 +41,24 @@ public sealed record TableDefinition
     public required string Name { get; init; }
     public List<ColumnDefinition> Columns { get; init; } = new();
     public PrimaryKeyDefinition? PrimaryKey { get; set; }
-    public List<UniqueConstraintDefinition> Unique { get; init; } = new();
-    public List<ForeignKeyDefinition> ForeignKeys { get; init; } = new();
-    public List<CheckConstraintDefinition> Checks { get; init; } = new();
+
+    // Most tables carry NO unique/FK/check/other-constraint rows, yet eagerly allocating an (empty) List
+    // for each was ~28% of the Table-bucket model-build allocation (issue #8). These four are lazily
+    // materialised on first touch: a read or an Add allocates the backing List once and caches it; every
+    // later access returns the same instance. Fully transparent — no caller invariant, no shared/poolable
+    // buffer, no release contract — so a constraint-free table allocates none of them. (Columns stays eager:
+    // every table has columns.) TableDefinition is never used as a dictionary key / in record equality, so
+    // the lazy getters' allocate-on-access never fires from a synthesized Equals/GetHashCode.
+    private List<UniqueConstraintDefinition>? _unique;
+    public List<UniqueConstraintDefinition> Unique { get => _unique ??= new(); init => _unique = value; }
+    private List<ForeignKeyDefinition>? _foreignKeys;
+    public List<ForeignKeyDefinition> ForeignKeys { get => _foreignKeys ??= new(); init => _foreignKeys = value; }
+    private List<CheckConstraintDefinition>? _checks;
+    public List<CheckConstraintDefinition> Checks { get => _checks ??= new(); init => _checks = value; }
 
     /// <summary>Constraint clauses captured verbatim (EXCLUDE and anything not finely modelled).</summary>
-    public List<string> OtherConstraints { get; init; } = new();
+    private List<string>? _otherConstraints;
+    public List<string> OtherConstraints { get => _otherConstraints ??= new(); init => _otherConstraints = value; }
 
     /// <summary>Clauses after the column list, captured verbatim: INHERITS / PARTITION BY / WITH / ON COMMIT.</summary>
     public string? TrailingOptions { get; set; }
