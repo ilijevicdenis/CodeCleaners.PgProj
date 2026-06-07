@@ -1,6 +1,10 @@
 import { describe, it, expect } from "vitest";
 import { renderTemplate, templateRelativePath } from "../../src/templates";
-import { setTargetVersionInProjectXml, readDefaultSchemaFromXml } from "../../src/projectFile";
+import {
+  setTargetVersionInProjectXml,
+  readDefaultSchemaFromXml,
+  readTargetVersionFromXml,
+} from "../../src/projectFile";
 
 describe("object templates", () => {
   it("renders a CREATE TABLE with the schema-qualified name", () => {
@@ -51,5 +55,10 @@ describe("project-file editing", () => {
   it("reads the default schema", () => {
     expect(readDefaultSchemaFromXml(xml)).toBe("afd");
     expect(readDefaultSchemaFromXml("<Project></Project>")).toBe("public");
+  });
+
+  it("reads the target version (undefined when not pinned)", () => {
+    expect(readTargetVersionFromXml(xml)).toBe("18");
+    expect(readTargetVersionFromXml("<Project></Project>")).toBeUndefined();
   });
 });

@@ -15,6 +15,7 @@ import {
   ModelTreeDto,
   PublishPlanDto,
 } from "./contract";
+import { SchemaCompareReportDto } from "./schemaCompare";
 
 export interface EngineConfig {
   /** Path to the pgproj CLI (or a .dll). */
@@ -142,6 +143,22 @@ export class PgProjEngine {
     return data;
   }
 
+  /**
+   * Two-way Schema Compare (EP-SCHEMACOMPARE): each endpoint is a project/.pgpkg/.schema.snapshot/live
+   * DB. Emits the structured, selectable `SchemaCompareReportDto`. `--format json` mirrors the report to
+   * stdout (we parse that); `-o <path>` additionally writes it to a file for tooling — passed when given.
+   */
+  async compareTwoWay(
+    source: string,
+    target: string,
+    cwd: string,
+    opts: CompareTwoWayOptions = {}
+  ): Promise<SchemaCompareReportDto> {
+    const args = buildCompareTwoWayArgs(source, target, opts);
+    const { data } = await this.runJson<SchemaCompareReportDto>(args, cwd);
+    return data;
+  }
+
   async publishDryRun(
     projectFile: string,
     connection: string,
@@ -165,11 +182,44 @@ export class PgProjEngine {
   }
 }
 
+export interface CompareTwoWayOptions {
+  /** Drop objects present in target but not source (the `--allow-drops` flag). */
+  allowDrops?: boolean;
+  /** Object-types to exclude from the diff (repeatable `--exclude`). */
+  exclude?: string[];
+  /** Also write the diff JSON to this path (`-o`), in addition to mirroring it to stdout. */
+  outFile?: string;
+}
+
+/**
+ * Pure arg-builder for the two-way compare (shared by the engine + a unit test). Does NOT append
+ * `--format json` — `runJson` adds that — but it does set `--source`/`--target` and pass-through options.
+ */
+export function buildCompareTwoWayArgs(
+  source: string,
+  target: string,
+  opts: CompareTwoWayOptions
+): string[] {
+  const args = ["compare", "--source", source, "--target", target];
+  if (opts.allowDrops) {
+    args.push("--allow-drops");
+  }
+  for (const ex of opts.exclude ?? []) {
+    args.push("--exclude", ex);
+  }
+  if (opts.outFile) {
+    args.push("-o", opts.outFile);
+  }
+  return args;
+}
+
 export interface PublishOptions {
   allowDrops?: boolean;
   noTransaction?: boolean;
   /** SQLCMD-style variables, "name=value". Passed through as `--var name=value` entries. */
   variables?: string[];
+  /** Optional `.pgpublish.json` to layer under the CLI flags (`--profile`). */
+  profile?: string;
 }
 
 /** Pure arg-builder for publish, shared by dry-run and live publish — kept testable. */
@@ -179,6 +229,9 @@ export function buildPublishArgs(
   opts: PublishOptions
 ): string[] {
   const args = ["publish", projectFile, "--connection", connection];
+  if (opts.profile) {
+    args.push("--profile", opts.profile);
+  }
   if (opts.allowDrops) {
     args.push("--allow-drops");
   }

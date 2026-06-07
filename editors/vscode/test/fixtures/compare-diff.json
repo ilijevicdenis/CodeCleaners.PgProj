@@ -1,0 +1,43 @@
+{
+  "schemaVersion": "1.0",
+  "verb": "compare",
+  "source": { "kind": "project", "displayName": "AllFeaturesDb", "buildDiagnostics": [] },
+  "target": { "kind": "liveDatabase", "displayName": "(database)", "buildDiagnostics": [] },
+  "inSync": false,
+  "changeCount": 3,
+  "includedCount": 3,
+  "destructiveCount": 1,
+  "objectTypes": ["table", "index"],
+  "changes": [
+    {
+      "id": "c1",
+      "kind": "CreateTableChange",
+      "objectType": "table",
+      "description": "Create table afd.customers",
+      "included": true,
+      "destructive": false,
+      "phase": 2,
+      "sql": "CREATE TABLE afd.customers (id bigint);"
+    },
+    {
+      "id": "c2",
+      "kind": "CreateIndexChange",
+      "objectType": "index",
+      "description": "Create index afd.customers_email_idx",
+      "included": true,
+      "destructive": false,
+      "phase": 3,
+      "sql": "CREATE INDEX customers_email_idx ON afd.customers (email);"
+    },
+    {
+      "id": "c3",
+      "kind": "DropTableChange",
+      "objectType": "table",
+      "description": "Drop table afd.legacy",
+      "included": true,
+      "destructive": true,
+      "phase": 1,
+      "sql": "DROP TABLE afd.legacy;"
+    }
+  ]
+}
