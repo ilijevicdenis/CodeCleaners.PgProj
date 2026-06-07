@@ -84,9 +84,11 @@ public static class ReferenceValidator
                     _ => Wrap(stmt),
                 };
 
-                var found = new SemanticAnalyzer(projectCatalog, noPreExisting).Analyze(analyzable);
+                // Run through the unified diagnostic so each finding carries file/line/col (issue #49);
+                // ReferenceValidationDiagnostic is the stable build-output shape, derived from it.
+                var found = new SemanticAnalyzer(projectCatalog, noPreExisting).AnalyzeUnified(analyzable, rel, line, col);
                 foreach (var d in found)
-                    diagnostics.Add(new ReferenceValidationDiagnostic(rel, line, col, d.Message));
+                    diagnostics.Add(new ReferenceValidationDiagnostic(d.File ?? rel, d.Line, d.Column, d.Message));
             }
         }
 
