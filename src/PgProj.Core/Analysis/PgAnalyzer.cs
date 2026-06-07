@@ -35,7 +35,9 @@ public sealed class PgAnalyzer
         new RuleInfo("PG003", DiagnosticSeverity.Warning, "UPDATE/DELETE without a WHERE clause"),
         new RuleInfo("PG004", DiagnosticSeverity.Warning, "Schema mutation inside a function body"),
         new RuleInfo("PG005", DiagnosticSeverity.Info,    "Function without a declared volatility"),
+        new RuleInfo("PG006", DiagnosticSeverity.Info,    "Table without a primary key"),
         new RuleInfo("PG007", DiagnosticSeverity.Info,    "SELECT * in a view body"),
+        new RuleInfo("PG008", DiagnosticSeverity.Info,    "numeric/decimal column without precision/scale"),
         new RuleInfo("PG009", DiagnosticSeverity.Info,    "LIMIT without ORDER BY"),
     };
 
@@ -71,6 +73,7 @@ public sealed class PgAnalyzer
             switch (stmt)
             {
                 case CreateFunctionStatement f: AnalyzeFunction(f, diags); break;
+                case CreateTableStatement t: AnalyzeTable(t, diags); break;
                 case CreateViewStatement v: CheckSelectStar(v, diags); break;
                 case QueryStatement q: CheckLimit(q.Query, $"{q.Query.From?.Relations.Count}", diags); break;
                 case UpdateStatement u when u.Where is null && u.WhereCurrentOf is null:
@@ -101,6 +104,36 @@ public sealed class PgAnalyzer
         if (Regex.IsMatch(body, @"\b(create|alter|drop)\s+(table|view|index|sequence|schema|type|function|materialized)\b"))
             Emit(diags, "PG004", "Schema mutation (CREATE/ALTER/DROP) inside a function body.", sig);
     }
+
+    // numeric/decimal with no precision/scale (optionally an array), case-insensitive: "numeric", "decimal",
+    // "numeric []" — but NOT "numeric(10,2)". Such a column stores arbitrary precision, almost always a mistake.
+    private static readonly Regex BareNumeric = new(@"^(numeric|decimal)\s*(\[\s*\])?$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+
+    private void AnalyzeTable(CreateTableStatement t, List<Diagnostic> diags)
+    {
+        var target = Q(t.Schema, t.Name);
+
+        // PG006 — a real table with no PRIMARY KEY. Skip the forms whose key comes from elsewhere: PARTITION
+        // OF / OF type (no column list of their own) and LIKE-element tables (the source may add the PK).
+        if (!t.IsPartitionOrTyped && !t.HasLikeElement && !HasPrimaryKey(t))
+            Emit(diags, "PG006",
+                "Table has no PRIMARY KEY — rows can't be uniquely identified (affects updates, logical replication, and tooling).",
+                target);
+
+        // PG008 — numeric/decimal columns without an explicit precision/scale.
+        foreach (var c in t.Columns)
+        {
+            var type = (c.Type.Text ?? "").Trim();
+            if (BareNumeric.IsMatch(type))
+                Emit(diags, "PG008",
+                    $"Column \"{c.Name}\" is {type} without precision/scale — specify numeric(p, s) (or a fixed-width type).",
+                    target);
+        }
+    }
+
+    private static bool HasPrimaryKey(CreateTableStatement t) =>
+        t.Constraints.Exists(k => k is PrimaryKeyConstraint)
+        || t.Columns.Exists(c => c.Constraints.Exists(k => k is InlinePrimaryKey));
 
     private void CheckSelectStar(CreateViewStatement v, List<Diagnostic> diags)
     {

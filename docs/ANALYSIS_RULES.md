@@ -12,7 +12,9 @@
 | PG003 | Warning | `UPDATE`/`DELETE` without a `WHERE` clause |
 | PG004 | Warning | Schema mutation (`CREATE`/`ALTER`/`DROP`) inside a function body |
 | PG005 | Info | Function without a declared volatility |
+| PG006 | Info | Table without a `PRIMARY KEY` (skips `PARTITION OF`/typed/`LIKE` tables) |
 | PG007 | Info | `SELECT *` in a view body |
+| PG008 | Info | `numeric`/`decimal` column without precision/scale |
 | PG009 | Info | `LIMIT` without `ORDER BY` |
 | PGV### | Error | Syntax newer than the project's `TargetPostgresVersion` (version gating, EP-TARGET) |
 
