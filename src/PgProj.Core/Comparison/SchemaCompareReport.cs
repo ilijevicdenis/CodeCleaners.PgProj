@@ -154,6 +154,7 @@ public static class SchemaCompareReport
         Cli.EndpointKind.Project => "project",
         Cli.EndpointKind.Package => "package",
         Cli.EndpointKind.LiveDatabase => "liveDatabase",
+        Cli.EndpointKind.Snapshot => "snapshot",
         _ => "unknown",
     };
 }

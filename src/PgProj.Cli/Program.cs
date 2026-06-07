@@ -14,6 +14,7 @@ using PgProj.Core.Model;
 using PgProj.Core.Packaging;
 using PgProj.Core.Project;
 using PgProj.Core.Project.References;
+using PgProj.Core.Snapshot;
 using PgProj.Core.Templates;
 
 namespace PgProj.Cli;
@@ -40,6 +41,7 @@ public static class Program
                 "publish" => await Publish(args),
                 "validate" => await Validate(args),
                 "extract" => await Extract(args),
+                "snapshot" => await Snapshot(args),
                 "drift" => await Drift(args),
                 "pull" => await Pull(args),
                 "analyze" => Analyze(args),
@@ -171,26 +173,39 @@ public static class Program
     {
         var cli = new CliArgs(args);
 
-        // Two-way form (--source X --target Y): each endpoint ∈ {project, .pgpkg, live DB}, resolved through
-        // the shared EndpointResolver so the full {project,pkg,live}² matrix is one code path. When --source/
-        // --target are absent we fall back to the legacy form below for back-compat.
+        // Two-way form (--source X --target Y): each endpoint ∈ {project, .pgpkg, .schema.snapshot, live DB},
+        // resolved through the shared EndpointResolver so the full {project,pkg,snapshot,live}² matrix is one
+        // code path. When --source/--target are absent we fall back to the legacy form below for back-compat.
         if (cli.GetOption("--source") is { } sourceSpec)
-            return await CompareTwoWay(cli, sourceSpec);
+        {
+            var targetSpec = cli.GetOption("--target")
+                ?? throw new CliUsageException("compare --source <X> requires --target <Y> (a .pgproj, .pgpkg, .schema.snapshot, or connection string).");
+            return await CompareTwoWay(cli, sourceSpec, targetSpec);
+        }
+
+        // Positional two-way form: `compare <source> <target>` where the target positional is itself an
+        // endpoint (e.g. `compare app.pgproj db.schema.snapshot`). This is the offline-compare invocation in
+        // the snapshot acceptance criteria — routed through the same matrix path as --source/--target.
+        if (cli.Positional(0) is { } pos0 && cli.Positional(1) is { } pos1)
+            return await CompareTwoWay(cli, pos0, pos1);
 
         return await CompareLegacy(args);
     }
 
-    /// <summary>The two-way Schema Compare: source &amp; target each a project/package/live DB.</summary>
-    private static async Task<int> CompareTwoWay(CliArgs cli, string sourceSpec)
+    /// <summary>The two-way Schema Compare: source &amp; target each a project/package/snapshot/live DB.</summary>
+    private static async Task<int> CompareTwoWay(CliArgs cli, string sourceSpec, string targetSpec)
     {
-        var targetSpec = cli.GetOption("--target")
-            ?? throw new CliUsageException("compare --source <X> requires --target <Y> (a .pgproj, .pgpkg, or connection string).");
-
         var options = new ComparerOptions { DropObjectsNotInSource = cli.HasFlag("--allow-drops") };
         var excludes = ParseExcludeObjectTypes(cli);
 
         var result = await SchemaCompare.RunAsync(sourceSpec, targetSpec, options, excludes);
         var changeSet = result.ChangeSet;
+
+        // Staleness: a snapshot endpoint compared offline is flagged when its captured source PG version
+        // (or its format version) mismatches what the other side expects — surfaced to stderr as a warning
+        // (a signal, not a failure: the compare still ran against the snapshot's model).
+        WarnIfSnapshotStale(result.Source, result.Target);
+        WarnIfSnapshotStale(result.Target, result.Source);
 
         // --output diff.json: write the structured, selectable diff for a UI to render (always JSON, regardless
         // of --format, since the consumer is a tool). --format json mirrors it to stdout for piping.
@@ -284,6 +299,31 @@ public static class Program
         foreach (var d in result.Source.BuildDiagnostics) Console.Error.WriteLine($"  source build: {d}");
         foreach (var d in result.Target.BuildDiagnostics) Console.Error.WriteLine($"  target build: {d}");
     }
+
+    /// <summary>
+    /// If <paramref name="endpoint"/> is a snapshot, checks it for staleness against the version
+    /// <paramref name="other"/> expects (a project's TargetPostgresVersion; otherwise just the format check)
+    /// and prints any reasons to stderr. Staleness is a signal, not a failure — the compare still ran.
+    /// </summary>
+    private static void WarnIfSnapshotStale(PgProj.Core.Cli.ResolvedEndpoint endpoint, PgProj.Core.Cli.ResolvedEndpoint other)
+    {
+        if (endpoint.Kind != PgProj.Core.Cli.EndpointKind.Snapshot || endpoint.SnapshotManifest is not { } manifest)
+            return;
+
+        var staleness = new SchemaSnapshot { Manifest = manifest, Model = endpoint.Model }
+            .CheckStaleness(ExpectedMajorOf(other));
+        if (!staleness.IsStale) return;
+
+        Console.Error.WriteLine($"warning: snapshot '{endpoint.DisplayName}' may be stale:");
+        foreach (var reason in staleness.Reasons) Console.Error.WriteLine($"  - {reason}");
+    }
+
+    /// <summary>The PostgreSQL major version an endpoint asserts: a project's TargetPostgresVersion (when set),
+    /// else null (no version expectation to check the snapshot against).</summary>
+    private static int? ExpectedMajorOf(PgProj.Core.Cli.ResolvedEndpoint endpoint) =>
+        endpoint.Project is { } p
+            ? PgProj.Core.Analysis.TargetVersionAnalyzer.ParseMajorVersion(p.TargetPostgresVersion)
+            : null;
 
     // ---- publish ------------------------------------------------------------------------
 
@@ -425,6 +465,36 @@ public static class Program
 
         Console.WriteLine($"Extracted {files.Count} object file(s) to {Path.GetFullPath(outDir)}");
         PrintModelSummary(model);
+        return 0;
+    }
+
+    // ---- snapshot (capture a live DB's canonical model to a portable .schema.snapshot) ---
+
+    /// <summary>
+    /// Introspects a live database ONCE and persists its canonical model to a <c>.schema.snapshot</c> so a
+    /// later <c>compare</c> can run against the database's schema offline — no re-introspection, no DB
+    /// connection on the compare step. The manifest stamps the source PostgreSQL version (basis for
+    /// staleness), so a snapshot captured against the wrong server version is flagged when it is compared.
+    /// </summary>
+    private static async Task<int> Snapshot(string[] args)
+    {
+        var conn = RequireConnection(args);
+        var outPath = GetOption(args, "-o", "--output")
+                      ?? throw new CliUsageException("snapshot requires -o <file.schema.snapshot> (the output path).");
+        if (!SchemaSnapshot.IsSnapshotPath(outPath))
+            Console.Error.WriteLine($"warning: '{Path.GetFileName(outPath)}' does not end in {SchemaSnapshot.Extension} " +
+                                    "— it will not be recognised as a snapshot by compare.");
+
+        var snapshot = await new SchemaSnapshotReader().CaptureAsync(conn, ToolVersion, UtcStamp());
+        var dir = Path.GetDirectoryName(Path.GetFullPath(outPath));
+        if (!string.IsNullOrEmpty(dir)) Directory.CreateDirectory(dir);
+        snapshot.Write(outPath);
+
+        var m = snapshot.Manifest;
+        Console.WriteLine($"Snapshot written to {outPath}");
+        Console.WriteLine($"  source PostgreSQL {m.SourcePgMajorVersion} ({m.SourcePgVersion})");
+        Console.WriteLine($"  formatVersion {m.FormatVersion}  created {m.CreatedUtc}  checksum {m.ModelChecksum}");
+        PrintModelSummary(snapshot.Model);
         return 0;
     }
 
@@ -982,13 +1052,14 @@ public static class Program
           pgproj script  <project.pgproj|.pgpkg> [-o create.sql] [--no-transaction] [--var N=V] [--profile <file>]
           pgproj compare <project.pgproj|.pgpkg> --connection <conn> [--allow-drops] [--profile <file>]                 (one-way: project/package → live DB)
           pgproj compare --source <X> --target <Y> [-o diff.json] [--format json] [--exclude <type,...>] [--allow-drops] [--fail-on-changes]
-                         (two-way Schema Compare; X and Y each a .pgproj, .pgpkg, or connection string)
+                         (two-way Schema Compare; X and Y each a .pgproj, .pgpkg, .schema.snapshot, or connection string)
           pgproj publish <project.pgproj|.pgpkg> --connection <conn> [--dry-run] [-o script.sql] [--allow-drops] [--no-transaction] [--parallel] [--strict] [--no-analyze] [--var N=V] [--substitute-objects] [--profile <file>]
           pgproj validate <project.pgproj|.pgpkg> --connection <conn> [--strict] [--no-analyze]   (apply to a throwaway temp DB, rolled back)
           pgproj pkg inspect <file.pgpkg>                                              (dump the manifest + object inventory)
           pgproj profile create <out.pgpublish.json> [--target-version 18] [--connection-name <label>] [--var N=V] [--allow-drops] [--no-transaction]
                          (write a reusable publish profile from the current flags; the connection string is never stored)
           pgproj extract --connection <conn> -o <outDir>
+          pgproj snapshot --connection <conn> -o <db.schema.snapshot>                    (introspect a live DB once → a portable schema.snapshot for offline compare)
           pgproj drift   <project.pgproj> --connection <conn> [--fail-on-drift]         (preview project files that differ from the DB; --fail-on-drift exits 6 on drift)
           pgproj pull    <project.pgproj> --connection <conn> [--dry-run] [--allow-deletes]   (rewrite project files FROM the DB — scenario 3)
           pgproj analyze <project.pgproj> [--strict]    (static safety analysis over the AST)
