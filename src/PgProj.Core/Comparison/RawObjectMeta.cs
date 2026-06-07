@@ -62,6 +62,10 @@ public static class RawObjectMeta
     ///   re-ordered statement set for the same end state.</item>
     /// <item><c>TextSearchDictionary</c> — option spelling/ordering (<c>dictinitoption</c> rendering).</item>
     /// <item><c>ForeignDataWrapper</c>/<c>Server</c> — handler/validator and OPTIONS(...) formatting.</item>
+    /// <item><c>Statistics</c> — source <c>(ndistinct, dependencies, mcv) ON a, b FROM t</c> vs the reader's
+    ///   canonical kind/column ordering and <c>regclass</c>-rendered table; semantically equal, never textual.</item>
+    /// <item><c>Aggregate</c> — source option spelling/spacing/order (<c>SFUNC=</c>, <c>INITCOND</c>) vs the
+    ///   reader's canonical <c>CREATE AGGREGATE</c> rendering; identity (schema.name(args)) is the stable key.</item>
     /// </list>
     /// Identity already encodes the object's stable name, so an identity match means "the same object
     /// exists on both sides"; a genuine rename/drop is still caught (different identity → create/drop).
@@ -72,7 +76,9 @@ public static class RawObjectMeta
             or ObjectKind.TextSearchDictionary
             or ObjectKind.TextSearchConfiguration
             or ObjectKind.ForeignDataWrapper
-            or ObjectKind.Server => true,
+            or ObjectKind.Server
+            or ObjectKind.Statistics
+            or ObjectKind.Aggregate => true,
         _ => false,
     };
 

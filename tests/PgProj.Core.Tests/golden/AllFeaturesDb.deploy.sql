@@ -273,7 +273,7 @@ BEGIN
 END;
 $$;
 
--- Create aggregate afd.afd.sum_int(integer)
+-- Create aggregate afd.sum_int(integer)
 CREATE AGGREGATE afd.sum_int(integer)(SFUNC=int4pl,STYPE=integer,INITCOND='0');
 
 -- Create cast (afd.mood AS integer)

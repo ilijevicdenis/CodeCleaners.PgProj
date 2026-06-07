@@ -771,9 +771,9 @@
   "Objects": [
     {
       "Kind": 10,
-      "Schema": "afd",
+      "Schema": "",
       "Name": "afd.sum_int(integer)",
-      "Identity": "aggregate:afd.afd.sum_int(integer)",
+      "Identity": "aggregate:afd.sum_int(integer)",
       "Body": "CREATE AGGREGATE afd.sum_int(integer)(SFUNC=int4pl,STYPE=integer,INITCOND=\u00270\u0027)",
       "BodyComparable": true
     },

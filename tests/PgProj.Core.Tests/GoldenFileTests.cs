@@ -78,7 +78,12 @@ public sealed class GoldenFileTests
     /// Normalises line endings to LF so comparisons are platform-portable and the golden files can
     /// be committed with Unix line endings without breaking on Windows (and vice-versa).
     /// </summary>
-    private static string Normalise(string s) => s.Replace("\r\n", "\n").Replace("\r", "\n");
+    private static string Normalise(string s) =>
+        // Fold both physical line endings AND the JSON-escaped ones embedded in serialized string values
+        // (e.g. a function body checked out with CRLF serializes to "...$$\r\n..." — the escaped "\r\n"
+        // is literal text inside the JSON, which the physical-newline replace below never touches). Without
+        // this, the model-JSON golden is not portable across CRLF/LF checkouts. See M1 determinism (#59/#60).
+        s.Replace("\\r\\n", "\\n").Replace("\\r", "\\n").Replace("\r\n", "\n").Replace("\r", "\n");
 
     /// <summary>
     /// Asserts <paramref name="actual"/> equals the committed golden file at
