@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using PgProj.Core.Contracts;
 using PgProj.Core.Model;
 using PgProj.Core.Parsing;
 
@@ -20,10 +21,23 @@ public sealed class ModelBuilder
 
     public DatabaseModel Build(ParseResult result) { var m = new DatabaseModel(); Build(result, m); return m; }
 
-    public void Build(ParseResult result, DatabaseModel model)
+    public void Build(ParseResult result, DatabaseModel model) => Build(result, model, null, null, null);
+
+    /// <summary>
+    /// Lowers a parse result into <paramref name="model"/> and, when <paramref name="positions"/> is
+    /// supplied, persists each object's source anchor (file:line:col) into it during the SAME pass —
+    /// so IDE navigation / diagnostics / model-tree resolve file+line without a second parse
+    /// (issue #45). <paramref name="sourceText"/> is the (already LF-normalised) file text and
+    /// <paramref name="relativeFile"/> its project-relative path; both are required when an index is given.
+    /// </summary>
+    public void Build(ParseResult result, DatabaseModel model,
+        SourcePositionIndex? positions, string? sourceText, string? relativeFile)
     {
         foreach (var stmt in result.Statements)
         {
+            if (positions is not null && sourceText is not null && relativeFile is not null)
+                positions.RecordStatement(stmt, sourceText, relativeFile, _defaultSchema);
+
             switch (stmt)
             {
                 case CreateSchemaStatement s when s.Name is not null: EnsureSchema(model, s.Name); break;

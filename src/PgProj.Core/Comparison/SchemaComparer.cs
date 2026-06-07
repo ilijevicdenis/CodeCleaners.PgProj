@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 using PgProj.Core.Model;
+using PgProj.Core.Versioning;
 
 namespace PgProj.Core.Comparison;
 
@@ -23,7 +23,15 @@ public sealed class ComparerOptions
 /// </summary>
 public sealed class SchemaComparer
 {
-    private static readonly Regex Whitespace = new(@"\s+", RegexOptions.Compiled);
+    // The version profile's ObjectCapabilities decide ALTER-vs-recreate (e.g. whether a changed table
+    // column can be migrated in place). Defaults to the latest profile so existing parameterless callers
+    // are unaffected; pass a profile (selected from TargetPostgresVersion) to diff for an older target.
+    // (Body/text canonicalization moved to Comparison/Canonicalizer in #42, so no Whitespace regex here.)
+    private readonly ObjectCapabilities _capabilities;
+
+    public SchemaComparer() : this(PostgresVersionProfile.Latest) { }
+
+    public SchemaComparer(PostgresVersionProfile profile) => _capabilities = profile.ObjectCapabilities;
 
     // Schema-qualified-name key with the model's identifier semantics (OrdinalIgnoreCase, mirroring
     // DatabaseModel.NameEquals). Used to pre-index target/source collections so the per-object lookups
@@ -115,14 +123,33 @@ public sealed class SchemaComparer
                 continue;
             }
 
-            // Columns present in source but not target -> add.
+            // Columns present in source but not target -> add. A changed column is migrated in place
+            // (AlterColumnChange) only when the version profile's ObjectCapabilities says every differing
+            // facet (type / nullability / default) is ALTER-able on the target; otherwise the column must
+            // be recreated (drop + re-add). The latest profile permits all three, so this is behaviour-
+            // preserving by default — the decision is no longer an inline version branch.
             foreach (var col in src.Columns)
             {
                 var existing = tgt.FindColumn(col.Name);
                 if (existing is null)
+                {
                     changes.Add(new AddColumnChange(src.Schema, src.Name, col));
+                }
                 else if (!ColumnsEqual(existing, col))
-                    changes.Add(new AlterColumnChange(src.Schema, src.Name, existing, col));
+                {
+                    var typeChanged = !string.Equals(existing.DataType, col.DataType, StringComparison.OrdinalIgnoreCase);
+                    var nullabilityChanged = existing.IsNullable != col.IsNullable;
+                    var defaultChanged = !DefaultsEqual(existing.Default, col.Default);
+
+                    if (_capabilities.CanAlterColumn(typeChanged, nullabilityChanged, defaultChanged))
+                        changes.Add(new AlterColumnChange(src.Schema, src.Name, existing, col));
+                    else
+                    {
+                        // No in-place ALTER path on this target version → recreate the column.
+                        changes.Add(new DropColumnChange(src.Schema, src.Name, existing.Name));
+                        changes.Add(new AddColumnChange(src.Schema, src.Name, col));
+                    }
+                }
             }
 
             // Columns present in target but not source -> drop (guarded).
@@ -347,38 +374,19 @@ public sealed class SchemaComparer
         return na == nb;
     }
 
-    // Strip explicit casts so a project default ('active') matches the catalog's
-    // ('active'::character varying), and collapse to a canonical form.
-    private static readonly Regex CastSuffix = new(@"::\s*""?[A-Za-z][A-Za-z0-9_ ]*""?(\[\])?", RegexOptions.Compiled);
-
-    private string NormalizeDefault(string? d) =>
-        string.IsNullOrWhiteSpace(d) ? string.Empty : NormalizeText(CastSuffix.Replace(d, string.Empty));
-
-    // Canonicalize dollar-quote tags ($function$ -> $$) so a hand-written function body matches the
-    // catalog's pg_get_functiondef rendering, which picks its own tag.
-    private static readonly Regex DollarTag = new(@"\$[A-Za-z0-9_]*\$", RegexOptions.Compiled);
-
-    // pg_get_viewdef adds a result-type cast to literals (0 -> 0::bigint). Strip casts on numeric/
-    // string LITERALS only (not column/expression casts), so a view round-trips with zero diff.
-    private static readonly Regex LiteralCast = new(@"(\b\d+(?:\.\d+)?|'[^']*')::[a-z0-9_]+", RegexOptions.Compiled);
-    // Reconcile punctuation spacing: our Token.Render is tight ("a,b" / "x=y") while pg_get_viewdef
-    // is spaced ("a, b" / "x = y"). A space is only meaningful between two word characters.
-    private static readonly Regex PunctSpace = new(@"\s*([^\w\s])\s*", RegexOptions.Compiled);
+    // Canonicalization (NormalizeText/NormalizeDefault/NormalizeBody/NormalizeRawBody) now lives in
+    // Canonicalizer — a single source of truth shared with Model/Identity/CanonicalHash (issue #42),
+    // so the semantic hash hashes byte-for-byte the same canonical text the comparer diffs on. These
+    // are thin delegates kept so the rest of this file reads unchanged.
+    private static string NormalizeDefault(string? d) => Canonicalizer.NormalizeDefault(d);
 
     /// <summary>Body comparison for verbatim objects: case-, whitespace-, punctuation-spacing-, dollar-tag-, literal-cast- and trailing-`;`-agnostic.</summary>
-    private static string NormalizeBody(string s)
-        => PunctSpace.Replace(LiteralCast.Replace(NormalizeText(DollarTag.Replace(s, "$$$$")), "$1"), "$1").TrimEnd(';', ' ');
-
-    // `IF NOT EXISTS` is an idempotency hint on CREATE, not part of the object's definition: the live
-    // reader emits it (so a re-deploy is replayable) while a project file may omit it. Drop it before
-    // comparison so `CREATE EXTENSION x` and `CREATE EXTENSION IF NOT EXISTS x` don't register a diff.
-    private static readonly Regex IfNotExists = new(@"\bif\s+not\s+exists\b", RegexOptions.Compiled);
+    private static string NormalizeBody(string s) => Canonicalizer.NormalizeBody(s);
 
     /// <summary>Raw single-statement DDL additionally ignores identifier quoting — the catalog reader
     /// quotes names (e.g. <c>CREATE EXTENSION "btree_gist"</c>) that a project usually writes bare —
     /// and the <c>IF NOT EXISTS</c> idempotency hint.</summary>
-    private static string NormalizeRawBody(string s) =>
-        Whitespace.Replace(IfNotExists.Replace(NormalizeBody(s.Replace("\"", "")), " "), " ").Trim();
+    private static string NormalizeRawBody(string s) => Canonicalizer.NormalizeRawBody(s);
 
     private static bool IndexesEqual(IndexDefinition a, IndexDefinition b) =>
         a.IsUnique == b.IsUnique
@@ -395,6 +403,5 @@ public sealed class SchemaComparer
         + "->" + fk.ReferencedSchema.ToLowerInvariant() + "." + fk.ReferencedTable.ToLowerInvariant()
         + "(" + string.Join(",", fk.ReferencedColumns.Select(c => c.ToLowerInvariant())) + ")";
 
-    private static string NormalizeText(string s) =>
-        Whitespace.Replace(s.Trim(), " ").ToLowerInvariant();
+    private static string NormalizeText(string s) => Canonicalizer.NormalizeText(s);
 }

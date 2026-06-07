@@ -75,15 +75,16 @@ public sealed class GoldenFileTests
     }
 
     /// <summary>
-    /// Normalises line endings to LF so comparisons are platform-portable and the golden files can
-    /// be committed with Unix line endings without breaking on Windows (and vice-versa).
+    /// Normalises PHYSICAL line endings to LF so the golden files can be committed with Unix line
+    /// endings and compared on any platform (a CRLF-autocrlf checkout of the golden text itself must
+    /// still match). The former escaped-EOL fold (folding the JSON-escaped <c>\r\n</c> inside serialized
+    /// string values) was a stopgap for #62 — now that source text is LF-normalised at LOAD time
+    /// (<see cref="PgProj.Core.Project.SourceReader"/>), an embedded function body can no longer carry a
+    /// <c>\r\n</c> regardless of the working-tree's line-ending policy, so the stopgap is gone. The
+    /// determinism guarantee is asserted directly by <see cref="LineEndingDeterminismTests"/>.
     /// </summary>
     private static string Normalise(string s) =>
-        // Fold both physical line endings AND the JSON-escaped ones embedded in serialized string values
-        // (e.g. a function body checked out with CRLF serializes to "...$$\r\n..." — the escaped "\r\n"
-        // is literal text inside the JSON, which the physical-newline replace below never touches). Without
-        // this, the model-JSON golden is not portable across CRLF/LF checkouts. See M1 determinism (#59/#60).
-        s.Replace("\\r\\n", "\\n").Replace("\\r", "\\n").Replace("\r\n", "\n").Replace("\r", "\n");
+        s.Replace("\r\n", "\n").Replace("\r", "\n");
 
     /// <summary>
     /// Asserts <paramref name="actual"/> equals the committed golden file at

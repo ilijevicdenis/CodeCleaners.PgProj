@@ -4,7 +4,7 @@
     <DefaultSchema>PGPROJ_DEFAULT_SCHEMA</DefaultSchema>
     <TargetPostgresVersion>PGPROJ_TARGET_VERSION</TargetPostgresVersion>
   </PropertyGroup>
-  <ItemGroup>
-    <Build Include="**/*.sql" />
-  </ItemGroup>
+  <!-- All *.sql files in this folder are included automatically.
+       Add <EnableDefaultSqlItems>false</EnableDefaultSqlItems> to the PropertyGroup above
+       to manage <Build Include="..." /> entries yourself. -->
 </Project>

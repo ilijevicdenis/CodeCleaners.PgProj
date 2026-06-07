@@ -94,9 +94,9 @@ public sealed class LiveReaderIntegrationTests : IClassFixture<ThrowawayDatabase
         var rawChurn = roundTrip
             .Select(ch => ch switch
             {
-                CreateRawObjectChange c => (Kind: (ObjectKind?)c.Def.Kind, Sql: ch.ToSql()),
-                RecreateRawObjectChange r => (Kind: (ObjectKind?)r.Def.Kind, Sql: ch.ToSql()),
-                _ => (Kind: null, Sql: null),
+                CreateRawObjectChange c => (Kind: (ObjectKind?)c.Def.Kind, Sql: (string?)ch.ToSql()),
+                RecreateRawObjectChange r => (Kind: (ObjectKind?)r.Def.Kind, Sql: (string?)ch.ToSql()),
+                _ => (Kind: (ObjectKind?)null, Sql: (string?)null),
             })
             .Where(x => x.Kind is ObjectKind k && scoped.Contains(k))
             .Select(x => x.Sql!)

@@ -159,7 +159,7 @@ public static class ReverseSync
         var rel = Path.GetRelativePath(project.ProjectDirectory, path);
         try
         {
-            var parsed = new PgParser().Parse(File.ReadAllText(path)); // fresh instance per worker
+            var parsed = new PgParser().Parse(SourceReader.ReadAllText(path)); // fresh instance per worker; LF-normalised (#62)
             var model = new ModelBuilder(project.DefaultSchema).Build(parsed);
             return (rel, DdlExporter.ExportFiles(model).Keys.ToList());
         }

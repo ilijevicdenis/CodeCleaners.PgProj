@@ -233,7 +233,8 @@ public static class Program
     {
         var profile = LoadProfile(args);            // EP-PROFILE: CLI flags override profile values.
         var (source, project) = await BuildSourceOrThrowAsync(args);
-        var target = await ReadTarget(args);
+        var versionProfile = ProfileFor(project); // PG version profile from TargetPostgresVersion
+        var target = await ReadTarget(args, versionProfile);
         var allowDrops = ResolveAllowDrops(args, profile);
 
         if (WantsJson(args))
@@ -242,7 +243,7 @@ public static class Program
             return 0;
         }
 
-        var changes = new SchemaComparer().Compare(source, target, new ComparerOptions
+        var changes = new SchemaComparer(versionProfile).Compare(source, target, new ComparerOptions
         {
             DropObjectsNotInSource = allowDrops,
         });
@@ -308,9 +309,10 @@ public static class Program
         // Target-platform gate (EP-TARGET): never publish syntax newer than <TargetPostgresVersion>.
         if (TargetVersionGateBlocks(project, args)) return ExitCode.AnalysisBlocked;
 
-        var target = await ReadTarget(args);
+        var versionProfile = ProfileFor(project); // PG version profile from TargetPostgresVersion
+        var target = await ReadTarget(args, versionProfile);
 
-        var changes = new SchemaComparer().Compare(source, target, new ComparerOptions
+        var changes = new SchemaComparer(versionProfile).Compare(source, target, new ComparerOptions
         {
             DropObjectsNotInSource = allowDrops,
         });
@@ -550,7 +552,7 @@ public static class Program
         var analyzer = new PgAnalyzer(config);
         var findings = new List<Diagnostic>();
         foreach (var file in project.ResolveSqlFiles())
-            findings.AddRange(analyzer.Analyze(new PgProj.Core.Syntax.PgParser().Parse(File.ReadAllText(file))));
+            findings.AddRange(analyzer.Analyze(new PgProj.Core.Syntax.PgParser().Parse(PgProj.Core.Project.SourceReader.ReadAllText(file))));
         return findings;
     }
 
@@ -910,6 +912,15 @@ public static class Program
 
     private static async Task<DatabaseModel> ReadTarget(string[] args) =>
         await new LiveDatabaseReader().ReadAsync(RequireConnection(args));
+
+    // Introspect the live target using the version profile selected from the project's
+    // TargetPostgresVersion, so the catalog SQL issued matches the declared target (blank → latest).
+    private static async Task<DatabaseModel> ReadTarget(string[] args, PgProj.Core.Versioning.PostgresVersionProfile profile) =>
+        await new LiveDatabaseReader(profile).ReadAsync(RequireConnection(args));
+
+    /// <summary>The PostgreSQL version profile a project targets (from <c>TargetPostgresVersion</c>; latest when unset).</summary>
+    private static PgProj.Core.Versioning.PostgresVersionProfile ProfileFor(DatabaseProject? project) =>
+        PgProj.Core.Versioning.PostgresVersionProfile.ForTarget(project?.TargetPostgresVersion);
 
     private static void PrintModelSummary(DatabaseModel m) =>
         Console.WriteLine($"  schemas={m.Schemas.Count} tables={m.Tables.Count} " +

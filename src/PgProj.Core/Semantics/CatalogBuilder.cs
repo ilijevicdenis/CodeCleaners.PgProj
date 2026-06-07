@@ -1,5 +1,6 @@
 using System.Linq;
 using PgProj.Core.Model;
+using PgProj.Core.Model.Identity;
 using PgProj.Core.Syntax;
 
 namespace PgProj.Core.Semantics;
@@ -7,6 +8,8 @@ namespace PgProj.Core.Semantics;
 /// <summary>Builds a <see cref="Catalog"/> from PgParser output — no legacy model involved.</summary>
 public static class CatalogBuilder
 {
+    private static readonly ObjectIdentityComputer Identity = new();
+
     public static Catalog Build(ParseResult result, string defaultSchema = "public")
     {
         var c = new Catalog { DefaultSchema = defaultSchema };
@@ -30,14 +33,17 @@ public static class CatalogBuilder
         foreach (var t in model.Tables)
         {
             catalog.AddExternalSchema(t.Schema);
-            catalog.AddRelation(t.Schema, t.Name, t.Columns.Select(col => col.Name));
+            catalog.AddRelation(t.Schema, t.Name,
+                t.Columns.Select(col => new Catalog.ColumnInfo(col.Name, col.DataType)),
+                Identity.StableIdOf(t), external: true);
         }
-        foreach (var v in model.Views) { catalog.AddExternalSchema(v.Schema); catalog.AddRelation(v.Schema, v.Name); }
-        foreach (var q in model.Sequences) { catalog.AddExternalSchema(q.Schema); catalog.AddRelation(q.Schema, q.Name); }
+        foreach (var v in model.Views) { catalog.AddExternalSchema(v.Schema); catalog.AddRelation(v.Schema, v.Name, columns: null, Identity.StableIdOf(v), external: true); }
+        foreach (var q in model.Sequences) { catalog.AddExternalSchema(q.Schema); catalog.AddRelation(q.Schema, q.Name, columns: null, Identity.StableIdOf(q), external: true); }
         foreach (var f in model.Functions)
         {
             if (!string.IsNullOrEmpty(f.Schema)) catalog.AddExternalSchema(f.Schema);
-            catalog.AddFunction(f.Name);
+            catalog.AddFunction(string.IsNullOrEmpty(f.Schema) ? null : f.Schema, f.Name,
+                new FunctionSignature(NormalizeArgTypes(f.ArgTypes)), Identity.StableIdOf(f), external: true);
         }
         foreach (var o in model.Objects)
         {
@@ -66,12 +72,18 @@ public static class CatalogBuilder
             case CreateTableStatement t when t.TrailingText is { } tr && tr.Contains("inherits", System.StringComparison.OrdinalIgnoreCase):
                 c.AddRelation(t.Schema, t.Name); break;
             case CreateTableStatement t:
-                c.AddRelation(t.Schema, t.Name, t.Columns.Select(col => col.Name));
+                c.AddRelation(t.Schema, t.Name,
+                    t.Columns.Select(col => new Catalog.ColumnInfo(col.Name, TypeNormalizer.Normalize(col.Type.Text))),
+                    TableStableId(c, t));
                 break;
             case CreateTableAsStatement ctas: c.AddRelation(ctas.Schema, ctas.Name); break;
             case CreateViewStatement v: c.AddRelation(v.Schema, v.Name); break;
             case CreateSequenceStatement sq: c.AddRelation(sq.Schema, sq.Name); break;
-            case CreateFunctionStatement f: c.AddFunction(f.Name); break;
+            case CreateFunctionStatement f:
+                c.AddFunction(f.Schema, f.Name, new FunctionSignature(NormalizeArgTypes(f.ArgTypes)),
+                    Identity.StableIdOf(new FunctionDefinition(f.Schema ?? c.DefaultSchema, f.Name,
+                        $"{f.Schema ?? c.DefaultSchema}.{f.Name}({f.ArgTypes})", f.Body ?? "", f.ArgTypes)));
+                break;
             case CreateSchemaStatement s when s.Name is not null:
                 c.AddSchema(s.Name);
                 break;
@@ -87,5 +99,27 @@ public static class CatalogBuilder
                 }
                 break;
         }
+    }
+
+    // Build a lightweight TableDefinition (columns + types + nullability) so the Identity Model can stamp a
+    // name-independent StableId on the relation symbol. Only the structural skeleton matters for the StableId,
+    // so we map the columns we can see; constraints we don't lower here simply make the id coarser, never wrong.
+    private static StableId TableStableId(Catalog c, CreateTableStatement t)
+    {
+        var table = new TableDefinition { Schema = t.Schema ?? c.DefaultSchema, Name = t.Name };
+        foreach (var col in t.Columns)
+        {
+            bool nullable = !col.Constraints.OfType<NotNullConstraint>().Any();
+            table.Columns.Add(new ColumnDefinition(col.Name, TypeNormalizer.Normalize(col.Type.Text), nullable));
+        }
+        return Identity.StableIdOf(table);
+    }
+
+    // Canonicalize an argument-type list the SAME way the Identity Model does, so the catalog's overload key
+    // matches a StableId-bearing function and "f(INT)" / "f(integer)" key identically.
+    private static string NormalizeArgTypes(string argTypes)
+    {
+        if (string.IsNullOrWhiteSpace(argTypes)) return "";
+        return string.Join(",", argTypes.Split(',').Select(a => TypeNormalizer.Normalize(a.Trim())));
     }
 }
