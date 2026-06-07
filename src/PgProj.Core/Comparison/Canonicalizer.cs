@@ -1,3 +1,4 @@
+using System;
 using System.Text.RegularExpressions;
 
 namespace PgProj.Core.Comparison;
@@ -56,6 +57,57 @@ public static class Canonicalizer
     /// <c>IF NOT EXISTS</c> idempotency hint.</summary>
     public static string NormalizeRawBody(string s) =>
         Whitespace.Replace(IfNotExists.Replace(NormalizeBody(s.Replace("\"", "")), " "), " ").Trim();
+
+    /// <summary>
+    /// Canonical form of a TRIGGER definition for round-trip comparison (issue #61). Builds on
+    /// <see cref="NormalizeRawBody"/> and additionally reconciles the two ways the same trigger is spelled
+    /// by a hand-written source vs <c>pg_get_triggerdef</c>:
+    /// <list type="bullet">
+    ///   <item><c>EXECUTE PROCEDURE</c> ⇄ <c>EXECUTE FUNCTION</c> (exact synonyms since PG11);</item>
+    ///   <item>the redundant extra parens the catalog wraps the WHEN predicate in
+    ///     (<c>WHEN ((a IS DISTINCT FROM b))</c> vs source <c>WHEN (a IS DISTINCT FROM b)</c>).</item>
+    /// </list>
+    /// A genuine body change (different timing/event/predicate/function) still produces a different form, so
+    /// a changed trigger continues to diff.
+    /// </summary>
+    public static string NormalizeTriggerBody(string s)
+    {
+        var b = NormalizeRawBody(s).Replace("execute procedure", "execute function");
+        return CollapseWhenDoubleParens(b);
+    }
+
+    // Peel ONE redundant balanced paren pair immediately following `when(` so `when((expr))` ≡ `when(expr)`.
+    // Only the pair whose inner content is itself fully parenthesised is removed (the exact catalog shape);
+    // a single-paren `when(expr)` and any non-enclosing form is left untouched.
+    private static string CollapseWhenDoubleParens(string b)
+    {
+        const string marker = "when(";
+        var idx = b.IndexOf(marker, StringComparison.Ordinal);
+        if (idx < 0) return b;
+        var open = idx + marker.Length - 1; // index of the first '(' after `when`
+        if (open + 1 >= b.Length || b[open + 1] != '(') return b; // not a double-paren
+        // Find the matching close for the OUTER '(' at `open`.
+        var depth = 0; var outerClose = -1;
+        for (var i = open; i < b.Length; i++)
+        {
+            if (b[i] == '(') depth++;
+            else if (b[i] == ')') { depth--; if (depth == 0) { outerClose = i; break; } }
+        }
+        if (outerClose < 0) return b;
+        // The char just before the outer close must be ')' (the inner pair's close) for this to be a
+        // genuine double-wrap; and the inner '(' at open+1 must match that inner ')'.
+        if (b[outerClose - 1] != ')') return b;
+        // Verify the inner pair is balanced and encloses everything between (open+1 .. outerClose-1).
+        depth = 0; var innerOk = true;
+        for (var i = open + 1; i < outerClose; i++)
+        {
+            if (b[i] == '(') depth++;
+            else if (b[i] == ')') { depth--; if (depth == 0 && i != outerClose - 1) { innerOk = false; break; } }
+        }
+        if (!innerOk || depth != 0) return b;
+        // Remove the outer pair: keep [.. open] + inner content (open+1 .. outerClose-1) + [outerClose+1 ..].
+        return b[..open] + "(" + b[(open + 2)..(outerClose - 1)] + ")" + b[(outerClose + 1)..];
+    }
 
     /// <summary>Canonicalize a column/expression default: drop explicit casts, then <see cref="NormalizeText"/>.</summary>
     public static string NormalizeDefault(string? d) =>

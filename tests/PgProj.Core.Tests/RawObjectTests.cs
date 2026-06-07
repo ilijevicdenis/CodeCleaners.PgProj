@@ -105,15 +105,43 @@ public class RawObjectTests
     [Fact]
     public void Changed_type_is_guarded_by_allow_drops()
     {
-        var source = Parse("CREATE TYPE app.tier AS ENUM ('a','b');");
-        var target = Parse("CREATE TYPE app.tier AS ENUM ('a');");
+        // A LABEL REMOVAL (target has 'a','b'; source keeps only 'a') is destructive — ALTER TYPE cannot
+        // drop an enum value, so it must fall through to the guarded drop+recreate (not the ADD VALUE delta).
+        var source = Parse("CREATE TYPE app.tier AS ENUM ('a');");
+        var target = Parse("CREATE TYPE app.tier AS ENUM ('a','b');");
 
         // Destructive recreate suppressed by default...
         Assert.Empty(new SchemaComparer().Compare(source, target).OfType<RecreateRawObjectChange>());
+        Assert.Empty(new SchemaComparer().Compare(source, target).OfType<AddEnumValuesChange>());
         // ...allowed when drops are permitted.
         Assert.Single(new SchemaComparer()
             .Compare(source, target, new ComparerOptions { DropObjectsNotInSource = true })
             .OfType<RecreateRawObjectChange>());
+    }
+
+    [Fact]
+    public void Added_enum_label_produces_precise_add_value_not_recreate()
+    {
+        // Appending a label is non-destructive — ALTER TYPE … ADD VALUE, never a drop+recreate, and it is
+        // emitted even WITHOUT --allow-drops (issue #53 field-level delta).
+        var source = Parse("CREATE TYPE app.tier AS ENUM ('a','b','c');");
+        var target = Parse("CREATE TYPE app.tier AS ENUM ('a','b');");
+
+        var add = Assert.Single(new SchemaComparer().Compare(source, target).OfType<AddEnumValuesChange>());
+        Assert.Equal(new[] { "c" }, add.NewLabels);
+        Assert.Contains("ADD VALUE", add.ToSql());
+        Assert.Contains("'c'", add.ToSql());
+        Assert.Empty(new SchemaComparer().Compare(source, target).OfType<RecreateRawObjectChange>());
+    }
+
+    [Fact]
+    public void Reordered_enum_labels_is_not_treated_as_add()
+    {
+        // A reorder is not expressible as ADD VALUE (it can't move existing labels) → it must NOT misfire
+        // the delta; with the labels merely permuted (no genuine add) it falls through to the guarded path.
+        var source = Parse("CREATE TYPE app.tier AS ENUM ('b','a');");
+        var target = Parse("CREATE TYPE app.tier AS ENUM ('a','b');");
+        Assert.Empty(new SchemaComparer().Compare(source, target).OfType<AddEnumValuesChange>());
     }
 
     [Fact]

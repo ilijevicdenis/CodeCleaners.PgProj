@@ -13,6 +13,14 @@ public sealed class ComparerOptions
     /// the target but absent from the project are left alone. When true, they are dropped.
     /// </summary>
     public bool DropObjectsNotInSource { get; init; }
+
+    /// <summary>
+    /// When true, an object that is structurally unchanged but moved name (same <see cref="Model.Identity.StableId"/>
+    /// + same <see cref="Model.Identity.CanonicalHash"/>, different FQN) is emitted as a single <em>Rename</em>
+    /// (via <see cref="IdentityDiffEngine"/>) instead of a Drop+Create pair (Phase 11, issue #53). OFF by
+    /// default so the greenfield diff — and the committed golden deploy script / model JSON — are unchanged.
+    /// </summary>
+    public bool DetectRenames { get; init; }
 }
 
 /// <summary>
@@ -62,14 +70,22 @@ public sealed class SchemaComparer
         options ??= new ComparerOptions();
         var changes = new List<SchemaChange>();
 
+        // Identity-based rename pre-pass (issue #53): when enabled, any structurally-unchanged object that
+        // only moved name becomes a single Rename and is recorded as "already matched" so the per-kind
+        // walks below skip its create AND its drop. Off by default → no plan → behaviour-preserving.
+        var plan = options.DetectRenames ? new IdentityDiffEngine().DetectRenames(source, target) : null;
+        if (plan is not null) changes.AddRange(plan.Changes);
+
         CompareSchemas(source, target, changes);
-        CompareSequences(source, target, changes);
-        CompareTables(source, target, changes, options);
-        CompareIndexes(source, target, changes, options);
-        CompareViews(source, target, changes, options);
-        CompareFunctions(source, target, changes);
+        CompareSequences(source, target, changes, options, plan);
+        CompareTables(source, target, changes, options, plan);
+        CompareIndexes(source, target, changes, options, plan);
+        CompareViews(source, target, changes, options, plan);
+        CompareFunctions(source, target, changes, plan);
         CompareRawObjects(source, target, changes, options);
 
+        // OrderBy is a stable sort, so changes at the same phase keep insertion order (preserving the
+        // existing within-phase ordering the golden tests pin).
         return changes.OrderBy(c => c.Phase).ToList();
     }
 
@@ -83,16 +99,35 @@ public sealed class SchemaComparer
         }
     }
 
-    private static void CompareSequences(DatabaseModel source, DatabaseModel target, List<SchemaChange> changes)
+    private static void CompareSequences(DatabaseModel source, DatabaseModel target, List<SchemaChange> changes,
+        ComparerOptions options, IdentityDiffEngine.RenamePlan? plan)
     {
         var tgtByName = IndexByName(target.Sequences, t => (t.Schema, t.Name));
         foreach (var s in source.Sequences)
         {
+            // A sequence the rename pre-pass already satisfied (it was renamed FROM a target sequence) is
+            // not (re)created here — the ALTER SEQUENCE … RENAME TO already produced it.
+            if (plan is not null && plan.NewSatisfied(IdentityDiffEngine.KindSequence, $"{s.Schema}.{s.Name}"))
+                continue;
+
             tgtByName.TryGetValue((s.Schema, s.Name), out var tgt);
             if (tgt is null)
                 changes.Add(new CreateSequenceChange(s));
             else if (SequenceOptionsDiffer(s, tgt) && SqlEmitter.SequenceOptions(s).Length > 0)
                 changes.Add(new AlterSequenceChange(s));
+        }
+
+        // DropSequenceChange (issue #53): a sequence present in the target but absent from source is dropped
+        // when --allow-drops is set — unless the rename pre-pass already consumed it as a rename source.
+        if (options.DropObjectsNotInSource)
+        {
+            var srcByName = IndexByName(source.Sequences, t => (t.Schema, t.Name));
+            foreach (var tgt in target.Sequences)
+            {
+                if (srcByName.ContainsKey((tgt.Schema, tgt.Name))) continue;
+                if (plan is not null && plan.OldConsumed(IdentityDiffEngine.KindSequence, $"{tgt.Schema}.{tgt.Name}")) continue;
+                changes.Add(new DropSequenceChange(tgt.Schema, tgt.Name));
+            }
         }
     }
 
@@ -109,12 +144,22 @@ public sealed class SchemaComparer
         return s.Cycle != t.Cycle;
     }
 
-    private void CompareTables(DatabaseModel source, DatabaseModel target, List<SchemaChange> changes, ComparerOptions options)
+    private void CompareTables(DatabaseModel source, DatabaseModel target, List<SchemaChange> changes,
+        ComparerOptions options, IdentityDiffEngine.RenamePlan? plan)
     {
         var tgtByName = IndexByName(target.Tables, t => (t.Schema, t.Name));
         foreach (var src in source.Tables)
         {
             tgtByName.TryGetValue((src.Schema, src.Name), out var tgt);
+
+            // A table the rename pre-pass produced (renamed FROM a target table): the structure/meaning are
+            // identical (that's what made it a pure rename), so the only step is the ALTER … RENAME already
+            // emitted — fall through to nothing here. We still resolve `tgt` to the OLD record so any
+            // *parallel* alteration (there is none for a pure rename) would diff correctly.
+            if (tgt is null && plan is not null
+                && plan.NewSatisfied(IdentityDiffEngine.KindTable, src.QualifiedName))
+                continue;
+
             if (tgt is null)
             {
                 changes.Add(new CreateTableChange(src));
@@ -161,6 +206,7 @@ public sealed class SchemaComparer
 
             CompareForeignKeys(src, tgt, changes, options);
             ComparePrimaryKey(src, tgt, changes, options);
+            CompareUniqueConstraints(src, tgt, changes, options);
             CompareChecks(src, tgt, changes, options);
         }
 
@@ -168,8 +214,34 @@ public sealed class SchemaComparer
         {
             var srcByName = IndexByName(source.Tables, t => (t.Schema, t.Name));
             foreach (var tgt in target.Tables)
-                if (!srcByName.ContainsKey((tgt.Schema, tgt.Name)))
-                    changes.Add(new DropTableChange(tgt.Schema, tgt.Name));
+            {
+                if (srcByName.ContainsKey((tgt.Schema, tgt.Name))) continue;
+                // A table renamed away (consumed by the rename pre-pass) must not also be dropped.
+                if (plan is not null && plan.OldConsumed(IdentityDiffEngine.KindTable, tgt.QualifiedName)) continue;
+                changes.Add(new DropTableChange(tgt.Schema, tgt.Name));
+            }
+        }
+    }
+
+    // Unique-constraint alteration on an existing table (issue #53): additions used to be emitted only as
+    // part of CREATE TABLE; here we add a unique constraint present in source but not target, and (guarded)
+    // drop one present in target but not source. Constraints are matched by their column set (order-
+    // insensitive), the same signature the identity model uses.
+    private static void CompareUniqueConstraints(TableDefinition src, TableDefinition tgt, List<SchemaChange> changes, ComparerOptions options)
+    {
+        static string Sig(UniqueConstraintDefinition u) =>
+            string.Join(",", u.Columns.Select(c => c.ToLowerInvariant()).OrderBy(c => c, StringComparer.Ordinal));
+
+        var targetSigs = tgt.Unique.Select(Sig).ToHashSet(StringComparer.Ordinal);
+        foreach (var u in src.Unique)
+            if (!targetSigs.Contains(Sig(u)))
+                changes.Add(new AddUniqueConstraintChange(src.Schema, src.Name, u));
+
+        if (options.DropObjectsNotInSource)
+        {
+            var sourceSigs = src.Unique.Select(Sig).ToHashSet(StringComparer.Ordinal);
+            foreach (var u in tgt.Unique.Where(u => u.Name is not null && !sourceSigs.Contains(Sig(u))))
+                changes.Add(new DropUniqueConstraintChange(src.Schema, src.Name, u.Name!));
         }
     }
 
@@ -200,20 +272,26 @@ public sealed class SchemaComparer
 
     private void CompareChecks(TableDefinition src, TableDefinition tgt, List<SchemaChange> changes, ComparerOptions options)
     {
-        var targetExprs = tgt.Checks.Select(c => NormalizeText(c.Expression)).ToHashSet();
+        // Constraint expressions are canonicalized with NormalizeExpression (issue #64): it folds the
+        // redundant outer parens, literal casts and operator spacing that pg_get_constraintdef adds, so a
+        // source `CHECK (discount BETWEEN 0 AND 100)` round-trips against the catalog's
+        // `CHECK (((discount >= 0) AND (discount <= 100)))`-style rendering without a phantom add — while a
+        // genuinely different predicate still differs. (BETWEEN is preserved verbatim by both sides here;
+        // the win is the paren/cast/spacing folding.)
+        var targetExprs = tgt.Checks.Select(c => NormalizeConstraint(c.Expression)).ToHashSet();
         foreach (var c in src.Checks)
-            if (!targetExprs.Contains(NormalizeText(c.Expression)))
+            if (!targetExprs.Contains(NormalizeConstraint(c.Expression)))
                 changes.Add(new AddCheckConstraintChange(src.Schema, src.Name, c));
 
-        var targetOther = tgt.OtherConstraints.Select(NormalizeText).ToHashSet();
+        var targetOther = tgt.OtherConstraints.Select(NormalizeConstraint).ToHashSet();
         foreach (var clause in src.OtherConstraints)
-            if (!targetOther.Contains(NormalizeText(clause)))
+            if (!targetOther.Contains(NormalizeConstraint(clause)))
                 changes.Add(new AddRawTableConstraintChange(src.Schema, src.Name, clause));
 
         if (options.DropObjectsNotInSource)
         {
-            var sourceExprs = src.Checks.Select(c => NormalizeText(c.Expression)).ToHashSet();
-            foreach (var c in tgt.Checks.Where(c => c.Name is not null && !sourceExprs.Contains(NormalizeText(c.Expression))))
+            var sourceExprs = src.Checks.Select(c => NormalizeConstraint(c.Expression)).ToHashSet();
+            foreach (var c in tgt.Checks.Where(c => c.Name is not null && !sourceExprs.Contains(NormalizeConstraint(c.Expression))))
                 changes.Add(new DropConstraintChange(src.Schema, src.Name, c.Name!));
         }
     }
@@ -235,7 +313,8 @@ public sealed class SchemaComparer
         }
     }
 
-    private void CompareIndexes(DatabaseModel source, DatabaseModel target, List<SchemaChange> changes, ComparerOptions options)
+    private void CompareIndexes(DatabaseModel source, DatabaseModel target, List<SchemaChange> changes,
+        ComparerOptions options, IdentityDiffEngine.RenamePlan? plan)
     {
         // Relations (schema, name) of source materialized views — an index on one must deploy after it.
         var matviews = new HashSet<(string, string)>(QualifiedName);
@@ -245,6 +324,8 @@ public sealed class SchemaComparer
         var tgtByName = IndexByName(target.Indexes, i => (i.Schema, i.Name));
         foreach (var src in source.Indexes)
         {
+            if (plan is not null && plan.NewSatisfied(IdentityDiffEngine.KindIndex, $"{src.Schema}.{src.Name}"))
+                continue;
             var onMv = matviews.Contains((src.Schema, src.Table));
             tgtByName.TryGetValue((src.Schema, src.Name), out var tgt);
             if (tgt is null)
@@ -262,16 +343,22 @@ public sealed class SchemaComparer
         {
             var srcByName = IndexByName(source.Indexes, i => (i.Schema, i.Name));
             foreach (var tgt in target.Indexes)
-                if (!srcByName.ContainsKey((tgt.Schema, tgt.Name)))
-                    changes.Add(new DropIndexChange(tgt.Schema, tgt.Name));
+            {
+                if (srcByName.ContainsKey((tgt.Schema, tgt.Name))) continue;
+                if (plan is not null && plan.OldConsumed(IdentityDiffEngine.KindIndex, $"{tgt.Schema}.{tgt.Name}")) continue;
+                changes.Add(new DropIndexChange(tgt.Schema, tgt.Name));
+            }
         }
     }
 
-    private void CompareViews(DatabaseModel source, DatabaseModel target, List<SchemaChange> changes, ComparerOptions options)
+    private void CompareViews(DatabaseModel source, DatabaseModel target, List<SchemaChange> changes,
+        ComparerOptions options, IdentityDiffEngine.RenamePlan? plan)
     {
         var tgtByName = IndexByName(target.Views, v => (v.Schema, v.Name));
         foreach (var src in source.Views)
         {
+            if (plan is not null && plan.NewSatisfied(IdentityDiffEngine.KindView, $"{src.Schema}.{src.Name}"))
+                continue;
             tgtByName.TryGetValue((src.Schema, src.Name), out var tgt);
             if (tgt is null || NormalizeBody(src.Body) != NormalizeBody(tgt.Body))
                 changes.Add(new CreateOrReplaceViewChange(src));
@@ -281,12 +368,16 @@ public sealed class SchemaComparer
         {
             var srcByName = IndexByName(source.Views, v => (v.Schema, v.Name));
             foreach (var tgt in target.Views)
-                if (!srcByName.ContainsKey((tgt.Schema, tgt.Name)))
-                    changes.Add(new DropViewChange(tgt.Schema, tgt.Name));
+            {
+                if (srcByName.ContainsKey((tgt.Schema, tgt.Name))) continue;
+                if (plan is not null && plan.OldConsumed(IdentityDiffEngine.KindView, $"{tgt.Schema}.{tgt.Name}")) continue;
+                changes.Add(new DropViewChange(tgt.Schema, tgt.Name));
+            }
         }
     }
 
-    private void CompareFunctions(DatabaseModel source, DatabaseModel target, List<SchemaChange> changes)
+    private void CompareFunctions(DatabaseModel source, DatabaseModel target, List<SchemaChange> changes,
+        IdentityDiffEngine.RenamePlan? plan)
     {
         // Group target overloads by schema.name once, preserving target order within each group so
         // FirstOrDefault still picks the same candidate as the old linear Where(...).ToList().
@@ -299,6 +390,11 @@ public sealed class SchemaComparer
 
         foreach (var src in source.Functions)
         {
+            // A function the rename pre-pass produced (renamed FROM a target function, structure+meaning
+            // identical) needs only the ALTER FUNCTION … RENAME already emitted.
+            if (plan is not null && plan.NewSatisfied(IdentityDiffEngine.KindFunction, $"{src.Schema}.{src.Name}"))
+                continue;
+
             // Match by schema.name (reliable for the common, non-overloaded case); when a name has
             // multiple overloads, disambiguate by normalized argument types.
             tgtByName.TryGetValue((src.Schema, src.Name), out var candidates);
@@ -307,20 +403,46 @@ public sealed class SchemaComparer
                     ? candidates.FirstOrDefault()
                     : candidates.FirstOrDefault(c => NormalizeText(c.ArgTypes) == NormalizeText(src.ArgTypes));
 
-            if (tgt is null || NormalizeBody(src.Body) != NormalizeBody(tgt.Body))
+            if (tgt is null)
+            {
                 changes.Add(new CreateOrReplaceFunctionChange(src));
+                continue;
+            }
+
+            if (NormalizeBody(src.Body) == NormalizeBody(tgt.Body)) continue; // identical → no change
+
+            // Structured function delta (issue #53): when the bodies differ ONLY in volatility (the rest of
+            // the body canonicalizes equal once the volatility keyword is neutralised), emit the precise
+            // ALTER FUNCTION … <VOLATILITY> instead of replaying the whole body. Any other body difference
+            // falls back to the existing CREATE OR REPLACE (Postgres can redefine a function in place).
+            var srcVol = FunctionFacts.Volatility(src);
+            var tgtVol = FunctionFacts.Volatility(tgt);
+            if (srcVol != tgtVol
+                && NormalizeBody(FunctionFacts.BodyWithoutVolatility(src.Body))
+                   == NormalizeBody(FunctionFacts.BodyWithoutVolatility(tgt.Body)))
+            {
+                changes.Add(new AlterFunctionAttributesChange(src, srcVol));
+                continue;
+            }
+
+            changes.Add(new CreateOrReplaceFunctionChange(src));
         }
     }
 
     private void CompareRawObjects(DatabaseModel source, DatabaseModel target, List<SchemaChange> changes, ComparerOptions options)
     {
-        // FindObject matches Identity case-insensitively (first occurrence) — mirror that with a dict.
-        var tgtByIdentity = new Dictionary<string, RawObjectDefinition>(StringComparer.OrdinalIgnoreCase);
-        foreach (var o in target.Objects) tgtByIdentity.TryAdd(o.Identity, o);
+        // Pair raw objects on a kind-canonical COMPARISON KEY (issue #61) rather than the verbatim stored
+        // Identity string. For most kinds the key IS the identity; for kinds whose project-parse and live-
+        // reconstruction historically built mismatching identities (cast, operator, operator-class) the key
+        // strips that divergence (operator symbol only, no doubled schema, normalized cast spelling) so an
+        // unchanged round-trip pairs them instead of emitting a phantom create. FindObject matched the first
+        // occurrence case-insensitively — mirror that with a dict.
+        var tgtByKey = new Dictionary<string, RawObjectDefinition>(StringComparer.OrdinalIgnoreCase);
+        foreach (var o in target.Objects) tgtByKey.TryAdd(RawObjectMeta.ComparisonKey(o), o);
 
         foreach (var src in source.Objects)
         {
-            tgtByIdentity.TryGetValue(src.Identity, out var tgt);
+            tgtByKey.TryGetValue(RawObjectMeta.ComparisonKey(src), out var tgt);
             if (tgt is null)
             {
                 // A typed/partition table (CREATE TABLE … OF type / PARTITION OF) is modeled in the
@@ -337,8 +459,19 @@ public sealed class SchemaComparer
                      // canonical DDL the source never matches textually — an identity hit means "same
                      // object exists", so never body-diff them or every round-trip churns a phantom recreate.
                      && !RawObjectMeta.ComparesByIdentityOnly(src.Kind)
-                     && NormalizeRawBody(src.Body) != NormalizeRawBody(tgt.Body))
+                     && NormalizeRawObjectBody(src) != NormalizeRawObjectBody(tgt))
             {
+                // Field-level delta (issue #53): an enum type that ONLY gained new labels (the existing
+                // labels are unchanged and in order) is altered in place with ALTER TYPE … ADD VALUE
+                // instead of the forbidden/destructive drop+recreate.
+                if (src.Kind == ObjectKind.Type
+                    && EnumLabelDelta(src, tgt) is { Count: > 0 } added
+                    && EnumLabelsArePureAddition(src, tgt))
+                {
+                    changes.Add(new AddEnumValuesChange(src.Schema, src.Name, added));
+                    continue;
+                }
+
                 // A destructive recreate (type/domain/foreign table can cascade-drop columns) is
                 // only emitted when drops are allowed; in-place redefinitions always proceed.
                 if (RawObjectMeta.IsDestructiveRecreate(src.Kind) && !options.DropObjectsNotInSource)
@@ -349,12 +482,64 @@ public sealed class SchemaComparer
 
         if (options.DropObjectsNotInSource)
         {
-            var srcByIdentity = new Dictionary<string, RawObjectDefinition>(StringComparer.OrdinalIgnoreCase);
-            foreach (var o in source.Objects) srcByIdentity.TryAdd(o.Identity, o);
+            var srcByKey = new Dictionary<string, RawObjectDefinition>(StringComparer.OrdinalIgnoreCase);
+            foreach (var o in source.Objects) srcByKey.TryAdd(RawObjectMeta.ComparisonKey(o), o);
             foreach (var tgt in target.Objects)
-                if (tgt.Kind != ObjectKind.Comment && !srcByIdentity.ContainsKey(tgt.Identity))
+                if (tgt.Kind != ObjectKind.Comment && !srcByKey.ContainsKey(RawObjectMeta.ComparisonKey(tgt)))
                     changes.Add(new DropRawObjectChange(tgt));
         }
+    }
+
+    // Body normalization for raw objects, kind-aware (issue #61). Most kinds use NormalizeRawBody as before;
+    // triggers additionally fold the redundant double-parens pg_get_triggerdef wraps the WHEN clause in
+    // (`WHEN ((expr))` vs source `WHEN (expr)`) and the literal `EXECUTE PROCEDURE`/`EXECUTE FUNCTION`
+    // synonym, so a semantically-identical trigger round-trips with no phantom recreate while a genuine
+    // body change still diffs.
+    private static string NormalizeRawObjectBody(RawObjectDefinition o) =>
+        o.Kind == ObjectKind.Trigger ? Canonicalizer.NormalizeTriggerBody(o.Body) : NormalizeRawBody(o.Body);
+
+    // ---- enum-label field delta helpers (issue #53) ------------------------------------------------
+
+    // Labels added in source that are not in target, preserving source order. Returns empty when the kind
+    // isn't an enum or labels can't be extracted from both sides.
+    private static IReadOnlyList<string> EnumLabelDelta(RawObjectDefinition src, RawObjectDefinition tgt)
+    {
+        var s = EnumLabels(src.Body);
+        var t = EnumLabels(tgt.Body);
+        if (s is null || t is null) return System.Array.Empty<string>();
+        var tset = new HashSet<string>(t, StringComparer.Ordinal);
+        return s.Where(l => !tset.Contains(l)).ToList();
+    }
+
+    // A pure addition = every TARGET label is still present in SOURCE in the same relative order (no removal,
+    // no reorder). ALTER TYPE … ADD VALUE can only append/insert labels, never drop or reorder, so anything
+    // else must fall through to the (guarded, destructive) recreate.
+    private static bool EnumLabelsArePureAddition(RawObjectDefinition src, RawObjectDefinition tgt)
+    {
+        var s = EnumLabels(src.Body);
+        var t = EnumLabels(tgt.Body);
+        if (s is null || t is null) return false;
+        // t must be a subsequence of s (order-preserving).
+        int i = 0;
+        foreach (var label in s) { if (i < t.Count && string.Equals(label, t[i], StringComparison.Ordinal)) i++; }
+        return i == t.Count;
+    }
+
+    private static readonly System.Text.RegularExpressions.Regex EnumBody =
+        new(@"as\s+enum\s*\((?<labels>.*)\)", System.Text.RegularExpressions.RegexOptions.Compiled | System.Text.RegularExpressions.RegexOptions.IgnoreCase | System.Text.RegularExpressions.RegexOptions.Singleline);
+    private static readonly System.Text.RegularExpressions.Regex EnumLabel =
+        new(@"'(?<v>(?:[^']|'')*)'", System.Text.RegularExpressions.RegexOptions.Compiled);
+
+    // Extract the ordered enum labels from a CREATE TYPE … AS ENUM ('a','b',…) body, or null when the body
+    // is not an enum (so a non-enum composite/range type never misfires the ADD VALUE path).
+    private static IReadOnlyList<string>? EnumLabels(string body)
+    {
+        var m = EnumBody.Match(body ?? "");
+        if (!m.Success) return null;
+        var labels = new List<string>();
+        foreach (System.Text.RegularExpressions.Match lm in EnumLabel.Matches(m.Groups["labels"].Value))
+            labels.Add(lm.Groups["v"].Value.Replace("''", "'"));
+        return labels;
     }
 
     // ---- equality helpers ----------------------------------------------------------------
@@ -365,7 +550,10 @@ public sealed class SchemaComparer
         && a.IsSerial == b.IsSerial
         && (a.IsSerial || DefaultsEqual(a.Default, b.Default)) // serial's nextval default is implicit
         && a.IsIdentity == b.IsIdentity
-        && NormalizeText(a.GeneratedExpression ?? "") == NormalizeText(b.GeneratedExpression ?? "");
+        // Generated-column expressions canonicalize with NormalizeExpression (issue #64) so a source
+        // `GENERATED ALWAYS AS (upper(full_name)) STORED` matches the catalog's parenthesised/cast rendering
+        // `(upper(full_name))` without a phantom column recreate.
+        && NormalizeExpression(a.GeneratedExpression ?? "") == NormalizeExpression(b.GeneratedExpression ?? "");
 
     private bool DefaultsEqual(string? a, string? b)
     {
@@ -404,4 +592,13 @@ public sealed class SchemaComparer
         + "(" + string.Join(",", fk.ReferencedColumns.Select(c => c.ToLowerInvariant())) + ")";
 
     private static string NormalizeText(string s) => Canonicalizer.NormalizeText(s);
+
+    /// <summary>Canonical form of a scalar expression (CHECK predicate, generated-column expression):
+    /// folds redundant parens, literal casts and operator spacing (issue #64). Thin delegate to the shared
+    /// <see cref="Canonicalizer.NormalizeExpression"/> so the comparer and CanonicalHash agree.</summary>
+    private static string NormalizeExpression(string s) => Canonicalizer.NormalizeExpression(s);
+
+    /// <summary>Canonical form of a table constraint clause (CHECK body, EXCLUDE/other-constraint clause).
+    /// Same folding as <see cref="NormalizeExpression"/>; named separately for intent at the call site.</summary>
+    private static string NormalizeConstraint(string s) => Canonicalizer.NormalizeExpression(s);
 }

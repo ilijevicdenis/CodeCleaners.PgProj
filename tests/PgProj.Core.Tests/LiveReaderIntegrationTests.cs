@@ -75,20 +75,26 @@ public sealed class LiveReaderIntegrationTests : IClassFixture<ThrowawayDatabase
         // Idempotence: re-comparing the live model to itself yields no changes (stable read).
         Assert.Empty(new SchemaComparer().Compare(live, live));
 
-        // Round-trip idempotency (issue #36): the *project* model compared against the freshly-read
-        // live model must be free of phantom non-destructive changes for the raw object kinds THIS
-        // ISSUE SCOPES — extension, text-search dictionary/config, FDW/server, the typed table
-        // (CREATE TABLE … OF type), plus statistics and aggregates (whose live reconstruction is
-        // canonical-but-not-textually-faithful, compared identity-only). Comprehensive round-trip
-        // fidelity for the remaining raw kinds (cast, operator, operator-class, trigger, comment) —
-        // whose canonical reconstruction or identity still diverges from hand-written source — is a
-        // larger effort tracked as a follow-up under M4/Phase-11 diff; it is intentionally NOT
-        // asserted here so this guard reflects #36's declared scope rather than masking those gaps.
+        // Round-trip idempotency: the *project* model compared against the freshly-read live model must be
+        // free of phantom non-destructive changes. #36 scoped this to extension, text-search dict/config,
+        // FDW/server, typed table, statistics and aggregates. M4 #61/#64 close the remaining gaps —
+        // cast / operator / operator-class / trigger / comment (raw kinds) and the finely-modelled
+        // functions / generated columns / BETWEEN / EXCLUDE — so the guard now covers ALL raw kinds present
+        // in AllFeaturesDb. Cast/operator/operator-class are reconciled by the kind-canonical comparison key
+        // and compared identity-only; triggers keep real body comparison (a changed trigger still diffs) via
+        // NormalizeTriggerBody; comments are read across every object class and paired on canonical body.
         var scoped = new HashSet<ObjectKind>
         {
             ObjectKind.Extension, ObjectKind.TextSearchDictionary, ObjectKind.TextSearchConfiguration,
             ObjectKind.ForeignDataWrapper, ObjectKind.Server, ObjectKind.Statistics,
             ObjectKind.Aggregate, ObjectKind.Table,
+            // #61 additions:
+            ObjectKind.Cast, ObjectKind.Operator, ObjectKind.OperatorClass, ObjectKind.OperatorFamily,
+            ObjectKind.Trigger, ObjectKind.Comment,
+            // other raw kinds AllFeaturesDb exercises that must also round-trip clean:
+            ObjectKind.Type, ObjectKind.Domain, ObjectKind.Collation, ObjectKind.Conversion,
+            ObjectKind.Rule, ObjectKind.Policy, ObjectKind.EventTrigger, ObjectKind.ForeignTable,
+            ObjectKind.Publication, ObjectKind.Language,
         };
         var roundTrip = new SchemaComparer().Compare(built.Model, live);
         var rawChurn = roundTrip

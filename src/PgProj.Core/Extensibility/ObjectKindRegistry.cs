@@ -86,10 +86,15 @@ public static class ObjectKindRegistry
         [ObjectKind.Domain]                = new("domain",        15, "Domains",      null,                         DropTargetStyle.SchemaQualified, false, true),
         [ObjectKind.Collation]             = new("collation",     12, "Collations",   null,                         DropTargetStyle.SchemaQualified, false, false),
         [ObjectKind.Conversion]            = new("conversion",    16, "Conversions",  null,                         DropTargetStyle.SchemaQualified, false, false),
-        [ObjectKind.Cast]                  = new("cast",          82, "Casts",        null,                         DropTargetStyle.Signature,       false, false, NameParseStyle.Cast),
-        [ObjectKind.Operator]              = new("operator",      82, "Operators",    null,                         DropTargetStyle.Signature,       false, false, NameParseStyle.Operator),
-        [ObjectKind.OperatorClass]         = new("operator",      83, "Operators",    "OPERATOR CLASS",             DropTargetStyle.Signature,       false, false, NameParseStyle.OperatorClassFamily),
-        [ObjectKind.OperatorFamily]        = new("operator",      82, "Operators",    "OPERATOR FAMILY",            DropTargetStyle.Signature,       false, false, NameParseStyle.OperatorClassFamily),
+        // Cast / Operator / OperatorClass / OperatorFamily reconstruct canonical DDL (arg-type-spelled
+        // signatures, member ops/funcs, option order) that never textually matches the hand-written source —
+        // so they compare by IDENTITY only (issue #61). The comparer now pairs them on a kind-canonical
+        // ComparisonKey (cast src->tgt, operator symbol, de-doubled opclass schema), so an identity hit means
+        // "same object exists"; a rename/drop still differs (different key → create/drop).
+        [ObjectKind.Cast]                  = new("cast",          82, "Casts",        null,                         DropTargetStyle.Signature,       true,  false, NameParseStyle.Cast),
+        [ObjectKind.Operator]              = new("operator",      82, "Operators",    null,                         DropTargetStyle.Signature,       true,  false, NameParseStyle.Operator),
+        [ObjectKind.OperatorClass]         = new("operator",      83, "Operators",    "OPERATOR CLASS",             DropTargetStyle.Signature,       true,  false, NameParseStyle.OperatorClassFamily),
+        [ObjectKind.OperatorFamily]        = new("operator",      82, "Operators",    "OPERATOR FAMILY",            DropTargetStyle.Signature,       true,  false, NameParseStyle.OperatorClassFamily),
         [ObjectKind.Aggregate]             = new("aggregate",     82, "Aggregates",   null,                         DropTargetStyle.Signature,       true,  false, NameParseStyle.Aggregate),
         [ObjectKind.Trigger]               = new("trigger",       85, "Triggers",     null,                         DropTargetStyle.TableScoped,     false, false, NameParseStyle.TableScopedOn),
         [ObjectKind.Rule]                  = new("rule",          86, "Rules",        null,                         DropTargetStyle.TableScoped,     false, false, NameParseStyle.TableScopedTo),
