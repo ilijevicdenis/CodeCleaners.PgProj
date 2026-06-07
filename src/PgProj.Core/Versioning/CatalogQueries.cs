@@ -341,6 +341,14 @@ public sealed record CatalogQueries
             JOIN pg_foreign_data_wrapper w ON w.oid = s.srvfdw
             ORDER BY s.srvname;";
 
+    // User mappings (#108): FOR <user> SERVER <server> [OPTIONS …]. pg_user_mappings.usename is NULL for a
+    // PUBLIC mapping; umoptions is visible to the server owner / superuser. Identity matches the parser's
+    // `usermapping:for <user> server <server>`.
+    public string UserMappings { get; init; } = @"
+            SELECT um.usename, um.srvname, um.umoptions
+            FROM pg_user_mappings um
+            ORDER BY um.srvname, COALESCE(um.usename, '');";
+
     public string Statistics { get; init; } = @"
             SELECT n.nspname, s.stxname,
                    (s.stxrelid::regclass)::text AS tbl,

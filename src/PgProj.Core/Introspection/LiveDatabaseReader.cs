@@ -52,7 +52,7 @@ public sealed class LiveDatabaseReader
         ReadRangeTypesAsync, ReadShellTypesAsync, ReadCollationsAsync, ReadAggregatesAsync,
         ReadDomainsAsync, ReadTriggersAsync, ReadRulesAsync, ReadPoliciesAsync, ReadEventTriggersAsync,
         ReadCommentsAsync, ReadConversionsAsync, ReadForeignDataWrappersAsync, ReadServersAsync,
-        ReadStatisticsAsync, ReadCastsAsync, ReadForeignTablesAsync, ReadOperatorsAsync,
+        ReadUserMappingsAsync, ReadStatisticsAsync, ReadCastsAsync, ReadForeignTablesAsync, ReadOperatorsAsync,
         ReadOperatorFamiliesAsync, ReadOperatorClassesAsync, ReadTextSearchDictionariesAsync,
         ReadTextSearchConfigurationsAsync, ReadPublicationsAsync, ReadExistenceObjectsAsync,
     ];
@@ -994,6 +994,28 @@ public sealed class LiveDatabaseReader
             body += $" FOREIGN DATA WRAPPER {r.GetString(1)}";
             body += OptionsClause(r.IsDBNull(4) ? null : r.GetFieldValue<string[]>(4));
             list.Add(MakeRaw(ObjectKind.Server, "", name, $"server:{name}", body + ";"));
+        }
+        return list;
+    }
+
+    private async Task<List<RawObjectDefinition>> ReadUserMappingsAsync(NpgsqlConnection conn, CancellationToken ct)
+    {
+        var sql = _q.UserMappings;
+
+        var list = new List<RawObjectDefinition>();
+        await using var cmd = new NpgsqlCommand(sql, conn);
+        await using var r = await cmd.ExecuteReaderAsync(ct);
+        while (await r.ReadAsync(ct))
+        {
+            // usename is NULL for a PUBLIC mapping (#108); the parser reads "PUBLIC" as the user.
+            var user = r.IsDBNull(0) ? "PUBLIC" : r.GetString(0);
+            var srv = r.GetString(1);
+            var opts = OptionsClause(r.IsDBNull(2) ? null : r.GetFieldValue<string[]>(2));
+            var name = $"FOR {user} SERVER {srv}";   // also the DROP USER MAPPING target (Signature style)
+            var body = $"CREATE USER MAPPING {name}{opts};";
+            // Identity-paired (not body-compared): options ordering/visibility makes the body fragile; the
+            // reconstruction is for extract fidelity. Identity matches the parser's usermapping:for…server….
+            list.Add(MakeRaw(ObjectKind.UserMapping, "", name, $"usermapping:{name}", body, bodyComparable: false));
         }
         return list;
     }

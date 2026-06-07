@@ -1084,6 +1084,14 @@
       "Identity": "type:afd.shell_type",
       "Body": "CREATE TYPE afd.shell_type",
       "BodyComparable": true
+    },
+    {
+      "Kind": 18,
+      "Schema": "",
+      "Name": "FOR PUBLIC SERVER dummy_server",
+      "Identity": "usermapping:for public server dummy_server",
+      "Body": "CREATE USER MAPPING FOR PUBLIC SERVER dummy_server OPTIONS(user \u0027remote_bob\u0027)",
+      "BodyComparable": true
     }
   ]
 }

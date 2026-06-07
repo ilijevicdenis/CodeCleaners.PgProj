@@ -70,6 +70,9 @@ public sealed class LiveReaderIntegrationTests : IClassFixture<ThrowawayDatabase
         Assert.Contains(live.Objects, o => o.Kind == ObjectKind.Policy && o.Body.Contains(" TO PUBLIC"));
         // #98: EXCLUDE constraints are introspected into TableDefinition.OtherConstraints.
         Assert.Contains(live.Tables, t => t.OtherConstraints.Any(c => c.Contains("EXCLUDE")));
+        // #108: user mappings are introspected (FOR <user> SERVER <server> [OPTIONS …]).
+        Assert.Contains(live.Objects, o => o.Kind == ObjectKind.UserMapping
+            && o.Body.Contains("CREATE USER MAPPING") && o.Body.Contains("SERVER dummy_server"));
 
         // Every exported object's DDL must re-parse cleanly — this is the "complete the parser" check.
         var unparseable = DdlExporter.ExportFiles(live)

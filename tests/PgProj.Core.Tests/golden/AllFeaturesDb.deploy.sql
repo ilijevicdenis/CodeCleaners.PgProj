@@ -1,6 +1,6 @@
 -- ============================================================
 -- PgProj deployment script
--- 69 change(s)
+-- 70 change(s)
 -- ============================================================
 
 BEGIN;
@@ -52,6 +52,9 @@ CREATE FOREIGN DATA WRAPPER dummy_fdw NO HANDLER NO VALIDATOR OPTIONS(debug 'tru
 
 -- Create server dummy_server
 CREATE SERVER dummy_server FOREIGN DATA WRAPPER dummy_fdw OPTIONS(host 'localhost',dbname 'remote');
+
+-- Create usermapping FOR PUBLIC SERVER dummy_server
+CREATE USER MAPPING FOR PUBLIC SERVER dummy_server OPTIONS(user 'remote_bob');
 
 -- Create table afd.base_entity
 CREATE TABLE "afd"."base_entity" (
