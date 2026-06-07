@@ -7,6 +7,7 @@ using PgProj.Core.Introspection;
 using PgProj.Core.Model;
 using PgProj.Core.Packaging;
 using PgProj.Core.Project;
+using PgProj.Core.Snapshot;
 
 namespace PgProj.Core.Cli;
 
@@ -21,6 +22,9 @@ public enum EndpointKind
 
     /// <summary>A live PostgreSQL database, introspected via its connection string.</summary>
     LiveDatabase,
+
+    /// <summary>A <c>.schema.snapshot</c> capture of a database; its model is loaded offline (no DB connection).</summary>
+    Snapshot,
 }
 
 /// <summary>The outcome of resolving a source/target spec to a comparable model.</summary>
@@ -29,12 +33,15 @@ public enum EndpointKind
 /// <param name="Project">The loaded project — non-null only for <see cref="EndpointKind.Project"/>.</param>
 /// <param name="DisplayName">A human label for banners/reports (project/package name, or "(database)").</param>
 /// <param name="BuildDiagnostics">Build problems for a <see cref="EndpointKind.Project"/> source (empty otherwise).</param>
+/// <param name="SnapshotManifest">The snapshot's manifest — non-null only for <see cref="EndpointKind.Snapshot"/>
+/// (carries the captured source PG version / format version used for staleness checks).</param>
 public sealed record ResolvedEndpoint(
     EndpointKind Kind,
     DatabaseModel Model,
     DatabaseProject? Project,
     string DisplayName,
-    IReadOnlyList<string> BuildDiagnostics);
+    IReadOnlyList<string> BuildDiagnostics,
+    SchemaSnapshotManifest? SnapshotManifest = null);
 
 /// <summary>
 /// Resolves a single source/target <em>spec</em> — a <c>.pgproj</c> path, a <c>.pgpkg</c> path, or a
@@ -53,15 +60,18 @@ public sealed record ResolvedEndpoint(
 public static class EndpointResolver
 {
     /// <summary>
-    /// Classifies a spec without touching it: a <c>*.pgpkg</c> → <see cref="EndpointKind.Package"/>; a
-    /// <c>*.pgproj</c> (by extension, or any existing file) → <see cref="EndpointKind.Project"/>; anything
-    /// else → <see cref="EndpointKind.LiveDatabase"/> (a connection string).
+    /// Classifies a spec without touching it: a <c>*.schema.snapshot</c> → <see cref="EndpointKind.Snapshot"/>;
+    /// a <c>*.pgpkg</c> → <see cref="EndpointKind.Package"/>; a <c>*.pgproj</c> (by extension, or any existing
+    /// file) → <see cref="EndpointKind.Project"/>; anything else → <see cref="EndpointKind.LiveDatabase"/>
+    /// (a connection string).
     /// </summary>
     public static EndpointKind Classify(string spec)
     {
         if (string.IsNullOrWhiteSpace(spec))
-            throw new CliUsageException("Expected a source/target (a .pgproj, a .pgpkg, or a connection string).");
+            throw new CliUsageException("Expected a source/target (a .pgproj, .pgpkg, .schema.snapshot, or a connection string).");
 
+        // The compound .schema.snapshot suffix is checked before the generic File.Exists → Project rule.
+        if (SchemaSnapshot.IsSnapshotPath(spec)) return EndpointKind.Snapshot;
         if (PgPkg.IsPackagePath(spec)) return EndpointKind.Package;
         if (spec.EndsWith(".pgproj", StringComparison.OrdinalIgnoreCase)) return EndpointKind.Project;
         // A real file on disk is never a connection string (covers extension-less or oddly-named projects).
@@ -81,6 +91,15 @@ public static class EndpointResolver
             {
                 var pkg = PgPkg.Read(Path.GetFullPath(spec));   // verifies the integrity checksum on read
                 return new ResolvedEndpoint(EndpointKind.Package, pkg.Model, null, pkg.Manifest.Name, Array.Empty<string>());
+            }
+            case EndpointKind.Snapshot:
+            {
+                // Offline: the snapshot's model is loaded straight from the file (integrity-checked on read).
+                // NO database connection is made on the compare step — this is the whole point of a snapshot.
+                var snap = SchemaSnapshot.Read(Path.GetFullPath(spec));
+                var display = snap.Manifest.SourceName is { Length: > 0 } n ? n : "(snapshot)";
+                return new ResolvedEndpoint(EndpointKind.Snapshot, snap.Model, null, display,
+                    Array.Empty<string>(), snap.Manifest);
             }
             case EndpointKind.Project:
             {
