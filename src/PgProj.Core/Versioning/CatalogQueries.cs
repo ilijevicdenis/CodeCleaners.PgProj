@@ -222,7 +222,7 @@ public sealed record CatalogQueries
             ORDER BY n.nspname, c.relname, pol.polname;";
 
     public string EventTriggers { get; init; } = @"
-            SELECT e.evtname, e.evtevent, np.nspname, p.proname
+            SELECT e.evtname, e.evtevent, np.nspname, p.proname, e.evttags
             FROM pg_event_trigger e
             JOIN pg_proc p ON p.oid = e.evtfoid
             JOIN pg_namespace np ON np.oid = p.pronamespace

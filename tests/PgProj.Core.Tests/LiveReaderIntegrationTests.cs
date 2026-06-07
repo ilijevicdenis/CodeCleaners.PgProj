@@ -63,6 +63,9 @@ public sealed class LiveReaderIntegrationTests : IClassFixture<ThrowawayDatabase
         Assert.Contains(live.Objects, o => o.Kind == ObjectKind.TextSearchConfiguration && o.Body.Contains("ADD MAPPING"));
         Assert.Contains(live.Objects, o => o.Kind == ObjectKind.OperatorClass && o.Body.Contains("CREATE OPERATOR CLASS"));
         Assert.Contains(live.Objects, o => o.Kind == ObjectKind.Publication && o.Body.Contains("CREATE PUBLICATION") && o.Body.Contains("FOR TABLE"));
+        // #104: event-trigger reconstruction now carries the WHEN TAG IN (...) filter (was omitted).
+        Assert.Contains(live.Objects, o => o.Kind == ObjectKind.EventTrigger
+            && o.Body.Contains("WHEN TAG IN") && o.Body.Contains("'CREATE TABLE'"));
 
         // Every exported object's DDL must re-parse cleanly — this is the "complete the parser" check.
         var unparseable = DdlExporter.ExportFiles(live)

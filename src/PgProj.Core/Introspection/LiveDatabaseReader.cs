@@ -713,8 +713,17 @@ public sealed class LiveDatabaseReader
         while (await r.ReadAsync(ct))
         {
             var name = r.GetString(0);
-            var body = $"CREATE EVENT TRIGGER {name} ON {r.GetString(1)} EXECUTE FUNCTION {r.GetString(2)}.{r.GetString(3)}();";
-            list.Add(MakeRaw(ObjectKind.EventTrigger, "", name, $"eventtrigger:{name}", body, bodyComparable: false));
+            var evt = r.GetString(1);
+            var fn = $"{r.GetString(2)}.{r.GetString(3)}";
+            // evttags (text[]) preserves the WHEN TAG IN order; NULL/empty = no tag filter (#104).
+            var tags = r.IsDBNull(4) ? null : r.GetFieldValue<string[]>(4);
+            var when = tags is { Length: > 0 }
+                ? " WHEN TAG IN (" + string.Join(", ", tags.Select(t => "'" + t.Replace("'", "''") + "'")) + ")"
+                : "";
+            var body = $"CREATE EVENT TRIGGER {name} ON {evt}{when} EXECUTE FUNCTION {fn}();";
+            // With the tags reconstructed the body now matches the parsed source under NormalizeRawBody,
+            // so it is body-comparable (was identity-only while tags were dropped).
+            list.Add(MakeRaw(ObjectKind.EventTrigger, "", name, $"eventtrigger:{name}", body));
         }
         return list;
     }
