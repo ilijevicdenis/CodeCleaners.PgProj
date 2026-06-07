@@ -50,13 +50,22 @@ public sealed class PlpgsqlValidator
     {
         var src = StripDollar(rawBody);
         if (src is null) return Array.Empty<string>();          // not dollar-quoted — skip (escape ambiguity)
-        List<Token> toks;
-        try { toks = OperatorLexer.Merge(Tokenizer.Tokenize(src)); }
+        // Re-tokenize the body to an always-pooled buffer returned in the finally. The validator only reads
+        // the stream through its cursor (no RenderRange/Segment — error messages are independent interpolated
+        // strings, and _errors retains no view into the buffer), so the rented Token[] goes straight back to
+        // the pool instead of the old copied-out List<Token>. Function bodies are often large, so this is the
+        // biggest of the transient re-tokenizations to pool.
+        PooledTokens toks;
+        try { toks = OperatorLexer.MergeInPlace(Tokenizer.TokenizeTransient(src)); }
         catch { return Array.Empty<string>(); }
-        var v = new PlpgsqlValidator(new TokenCursor(toks), ctx);
-        try { v.ParseBlock(topLevel: true); }
-        catch (ParseException) { /* lost the thread — never report a generic failure */ }
-        return v._errors;
+        try
+        {
+            var v = new PlpgsqlValidator(new TokenCursor(toks), ctx);
+            try { v.ParseBlock(topLevel: true); }
+            catch (ParseException) { /* lost the thread — never report a generic failure */ }
+            return v._errors;
+        }
+        finally { toks.Return(); }
     }
 
     private void Err(string message) => _errors.Add(message);
