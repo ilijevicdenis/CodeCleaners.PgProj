@@ -152,7 +152,11 @@ public sealed class ModelBuilder
                     case ObjectKind.Rule:
                         name = cur.ExpectIdentifier(); onObject = ScanThenQual(cur, "TO"); schema = SchemaOf(onObject); break;
                     case ObjectKind.Aggregate:
-                        { var (sc, an) = Qual(cur); schema = sc; name = $"{sc}.{an}" + ParenArgs(cur); break; }
+                        // Leave `schema` empty and fold it into `name` (like Operator/Cast): the name must
+                        // carry the schema + arg signature so the identity is `aggregate:<schema>.<name>(<args>)`,
+                        // matching the live reader. Setting `schema` here too would double it via BuildIdentity
+                        // (`aggregate:afd.afd.sum_int(integer)`) and make every aggregate read as a phantom create.
+                        { var (sc, an) = Qual(cur); name = $"{sc}.{an}" + ParenArgs(cur); break; }
                     case ObjectKind.Operator:
                         name = CaptureUntilOpenParen(cur) + ParenArgs(cur); break;
                     case ObjectKind.OperatorClass or ObjectKind.OperatorFamily:

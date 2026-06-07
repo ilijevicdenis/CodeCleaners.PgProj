@@ -305,7 +305,12 @@ public sealed class SchemaComparer
                     continue;
                 changes.Add(new CreateRawObjectChange(src));
             }
-            else if (src.BodyComparable && tgt.BodyComparable && NormalizeRawBody(src.Body) != NormalizeRawBody(tgt.Body))
+            else if (src.BodyComparable && tgt.BodyComparable
+                     // Identity-only kinds (extension, text-search dict/config, FDW, server) reconstruct
+                     // canonical DDL the source never matches textually — an identity hit means "same
+                     // object exists", so never body-diff them or every round-trip churns a phantom recreate.
+                     && !RawObjectMeta.ComparesByIdentityOnly(src.Kind)
+                     && NormalizeRawBody(src.Body) != NormalizeRawBody(tgt.Body))
             {
                 // A destructive recreate (type/domain/foreign table can cascade-drop columns) is
                 // only emitted when drops are allowed; in-place redefinitions always proceed.
@@ -364,9 +369,16 @@ public sealed class SchemaComparer
     private static string NormalizeBody(string s)
         => PunctSpace.Replace(LiteralCast.Replace(NormalizeText(DollarTag.Replace(s, "$$$$")), "$1"), "$1").TrimEnd(';', ' ');
 
+    // `IF NOT EXISTS` is an idempotency hint on CREATE, not part of the object's definition: the live
+    // reader emits it (so a re-deploy is replayable) while a project file may omit it. Drop it before
+    // comparison so `CREATE EXTENSION x` and `CREATE EXTENSION IF NOT EXISTS x` don't register a diff.
+    private static readonly Regex IfNotExists = new(@"\bif\s+not\s+exists\b", RegexOptions.Compiled);
+
     /// <summary>Raw single-statement DDL additionally ignores identifier quoting — the catalog reader
-    /// quotes names (e.g. <c>CREATE EXTENSION "btree_gist"</c>) that a project usually writes bare.</summary>
-    private static string NormalizeRawBody(string s) => NormalizeBody(s.Replace("\"", ""));
+    /// quotes names (e.g. <c>CREATE EXTENSION "btree_gist"</c>) that a project usually writes bare —
+    /// and the <c>IF NOT EXISTS</c> idempotency hint.</summary>
+    private static string NormalizeRawBody(string s) =>
+        Whitespace.Replace(IfNotExists.Replace(NormalizeBody(s.Replace("\"", "")), " "), " ").Trim();
 
     private static bool IndexesEqual(IndexDefinition a, IndexDefinition b) =>
         a.IsUnique == b.IsUnique

@@ -2,6 +2,7 @@ using System.Linq;
 using PgProj.Core.Comparison;
 using PgProj.Core.Model;
 using PgProj.Core.Parsing;
+using PgProj.Core.Syntax;
 using Xunit;
 
 namespace PgProj.Core.Tests;
@@ -128,6 +129,128 @@ public class RawObjectTests
         var changes = new SchemaComparer().Compare(source, target);
         Assert.Empty(changes.OfType<CreateRawObjectChange>());
         Assert.Empty(changes.OfType<RecreateRawObjectChange>());
+    }
+
+    // ---- round-trip idempotency (issue #36): a project model compared against a model holding the
+    // live reader's *canonical* reconstruction of the same object must produce ZERO phantom diffs. -----
+
+    /// <summary>Builds a one-object model the way <c>LiveDatabaseReader</c> would, so a comparison
+    /// stands in for an extract → re-compare without needing a live server.</summary>
+    private static DatabaseModel Live(ObjectKind kind, string schema, string name, string identity, string body)
+    {
+        var m = new DatabaseModel();
+        // The source model auto-creates any referenced schema; mirror that on the live side so the
+        // only thing under test is the raw-object body comparison (not a spurious CreateSchema diff).
+        if (!string.IsNullOrEmpty(schema)) m.Schemas.Add(new SchemaDefinition(schema));
+        m.Objects.Add(new RawObjectDefinition(kind, schema, name, identity.ToLowerInvariant(), body));
+        return m;
+    }
+
+    private static void AssertNoPhantomDiff(DatabaseModel source, DatabaseModel live)
+    {
+        // Both diff directions must be clean, with and without --allow-drops, mirroring extract/drift.
+        Assert.Empty(new SchemaComparer().Compare(source, live));
+        Assert.Empty(new SchemaComparer().Compare(source, live, new ComparerOptions { DropObjectsNotInSource = true }));
+    }
+
+    [Fact]
+    public void Extension_bare_vs_if_not_exists_quoted_is_no_diff()
+    {
+        // Source writes it bare; the reader emits IF NOT EXISTS + quoted name.
+        var source = Parse("CREATE EXTENSION btree_gist;");
+        var live = Live(ObjectKind.Extension, "", "btree_gist", "extension:btree_gist",
+            "CREATE EXTENSION IF NOT EXISTS \"btree_gist\";");
+        AssertNoPhantomDiff(source, live);
+    }
+
+    [Fact]
+    public void TextSearchDictionary_option_formatting_is_no_diff()
+    {
+        // Source: multi-line, spaced options; reader: single line, different option spelling/order.
+        var source = Parse("""
+            CREATE TEXT SEARCH DICTIONARY afd.english_dict (
+                TEMPLATE  = pg_catalog.simple,
+                STOPWORDS = english
+            );
+            """);
+        var live = Live(ObjectKind.TextSearchDictionary, "afd", "english_dict",
+            "textsearchdictionary:afd.english_dict",
+            "CREATE TEXT SEARCH DICTIONARY afd.english_dict (TEMPLATE = pg_catalog.simple, stopwords = 'english');");
+        AssertNoPhantomDiff(source, live);
+    }
+
+    [Fact]
+    public void TextSearchConfiguration_copy_vs_parser_add_mapping_is_no_diff()
+    {
+        // The classic phantom: source COPYs a config + one ALTER MAPPING; the reader reconstructs the
+        // end state as PARSER=… plus one ADD MAPPING per token type — structurally different DDL,
+        // semantically the same object. Identity-only comparison keeps the round-trip clean.
+        var source = Parse("""
+            CREATE TEXT SEARCH CONFIGURATION afd.english_cfg (COPY = pg_catalog.english);
+            ALTER TEXT SEARCH CONFIGURATION afd.english_cfg
+                ALTER MAPPING FOR asciiword, word WITH afd.english_dict;
+            """);
+        var live = Live(ObjectKind.TextSearchConfiguration, "afd", "english_cfg",
+            "textsearchconfiguration:afd.english_cfg",
+            "CREATE TEXT SEARCH CONFIGURATION afd.english_cfg (PARSER = pg_catalog.default);\n"
+            + "ALTER TEXT SEARCH CONFIGURATION afd.english_cfg ADD MAPPING FOR asciiword WITH afd.english_dict;\n"
+            + "ALTER TEXT SEARCH CONFIGURATION afd.english_cfg ADD MAPPING FOR word WITH afd.english_dict;");
+        AssertNoPhantomDiff(source, live);
+    }
+
+    [Fact]
+    public void ForeignDataWrapper_option_and_handler_formatting_is_no_diff()
+    {
+        var source = Parse("CREATE FOREIGN DATA WRAPPER dummy_fdw NO HANDLER NO VALIDATOR OPTIONS (debug 'true');");
+        // Reader omits the NO HANDLER / NO VALIDATOR keywords and may reorder/format OPTIONS.
+        var live = Live(ObjectKind.ForeignDataWrapper, "", "dummy_fdw", "foreigndatawrapper:dummy_fdw",
+            "CREATE FOREIGN DATA WRAPPER dummy_fdw OPTIONS (debug 'true');");
+        AssertNoPhantomDiff(source, live);
+    }
+
+    [Fact]
+    public void Server_option_formatting_is_no_diff()
+    {
+        var source = Parse("CREATE SERVER dummy_server FOREIGN DATA WRAPPER dummy_fdw OPTIONS (host 'localhost', dbname 'x');");
+        var live = Live(ObjectKind.Server, "", "dummy_server", "server:dummy_server",
+            "CREATE SERVER dummy_server FOREIGN DATA WRAPPER dummy_fdw OPTIONS (host 'localhost', dbname 'x');");
+        AssertNoPhantomDiff(source, live);
+    }
+
+    [Fact]
+    public void IdentityOnly_kinds_still_create_when_target_is_missing()
+    {
+        // Identity-only comparison must NOT mask a genuinely absent object — it must still be created.
+        var source = Parse("CREATE EXTENSION btree_gist;");
+        var change = Assert.Single(new SchemaComparer().Compare(source, new DatabaseModel()).OfType<CreateRawObjectChange>());
+        Assert.Contains("CREATE EXTENSION", change.ToSql());
+    }
+
+    [Fact]
+    public void Typed_table_OF_type_round_trips_against_reader_form()
+    {
+        // Source models a typed table as a raw `table:` object (OF type); the reader now reconstructs
+        // the same OF-type form (instead of flattening to a column list), so re-compare is clean.
+        var source = Parse("CREATE TABLE afd.address_row OF afd.address (PRIMARY KEY (zip));");
+        var live = Live(ObjectKind.Table, "afd", "address_row", "table:afd.address_row",
+            "CREATE TABLE afd.address_row OF afd.address (PRIMARY KEY (zip));");
+        AssertNoPhantomDiff(source, live);
+
+        // And the typed-table OF-type body re-parses cleanly (extract fidelity).
+        Assert.Empty(new PgParser().Parse(live.Objects.Single().Body).Diagnostics);
+    }
+
+    [Fact]
+    public void Identity_only_metadata_covers_the_canonical_reconstruction_kinds()
+    {
+        Assert.True(RawObjectMeta.ComparesByIdentityOnly(ObjectKind.Extension));
+        Assert.True(RawObjectMeta.ComparesByIdentityOnly(ObjectKind.TextSearchDictionary));
+        Assert.True(RawObjectMeta.ComparesByIdentityOnly(ObjectKind.TextSearchConfiguration));
+        Assert.True(RawObjectMeta.ComparesByIdentityOnly(ObjectKind.ForeignDataWrapper));
+        Assert.True(RawObjectMeta.ComparesByIdentityOnly(ObjectKind.Server));
+        // Body-faithful kinds must keep their real body diff (e.g. triggers detect changes).
+        Assert.False(RawObjectMeta.ComparesByIdentityOnly(ObjectKind.Trigger));
+        Assert.False(RawObjectMeta.ComparesByIdentityOnly(ObjectKind.Type));
     }
 
     [Fact]

@@ -1,0 +1,1089 @@
+{
+  "Schemas": [
+    {
+      "Name": "afd"
+    },
+    {
+      "Name": "reporting"
+    }
+  ],
+  "Tables": [
+    {
+      "Schema": "afd",
+      "Name": "base_entity",
+      "Columns": [
+        {
+          "Name": "id",
+          "DataType": "bigint",
+          "IsNullable": false,
+          "IsIdentity": true,
+          "IdentityKind": "BY DEFAULT",
+          "IsSerial": false
+        },
+        {
+          "Name": "created_at",
+          "DataType": "timestamp with time zone",
+          "IsNullable": false,
+          "Default": "now()",
+          "IsIdentity": false,
+          "IsSerial": false
+        },
+        {
+          "Name": "kind",
+          "DataType": "text",
+          "IsNullable": false,
+          "IsIdentity": false,
+          "IsSerial": false
+        }
+      ],
+      "PrimaryKey": {
+        "Columns": [
+          "id"
+        ]
+      },
+      "Unique": [],
+      "ForeignKeys": [],
+      "Checks": [],
+      "OtherConstraints": [],
+      "QualifiedName": "afd.base_entity"
+    },
+    {
+      "Schema": "afd",
+      "Name": "customers",
+      "Columns": [
+        {
+          "Name": "id",
+          "DataType": "bigint",
+          "IsNullable": true,
+          "IsIdentity": true,
+          "IdentityKind": "BY DEFAULT",
+          "IsSerial": false
+        },
+        {
+          "Name": "tenant_id",
+          "DataType": "integer",
+          "IsNullable": false,
+          "Default": "1",
+          "IsIdentity": false,
+          "IsSerial": false
+        },
+        {
+          "Name": "email",
+          "DataType": "afd.email",
+          "IsNullable": false,
+          "IsIdentity": false,
+          "IsSerial": false
+        },
+        {
+          "Name": "full_name",
+          "DataType": "text",
+          "IsNullable": false,
+          "IsIdentity": false,
+          "IsSerial": false
+        },
+        {
+          "Name": "code",
+          "DataType": "character(8)",
+          "IsNullable": true,
+          "IsIdentity": false,
+          "IsSerial": false
+        },
+        {
+          "Name": "short_name",
+          "DataType": "character varying(50)",
+          "IsNullable": true,
+          "IsIdentity": false,
+          "IsSerial": false
+        },
+        {
+          "Name": "notes",
+          "DataType": "text",
+          "IsNullable": true,
+          "IsIdentity": false,
+          "IsSerial": false
+        },
+        {
+          "Name": "balance_cents",
+          "DataType": "bigint",
+          "IsNullable": false,
+          "Default": "0",
+          "IsIdentity": false,
+          "IsSerial": false
+        },
+        {
+          "Name": "score",
+          "DataType": "numeric(10, 2)",
+          "IsNullable": false,
+          "Default": "0",
+          "IsIdentity": false,
+          "IsSerial": false
+        },
+        {
+          "Name": "rating",
+          "DataType": "real",
+          "IsNullable": true,
+          "IsIdentity": false,
+          "IsSerial": false
+        },
+        {
+          "Name": "big_rating",
+          "DataType": "double precision",
+          "IsNullable": true,
+          "IsIdentity": false,
+          "IsSerial": false
+        },
+        {
+          "Name": "qty",
+          "DataType": "afd.pos_int",
+          "IsNullable": true,
+          "Default": "1",
+          "IsIdentity": false,
+          "IsSerial": false
+        },
+        {
+          "Name": "serial_no",
+          "DataType": "integer",
+          "IsNullable": false,
+          "IsIdentity": false,
+          "IsSerial": true
+        },
+        {
+          "Name": "big_serial_no",
+          "DataType": "bigint",
+          "IsNullable": false,
+          "IsIdentity": false,
+          "IsSerial": true
+        },
+        {
+          "Name": "is_active",
+          "DataType": "boolean",
+          "IsNullable": false,
+          "Default": "true",
+          "IsIdentity": false,
+          "IsSerial": false
+        },
+        {
+          "Name": "created_at",
+          "DataType": "timestamp with time zone",
+          "IsNullable": false,
+          "Default": "now()",
+          "IsIdentity": false,
+          "IsSerial": false
+        },
+        {
+          "Name": "born_on",
+          "DataType": "date",
+          "IsNullable": true,
+          "IsIdentity": false,
+          "IsSerial": false
+        },
+        {
+          "Name": "wake_time",
+          "DataType": "time without time zone",
+          "IsNullable": true,
+          "IsIdentity": false,
+          "IsSerial": false
+        },
+        {
+          "Name": "duration",
+          "DataType": "interval",
+          "IsNullable": true,
+          "IsIdentity": false,
+          "IsSerial": false
+        },
+        {
+          "Name": "ip_addr",
+          "DataType": "inet",
+          "IsNullable": true,
+          "IsIdentity": false,
+          "IsSerial": false
+        },
+        {
+          "Name": "mac",
+          "DataType": "macaddr",
+          "IsNullable": true,
+          "IsIdentity": false,
+          "IsSerial": false
+        },
+        {
+          "Name": "flags",
+          "DataType": "bit(8)",
+          "IsNullable": true,
+          "IsIdentity": false,
+          "IsSerial": false
+        },
+        {
+          "Name": "varflags",
+          "DataType": "bit varying(16)",
+          "IsNullable": true,
+          "IsIdentity": false,
+          "IsSerial": false
+        },
+        {
+          "Name": "ext_id",
+          "DataType": "uuid",
+          "IsNullable": true,
+          "Default": "gen_random_uuid()",
+          "IsIdentity": false,
+          "IsSerial": false
+        },
+        {
+          "Name": "wallet",
+          "DataType": "money",
+          "IsNullable": true,
+          "IsIdentity": false,
+          "IsSerial": false
+        },
+        {
+          "Name": "tags",
+          "DataType": "text[]",
+          "IsNullable": false,
+          "Default": "\u0027{}\u0027",
+          "IsIdentity": false,
+          "IsSerial": false
+        },
+        {
+          "Name": "scores",
+          "DataType": "integer[]",
+          "IsNullable": true,
+          "IsIdentity": false,
+          "IsSerial": false
+        },
+        {
+          "Name": "matrix",
+          "DataType": "numeric(6, 2)[][]",
+          "IsNullable": true,
+          "IsIdentity": false,
+          "IsSerial": false
+        },
+        {
+          "Name": "profile",
+          "DataType": "jsonb",
+          "IsNullable": false,
+          "Default": "\u0027{}\u0027::jsonb",
+          "IsIdentity": false,
+          "IsSerial": false
+        },
+        {
+          "Name": "legacy_doc",
+          "DataType": "json",
+          "IsNullable": true,
+          "IsIdentity": false,
+          "IsSerial": false
+        },
+        {
+          "Name": "xml_doc",
+          "DataType": "xml",
+          "IsNullable": true,
+          "IsIdentity": false,
+          "IsSerial": false
+        },
+        {
+          "Name": "home",
+          "DataType": "afd.address",
+          "IsNullable": true,
+          "IsIdentity": false,
+          "IsSerial": false
+        },
+        {
+          "Name": "status",
+          "DataType": "afd.mood",
+          "IsNullable": false,
+          "Default": "\u0027ok\u0027",
+          "IsIdentity": false,
+          "IsSerial": false
+        },
+        {
+          "Name": "valid_period",
+          "DataType": "tstzrange",
+          "IsNullable": true,
+          "IsIdentity": false,
+          "IsSerial": false
+        },
+        {
+          "Name": "temp_range",
+          "DataType": "afd.float_range",
+          "IsNullable": true,
+          "IsIdentity": false,
+          "IsSerial": false
+        },
+        {
+          "Name": "region",
+          "DataType": "circle",
+          "IsNullable": true,
+          "IsIdentity": false,
+          "IsSerial": false
+        },
+        {
+          "Name": "search",
+          "DataType": "tsvector",
+          "IsNullable": true,
+          "IsIdentity": false,
+          "IsSerial": false
+        },
+        {
+          "Name": "order_no",
+          "DataType": "bigint",
+          "IsNullable": false,
+          "Default": "nextval(\u0027afd.order_no_seq\u0027)",
+          "IsIdentity": false,
+          "IsSerial": false
+        },
+        {
+          "Name": "name_upper",
+          "DataType": "text",
+          "IsNullable": true,
+          "IsIdentity": false,
+          "GeneratedExpression": "upper(full_name)",
+          "IsSerial": false
+        },
+        {
+          "Name": "balance_dollars",
+          "DataType": "numeric(20, 2)",
+          "IsNullable": true,
+          "IsIdentity": false,
+          "GeneratedExpression": "balance_cents/100.0",
+          "IsSerial": false
+        },
+        {
+          "Name": "discount",
+          "DataType": "integer",
+          "IsNullable": true,
+          "IsIdentity": false,
+          "IsSerial": false
+        },
+        {
+          "Name": "referral_email",
+          "DataType": "afd.email",
+          "IsNullable": true,
+          "IsIdentity": false,
+          "IsSerial": false
+        }
+      ],
+      "PrimaryKey": {
+        "Name": "customers_pk",
+        "Columns": [
+          "tenant_id",
+          "id"
+        ]
+      },
+      "Unique": [
+        {
+          "Columns": [
+            "referral_email"
+          ]
+        },
+        {
+          "Name": "customers_email_uq",
+          "Columns": [
+            "tenant_id",
+            "email"
+          ]
+        }
+      ],
+      "ForeignKeys": [],
+      "Checks": [
+        {
+          "Expression": "discount BETWEEN 0 AND 100"
+        },
+        {
+          "Name": "customers_score_chk",
+          "Expression": "score\u003E=0"
+        }
+      ],
+      "OtherConstraints": [],
+      "QualifiedName": "afd.customers"
+    },
+    {
+      "Schema": "afd",
+      "Name": "customers_archive",
+      "Columns": [
+        {
+          "Name": "archived_at",
+          "DataType": "timestamp with time zone",
+          "IsNullable": false,
+          "Default": "now()",
+          "IsIdentity": false,
+          "IsSerial": false
+        }
+      ],
+      "Unique": [],
+      "ForeignKeys": [],
+      "Checks": [],
+      "OtherConstraints": [],
+      "QualifiedName": "afd.customers_archive"
+    },
+    {
+      "Schema": "afd",
+      "Name": "document",
+      "Columns": [
+        {
+          "Name": "title",
+          "DataType": "text",
+          "IsNullable": false,
+          "IsIdentity": false,
+          "IsSerial": false
+        },
+        {
+          "Name": "body",
+          "DataType": "text",
+          "IsNullable": true,
+          "IsIdentity": false,
+          "IsSerial": false
+        }
+      ],
+      "Unique": [],
+      "ForeignKeys": [],
+      "Checks": [],
+      "OtherConstraints": [],
+      "TrailingOptions": "INHERITS(afd.base_entity)",
+      "QualifiedName": "afd.document"
+    },
+    {
+      "Schema": "afd",
+      "Name": "events",
+      "Columns": [
+        {
+          "Name": "id",
+          "DataType": "bigint",
+          "IsNullable": true,
+          "IsIdentity": true,
+          "IdentityKind": "BY DEFAULT",
+          "IsSerial": false
+        },
+        {
+          "Name": "occurred",
+          "DataType": "date",
+          "IsNullable": false,
+          "IsIdentity": false,
+          "IsSerial": false
+        },
+        {
+          "Name": "kind",
+          "DataType": "text",
+          "IsNullable": false,
+          "IsIdentity": false,
+          "IsSerial": false
+        },
+        {
+          "Name": "payload",
+          "DataType": "jsonb",
+          "IsNullable": true,
+          "IsIdentity": false,
+          "IsSerial": false
+        }
+      ],
+      "PrimaryKey": {
+        "Columns": [
+          "id",
+          "occurred"
+        ]
+      },
+      "Unique": [],
+      "ForeignKeys": [],
+      "Checks": [],
+      "OtherConstraints": [],
+      "TrailingOptions": "PARTITION BY RANGE(occurred)",
+      "QualifiedName": "afd.events"
+    },
+    {
+      "Schema": "afd",
+      "Name": "orders",
+      "Columns": [
+        {
+          "Name": "id",
+          "DataType": "bigint",
+          "IsNullable": false,
+          "IsIdentity": true,
+          "IdentityKind": "ALWAYS",
+          "IsSerial": false
+        },
+        {
+          "Name": "tenant_id",
+          "DataType": "integer",
+          "IsNullable": false,
+          "IsIdentity": false,
+          "IsSerial": false
+        },
+        {
+          "Name": "customer_id",
+          "DataType": "bigint",
+          "IsNullable": false,
+          "IsIdentity": false,
+          "IsSerial": false
+        },
+        {
+          "Name": "total_cents",
+          "DataType": "integer",
+          "IsNullable": false,
+          "Default": "0",
+          "IsIdentity": false,
+          "IsSerial": false
+        },
+        {
+          "Name": "placed_at",
+          "DataType": "timestamp with time zone",
+          "IsNullable": false,
+          "Default": "now()",
+          "IsIdentity": false,
+          "IsSerial": false
+        }
+      ],
+      "PrimaryKey": {
+        "Columns": [
+          "id"
+        ]
+      },
+      "Unique": [],
+      "ForeignKeys": [
+        {
+          "Name": "orders_customer_fk",
+          "Columns": [
+            "tenant_id",
+            "customer_id"
+          ],
+          "ReferencedSchema": "afd",
+          "ReferencedTable": "customers",
+          "ReferencedColumns": [
+            "tenant_id",
+            "id"
+          ],
+          "OnDelete": "CASCADE",
+          "OnUpdate": "RESTRICT"
+        }
+      ],
+      "Checks": [
+        {
+          "Expression": "total_cents\u003E=0"
+        }
+      ],
+      "OtherConstraints": [],
+      "QualifiedName": "afd.orders"
+    },
+    {
+      "Schema": "afd",
+      "Name": "room_booking",
+      "Columns": [
+        {
+          "Name": "id",
+          "DataType": "bigint",
+          "IsNullable": false,
+          "IsIdentity": true,
+          "IdentityKind": "BY DEFAULT",
+          "IsSerial": false
+        },
+        {
+          "Name": "room_id",
+          "DataType": "integer",
+          "IsNullable": false,
+          "IsIdentity": false,
+          "IsSerial": false
+        },
+        {
+          "Name": "during",
+          "DataType": "tstzrange",
+          "IsNullable": false,
+          "IsIdentity": false,
+          "IsSerial": false
+        }
+      ],
+      "PrimaryKey": {
+        "Columns": [
+          "id"
+        ]
+      },
+      "Unique": [],
+      "ForeignKeys": [],
+      "Checks": [],
+      "OtherConstraints": [
+        "CONSTRAINT room_no_overlap EXCLUDE USING gist(room_id WITH=,during WITH\u0026\u0026)"
+      ],
+      "QualifiedName": "afd.room_booking"
+    }
+  ],
+  "Indexes": [
+    {
+      "Name": "customers_active_idx",
+      "Schema": "afd",
+      "Table": "customers",
+      "Columns": [
+        "full_name"
+      ],
+      "IsUnique": false,
+      "WhereClause": "is_active"
+    },
+    {
+      "Name": "customers_email_idx",
+      "Schema": "afd",
+      "Table": "customers",
+      "Columns": [
+        "tenant_id",
+        "email"
+      ],
+      "IsUnique": true
+    },
+    {
+      "Name": "customers_name_lower_idx",
+      "Schema": "afd",
+      "Table": "customers",
+      "Columns": [
+        "lower(full_name) text_pattern_ops ASC NULLS LAST"
+      ],
+      "IsUnique": false,
+      "Method": "btree"
+    },
+    {
+      "Name": "customers_profile_gin",
+      "Schema": "afd",
+      "Table": "customers",
+      "Columns": [
+        "profile jsonb_path_ops"
+      ],
+      "IsUnique": false,
+      "Method": "gin"
+    },
+    {
+      "Name": "customers_region_gist",
+      "Schema": "afd",
+      "Table": "customers",
+      "Columns": [
+        "region"
+      ],
+      "IsUnique": false,
+      "Method": "gist"
+    },
+    {
+      "Name": "customers_tags_gin",
+      "Schema": "afd",
+      "Table": "customers",
+      "Columns": [
+        "tags"
+      ],
+      "IsUnique": false,
+      "Method": "gin"
+    }
+  ],
+  "Views": [
+    {
+      "Schema": "afd",
+      "Name": "active_customers_v",
+      "Body": "SELECT tenant_id,id,email,full_name,is_active,status FROM afd.customers WHERE is_active",
+      "IsMaterialized": false
+    },
+    {
+      "Schema": "afd",
+      "Name": "customer_orders",
+      "Body": "SELECT c.tenant_id,c.id AS customer_id,c.email,count(o.id) AS order_count,coalesce(sum(o.total_cents),0) AS total_cents FROM afd.customers c LEFT JOIN afd.orders o ON o.tenant_id=c.tenant_id AND o.customer_id=c.id GROUP BY c.tenant_id,c.id,c.email",
+      "IsMaterialized": false
+    },
+    {
+      "Schema": "reporting",
+      "Name": "customer_mv",
+      "Body": "SELECT status,count(*) AS n,avg(score) AS avg_score FROM afd.customers GROUP BY status",
+      "IsMaterialized": true
+    }
+  ],
+  "Sequences": [
+    {
+      "Schema": "afd",
+      "Name": "order_no_seq",
+      "DataType": "bigint",
+      "Increment": 10,
+      "MinValue": 1000,
+      "MaxValue": 9999999999,
+      "Start": 1000,
+      "Cache": 5,
+      "Cycle": true
+    }
+  ],
+  "Functions": [
+    {
+      "Schema": "afd",
+      "Name": "accumulate",
+      "Signature": "afd.accumulate(bigint, integer[])",
+      "Body": "CREATE FUNCTION afd.accumulate(INOUT running bigint,VARIADIC vals integer[]) LANGUAGE plpgsql IMMUTABLE AS $$\nDECLARE\n    v integer;\nBEGIN\n    FOREACH v IN ARRAY vals LOOP\n        running := running \u002B v;\n    END LOOP;\nEND;\n$$",
+      "ArgTypes": "bigint, integer[]"
+    },
+    {
+      "Schema": "afd",
+      "Name": "active_customers",
+      "Signature": "afd.active_customers()",
+      "Body": "CREATE FUNCTION afd.active_customers() RETURNS SETOF afd.customers LANGUAGE sql STABLE SECURITY DEFINER AS $$\n    SELECT * FROM afd.customers WHERE is_active\n$$",
+      "ArgTypes": ""
+    },
+    {
+      "Schema": "afd",
+      "Name": "add",
+      "Signature": "afd.add(integer, integer)",
+      "Body": "CREATE FUNCTION afd.add(a integer,b integer DEFAULT 0) RETURNS integer LANGUAGE sql IMMUTABLE STRICT PARALLEL SAFE RETURN a\u002Bb",
+      "ArgTypes": "integer, integer"
+    },
+    {
+      "Schema": "afd",
+      "Name": "customer_stats",
+      "Signature": "afd.customer_stats(numeric)",
+      "Body": "CREATE FUNCTION afd.customer_stats(min_score numeric DEFAULT 0) RETURNS TABLE(status afd.mood,customer_count bigint,avg_score numeric) LANGUAGE plpgsql STABLE AS $$\nBEGIN\n    RETURN QUERY\n        SELECT c.status, count(*), avg(c.score)\n        FROM afd.customers c\n        WHERE c.score \u003E= min_score\n        GROUP BY c.status;\nEND;\n$$",
+      "ArgTypes": "numeric"
+    },
+    {
+      "Schema": "afd",
+      "Name": "log_ddl",
+      "Signature": "afd.log_ddl()",
+      "Body": "CREATE FUNCTION afd.log_ddl() RETURNS event_trigger LANGUAGE plpgsql AS $$\nBEGIN\n    RAISE NOTICE \u0027DDL command % executed\u0027, tg_tag;\nEND;\n$$",
+      "ArgTypes": ""
+    },
+    {
+      "Schema": "afd",
+      "Name": "mood_eq",
+      "Signature": "afd.mood_eq(afd.mood, afd.mood)",
+      "Body": "CREATE FUNCTION afd.mood_eq(a afd.mood,b afd.mood) RETURNS boolean LANGUAGE sql IMMUTABLE STRICT AS $$\n    SELECT a = b\n$$",
+      "ArgTypes": "afd.mood, afd.mood"
+    },
+    {
+      "Schema": "afd",
+      "Name": "mood_to_int",
+      "Signature": "afd.mood_to_int(afd.mood)",
+      "Body": "CREATE FUNCTION afd.mood_to_int(m afd.mood) RETURNS integer LANGUAGE sql IMMUTABLE STRICT AS $$\n    SELECT CASE m WHEN \u0027sad\u0027 THEN -1 WHEN \u0027ok\u0027 THEN 0 WHEN \u0027happy\u0027 THEN 1 END\n$$",
+      "ArgTypes": "afd.mood"
+    },
+    {
+      "Schema": "afd",
+      "Name": "split_name",
+      "Signature": "afd.split_name(text, text, text)",
+      "Body": "CREATE FUNCTION afd.split_name(IN full_name text,OUT first_name text,OUT last_name text) LANGUAGE sql IMMUTABLE AS $$\n    SELECT split_part(full_name, \u0027 \u0027, 1),\n           split_part(full_name, \u0027 \u0027, 2)\n$$",
+      "ArgTypes": "text, text, text"
+    },
+    {
+      "Schema": "afd",
+      "Name": "touch_updated_at",
+      "Signature": "afd.touch_updated_at()",
+      "Body": "CREATE FUNCTION afd.touch_updated_at() RETURNS trigger LANGUAGE plpgsql AS $$\nBEGIN\n    NEW.created_at := now();\n    RETURN NEW;\nEND;\n$$",
+      "ArgTypes": ""
+    },
+    {
+      "Schema": "afd",
+      "Name": "archive_customer",
+      "Signature": "afd.archive_customer(integer, bigint, boolean)",
+      "Body": "CREATE PROCEDURE afd.archive_customer(IN p_tenant integer,IN p_id bigint,INOUT moved boolean DEFAULT false) LANGUAGE plpgsql AS $$\nBEGIN\n    INSERT INTO afd.customers_archive\n    SELECT now(), c.*\n    FROM afd.customers c\n    WHERE c.tenant_id = p_tenant AND c.id = p_id;\n\n    DELETE FROM afd.customers c\n    WHERE c.tenant_id = p_tenant AND c.id = p_id;\n\n    moved := FOUND;\nEND;\n$$",
+      "ArgTypes": "integer, bigint, boolean"
+    }
+  ],
+  "Objects": [
+    {
+      "Kind": 10,
+      "Schema": "",
+      "Name": "afd.sum_int(integer)",
+      "Identity": "aggregate:afd.sum_int(integer)",
+      "Body": "CREATE AGGREGATE afd.sum_int(integer)(SFUNC=int4pl,STYPE=integer,INITCOND=\u00270\u0027)",
+      "BodyComparable": true
+    },
+    {
+      "Kind": 6,
+      "Schema": "",
+      "Name": "(afd.mood AS integer)",
+      "Identity": "cast:(afd.mood as integer)",
+      "Body": "CREATE CAST(afd.mood AS integer) WITH FUNCTION afd.mood_to_int(afd.mood) AS ASSIGNMENT",
+      "BodyComparable": true
+    },
+    {
+      "Kind": 4,
+      "Schema": "afd",
+      "Name": "case_insensitive",
+      "Identity": "collation:afd.case_insensitive",
+      "Body": "CREATE COLLATION afd.case_insensitive(PROVIDER=icu,LOCALE=\u0027und-u-ks-level2\u0027,DETERMINISTIC=false)",
+      "BodyComparable": true
+    },
+    {
+      "Kind": 26,
+      "Schema": "",
+      "Name": "",
+      "Identity": "comment:schema afd",
+      "Body": "COMMENT ON SCHEMA afd IS \u0027All-features showcase schema\u0027",
+      "BodyComparable": true
+    },
+    {
+      "Kind": 26,
+      "Schema": "",
+      "Name": "",
+      "Identity": "comment:table afd.customers",
+      "Body": "COMMENT ON TABLE afd.customers IS \u0027Customer master records (flagship table)\u0027",
+      "BodyComparable": true
+    },
+    {
+      "Kind": 26,
+      "Schema": "",
+      "Name": "",
+      "Identity": "comment:column afd.customers.profile",
+      "Body": "COMMENT ON COLUMN afd.customers.profile IS \u0027Arbitrary JSONB customer profile\u0027",
+      "BodyComparable": true
+    },
+    {
+      "Kind": 26,
+      "Schema": "",
+      "Name": "",
+      "Identity": "comment:view afd.customer_orders",
+      "Body": "COMMENT ON VIEW afd.customer_orders IS \u0027Per-customer order rollup\u0027",
+      "BodyComparable": true
+    },
+    {
+      "Kind": 26,
+      "Schema": "",
+      "Name": "",
+      "Identity": "comment:materialized view reporting.customer_mv",
+      "Body": "COMMENT ON MATERIALIZED VIEW reporting.customer_mv IS \u0027Cached customer counts by status\u0027",
+      "BodyComparable": true
+    },
+    {
+      "Kind": 26,
+      "Schema": "",
+      "Name": "",
+      "Identity": "comment:function afd.add(integer,integer)",
+      "Body": "COMMENT ON FUNCTION afd.add(integer,integer) IS \u0027Add two integers\u0027",
+      "BodyComparable": true
+    },
+    {
+      "Kind": 26,
+      "Schema": "",
+      "Name": "",
+      "Identity": "comment:type afd.mood",
+      "Body": "COMMENT ON TYPE afd.mood IS \u0027Three-valued mood enum\u0027",
+      "BodyComparable": true
+    },
+    {
+      "Kind": 26,
+      "Schema": "",
+      "Name": "",
+      "Identity": "comment:domain afd.email",
+      "Body": "COMMENT ON DOMAIN afd.email IS \u0027Validated email address\u0027",
+      "BodyComparable": true
+    },
+    {
+      "Kind": 26,
+      "Schema": "",
+      "Name": "",
+      "Identity": "comment:index afd.customers_email_idx",
+      "Body": "COMMENT ON INDEX afd.customers_email_idx IS \u0027Unique email per tenant\u0027",
+      "BodyComparable": true
+    },
+    {
+      "Kind": 26,
+      "Schema": "",
+      "Name": "",
+      "Identity": "comment:sequence afd.order_no_seq",
+      "Body": "COMMENT ON SEQUENCE afd.order_no_seq IS \u0027Human-facing order numbers\u0027",
+      "BodyComparable": true
+    },
+    {
+      "Kind": 26,
+      "Schema": "",
+      "Name": "",
+      "Identity": "comment:trigger customers_touch on afd.customers",
+      "Body": "COMMENT ON TRIGGER customers_touch ON afd.customers IS \u0027Bumps created_at on rename\u0027",
+      "BodyComparable": true
+    },
+    {
+      "Kind": 5,
+      "Schema": "afd",
+      "Name": "latin1_to_utf8",
+      "Identity": "conversion:afd.latin1_to_utf8",
+      "Body": "CREATE CONVERSION afd.latin1_to_utf8 FOR \u0027LATIN1\u0027 TO \u0027UTF8\u0027 FROM iso8859_1_to_utf8",
+      "BodyComparable": true
+    },
+    {
+      "Kind": 3,
+      "Schema": "afd",
+      "Name": "email",
+      "Identity": "domain:afd.email",
+      "Body": "CREATE DOMAIN afd.email AS text DEFAULT \u0027unknown@example.com\u0027 CONSTRAINT email_format CHECK(VALUE~\u0027^[^@]\u002B@[^@]\u002B\\.[^@]\u002B$\u0027)",
+      "BodyComparable": true
+    },
+    {
+      "Kind": 3,
+      "Schema": "afd",
+      "Name": "pos_int",
+      "Identity": "domain:afd.pos_int",
+      "Body": "CREATE DOMAIN afd.pos_int AS integer NOT NULL CHECK(VALUE\u003E0)",
+      "BodyComparable": true
+    },
+    {
+      "Kind": 14,
+      "Schema": "",
+      "Name": "audit_ddl",
+      "Identity": "eventtrigger:audit_ddl",
+      "Body": "CREATE EVENT TRIGGER audit_ddl ON ddl_command_end WHEN TAG IN(\u0027CREATE TABLE\u0027,\u0027ALTER TABLE\u0027,\u0027DROP TABLE\u0027) EXECUTE FUNCTION afd.log_ddl()",
+      "BodyComparable": true
+    },
+    {
+      "Kind": 0,
+      "Schema": "",
+      "Name": "btree_gist",
+      "Identity": "extension:btree_gist",
+      "Body": "CREATE EXTENSION IF NOT EXISTS btree_gist",
+      "BodyComparable": true
+    },
+    {
+      "Kind": 16,
+      "Schema": "",
+      "Name": "dummy_fdw",
+      "Identity": "foreigndatawrapper:dummy_fdw",
+      "Body": "CREATE FOREIGN DATA WRAPPER dummy_fdw NO HANDLER NO VALIDATOR OPTIONS(debug \u0027true\u0027)",
+      "BodyComparable": true
+    },
+    {
+      "Kind": 17,
+      "Schema": "",
+      "Name": "dummy_server",
+      "Identity": "server:dummy_server",
+      "Body": "CREATE SERVER dummy_server FOREIGN DATA WRAPPER dummy_fdw OPTIONS(host \u0027localhost\u0027,dbname \u0027remote\u0027)",
+      "BodyComparable": true
+    },
+    {
+      "Kind": 19,
+      "Schema": "afd",
+      "Name": "remote_customers",
+      "Identity": "foreigntable:afd.remote_customers",
+      "Body": "CREATE FOREIGN TABLE afd.remote_customers(id bigint NOT NULL,email text) SERVER dummy_server OPTIONS(schema_name \u0027public\u0027,table_name \u0027customers\u0027)",
+      "BodyComparable": true
+    },
+    {
+      "Kind": 8,
+      "Schema": "afd",
+      "Name": "afd.int_minmax_ops USING btree",
+      "Identity": "operatorclass:afd.afd.int_minmax_ops using btree",
+      "Body": "CREATE OPERATOR CLASS afd.int_minmax_ops FOR TYPE integer USING btree AS OPERATOR 1\u003C,OPERATOR 2\u003C=,OPERATOR 3=,OPERATOR 4\u003E=,OPERATOR 5\u003E,FUNCTION 1 btint4cmp(integer,integer)",
+      "BodyComparable": true
+    },
+    {
+      "Kind": 7,
+      "Schema": "",
+      "Name": "afd.===(FUNCTION=afd.mood_eq,LEFTARG=afd.mood,RIGHTARG=afd.mood,COMMUTATOR=OPERATOR(afd.===),HASHES,MERGES)",
+      "Identity": "operator:afd.===(function=afd.mood_eq,leftarg=afd.mood,rightarg=afd.mood,commutator=operator(afd.===),hashes,merges)",
+      "Body": "CREATE OPERATOR afd.===(FUNCTION=afd.mood_eq,LEFTARG=afd.mood,RIGHTARG=afd.mood,COMMUTATOR=OPERATOR(afd.===),HASHES,MERGES)",
+      "BodyComparable": true
+    },
+    {
+      "Kind": 13,
+      "Schema": "afd",
+      "Name": "customers_tenant_isolation",
+      "Identity": "policy:customers_tenant_isolation on afd.customers",
+      "Body": "CREATE POLICY customers_tenant_isolation ON afd.customers AS PERMISSIVE FOR ALL TO PUBLIC USING(tenant_id=current_setting(\u0027afd.tenant_id\u0027,true)::integer) WITH CHECK(tenant_id=current_setting(\u0027afd.tenant_id\u0027,true)::integer)",
+      "OnObject": "afd.customers",
+      "BodyComparable": true
+    },
+    {
+      "Kind": 25,
+      "Schema": "",
+      "Name": "customer_pub",
+      "Identity": "publication:customer_pub",
+      "Body": "CREATE PUBLICATION customer_pub FOR TABLE afd.customers,afd.orders WITH(publish=\u0027insert, update\u0027)",
+      "BodyComparable": true
+    },
+    {
+      "Kind": 12,
+      "Schema": "afd",
+      "Name": "orders_no_delete",
+      "Identity": "rule:orders_no_delete on afd.orders",
+      "Body": "CREATE RULE orders_no_delete AS ON DELETE TO afd.orders DO INSTEAD NOTHING",
+      "OnObject": "afd.orders",
+      "BodyComparable": true
+    },
+    {
+      "Kind": 15,
+      "Schema": "afd",
+      "Name": "customers_stats",
+      "Identity": "statistics:afd.customers_stats",
+      "Body": "CREATE STATISTICS afd.customers_stats(ndistinct,dependencies,mcv) ON tenant_id,status,is_active FROM afd.customers",
+      "BodyComparable": true
+    },
+    {
+      "Kind": 27,
+      "Schema": "afd",
+      "Name": "address_row",
+      "Identity": "table:afd.address_row",
+      "Body": "CREATE TABLE afd.address_row OF afd.address(PRIMARY KEY(zip))",
+      "BodyComparable": true
+    },
+    {
+      "Kind": 27,
+      "Schema": "afd",
+      "Name": "events_2024",
+      "Identity": "table:afd.events_2024",
+      "Body": "CREATE TABLE afd.events_2024 PARTITION OF afd.events FOR VALUES FROM(\u00272024-01-01\u0027) TO(\u00272025-01-01\u0027)",
+      "BodyComparable": true
+    },
+    {
+      "Kind": 27,
+      "Schema": "afd",
+      "Name": "events_default",
+      "Identity": "table:afd.events_default",
+      "Body": "CREATE TABLE afd.events_default PARTITION OF afd.events DEFAULT",
+      "BodyComparable": true
+    },
+    {
+      "Kind": 20,
+      "Schema": "afd",
+      "Name": "english_cfg",
+      "Identity": "textsearchconfiguration:afd.english_cfg",
+      "Body": "CREATE TEXT SEARCH CONFIGURATION afd.english_cfg(COPY=pg_catalog.english)",
+      "BodyComparable": true
+    },
+    {
+      "Kind": 21,
+      "Schema": "afd",
+      "Name": "english_dict",
+      "Identity": "textsearchdictionary:afd.english_dict",
+      "Body": "CREATE TEXT SEARCH DICTIONARY afd.english_dict(TEMPLATE=pg_catalog.simple,STOPWORDS=english)",
+      "BodyComparable": true
+    },
+    {
+      "Kind": 11,
+      "Schema": "afd",
+      "Name": "customers_touch",
+      "Identity": "trigger:customers_touch on afd.customers",
+      "Body": "CREATE TRIGGER customers_touch BEFORE UPDATE ON afd.customers FOR EACH ROW WHEN(OLD.full_name IS DISTINCT FROM NEW.full_name) EXECUTE FUNCTION afd.touch_updated_at()",
+      "OnObject": "afd.customers",
+      "BodyComparable": true
+    },
+    {
+      "Kind": 11,
+      "Schema": "afd",
+      "Name": "orders_stmt_audit",
+      "Identity": "trigger:orders_stmt_audit on afd.orders",
+      "Body": "CREATE TRIGGER orders_stmt_audit AFTER INSERT OR UPDATE OR DELETE ON afd.orders FOR EACH STATEMENT EXECUTE FUNCTION afd.touch_updated_at()",
+      "OnObject": "afd.orders",
+      "BodyComparable": true
+    },
+    {
+      "Kind": 2,
+      "Schema": "afd",
+      "Name": "address",
+      "Identity": "type:afd.address",
+      "Body": "CREATE TYPE afd.address AS(street text,city text,zip text)",
+      "BodyComparable": true
+    },
+    {
+      "Kind": 2,
+      "Schema": "afd",
+      "Name": "float_range",
+      "Identity": "type:afd.float_range",
+      "Body": "CREATE TYPE afd.float_range AS RANGE(SUBTYPE=float8)",
+      "BodyComparable": true
+    },
+    {
+      "Kind": 2,
+      "Schema": "afd",
+      "Name": "mood",
+      "Identity": "type:afd.mood",
+      "Body": "CREATE TYPE afd.mood AS ENUM(\u0027sad\u0027,\u0027ok\u0027,\u0027happy\u0027)",
+      "BodyComparable": true
+    },
+    {
+      "Kind": 2,
+      "Schema": "afd",
+      "Name": "shell_type",
+      "Identity": "type:afd.shell_type",
+      "Body": "CREATE TYPE afd.shell_type",
+      "BodyComparable": true
+    }
+  ]
+}

@@ -11,6 +11,11 @@ namespace PgProj.Core.Syntax;
 public sealed record ParseDiagnostic(string Message, int Line, int Column, int Offset)
 {
     public override string ToString() => $"{Line}:{Column}: {Message}";
+
+    /// <summary>Lift this parse problem into the unified compiler-style diagnostic (always an error, code <c>BUILD</c>),
+    /// stamping the project-relative <paramref name="file"/> when the caller knows it.</summary>
+    public Diagnostics.Diagnostic ToUnified(string? file = null) =>
+        Diagnostics.Diagnostic.FromParser(Message, file, Line, Column);
 }
 
 /// <summary>The outcome of parsing a (possibly multi-statement) SQL string.</summary>

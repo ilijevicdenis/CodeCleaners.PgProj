@@ -7,6 +7,7 @@ using PgProj.Core.Introspection;
 using PgProj.Core.Model;
 using PgProj.Core.Project;
 using PgProj.Core.Syntax;
+using Xunit;
 
 namespace PgProj.Core.Tests;
 
@@ -14,16 +15,22 @@ namespace PgProj.Core.Tests;
 /// End-to-end "read from database" check, driven entirely from C# (ADO.NET via Npgsql — no shelling to
 /// the CLI). Greenfield-deploys the AllFeaturesDb sample to a live server, reads it back with the
 /// parallel <see cref="LiveDatabaseReader"/>, and re-parses every exported object so the catalog DDL is
-/// proven to round-trip through the parser. Skipped unless PGPROJ_TEST_CONNECTION points at a throwaway DB.
+/// proven to round-trip through the parser. Skipped unless PGPROJ_TEST_CONNECTION points at a live DB.
+///
+/// Each run gets its OWN throwaway database (via <see cref="ThrowawayDatabaseFixture"/>) so there is no
+/// shared-state pollution between test classes and no manual DROP-cleanup required.
 /// </summary>
-public sealed class LiveReaderIntegrationTests
+public sealed class LiveReaderIntegrationTests : IClassFixture<ThrowawayDatabaseFixture>
 {
-    private static string? Conn => Environment.GetEnvironmentVariable("PGPROJ_TEST_CONNECTION");
+    private readonly ThrowawayDatabaseFixture _fixture;
+
+    public LiveReaderIntegrationTests(ThrowawayDatabaseFixture fixture)
+        => _fixture = fixture;
 
     [Fact]
     public async Task Deploy_read_back_and_reparse_round_trips()
     {
-        var conn = Conn;
+        var conn = _fixture.ConnectionString;
         if (string.IsNullOrWhiteSpace(conn)) return;   // no live DB available — treated as a skip
 
         var project = DatabaseProject.Load(FindSampleProject());
@@ -35,7 +42,6 @@ public sealed class LiveReaderIntegrationTests
         var script = new DeployScriptGenerator().Generate(create, new DeployOptions { WrapInTransaction = true });
 
         var deployer = new DatabaseDeployer();
-        await deployer.ExecuteAsync(conn, "DROP PUBLICATION IF EXISTS customer_pub; DROP SCHEMA IF EXISTS afd CASCADE; DROP SCHEMA IF EXISTS reporting CASCADE; DROP FOREIGN DATA WRAPPER IF EXISTS dummy_fdw CASCADE;");
         await deployer.ExecuteAsync(conn, script);
 
         // Read it back with the parallel reader and sanity-check the shape.
@@ -69,9 +75,41 @@ public sealed class LiveReaderIntegrationTests
         // Idempotence: re-comparing the live model to itself yields no changes (stable read).
         Assert.Empty(new SchemaComparer().Compare(live, live));
 
+        // Round-trip idempotency (issue #36): the *project* model compared against the freshly-read
+        // live model must be free of phantom non-destructive changes for the raw object kinds THIS
+        // ISSUE SCOPES — extension, text-search dictionary/config, FDW/server, the typed table
+        // (CREATE TABLE … OF type), plus statistics and aggregates (whose live reconstruction is
+        // canonical-but-not-textually-faithful, compared identity-only). Comprehensive round-trip
+        // fidelity for the remaining raw kinds (cast, operator, operator-class, trigger, comment) —
+        // whose canonical reconstruction or identity still diverges from hand-written source — is a
+        // larger effort tracked as a follow-up under M4/Phase-11 diff; it is intentionally NOT
+        // asserted here so this guard reflects #36's declared scope rather than masking those gaps.
+        var scoped = new HashSet<ObjectKind>
+        {
+            ObjectKind.Extension, ObjectKind.TextSearchDictionary, ObjectKind.TextSearchConfiguration,
+            ObjectKind.ForeignDataWrapper, ObjectKind.Server, ObjectKind.Statistics,
+            ObjectKind.Aggregate, ObjectKind.Table,
+        };
+        var roundTrip = new SchemaComparer().Compare(built.Model, live);
+        var rawChurn = roundTrip
+            .Select(ch => ch switch
+            {
+                CreateRawObjectChange c => (Kind: (ObjectKind?)c.Def.Kind, Sql: ch.ToSql()),
+                RecreateRawObjectChange r => (Kind: (ObjectKind?)r.Def.Kind, Sql: ch.ToSql()),
+                _ => (Kind: null, Sql: null),
+            })
+            .Where(x => x.Kind is ObjectKind k && scoped.Contains(k))
+            .Select(x => x.Sql!)
+            .ToList();
+        Assert.True(rawChurn.Count == 0, "phantom raw-object diffs on project→live round-trip (scoped kinds):\n" + string.Join("\n", rawChurn));
+
         // Gold-standard round-trip: the extracted model must itself re-deploy cleanly — this proves
         // every reconstructed raw-object DDL (aggregates, FDW/server/foreign table, collation, …) is
         // valid and correctly ordered, not just parseable.
+        //
+        // The throwaway DB already has the full AllFeaturesDb deployed from the greenfield step above;
+        // drop project-owned objects before re-deploying so the second deploy starts from a clean slate
+        // within the same throwaway DB.
         var recreate = new SchemaComparer().Compare(live, new DatabaseModel());
         var script2 = new DeployScriptGenerator().Generate(recreate, new DeployOptions { WrapInTransaction = true });
         await deployer.ExecuteAsync(conn, "DROP PUBLICATION IF EXISTS customer_pub; DROP SCHEMA IF EXISTS afd CASCADE; DROP SCHEMA IF EXISTS reporting CASCADE; DROP FOREIGN DATA WRAPPER IF EXISTS dummy_fdw CASCADE;");
@@ -81,7 +119,7 @@ public sealed class LiveReaderIntegrationTests
     [Fact]
     public async Task ShadowValidate_accepts_valid_sql_and_catches_broken_sql()
     {
-        var conn = Conn;
+        var conn = _fixture.ConnectionString;
         if (string.IsNullOrWhiteSpace(conn)) return;
         var validator = new ShadowValidator();
 
