@@ -73,6 +73,15 @@ public sealed class LiveReaderIntegrationTests : IClassFixture<ThrowawayDatabase
         // #108: user mappings are introspected (FOR <user> SERVER <server> [OPTIONS …]).
         Assert.Contains(live.Objects, o => o.Kind == ObjectKind.UserMapping
             && o.Body.Contains("CREATE USER MAPPING") && o.Body.Contains("SERVER dummy_server"));
+        // #99: partitioning + inheritance round-trip. Parent carries PARTITION BY; children are raw
+        // PARTITION OF objects (not flattened to standalone tables); an INHERITS child carries INHERITS.
+        Assert.Contains(live.Tables, t => DatabaseModel.NameEquals(t.Name, "events")
+            && (t.TrailingOptions ?? "").Contains("PARTITION BY"));
+        Assert.Contains(live.Objects, o => o.Kind == ObjectKind.Table
+            && DatabaseModel.NameEquals(o.Name, "events_2024") && o.Body.Contains("PARTITION OF"));
+        Assert.DoesNotContain(live.Tables, t => DatabaseModel.NameEquals(t.Name, "events_2024")); // not double-modelled
+        Assert.Contains(live.Tables, t => DatabaseModel.NameEquals(t.Name, "document")
+            && (t.TrailingOptions ?? "").Contains("INHERITS"));
 
         // Every exported object's DDL must re-parse cleanly — this is the "complete the parser" check.
         var unparseable = DdlExporter.ExportFiles(live)

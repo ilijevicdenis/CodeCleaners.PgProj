@@ -29,8 +29,51 @@ public sealed record CatalogQueries
               -- ReadTypedTablesAsync; flattening them to a column list here would both lose that nature
               -- and double-list the table, so skip them in the finely-modelled read.
               AND c.reloftype = 0
+              -- Partition children (CREATE TABLE … PARTITION OF …) are reconstructed in their PARTITION OF
+              -- form by ReadPartitionChildrenAsync (a raw table object, matching the project parse); reading
+              -- them here as a plain column list would lose the partition relationship and double-list them.
+              AND NOT c.relispartition
               AND n.nspname NOT IN ('pg_catalog','information_schema') AND n.nspname NOT LIKE 'pg_%'
             ORDER BY n.nspname, c.relname, a.attnum;";
+
+    // Partition children (#99): CREATE TABLE … PARTITION OF parent <bound>. relpartbound renders as
+    // ""FOR VALUES …"" or ""DEFAULT"". Modelled as a raw table object (matching the project parse), so the
+    // partition relationship round-trips instead of flattening to a standalone table.
+    public string PartitionChildren { get; init; } = @"
+            SELECT n.nspname, c.relname, pn.nspname || '.' || p.relname AS parent,
+                   pg_get_expr(c.relpartbound, c.oid) AS bound
+            FROM pg_class c
+            JOIN pg_namespace n ON n.oid = c.relnamespace
+            JOIN pg_inherits i ON i.inhrelid = c.oid
+            JOIN pg_class p ON p.oid = i.inhparent
+            JOIN pg_namespace pn ON pn.oid = p.relnamespace
+            WHERE c.relispartition AND c.relkind IN ('r','p')   -- table partitions only, not partitioned indexes
+              AND n.nspname NOT IN ('pg_catalog','information_schema') AND n.nspname NOT LIKE 'pg_%'
+            ORDER BY n.nspname, c.relname;";
+
+    // Partition keys (#99): the PARTITION BY clause for a partitioned parent (relkind 'p'). Applied to the
+    // finely-modelled parent's TrailingOptions so extract/redeploy recreates it as partitioned.
+    public string PartitionKeys { get; init; } = @"
+            SELECT n.nspname, c.relname, pg_get_partkeydef(c.oid) AS keydef
+            FROM pg_class c
+            JOIN pg_namespace n ON n.oid = c.relnamespace
+            WHERE c.relkind = 'p'
+              AND n.nspname NOT IN ('pg_catalog','information_schema') AND n.nspname NOT LIKE 'pg_%'
+            ORDER BY n.nspname, c.relname;";
+
+    // Table inheritance (#99): the INHERITS (…) parents of a non-partition child. Applied to the child's
+    // TrailingOptions so the inheritance relationship round-trips.
+    public string TableInheritance { get; init; } = @"
+            SELECT n.nspname, c.relname,
+                   string_agg(pn.nspname || '.' || p.relname, ', ' ORDER BY i.inhseqno) AS parents
+            FROM pg_inherits i
+            JOIN pg_class c ON c.oid = i.inhrelid
+            JOIN pg_namespace n ON n.oid = c.relnamespace
+            JOIN pg_class p ON p.oid = i.inhparent
+            JOIN pg_namespace pn ON pn.oid = p.relnamespace
+            WHERE NOT c.relispartition AND c.relkind IN ('r','p')   -- real INHERITS children, not index/partition rows
+              AND n.nspname NOT IN ('pg_catalog','information_schema') AND n.nspname NOT LIKE 'pg_%'
+            GROUP BY n.nspname, c.relname;";
 
     public string Indexes { get; init; } = @"
             SELECT n.nspname, c.relname AS tbl, ic.relname AS idx, ix.indisunique,

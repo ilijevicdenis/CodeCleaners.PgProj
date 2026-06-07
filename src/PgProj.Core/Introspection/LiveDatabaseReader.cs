@@ -48,7 +48,7 @@ public sealed class LiveDatabaseReader
     /// </summary>
     private RawObjectReader[] RawObjectReaders =>
     [
-        ReadExtensionsAsync, ReadTypedTablesAsync, ReadEnumTypesAsync, ReadCompositeTypesAsync,
+        ReadExtensionsAsync, ReadTypedTablesAsync, ReadPartitionChildrenAsync, ReadEnumTypesAsync, ReadCompositeTypesAsync,
         ReadRangeTypesAsync, ReadShellTypesAsync, ReadCollationsAsync, ReadAggregatesAsync,
         ReadDomainsAsync, ReadTriggersAsync, ReadRulesAsync, ReadPoliciesAsync, ReadEventTriggersAsync,
         ReadCommentsAsync, ReadConversionsAsync, ReadForeignDataWrappersAsync, ReadServersAsync,
@@ -107,10 +107,11 @@ public sealed class LiveDatabaseReader
         var checksTask      = ReadVoid(c => ReadChecksAsync(c, byKey, ct));
         var fksTask         = ReadVoid(c => ReadForeignKeysAsync(c, byKey, ct));
         var excludesTask    = ReadVoid(c => ReadExcludeConstraintsAsync(c, byKey, ct));
+        var partitioningTask = ReadVoid(c => ReadTablePartitioningAsync(c, byKey, ct));
 
         await Task.WhenAll(rawTasks);
         await Task.WhenAll(schemasTask, indexesTask, viewsTask, sequencesTask, functionsTask,
-                           constraintsTask, checksTask, fksTask, excludesTask);
+                           constraintsTask, checksTask, fksTask, excludesTask, partitioningTask);
 
         // ---- merge (single-threaded) ----
         var model = new DatabaseModel();
@@ -283,6 +284,24 @@ public sealed class LiveDatabaseReader
             // named source clause ("CONSTRAINT room_no_overlap EXCLUDE …") round-trips without a phantom diff.
             def.OtherConstraints.Add($"CONSTRAINT {r.GetString(2)} {r.GetString(3)}");
         }
+    }
+
+    // Partitioning + inheritance trailing clauses (#99): set TrailingOptions on the finely-modelled parent
+    // (PARTITION BY …) and on a non-partition INHERITS child (INHERITS (…)). Wave-2 reader writing ONLY the
+    // disjoint TrailingOptions member, so it races nothing the constraint/check/fk/exclude readers touch.
+    private async Task ReadTablePartitioningAsync(NpgsqlConnection conn, Dictionary<string, TableDefinition> tables, CancellationToken ct)
+    {
+        await using (var cmd = new NpgsqlCommand(_q.PartitionKeys, conn))
+        await using (var r = await cmd.ExecuteReaderAsync(ct))
+            while (await r.ReadAsync(ct))
+                if (tables.TryGetValue($"{r.GetString(0)}.{r.GetString(1)}", out var def))
+                    def.TrailingOptions = $"PARTITION BY {r.GetString(2)}";
+
+        await using (var cmd = new NpgsqlCommand(_q.TableInheritance, conn))
+        await using (var r = await cmd.ExecuteReaderAsync(ct))
+            while (await r.ReadAsync(ct))
+                if (tables.TryGetValue($"{r.GetString(0)}.{r.GetString(1)}", out var def))
+                    def.TrailingOptions = $"INHERITS ({r.GetString(2)})";
     }
 
     private async Task ReadForeignKeysAsync(NpgsqlConnection conn, Dictionary<string, TableDefinition> tables, CancellationToken ct)
@@ -494,6 +513,28 @@ public sealed class LiveDatabaseReader
             var body = pkCols is null
                 ? $"CREATE TABLE {schema}.{name} OF {ofType};"
                 : $"CREATE TABLE {schema}.{name} OF {ofType} (PRIMARY KEY ({pkCols}));";
+            list.Add(MakeRaw(ObjectKind.Table, schema, name, $"table:{schema}.{name}", body));
+        }
+        return list;
+    }
+
+    // Partition children: CREATE TABLE … PARTITION OF parent <bound> (#99). Emitted as a raw `table:` object
+    // (the same modelling the parser uses) so extract/round-trip preserves the partition relationship instead
+    // of flattening the child to a standalone table. Excluded from the finely-modelled read by relispartition.
+    private async Task<List<RawObjectDefinition>> ReadPartitionChildrenAsync(NpgsqlConnection conn, CancellationToken ct)
+    {
+        var sql = _q.PartitionChildren;
+
+        var list = new List<RawObjectDefinition>();
+        await using var cmd = new NpgsqlCommand(sql, conn);
+        await using var r = await cmd.ExecuteReaderAsync(ct);
+        while (await r.ReadAsync(ct))
+        {
+            var schema = r.GetString(0);
+            var name = r.GetString(1);
+            var parent = r.GetString(2);
+            var bound = r.IsDBNull(3) ? "DEFAULT" : r.GetString(3);   // relpartbound: "FOR VALUES …" or DEFAULT
+            var body = $"CREATE TABLE {schema}.{name} PARTITION OF {parent} {bound};";
             list.Add(MakeRaw(ObjectKind.Table, schema, name, $"table:{schema}.{name}", body));
         }
         return list;
