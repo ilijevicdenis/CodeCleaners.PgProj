@@ -28,6 +28,14 @@ public sealed record DatabaseProject
     public IReadOnlyList<string> IncludePatterns { get; init; } = new[] { "**/*.sql" };
 
     /// <summary>
+    /// Glob patterns (relative to <see cref="ProjectDirectory"/>) whose matches are removed from the
+    /// build set, read from <c>&lt;Build Remove="…"/&gt;</c> / <c>&lt;Exclude Include="…"/&gt;</c> /
+    /// <c>&lt;Build … Exclude="…"&gt;</c> items in the <c>.pgproj</c>. Support the same glob vocabulary as
+    /// includes (<c>**</c>, <c>*</c>, <c>?</c>). Applied after include resolution.
+    /// </summary>
+    public IReadOnlyList<string> ExcludePatterns { get; init; } = System.Array.Empty<string>();
+
+    /// <summary>
     /// Absolute path of the single pre-deployment script (SSDT <c>BuildAction=PreDeploy</c>), or null.
     /// Spliced before the schema diff in the generated deploy script.
     /// </summary>
@@ -65,7 +73,9 @@ public sealed record DatabaseProject
 
     private string ReadSource(string file)
     {
-        var text = File.ReadAllText(file);
+        // LF-normalised at load time (#62) so the model + every verbatim-embedding artifact is
+        // byte-identical across CRLF/LF checkouts. The optional SQLCMD transform runs on LF text.
+        var text = SourceReader.ReadAllText(file);
         if (ObjectContentTransform is null) return text;
         return ObjectContentTransform(Path.GetRelativePath(ProjectDirectory, file), text);
     }
@@ -101,6 +111,8 @@ public sealed record DatabaseProject
             includes.Add("**/*.sql");
         }
 
+        var excludes = LoadExcludePatterns(root);
+
         var (preDeploy, postDeploy) = LoadDeployScripts(root, dir);
         var variables = LoadSqlCmdVariables(root);
 
@@ -113,6 +125,7 @@ public sealed record DatabaseProject
             TargetPostgresVersion = root.Descendants().Any(e => e.Name.LocalName.Equals("TargetPostgresVersion", StringComparison.OrdinalIgnoreCase))
                 ? Prop("TargetPostgresVersion", "") : null,
             IncludePatterns = includes,
+            ExcludePatterns = excludes,
             PreDeployScriptPath = preDeploy,
             PostDeployScriptPath = postDeploy,
             SqlCmdVariableDefaults = variables,
@@ -155,6 +168,42 @@ public sealed record DatabaseProject
             }
         }
         return (pre, post);
+    }
+
+    /// <summary>
+    /// Reads exclude/remove glob patterns from the manifest. Three MSBuild-flavoured spellings are honoured:
+    /// <list type="bullet">
+    /// <item><c>&lt;Build Remove="pattern"/&gt;</c> — MSBuild item Remove metadata.</item>
+    /// <item><c>&lt;Build Include="…" Exclude="pattern"/&gt;</c> — MSBuild item Exclude attribute.</item>
+    /// <item><c>&lt;Exclude Include="pattern"/&gt;</c> / <c>&lt;Remove Include="pattern"/&gt;</c> — explicit element.</item>
+    /// </list>
+    /// </summary>
+    private static IReadOnlyList<string> LoadExcludePatterns(XElement root)
+    {
+        var excludes = new List<string>();
+        foreach (var e in root.Descendants())
+        {
+            var local = e.Name.LocalName;
+            if (local.Equals("Build", StringComparison.OrdinalIgnoreCase))
+            {
+                Add(e.Attribute("Remove")?.Value);
+                Add(e.Attribute("Exclude")?.Value);
+            }
+            else if (local.Equals("Exclude", StringComparison.OrdinalIgnoreCase)
+                  || local.Equals("Remove", StringComparison.OrdinalIgnoreCase))
+            {
+                Add(e.Attribute("Include")?.Value);
+            }
+        }
+        return excludes;
+
+        void Add(string? v)
+        {
+            // A single item may list several patterns separated by ';' (MSBuild item-list syntax).
+            if (string.IsNullOrWhiteSpace(v)) return;
+            foreach (var part in v.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+                excludes.Add(part);
+        }
     }
 
     /// <summary>
@@ -209,26 +258,23 @@ public sealed record DatabaseProject
     /// <summary>Resolves all .sql files the project includes, de-duplicated and ordered deterministically.</summary>
     public IReadOnlyList<string> ResolveSqlFiles()
     {
+        // Materialise the candidate set once: every file under the project dir (full glob semantics —
+        // incl. **, * and ? — are applied against the project-relative path below, not delegated to the
+        // OS GetFiles wildcard, which only supports a single trailing TopDirectoryOnly/AllDirectories pass).
+        var allFiles = Directory.Exists(ProjectDirectory)
+            ? Directory.GetFiles(ProjectDirectory, "*", SearchOption.AllDirectories)
+            : System.Array.Empty<string>();
+
+        var includeGlobs = IncludePatterns.Select(GlobMatcher.Compile).ToList();
+        var excludeGlobs = ExcludePatterns.Select(GlobMatcher.Compile).ToList();
+
         var files = new List<string>();
-        foreach (var pattern in IncludePatterns)
+        foreach (var file in allFiles)
         {
-            var norm = pattern.Replace('\\', '/');
-            if (norm.Contains("**"))
-            {
-                files.AddRange(Directory.GetFiles(ProjectDirectory, "*.sql", SearchOption.AllDirectories));
-            }
-            else if (norm.Contains('*'))
-            {
-                var subDir = Path.Combine(ProjectDirectory, Path.GetDirectoryName(norm) ?? string.Empty);
-                var glob = Path.GetFileName(norm);
-                if (Directory.Exists(subDir))
-                    files.AddRange(Directory.GetFiles(subDir, glob, SearchOption.TopDirectoryOnly));
-            }
-            else
-            {
-                var literal = Path.Combine(ProjectDirectory, norm);
-                if (File.Exists(literal)) files.Add(literal);
-            }
+            var rel = Path.GetRelativePath(ProjectDirectory, file).Replace('\\', '/');
+            if (!includeGlobs.Any(g => g.IsMatch(rel))) continue;
+            if (excludeGlobs.Any(g => g.IsMatch(rel))) continue;
+            files.Add(file);
         }
 
         // Pre/post-deploy scripts are data/seed scripts spliced around the diff at publish time, not
@@ -256,9 +302,9 @@ public sealed record DatabaseProject
         var unifiedDiags = new List<Diagnostic>();
         var files = ResolveSqlFiles();
         var builder = new Syntax.ModelBuilder(DefaultSchema);
-        // First-seen position map: object identity → (rel-file, line, col).
-        // Populated as we parse so FindDuplicates can point at the prior definition.
-        var firstSeen = new Dictionary<string, (string RelFile, int Line, int Col)>(StringComparer.OrdinalIgnoreCase);
+        // Source anchors persisted in this same parse pass (#45); also feeds FindDuplicates' "first
+        // defined here" related-location (#63). First-occurrence wins (see SourcePositionIndex).
+        var positions = new Contracts.SourcePositionIndex();
 
         foreach (var file in files)
         {
@@ -267,15 +313,13 @@ public sealed record DatabaseProject
             var rel = Path.GetRelativePath(ProjectDirectory, file).Replace('\\', '/');
             foreach (var d in parsed.Diagnostics)
                 unifiedDiags.Add(Diagnostic.FromParser(d.Message, rel, d.Line, d.Column));
-            // Record first-seen positions before merging into the model (model merge is first-occurrence wins,
-            // matching the order we parse here).
-            RecordFirstSeen(parsed, text, rel, DefaultSchema, firstSeen);
-            builder.Build(parsed, model);
+            // Build model + persist source anchors in ONE parse — no separate SourcePositionIndex re-parse.
+            builder.Build(parsed, model, positions, text, rel);
             parsed.ReleaseTokens();   // model built → return the pooled token buffer (no SourceText read after this)
         }
 
-        unifiedDiags.AddRange(FindDuplicates(model, firstSeen));
-        return new ProjectBuildResult(model, unifiedDiags, files);
+        unifiedDiags.AddRange(FindDuplicates(model, positions));
+        return new ProjectBuildResult(model, unifiedDiags, files, positions);
     }
 
     /// <summary>
@@ -298,7 +342,7 @@ public sealed record DatabaseProject
             ct.ThrowIfCancellationRequested();
             var model = new DatabaseModel();
             var unifiedDiags = new List<Diagnostic>();
-            var firstSeen = new Dictionary<string, (string RelFile, int Line, int Col)>(StringComparer.OrdinalIgnoreCase);
+            var positions = new Contracts.SourcePositionIndex();
             if (files.Count == 1)
             {
                 try
@@ -308,8 +352,7 @@ public sealed record DatabaseProject
                     var rel = Path.GetRelativePath(ProjectDirectory, files[0]).Replace('\\', '/');
                     foreach (var d in parsed.Diagnostics)
                         unifiedDiags.Add(Diagnostic.FromParser(d.Message, rel, d.Line, d.Column));
-                    RecordFirstSeen(parsed, text, rel, DefaultSchema, firstSeen);
-                    new Syntax.ModelBuilder(DefaultSchema).Build(parsed, model);
+                    new Syntax.ModelBuilder(DefaultSchema).Build(parsed, model, positions, text, rel);
                     parsed.ReleaseTokens();
                 }
                 catch (Exception ex)
@@ -317,8 +360,8 @@ public sealed record DatabaseProject
                     unifiedDiags.Add(Diagnostic.FromBuild($"Failed to read/parse '{Path.GetFileName(files[0])}': {ex.Message}"));
                 }
             }
-            unifiedDiags.AddRange(FindDuplicates(model, firstSeen));
-            return new ProjectBuildResult(model, unifiedDiags, files);
+            unifiedDiags.AddRange(FindDuplicates(model, positions));
+            return new ProjectBuildResult(model, unifiedDiags, files, positions);
         }
 
         var parts = new PartialParse[files.Count];     // one slot per file; index = order
@@ -344,21 +387,21 @@ public sealed record DatabaseProject
         {
             var text = ReadSource(path);
             var parsed = new Syntax.PgParser().Parse(text); // fresh instance → isolated per worker
-            var model = new Syntax.ModelBuilder(DefaultSchema).Build(parsed);
+            var model = new DatabaseModel();
             var rel = Path.GetRelativePath(ProjectDirectory, path).Replace('\\', '/');
+            var positions = new Contracts.SourcePositionIndex(); // per-worker → no shared mutable state
+            new Syntax.ModelBuilder(DefaultSchema).Build(parsed, model, positions, text, rel);
             var diags = parsed.Diagnostics
                 .Select(d => Diagnostic.FromParser(d.Message, rel, d.Line, d.Column))
                 .ToList();
-            var firstSeen = new Dictionary<string, (string RelFile, int Line, int Col)>(StringComparer.OrdinalIgnoreCase);
-            RecordFirstSeen(parsed, text, rel, DefaultSchema, firstSeen);
             parsed.ReleaseTokens();   // model built → return the pooled token buffer (per-worker, ArrayPool is thread-safe)
-            return new PartialParse(model, diags, firstSeen);
+            return new PartialParse(model, diags, positions);
         }
         catch (Exception ex) // unreadable file / catastrophic parser failure → isolate to this file
         {
             return new PartialParse(new DatabaseModel(),
                 new List<Diagnostic> { Diagnostic.FromBuild($"Failed to read/parse '{Path.GetFileName(path)}': {ex.Message}") },
-                new Dictionary<string, (string RelFile, int Line, int Col)>());
+                new Contracts.SourcePositionIndex());
         }
     }
 
@@ -366,9 +409,7 @@ public sealed record DatabaseProject
     {
         var model = new DatabaseModel();
         var unifiedDiags = new List<Diagnostic>();
-        // Merge first-seen maps in sorted-file order (same order as the model merge) so that the
-        // first-file winner mirrors the model's first-occurrence-wins merge.
-        var mergedFirstSeen = new Dictionary<string, (string RelFile, int Line, int Col)>(StringComparer.OrdinalIgnoreCase);
+        var positions = new Contracts.SourcePositionIndex();
 
         foreach (var part in parts) // ordered walk → deterministic, matches sequential Build()
         {
@@ -381,13 +422,11 @@ public sealed record DatabaseProject
             model.Functions.AddRange(part.Model.Functions);
             model.Objects.AddRange(part.Model.Objects);
             unifiedDiags.AddRange(part.Diagnostics);
-            // First-occurrence wins (same logic as schema merge above).
-            foreach (var kv in part.FirstSeen)
-                if (!mergedFirstSeen.ContainsKey(kv.Key)) mergedFirstSeen[kv.Key] = kv.Value;
+            positions.Merge(part.Positions); // file-ordered merge → first-definition-wins, same as model
         }
 
-        unifiedDiags.AddRange(FindDuplicates(model, mergedFirstSeen)); // same post-merge dup scan as Build()
-        return new ProjectBuildResult(model, unifiedDiags, files);
+        unifiedDiags.AddRange(FindDuplicates(model, positions)); // same post-merge dup scan as Build()
+        return new ProjectBuildResult(model, unifiedDiags, files, positions);
     }
 
     private static IEnumerable<(int Index, string Path)> EnumerateIndexed(IReadOnlyList<string> files)
@@ -398,7 +437,7 @@ public sealed record DatabaseProject
     private readonly record struct PartialParse(
         DatabaseModel Model,
         List<Diagnostic> Diagnostics,
-        Dictionary<string, (string RelFile, int Line, int Col)> FirstSeen);
+        Contracts.SourcePositionIndex Positions);
 
     /// <summary>
     /// Records the first-seen source position for each distinctly-identifiable statement in a parse result.
@@ -407,37 +446,22 @@ public sealed record DatabaseProject
     /// model stay in sync). <paramref name="defaultSchema"/> must match the project's default schema so that
     /// unqualified object names hash to the same key that <see cref="FindDuplicates"/> looks up.
     /// </summary>
-    private static void RecordFirstSeen(
-        Syntax.ParseResult parsed,
-        string sourceText,
-        string relFile,
-        string defaultSchema,
-        Dictionary<string, (string RelFile, int Line, int Col)> firstSeen)
-    {
-        foreach (var stmt in parsed.Statements)
-        {
-            var key = SourcePositionIndex.IdentityOf(stmt, defaultSchema);
-            if (key is null) continue;
-            if (firstSeen.ContainsKey(key)) continue;   // first-occurrence wins
-            var (line, col) = SourcePositionIndex.LineCol(sourceText, stmt.Position);
-            firstSeen[key] = (relFile, line, col);
-        }
-    }
-
     /// <summary>
     /// Scans the merged model for duplicate definitions and emits a structured <see cref="Diagnostic"/>
     /// for each group of duplicates. Each diagnostic carries a <see cref="RelatedLocation"/> pointing at
-    /// the prior (first) definition when the position map knows where it was first seen.
+    /// the prior (first) definition, looked up from the build's source-position index (#45) — which is
+    /// first-occurrence-wins, so it resolves to the first definition (#63).
     /// </summary>
     private static IEnumerable<Diagnostic> FindDuplicates(
         DatabaseModel model,
-        Dictionary<string, (string RelFile, int Line, int Col)>? firstSeen = null)
+        Contracts.SourcePositionIndex? positions = null)
     {
         RelatedLocation[] PriorDef(string identityKey)
         {
-            if (firstSeen is null) return Array.Empty<RelatedLocation>();
-            if (!firstSeen.TryGetValue(identityKey, out var pos)) return Array.Empty<RelatedLocation>();
-            return new[] { new RelatedLocation(pos.RelFile, pos.Line, pos.Col, "first defined here") };
+            var pos = positions?.Find(identityKey);
+            return pos is { } p
+                ? new[] { new RelatedLocation(p.File, p.Line, p.Col, "first defined here") }
+                : Array.Empty<RelatedLocation>();
         }
 
         foreach (var dup in model.Tables.GroupBy(t => $"{t.Schema}.{t.Name}".ToLowerInvariant()).Where(g => g.Count() > 1))
@@ -480,8 +504,8 @@ public sealed record DatabaseProject
 
 /// <summary>
 /// The outcome of a <see cref="DatabaseProject"/> build. Carries the merged model, the list of build
-/// problems (both as unified <see cref="Diagnostic"/> objects and as backwards-compatible strings), and
-/// the set of parsed source files.
+/// problems (both as unified <see cref="Diagnostic"/> objects and as backwards-compatible strings), the
+/// set of parsed source files, and the source-position index persisted during the build (#45).
 /// </summary>
 public sealed record ProjectBuildResult
 {
@@ -505,14 +529,23 @@ public sealed record ProjectBuildResult
 
     public IReadOnlyList<string> Files { get; init; }
 
+    /// <summary>Source anchors (file/line/col per object identity) persisted during the build (#45),
+    /// so model-tree/diagnostics resolve positions without a second parse pass.</summary>
+    public Contracts.SourcePositionIndex Positions { get; init; }
+
     public bool HasErrors => UnifiedDiagnostics.Count > 0;
 
     /// <summary>Initializes the result from the unified diagnostic list; the string shim is derived automatically.</summary>
-    public ProjectBuildResult(DatabaseModel model, IReadOnlyList<Diagnostics.Diagnostic> unifiedDiagnostics, IReadOnlyList<string> files)
+    public ProjectBuildResult(
+        DatabaseModel model,
+        IReadOnlyList<Diagnostics.Diagnostic> unifiedDiagnostics,
+        IReadOnlyList<string> files,
+        Contracts.SourcePositionIndex positions)
     {
         Model = model;
         UnifiedDiagnostics = unifiedDiagnostics;
         Diagnostics = unifiedDiagnostics.Select(d => d.ToString()).ToList();
         Files = files;
+        Positions = positions;
     }
 }

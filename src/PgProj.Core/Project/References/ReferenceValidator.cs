@@ -37,7 +37,7 @@ public static class ReferenceValidator
 
         foreach (var file in files)
         {
-            var parsed = new PgParser().Parse(File.ReadAllText(file));
+            var parsed = new PgParser().Parse(SourceReader.ReadAllText(file)); // LF-normalised (#62)
             parsedByFile[file] = parsed;
             foreach (var stmt in parsed.Statements)
                 CatalogBuilder.Absorb(projectCatalog, stmt);
@@ -65,7 +65,7 @@ public static class ReferenceValidator
         {
             var parsed = parsedByFile[file];
             var rel = Path.GetRelativePath(project.ProjectDirectory, file).Replace('\\', '/');
-            var text = File.ReadAllText(file);
+            var text = SourceReader.ReadAllText(file); // LF-normalised → positions match the parse (#62)
 
             // Analyze one statement at a time so every diagnostic can be attributed to that statement's
             // source position. The catalog already contains all project + external objects, so order of
