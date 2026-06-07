@@ -64,6 +64,10 @@ public sealed class LiveReaderIntegrationTests : IClassFixture<ThrowawayDatabase
         Assert.Contains(live.Objects, o => o.Kind == ObjectKind.Operator && o.Body.Contains("CREATE OPERATOR"));
         Assert.Contains(live.Objects, o => o.Kind == ObjectKind.TextSearchDictionary && o.Body.Contains("CREATE TEXT SEARCH DICTIONARY"));
         Assert.Contains(live.Objects, o => o.Kind == ObjectKind.TextSearchConfiguration && o.Body.Contains("ADD MAPPING"));
+        // #109/#108: TS parser/template + procedural language reconstructed from their support-function regprocs.
+        Assert.Contains(live.Objects, o => o.Kind == ObjectKind.TextSearchParser && o.Body.Contains("CREATE TEXT SEARCH PARSER") && o.Body.Contains("prsd_start"));
+        Assert.Contains(live.Objects, o => o.Kind == ObjectKind.TextSearchTemplate && o.Body.Contains("CREATE TEXT SEARCH TEMPLATE") && o.Body.Contains("dsimple_lexize"));
+        Assert.Contains(live.Objects, o => o.Kind == ObjectKind.Language && o.Body.Contains("CREATE LANGUAGE afd_plpgsql") && o.Body.Contains("HANDLER"));
         Assert.Contains(live.Objects, o => o.Kind == ObjectKind.OperatorClass && o.Body.Contains("CREATE OPERATOR CLASS"));
         Assert.Contains(live.Objects, o => o.Kind == ObjectKind.Publication && o.Body.Contains("CREATE PUBLICATION") && o.Body.Contains("FOR TABLE"));
         // #104: event-trigger reconstruction now carries the WHEN TAG IN (...) filter (was omitted).
@@ -151,7 +155,7 @@ public sealed class LiveReaderIntegrationTests : IClassFixture<ThrowawayDatabase
         // within the same throwaway DB.
         var recreate = new SchemaComparer().Compare(live, new DatabaseModel());
         var script2 = new DeployScriptGenerator().Generate(recreate, new DeployOptions { WrapInTransaction = true });
-        await deployer.ExecuteAsync(conn, "DROP PUBLICATION IF EXISTS customer_pub; DROP SCHEMA IF EXISTS afd CASCADE; DROP SCHEMA IF EXISTS reporting CASCADE; DROP FOREIGN DATA WRAPPER IF EXISTS dummy_fdw CASCADE;");
+        await deployer.ExecuteAsync(conn, "DROP PUBLICATION IF EXISTS customer_pub; DROP SCHEMA IF EXISTS afd CASCADE; DROP SCHEMA IF EXISTS reporting CASCADE; DROP FOREIGN DATA WRAPPER IF EXISTS dummy_fdw CASCADE; DROP LANGUAGE IF EXISTS afd_plpgsql CASCADE;");
         await deployer.ExecuteAsync(conn, script2);
     }
 

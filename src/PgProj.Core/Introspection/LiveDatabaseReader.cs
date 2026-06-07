@@ -54,7 +54,8 @@ public sealed class LiveDatabaseReader
         ReadCommentsAsync, ReadConversionsAsync, ReadForeignDataWrappersAsync, ReadServersAsync,
         ReadUserMappingsAsync, ReadStatisticsAsync, ReadCastsAsync, ReadForeignTablesAsync, ReadOperatorsAsync,
         ReadOperatorFamiliesAsync, ReadOperatorClassesAsync, ReadTextSearchDictionariesAsync,
-        ReadTextSearchConfigurationsAsync, ReadPublicationsAsync, ReadExpressionStatisticsAsync,
+        ReadTextSearchConfigurationsAsync, ReadTextSearchParsersAsync, ReadTextSearchTemplatesAsync,
+        ReadLanguagesAsync, ReadPublicationsAsync, ReadExpressionStatisticsAsync,
     ];
 
     public async Task<DatabaseModel> ReadAsync(string connectionString, CancellationToken ct = default)
@@ -972,6 +973,69 @@ public sealed class LiveDatabaseReader
 
             list.Add(MakeRaw(ObjectKind.TextSearchConfiguration, c.Schema, c.Name,
                 $"textsearchconfiguration:{c.Schema}.{c.Name}", sb.ToString()));
+        }
+        return list;
+    }
+
+    private async Task<List<RawObjectDefinition>> ReadTextSearchParsersAsync(NpgsqlConnection conn, CancellationToken ct)
+    {
+        var sql = _q.TextSearchParsers;
+
+        var list = new List<RawObjectDefinition>();
+        await using var cmd = new NpgsqlCommand(sql, conn);
+        await using var r = await cmd.ExecuteReaderAsync(ct);
+        while (await r.ReadAsync(ct))
+        {
+            var schema = r.GetString(0);
+            var name = r.GetString(1);
+            var opts = new List<string>
+            {
+                $"START = {r.GetString(2)}", $"GETTOKEN = {r.GetString(3)}",
+                $"END = {r.GetString(4)}", $"LEXTYPES = {r.GetString(5)}",
+            };
+            if (!r.IsDBNull(6)) opts.Add($"HEADLINE = {r.GetString(6)}");
+            var body = $"CREATE TEXT SEARCH PARSER {schema}.{name} ({string.Join(", ", opts)});";
+            list.Add(MakeRaw(ObjectKind.TextSearchParser, schema, name, $"textsearchparser:{schema}.{name}", body, bodyComparable: false));
+        }
+        return list;
+    }
+
+    private async Task<List<RawObjectDefinition>> ReadTextSearchTemplatesAsync(NpgsqlConnection conn, CancellationToken ct)
+    {
+        var sql = _q.TextSearchTemplates;
+
+        var list = new List<RawObjectDefinition>();
+        await using var cmd = new NpgsqlCommand(sql, conn);
+        await using var r = await cmd.ExecuteReaderAsync(ct);
+        while (await r.ReadAsync(ct))
+        {
+            var schema = r.GetString(0);
+            var name = r.GetString(1);
+            var opts = new List<string>();
+            if (!r.IsDBNull(2)) opts.Add($"INIT = {r.GetString(2)}");
+            opts.Add($"LEXIZE = {r.GetString(3)}");
+            var body = $"CREATE TEXT SEARCH TEMPLATE {schema}.{name} ({string.Join(", ", opts)});";
+            list.Add(MakeRaw(ObjectKind.TextSearchTemplate, schema, name, $"textsearchtemplate:{schema}.{name}", body, bodyComparable: false));
+        }
+        return list;
+    }
+
+    // Procedural languages (#108): CREATE [TRUSTED] LANGUAGE name HANDLER … [INLINE …] [VALIDATOR …].
+    private async Task<List<RawObjectDefinition>> ReadLanguagesAsync(NpgsqlConnection conn, CancellationToken ct)
+    {
+        var sql = _q.Languages;
+
+        var list = new List<RawObjectDefinition>();
+        await using var cmd = new NpgsqlCommand(sql, conn);
+        await using var r = await cmd.ExecuteReaderAsync(ct);
+        while (await r.ReadAsync(ct))
+        {
+            var name = r.GetString(0);
+            var trusted = !r.IsDBNull(1) && r.GetBoolean(1) ? "TRUSTED " : "";
+            var body = $"CREATE {trusted}LANGUAGE {name} HANDLER {r.GetString(2)}";
+            if (!r.IsDBNull(3)) body += $" INLINE {r.GetString(3)}";
+            if (!r.IsDBNull(4)) body += $" VALIDATOR {r.GetString(4)}";
+            list.Add(MakeRaw(ObjectKind.Language, "", name, $"language:{name}", body + ";", bodyComparable: false));
         }
         return list;
     }

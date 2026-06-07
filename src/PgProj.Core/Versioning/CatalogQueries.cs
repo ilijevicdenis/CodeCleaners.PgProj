@@ -544,6 +544,37 @@ public sealed record CatalogQueries
                 GROUP BY tt.alias, m.maptokentype
                 ORDER BY m.maptokentype;";
 
+    // Text-search PARSER/TEMPLATE (#109): reconstructed from their support-function regprocs. A user can
+    // create these in pure SQL by pointing at built-in C support functions (prsd_*, dsimple_*, …).
+    public string TextSearchParsers { get; init; } = @"
+            SELECT n.nspname, p.prsname,
+                   p.prsstart::regproc::text, p.prstoken::regproc::text, p.prsend::regproc::text,
+                   p.prslextype::regproc::text, NULLIF(p.prsheadline, 0)::regproc::text
+            FROM pg_ts_parser p
+            JOIN pg_namespace n ON n.oid = p.prsnamespace
+            WHERE n.nspname NOT IN ('pg_catalog','information_schema') AND n.nspname NOT LIKE 'pg_%'
+            ORDER BY n.nspname, p.prsname;";
+
+    public string TextSearchTemplates { get; init; } = @"
+            SELECT n.nspname, t.tmplname, NULLIF(t.tmplinit, 0)::regproc::text, t.tmpllexize::regproc::text
+            FROM pg_ts_template t
+            JOIN pg_namespace n ON n.oid = t.tmplnamespace
+            WHERE n.nspname NOT IN ('pg_catalog','information_schema') AND n.nspname NOT LIKE 'pg_%'
+            ORDER BY n.nspname, t.tmplname;";
+
+    // Procedural languages (#108): user CREATE LANGUAGE (lanispl) that isn't extension-owned (plpgsql is
+    // owned by its extension and recreated by CREATE EXTENSION, so it's excluded).
+    public string Languages { get; init; } = @"
+            SELECT l.lanname, l.lanpltrusted,
+                   l.lanplcallfoid::regproc::text AS handler,
+                   NULLIF(l.laninline, 0)::regproc::text AS inline,
+                   NULLIF(l.lanvalidator, 0)::regproc::text AS validator
+            FROM pg_language l
+            WHERE l.lanispl
+              AND NOT EXISTS (SELECT 1 FROM pg_depend d
+                              WHERE d.classid = 'pg_language'::regclass AND d.objid = l.oid AND d.deptype = 'e')
+            ORDER BY l.lanname;";
+
     public string Publications { get; init; } = @"
             SELECT p.pubname, p.puballtables, p.pubinsert, p.pubupdate, p.pubdelete, p.pubtruncate, p.pubviaroot,
                    (SELECT string_agg(quote_ident(n.nspname)||'.'||quote_ident(c.relname), ', '

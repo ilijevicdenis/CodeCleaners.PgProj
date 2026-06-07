@@ -1,12 +1,15 @@
 -- ============================================================
 -- PgProj deployment script
--- 71 change(s)
+-- 74 change(s)
 -- ============================================================
 
 BEGIN;
 
 -- Create extension btree_gist
 CREATE EXTENSION IF NOT EXISTS btree_gist;
+
+-- Create language afd_plpgsql
+CREATE LANGUAGE afd_plpgsql HANDLER plpgsql_call_handler INLINE plpgsql_inline_handler VALIDATOR plpgsql_validator;
 
 -- Create schema afd
 CREATE SCHEMA IF NOT EXISTS "afd";
@@ -16,6 +19,12 @@ CREATE SCHEMA IF NOT EXISTS "reporting";
 
 -- Create collation afd.case_insensitive
 CREATE COLLATION afd.case_insensitive(PROVIDER=icu,LOCALE='und-u-ks-level2',DETERMINISTIC=false);
+
+-- Create textsearchparser afd.myparser
+CREATE TEXT SEARCH PARSER afd.myparser(START=prsd_start,GETTOKEN=prsd_nexttoken,END=prsd_end,LEXTYPES=prsd_lextype);
+
+-- Create textsearchtemplate afd.mytmpl
+CREATE TEXT SEARCH TEMPLATE afd.mytmpl(INIT=dsimple_init,LEXIZE=dsimple_lexize);
 
 -- Create textsearchdictionary afd.english_dict
 CREATE TEXT SEARCH DICTIONARY afd.english_dict(TEMPLATE=pg_catalog.simple,STOPWORDS=english);

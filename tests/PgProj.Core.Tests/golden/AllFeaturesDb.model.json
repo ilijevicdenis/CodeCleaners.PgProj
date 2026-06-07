@@ -946,6 +946,14 @@
       "BodyComparable": true
     },
     {
+      "Kind": 1,
+      "Schema": "",
+      "Name": "afd_plpgsql",
+      "Identity": "language:afd_plpgsql",
+      "Body": "CREATE LANGUAGE afd_plpgsql HANDLER plpgsql_call_handler INLINE plpgsql_inline_handler VALIDATOR plpgsql_validator",
+      "BodyComparable": true
+    },
+    {
       "Kind": 8,
       "Schema": "afd",
       "Name": "afd.int_minmax_ops USING btree",
@@ -1041,6 +1049,22 @@
       "Name": "english_dict",
       "Identity": "textsearchdictionary:afd.english_dict",
       "Body": "CREATE TEXT SEARCH DICTIONARY afd.english_dict(TEMPLATE=pg_catalog.simple,STOPWORDS=english)",
+      "BodyComparable": true
+    },
+    {
+      "Kind": 22,
+      "Schema": "afd",
+      "Name": "myparser",
+      "Identity": "textsearchparser:afd.myparser",
+      "Body": "CREATE TEXT SEARCH PARSER afd.myparser(START=prsd_start,GETTOKEN=prsd_nexttoken,END=prsd_end,LEXTYPES=prsd_lextype)",
+      "BodyComparable": true
+    },
+    {
+      "Kind": 23,
+      "Schema": "afd",
+      "Name": "mytmpl",
+      "Identity": "textsearchtemplate:afd.mytmpl",
+      "Body": "CREATE TEXT SEARCH TEMPLATE afd.mytmpl(INIT=dsimple_init,LEXIZE=dsimple_lexize)",
       "BodyComparable": true
     },
     {
