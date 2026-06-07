@@ -4,8 +4,8 @@
 > SSDT-for-PostgreSQL parity and is the single place to read "where are we now". It is **updated on
 > every delivered milestone** (see [Update contract](#update-contract) below).
 
-**Last updated:** 2026-06-07 · **Streams:** semantic core (EP-SEMCORE #41) · SSDT parity (#27) ·
-performance (#12)
+**Last updated:** 2026-06-07 (M1 wave delivered) · **Streams:** semantic core (EP-SEMCORE #41) ·
+SSDT parity (#27) · performance (#12)
 
 Legend: ✅ delivered · 🟡 in progress · ⬜ not started · ⛔ blocked.
 
@@ -18,10 +18,10 @@ deliverable subtasks; **complex issues are broken into smaller subtasks when imp
 
 | # | Milestone | Stream | Issues | Done | Status | GitHub |
 |---|-----------|--------|--------|------|--------|--------|
-| **M1** | Determinism & Diagnostics Foundations | cross-cutting | #59, #49, #60, #36, #37 | 1 / 5 | 🟡 | [milestone/1](https://github.com/ilijevicdenis/CodeCleaners.PgProj/milestone/1) |
+| **M1** | Determinism & Diagnostics Foundations | cross-cutting | #59, #49, #36, #37, #60, #62, #63 | 4 / 7 | 🟡 | [milestone/1](https://github.com/ilijevicdenis/CodeCleaners.PgProj/milestone/1) |
 | **M2** | Semantic Core — Identity & Foundations | EP-SEMCORE | #42, #43, #44, #45, #46, #39 | 0 / 6 | ⬜ | [milestone/2](https://github.com/ilijevicdenis/CodeCleaners.PgProj/milestone/2) |
 | **M3** | Semantic Core — Binding & Validation | EP-SEMCORE | #47, #48, #50, #51 | 0 / 4 | ⬜ | [milestone/3](https://github.com/ilijevicdenis/CodeCleaners.PgProj/milestone/3) |
-| **M4** | Diff, Risk, Deploy & Incremental | EP-SEMCORE | #52, #53, #54, #55, #56, #57, #58 | 0 / 7 | ⬜ | [milestone/4](https://github.com/ilijevicdenis/CodeCleaners.PgProj/milestone/4) |
+| **M4** | Diff, Risk, Deploy & Incremental | EP-SEMCORE | #52, #53, #54, #55, #56, #57, #58, #61, #64 | 0 / 9 | ⬜ | [milestone/4](https://github.com/ilijevicdenis/CodeCleaners.PgProj/milestone/4) |
 | **M5** | SSDT Parity — Editor UI | parity #27 | #31, #24, #25, #26 | 0 / 4 | ⬜ | [milestone/5](https://github.com/ilijevicdenis/CodeCleaners.PgProj/milestone/5) |
 | **M6** | Performance & Engine Backlog | perf #12 | #8, #10 | 0 / 6 † | ⬜ | [milestone/6](https://github.com/ilijevicdenis/CodeCleaners.PgProj/milestone/6) |
 
@@ -48,10 +48,25 @@ The reproducibility & quality base everything else leans on.
 - ✅ **#59** — deterministic raw-object ordering across the parallel introspection merge
   *(delivered 2026-06-07, commit `2200b6c`; two introspections of the same DB now yield byte-identical
   models + deploy scripts)*
-- ⬜ **#49** — unify diagnostics into one compiler-style type (file/line/col/code/severity/related)
-- ⬜ **#60** — testing: golden-file scripts + CanonicalHash-stability + StableId-under-rename
-- ⬜ **#36** — round-trip idempotency: phantom diffs + typed-table fidelity for raw object kinds
-- ⬜ **#37** — integration tests on throwaway databases (isolation)
+- ✅ **#49** — unify diagnostics into one compiler-style type (file/line/col/code/severity/related)
+  *(delivered 2026-06-07, commit `949b766`; unified `Diagnostic` in `src/PgProj.Core/Diagnostics/`,
+  producers migrated, JSON contract kept stable, 8 unit tests. Follow-up [#63](https://github.com/ilijevicdenis/CodeCleaners.PgProj/issues/63):
+  populate & surface `Related[]` end-to-end)*
+- ✅ **#36** — round-trip idempotency: phantom diffs + typed-table fidelity for raw object kinds
+  *(delivered 2026-06-07; identity-only compare for canonical-reconstruction kinds, typed-table
+  `OF type` fidelity, aggregate identity double-schema bug fixed. Scoped to the declared kinds; the
+  rest split to [#61](https://github.com/ilijevicdenis/CodeCleaners.PgProj/issues/61) (raw kinds) +
+  [#64](https://github.com/ilijevicdenis/CodeCleaners.PgProj/issues/64) (finely-modelled), both M4)*
+- ✅ **#37** — integration tests on throwaway databases (isolation)
+  *(delivered 2026-06-07; `ThrowawayDatabaseFixture` per-class DB create/drop, 5 integration classes
+  migrated off fragile shared-DB cleanup)*
+- 🟡 **#60** — testing: golden-file scripts + CanonicalHash-stability + StableId-under-rename
+  *(golden-file determinism delivered 2026-06-07 — deploy-script + model-JSON goldens with regen via
+  `PGPROJ_UPDATE_GOLDEN`. CanonicalHash-stability + StableId-under-rename tests are **blocked on #42**
+  (M2 Object Identity Model) and land with it)*
+- ⬜ **#62** — determinism: normalize source line endings so build artifacts are byte-reproducible
+  across CRLF/LF checkouts *(golden test currently folds escaped EOLs as a stopgap)*
+- ⬜ **#63** — diagnostics: populate & surface related locations end-to-end (completes #49)
 
 ### M2 · Semantic Core — Identity & Foundations ⬜
 
@@ -112,6 +127,7 @@ Newest first. One line per delivered issue/milestone; this is the audit trail of
 
 | Date | Milestone | Item | Commit | Notes |
 |------|-----------|------|--------|-------|
+| 2026-06-07 | M1 | #49 unify diagnostics + #37 throwaway-DB isolation + #36 round-trip (scoped) + #60 golden-file | merge of `milestone/m1-foundations` | M1 wave delivered via 4 worktree agents + integration fixes (aggregate identity double-schema bug). Validated against PG18: 22,217 pass / 0 fail / 0 skip; allocation footprint unchanged (16.94 MB/op). #60 golden-file done; its hash/rename tests deferred to #42. Remaining M1: #62, #63. |
 | 2026-06-07 | M1 | #59 deterministic raw-object ordering | `2200b6c` | Sort `model.Objects` by (kind, schema, name, identity) after the parallel merge; DB-free + live regression tests; full suite green (22,195 pass against PG18). |
 
 ---
