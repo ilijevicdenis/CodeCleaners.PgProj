@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ============================================================================================
+  PgProj Visual Studio extension (VSIX) — EP-VS #25 Route B (project system / project flavor).
+
+  *** THIS PROJECT CANNOT BE BUILT WITH `dotnet build`. ***
+  It targets the classic .NET Framework + the Visual Studio SDK (Microsoft.VSSDK.BuildTools,
+  Microsoft.VisualStudio.* assemblies) and requires:
+    - Windows
+    - Visual Studio 2022 (17.x) with the "Visual Studio extension development" workload
+  Build it from inside Visual Studio (open ../PgProj.VisualStudio.sln), or with MSBuild from a
+  Developer Command Prompt. It is intentionally NOT in ../../../PgProj.slnx and is NOT part of the
+  `dotnet test` suite, so it never breaks the cross-platform build/test gates.
+
+  This file is a SCAFFOLD: package versions and a couple of imports are placeholders to be pinned
+  when the VS SDK is available. The repo author could not build/run it in the headless environment
+  where it was scaffolded.
+  ============================================================================================
+-->
+<Project ToolsVersion="Current" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(VisualStudioVersion)\Bin\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(VisualStudioVersion)\Bin\Microsoft.Common.props')" />
+
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{B0000000-0000-0000-0000-000000000025}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>PgProj.VisualStudio</RootNamespace>
+    <AssemblyName>PgProj.VisualStudio</AssemblyName>
+    <!-- VS extensions are still .NET Framework. 4.7.2 is the VS 2022 baseline. -->
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <GeneratePkgDefFile>true</GeneratePkgDefFile>
+    <IncludeAssemblyInVSIXContainer>true</IncludeAssemblyInVSIXContainer>
+    <IncludeDebugSymbolsInVSIXContainer>false</IncludeDebugSymbolsInVSIXContainer>
+    <IncludeDebugSymbolsInLocalVSIXDeployment>false</IncludeDebugSymbolsInLocalVSIXDeployment>
+    <CopyBuildOutputToOutputDirectory>true</CopyBuildOutputToOutputDirectory>
+    <CopyOutputSymbolsToOutputDirectory>true</CopyOutputSymbolsToOutputDirectory>
+    <StartAction>Program</StartAction>
+    <StartProgram Condition="'$(DevEnvDir)' != ''">$(DevEnvDir)devenv.exe</StartProgram>
+    <StartArguments>/rootsuffix Exp</StartArguments>
+    <DeployExtension>True</DeployExtension>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!--
+      VS SDK packages — PINNED AT SCAFFOLD TIME AS PLACEHOLDERS. Restore requires the VS SDK
+      feeds / the extension-development workload. Microsoft.VSSDK.BuildTools is what turns this
+      into a VSIX and processes source.extension.vsixmanifest.
+    -->
+    <PackageReference Include="Microsoft.VSSDK.BuildTools" Version="17.11.*">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.VisualStudio.SDK" Version="17.11.*" ExcludeAssets="runtime" />
+    <!-- LSP client base class (ILanguageClient) lives here. -->
+    <PackageReference Include="Microsoft.VisualStudio.LanguageServer.Client" Version="17.11.*" ExcludeAssets="runtime" />
+    <!-- Project-system (CPS) helpers for the .pgproj project flavor (Route B project system). -->
+    <PackageReference Include="Microsoft.VisualStudio.ProjectSystem.SDK" Version="17.*" ExcludeAssets="runtime" />
+    <PackageReference Include="Microsoft.VisualStudio.ProjectSystem.SDK.Tools" Version="17.*">
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="PgProjPackage.cs" />
+    <Compile Include="PgProjGuids.cs" />
+    <Compile Include="ProjectSystem\PgProjProjectFactory.cs" />
+    <Compile Include="ProjectSystem\PgProjUnconfiguredProject.cs" />
+    <Compile Include="Properties\PgProjBuildPropertiesPage.cs" />
+    <Compile Include="Properties\PgProjDatabasePropertiesPage.cs" />
+    <Compile Include="Properties\PgProjSqlCmdVariablesPage.cs" />
+    <Compile Include="Properties\PgProjTargetPlatformPage.cs" />
+    <Compile Include="Commands\PublishCommand.cs" />
+    <Compile Include="Commands\SchemaCompareCommand.cs" />
+    <Compile Include="LanguageClient\PgProjLanguageClient.cs" />
+    <Compile Include="LanguageClient\PgProjContentDefinition.cs" />
+    <Compile Include="ToolWindows\SchemaCompareToolWindow.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="source.extension.vsixmanifest">
+      <SubType>Designer</SubType>
+    </None>
+    <VSCTCompile Include="PgProjCommands.vsct">
+      <ResourceName>Menus.ctmenu</ResourceName>
+    </VSCTCompile>
+  </ItemGroup>
+
+  <Import Project="$(VSToolsPath)\VSSDK\Microsoft.VsSDK.targets" Condition="Exists('$(VSToolsPath)\VSSDK\Microsoft.VsSDK.targets')" />
+</Project>

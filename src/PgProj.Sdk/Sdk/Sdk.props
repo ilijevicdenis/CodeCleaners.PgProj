@@ -1,21 +1,53 @@
 <!--
   PgProj MSBuild SDK — props.
-  Imported at the top of a .pgproj. Establishes defaults so a database project builds with the
-  same `dotnet build` / Visual Studio gesture as any other project.
+  Imported at the top of a .pgproj (either explicitly via <Import .../> when consumed from source,
+  or automatically by MSBuild's SDK resolver via <Project Sdk="PgProj.Sdk/x.y.z">). Establishes
+  defaults so a database project builds with the same `dotnet build` / Visual Studio gesture as any
+  other project.
 -->
 <Project>
   <PropertyGroup>
     <Configuration Condition="'$(Configuration)' == ''">Debug</Configuration>
 
-    <!-- The pgproj CLI. When the SDK is consumed from source (this repo) it points at the CLI
-         project; a packaged SDK would instead carry the tool in tools/. -->
-    <PgProjCliProject Condition="'$(PgProjCliProject)' == ''">$([MSBuild]::NormalizePath('$(MSBuildThisFileDirectory)..\..\PgProj.Cli\PgProj.Cli.csproj'))</PgProjCliProject>
+    <!--
+      How the pgproj CLI is invoked. Two modes (resolved in Sdk.targets):
 
-    <!-- Build artifact (the JSON model — the .dacpac analogue). -->
-    <PgProjOutput Condition="'$(PgProjOutput)' == ''">$(MSBuildProjectDirectory)\bin\$(MSBuildProjectName).model.json</PgProjOutput>
+      1. From-source (this repo): PgProjCliProject points at the CLI .csproj and the targets run it
+         with `dotnet run` (the project flag). Detected when this Sdk.props sits next to the CLI
+         source (../../PgProj.Cli alongside src/PgProj.Sdk/Sdk/).
+
+      2. From a packaged SDK (NuGet): the .nupkg carries a framework-dependent publish of the CLI
+         under tools/. The targets then run `dotnet <tools>/PgProj.Cli.dll`. PgProjCliDll points at it.
+
+      A consumer can override either property to force a specific invocation (e.g. point PgProjCliDll
+      at a self-built CLI).
+    -->
+    <_PgProjCliSourceCandidate>$([MSBuild]::NormalizePath('$(MSBuildThisFileDirectory)..\..\PgProj.Cli\PgProj.Cli.csproj'))</_PgProjCliSourceCandidate>
+    <_PgProjCliDllCandidate>$([MSBuild]::NormalizePath('$(MSBuildThisFileDirectory)..\tools\PgProj.Cli.dll'))</_PgProjCliDllCandidate>
+
+    <!-- Packaged-SDK CLI payload (tools/PgProj.Cli.dll next to the Sdk/ folder). Wins when present. -->
+    <PgProjCliDll Condition="'$(PgProjCliDll)' == '' And Exists('$(_PgProjCliDllCandidate)')">$(_PgProjCliDllCandidate)</PgProjCliDll>
+    <!-- From-source CLI project. Used only when no packaged DLL was found. -->
+    <PgProjCliProject Condition="'$(PgProjCliProject)' == '' And '$(PgProjCliDll)' == '' And Exists('$(_PgProjCliSourceCandidate)')">$(_PgProjCliSourceCandidate)</PgProjCliProject>
+
+    <!-- Build artifacts. The JSON model is the .dacpac analogue; the .pgpkg is the portable package. -->
+    <PgProjOutputDir Condition="'$(PgProjOutputDir)' == ''">$(MSBuildProjectDirectory)\bin</PgProjOutputDir>
+    <PgProjOutput Condition="'$(PgProjOutput)' == ''">$(PgProjOutputDir)\$(MSBuildProjectName).model.json</PgProjOutput>
+    <PgProjPackage Condition="'$(PgProjPackage)' == ''">$(PgProjOutputDir)\$(MSBuildProjectName).pgpkg</PgProjPackage>
 
     <!-- So IDEs that key off these don't choke on an unfamiliar project type. -->
     <DefaultLanguageSourceExtension>.sql</DefaultLanguageSourceExtension>
+
+    <!--
+      Publish settings (surfaced to VS's right-click -> Publish). A .pgproj sets these (or passes
+      them on the command line: `dotnet build -t:Publish -p:PgProjPublishConnection=...`):
+        <PgProjPublishConnection>  the Npgsql connection string to deploy to (required for Publish)
+        <PgProjPublishProfile>     a .pgpublish.json profile (options + SQLCMD variables)
+        <PgProjPublishAllowDrops>  true -> allow destructive changes
+        <PgProjPublishExtraArgs>   any extra `pgproj publish` flags (e.g. the no-transaction switch)
+      Never hard-code a connection string in a committed .pgproj — prefer a profile or pass at build time.
+    -->
+    <PgProjPublishAllowDrops Condition="'$(PgProjPublishAllowDrops)' == ''">false</PgProjPublishAllowDrops>
 
     <!--
       Auto-include opt-out: set <EnableDefaultSqlItems>false</EnableDefaultSqlItems> in your

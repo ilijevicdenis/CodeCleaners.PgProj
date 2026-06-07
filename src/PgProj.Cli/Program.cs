@@ -1051,7 +1051,7 @@ public static class Program
 
     private static string DefaultProjectFile(string name) =>
         $"""
-        <Project Sdk="PgProj.Sdk/0.1.0">
+        <Project Sdk="PgProj.Sdk/0.1.0" DefaultTargets="Build">
           <PropertyGroup>
             <Name>{name}</Name>
             <DefaultSchema>public</DefaultSchema>

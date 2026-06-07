@@ -1,23 +1,88 @@
 <!--
   PgProj MSBuild SDK — targets.
-  Wires the standard MSBuild verbs (Restore/Build/Rebuild/Clean) to the pgproj CLI so the database
-  project participates in `dotnet build`, solution builds, and the Visual Studio Build command.
+  Wires the standard MSBuild verbs (Restore/Build/Rebuild/Clean/Publish) to the pgproj CLI so the
+  database project participates in `dotnet build`, solution builds, and the Visual Studio
+  Build/Rebuild/Clean/Publish commands.
 -->
 <Project>
+  <!--
+    Resolve a single CLI command line, used by every verb below. Precedence:
+      1. PgProjCliExe      — an explicit `pgproj`/`pgproj.exe` on PATH or a full path (no `dotnet` prefix).
+      2. PgProjCliDll      — a packaged framework-dependent publish (tools/PgProj.Cli.dll): `dotnet <dll>`.
+      3. PgProjCliProject  — from-source CLI .csproj, run via `dotnet run` with a trailing arg separator.
+    The arg separator is only needed for `dotnet run`; the other two pass args straight through.
+  -->
+  <PropertyGroup>
+    <_PgProjCliInvocation Condition="'$(PgProjCliExe)' != ''">&quot;$(PgProjCliExe)&quot;</_PgProjCliInvocation>
+    <_PgProjCliInvocation Condition="'$(_PgProjCliInvocation)' == '' And '$(PgProjCliDll)' != ''">dotnet &quot;$(PgProjCliDll)&quot;</_PgProjCliInvocation>
+    <_PgProjCliInvocation Condition="'$(_PgProjCliInvocation)' == '' And '$(PgProjCliProject)' != ''">dotnet run --project &quot;$(PgProjCliProject)&quot; -c $(Configuration) --</_PgProjCliInvocation>
+  </PropertyGroup>
+
+  <Target Name="_PgProjResolveCli">
+    <Error Condition="'$(_PgProjCliInvocation)' == ''"
+           Text="PgProj.Sdk could not locate the pgproj CLI. Set one of: PgProjCliExe (a 'pgproj' on PATH), PgProjCliDll (a published PgProj.Cli.dll), or PgProjCliProject (the CLI .csproj when building from source). A packaged SDK ships tools/PgProj.Cli.dll; from source the CLI is auto-detected next to the SDK." />
+  </Target>
+
   <!-- Restore is invoked implicitly by `dotnet build`; a database project has nothing to restore. -->
   <Target Name="Restore" />
 
-  <Target Name="Build">
+  <Target Name="Build" DependsOnTargets="_PgProjResolveCli">
     <Message Importance="high" Text="pgproj: building database project '$(MSBuildProjectName)'" />
-    <Exec Command="dotnet run --project &quot;$(PgProjCliProject)&quot; -c $(Configuration) -- build &quot;$(MSBuildProjectFullPath)&quot; -o &quot;$(PgProjOutput)&quot;" />
+    <MakeDir Directories="$(PgProjOutputDir)" />
+    <!-- build emits both the model (.model.json) and the portable package (.pgpkg) alongside it. -->
+    <Exec Command="$(_PgProjCliInvocation) build &quot;$(MSBuildProjectFullPath)&quot; -o &quot;$(PgProjOutput)&quot; --package &quot;$(PgProjPackage)&quot;" />
   </Target>
 
   <Target Name="Clean">
     <Delete Files="$(PgProjOutput)" Condition="Exists('$(PgProjOutput)')" />
+    <Delete Files="$(PgProjPackage)" Condition="Exists('$(PgProjPackage)')" />
   </Target>
 
   <Target Name="Rebuild" DependsOnTargets="Clean;Build" />
 
-  <!-- Allow `dotnet publish`/`pack` to no-op rather than error on an unfamiliar project. -->
-  <Target Name="Publish" DependsOnTargets="Build" />
+  <!--
+    Publish: right-click -> Publish in Visual Studio (or `dotnet build -t:Publish`). Builds first (so
+    the model is current), then runs the deploy engine. Three shapes:
+
+      * Real publish   (PgProjPublishConnection set, no dry run): `pgproj publish` against that
+                       connection diffs the project vs the live server and applies the deploy script.
+      * Diff dry-run   (PgProjPublishConnection set + PgProjPublishDryRun=true): `pgproj publish` in
+                       dry-run mode writes the *incremental* deploy script for that target, no mutation.
+      * Offline dry-run (no connection + PgProjPublishDryRun=true): `pgproj script` writes the full
+                       create script with no server contact — the "what would I deploy" preview a VS
+                       user can run without a database.
+
+    With neither a connection nor a dry run set, it fails with a clear message rather than a silent
+    no-op, so the gesture is honest about what it needs. The script is written to PgProjPublishScript
+    (default bin/<Name>.deploy.sql).
+  -->
+  <PropertyGroup>
+    <!-- The generated deploy/preview script. Named with a leading '_' so the CLI's source globber
+         (which skips '_'-prefixed files as generated artifacts) never re-parses it as a schema source
+         on the next build — otherwise a `.sql` left in bin/ would be picked up as a duplicate of every
+         object it creates. -->
+    <PgProjPublishScript Condition="'$(PgProjPublishScript)' == ''">$(PgProjOutputDir)\_$(MSBuildProjectName).deploy.sql</PgProjPublishScript>
+
+    <!-- Offline dry-run path: no connection, just emit the full create script. -->
+    <_PgProjOfflineDryRun Condition="'$(PgProjPublishDryRun)' == 'true' And '$(PgProjPublishConnection)' == ''">true</_PgProjOfflineDryRun>
+
+    <_PgProjPublishArgs Condition="'$(_PgProjOfflineDryRun)' == 'true'">script &quot;$(MSBuildProjectFullPath)&quot; -o &quot;$(PgProjPublishScript)&quot;</_PgProjPublishArgs>
+
+    <_PgProjPublishArgs Condition="'$(_PgProjOfflineDryRun)' != 'true'">publish &quot;$(MSBuildProjectFullPath)&quot;</_PgProjPublishArgs>
+    <_PgProjPublishArgs Condition="'$(_PgProjOfflineDryRun)' != 'true' And '$(PgProjPublishConnection)' != ''">$(_PgProjPublishArgs) --connection &quot;$(PgProjPublishConnection)&quot;</_PgProjPublishArgs>
+    <_PgProjPublishArgs Condition="'$(_PgProjOfflineDryRun)' != 'true' And '$(PgProjPublishDryRun)' == 'true'">$(_PgProjPublishArgs) --dry-run -o &quot;$(PgProjPublishScript)&quot;</_PgProjPublishArgs>
+
+    <!-- Flags that apply to both publish and the offline script path where meaningful. -->
+    <_PgProjPublishArgs Condition="'$(PgProjPublishProfile)' != ''">$(_PgProjPublishArgs) --profile &quot;$(PgProjPublishProfile)&quot;</_PgProjPublishArgs>
+    <_PgProjPublishArgs Condition="'$(_PgProjOfflineDryRun)' != 'true' And '$(PgProjPublishAllowDrops)' == 'true'">$(_PgProjPublishArgs) --allow-drops</_PgProjPublishArgs>
+    <_PgProjPublishArgs Condition="'$(PgProjPublishExtraArgs)' != ''">$(_PgProjPublishArgs) $(PgProjPublishExtraArgs)</_PgProjPublishArgs>
+  </PropertyGroup>
+
+  <Target Name="Publish" DependsOnTargets="_PgProjResolveCli;Build">
+    <Error Condition="'$(PgProjPublishConnection)' == '' And '$(PgProjPublishDryRun)' != 'true'"
+           Text="pgproj Publish needs a target: set &lt;PgProjPublishConnection&gt; in the .pgproj (or pass -p:PgProjPublishConnection=...), or do a dry run with -p:PgProjPublishDryRun=true (offline create-script preview, no server needed). A publish profile alone (PgProjPublishProfile) does not carry the connection string — that is supplied here or via PGPROJ_CONNECTION." />
+    <Message Importance="high" Text="pgproj: publishing database project '$(MSBuildProjectName)' (offline create-script preview)" Condition="'$(_PgProjOfflineDryRun)' == 'true'" />
+    <Message Importance="high" Text="pgproj: publishing database project '$(MSBuildProjectName)'" Condition="'$(_PgProjOfflineDryRun)' != 'true'" />
+    <Exec Command="$(_PgProjCliInvocation) $(_PgProjPublishArgs)" />
+  </Target>
 </Project>
