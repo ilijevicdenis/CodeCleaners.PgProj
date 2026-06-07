@@ -22,11 +22,11 @@ Legend: ✅ full · ◑ partial · ⬜ not yet · `raw` = handled by the generic
 | CREATE TABLE — GENERATED … STORED | ✅ | ✅ | ✅ | expression retained (LIM-104) |
 | CREATE TABLE — identity ALWAYS/BY DEFAULT | ✅ | ✅ | ✅ | LIM-009 |
 | CREATE TABLE — EXCLUDE constraint | ✅ | ✅ | ✅ | introspected via pg_get_constraintdef into OtherConstraints (#98) |
-| CREATE TABLE — INHERITS / PARTITION BY / WITH | ◑ | ◑ | ⬜ | trailing clauses round-trip (LIM-101); introspection pending (#99) |
-| CREATE TABLE — PARTITION OF / OF type | `raw` | `raw` | ◑ | `OF type` introspected (`ReadTypedTablesAsync`); `PARTITION OF` pending (#99) |
+| CREATE TABLE — INHERITS / PARTITION BY / WITH | ◑ | ◑ | ✅ | PARTITION BY + INHERITS introspected to TrailingOptions (#99); WITH storage params still off by default |
+| CREATE TABLE — PARTITION OF / OF type | `raw` | `raw` | ✅ | `OF type` (`ReadTypedTablesAsync`) + `PARTITION OF` (`ReadPartitionChildrenAsync`) (#99) |
 | ALTER TABLE (as deploy output) | n/a | ✅ | n/a | ADD/ALTER/DROP COLUMN (+USING), PK, FK, CHECK |
-| CREATE INDEX (+ partial/INCLUDE/opclass) | ✅ | ✅ | ◑ | expression/opclass compare is textual (LIM-005, #101) |
-| CREATE STATISTICS | `raw` | `raw` | ◑ | column-based introspected (`ReadStatisticsAsync`); expression stats existence-only (#110) |
+| CREATE INDEX (+ partial/INCLUDE/opclass) | ✅ | ✅ | ✅ | opclass/expression introspected; redundant ASC/NULLS defaults folded so they round-trip (#101) |
+| CREATE STATISTICS | `raw` | `raw` | ✅ | column-based (`ReadStatisticsAsync`) + expression stats via pg_get_statisticsobjdef (`ReadExpressionStatisticsAsync`, #110) |
 | CREATE SEQUENCE (+ options) | ✅ | ✅ | ✅ | AS/INCREMENT/MIN/MAX/START/CACHE/CYCLE (LIM-102) |
 | CREATE VIEW | ✅ | ✅ | ✅ | body compared normalized (LIM-003) |
 | CREATE MATERIALIZED VIEW | ✅ | ✅ | ✅ | matview flag introspected via relkind (`ReadViewsAsync`) |
@@ -70,7 +70,7 @@ Diff rule: missing on target → emit body; body changed → `DROP … IF EXISTS
 The introspection column is where the remaining work concentrates: project-side build/script/
 project-vs-project compare already cover everything; live-server compare/publish/extract already cover
 all ✅ rows. The remaining ⬜/◑ are tracked under **EP-COVERAGE (#72)** on milestone M7. **Done:** EXCLUDE
-constraints (#98), EVENT TRIGGER tags (#104), POLICY `TO` roles (#103), USER MAPPING (#108). **Open:**
-PARTITION/INHERITS (#99), index opclass structured (#101), base types (#102), LANGUAGE/TRANSFORM (#108 tail
-— need C-backed objects), TEXT SEARCH PARSER/TEMPLATE (#109 — C-backed), expression-statistics tail (#110).
-See also BUGS.md LIM-1xx.
+constraints (#98), EVENT TRIGGER tags (#104), POLICY `TO` roles (#103), USER MAPPING (#108),
+PARTITION/INHERITS (#99), index opclass/ordering (#101), expression statistics (#110). **Open (all need
+C-backed objects a pure-SQL sample can't exercise):** base types (#102), LANGUAGE/TRANSFORM (#108 tail),
+TEXT SEARCH PARSER/TEMPLATE (#109). See also BUGS.md LIM-1xx.
