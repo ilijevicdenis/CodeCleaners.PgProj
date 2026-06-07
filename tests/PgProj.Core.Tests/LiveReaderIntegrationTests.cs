@@ -68,6 +68,8 @@ public sealed class LiveReaderIntegrationTests : IClassFixture<ThrowawayDatabase
             && o.Body.Contains("WHEN TAG IN") && o.Body.Contains("'CREATE TABLE'"));
         // #103: policy reconstruction now carries the TO roles clause (was omitted).
         Assert.Contains(live.Objects, o => o.Kind == ObjectKind.Policy && o.Body.Contains(" TO PUBLIC"));
+        // #98: EXCLUDE constraints are introspected into TableDefinition.OtherConstraints.
+        Assert.Contains(live.Tables, t => t.OtherConstraints.Any(c => c.Contains("EXCLUDE")));
 
         // Every exported object's DDL must re-parse cleanly — this is the "complete the parser" check.
         var unparseable = DdlExporter.ExportFiles(live)
@@ -113,6 +115,12 @@ public sealed class LiveReaderIntegrationTests : IClassFixture<ThrowawayDatabase
             .Select(x => x.Sql!)
             .ToList();
         Assert.True(rawChurn.Count == 0, "phantom raw-object diffs on project→live round-trip (scoped kinds):\n" + string.Join("\n", rawChurn));
+
+        // #98: with EXCLUDE constraints introspected, a project→live round-trip no longer reports a phantom
+        // "add EXCLUDE" table-constraint change (these are AddRawTableConstraintChange, not a raw object).
+        var exChurn = roundTrip.OfType<AddRawTableConstraintChange>().Where(c => c.Clause.Contains("EXCLUDE")).ToList();
+        Assert.True(exChurn.Count == 0, "phantom EXCLUDE-constraint diffs on project→live round-trip:\n"
+            + string.Join("\n", exChurn.Select(c => c.Clause)));
 
         // Gold-standard round-trip: the extracted model must itself re-deploy cleanly — this proves
         // every reconstructed raw-object DDL (aggregates, FDW/server/foreign table, collation, …) is

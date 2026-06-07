@@ -106,10 +106,11 @@ public sealed class LiveDatabaseReader
         var constraintsTask = ReadVoid(c => ReadConstraintsAsync(c, byKey, ct));
         var checksTask      = ReadVoid(c => ReadChecksAsync(c, byKey, ct));
         var fksTask         = ReadVoid(c => ReadForeignKeysAsync(c, byKey, ct));
+        var excludesTask    = ReadVoid(c => ReadExcludeConstraintsAsync(c, byKey, ct));
 
         await Task.WhenAll(rawTasks);
         await Task.WhenAll(schemasTask, indexesTask, viewsTask, sequencesTask, functionsTask,
-                           constraintsTask, checksTask, fksTask);
+                           constraintsTask, checksTask, fksTask, excludesTask);
 
         // ---- merge (single-threaded) ----
         var model = new DatabaseModel();
@@ -261,6 +262,26 @@ public sealed class LiveDatabaseReader
                 ? constraintDef["CHECK ".Length..].Trim()
                 : constraintDef;
             def.Checks.Add(new CheckConstraintDefinition(name, expr));
+        }
+    }
+
+    // EXCLUDE constraints (#98): contype 'x', reconstructed verbatim via pg_get_constraintdef into
+    // TableDefinition.OtherConstraints — the same slot the parser uses, so an unchanged EXCLUDE produces no
+    // diff on a project→live compare. Wave-2 reader: writes ONLY OtherConstraints (disjoint from the
+    // PK/Unique/Check/FK members the other wave-2 readers touch), so it needs no lock.
+    private async Task ReadExcludeConstraintsAsync(NpgsqlConnection conn, Dictionary<string, TableDefinition> tables, CancellationToken ct)
+    {
+        var sql = _q.ExcludeConstraints;
+
+        await using var cmd = new NpgsqlCommand(sql, conn);
+        await using var r = await cmd.ExecuteReaderAsync(ct);
+        while (await r.ReadAsync(ct))
+        {
+            var key = $"{r.GetString(0)}.{r.GetString(1)}";
+            if (!tables.TryGetValue(key, out var def)) continue;
+            // pg_get_constraintdef returns the bare "EXCLUDE USING …"; prefix the constraint name so a
+            // named source clause ("CONSTRAINT room_no_overlap EXCLUDE …") round-trips without a phantom diff.
+            def.OtherConstraints.Add($"CONSTRAINT {r.GetString(2)} {r.GetString(3)}");
         }
     }
 

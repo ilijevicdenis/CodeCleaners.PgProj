@@ -90,6 +90,18 @@ public sealed record CatalogQueries
               AND n.nspname NOT IN ('pg_catalog','information_schema') AND n.nspname NOT LIKE 'pg_%'
             ORDER BY n.nspname, c.relname, con.conname;";
 
+    // EXCLUDE constraints (contype 'x') reconstructed verbatim via pg_get_constraintdef — e.g.
+    // ""EXCLUDE USING gist (room_id WITH =, during WITH &&)"" — landing in TableDefinition.OtherConstraints,
+    // the same verbatim slot the parser fills, so a project's EXCLUDE round-trips against the live read (#98).
+    public string ExcludeConstraints { get; init; } = @"
+            SELECT n.nspname, c.relname, con.conname, pg_get_constraintdef(con.oid) AS def
+            FROM pg_constraint con
+            JOIN pg_class c ON c.oid = con.conrelid
+            JOIN pg_namespace n ON n.oid = c.relnamespace
+            WHERE con.contype = 'x'
+              AND n.nspname NOT IN ('pg_catalog','information_schema') AND n.nspname NOT LIKE 'pg_%'
+            ORDER BY n.nspname, c.relname, con.conname;";
+
     public string ForeignKeys { get; init; } = @"
             SELECT n.nspname, c.relname, con.conname,
                    a.attname AS col, k.ord,
