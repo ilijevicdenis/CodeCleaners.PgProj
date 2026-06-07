@@ -39,7 +39,8 @@ $journey = @(
   @{ tag='Retoken';  v=17.77; g='floor'  }   # pool the raw-identity / table-tail / plpgsql re-tokenizations
   @{ tag='Quote';    v=17.25; g='floor'  }   # ReadQuoted no-escape fast path (no StringBuilder, intern literals)
   @{ tag='NoSet';    v=16.74; g='floor'  }   # drop per-table column-validation HashSets (linear scan)
-  @{ tag='Presize';  v=16.16; g='floor'  }   # pre-size the per-file string interner (measured BDN endpoint)
+  @{ tag='Presize';  v=16.16; g='floor'  }   # pre-size the per-file string interner
+  @{ tag='LazyCons'; v=16.06; g='floor'  }   # lazy table constraint lists (Unique/FK/Check/Other allocate on first touch) — measured BDN endpoint
 )
 
 $N = $journey.Count
@@ -75,7 +76,7 @@ $l1 = $chartRight - 690; $l2 = $chartRight - 500; $l3 = $chartRight - 320; $l4 =
 $parts += "<rect x='$(n $l1)' y='66' width='14' height='14' fill='$cPrior'/><text x='$(n ([double]$l1+20))' y='78' font-size='12' fill='#374151'>prior effort (1-10)</text>"
 $parts += "<rect x='$(n $l2)' y='66' width='14' height='14' fill='$cRecent'/><text x='$(n ([double]$l2+20))' y='78' font-size='12' fill='#374151'>recent (11-18)</text>"
 $parts += "<rect x='$(n $l3)' y='66' width='14' height='14' fill='$cStable'/><text x='$(n ([double]$l3+20))' y='78' font-size='12' fill='#374151'>stability (19)</text>"
-$parts += "<rect x='$(n $l4)' y='66' width='14' height='14' fill='$cFloor'/><text x='$(n ([double]$l4+20))' y='78' font-size='12' fill='#374151'>alloc floor (20-23)</text>"
+$parts += "<rect x='$(n $l4)' y='66' width='14' height='14' fill='$cFloor'/><text x='$(n ([double]$l4+20))' y='78' font-size='12' fill='#374151'>alloc floor (20-24)</text>"
 $parts += "</svg>"
 [IO.File]::WriteAllText((Join-Path $here 'parser-perf-journey.svg'), ($parts -join ''), [Text.UTF8Encoding]::new($false))
 
@@ -83,10 +84,10 @@ $parts += "</svg>"
 # Chart 2 — recent effort across the 4 buckets: start (#10) vs after the recent wins (#19).
 # =========================================================================================
 $buckets = @(
-  @{ name='All';    start=31.22; end=16.16; col='#0072B2' }
-  @{ name='Raw';    start=19.25; end=9.52;  col='#D55E00' }
+  @{ name='All';    start=31.22; end=16.06; col='#0072B2' }
+  @{ name='Raw';    start=19.25; end=9.53;  col='#D55E00' }
   @{ name='Select'; start=11.09; end=4.84;  col='#009E73' }
-  @{ name='Table';  start=3.20;  end=1.77;  col='#E69F00' }
+  @{ name='Table';  start=3.20;  end=1.66;  col='#E69F00' }
 )
 $by0 = 402.0; $byTop = 78.0; $bspan = $by0 - $byTop      # 0% at by0, 100% at byTop
 $bW = 78.0; $gap = 16.0; $pitch = 273.0; $g1 = 114.5

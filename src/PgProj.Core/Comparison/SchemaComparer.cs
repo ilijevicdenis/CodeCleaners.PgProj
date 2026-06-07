@@ -298,12 +298,16 @@ public sealed class SchemaComparer
         static string Sig(UniqueConstraintDefinition u) =>
             string.Join(",", u.Columns.Select(c => c.ToLowerInvariant()).OrderBy(c => c, StringComparer.Ordinal));
 
-        var targetSigs = tgt.Unique.Select(Sig).ToHashSet(StringComparer.Ordinal);
-        foreach (var u in src.Unique)
-            if (!targetSigs.Contains(Sig(u)))
-                changes.Add(new AddUniqueConstraintChange(src.Schema, src.Name, u));
+        // Skip the target signature set unless the source has unique constraints to match (no source ⇒ no add).
+        if (src.Unique.Count > 0)
+        {
+            var targetSigs = tgt.Unique.Select(Sig).ToHashSet(StringComparer.Ordinal);
+            foreach (var u in src.Unique)
+                if (!targetSigs.Contains(Sig(u)))
+                    changes.Add(new AddUniqueConstraintChange(src.Schema, src.Name, u));
+        }
 
-        if (options.DropObjectsNotInSource)
+        if (options.DropObjectsNotInSource && tgt.Unique.Count > 0)
         {
             var sourceSigs = src.Unique.Select(Sig).ToHashSet(StringComparer.Ordinal);
             foreach (var u in tgt.Unique.Where(u => u.Name is not null && !sourceSigs.Contains(Sig(u))))
@@ -329,14 +333,33 @@ public sealed class SchemaComparer
         if (options.IgnoreColumnOrder) return;
 
         var cmp = options.CaseSensitiveIdentifiers ? StringComparer.Ordinal : StringComparer.OrdinalIgnoreCase;
-        var srcNames = src.Columns.Select(c => c.Name).ToList();
-        var tgtNames = tgt.Columns.Select(c => c.Name).ToList();
 
         // Only a *pure reorder* counts: identical column SETS, differing only in sequence. Adds/drops are
         // already handled above and shouldn't double-report as an order change.
-        if (srcNames.Count != tgtNames.Count) return;
+        var srcCols = src.Columns;
+        var tgtCols = tgt.Columns;
+        if (srcCols.Count != tgtCols.Count) return;
+
+        // Fast path (the overwhelmingly common "same order" case): walk both column lists in lockstep
+        // and bail the instant a position matches by name — no list/OrderBy allocations at all. Only when
+        // a position genuinely differs do we materialize the name lists to test set-equality and (maybe)
+        // emit. This preserves the exact verdict and the emitted ColumnOrderChange's name lists; it just
+        // skips the two ToList()s and two OrderBy passes that the equal-order steady state paid every call.
+        var sameOrder = true;
+        for (var i = 0; i < srcCols.Count; i++)
+        {
+            if (!cmp.Equals(srcCols[i].Name, tgtCols[i].Name)) { sameOrder = false; break; }
+        }
+        if (sameOrder) return; // identical sequence → nothing to report
+
+        var srcNames = new List<string>(srcCols.Count);
+        foreach (var c in srcCols) srcNames.Add(c.Name);
+        var tgtNames = new List<string>(tgtCols.Count);
+        foreach (var c in tgtCols) tgtNames.Add(c.Name);
+
+        // Same multiset of names but a different sequence ⇒ a pure reorder; a differing set means an
+        // add/drop already reported above, so we must NOT double-report it here.
         if (!srcNames.OrderBy(n => n, cmp).SequenceEqual(tgtNames.OrderBy(n => n, cmp), cmp)) return;
-        if (srcNames.SequenceEqual(tgtNames, cmp)) return; // same order already
 
         changes.Add(new ColumnOrderChange(src.Schema, src.Name, srcNames, tgtNames));
     }
@@ -392,17 +415,27 @@ public sealed class SchemaComparer
         // `CHECK (((discount >= 0) AND (discount <= 100)))`-style rendering without a phantom add — while a
         // genuinely different predicate still differs. (BETWEEN is preserved verbatim by both sides here;
         // the win is the paren/cast/spacing folding.)
-        var targetExprs = tgt.Checks.Select(c => NormalizeConstraint(c.Expression)).ToHashSet();
-        foreach (var c in src.Checks)
-            if (!targetExprs.Contains(NormalizeConstraint(c.Expression)))
-                changes.Add(new AddCheckConstraintChange(src.Schema, src.Name, c));
+        // CHECK adds: a source check whose normalized expression isn't present in the target. Only build the
+        // membership set when the source actually has checks to test (an empty source emits nothing).
+        if (src.Checks.Count > 0)
+        {
+            var targetExprs = tgt.Checks.Select(c => NormalizeConstraint(c.Expression)).ToHashSet();
+            foreach (var c in src.Checks)
+                if (!targetExprs.Contains(NormalizeConstraint(c.Expression)))
+                    changes.Add(new AddCheckConstraintChange(src.Schema, src.Name, c));
+        }
 
-        var targetOther = tgt.OtherConstraints.Select(NormalizeConstraint).ToHashSet();
-        foreach (var clause in src.OtherConstraints)
-            if (!targetOther.Contains(NormalizeConstraint(clause)))
-                changes.Add(new AddRawTableConstraintChange(src.Schema, src.Name, clause));
+        // Raw table-constraint adds: skip the whole set build when the source has none (the common case —
+        // EXCLUDE/verbatim constraints are rare), since an empty source can never add one.
+        if (src.OtherConstraints.Count > 0)
+        {
+            var targetOther = tgt.OtherConstraints.Select(NormalizeConstraint).ToHashSet();
+            foreach (var clause in src.OtherConstraints)
+                if (!targetOther.Contains(NormalizeConstraint(clause)))
+                    changes.Add(new AddRawTableConstraintChange(src.Schema, src.Name, clause));
+        }
 
-        if (options.DropObjectsNotInSource)
+        if (options.DropObjectsNotInSource && tgt.Checks.Count > 0)
         {
             var sourceExprs = src.Checks.Select(c => NormalizeConstraint(c.Expression)).ToHashSet();
             foreach (var c in tgt.Checks.Where(c => c.Name is not null && !sourceExprs.Contains(NormalizeConstraint(c.Expression))))
@@ -412,14 +445,19 @@ public sealed class SchemaComparer
 
     private void CompareForeignKeys(TableDefinition src, TableDefinition tgt, List<SchemaChange> changes, ComparerOptions options)
     {
-        var targetSigs = tgt.ForeignKeys.Select(ForeignKeySignature).ToHashSet(StringComparer.OrdinalIgnoreCase);
-        foreach (var fk in src.ForeignKeys)
+        // Only build the target signature set when the source has FKs to test against it — a source with no
+        // foreign keys can never add one, so the set (and the per-target signature strings) are pure waste.
+        if (src.ForeignKeys.Count > 0)
         {
-            if (!targetSigs.Contains(ForeignKeySignature(fk)))
-                changes.Add(new AddForeignKeyChange(src, fk));
+            var targetSigs = tgt.ForeignKeys.Select(ForeignKeySignature).ToHashSet(StringComparer.OrdinalIgnoreCase);
+            foreach (var fk in src.ForeignKeys)
+            {
+                if (!targetSigs.Contains(ForeignKeySignature(fk)))
+                    changes.Add(new AddForeignKeyChange(src, fk));
+            }
         }
 
-        if (options.DropObjectsNotInSource)
+        if (options.DropObjectsNotInSource && tgt.ForeignKeys.Count > 0)
         {
             var sourceSigs = src.ForeignKeys.Select(ForeignKeySignature).ToHashSet(StringComparer.OrdinalIgnoreCase);
             foreach (var fk in tgt.ForeignKeys.Where(f => !sourceSigs.Contains(ForeignKeySignature(f))))

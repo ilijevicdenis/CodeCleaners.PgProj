@@ -26,6 +26,8 @@ public static class Program
     public static void Main(string[] args)
     {
         if (args.Length > 0 && args[0] == "alloc") { AllocProbe(); return; }
+        if (args.Length > 0 && args[0] == "modelalloc") { ModelAllocProbe(); return; }
+        if (args.Length > 0 && args[0] == "modeltypes") { ModelTypes(args.Length > 1 ? args[1] : "All"); return; }
         if (args.Length > 0 && args[0] == "alloctypes") { AllocTypes(args.Length > 1 ? args[1] : "All"); return; }
         if (args.Length > 0 && args[0] == "retention") { RetentionProbe(args.Length > 1 ? args[1] : "All"); return; }
         BenchmarkSwitcher.FromAssembly(typeof(Program).Assembly).Run(args, new BenchConfig());
@@ -43,6 +45,22 @@ public static class Program
         listener.Reset();
         for (int i = 0; i < 400; i++) { var p = new PgParser().Parse(sql); new ModelBuilder().Build(p); p.ReleaseTokens(); }
         System.Threading.Thread.Sleep(300);                                                 // flush events
+        listener.Report(25);
+    }
+
+    // Allocation-by-TYPE for the MODEL-BUILD stage only: the bucket is parsed ONCE up front, then only
+    // ModelBuilder.Build is looped under the listener — so the ranked types are exactly the model-stage
+    // allocations (AddTable, DeriveRaw, the records), with parse churn excluded.
+    private static void ModelTypes(string bucket)
+    {
+        var sql = CorpusWorkload.Buckets[bucket];
+        var parsed = new PgParser().Parse(sql);
+        Console.WriteLine($"Alloc-by-type — Model-build only, bucket '{bucket}' ({sql.Length:N0} chars)");
+        using var listener = new TypeAllocListener();
+        for (int i = 0; i < 10; i++) new ModelBuilder("public").Build(parsed);   // warm
+        listener.Reset();
+        for (int i = 0; i < 400; i++) new ModelBuilder("public").Build(parsed);
+        System.Threading.Thread.Sleep(300);
         listener.Report(25);
     }
 
@@ -136,6 +154,40 @@ public static class Program
         Measure("Tokenize+Merge", () => { var p = OperatorLexer.MergeInPlace(Tokenizer.TokenizePooled(sql)); var c = p.Count; p.Return(); return c; });
         Measure("Parse         ", () => { var p = new PgParser().Parse(sql); var c = p.Statements.Count; p.ReleaseTokens(); return c; });
         Measure("Parse+Model   ", () => { var p = new PgParser().Parse(sql); var c = new ModelBuilder().Build(p).Tables.Count; p.ReleaseTokens(); return c; });
+    }
+
+    // Model-build-only bytes/op, parsing factored out (same isolation as ModelBuildBenchmarks, which
+    // BenchmarkDotNet cannot run from inside a git worktree — it finds >1 PgProj.Benchmarks.csproj and
+    // refuses). Each bucket is parsed ONCE; the measured op is only `new ModelBuilder("public").Build`.
+    // GC.GetAllocatedBytesForCurrentThread() is a deterministic per-thread counter (not statistical
+    // sampling), so the per-op number is exact for a single-threaded loop — the cleanest model-stage gate.
+    private static void ModelAllocProbe()
+    {
+        Console.WriteLine("Model-build-only bytes/op (parse factored out) — GC.GetAllocatedBytesForCurrentThread");
+        foreach (var bucket in new[] { "Table", "Raw", "Select", "All" })
+        {
+            var parsed = new PgParser().Parse(CorpusWorkload.Buckets[bucket]);
+            MeasureModel(bucket, parsed);
+        }
+    }
+
+    private static void MeasureModel(string bucket, ParseResult parsed)
+    {
+        Func<int> op = () => new ModelBuilder("public").Build(parsed).Tables.Count;
+        for (int i = 0; i < 30; i++) op();                      // warm up + JIT
+        GC.Collect(); GC.WaitForPendingFinalizers(); GC.Collect();
+
+        const int iters = 500;
+        long before = GC.GetAllocatedBytesForCurrentThread();
+        var sw = Stopwatch.StartNew();
+        for (int i = 0; i < iters; i++) op();
+        sw.Stop();
+        long after = GC.GetAllocatedBytesForCurrentThread();
+
+        double bytesPerOp = (after - before) / (double)iters;
+        double usPerOp = sw.Elapsed.TotalMicroseconds / iters;
+        int tables = 0; foreach (var st in parsed.Statements) if (st is CreateTableStatement) tables++;
+        Console.WriteLine($"  {bucket,-7} {bytesPerOp,12:N0} B/op  {usPerOp,10:N1} us/op  (tables={tables})");
     }
 
     private static void Measure(string label, Func<int> op)
