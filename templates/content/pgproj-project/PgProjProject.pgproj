@@ -1,4 +1,4 @@
-<Project Sdk="PgProj.Sdk/0.1.0">
+<Project Sdk="PgProj.Sdk/0.1.0" DefaultTargets="Build">
   <PropertyGroup>
     <Name>PgProjProject</Name>
     <DefaultSchema>PGPROJ_DEFAULT_SCHEMA</DefaultSchema>

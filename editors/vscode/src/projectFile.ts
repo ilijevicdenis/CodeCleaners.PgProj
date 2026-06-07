@@ -26,3 +26,9 @@ export function readDefaultSchemaFromXml(xml: string): string {
   const m = xml.match(/<DefaultSchema>\s*([^<\s]+)\s*<\/DefaultSchema>/i);
   return m?.[1] ?? "public";
 }
+
+/** Read <TargetPostgresVersion> from a .pgproj XML string, or undefined when not pinned. */
+export function readTargetVersionFromXml(xml: string): string | undefined {
+  const m = xml.match(/<TargetPostgresVersion>\s*([^<\s]+)\s*<\/TargetPostgresVersion>/i);
+  return m?.[1];
+}

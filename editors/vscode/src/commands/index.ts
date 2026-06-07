@@ -6,7 +6,7 @@
 import * as fs from "fs";
 import * as path from "path";
 import * as vscode from "vscode";
-import { PgProjEngine, PublishOptions } from "../engine/engine";
+import { PgProjEngine } from "../engine/engine";
 import { DiagnosticsController } from "../diagnosticsController";
 import { ProjectsTreeProvider } from "../views/projectsTree";
 import { TreeNode } from "../views/treeModel";
@@ -16,13 +16,22 @@ import {
   renderTemplate,
   templateRelativePath,
 } from "../templates";
-import { readDefaultSchemaFromXml, setTargetVersionInProjectXml } from "../projectFile";
+import {
+  readDefaultSchemaFromXml,
+  readTargetVersionFromXml as readTargetVersion,
+  setTargetVersionInProjectXml,
+} from "../projectFile";
+import { PublishView } from "../webviews/publishView";
+import { SchemaCompareView } from "../webviews/schemaCompareView";
+import { TableDesignerPanel } from "../designer/designerPanel";
 
 export interface CommandContext {
   engine: PgProjEngine;
   diagnostics: DiagnosticsController;
   tree: ProjectsTreeProvider;
   output: vscode.OutputChannel;
+  /** The extension context — webview panels (publish, schema compare, table designer) register disposables against it. */
+  extension: vscode.ExtensionContext;
 }
 
 /** Resolve the project file path from a context-menu node, else prompt across discovered projects. */
@@ -156,103 +165,63 @@ export async function validateCommand(ctx: CommandContext, node?: TreeNode): Pro
   });
 }
 
-// ---- Publish (input-driven MVP; full webview is a follow-up, see EP-PROFILE) ---------------------
+// ---- Publish (webview: connection + SQLCMD grid + options + save-profile + generate-script) -------
 
 export async function publishCommand(ctx: CommandContext, node?: TreeNode): Promise<void> {
   const projectFile = await resolveProjectFile(node);
   if (!projectFile) {
     return;
   }
-  const connection = await promptConnection();
-  if (!connection) {
-    return;
+  // Seed the dialog's target version from the project file when readable.
+  let targetVersion: string | undefined;
+  try {
+    targetVersion = readTargetVersion(fs.readFileSync(projectFile, "utf8"));
+  } catch {
+    targetVersion = undefined;
   }
-
-  const optionPicks = await vscode.window.showQuickPick(
-    [
-      { label: "Allow destructive changes (--allow-drops)", picked: false, key: "allowDrops" },
-      { label: "Do not wrap in a transaction (--no-transaction)", picked: false, key: "noTransaction" },
-    ],
-    { canPickMany: true, placeHolder: "Publish options (optional)" }
-  );
-  if (optionPicks === undefined) {
-    return; // cancelled
-  }
-  const opts: PublishOptions = {
-    allowDrops: optionPicks.some((p) => p.key === "allowDrops"),
-    noTransaction: optionPicks.some((p) => p.key === "noTransaction"),
-    variables: await promptSqlcmdVariables(),
-  };
-
-  // Preview via dry-run, then confirm. This mirrors the SQL Database Projects "Generate Script" gate
-  // before a live deploy without needing the full webview yet.
-  const cwd = path.dirname(projectFile);
-  let confirmed = false;
-  await run(ctx, `Previewing publish for ${path.basename(projectFile)}`, async () => {
-    const plan = await ctx.engine.publishDryRun(projectFile, connection, cwd, opts);
-    if (plan.inSync) {
-      void vscode.window.showInformationMessage("Nothing to publish — target already matches the project.");
-      return;
-    }
-    ctx.output.appendLine(
-      `[publish dry-run] ${plan.project}: ${plan.changeCount} change(s), ${plan.destructiveCount} destructive`
-    );
-    const doc = await vscode.workspace.openTextDocument({ language: "sql", content: plan.script });
-    await vscode.window.showTextDocument(doc, { preview: true });
-    const choice = await vscode.window.showWarningMessage(
-      `Publish ${plan.changeCount} change(s) (${plan.destructiveCount} destructive) to the target?`,
-      { modal: true },
-      "Publish"
-    );
-    confirmed = choice === "Publish";
-  });
-  if (!confirmed) {
-    return;
-  }
-
-  await run(ctx, `Publishing ${path.basename(projectFile)}`, async () => {
-    const result = await ctx.engine.publish(projectFile, connection, cwd, opts);
-    ctx.output.appendLine(result.stdout.trim());
-    if (result.stderr.trim()) {
-      ctx.output.appendLine(result.stderr.trim());
-    }
-    if (result.exitCode === 0) {
-      void vscode.window.showInformationMessage("Publish succeeded.");
-    } else {
-      void vscode.window.showErrorMessage("Publish failed. See output.");
-      ctx.output.show(true);
-    }
-  });
+  PublishView.show(ctx.extension, ctx.engine, ctx.output, projectFile, { targetVersion });
 }
 
-// ---- Schema Compare (stub — full webview is EP-SCHEMACOMPARE #19) --------------------------------
+// ---- Schema Compare (webview: source/target pickers + checkable diff + script/apply) -------------
 
 export async function schemaCompareCommand(ctx: CommandContext, node?: TreeNode): Promise<void> {
-  const projectFile = await resolveProjectFile(node);
-  if (!projectFile) {
+  // A context-menu invocation seeds the source with the chosen project; the target is picked in the view.
+  const source = node?.projectFile ?? (await resolveProjectFile(node)) ?? "";
+  SchemaCompareView.show(ctx.extension, ctx.engine, ctx.output, source);
+}
+
+// ---- Design table (EP-DESIGNER #26: graphical table designer webview) -----------------------------
+
+export async function designTableCommand(
+  ctx: CommandContext,
+  arg?: TreeNode | vscode.Uri
+): Promise<void> {
+  const sqlFile = await resolveTableSqlFile(arg);
+  if (!sqlFile) {
     return;
   }
-  const connection = await promptConnection("Target connection string to compare against");
-  if (!connection) {
-    return;
+  await TableDesignerPanel.show(ctx.extension, ctx.engine, ctx.output, sqlFile);
+}
+
+/** Resolve the .sql file to design: a passed Uri / the active editor / a tree node, else a quick pick. */
+async function resolveTableSqlFile(arg?: TreeNode | vscode.Uri): Promise<string | undefined> {
+  if (arg instanceof vscode.Uri && arg.fsPath.toLowerCase().endsWith(".sql")) {
+    return arg.fsPath;
   }
-  await run(ctx, `Comparing ${path.basename(projectFile)}`, async () => {
-    const cwd = path.dirname(projectFile);
-    const report = await ctx.engine.compare(projectFile, connection, cwd);
-    if (report.inSync) {
-      void vscode.window.showInformationMessage("In sync — target already matches the project.");
-      return;
-    }
-    ctx.output.appendLine(`[compare] ${report.project}: ${report.changeCount} change(s):`);
-    for (const c of report.changes) {
-      ctx.output.appendLine(`  [${c.destructive ? "!" : "+"}] ${c.description}`);
-    }
-    ctx.output.show(true);
-    // TODO(EP-SCHEMACOMPARE #19): render this as a checkable diff webview with apply/script.
-    void vscode.window.showInformationMessage(
-      `${report.changeCount} difference(s). Full Schema Compare UI is a follow-up (#19) — see output.`
-    );
-  });
+  const active = vscode.window.activeTextEditor?.document;
+  if (active && active.fileName.toLowerCase().endsWith(".sql")) {
+    return active.fileName;
+  }
+  const files = await vscode.workspace.findFiles("**/*.sql", "**/{node_modules,bin,obj}/**");
+  if (files.length === 0) {
+    void vscode.window.showWarningMessage("No .sql files found in this workspace.");
+    return undefined;
+  }
+  const pick = await vscode.window.showQuickPick(
+    files.map((f) => ({ label: path.basename(f.fsPath), description: f.fsPath, fsPath: f.fsPath })),
+    { placeHolder: "Select a table .sql file to design" }
+  );
+  return pick?.fsPath;
 }
 
 // ---- Add object ----------------------------------------------------------------------------------
@@ -374,24 +343,6 @@ function promptConnection(prompt = "PostgreSQL connection string"): Thenable<str
     placeHolder: "Host=localhost;Port=5432;Username=postgres;Password=...;Database=mydb",
     ignoreFocusOut: true,
   });
-}
-
-/** Collect SQLCMD-style variables ("name=value") one at a time; empty input ends the loop. */
-async function promptSqlcmdVariables(): Promise<string[]> {
-  const vars: string[] = [];
-  for (;;) {
-    const entry = await vscode.window.showInputBox({
-      prompt: `SQLCMD variable ${vars.length + 1} as name=value (leave empty to finish)`,
-      placeHolder: "Environment=Production",
-      ignoreFocusOut: true,
-      validateInput: (v) => (v === "" || /^[^=]+=.*/.test(v) ? undefined : "Use name=value."),
-    });
-    if (!entry) {
-      break;
-    }
-    vars.push(entry);
-  }
-  return vars;
 }
 
 // ---- project-file helpers ------------------------------------------------------------------------

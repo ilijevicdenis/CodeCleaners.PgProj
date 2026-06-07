@@ -5,6 +5,11 @@
   "version": "0.1.0",
   "publisher": "codecleaners",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ilijevicdenis/CodeCleaners.PgProj.git",
+    "directory": "editors/vscode"
+  },
   "engines": {
     "vscode": "^1.90.0"
   },
@@ -22,7 +27,10 @@
   "main": "./dist/extension.js",
   "activationEvents": [
     "workspaceContains:**/*.pgproj",
-    "onView:pgproj.projects"
+    "onView:pgproj.projects",
+    "onLanguage:sql",
+    "onLanguage:pgsql",
+    "onCommand:pgproj.designTable"
   ],
   "contributes": {
     "configuration": {
@@ -37,9 +45,28 @@
           "type": "string",
           "default": "dotnet",
           "description": "Path to the dotnet host. Used when 'pgproj.cliPath' points at a .dll. Defaults to 'dotnet' (resolved on PATH)."
+        },
+        "pgproj.lsp.debounceMs": {
+          "type": "number",
+          "default": 150,
+          "minimum": 0,
+          "description": "Debounce window (ms) for the live language server (pgproj serve) diagnose pass."
         }
       }
     },
+    "languages": [
+      {
+        "id": "sql",
+        "aliases": [
+          "SQL",
+          "PostgreSQL"
+        ],
+        "extensions": [
+          ".sql",
+          ".pgsql"
+        ]
+      }
+    ],
     "viewsContainers": {
       "activitybar": [
         {
@@ -123,6 +150,12 @@
         "icon": "$(add)"
       },
       {
+        "command": "pgproj.designTable",
+        "title": "Design Table",
+        "category": "PgProj",
+        "icon": "$(table)"
+      },
+      {
         "command": "pgproj.openProjectFile",
         "title": "Edit Project File",
         "category": "PgProj"
@@ -198,6 +231,20 @@
           "group": "9_open@1"
         }
       ],
+      "editor/context": [
+        {
+          "command": "pgproj.designTable",
+          "when": "resourceExtname == .sql",
+          "group": "pgproj@1"
+        }
+      ],
+      "explorer/context": [
+        {
+          "command": "pgproj.designTable",
+          "when": "resourceExtname == .sql",
+          "group": "pgproj@1"
+        }
+      ],
       "commandPalette": [
         {
           "command": "pgproj.refresh",
@@ -230,5 +277,8 @@
     "mocha": "^10.4.0",
     "typescript": "^5.4.5",
     "vitest": "^1.6.0"
+  },
+  "dependencies": {
+    "vscode-languageclient": "^9.0.1"
   }
 }

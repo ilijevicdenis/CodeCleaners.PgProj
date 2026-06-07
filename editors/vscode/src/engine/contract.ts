@@ -107,6 +107,69 @@ export interface PublishPlanDto {
   script: string;
 }
 
+// ---- table designer (EP-DESIGNER #26) --------------------------------------------------------
+// Mirror of PgProj.Core.Contracts.TableModelDto — the shape `pgproj describe-table` emits and
+// `pgproj emit-table` consumes. All SQL generation stays in the engine's SqlEmitter; these types are
+// only the editable model the designer form binds to.
+
+export interface DesignerColumnDto {
+  name: string;
+  dataType: string;
+  nullable: boolean;
+  default?: string;
+  identity: boolean;
+  identityKind?: string;
+  generated?: string;
+  serial: boolean;
+}
+
+export interface DesignerKeyDto {
+  name?: string;
+  columns: string[];
+}
+
+export interface DesignerForeignKeyDto {
+  name?: string;
+  columns: string[];
+  referencedSchema: string;
+  referencedTable: string;
+  referencedColumns: string[];
+  onDelete?: string;
+  onUpdate?: string;
+}
+
+export interface DesignerCheckDto {
+  name?: string;
+  expression: string;
+}
+
+export interface DesignerIndexDto {
+  name: string;
+  unique: boolean;
+  columns: string[];
+  method?: string;
+  where?: string;
+}
+
+export interface TableModelDto {
+  schemaVersion: string;
+  verb: "describe-table";
+  schema: string;
+  name: string;
+  columns: DesignerColumnDto[];
+  primaryKey?: DesignerKeyDto;
+  unique: DesignerKeyDto[];
+  foreignKeys: DesignerForeignKeyDto[];
+  checks: DesignerCheckDto[];
+  indexes: DesignerIndexDto[];
+  /** EXCLUDE and other verbatim constraint clauses — view-only in the form. */
+  otherConstraints: string[];
+  /** PARTITION BY / INHERITS / WITH … — view-only in the form. */
+  trailingOptions?: string;
+  /** RLS enable, policies, comments that followed the table — view-only, preserved verbatim. */
+  companions: string[];
+}
+
 /** Parse the major component of a "major.minor" schemaVersion string. */
 export function schemaMajor(version: string): number {
   const major = parseInt(String(version).split(".")[0], 10);

@@ -141,7 +141,7 @@ feature).
 ## The `.pgproj` file
 
 ```xml
-<Project Sdk="PgProj.Sdk/0.1.0">
+<Project Sdk="PgProj.Sdk/0.1.0" DefaultTargets="Build">
   <PropertyGroup>
     <Name>SampleDb</Name>
     <DefaultSchema>app</DefaultSchema>
@@ -155,8 +155,10 @@ needed.  To opt out and control item inclusion yourself, add
 `<EnableDefaultSqlItems>false</EnableDefaultSqlItems>` to the `<PropertyGroup>` and declare your
 own `<Build Include="..." />` items.
 
-It is intentionally MSBuild-shaped so a future Visual Studio project system / build SDK can adopt
-it without changing the file format. Files whose name starts with `_` are treated as non-source.
+It is intentionally MSBuild-shaped so Visual Studio's built-in SDK-style project support can open,
+build, and **publish** it — see the [Visual Studio experience](./docs/VISUAL_STUDIO.md) (Route A: the
+`PgProj.Sdk` MSBuild SDK, packable to NuGet; Route B: a scaffolded VSIX project system under
+[`editors/vs/`](./editors/vs/README.md)). Files whose name starts with `_` are treated as non-source.
 
 ## Safety model
 

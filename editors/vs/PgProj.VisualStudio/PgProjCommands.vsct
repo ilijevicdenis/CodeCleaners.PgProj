@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  EP-VS #25 Route B — command table for the PgProj VS extension. SCAFFOLD.
+  Adds "Publish" and "Schema Compare" to the .pgproj project context menu. Compiled by
+  Microsoft.VSSDK.BuildTools (VS SDK). GUIDs match PgProjGuids.cs.
+-->
+<CommandTable xmlns="http://schemas.microsoft.com/VisualStudio/2005-10-18/CommandTable" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <Extern href="stdidcmd.h" />
+  <Extern href="vsshlids.h" />
+
+  <Commands package="guidPgProjPackage">
+    <Groups>
+      <Group guid="guidPgProjCmdSet" id="PgProjProjectContextGroup" priority="0x0600">
+        <!-- IDM_VS_CTXT_PROJNODE: the project node context menu. -->
+        <Parent guid="guidSHLMainMenu" id="IDM_VS_CTXT_PROJNODE" />
+      </Group>
+    </Groups>
+
+    <Buttons>
+      <Button guid="guidPgProjCmdSet" id="cmdidPublish" priority="0x0100" type="Button">
+        <Parent guid="guidPgProjCmdSet" id="PgProjProjectContextGroup" />
+        <Strings>
+          <ButtonText>Publish…</ButtonText>
+        </Strings>
+      </Button>
+      <Button guid="guidPgProjCmdSet" id="cmdidSchemaCompare" priority="0x0101" type="Button">
+        <Parent guid="guidPgProjCmdSet" id="PgProjProjectContextGroup" />
+        <Strings>
+          <ButtonText>Schema Compare…</ButtonText>
+        </Strings>
+      </Button>
+    </Buttons>
+  </Commands>
+
+  <Symbols>
+    <!-- Must match PgProjGuids.PackageGuidString. -->
+    <GuidSymbol name="guidPgProjPackage" value="{b0000000-0000-0000-0000-000000000025}" />
+    <!-- Must match PgProjGuids.CommandSetGuidString. -->
+    <GuidSymbol name="guidPgProjCmdSet" value="{b0000000-0000-0000-0000-0000000000a2}">
+      <IDSymbol name="PgProjProjectContextGroup" value="0x1020" />
+      <IDSymbol name="cmdidPublish" value="0x0100" />
+      <IDSymbol name="cmdidSchemaCompare" value="0x0101" />
+    </GuidSymbol>
+  </Symbols>
+</CommandTable>

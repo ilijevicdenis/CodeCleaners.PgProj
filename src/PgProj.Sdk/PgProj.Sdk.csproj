@@ -1,0 +1,84 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    PgProj.Sdk — an MSBuild *project SDK* packaged on NuGet, so a `.pgproj` can use the terse
+    top-level form `<Project Sdk="PgProj.Sdk/x.y.z">` and MSBuild's SDK resolver locates it (no
+    relative <Import> needed). The package follows the canonical SDK layout — `Sdk/Sdk.props` +
+    `Sdk/Sdk.targets` at the package root — and additionally carries a framework-dependent publish
+    of the pgproj CLI under `tools/`, so the targets can build/publish a project on a machine that
+    has the .NET runtime but not this repo's source.
+
+    This project produces a .nupkg only (no compiled assembly of its own). It is deliberately NOT
+    in PgProj.slnx and is NOT a `dotnet build` participant for the test suite — `dotnet pack` it
+    explicitly to produce the package.
+  -->
+  <PropertyGroup>
+    <PackageId>PgProj.Sdk</PackageId>
+    <Version>0.1.0</Version>
+    <Title>PgProj MSBuild SDK</Title>
+    <Authors>CodeCleaners d.o.o.</Authors>
+    <Description>MSBuild project SDK for PostgreSQL declarative database projects (.pgproj): build to a model/.pgpkg and publish to a server with the standard dotnet/Visual Studio Build and Publish gestures. Carries the pgproj CLI under tools/.</Description>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageTags>msbuild;sdk;postgresql;pgproj;database;ssdt;dacpac</PackageTags>
+
+    <!-- A TFM is required by Microsoft.NET.Sdk, but we emit no assembly of our own; we only pack the
+         SDK props/targets + the published CLI payload, assembled by the targets below. -->
+    <TargetFramework>net10.0</TargetFramework>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <NoDefaultExcludes>true</NoDefaultExcludes>
+    <!-- NU5128: no lib/ folder + no dependencies is expected for an SDK/tool-carrying package. -->
+    <NoWarn>$(NoWarn);NU5128</NoWarn>
+
+    <!-- Contribute all package files via the TFM-specific content hook (runs during pack, after the
+         CLI has been staged). -->
+    <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);_PgProjAddPackageFiles</TargetsForTfmSpecificContentInPackage>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="**\*.cs" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <_PgProjCliProject>$(MSBuildThisFileDirectory)..\PgProj.Cli\PgProj.Cli.csproj</_PgProjCliProject>
+    <!-- No trailing backslash: a trailing '\' before the closing &quot; would escape the quote on
+         the dotnet publish command line. -->
+    <_PgProjCliStageDir>$(MSBuildThisFileDirectory)obj\cli-publish</_PgProjCliStageDir>
+  </PropertyGroup>
+
+  <!--
+    Stage the CLI: a framework-dependent publish of PgProj.Cli (no RID, no ReadyToRun) so the tools/
+    payload runs on any OS with the .NET 10 runtime. The consumer's Sdk.targets invoke it as
+    `dotnet tools/PgProj.Cli.dll`. Runs before the package-file collection below.
+  -->
+  <Target Name="_PublishPgProjCli">
+    <Message Importance="high" Text="PgProj.Sdk: publishing CLI payload into $(_PgProjCliStageDir)" />
+    <Exec Command="dotnet publish &quot;$(_PgProjCliProject)&quot; -c Release -f net10.0 -o &quot;$(_PgProjCliStageDir)&quot; --nologo -p:PublishReadyToRun=false --self-contained false" />
+  </Target>
+
+  <!--
+    Assemble the whole package: the canonical SDK layout (Sdk/Sdk.props + Sdk/Sdk.targets at the
+    package root) plus the staged CLI under tools/. This hook is invoked by pack and its output is
+    merged into the .nupkg content set.
+  -->
+  <Target Name="_PgProjAddPackageFiles" DependsOnTargets="_PublishPgProjCli">
+    <!-- Gather the staged CLI into its own item first so %(RecursiveDir) is computed relative to the
+         stage dir (anchoring the glob with a trailing '\' before '**'); batching it with other items
+         in a single TfmSpecificPackageFile group corrupts the RecursiveDir metadata. -->
+    <ItemGroup>
+      <_PgProjCliFile Include="$(_PgProjCliStageDir)\**\*" />
+    </ItemGroup>
+    <ItemGroup>
+      <TfmSpecificPackageFile Include="$(MSBuildThisFileDirectory)Sdk\Sdk.props" PackagePath="Sdk\Sdk.props" />
+      <TfmSpecificPackageFile Include="$(MSBuildThisFileDirectory)Sdk\Sdk.targets" PackagePath="Sdk\Sdk.targets" />
+      <TfmSpecificPackageFile Include="@(_PgProjCliFile)" PackagePath="tools\%(_PgProjCliFile.RecursiveDir)" />
+    </ItemGroup>
+  </Target>
+
+  <!-- The README is packed for the gallery page. -->
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+</Project>

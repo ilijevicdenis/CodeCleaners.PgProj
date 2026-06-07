@@ -6,6 +6,7 @@ import { EngineConfig, PgProjEngine } from "./engine/engine";
 import { ProjectsTreeProvider } from "./views/projectsTree";
 import { TreeNode } from "./views/treeModel";
 import { DiagnosticsController } from "./diagnosticsController";
+import { PgProjLanguageClient } from "./lsp/languageClient";
 import * as cmd from "./commands";
 
 function readEngineConfig(): EngineConfig {
@@ -22,15 +23,25 @@ export function activate(context: vscode.ExtensionContext): void {
   const diagnostics = new DiagnosticsController();
   const tree = new ProjectsTreeProvider(engine, output);
 
-  const ctx: cmd.CommandContext = { engine, diagnostics, tree, output };
+  // The LIVE path: a vscode-languageclient over `pgproj serve` (as-you-type diagnostics/hover/
+  // definition/completion). The build-time DiagnosticsController is the batch path; they coexist.
+  const languageClient = new PgProjLanguageClient(output);
+  void languageClient.start(readEngineConfig());
 
-  // Re-read the engine config (cliPath/dotnetPath) when the user changes it.
+  const ctx: cmd.CommandContext = { engine, diagnostics, tree, output, extension: context };
+
+  // Re-read the engine config (cliPath/dotnetPath) when the user changes it, and restart the LSP server.
   context.subscriptions.push(
     vscode.workspace.onDidChangeConfiguration((e) => {
-      if (e.affectsConfiguration("pgproj.cliPath") || e.affectsConfiguration("pgproj.dotnetPath")) {
+      if (
+        e.affectsConfiguration("pgproj.cliPath") ||
+        e.affectsConfiguration("pgproj.dotnetPath") ||
+        e.affectsConfiguration("pgproj.lsp.debounceMs")
+      ) {
         engine = new PgProjEngine(readEngineConfig());
         ctx.engine = engine;
         tree.refresh();
+        void languageClient.start(readEngineConfig());
       }
     })
   );
@@ -39,7 +50,7 @@ export function activate(context: vscode.ExtensionContext): void {
     vscode.window.registerTreeDataProvider("pgproj.projects", tree),
     output,
     diagnostics,
-    { dispose: () => {} }
+    languageClient
   );
 
   const register = (id: string, handler: (node?: TreeNode) => unknown) =>
@@ -55,6 +66,11 @@ export function activate(context: vscode.ExtensionContext): void {
   register("pgproj.generateScript", (node) => cmd.generateScriptCommand(ctx, node));
   register("pgproj.schemaCompare", (node) => cmd.schemaCompareCommand(ctx, node));
   register("pgproj.addObject", (node) => cmd.addObjectCommand(ctx, node));
+  context.subscriptions.push(
+    vscode.commands.registerCommand("pgproj.designTable", (arg?: TreeNode | vscode.Uri) =>
+      cmd.designTableCommand(ctx, arg)
+    )
+  );
   register("pgproj.openProjectFile", (node) => cmd.openProjectFileCommand(ctx, node));
   register("pgproj.setTargetVersion", (node) => cmd.setTargetVersionCommand(ctx, node));
   register("pgproj.newProject", () => cmd.newProjectCommand(ctx));

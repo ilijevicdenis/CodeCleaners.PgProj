@@ -124,7 +124,7 @@ public static class Scaffolder
             : $"\n    <TargetPostgresVersion>{targetVersion}</TargetPostgresVersion>";
         return
             $"""
-            <Project Sdk="PgProj.Sdk/0.1.0">
+            <Project Sdk="PgProj.Sdk/0.1.0" DefaultTargets="Build">
               <PropertyGroup>
                 <Name>{name}</Name>
                 <DefaultSchema>{defaultSchema}</DefaultSchema>{versionLine}

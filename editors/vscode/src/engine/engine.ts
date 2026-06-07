@@ -14,7 +14,9 @@ import {
   CompareReportDto,
   ModelTreeDto,
   PublishPlanDto,
+  TableModelDto,
 } from "./contract";
+import { SchemaCompareReportDto } from "./schemaCompare";
 
 export interface EngineConfig {
   /** Path to the pgproj CLI (or a .dll). */
@@ -29,15 +31,18 @@ export interface RunResult {
   stderr: string;
 }
 
-/** Abstracts process launching so unit tests can inject a fake without spawning anything. */
+/** Abstracts process launching so unit tests can inject a fake without spawning anything. The optional
+ * `stdin` is written to the child's standard input then closed (used by `emit-table`, which reads the
+ * model JSON from stdin). */
 export type Spawner = (
   command: string,
   args: string[],
-  cwd: string
+  cwd: string,
+  stdin?: string
 ) => Promise<RunResult>;
 
 /** The real spawner: launches a child process and collects its stdio. */
-export const nodeSpawner: Spawner = (command, args, cwd) =>
+export const nodeSpawner: Spawner = (command, args, cwd, stdin) =>
   new Promise<RunResult>((resolve, reject) => {
     const child = spawn(command, args, { cwd, shell: false });
     let stdout = "";
@@ -46,6 +51,9 @@ export const nodeSpawner: Spawner = (command, args, cwd) =>
     child.stderr.on("data", (d) => (stderr += d.toString()));
     child.on("error", reject);
     child.on("close", (code) => resolve({ exitCode: code ?? 0, stdout, stderr }));
+    if (stdin !== undefined) {
+      child.stdin.end(stdin);
+    }
   });
 
 /**
@@ -68,10 +76,11 @@ export class PgProjEngine {
     private readonly spawner: Spawner = nodeSpawner
   ) {}
 
-  /** Run a raw verb (no JSON parsing). The caller owns interpreting stdout/stderr/exitCode. */
-  async run(verbArgs: string[], cwd: string): Promise<RunResult> {
+  /** Run a raw verb (no JSON parsing). The caller owns interpreting stdout/stderr/exitCode. The optional
+   * `stdin` is piped to the child (used by `emit-table`). */
+  async run(verbArgs: string[], cwd: string, stdin?: string): Promise<RunResult> {
     const { command, args } = resolveInvocation(this.config, verbArgs);
-    return this.spawner(command, args, cwd);
+    return this.spawner(command, args, cwd, stdin);
   }
 
   /** Run a `--format json` verb and parse + version-check its single JSON document. */
@@ -101,6 +110,44 @@ export class PgProjEngine {
   async modelTree(projectFile: string, cwd: string): Promise<ModelTreeDto> {
     const { data } = await this.runJson<ModelTreeDto>(["model-tree", projectFile], cwd);
     return data;
+  }
+
+  /**
+   * Read a single table's structured model from its .sql file (EP-DESIGNER #26). The engine always emits
+   * JSON for this verb, so it is parsed + version-checked here exactly like the --format json verbs.
+   * `qualifiedName` selects one table when the file holds several; omit for the first table.
+   */
+  async describeTable(sqlFile: string, cwd: string, qualifiedName?: string): Promise<TableModelDto> {
+    const args = ["describe-table", sqlFile];
+    if (qualifiedName) {
+      args.push("--table", qualifiedName);
+    }
+    const result = await this.run(args, cwd);
+    const text = result.stdout.trim();
+    if (result.exitCode !== 0 || !text) {
+      throw new Error(result.stderr.trim() || `describe-table exited ${result.exitCode}`);
+    }
+    let data: TableModelDto;
+    try {
+      data = JSON.parse(text) as TableModelDto;
+    } catch (e) {
+      throw new Error(`Failed to parse describe-table JSON: ${(e as Error).message}`);
+    }
+    assertSchemaVersion(data.schemaVersion);
+    return data;
+  }
+
+  /**
+   * Emit the .sql for a designer table model through the engine's SqlEmitter (the single source of truth
+   * for generated SQL). The model JSON is piped to the engine over stdin (`emit-table -`) and the .sql is
+   * returned as stdout — no temp files, no SQL string-building in the extension.
+   */
+  async emitTable(model: TableModelDto, cwd: string): Promise<string> {
+    const result = await this.run(["emit-table", "-"], cwd, JSON.stringify(model));
+    if (result.exitCode !== 0) {
+      throw new Error(result.stderr.trim() || `emit-table exited ${result.exitCode}`);
+    }
+    return result.stdout;
   }
 
   async build(
@@ -142,6 +189,22 @@ export class PgProjEngine {
     return data;
   }
 
+  /**
+   * Two-way Schema Compare (EP-SCHEMACOMPARE): each endpoint is a project/.pgpkg/.schema.snapshot/live
+   * DB. Emits the structured, selectable `SchemaCompareReportDto`. `--format json` mirrors the report to
+   * stdout (we parse that); `-o <path>` additionally writes it to a file for tooling — passed when given.
+   */
+  async compareTwoWay(
+    source: string,
+    target: string,
+    cwd: string,
+    opts: CompareTwoWayOptions = {}
+  ): Promise<SchemaCompareReportDto> {
+    const args = buildCompareTwoWayArgs(source, target, opts);
+    const { data } = await this.runJson<SchemaCompareReportDto>(args, cwd);
+    return data;
+  }
+
   async publishDryRun(
     projectFile: string,
     connection: string,
@@ -165,11 +228,44 @@ export class PgProjEngine {
   }
 }
 
+export interface CompareTwoWayOptions {
+  /** Drop objects present in target but not source (the `--allow-drops` flag). */
+  allowDrops?: boolean;
+  /** Object-types to exclude from the diff (repeatable `--exclude`). */
+  exclude?: string[];
+  /** Also write the diff JSON to this path (`-o`), in addition to mirroring it to stdout. */
+  outFile?: string;
+}
+
+/**
+ * Pure arg-builder for the two-way compare (shared by the engine + a unit test). Does NOT append
+ * `--format json` — `runJson` adds that — but it does set `--source`/`--target` and pass-through options.
+ */
+export function buildCompareTwoWayArgs(
+  source: string,
+  target: string,
+  opts: CompareTwoWayOptions
+): string[] {
+  const args = ["compare", "--source", source, "--target", target];
+  if (opts.allowDrops) {
+    args.push("--allow-drops");
+  }
+  for (const ex of opts.exclude ?? []) {
+    args.push("--exclude", ex);
+  }
+  if (opts.outFile) {
+    args.push("-o", opts.outFile);
+  }
+  return args;
+}
+
 export interface PublishOptions {
   allowDrops?: boolean;
   noTransaction?: boolean;
   /** SQLCMD-style variables, "name=value". Passed through as `--var name=value` entries. */
   variables?: string[];
+  /** Optional `.pgpublish.json` to layer under the CLI flags (`--profile`). */
+  profile?: string;
 }
 
 /** Pure arg-builder for publish, shared by dry-run and live publish — kept testable. */
@@ -179,6 +275,9 @@ export function buildPublishArgs(
   opts: PublishOptions
 ): string[] {
   const args = ["publish", projectFile, "--connection", connection];
+  if (opts.profile) {
+    args.push("--profile", opts.profile);
+  }
   if (opts.allowDrops) {
     args.push("--allow-drops");
   }

@@ -20,6 +20,8 @@ BenchmarkDotNet.Artifacts/
 # PgProj build artifacts
 *.model.json
 extracted/
+artifacts/
+*.nupkg
 
 # Golden test fixtures are committed even if their extension matches a build-artifact pattern
 !tests/**/golden/*.model.json
