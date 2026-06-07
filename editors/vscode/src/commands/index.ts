@@ -23,13 +23,14 @@ import {
 } from "../projectFile";
 import { PublishView } from "../webviews/publishView";
 import { SchemaCompareView } from "../webviews/schemaCompareView";
+import { TableDesignerPanel } from "../designer/designerPanel";
 
 export interface CommandContext {
   engine: PgProjEngine;
   diagnostics: DiagnosticsController;
   tree: ProjectsTreeProvider;
   output: vscode.OutputChannel;
-  /** The extension context — webview panels register their disposables against it. */
+  /** The extension context — webview panels (publish, schema compare, table designer) register disposables against it. */
   extension: vscode.ExtensionContext;
 }
 
@@ -187,6 +188,40 @@ export async function schemaCompareCommand(ctx: CommandContext, node?: TreeNode)
   // A context-menu invocation seeds the source with the chosen project; the target is picked in the view.
   const source = node?.projectFile ?? (await resolveProjectFile(node)) ?? "";
   SchemaCompareView.show(ctx.extension, ctx.engine, ctx.output, source);
+}
+
+// ---- Design table (EP-DESIGNER #26: graphical table designer webview) -----------------------------
+
+export async function designTableCommand(
+  ctx: CommandContext,
+  arg?: TreeNode | vscode.Uri
+): Promise<void> {
+  const sqlFile = await resolveTableSqlFile(arg);
+  if (!sqlFile) {
+    return;
+  }
+  await TableDesignerPanel.show(ctx.extension, ctx.engine, ctx.output, sqlFile);
+}
+
+/** Resolve the .sql file to design: a passed Uri / the active editor / a tree node, else a quick pick. */
+async function resolveTableSqlFile(arg?: TreeNode | vscode.Uri): Promise<string | undefined> {
+  if (arg instanceof vscode.Uri && arg.fsPath.toLowerCase().endsWith(".sql")) {
+    return arg.fsPath;
+  }
+  const active = vscode.window.activeTextEditor?.document;
+  if (active && active.fileName.toLowerCase().endsWith(".sql")) {
+    return active.fileName;
+  }
+  const files = await vscode.workspace.findFiles("**/*.sql", "**/{node_modules,bin,obj}/**");
+  if (files.length === 0) {
+    void vscode.window.showWarningMessage("No .sql files found in this workspace.");
+    return undefined;
+  }
+  const pick = await vscode.window.showQuickPick(
+    files.map((f) => ({ label: path.basename(f.fsPath), description: f.fsPath, fsPath: f.fsPath })),
+    { placeHolder: "Select a table .sql file to design" }
+  );
+  return pick?.fsPath;
 }
 
 // ---- Add object ----------------------------------------------------------------------------------

@@ -46,6 +46,8 @@ public static class Program
                 "pull" => await Pull(args),
                 "analyze" => Analyze(args),
                 "model-tree" => await ModelTree(args),
+                "describe-table" => DescribeTable(args),
+                "emit-table" => EmitTable(args),
                 "script" => await Script(args),
                 "pkg" => await Pkg(args),
                 "profile" => Profile(args),
@@ -615,6 +617,58 @@ public static class Program
         return 0;
     }
 
+    // ---- describe-table / emit-table (EP-DESIGNER: the table-designer round-trip) ---------
+
+    /// <summary>
+    /// Parses a single table's <c>.sql</c> file and prints its structured model as JSON — the input the
+    /// graphical table designer (issue #26) binds its form to. Reuses the production parser + model builder,
+    /// so the JSON is exactly what the deploy engine sees. Pairs with <see cref="EmitTable"/>: the JSON
+    /// printed here round-trips back to <c>.sql</c> via the engine's single <c>SqlEmitter</c>.
+    /// </summary>
+    private static int DescribeTable(string[] args)
+    {
+        var cli = new CliArgs(args);
+        var sqlPath = cli.RequirePositional("table .sql file");
+        var defaultSchema = cli.GetOption("--default-schema") ?? "public";
+        var table = cli.GetOption("--table");   // optional schema.name; default = first table in the file
+
+        var dto = TableDesigner.Describe(File.ReadAllText(sqlPath), table, defaultSchema);
+
+        // Always JSON: the consumer is a tool (the designer webview). --format json is accepted but implied.
+        Console.WriteLine(JsonContract.Serialize(dto));
+        return ExitCode.Success;
+    }
+
+    /// <summary>
+    /// Reads a table model JSON (the shape <see cref="DescribeTable"/> emits, as edited by the designer) and
+    /// emits the <c>.sql</c> for it through the engine's <c>SqlEmitter</c> — the same emitter the deploy
+    /// engine uses, so the designer can never drift from what deploy writes. The JSON comes from a file
+    /// argument or, when that is "-", from stdin. With <c>-o</c> the SQL is written to a file; otherwise it
+    /// goes to stdout.
+    /// </summary>
+    private static int EmitTable(string[] args)
+    {
+        var cli = new CliArgs(args);
+        var jsonPath = cli.RequirePositional("table model .json file (or - for stdin)");
+        var json = jsonPath == "-" ? Console.In.ReadToEnd() : File.ReadAllText(jsonPath);
+
+        var dto = System.Text.Json.JsonSerializer.Deserialize<TableModelDto>(json, JsonContract.Options)
+                  ?? throw new InvalidOperationException("Could not parse the table model JSON.");
+        var sql = TableDesigner.Emit(dto);
+
+        var outPath = cli.GetOption("-o", "--output");
+        if (outPath is not null)
+        {
+            File.WriteAllText(outPath, sql);
+            Console.WriteLine($"Table SQL written to {outPath}");
+        }
+        else
+        {
+            Console.Write(sql);
+        }
+        return ExitCode.Success;
+    }
+
     // ---- serve (EP-LSP: resident language service over STDIO) ----------------------------
 
     /// <summary>
@@ -1088,6 +1142,8 @@ public static class Program
           pgproj pull    <project.pgproj> --connection <conn> [--dry-run] [--allow-deletes]   (rewrite project files FROM the DB — scenario 3)
           pgproj analyze <project.pgproj> [--strict]    (static safety analysis over the AST)
           pgproj model-tree <project.pgproj> [--format json]   (objects + source positions, for editors)
+          pgproj describe-table <table.sql> [--table schema.name] [--default-schema public]   (one table's model as JSON, for the graphical designer)
+          pgproj emit-table <table.json | -> [-o table.sql]     (round-trip the designer's table JSON back to .sql via the engine emitter)
           pgproj serve [<workspace-dir>] [--debounce <ms>]     (resident LSP language server over STDIO — live diagnostics/definition/hover/completion)
 
         Options:
