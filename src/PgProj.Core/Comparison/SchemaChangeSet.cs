@@ -67,6 +67,15 @@ public sealed class SchemaChangeSet
     /// <summary>Number of destructive changes across the whole set.</summary>
     public int DestructiveCount => _changes.Count(c => c.IsDestructive);
 
+    /// <summary>The highest <see cref="Risk.RiskLevel"/> among the included changes (Safe when none).</summary>
+    public Risk.RiskLevel MaxIncludedRiskLevel =>
+        _changes.Where(c => c.Included).Select(c => c.RiskLevel)
+                .DefaultIfEmpty(Risk.RiskLevel.Safe).Max();
+
+    /// <summary>Number of included changes classified as data loss or worse (DataLoss/Blocking).</summary>
+    public int IncludedDataLossCount =>
+        _changes.Count(c => c.Included && c.RiskLevel >= Risk.RiskLevel.DataLoss);
+
     /// <summary>Number of currently-included changes.</summary>
     public int IncludedCount => _changes.Count(c => c.Included);
 

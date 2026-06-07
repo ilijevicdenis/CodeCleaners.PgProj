@@ -1,6 +1,7 @@
 using System;
 using System.Security.Cryptography;
 using System.Text;
+using PgProj.Core.Comparison.Risk;
 
 namespace PgProj.Core.Comparison;
 
@@ -43,6 +44,17 @@ public sealed class SelectableChange
 
     /// <summary>True when applying this change can lose data/objects (drop/destructive recreate).</summary>
     public bool IsDestructive => Change.IsDestructive;
+
+    // The fine-grained risk verdict (Phase 12, issue #54). Computed once on first access and cached —
+    // classification is pure and deterministic, so the lazy field never goes stale. This SUPERSEDES, but
+    // does not replace, the coarse IsDestructive signal above (kept for back-compat).
+    private ChangeRisk? _risk;
+
+    /// <summary>The full risk verdict: level + rationale + table-rewrite / exclusive-lock flags (issue #54).</summary>
+    public ChangeRisk Risk => _risk ??= RiskAnalyzer.Default.Classify(Change);
+
+    /// <summary>Shorthand for <see cref="Risk"/>'s <see cref="ChangeRisk.Level"/> — Safe…Blocking.</summary>
+    public RiskLevel RiskLevel => Risk.Level;
 
     /// <summary>Deploy-ordering phase (lower runs first).</summary>
     public int Phase => Change.Phase;

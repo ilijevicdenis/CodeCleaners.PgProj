@@ -25,8 +25,8 @@ public static class SchemaCompareObjectType
 
         CreateSequenceChange or AlterSequenceChange or RenameSequenceChange or DropSequenceChange => "sequence",
 
-        CreateTableChange or DropTableChange or RenameTableChange => "table",
-        AddColumnChange or AlterColumnChange or DropColumnChange => "column",
+        CreateTableChange or DropTableChange or RenameTableChange or AlterTableStorageChange => "table",
+        AddColumnChange or AlterColumnChange or DropColumnChange or ColumnOrderChange => "column",
 
         AddPrimaryKeyChange or DropPrimaryKeyChange => "primarykey",
         AddForeignKeyChange or DropForeignKeyChange => "foreignkey",

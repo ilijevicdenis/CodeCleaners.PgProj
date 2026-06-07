@@ -6,6 +6,12 @@ using PgProj.Core.Versioning;
 
 namespace PgProj.Core.Comparison;
 
+/// <summary>
+/// What counts as a difference when diffing a source against a target (Phase 18, issue #58). Every option
+/// defaults to the value that <b>reproduces today's behaviour exactly</b>, so an existing parameterless
+/// caller — and every golden/round-trip test — is unaffected. Opting in/out is an explicit, deliberate
+/// choice surfaced by the CLI and by a serializable <see cref="ComparisonProfile"/>.
+/// </summary>
 public sealed class ComparerOptions
 {
     /// <summary>
@@ -21,6 +27,64 @@ public sealed class ComparerOptions
     /// default so the greenfield diff — and the committed golden deploy script / model JSON — are unchanged.
     /// </summary>
     public bool DetectRenames { get; init; }
+
+    /// <summary>
+    /// When true, two tables whose columns are identical but declared in a different order compare EQUAL
+    /// (no <see cref="ColumnOrderChange"/> is emitted). Defaults to <c>false</c>: Postgres column order is
+    /// physically meaningful, so by default a pure reorder is reported (as a benign, non-destructive,
+    /// no-SQL change). Wires to #51's <see cref="Model.Identity.CanonicalFormOptions.IgnoreColumnOrder"/>.
+    /// </summary>
+    public bool IgnoreColumnOrder { get; init; }
+
+    /// <summary>
+    /// When true (the <b>default</b> — preserving today's behaviour, where the comparer never looked at
+    /// them) storage/physical params captured verbatim in <see cref="Model.TableDefinition.TrailingOptions"/>
+    /// (<c>WITH (fillfactor=…)</c>, <c>TABLESPACE …</c>) are ignored. Set <c>false</c> to surface a
+    /// <see cref="AlterTableStorageChange"/> when they differ.
+    /// </summary>
+    public bool IgnoreStorageParameters { get; init; } = true;
+
+    /// <summary>
+    /// When false (the <b>default</b>) identifiers are matched case-insensitively (Postgres folds unquoted
+    /// names to lower case; the model's <see cref="Model.DatabaseModel.NameEquals"/> is case-insensitive).
+    /// Set <c>true</c> to treat <c>"Foo"</c> and <c>foo</c> as different objects/columns (quoted-identifier
+    /// sensitivity).
+    /// </summary>
+    public bool CaseSensitiveIdentifiers { get; init; }
+
+    /// <summary>
+    /// Whether ownership / role assignments are part of the diff. <b>Always read-only true</b>: the model
+    /// does not capture object ownership or roles, so they are unconditionally ignored today. Exposed so a
+    /// profile can record the intent (and a future ownership-aware diff can honour it) without lying about
+    /// current behaviour.
+    /// </summary>
+    public bool IgnoreOwnershipAndRoles => true;
+
+    /// <summary>
+    /// Whether GRANT/REVOKE permissions are part of the diff. <b>Always read-only true</b>: permissions are
+    /// not modelled, so they are unconditionally ignored today (same posture as ownership above).
+    /// </summary>
+    public bool IgnorePermissions => true;
+
+    /// <summary>
+    /// Whether <c>COMMENT ON</c> differences are diffed independently. Comments ARE modelled (as raw
+    /// objects) and are compared; this flag is read-only <c>false</c> to document that today comments are
+    /// NOT ignored. (Kept for profile symmetry / future toggling.)
+    /// </summary>
+    public bool IgnoreComments => false;
+
+    /// <summary>Name equality honouring <see cref="CaseSensitiveIdentifiers"/>.</summary>
+    internal bool NameEquals(string? a, string? b) =>
+        CaseSensitiveIdentifiers
+            ? string.Equals(a, b, System.StringComparison.Ordinal)
+            : Model.DatabaseModel.NameEquals(a ?? string.Empty, b ?? string.Empty);
+
+    /// <summary>
+    /// The matching <see cref="Model.Identity.CanonicalFormOptions"/> (#51) for these comparer options, so an
+    /// identity-/hash-based comparison and the field-level diff agree on whether column order is significant.
+    /// </summary>
+    public Model.Identity.CanonicalFormOptions ToCanonicalFormOptions() =>
+        new() { IgnoreColumnOrder = IgnoreColumnOrder };
 }
 
 /// <summary>
@@ -175,7 +239,7 @@ public sealed class SchemaComparer
             // preserving by default — the decision is no longer an inline version branch.
             foreach (var col in src.Columns)
             {
-                var existing = tgt.FindColumn(col.Name);
+                var existing = FindColumn(tgt, col.Name, options);
                 if (existing is null)
                 {
                     changes.Add(new AddColumnChange(src.Schema, src.Name, col));
@@ -200,10 +264,12 @@ public sealed class SchemaComparer
             // Columns present in target but not source -> drop (guarded).
             if (options.DropObjectsNotInSource)
             {
-                foreach (var col in tgt.Columns.Where(c => src.FindColumn(c.Name) is null))
+                foreach (var col in tgt.Columns.Where(c => FindColumn(src, c.Name, options) is null))
                     changes.Add(new DropColumnChange(src.Schema, src.Name, col.Name));
             }
 
+            CompareColumnOrder(src, tgt, changes, options);
+            CompareStorageOptions(src, tgt, changes, options);
             CompareForeignKeys(src, tgt, changes, options);
             ComparePrimaryKey(src, tgt, changes, options);
             CompareUniqueConstraints(src, tgt, changes, options);
@@ -244,6 +310,54 @@ public sealed class SchemaComparer
                 changes.Add(new DropUniqueConstraintChange(src.Schema, src.Name, u.Name!));
         }
     }
+
+    // Column lookup honouring CaseSensitiveIdentifiers: default is the model's case-insensitive FindColumn;
+    // when sensitivity is on, an ordinal (case-exact) match so "Foo" and "foo" are distinct columns.
+    private static ColumnDefinition? FindColumn(TableDefinition table, string name, ComparerOptions options)
+    {
+        if (!options.CaseSensitiveIdentifiers) return table.FindColumn(name);
+        foreach (var c in table.Columns)
+            if (string.Equals(c.Name, name, StringComparison.Ordinal)) return c;
+        return null;
+    }
+
+    // Emit a benign ColumnOrderChange when the two tables share the same columns but in a different order
+    // and the caller did NOT opt into ignoring order. Off (IgnoreColumnOrder=true) => never emitted, so the
+    // table compares equal on order. Default keeps order significant (matching the identity model / #51).
+    private static void CompareColumnOrder(TableDefinition src, TableDefinition tgt, List<SchemaChange> changes, ComparerOptions options)
+    {
+        if (options.IgnoreColumnOrder) return;
+
+        var cmp = options.CaseSensitiveIdentifiers ? StringComparer.Ordinal : StringComparer.OrdinalIgnoreCase;
+        var srcNames = src.Columns.Select(c => c.Name).ToList();
+        var tgtNames = tgt.Columns.Select(c => c.Name).ToList();
+
+        // Only a *pure reorder* counts: identical column SETS, differing only in sequence. Adds/drops are
+        // already handled above and shouldn't double-report as an order change.
+        if (srcNames.Count != tgtNames.Count) return;
+        if (!srcNames.OrderBy(n => n, cmp).SequenceEqual(tgtNames.OrderBy(n => n, cmp), cmp)) return;
+        if (srcNames.SequenceEqual(tgtNames, cmp)) return; // same order already
+
+        changes.Add(new ColumnOrderChange(src.Schema, src.Name, srcNames, tgtNames));
+    }
+
+    // Emit an AlterTableStorageChange when the verbatim trailing storage clause (WITH (...) / TABLESPACE)
+    // differs and the caller opted IN to comparing storage params (IgnoreStorageParameters=false). Default
+    // (true) ignores them entirely — exactly today's behaviour, where the comparer never read TrailingOptions.
+    private static void CompareStorageOptions(TableDefinition src, TableDefinition tgt, List<SchemaChange> changes, ComparerOptions options)
+    {
+        if (options.IgnoreStorageParameters) return;
+
+        var s = NormalizeStorage(src.TrailingOptions);
+        var t = NormalizeStorage(tgt.TrailingOptions);
+        if (!string.Equals(s, t, StringComparison.Ordinal))
+            changes.Add(new AlterTableStorageChange(src.Schema, src.Name, src.TrailingOptions, tgt.TrailingOptions));
+    }
+
+    // Canonicalize the trailing clause for storage comparison: lower-case + collapse whitespace so
+    // "WITH (fillfactor=70)" and "with ( fillfactor = 70 )" don't churn. Null/empty → "".
+    private static string NormalizeStorage(string? s) =>
+        string.IsNullOrWhiteSpace(s) ? string.Empty : NormalizeText(s).ToLowerInvariant();
 
     private static void ComparePrimaryKey(TableDefinition src, TableDefinition tgt, List<SchemaChange> changes, ComparerOptions options)
     {
