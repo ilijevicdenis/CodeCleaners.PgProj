@@ -32,7 +32,7 @@ Legend: ✅ full · ◑ partial · ⬜ not yet · `raw` = handled by the generic
 | CREATE MATERIALIZED VIEW | ✅ | ✅ | ✅ | matview flag introspected via relkind (`ReadViewsAsync`) |
 | CREATE FUNCTION / PROCEDURE | ✅ | ✅ | ✅ | overloads disambiguated by arg types (LIM-002) |
 | CREATE AGGREGATE | `raw` | `raw` | ✅ | introspected (`ReadAggregatesAsync`: SFUNC/STYPE/FINALFUNC/…) |
-| CREATE TYPE — enum/composite/range/base | `raw` | `raw` | ◑ | enum + composite + range introspected; base type pending (#102) |
+| CREATE TYPE — enum/composite/range/base | `raw` | `raw` | ◑ | enum + composite + range introspected; **base types deferred** (#102 — need C I/O functions, see backlog) |
 | CREATE DOMAIN | `raw` | `raw` | ✅ | introspected (base type + constraints) |
 | CREATE TRIGGER | `raw` | `raw` | ✅ | via pg_get_triggerdef |
 | CREATE EVENT TRIGGER | `raw` | `raw` | ✅ | reconstructed incl. WHEN TAG IN; body-comparable (#104) |
@@ -40,14 +40,14 @@ Legend: ✅ full · ◑ partial · ⬜ not yet · `raw` = handled by the generic
 | CREATE POLICY (RLS) | `raw` | `raw` | ✅ | reconstructed incl. TO roles; identity-only compare (#103) |
 | CREATE EXTENSION | `raw` | `raw` | ✅ | |
 | CREATE PUBLICATION | `raw` | `raw` | ✅ | introspected (`ReadPublicationsAsync`) |
-| CREATE LANGUAGE | `raw` | `raw` | ⬜ | procedural-language (xplang) (#108) |
-| CREATE TRANSFORM | `raw` | `raw` | ⬜ | (#108) |
+| CREATE LANGUAGE | `raw` | `raw` | ✅ | introspected (`ReadLanguagesAsync`: handler/inline/validator, non-extension) (#108) |
+| CREATE TRANSFORM | `raw` | `raw` | ⬜ | **deferred** (#108 — needs C `internal`-typed transform functions, see backlog) |
 | CREATE COLLATION | `raw` | `raw` | ✅ | introspected (`ReadCollationsAsync`: provider/locale/deterministic) |
 | CREATE CAST | `raw` | `raw` | ✅ | introspected (`ReadCastsAsync`, user casts) |
 | CREATE CONVERSION | `raw` | `raw` | ✅ | introspected (`ReadConversionsAsync`) |
 | CREATE OPERATOR / CLASS / FAMILY | `raw` | `raw` | ✅ | full DDL reconstruction (`ReadOperators/OperatorClasses/OperatorFamiliesAsync`) |
 | CREATE TEXT SEARCH CONFIG/DICT | `raw` | `raw` | ✅ | introspected (`ReadTextSearchConfigurations/DictionariesAsync`) |
-| CREATE TEXT SEARCH PARSER/TEMPLATE | `raw` | `raw` | ⬜ | (#109) |
+| CREATE TEXT SEARCH PARSER/TEMPLATE | `raw` | `raw` | ✅ | introspected from support-function regprocs (`ReadTextSearchParsers/TemplatesAsync`) (#109) |
 | CREATE FOREIGN TABLE | `raw` | `raw` | ✅ | introspected (`ReadForeignTablesAsync`: columns/server/options) |
 | CREATE FOREIGN DATA WRAPPER / SERVER | `raw` | `raw` | ✅ | full DDL reconstruction (`ReadForeignDataWrappers/ServersAsync`) |
 | CREATE USER MAPPING | `raw` | `raw` | ✅ | parser fix + `ReadUserMappingsAsync` (FOR user SERVER server +OPTIONS) (#108) |
@@ -70,7 +70,8 @@ Diff rule: missing on target → emit body; body changed → `DROP … IF EXISTS
 The introspection column is where the remaining work concentrates: project-side build/script/
 project-vs-project compare already cover everything; live-server compare/publish/extract already cover
 all ✅ rows. The remaining ⬜/◑ are tracked under **EP-COVERAGE (#72)** on milestone M7. **Done:** EXCLUDE
-constraints (#98), EVENT TRIGGER tags (#104), POLICY `TO` roles (#103), USER MAPPING (#108),
-PARTITION/INHERITS (#99), index opclass/ordering (#101), expression statistics (#110). **Open (all need
-C-backed objects a pure-SQL sample can't exercise):** base types (#102), LANGUAGE/TRANSFORM (#108 tail),
-TEXT SEARCH PARSER/TEMPLATE (#109). See also BUGS.md LIM-1xx.
+constraints (#98), EVENT TRIGGER tags (#104), POLICY `TO` roles (#103), USER MAPPING + LANGUAGE (#108),
+PARTITION/INHERITS (#99), index opclass/ordering (#101), expression statistics (#110), TEXT SEARCH
+PARSER/TEMPLATE (#109). **Deferred to backlog** (genuinely need C functions loaded into the PG server,
+which in practice ship via an extension and are then introspected as extension-owned): **base types
+(#102)** and **transforms (#108 tail)**. See also BUGS.md LIM-1xx.

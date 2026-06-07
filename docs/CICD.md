@@ -91,27 +91,6 @@ The deploy must never happen without a human in the loop:
    `${{ secrets.PGPROJ_CONNECTION }}`; the action feeds it through the `PGPROJ_CONNECTION` env var so it
    never appears on the command line or in logs.
 
-## Azure DevOps
-
-A step template lives at `ci/azure-devops/pgproj-template.yml`. It installs the .NET 10 SDK,
-publishes the CLI, runs the requested verb, and (for `build`) publishes the model as a pipeline
-artifact.
-
-```yaml
-steps:
-  - template: ci/azure-devops/pgproj-template.yml
-    parameters:
-      project: $(Build.SourcesDirectory)/sample/SampleDb/SampleDb.pgproj
-      command: build
-      strict: true
-```
-
-**Approval & dry-run gating (Azure DevOps):** run `build` in a CI stage, then put the `publish`
-(no dry-run) step inside a *deployment job* that targets an **Environment** with an **Approvals and
-checks → Approvals** gate. Use `dryRun: true` on PR validation builds. Map the connection from a
-**secret** pipeline variable to the template's `connection` parameter (it is exported only as the
-`PGPROJ_CONNECTION` env var for the CLI step).
-
 ## Container image
 
 For any other CI (GitLab, Jenkins, CircleCI, local), use the `Dockerfile` at the repo root. It
