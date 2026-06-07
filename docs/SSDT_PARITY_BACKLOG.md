@@ -47,6 +47,22 @@ The headless engine is in good shape. These epics are **complete** and only need
 - **EP-SDK** — `PgProj.Sdk` MSBuild props/targets so `dotnet build` builds a `.pgproj`.
 - **EP-PARSER** — 100% accept/reject parity vs PostgreSQL 18 on a 21,743-statement corpus.
 
+**Delivered during the M-waves (this §3 list lagged the code — confirmed by the 2026-06-07 M7 audit, see
+[`reference/PROGRESS.md`](reference/PROGRESS.md) M7):**
+
+- **EP-PKG / EP-VARS / EP-DEPLOYSCRIPTS / EP-REF / EP-RPC** — Phase-1 engine completeness (waves 1–2).
+- **EP-TARGET** ✅ — version-aware validation (`TargetVersionAnalyzer` + `PgVersionCapabilities` table + `PGV###`; gate on build/publish/validate).
+- **EP-PROFILE** ✅ — `.pgpublish.json` + `profile create` + `--profile` (CLI>profile>default; secret-free).
+- **EP-SCHEMACOMPARE** ✅ — unified two-way `SchemaCompare` + selectable change set + `--output diff.json` + `--exclude`.
+- **EP-TEMPLATES** ✅ — object templates + `add`/`new project` + `dotnet new` pack (`templates/`).
+- **EP-VSCODE / EP-VS Route A / EP-DESIGNER (read+round-trip)** — delivered in M5 (#24/#25/#26/#31).
+- **EP-ANALYSIS+** 🟡 — per-rule config + `--rule` + SARIF done; **open:** external rule packs, growing the rule set.
+
+> **Reality check (2026-06-07):** the per-epic task checklists in §3 below are the *original* backlog and
+> were not all re-ticked. Treat the list above + `PROGRESS.md` M7 as the source of truth for what's done;
+> the genuinely-open work is **EP-ANALYSIS+ tail, EP-COVERAGE (introspection, tracked in `reference/COVERAGE.md`),
+> EP-CICD (planning), EP-VS Route B, EP-DESIGNER deepening.**
+
 ---
 
 ## 3. The gap to SSDT parity — epics
@@ -147,6 +163,8 @@ run around the schema diff.
 
 ### EP-TARGET — Target-platform enforcement (version-aware validation) — **P1**
 
+> ✅ **DELIVERED** (M7 audit 2026-06-07, issue #66). `Analysis/TargetVersionAnalyzer.cs` + `Versioning/PgVersionCapabilities`/`SupportedFeatures` + `PGV###`; gate wired into build/publish/validate. Tests `TargetVersionTests`/`VersionProfileTests`. Tasks below are historical.
+
 `TargetPostgresVersion` (16/17/18) is parsed but not enforced. SSDT blocks SQL2022-only syntax on a
 SQL2017 target. Mirrors matrix row *Target platform*.
 
@@ -164,6 +182,8 @@ SQL2017 target. Mirrors matrix row *Target platform*.
 ---
 
 ### EP-ANALYSIS+ — Configurable code analysis & extensibility — **P1**
+
+> 🟡 **PARTLY DELIVERED** (M7 audit 2026-06-07, issue #67). Done: per-rule config `Analysis/AnalysisConfig.cs` (`.pgproj.analysis.json`), CLI `--rule`, SARIF (`Analysis/SarifWriter.cs`). **Open: #79** external rule-pack discovery (no assembly loading yet), **#81** grow the rule set.
 
 Matrix rows *Code analysis enable/disable GUI* + *run code analysis*. Today rules are all-or-nothing.
 SSDT lets you enable/disable rules and set severity, plus third-party rule packs.
@@ -185,6 +205,8 @@ SSDT lets you enable/disable rules and set severity, plus third-party rule packs
 
 ### EP-PROFILE — Publish profiles — **P1**
 
+> ✅ **DELIVERED** (M7 audit 2026-06-07, issue #68). `Deployment/PublishProfile.cs` (secret-whitelisted `.pgpublish.json`), `profile create` verb, `--profile` on publish/script/compare (CLI>profile>default). Tests `PublishProfileTests`. Tasks below are historical.
+
 Matrix rows *Publish profile creation* + *Load connection details and SQLCMD variables from profile*.
 A reusable file capturing target connection + variables + publish options.
 
@@ -202,6 +224,8 @@ A reusable file capturing target connection + variables + publish options.
 ---
 
 ### EP-SCHEMACOMPARE — First-class two-way Schema Compare — **P1**
+
+> ✅ **DELIVERED** (M7 audit 2026-06-07, issue #69). `Comparison/SchemaCompare.cs` unified two-way API (source/target ∈ project/pkg/snapshot/live via `EndpointResolver`), selectable `SchemaChangeSet`, `--output diff.json`, `--exclude`. Tests `SchemaCompareTests`. Tasks below are historical.
 
 The engine diffs both directions (`compare` = project→DB, `drift`/`pull` = DB→project), but SSDT
 exposes a **single Schema Compare** surface with a reviewable, **selective** change list and apply in
@@ -221,6 +245,8 @@ either direction. Matrix rows *Schema comparison project↔database*.
 ---
 
 ### EP-TEMPLATES — New-object templates & `dotnet new` — **P1**
+
+> ✅ **DELIVERED** (M7 audit 2026-06-07, issue #70). `Templates/*` (`Scaffolder`/`TemplateCatalog`), `add`/`new project` verbs, `dotnet new` pack at `templates/PgProj.Templates.csproj`. Tests `TemplateTests`/`TemplateIntegrationTests`. Tasks below are historical.
 
 Matrix rows *New object templates* + *Create new empty project / from existing database*.
 

@@ -21,36 +21,37 @@ Legend: ✅ full · ◑ partial · ⬜ not yet · `raw` = handled by the generic
 | CREATE TABLE — CHECK constraint | ✅ | ✅ | ✅ | column + named table-level (LIM-103) |
 | CREATE TABLE — GENERATED … STORED | ✅ | ✅ | ✅ | expression retained (LIM-104) |
 | CREATE TABLE — identity ALWAYS/BY DEFAULT | ✅ | ✅ | ✅ | LIM-009 |
-| CREATE TABLE — EXCLUDE constraint | ✅ | ✅ | ⬜ | captured + scripted verbatim; introspection pending |
-| CREATE TABLE — INHERITS / PARTITION BY / WITH | ◑ | ◑ | ⬜ | trailing clauses round-trip (LIM-101) |
-| CREATE TABLE — PARTITION OF / OF type | `raw` | `raw` | ⬜ | captured verbatim as raw Table object |
+| CREATE TABLE — EXCLUDE constraint | ✅ | ✅ | ⬜ | captured + scripted verbatim; introspection pending (#98) |
+| CREATE TABLE — INHERITS / PARTITION BY / WITH | ◑ | ◑ | ⬜ | trailing clauses round-trip (LIM-101); introspection pending (#99) |
+| CREATE TABLE — PARTITION OF / OF type | `raw` | `raw` | ◑ | `OF type` introspected (`ReadTypedTablesAsync`); `PARTITION OF` pending (#99) |
 | ALTER TABLE (as deploy output) | n/a | ✅ | n/a | ADD/ALTER/DROP COLUMN (+USING), PK, FK, CHECK |
-| CREATE INDEX (+ partial/INCLUDE/opclass) | ✅ | ✅ | ◑ | expression/opclass compare is textual (LIM-005) |
-| CREATE STATISTICS | `raw` | `raw` | ◑ | existence-only introspection |
+| CREATE INDEX (+ partial/INCLUDE/opclass) | ✅ | ✅ | ◑ | expression/opclass compare is textual (LIM-005, #101) |
+| CREATE STATISTICS | `raw` | `raw` | ◑ | column-based introspected (`ReadStatisticsAsync`); expression stats existence-only (#110) |
 | CREATE SEQUENCE (+ options) | ✅ | ✅ | ✅ | AS/INCREMENT/MIN/MAX/START/CACHE/CYCLE (LIM-102) |
 | CREATE VIEW | ✅ | ✅ | ✅ | body compared normalized (LIM-003) |
-| CREATE MATERIALIZED VIEW | ✅ | ✅ | ◑ | introspected as view; matview flag on extract pending |
+| CREATE MATERIALIZED VIEW | ✅ | ✅ | ✅ | matview flag introspected via relkind (`ReadViewsAsync`) |
 | CREATE FUNCTION / PROCEDURE | ✅ | ✅ | ✅ | overloads disambiguated by arg types (LIM-002) |
-| CREATE AGGREGATE | `raw` | `raw` | ⬜ | |
-| CREATE TYPE — enum/composite/range/base | `raw` | `raw` | ◑ | enum + composite introspected; range/base pending |
+| CREATE AGGREGATE | `raw` | `raw` | ✅ | introspected (`ReadAggregatesAsync`: SFUNC/STYPE/FINALFUNC/…) |
+| CREATE TYPE — enum/composite/range/base | `raw` | `raw` | ◑ | enum + composite + range introspected; base type pending (#102) |
 | CREATE DOMAIN | `raw` | `raw` | ✅ | introspected (base type + constraints) |
 | CREATE TRIGGER | `raw` | `raw` | ✅ | via pg_get_triggerdef |
-| CREATE EVENT TRIGGER | `raw` | `raw` | ◑ | reconstructed (tags omitted) |
+| CREATE EVENT TRIGGER | `raw` | `raw` | ◑ | reconstructed (tags omitted, #104) |
 | CREATE RULE | `raw` | `raw` | ✅ | via pg_get_ruledef |
-| CREATE POLICY (RLS) | `raw` | `raw` | ◑ | reconstructed (TO roles omitted) |
+| CREATE POLICY (RLS) | `raw` | `raw` | ◑ | reconstructed (TO roles omitted, #103) |
 | CREATE EXTENSION | `raw` | `raw` | ✅ | |
-| CREATE LANGUAGE | `raw` | `raw` | ⬜ | procedural-language (xplang) |
-| CREATE TRANSFORM | `raw` | `raw` | ⬜ | |
-| CREATE COLLATION | `raw` | `raw` | ◑ | existence-only introspection |
-| CREATE CAST | `raw` | `raw` | ⬜ | |
-| CREATE CONVERSION | `raw` | `raw` | ◑ | existence-only introspection |
-| CREATE OPERATOR / CLASS / FAMILY | `raw` | `raw` | ⬜ | |
-| CREATE TEXT SEARCH CONFIG/DICT | `raw` | `raw` | ◑ | existence-only introspection |
-| CREATE TEXT SEARCH PARSER/TEMPLATE | `raw` | `raw` | ⬜ | |
-| CREATE FOREIGN TABLE | `raw` | `raw` | ◑ | existence-only introspection |
-| CREATE FOREIGN DATA WRAPPER / SERVER | `raw` | `raw` | ◑ | existence-only introspection |
-| CREATE USER MAPPING | `raw` | `raw` | ⬜ | references a role but defines schema |
-| COMMENT ON … | `raw` | `raw` | ⬜ | comment text is schema metadata |
+| CREATE PUBLICATION | `raw` | `raw` | ✅ | introspected (`ReadPublicationsAsync`) |
+| CREATE LANGUAGE | `raw` | `raw` | ⬜ | procedural-language (xplang) (#108) |
+| CREATE TRANSFORM | `raw` | `raw` | ⬜ | (#108) |
+| CREATE COLLATION | `raw` | `raw` | ✅ | introspected (`ReadCollationsAsync`: provider/locale/deterministic) |
+| CREATE CAST | `raw` | `raw` | ✅ | introspected (`ReadCastsAsync`, user casts) |
+| CREATE CONVERSION | `raw` | `raw` | ✅ | introspected (`ReadConversionsAsync`) |
+| CREATE OPERATOR / CLASS / FAMILY | `raw` | `raw` | ✅ | full DDL reconstruction (`ReadOperators/OperatorClasses/OperatorFamiliesAsync`) |
+| CREATE TEXT SEARCH CONFIG/DICT | `raw` | `raw` | ✅ | introspected (`ReadTextSearchConfigurations/DictionariesAsync`) |
+| CREATE TEXT SEARCH PARSER/TEMPLATE | `raw` | `raw` | ⬜ | (#109) |
+| CREATE FOREIGN TABLE | `raw` | `raw` | ✅ | introspected (`ReadForeignTablesAsync`: columns/server/options) |
+| CREATE FOREIGN DATA WRAPPER / SERVER | `raw` | `raw` | ✅ | full DDL reconstruction (`ReadForeignDataWrappers/ServersAsync`) |
+| CREATE USER MAPPING | `raw` | `raw` | ⬜ | references a role but defines schema (#108) |
+| COMMENT ON … | `raw` | `raw` | ✅ | introspected across all object classes (`ReadCommentsAsync`) |
 
 ## Raw-object mechanism
 
@@ -67,5 +68,8 @@ Diff rule: missing on target → emit body; body changed → `DROP … IF EXISTS
 — trigger/rule/policy/etc. — do not). Comments never drop; a change just re-emits.
 
 The introspection column is where the remaining work concentrates: project-side build/script/
-project-vs-project compare already cover everything; live-server compare/publish/extract cover the
-✅/◑ rows and will be filled in kind-by-kind (see BUGS.md LIM-1xx).
+project-vs-project compare already cover everything; live-server compare/publish/extract already cover
+all ✅ rows. The remaining ⬜/◑ are tracked under **EP-COVERAGE (#72)** on milestone M7: EXCLUDE
+constraints (#98), PARTITION/INHERITS (#99), index opclass structured (#101), base types (#102),
+POLICY `TO` roles (#103), EVENT TRIGGER tags (#104), LANGUAGE/TRANSFORM/USER MAPPING (#108), TEXT
+SEARCH PARSER/TEMPLATE (#109), and the expression-statistics tail (#110). See also BUGS.md LIM-1xx.
