@@ -301,10 +301,14 @@ public sealed partial class PgParser
         }
         if (!b.AtEnd) throw new ParseException($"unexpected '{b.CurrentText!}' in table definition", b.Here);
 
-        // case-sensitive: quoted "a"/"A" are distinct columns; comparing ordinally avoids any false positive
-        var seenCols = new HashSet<string>(StringComparer.Ordinal);
-        foreach (var col in table.Columns)
-            if (!seenCols.Add(col.Name)) throw new ParseException($"column \"{col.Name}\" specified more than once", b.Here);
+        // Duplicate-column check by linear scan — column lists are short, so O(n²) comparisons cost less
+        // than building+hashing a HashSet and allocate nothing (HashSet<string> + its Entry[] backing were
+        // a per-table allocation). Ordinal: quoted "a"/"A" stay distinct, avoiding any false positive.
+        var cols = table.Columns;
+        for (int i = 0; i < cols.Count; i++)
+            for (int j = 0; j < i; j++)
+                if (string.Equals(cols[i].Name, cols[j].Name, StringComparison.Ordinal))
+                    throw new ParseException($"column \"{cols[i].Name}\" specified more than once", b.Here);
     }
 
     private void ParseTableElement(TokenCursor b, CreateTableStatement table)
@@ -713,11 +717,12 @@ public sealed partial class PgParser
         if (t.IsPartitionOrTyped || t.HasLikeElement || t.Columns.Count == 0) return;
         if (t.TrailingText is not null && t.TrailingText.Contains("INHERITS", StringComparison.OrdinalIgnoreCase)) return;
 
-        var defined = new HashSet<string>(t.Columns.Select(x => x.Name), StringComparer.OrdinalIgnoreCase);
+        // Membership by linear scan over the (short) column list — no HashSet, no Select() iterator, and the
+        // single-column NOT NULL case checks directly rather than wrapping the name in a one-element array.
         void Check(IEnumerable<string> cols)
         {
             foreach (var col in cols)
-                if (!defined.Contains(col))
+                if (!ColumnDefined(t, col))
                     throw new ParseException($"column \"{col}\" named in a constraint does not exist", c.Here);
         }
         foreach (var con in t.Constraints)
@@ -727,9 +732,22 @@ public sealed partial class PgParser
                 case PrimaryKeyConstraint pk: Check(pk.Columns); Check(pk.Include); break;
                 case UniqueConstraint u: Check(u.Columns); Check(u.Include); break;
                 case ForeignKeyConstraint fk: Check(fk.Columns); break;
-                case NotNullTableConstraint nn: Check(new[] { nn.Column }); break;
+                case NotNullTableConstraint nn:
+                    if (!ColumnDefined(t, nn.Column))
+                        throw new ParseException($"column \"{nn.Column}\" named in a constraint does not exist", c.Here);
+                    break;
             }
         }
+    }
+
+    /// <summary>True if <paramref name="name"/> is one of the table's defined columns (case-insensitive,
+    /// matching the old HashSet comparer). Linear scan: column lists are short, so this allocates nothing
+    /// where the set+Select() did.</summary>
+    private static bool ColumnDefined(CreateTableStatement t, string name)
+    {
+        foreach (var col in t.Columns)
+            if (string.Equals(col.Name, name, StringComparison.OrdinalIgnoreCase)) return true;
+        return false;
     }
 
     /// <summary>The ON DELETE SET NULL/DEFAULT column list must be a subset of the FK columns.</summary>
