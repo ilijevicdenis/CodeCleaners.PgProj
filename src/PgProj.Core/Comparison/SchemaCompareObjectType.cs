@@ -23,19 +23,23 @@ public static class SchemaCompareObjectType
     {
         CreateSchemaChange => "schema",
 
-        CreateSequenceChange or AlterSequenceChange => "sequence",
+        CreateSequenceChange or AlterSequenceChange or RenameSequenceChange or DropSequenceChange => "sequence",
 
-        CreateTableChange or DropTableChange => "table",
+        CreateTableChange or DropTableChange or RenameTableChange => "table",
         AddColumnChange or AlterColumnChange or DropColumnChange => "column",
 
         AddPrimaryKeyChange or DropPrimaryKeyChange => "primarykey",
         AddForeignKeyChange or DropForeignKeyChange => "foreignkey",
+        AddUniqueConstraintChange or DropUniqueConstraintChange => "constraint",
         AddCheckConstraintChange or AddRawTableConstraintChange or DropConstraintChange => "constraint",
 
-        CreateIndexChange or DropIndexChange => "index",
+        CreateIndexChange or DropIndexChange or RenameIndexChange => "index",
 
-        CreateOrReplaceViewChange or DropViewChange => "view",
-        CreateOrReplaceFunctionChange => "function",
+        CreateOrReplaceViewChange or DropViewChange or RenameViewChange => "view",
+        CreateOrReplaceFunctionChange or AlterFunctionAttributesChange or RenameFunctionChange => "function",
+
+        // An enum-label add is a structured delta on a `type` object.
+        AddEnumValuesChange => "type",
 
         CreateRawObjectChange raw => OfKind(raw.Def.Kind),
         RecreateRawObjectChange raw => OfKind(raw.Def.Kind),
