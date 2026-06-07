@@ -4,7 +4,7 @@
 > SSDT-for-PostgreSQL parity and is the single place to read "where are we now". It is **updated on
 > every delivered milestone** (see [Update contract](#update-contract) below).
 
-**Last updated:** 2026-06-07 (M1 + M2 + M3 complete) · **Streams:** semantic core (EP-SEMCORE #41) ·
+**Last updated:** 2026-06-07 (M1–M4 complete) · **Streams:** semantic core (EP-SEMCORE #41) ·
 SSDT parity (#27) · performance (#12)
 
 Legend: ✅ delivered · 🟡 in progress · ⬜ not started · ⛔ blocked.
@@ -21,7 +21,7 @@ deliverable subtasks; **complex issues are broken into smaller subtasks when imp
 | **M1** | Determinism & Diagnostics Foundations | cross-cutting | #59, #49, #36, #37, #60, #62, #63 | 7 / 7 | ✅ | [milestone/1](https://github.com/ilijevicdenis/CodeCleaners.PgProj/milestone/1) |
 | **M2** | Semantic Core — Identity & Foundations | EP-SEMCORE | #42, #43, #44, #45, #46, #39 | 6 / 6 | ✅ | [milestone/2](https://github.com/ilijevicdenis/CodeCleaners.PgProj/milestone/2) |
 | **M3** | Semantic Core — Binding & Validation | EP-SEMCORE | #47, #48, #50, #51 | 4 / 4 | ✅ | [milestone/3](https://github.com/ilijevicdenis/CodeCleaners.PgProj/milestone/3) |
-| **M4** | Diff, Risk, Deploy & Incremental | EP-SEMCORE | #52, #53, #54, #55, #56, #57, #58, #61, #64 | 0 / 9 | ⬜ | [milestone/4](https://github.com/ilijevicdenis/CodeCleaners.PgProj/milestone/4) |
+| **M4** | Diff, Risk, Deploy & Incremental | EP-SEMCORE | #52, #53, #54, #55, #56, #57, #58, #61, #64 | 8 / 9 | 🟡 | [milestone/4](https://github.com/ilijevicdenis/CodeCleaners.PgProj/milestone/4) |
 | **M5** | SSDT Parity — Editor UI | parity #27 | #31, #24, #25, #26 | 0 / 4 | ⬜ | [milestone/5](https://github.com/ilijevicdenis/CodeCleaners.PgProj/milestone/5) |
 | **M6** | Performance & Engine Backlog | perf #12 | #8, #10 | 0 / 6 † | ⬜ | [milestone/6](https://github.com/ilijevicdenis/CodeCleaners.PgProj/milestone/6) |
 
@@ -107,17 +107,19 @@ EP-SEMCORE Part A, Phases 3–8. **Complete (4/4).**
 - ✅ **#51** — Phase 8: canonical model hardening (column-order, body canonicalization, type aliases)
   *(delivered; broadened TypeNormalizer, canonical expression form, canonicalization in the model, gated column-order)*
 
-### M4 · Diff, Risk, Deploy & Incremental ⬜
+### M4 · Diff, Risk, Deploy & Incremental 🟡
 
-EP-SEMCORE Parts B+C, Phases 10–15 & 18.
+EP-SEMCORE Parts B+C, Phases 10–15 & 18. **8/9 — all phases delivered; #61 carries a small round-trip tail.**
 
-- ⬜ **#52** — Phase 10: schema snapshots (`schema.snapshot` artifact — versioning + staleness)
-- ⬜ **#53** — Phase 11: identity-based diff (StableId rename detection + field-level deltas)
-- ⬜ **#54** — Phase 12: Deployment Risk Analyzer (Safe/Warning/Dangerous/DataLoss/Blocking)
-- ⬜ **#55** — Phase 13: deployment planning (computed topo-sort, edge-class aware, cycle→skeleton-then-alter)
-- ⬜ **#56** — Phase 14: option- & version-aware script generation (prefer-ALTER, idempotent, timeouts, verbose)
-- ⬜ **#57** — Phase 15: incremental analysis & object cache (reverse-dep invalidation)
-- ⬜ **#58** — Phase 18: options & profiles (comparison equivalence + ComparisonProfile + block-on-data-loss)
+- ✅ **#52** — Phase 10: schema snapshots *(delivered; `schema.snapshot` offline compare endpoint + staleness + `pgproj snapshot` CLI)*
+- ✅ **#53** — Phase 11: identity-based diff *(delivered; gated rename detection + structured function/unique/sequence/enum deltas)*
+- ✅ **#54** — Phase 12: Deployment Risk Analyzer *(delivered; Safe/Warning/Dangerous/DataLoss/Blocking + rationale + rewrite/lock flags)*
+- ✅ **#55** — Phase 13: deployment planning *(delivered; topo-sort over the dependency graph, edge-class aware, skeleton-then-alter for hard cycles)*
+- ✅ **#56** — Phase 14: option- & version-aware script generation *(delivered; idempotent IF EXISTS, timeouts, verbose, include/exclude, ObjectCapabilities ALTER paths; defaults byte-identical)*
+- ✅ **#57** — Phase 15: incremental analysis & object cache *(delivered; CanonicalHash-keyed cache, reverse-closure invalidation)*
+- ✅ **#58** — Phase 18: options & profiles *(delivered; comparison-equivalence options, ComparisonProfile, block-on-data-loss gate wired to risk)*
+- ✅ **#64** — round-trip idempotency (finely-modelled) *(delivered with #53/#61)*
+- 🟡 **#61** — round-trip idempotency (remaining raw kinds) *(cast/operator/op-class/op-family delivered; Trigger + function-comment fidelity gaps remain — tracked here)*
 
 ### M5 · SSDT Parity — Editor UI ⬜
 
@@ -145,6 +147,7 @@ Newest first. One line per delivered issue/milestone; this is the audit trail of
 
 | Date | Milestone | Item | Commit | Notes |
 |------|-----------|------|--------|-------|
+| 2026-06-07 | M4 | #52 #53 #54 #55 #56 #57 #58 #64 + #61 (partial) — snapshots, identity diff, risk, planning, gen, incremental, options, round-trip | merge of `milestone/m4-diff-deploy` | Three dependency-ordered worktree-agent waves. PG18 suite 22,471 pass / 0 fail / 0 skip; allocation neutral; defaults byte-identical. #61 trigger + function-comment round-trip gaps remain (tracked). |
 | 2026-06-07 | M3 | #47 #48 #50 #51 — binding, validation, dependency graph, canonical hardening (**completes M3**) | merge of `milestone/m3-binding-validation` | Two worktree-agent waves (#47/#51 then #48/#50 on the bound model). PG18 suite 22,363 pass / 0 fail / 0 skip; goldens byte-identical. Parse allocation +0.35% (tightened from +1.16% — ColumnRef single-slot, trigger detail behind one ref). |
 | 2026-06-07 | M2 | #44 IProjectObject contract + object-kind registry (**completes M2**) | merge of `feature/44-iprojectobject-registry` | Contract + registry; every per-kind switch (RawObjectMeta, SchemaCompareObjectType, LiveDatabaseReader fan-out, ModelBuilder.BuildRaw) collapsed into one ObjectKindRegistry table. Golden byte-identical; PG18 suite 22,301 pass / 0 fail / 0 skip. |
 | 2026-06-07 | M2 + M1 | #42 #43 #45 #46 #39 (M2) + #60 #62 #63 (M1 finishers) | merge of `milestone/m2-semantic-core` | Two dependency-phased worktree-agent waves + hand-resolved integration (unified #63/#45 position tracking onto `SourcePositionIndex`). **M1 now complete (7/7).** Validated against PG18: 22,294 pass / 0 fail / 0 skip; allocation neutral. M2 5/6 — #44 remains. |
