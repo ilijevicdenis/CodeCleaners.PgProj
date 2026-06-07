@@ -550,7 +550,7 @@ public static class Program
         var analyzer = new PgAnalyzer(config);
         var findings = new List<Diagnostic>();
         foreach (var file in project.ResolveSqlFiles())
-            findings.AddRange(analyzer.Analyze(new PgProj.Core.Syntax.PgParser().Parse(File.ReadAllText(file))));
+            findings.AddRange(analyzer.Analyze(new PgProj.Core.Syntax.PgParser().Parse(PgProj.Core.Project.SourceReader.ReadAllText(file))));
         return findings;
     }
 

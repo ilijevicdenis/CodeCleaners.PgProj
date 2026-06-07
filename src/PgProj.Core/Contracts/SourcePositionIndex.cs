@@ -19,7 +19,13 @@ public sealed class SourcePositionIndex
 {
     private readonly Dictionary<string, SourcePosition> _byIdentity = new(StringComparer.OrdinalIgnoreCase);
 
-    private SourcePositionIndex() { }
+    /// <summary>
+    /// Public so the build pipeline can populate it in-line as a byproduct of the model build
+    /// (no second parse pass) via <see cref="RecordStatement"/> / <see cref="Merge"/>. The standalone
+    /// <see cref="Build(DatabaseProject)"/> re-parse path is retained for callers that hold only a
+    /// project (e.g. SARIF analysis) and never ran a model build.
+    /// </summary>
+    public SourcePositionIndex() { }
 
     /// <summary>Builds the index for a project (one pass over its resolved .sql files).</summary>
     public static SourcePositionIndex Build(DatabaseProject project)
@@ -28,28 +34,47 @@ public sealed class SourcePositionIndex
         foreach (var file in project.ResolveSqlFiles())
         {
             string text;
-            try { text = File.ReadAllText(file); }
+            try { text = SourceReader.ReadAllText(file); }
             catch { continue; } // unreadable file → simply contributes no positions
             var rel = Path.GetRelativePath(project.ProjectDirectory, file).Replace('\\', '/');
             var parsed = new PgParser().Parse(text);
             foreach (var stmt in parsed.Statements)
-            {
-                var (line, col) = LineCol(text, stmt.Position);
-                var pos = new SourcePosition(rel, line, col);
-                var key = IdentityOf(stmt, project.DefaultSchema);
-                if (key is not null)
-                {
-                    // First occurrence wins, mirroring the build's first-definition-wins merge.
-                    if (!idx._byIdentity.ContainsKey(key)) idx._byIdentity[key] = pos;
-                }
-                else if (stmt is RawCreateStatement raw && raw.Name is not null)
-                {
-                    idx.AddRawByName(raw.Schema ?? "", raw.Name, pos);
-                    if (!string.IsNullOrEmpty(raw.Schema)) idx.AddRawByName("", raw.Name, pos);
-                }
-            }
+                idx.RecordStatement(stmt, text, rel, project.DefaultSchema);
         }
         return idx;
+    }
+
+    /// <summary>
+    /// Records the source anchor for one parsed statement, keyed by the same identity
+    /// <see cref="ModelTreeBuilder"/> looks up. Called once per statement during the model build so
+    /// positions are persisted in the same parse pass that produces the model (issue #45) — the
+    /// dedicated re-parse in <see cref="Build(DatabaseProject)"/> becomes unnecessary for the build /
+    /// model-tree paths. First occurrence wins, mirroring the build's first-definition-wins merge.
+    /// </summary>
+    public void RecordStatement(SqlStatement stmt, string sourceText, string relativeFile, string defaultSchema)
+    {
+        var (line, col) = LineCol(sourceText, stmt.Position);
+        var pos = new SourcePosition(relativeFile, line, col);
+        var key = IdentityOf(stmt, defaultSchema);
+        if (key is not null)
+        {
+            if (!_byIdentity.ContainsKey(key)) _byIdentity[key] = pos;
+        }
+        else if (stmt is RawCreateStatement raw && raw.Name is not null)
+        {
+            AddRawByName(raw.Schema ?? "", raw.Name, pos);
+            if (!string.IsNullOrEmpty(raw.Schema)) AddRawByName("", raw.Name, pos);
+        }
+    }
+
+    /// <summary>
+    /// Folds another index into this one (first-occurrence wins), so the parallel build can merge the
+    /// per-file indexes in deterministic file order — matching the model merge.
+    /// </summary>
+    public void Merge(SourcePositionIndex other)
+    {
+        foreach (var kv in other._byIdentity)
+            if (!_byIdentity.ContainsKey(kv.Key)) _byIdentity[kv.Key] = kv.Value;
     }
 
     /// <summary>Look up a position by the object identity produced by <see cref="ModelTreeBuilder"/>.</summary>

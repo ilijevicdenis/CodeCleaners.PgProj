@@ -32,7 +32,9 @@ public static class PgPkgBuilder
         foreach (var file in files)
         {
             var rel = Path.GetRelativePath(project.ProjectDirectory, file).Replace('\\', '/');
-            sources.Add(new PgPkgSource(rel, File.ReadAllText(file)));
+            // LF-normalise embedded source so the package + its checksum are byte-identical across
+            // CRLF/LF checkouts (#62), matching the model-build reader.
+            sources.Add(new PgPkgSource(rel, PgProj.Core.Project.SourceReader.ReadAllText(file)));
         }
 
         var checksum = SourceChecksum.Compute(sources.ConvertAll(s => (s.RelativePath, s.Content)));

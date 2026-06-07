@@ -26,6 +26,14 @@ public sealed record DatabaseProject
     public IReadOnlyList<string> IncludePatterns { get; init; } = new[] { "**/*.sql" };
 
     /// <summary>
+    /// Glob patterns (relative to <see cref="ProjectDirectory"/>) whose matches are removed from the
+    /// build set, read from <c>&lt;Build Remove="…"/&gt;</c> / <c>&lt;Exclude Include="…"/&gt;</c> /
+    /// <c>&lt;Build … Exclude="…"&gt;</c> items in the <c>.pgproj</c>. Support the same glob vocabulary as
+    /// includes (<c>**</c>, <c>*</c>, <c>?</c>). Applied after include resolution.
+    /// </summary>
+    public IReadOnlyList<string> ExcludePatterns { get; init; } = System.Array.Empty<string>();
+
+    /// <summary>
     /// Absolute path of the single pre-deployment script (SSDT <c>BuildAction=PreDeploy</c>), or null.
     /// Spliced before the schema diff in the generated deploy script.
     /// </summary>
@@ -63,7 +71,9 @@ public sealed record DatabaseProject
 
     private string ReadSource(string file)
     {
-        var text = File.ReadAllText(file);
+        // LF-normalised at load time (#62) so the model + every verbatim-embedding artifact is
+        // byte-identical across CRLF/LF checkouts. The optional SQLCMD transform runs on LF text.
+        var text = SourceReader.ReadAllText(file);
         if (ObjectContentTransform is null) return text;
         return ObjectContentTransform(Path.GetRelativePath(ProjectDirectory, file), text);
     }
@@ -91,6 +101,8 @@ public sealed record DatabaseProject
         if (includes.Count == 0)
             includes.Add("**/*.sql");
 
+        var excludes = LoadExcludePatterns(root);
+
         var (preDeploy, postDeploy) = LoadDeployScripts(root, dir);
         var variables = LoadSqlCmdVariables(root);
 
@@ -103,6 +115,7 @@ public sealed record DatabaseProject
             TargetPostgresVersion = root.Descendants().Any(e => e.Name.LocalName.Equals("TargetPostgresVersion", StringComparison.OrdinalIgnoreCase))
                 ? Prop("TargetPostgresVersion", "") : null,
             IncludePatterns = includes,
+            ExcludePatterns = excludes,
             PreDeployScriptPath = preDeploy,
             PostDeployScriptPath = postDeploy,
             SqlCmdVariableDefaults = variables,
@@ -145,6 +158,42 @@ public sealed record DatabaseProject
             }
         }
         return (pre, post);
+    }
+
+    /// <summary>
+    /// Reads exclude/remove glob patterns from the manifest. Three MSBuild-flavoured spellings are honoured:
+    /// <list type="bullet">
+    /// <item><c>&lt;Build Remove="pattern"/&gt;</c> — MSBuild item Remove metadata.</item>
+    /// <item><c>&lt;Build Include="…" Exclude="pattern"/&gt;</c> — MSBuild item Exclude attribute.</item>
+    /// <item><c>&lt;Exclude Include="pattern"/&gt;</c> / <c>&lt;Remove Include="pattern"/&gt;</c> — explicit element.</item>
+    /// </list>
+    /// </summary>
+    private static IReadOnlyList<string> LoadExcludePatterns(XElement root)
+    {
+        var excludes = new List<string>();
+        foreach (var e in root.Descendants())
+        {
+            var local = e.Name.LocalName;
+            if (local.Equals("Build", StringComparison.OrdinalIgnoreCase))
+            {
+                Add(e.Attribute("Remove")?.Value);
+                Add(e.Attribute("Exclude")?.Value);
+            }
+            else if (local.Equals("Exclude", StringComparison.OrdinalIgnoreCase)
+                  || local.Equals("Remove", StringComparison.OrdinalIgnoreCase))
+            {
+                Add(e.Attribute("Include")?.Value);
+            }
+        }
+        return excludes;
+
+        void Add(string? v)
+        {
+            // A single item may list several patterns separated by ';' (MSBuild item-list syntax).
+            if (string.IsNullOrWhiteSpace(v)) return;
+            foreach (var part in v.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+                excludes.Add(part);
+        }
     }
 
     /// <summary>
@@ -199,26 +248,23 @@ public sealed record DatabaseProject
     /// <summary>Resolves all .sql files the project includes, de-duplicated and ordered deterministically.</summary>
     public IReadOnlyList<string> ResolveSqlFiles()
     {
+        // Materialise the candidate set once: every file under the project dir (full glob semantics —
+        // incl. **, * and ? — are applied against the project-relative path below, not delegated to the
+        // OS GetFiles wildcard, which only supports a single trailing TopDirectoryOnly/AllDirectories pass).
+        var allFiles = Directory.Exists(ProjectDirectory)
+            ? Directory.GetFiles(ProjectDirectory, "*", SearchOption.AllDirectories)
+            : System.Array.Empty<string>();
+
+        var includeGlobs = IncludePatterns.Select(GlobMatcher.Compile).ToList();
+        var excludeGlobs = ExcludePatterns.Select(GlobMatcher.Compile).ToList();
+
         var files = new List<string>();
-        foreach (var pattern in IncludePatterns)
+        foreach (var file in allFiles)
         {
-            var norm = pattern.Replace('\\', '/');
-            if (norm.Contains("**"))
-            {
-                files.AddRange(Directory.GetFiles(ProjectDirectory, "*.sql", SearchOption.AllDirectories));
-            }
-            else if (norm.Contains('*'))
-            {
-                var subDir = Path.Combine(ProjectDirectory, Path.GetDirectoryName(norm) ?? string.Empty);
-                var glob = Path.GetFileName(norm);
-                if (Directory.Exists(subDir))
-                    files.AddRange(Directory.GetFiles(subDir, glob, SearchOption.TopDirectoryOnly));
-            }
-            else
-            {
-                var literal = Path.Combine(ProjectDirectory, norm);
-                if (File.Exists(literal)) files.Add(literal);
-            }
+            var rel = Path.GetRelativePath(ProjectDirectory, file).Replace('\\', '/');
+            if (!includeGlobs.Any(g => g.IsMatch(rel))) continue;
+            if (excludeGlobs.Any(g => g.IsMatch(rel))) continue;
+            files.Add(file);
         }
 
         // Pre/post-deploy scripts are data/seed scripts spliced around the diff at publish time, not
@@ -246,18 +292,21 @@ public sealed record DatabaseProject
         var diagnostics = new List<string>();
         var files = ResolveSqlFiles();
         var builder = new Syntax.ModelBuilder(DefaultSchema);
+        var positions = new Contracts.SourcePositionIndex();   // populated in this same pass (#45)
 
         foreach (var file in files)
         {
-            var parsed = new Syntax.PgParser().Parse(ReadSource(file));
-            var rel = Path.GetRelativePath(ProjectDirectory, file);
+            var text = ReadSource(file);
+            var parsed = new Syntax.PgParser().Parse(text);
+            var rel = Path.GetRelativePath(ProjectDirectory, file).Replace('\\', '/');
             foreach (var d in parsed.Diagnostics) diagnostics.Add($"{rel}: {d}");   // attribute to the project file to fix
-            builder.Build(parsed, model);
+            // Build model + persist source anchors in ONE parse — no separate SourcePositionIndex re-parse.
+            builder.Build(parsed, model, positions, text, rel);
             parsed.ReleaseTokens();   // model built → return the pooled token buffer (no SourceText read after this)
         }
 
         diagnostics.AddRange(FindDuplicates(model));
-        return new ProjectBuildResult(model, diagnostics, files);
+        return new ProjectBuildResult(model, diagnostics, files, positions);
     }
 
     /// <summary>
@@ -280,14 +329,16 @@ public sealed record DatabaseProject
             ct.ThrowIfCancellationRequested();
             var model = new DatabaseModel();
             var diagnostics = new List<string>();
+            var positions = new Contracts.SourcePositionIndex();
             if (files.Count == 1)
             {
                 try
                 {
-                    var parsed = new Syntax.PgParser().Parse(ReadSource(files[0]));
-                    var rel = Path.GetRelativePath(ProjectDirectory, files[0]);
+                    var text = ReadSource(files[0]);
+                    var parsed = new Syntax.PgParser().Parse(text);
+                    var rel = Path.GetRelativePath(ProjectDirectory, files[0]).Replace('\\', '/');
                     foreach (var d in parsed.Diagnostics) diagnostics.Add($"{rel}: {d}");
-                    new Syntax.ModelBuilder(DefaultSchema).Build(parsed, model);
+                    new Syntax.ModelBuilder(DefaultSchema).Build(parsed, model, positions, text, rel);
                     parsed.ReleaseTokens();
                 }
                 catch (Exception ex)
@@ -296,7 +347,7 @@ public sealed record DatabaseProject
                 }
             }
             diagnostics.AddRange(FindDuplicates(model));
-            return new ProjectBuildResult(model, diagnostics, files);
+            return new ProjectBuildResult(model, diagnostics, files, positions);
         }
 
         var parts = new PartialParse[files.Count];     // one slot per file; index = order
@@ -320,17 +371,21 @@ public sealed record DatabaseProject
     {
         try
         {
-            var parsed = new Syntax.PgParser().Parse(ReadSource(path)); // fresh instance → isolated per worker
-            var model = new Syntax.ModelBuilder(DefaultSchema).Build(parsed);
-            var rel = Path.GetRelativePath(ProjectDirectory, path);
+            var text = ReadSource(path);
+            var parsed = new Syntax.PgParser().Parse(text); // fresh instance → isolated per worker
+            var model = new DatabaseModel();
+            var rel = Path.GetRelativePath(ProjectDirectory, path).Replace('\\', '/');
+            var positions = new Contracts.SourcePositionIndex(); // per-worker → no shared mutable state
+            new Syntax.ModelBuilder(DefaultSchema).Build(parsed, model, positions, text, rel);
             var diags = parsed.Diagnostics.Select(d => $"{rel}: {d}").ToList();
             parsed.ReleaseTokens();   // model built → return the pooled token buffer (per-worker, ArrayPool is thread-safe)
-            return new PartialParse(model, diags);
+            return new PartialParse(model, diags, positions);
         }
         catch (Exception ex) // unreadable file / catastrophic parser failure → isolate to this file
         {
             return new PartialParse(new DatabaseModel(),
-                new List<string> { $"Failed to read/parse '{Path.GetFileName(path)}': {ex.Message}" });
+                new List<string> { $"Failed to read/parse '{Path.GetFileName(path)}': {ex.Message}" },
+                new Contracts.SourcePositionIndex());
         }
     }
 
@@ -338,6 +393,7 @@ public sealed record DatabaseProject
     {
         var model = new DatabaseModel();
         var diagnostics = new List<string>();
+        var positions = new Contracts.SourcePositionIndex();
 
         foreach (var part in parts) // ordered walk → deterministic, matches sequential Build()
         {
@@ -350,10 +406,11 @@ public sealed record DatabaseProject
             model.Functions.AddRange(part.Model.Functions);
             model.Objects.AddRange(part.Model.Objects);
             diagnostics.AddRange(part.Diagnostics);
+            positions.Merge(part.Positions); // file-ordered merge → first-definition-wins, same as model
         }
 
         diagnostics.AddRange(FindDuplicates(model)); // same post-merge dup scan as Build()
-        return new ProjectBuildResult(model, diagnostics, files);
+        return new ProjectBuildResult(model, diagnostics, files, positions);
     }
 
     private static IEnumerable<(int Index, string Path)> EnumerateIndexed(IReadOnlyList<string> files)
@@ -361,7 +418,8 @@ public sealed record DatabaseProject
         for (var i = 0; i < files.Count; i++) yield return (i, files[i]);
     }
 
-    private readonly record struct PartialParse(DatabaseModel Model, List<string> Diagnostics);
+    private readonly record struct PartialParse(
+        DatabaseModel Model, List<string> Diagnostics, Contracts.SourcePositionIndex Positions);
 
     private static IEnumerable<string> FindDuplicates(DatabaseModel model)
     {
@@ -382,7 +440,8 @@ public sealed record DatabaseProject
 public sealed record ProjectBuildResult(
     DatabaseModel Model,
     IReadOnlyList<string> Diagnostics,
-    IReadOnlyList<string> Files)
+    IReadOnlyList<string> Files,
+    Contracts.SourcePositionIndex Positions)
 {
     public bool HasErrors => Diagnostics.Count > 0;
 }

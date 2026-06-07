@@ -22,7 +22,8 @@ public static class ContractBuilder
     {
         var result = await project.BuildAsync();
         var diagnostics = result.Diagnostics.Select(ContractMappers.ToBuildDto).ToList();
-        var positions = includeTree ? SourcePositionIndex.Build(project) : null;
+        // Source anchors come from the build itself (persisted in the same parse pass) — no re-parse (#45).
+        var positions = includeTree ? result.Positions : null;
 
         return new BuildReportDto
         {
@@ -40,8 +41,8 @@ public static class ContractBuilder
     public static async Task<ModelTreeDto> ModelTreeAsync(DatabaseProject project)
     {
         var result = await project.BuildAsync();
-        var positions = SourcePositionIndex.Build(project);
-        return ModelTreeBuilder.Build(result.Model, project.Name, positions);
+        // Positions are a byproduct of the build — the dedicated re-parse pass is gone (#45).
+        return ModelTreeBuilder.Build(result.Model, project.Name, result.Positions);
     }
 
     /// <summary>
@@ -54,7 +55,7 @@ public static class ContractBuilder
         var analyzer = new PgAnalyzer(config);
         var findings = new List<Diagnostic>();
         foreach (var file in project.ResolveSqlFiles())
-            findings.AddRange(analyzer.Analyze(new PgParser().Parse(File.ReadAllText(file))));
+            findings.AddRange(analyzer.Analyze(new PgParser().Parse(SourceReader.ReadAllText(file))));
 
         var diags = findings.Select(f => ContractMappers.ToDto(f, positions)).ToList();
         var summary = ContractMappers.SummaryOf(diags);
