@@ -10,9 +10,10 @@ public sealed partial class PgParser
 {
     private SqlStatement ParseCreateView(TokenCursor c, bool materialized)
     {
+        int pos = c.Here;
         c.MatchWords("IF", "NOT", "EXISTS");
         var (s, n) = ParseQualifiedName(c);
-        var node = new CreateViewStatement { Schema = s, Name = n, Materialized = materialized };
+        var node = new CreateViewStatement { Position = pos, Schema = s, Name = n, Materialized = materialized };
 
         // skip pre-AS clauses: column list, WITH (options), USING method, TABLESPACE
         while (!c.AtEnd && !c.AtWord("AS")) { if (c.AtSymbol('(')) c.SkipBalancedParens(); else c.Advance(); }
@@ -135,10 +136,11 @@ public sealed partial class PgParser
 
     private SqlStatement ParseCreateFunction(TokenCursor c)
     {
+        int pos = c.Here;
         bool isProc = c.MatchWord("PROCEDURE");
         if (!isProc) c.ExpectWord("FUNCTION");
         var (s, n) = ParseQualifiedName(c);
-        var node = new CreateFunctionStatement { Schema = s, Name = n, IsProcedure = isProc };
+        var node = new CreateFunctionStatement { Position = pos, Schema = s, Name = n, IsProcedure = isProc };
 
         if (!c.AtSymbol('(')) throw new ParseException("expected '(' for the function parameter list", c.Here);
         var argInner = CaptureBalancedParens(c);
@@ -224,7 +226,7 @@ public sealed partial class PgParser
         if (o.MatchWord("RETURNS"))
         {
             if (o.MatchWord("TABLE")) { returnsTable = true; returnsSet = true; if (!o.AtSymbol('(')) throw new ParseException("expected '(' after RETURNS TABLE", o.Here); o.SkipBalancedParens(); }
-            else { if (o.MatchWord("SETOF")) returnsSet = true; var rt = ParseCastType(o); if (rt.Trim().Equals("void", System.StringComparison.OrdinalIgnoreCase)) node.ReturnsVoid = true; }
+            else { if (o.MatchWord("SETOF")) returnsSet = true; var rt = ParseCastType(o); node.ReturnType = rt.Trim(); if (rt.Trim().Equals("void", System.StringComparison.OrdinalIgnoreCase)) node.ReturnsVoid = true; }
         }
         node.ReturnsSetof = returnsSet;
         if (hasOut && returnsTable) throw new ParseException("cannot use OUT parameters together with RETURNS TABLE", o.Here);

@@ -82,7 +82,8 @@ public static class CatalogBuilder
             case CreateFunctionStatement f:
                 c.AddFunction(f.Schema, f.Name, new FunctionSignature(NormalizeArgTypes(f.ArgTypes)),
                     Identity.StableIdOf(new FunctionDefinition(f.Schema ?? c.DefaultSchema, f.Name,
-                        $"{f.Schema ?? c.DefaultSchema}.{f.Name}({f.ArgTypes})", f.Body ?? "", f.ArgTypes)));
+                        $"{f.Schema ?? c.DefaultSchema}.{f.Name}({f.ArgTypes})", f.Body ?? "", f.ArgTypes)),
+                    returnType: f.ReturnType is null ? null : TypeNormalizer.Normalize(f.ReturnType));
                 break;
             case CreateSchemaStatement s when s.Name is not null:
                 c.AddSchema(s.Name);

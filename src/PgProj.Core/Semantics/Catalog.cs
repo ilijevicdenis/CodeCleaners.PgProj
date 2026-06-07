@@ -104,7 +104,7 @@ public sealed class Catalog
 
     /// <summary>Adds a specific function overload keyed on its normalized argument signature.</summary>
     public void AddFunction(string? schema, string name, FunctionSignature signature,
-        StableId stableId = default, string? sourceFile = null, bool external = false)
+        StableId stableId = default, string? sourceFile = null, bool external = false, string? returnType = null)
     {
         var bare = StripSchema(name);
         if (!_functions.TryGetValue(bare, out var sigs)) _functions[bare] = sigs = new List<FunctionSignature>();
@@ -112,7 +112,7 @@ public sealed class Catalog
 
         var s = schema ?? DefaultSchema;
         if (schema is not null) AddSchema(schema);
-        Symbols.Add(SymbolEntry.ForFunction(s, bare, signature, stableId: stableId, sourceFile: sourceFile, external: external));
+        Symbols.Add(SymbolEntry.ForFunction(s, bare, signature, stableId: stableId, sourceFile: sourceFile, external: external, returnType: returnType));
     }
 
     /// <summary>

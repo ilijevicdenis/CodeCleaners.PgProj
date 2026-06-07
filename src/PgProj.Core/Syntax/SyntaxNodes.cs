@@ -101,6 +101,18 @@ public sealed class RawCreateStatement : SqlStatement
     public string? Schema { get; set; }
     public string? Name { get; set; }
     public string? OnObject { get; set; }   // "schema.table" for trigger/rule/policy
+
+    // ---- CREATE TRIGGER detail (semantic validation, #48) — additive, set only by ParseCreateTrigger.
+    // The model/comparer never read these (they re-derive from SourceText); they let the semantic
+    // validator resolve the trigger's target relation + the function it EXECUTEs without a re-parse.
+    /// <summary>The trigger's target relation schema (the <c>ON schema.table</c>), when written qualified.</summary>
+    public string? OnSchema { get; set; }
+    /// <summary>The trigger's target relation name (the <c>ON … table</c>), for a CREATE TRIGGER.</summary>
+    public string? OnTable { get; set; }
+    /// <summary>The schema of the function the trigger EXECUTEs, when written qualified.</summary>
+    public string? TriggerFunctionSchema { get; set; }
+    /// <summary>The unqualified name of the function the trigger EXECUTEs (FUNCTION/PROCEDURE), for a CREATE TRIGGER.</summary>
+    public string? TriggerFunctionName { get; set; }
 }
 
 public sealed class CreateViewStatement : SqlStatement
@@ -146,6 +158,7 @@ public sealed class CreateFunctionStatement : SqlStatement
     public bool ReturnsVoid { get; set; }            // RETURNS void
     public bool ReturnsSetof { get; set; }           // RETURNS SETOF … / RETURNS TABLE(…)
     public bool HasOutParams { get; set; }           // any OUT / INOUT parameter
+    public string? ReturnType { get; set; }          // the RETURNS scalar type text (e.g. "trigger", "integer"); null for RETURNS TABLE
 }
 
 // ---- CREATE TABLE -----------------------------------------------------------
