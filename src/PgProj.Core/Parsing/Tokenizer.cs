@@ -240,8 +240,26 @@ public sealed class Tokenizer
 
     private string ReadQuoted(char quote, bool backslashEscapes = false)
     {
+        // Fast path: scan to the closing quote. The overwhelming majority of literals/identifiers contain no
+        // escape (no doubled quote, and for an E-string no backslash), so their value is a clean source slice
+        // — return it interned, with no StringBuilder and no char-by-char copy. Interning also dedupes
+        // recurring literals ('active', 'pending', …) that the old sb.ToString() allocated fresh every time;
+        // the vocabulary is exact-case (Ordinal) so a literal's spelling is never altered.
+        int contentStart = _i + 1;
+        for (int j = contentStart; j < _s.Length; j++)
+        {
+            char c = _s[j];
+            if (backslashEscapes && c == '\\') break;               // E-string backslash escape → slow path
+            if (c != quote) continue;
+            if (j + 1 < _s.Length && _s[j + 1] == quote) break;     // doubled-quote escape → slow path
+            _i = j + 1;                                             // consume through the closing quote
+            return Intern(contentStart, j - contentStart);
+        }
+
+        // Slow path: an escape is present (or the literal is unterminated). Build the value char-by-char,
+        // exactly as before — doubled quotes collapse to one, E-string backslash pairs are kept verbatim.
         var sb = new StringBuilder();
-        _i++; // opening quote
+        _i = contentStart; // already past the opening quote
         while (_i < _s.Length)
         {
             var c = _s[_i];
