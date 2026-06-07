@@ -69,6 +69,19 @@ public sealed class LiveReaderIntegrationTests
         // Idempotence: re-comparing the live model to itself yields no changes (stable read).
         Assert.Empty(new SchemaComparer().Compare(live, live));
 
+        // Round-trip idempotency (issue #36): the *project* model compared against the freshly-read
+        // live model must also be free of phantom non-destructive changes for the raw object kinds
+        // whose live reconstruction is canonical-but-not-textually-faithful (extension, text-search
+        // dictionary/config, FDW/server) and for the typed table (CREATE TABLE … OF type). Recreates
+        // of finely-modelled objects (views/functions whose pg_get_*def rendering differs) are tracked
+        // separately; here we guard the raw-object kinds this issue is about.
+        var roundTrip = new SchemaComparer().Compare(built.Model, live);
+        var rawChurn = roundTrip
+            .Where(ch => ch is CreateRawObjectChange or RecreateRawObjectChange)
+            .Select(ch => ch.ToSql())
+            .ToList();
+        Assert.True(rawChurn.Count == 0, "phantom raw-object diffs on project→live round-trip:\n" + string.Join("\n", rawChurn));
+
         // Gold-standard round-trip: the extracted model must itself re-deploy cleanly — this proves
         // every reconstructed raw-object DDL (aggregates, FDW/server/foreign table, collation, …) is
         // valid and correctly ordered, not just parseable.

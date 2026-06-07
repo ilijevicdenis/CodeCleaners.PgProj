@@ -48,6 +48,34 @@ public static class RawObjectMeta
     public static bool IsDestructiveRecreate(ObjectKind kind) =>
         kind is ObjectKind.Type or ObjectKind.Domain or ObjectKind.ForeignTable or ObjectKind.Table;
 
+    /// <summary>
+    /// Kinds whose live introspection reconstructs a <em>canonical</em> DDL that is semantically equal
+    /// to the hand-written source but never textually matches it — and which no whitespace/case/quote
+    /// normalization can reconcile — so they must be compared by <em>identity</em> only (presence ==
+    /// equal), never by body. Comparing their bodies produces phantom non-destructive diffs on every
+    /// round-trip (extract / drift / pull) for an unchanged object. Examples that motivate each:
+    /// <list type="bullet">
+    /// <item><c>Extension</c> — source <c>CREATE EXTENSION btree_gist</c> vs reader
+    ///   <c>CREATE EXTENSION IF NOT EXISTS "btree_gist"</c>; also <c>VERSION</c>/<c>SCHEMA</c> clauses.</item>
+    /// <item><c>TextSearchConfiguration</c> — source <c>(COPY = pg_catalog.english) … ALTER MAPPING</c>
+    ///   vs reader <c>(PARSER = …) … one ADD MAPPING per token type</c>: a structurally different,
+    ///   re-ordered statement set for the same end state.</item>
+    /// <item><c>TextSearchDictionary</c> — option spelling/ordering (<c>dictinitoption</c> rendering).</item>
+    /// <item><c>ForeignDataWrapper</c>/<c>Server</c> — handler/validator and OPTIONS(...) formatting.</item>
+    /// </list>
+    /// Identity already encodes the object's stable name, so an identity match means "the same object
+    /// exists on both sides"; a genuine rename/drop is still caught (different identity → create/drop).
+    /// </summary>
+    public static bool ComparesByIdentityOnly(ObjectKind kind) => kind switch
+    {
+        ObjectKind.Extension
+            or ObjectKind.TextSearchDictionary
+            or ObjectKind.TextSearchConfiguration
+            or ObjectKind.ForeignDataWrapper
+            or ObjectKind.Server => true,
+        _ => false,
+    };
+
     private static string DropKeyword(ObjectKind kind) => kind switch
     {
         ObjectKind.OperatorClass => "OPERATOR CLASS",
