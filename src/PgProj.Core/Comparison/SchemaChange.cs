@@ -122,6 +122,38 @@ public sealed record AlterColumnChange(string Schema, string Table, ColumnDefini
     }
 }
 
+/// <summary>
+/// A pure column-<em>reordering</em>: the two tables have the same columns but in a different declaration
+/// order. Emitted only when <see cref="ComparerOptions.IgnoreColumnOrder"/> is false. It is non-destructive
+/// and carries NO SQL (Postgres cannot reorder columns in place without a table rewrite, which the tool does
+/// not perform) — it exists so a reviewer/UI sees that the order diverges; it is skipped in script output.
+/// </summary>
+public sealed record ColumnOrderChange(string Schema, string Table,
+    System.Collections.Generic.IReadOnlyList<string> SourceOrder,
+    System.Collections.Generic.IReadOnlyList<string> TargetOrder) : SchemaChange
+{
+    public override int Phase => 46;
+    public override bool IsDestructive => false;
+    public override string Describe() =>
+        $"Column order differs on {Schema}.{Table} (source: {string.Join(", ", SourceOrder)})";
+    // No automated SQL — surfaced as an informational comment only.
+    public override string ToSql() => $"-- column order on {SqlEmitter.Qualified(Schema, Table)} differs; reorder requires a table rewrite (not performed).";
+}
+
+/// <summary>
+/// A change to a table's physical storage options (the verbatim <c>WITH (...)</c> / <c>TABLESPACE ...</c>
+/// trailing clause). Emitted only when <see cref="ComparerOptions.IgnoreStorageParameters"/> is false.
+/// Non-destructive. The SQL is best-effort (storage params via <c>ALTER TABLE ... SET</c> when present).
+/// </summary>
+public sealed record AlterTableStorageChange(string Schema, string Table, string? SourceOptions, string? TargetOptions) : SchemaChange
+{
+    public override int Phase => 47;
+    public override bool IsDestructive => false;
+    public override string Describe() => $"Alter storage options on {Schema}.{Table}";
+    public override string ToSql() =>
+        $"-- storage options on {SqlEmitter.Qualified(Schema, Table)} differ (source: {SourceOptions ?? "<none>"}); apply manually.";
+}
+
 public sealed record AddCheckConstraintChange(string Schema, string Table, CheckConstraintDefinition Check) : SchemaChange
 {
     public override int Phase => 48;
