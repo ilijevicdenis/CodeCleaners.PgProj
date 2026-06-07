@@ -55,6 +55,7 @@ public sealed class LiveDatabaseReader
         var rawTasks = new[]
         {
             Read(c => ReadExtensionsAsync(c, ct)),
+            Read(c => ReadTypedTablesAsync(c, ct)),
             Read(c => ReadEnumTypesAsync(c, ct)),
             Read(c => ReadCompositeTypesAsync(c, ct)),
             Read(c => ReadRangeTypesAsync(c, ct)),
@@ -166,6 +167,10 @@ public sealed class LiveDatabaseReader
             JOIN pg_namespace n ON n.oid = c.relnamespace
             LEFT JOIN pg_attrdef d ON d.adrelid = a.attrelid AND d.adnum = a.attnum
             WHERE c.relkind IN ('r','p') AND a.attnum > 0 AND NOT a.attisdropped
+              -- Typed tables (CREATE TABLE … OF <type>) are reconstructed in their `OF type` form by
+              -- ReadTypedTablesAsync; flattening them to a column list here would both lose that nature
+              -- and double-list the table, so skip them in the finely-modelled read.
+              AND c.reloftype = 0
               AND n.nspname NOT IN ('pg_catalog','information_schema') AND n.nspname NOT LIKE 'pg_%'
             ORDER BY n.nspname, c.relname, a.attnum;";
 
@@ -513,6 +518,46 @@ public sealed class LiveDatabaseReader
             var name = r.GetString(0);
             list.Add(MakeRaw(ObjectKind.Extension, "", name, $"extension:{name}",
                 $"CREATE EXTENSION IF NOT EXISTS {SqlEmitter.Quote(name)};"));
+        }
+        return list;
+    }
+
+    // Typed tables: CREATE TABLE … OF <composite type>. The columns are dictated by the type, so the
+    // reconstruction omits the column list (matching the source form) and adds only table-level pieces
+    // the type itself doesn't carry — currently the PRIMARY KEY. Emitted as a raw `table:` object (same
+    // modelling the parser uses for the source form) so extract/round-trip preserves the `OF type`
+    // nature instead of flattening it to a plain column-list CREATE TABLE.
+    private async Task<List<RawObjectDefinition>> ReadTypedTablesAsync(NpgsqlConnection conn, CancellationToken ct)
+    {
+        const string sql = @"
+            SELECT n.nspname, c.relname,
+                   tn.nspname AS type_schema, t.typname AS type_name,
+                   (SELECT string_agg(a.attname, ', ' ORDER BY k.ord)
+                      FROM pg_constraint con
+                      JOIN LATERAL unnest(con.conkey) WITH ORDINALITY AS k(attnum, ord) ON true
+                      JOIN pg_attribute a ON a.attrelid = con.conrelid AND a.attnum = k.attnum
+                      WHERE con.conrelid = c.oid AND con.contype = 'p') AS pk_cols
+            FROM pg_class c
+            JOIN pg_namespace n ON n.oid = c.relnamespace
+            JOIN pg_type t ON t.oid = c.reloftype
+            JOIN pg_namespace tn ON tn.oid = t.typnamespace
+            WHERE c.relkind IN ('r','p') AND c.reloftype <> 0
+              AND n.nspname NOT IN ('pg_catalog','information_schema') AND n.nspname NOT LIKE 'pg_%'
+            ORDER BY n.nspname, c.relname;";
+
+        var list = new List<RawObjectDefinition>();
+        await using var cmd = new NpgsqlCommand(sql, conn);
+        await using var r = await cmd.ExecuteReaderAsync(ct);
+        while (await r.ReadAsync(ct))
+        {
+            var schema = r.GetString(0);
+            var name = r.GetString(1);
+            var ofType = $"{r.GetString(2)}.{r.GetString(3)}";
+            var pkCols = r.IsDBNull(4) ? null : r.GetString(4);
+            var body = pkCols is null
+                ? $"CREATE TABLE {schema}.{name} OF {ofType};"
+                : $"CREATE TABLE {schema}.{name} OF {ofType} (PRIMARY KEY ({pkCols}));";
+            list.Add(MakeRaw(ObjectKind.Table, schema, name, $"table:{schema}.{name}", body));
         }
         return list;
     }
