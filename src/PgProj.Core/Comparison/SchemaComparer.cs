@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using PgProj.Core.Model;
 using PgProj.Core.Versioning;
 
@@ -734,9 +735,25 @@ public sealed class SchemaComparer
         && a.Columns.Select(NormalizeIndexColumn).SequenceEqual(b.Columns.Select(NormalizeIndexColumn))
         && NormalizeText(a.WhereClause ?? "") == NormalizeText(b.WhereClause ?? "");
 
-    // Index columns come quoted from the catalog (pg_get_indexdef) but usually bare from a
-    // project file; strip quotes so "email" and email compare equal.
-    private static string NormalizeIndexColumn(string c) => NormalizeText(c).Replace("\"", "");
+    // Index columns come quoted from the catalog (pg_get_indexdef) but usually bare from a project file;
+    // strip quotes so "email" and email compare equal. Also drop the REDUNDANT sort/null-ordering modifiers
+    // a project may spell out (ASC; NULLS LAST for ASC; NULLS FIRST for DESC) — pg_get_indexdef omits these
+    // defaults, so without folding them an index like `(lower(x) text_pattern_ops ASC NULLS LAST)` churns a
+    // phantom drop+recreate on every round-trip. Non-default ordering (DESC, NULLS FIRST on ASC, NULLS LAST
+    // on DESC) is preserved, so a genuine ordering change still diffs (#101).
+    private static readonly Regex IdxAsc = new(@"\basc\b", RegexOptions.Compiled);
+    private static readonly Regex IdxNullsLast = new(@"\bnulls\s+last\b", RegexOptions.Compiled);
+    private static readonly Regex IdxNullsFirst = new(@"\bnulls\s+first\b", RegexOptions.Compiled);
+    private static readonly Regex IdxWs = new(@"\s+", RegexOptions.Compiled);
+    private static string NormalizeIndexColumn(string c)
+    {
+        var s = NormalizeText(c).Replace("\"", "");
+        var desc = Regex.IsMatch(s, @"\bdesc\b");
+        s = IdxAsc.Replace(s, " ");
+        s = desc ? IdxNullsFirst.Replace(s, " ")   // NULLS FIRST is the default under DESC
+                 : IdxNullsLast.Replace(s, " ");    // NULLS LAST is the default under ASC
+        return IdxWs.Replace(s, " ").Trim();
+    }
 
     private static string ForeignKeySignature(ForeignKeyDefinition fk) =>
         string.Join(",", fk.Columns.Select(c => c.ToLowerInvariant()))

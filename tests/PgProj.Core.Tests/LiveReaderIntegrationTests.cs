@@ -134,6 +134,11 @@ public sealed class LiveReaderIntegrationTests : IClassFixture<ThrowawayDatabase
         Assert.True(exChurn.Count == 0, "phantom EXCLUDE-constraint diffs on project→live round-trip:\n"
             + string.Join("\n", exChurn.Select(c => c.Clause)));
 
+        // #101: opclass/expression/ordering indexes (e.g. `lower(full_name) text_pattern_ops ASC NULLS LAST`)
+        // must not churn a phantom drop+recreate just because pg_get_indexdef omits the redundant defaults.
+        var idxChurn = roundTrip.Where(c => c is CreateIndexChange or DropIndexChange).Select(c => c.ToSql()).ToList();
+        Assert.True(idxChurn.Count == 0, "phantom index diffs on project→live round-trip:\n" + string.Join("\n", idxChurn));
+
         // Gold-standard round-trip: the extracted model must itself re-deploy cleanly — this proves
         // every reconstructed raw-object DDL (aggregates, FDW/server/foreign table, collation, …) is
         // valid and correctly ordered, not just parseable.
