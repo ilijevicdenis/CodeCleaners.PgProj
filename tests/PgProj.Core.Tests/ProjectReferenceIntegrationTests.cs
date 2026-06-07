@@ -17,18 +17,22 @@ namespace PgProj.Core.Tests;
 /// against an EMPTY database fails predictably because A's table is absent.
 ///
 /// Mirrors <see cref="PgPkgIntegrationTests"/> / <see cref="LiveReaderIntegrationTests"/>: skipped (no-op)
-/// unless PGPROJ_TEST_CONNECTION points at a throwaway DB.
+/// unless PGPROJ_TEST_CONNECTION points at a live DB.
+///
+/// Each run gets its OWN throwaway database (via <see cref="ThrowawayDatabaseFixture"/>) so no
+/// cross-class state leaks. Both tests in this class share the same fixture DB; each test resets it via
+/// a schema-level DROP at the start of its work (equivalent to a per-test clean slate within the class).
 /// </summary>
-public sealed class ProjectReferenceIntegrationTests : IDisposable
+public sealed class ProjectReferenceIntegrationTests : IClassFixture<ThrowawayDatabaseFixture>, IDisposable
 {
-    private static string? Conn => Environment.GetEnvironmentVariable("PGPROJ_TEST_CONNECTION");
+    private readonly ThrowawayDatabaseFixture _fixture;
+    private readonly string _root;
 
     private const string DropAll = "DROP SCHEMA IF EXISTS common CASCADE; DROP SCHEMA IF EXISTS app CASCADE;";
 
-    private readonly string _root;
-
-    public ProjectReferenceIntegrationTests()
+    public ProjectReferenceIntegrationTests(ThrowawayDatabaseFixture fixture)
     {
+        _fixture = fixture;
         _root = Path.Combine(Path.GetTempPath(), "pgref_int_" + Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(_root);
     }
@@ -72,7 +76,7 @@ public sealed class ProjectReferenceIntegrationTests : IDisposable
     [Fact]
     public async Task Publish_A_then_B_to_same_database_resolves_against_present_objects()
     {
-        var conn = Conn;
+        var conn = _fixture.ConnectionString;
         if (string.IsNullOrWhiteSpace(conn)) return;   // no live DB → treated as a skip
 
         var (a, b) = MakeAB();
@@ -95,6 +99,7 @@ public sealed class ProjectReferenceIntegrationTests : IDisposable
         Assert.Contains("customer_names", bScript, StringComparison.OrdinalIgnoreCase);
 
         var deployer = new DatabaseDeployer();
+        // Reset this class's throwaway DB to a clean state before this test's scenario.
         await deployer.ExecuteAsync(conn, DropAll);
         await deployer.ExecuteAsync(conn, FullCreate(builtA.Model));   // A first
         await deployer.ExecuteAsync(conn, bScript);                    // then B — resolves against A
@@ -102,14 +107,13 @@ public sealed class ProjectReferenceIntegrationTests : IDisposable
         var live = await new LiveDatabaseReader().ReadAsync(conn);
         Assert.Contains(live.Tables, t => DatabaseModel.NameEquals(t.Schema, "common") && DatabaseModel.NameEquals(t.Name, "customer"));
         Assert.Contains(live.Views, v => DatabaseModel.NameEquals(v.Schema, "app") && DatabaseModel.NameEquals(v.Name, "customer_names"));
-
-        await deployer.ExecuteAsync(conn, DropAll);
+        // No trailing DropAll needed — the throwaway DB is dropped by the fixture on dispose.
     }
 
     [Fact]
     public async Task Publish_B_alone_to_empty_database_fails_because_A_is_absent()
     {
-        var conn = Conn;
+        var conn = _fixture.ConnectionString;
         if (string.IsNullOrWhiteSpace(conn)) return;   // no live DB → treated as a skip
 
         var (_, b) = MakeAB();
@@ -117,13 +121,13 @@ public sealed class ProjectReferenceIntegrationTests : IDisposable
         Assert.False(builtB.HasErrors);
 
         var deployer = new DatabaseDeployer();
+        // Reset this class's throwaway DB to a clean state before this test's scenario.
         await deployer.ExecuteAsync(conn, DropAll);
 
         // B's script references common.customer (only via the view body) but never creates it; against an
         // empty DB the CREATE VIEW must fail because the referenced relation does not exist.
         await Assert.ThrowsAnyAsync<Exception>(async () =>
             await deployer.ExecuteAsync(conn, FullCreate(builtB.Model)));
-
-        await deployer.ExecuteAsync(conn, DropAll);
+        // No trailing DropAll needed — the throwaway DB is dropped by the fixture on dispose.
     }
 }

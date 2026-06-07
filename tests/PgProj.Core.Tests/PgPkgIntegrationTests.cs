@@ -15,20 +15,22 @@ namespace PgProj.Core.Tests;
 /// End-to-end "build once, deploy many" check for the <c>.pgpkg</c> artifact, driven from C# (ADO.NET via
 /// Npgsql). Builds the AllFeaturesDb sample into a package, publishes the package's embedded model to a
 /// fresh server, reads it back, and asserts the live catalog matches the package. Mirrors
-/// <see cref="LiveReaderIntegrationTests"/>; skipped unless PGPROJ_TEST_CONNECTION points at a throwaway DB.
+/// <see cref="LiveReaderIntegrationTests"/>; skipped unless PGPROJ_TEST_CONNECTION points at a live DB.
+///
+/// Each run gets its OWN throwaway database (via <see cref="ThrowawayDatabaseFixture"/>) so there is no
+/// shared-state pollution between test classes.
 /// </summary>
-public sealed class PgPkgIntegrationTests
+public sealed class PgPkgIntegrationTests : IClassFixture<ThrowawayDatabaseFixture>
 {
-    private static string? Conn => Environment.GetEnvironmentVariable("PGPROJ_TEST_CONNECTION");
+    private readonly ThrowawayDatabaseFixture _fixture;
 
-    private const string DropAll =
-        "DROP PUBLICATION IF EXISTS customer_pub; DROP SCHEMA IF EXISTS afd CASCADE; " +
-        "DROP SCHEMA IF EXISTS reporting CASCADE; DROP FOREIGN DATA WRAPPER IF EXISTS dummy_fdw CASCADE;";
+    public PgPkgIntegrationTests(ThrowawayDatabaseFixture fixture)
+        => _fixture = fixture;
 
     [Fact]
     public async Task Build_pgpkg_then_publish_from_package_matches_publish_from_source()
     {
-        var conn = Conn;
+        var conn = _fixture.ConnectionString;
         if (string.IsNullOrWhiteSpace(conn)) return;   // no live DB → treated as a skip
 
         var project = DatabaseProject.Load(FindSampleProject());
@@ -49,9 +51,8 @@ public sealed class PgPkgIntegrationTests
                 new SchemaComparer().Compare(m, new DatabaseModel()), new DeployOptions { WrapInTransaction = true });
             Assert.Equal(Create(built.Model), Create(fromPkg.Model));
 
-            // Publish the package model to a fresh DB.
+            // Publish the package model to the fixture's throwaway DB (clean slate — nothing deployed yet).
             var deployer = new DatabaseDeployer();
-            await deployer.ExecuteAsync(conn, DropAll);
             await deployer.ExecuteAsync(conn, Create(fromPkg.Model));
 
             // Introspect and confirm the live catalog matches the package model (no residual diff).
