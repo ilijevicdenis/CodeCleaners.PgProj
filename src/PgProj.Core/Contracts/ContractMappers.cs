@@ -43,7 +43,8 @@ public static class ContractMappers
     /// <summary>
     /// The single mapping from the unified <see cref="UnifiedDiagnostic"/> onto the wire
     /// <see cref="DiagnosticDto"/>. Every other diagnostic source funnels through the unified type and
-    /// then this method, so no field (code/severity/file/line/col/target) is ever dropped in the contract layer.
+    /// then this method, so no field (code/severity/file/line/col/target/related) is ever dropped in
+    /// the contract layer.
     /// </summary>
     public static DiagnosticDto ToDto(UnifiedDiagnostic d) => new()
     {
@@ -54,6 +55,16 @@ public static class ContractMappers
         File = d.File,
         Line = d.Line,
         Col = d.Column,
+        Related = d.Related.Count > 0 ? d.Related.Select(ToDto).ToList() : null,
+    };
+
+    /// <summary>Maps a <see cref="PgProj.Core.Diagnostics.RelatedLocation"/> to the wire DTO.</summary>
+    private static RelatedLocationDto ToDto(PgProj.Core.Diagnostics.RelatedLocation r) => new()
+    {
+        File = r.File,
+        Line = r.Line,
+        Col = r.Column,
+        Message = r.Message,
     };
 
     // ---- analyzer findings (RuleId/Severity/Message/Target) -------------------------------------

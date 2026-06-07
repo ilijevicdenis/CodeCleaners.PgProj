@@ -5,6 +5,8 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using PgProj.Core.Contracts;
+using PgProj.Core.Diagnostics;
 using PgProj.Core.Model;
 using PgProj.Core.Parsing;
 using Refs = PgProj.Core.Project.References;
@@ -243,21 +245,29 @@ public sealed record DatabaseProject
     public ProjectBuildResult Build()
     {
         var model = new DatabaseModel();
-        var diagnostics = new List<string>();
+        var unifiedDiags = new List<Diagnostic>();
         var files = ResolveSqlFiles();
         var builder = new Syntax.ModelBuilder(DefaultSchema);
+        // First-seen position map: object identity → (rel-file, line, col).
+        // Populated as we parse so FindDuplicates can point at the prior definition.
+        var firstSeen = new Dictionary<string, (string RelFile, int Line, int Col)>(StringComparer.OrdinalIgnoreCase);
 
         foreach (var file in files)
         {
-            var parsed = new Syntax.PgParser().Parse(ReadSource(file));
-            var rel = Path.GetRelativePath(ProjectDirectory, file);
-            foreach (var d in parsed.Diagnostics) diagnostics.Add($"{rel}: {d}");   // attribute to the project file to fix
+            var text = ReadSource(file);
+            var parsed = new Syntax.PgParser().Parse(text);
+            var rel = Path.GetRelativePath(ProjectDirectory, file).Replace('\\', '/');
+            foreach (var d in parsed.Diagnostics)
+                unifiedDiags.Add(Diagnostic.FromParser(d.Message, rel, d.Line, d.Column));
+            // Record first-seen positions before merging into the model (model merge is first-occurrence wins,
+            // matching the order we parse here).
+            RecordFirstSeen(parsed, text, rel, DefaultSchema, firstSeen);
             builder.Build(parsed, model);
             parsed.ReleaseTokens();   // model built → return the pooled token buffer (no SourceText read after this)
         }
 
-        diagnostics.AddRange(FindDuplicates(model));
-        return new ProjectBuildResult(model, diagnostics, files);
+        unifiedDiags.AddRange(FindDuplicates(model, firstSeen));
+        return new ProjectBuildResult(model, unifiedDiags, files);
     }
 
     /// <summary>
@@ -279,24 +289,28 @@ public sealed record DatabaseProject
         {
             ct.ThrowIfCancellationRequested();
             var model = new DatabaseModel();
-            var diagnostics = new List<string>();
+            var unifiedDiags = new List<Diagnostic>();
+            var firstSeen = new Dictionary<string, (string RelFile, int Line, int Col)>(StringComparer.OrdinalIgnoreCase);
             if (files.Count == 1)
             {
                 try
                 {
-                    var parsed = new Syntax.PgParser().Parse(ReadSource(files[0]));
-                    var rel = Path.GetRelativePath(ProjectDirectory, files[0]);
-                    foreach (var d in parsed.Diagnostics) diagnostics.Add($"{rel}: {d}");
+                    var text = ReadSource(files[0]);
+                    var parsed = new Syntax.PgParser().Parse(text);
+                    var rel = Path.GetRelativePath(ProjectDirectory, files[0]).Replace('\\', '/');
+                    foreach (var d in parsed.Diagnostics)
+                        unifiedDiags.Add(Diagnostic.FromParser(d.Message, rel, d.Line, d.Column));
+                    RecordFirstSeen(parsed, text, rel, DefaultSchema, firstSeen);
                     new Syntax.ModelBuilder(DefaultSchema).Build(parsed, model);
                     parsed.ReleaseTokens();
                 }
                 catch (Exception ex)
                 {
-                    diagnostics.Add($"Failed to read/parse '{Path.GetFileName(files[0])}': {ex.Message}");
+                    unifiedDiags.Add(Diagnostic.FromBuild($"Failed to read/parse '{Path.GetFileName(files[0])}': {ex.Message}"));
                 }
             }
-            diagnostics.AddRange(FindDuplicates(model));
-            return new ProjectBuildResult(model, diagnostics, files);
+            unifiedDiags.AddRange(FindDuplicates(model, firstSeen));
+            return new ProjectBuildResult(model, unifiedDiags, files);
         }
 
         var parts = new PartialParse[files.Count];     // one slot per file; index = order
@@ -320,24 +334,33 @@ public sealed record DatabaseProject
     {
         try
         {
-            var parsed = new Syntax.PgParser().Parse(ReadSource(path)); // fresh instance → isolated per worker
+            var text = ReadSource(path);
+            var parsed = new Syntax.PgParser().Parse(text); // fresh instance → isolated per worker
             var model = new Syntax.ModelBuilder(DefaultSchema).Build(parsed);
-            var rel = Path.GetRelativePath(ProjectDirectory, path);
-            var diags = parsed.Diagnostics.Select(d => $"{rel}: {d}").ToList();
+            var rel = Path.GetRelativePath(ProjectDirectory, path).Replace('\\', '/');
+            var diags = parsed.Diagnostics
+                .Select(d => Diagnostic.FromParser(d.Message, rel, d.Line, d.Column))
+                .ToList();
+            var firstSeen = new Dictionary<string, (string RelFile, int Line, int Col)>(StringComparer.OrdinalIgnoreCase);
+            RecordFirstSeen(parsed, text, rel, DefaultSchema, firstSeen);
             parsed.ReleaseTokens();   // model built → return the pooled token buffer (per-worker, ArrayPool is thread-safe)
-            return new PartialParse(model, diags);
+            return new PartialParse(model, diags, firstSeen);
         }
         catch (Exception ex) // unreadable file / catastrophic parser failure → isolate to this file
         {
             return new PartialParse(new DatabaseModel(),
-                new List<string> { $"Failed to read/parse '{Path.GetFileName(path)}': {ex.Message}" });
+                new List<Diagnostic> { Diagnostic.FromBuild($"Failed to read/parse '{Path.GetFileName(path)}': {ex.Message}") },
+                new Dictionary<string, (string RelFile, int Line, int Col)>());
         }
     }
 
     private static ProjectBuildResult Merge(PartialParse[] parts, IReadOnlyList<string> files)
     {
         var model = new DatabaseModel();
-        var diagnostics = new List<string>();
+        var unifiedDiags = new List<Diagnostic>();
+        // Merge first-seen maps in sorted-file order (same order as the model merge) so that the
+        // first-file winner mirrors the model's first-occurrence-wins merge.
+        var mergedFirstSeen = new Dictionary<string, (string RelFile, int Line, int Col)>(StringComparer.OrdinalIgnoreCase);
 
         foreach (var part in parts) // ordered walk → deterministic, matches sequential Build()
         {
@@ -349,11 +372,14 @@ public sealed record DatabaseProject
             model.Sequences.AddRange(part.Model.Sequences);
             model.Functions.AddRange(part.Model.Functions);
             model.Objects.AddRange(part.Model.Objects);
-            diagnostics.AddRange(part.Diagnostics);
+            unifiedDiags.AddRange(part.Diagnostics);
+            // First-occurrence wins (same logic as schema merge above).
+            foreach (var kv in part.FirstSeen)
+                if (!mergedFirstSeen.ContainsKey(kv.Key)) mergedFirstSeen[kv.Key] = kv.Value;
         }
 
-        diagnostics.AddRange(FindDuplicates(model)); // same post-merge dup scan as Build()
-        return new ProjectBuildResult(model, diagnostics, files);
+        unifiedDiags.AddRange(FindDuplicates(model, mergedFirstSeen)); // same post-merge dup scan as Build()
+        return new ProjectBuildResult(model, unifiedDiags, files);
     }
 
     private static IEnumerable<(int Index, string Path)> EnumerateIndexed(IReadOnlyList<string> files)
@@ -361,28 +387,124 @@ public sealed record DatabaseProject
         for (var i = 0; i < files.Count; i++) yield return (i, files[i]);
     }
 
-    private readonly record struct PartialParse(DatabaseModel Model, List<string> Diagnostics);
+    private readonly record struct PartialParse(
+        DatabaseModel Model,
+        List<Diagnostic> Diagnostics,
+        Dictionary<string, (string RelFile, int Line, int Col)> FirstSeen);
 
-    private static IEnumerable<string> FindDuplicates(DatabaseModel model)
+    /// <summary>
+    /// Records the first-seen source position for each distinctly-identifiable statement in a parse result.
+    /// Must be called BEFORE <see cref="Syntax.ModelBuilder.Build"/> merges the parsed statements into the
+    /// shared model (the model merge is first-occurrence wins; we mirror that here so the position map and the
+    /// model stay in sync). <paramref name="defaultSchema"/> must match the project's default schema so that
+    /// unqualified object names hash to the same key that <see cref="FindDuplicates"/> looks up.
+    /// </summary>
+    private static void RecordFirstSeen(
+        Syntax.ParseResult parsed,
+        string sourceText,
+        string relFile,
+        string defaultSchema,
+        Dictionary<string, (string RelFile, int Line, int Col)> firstSeen)
     {
+        foreach (var stmt in parsed.Statements)
+        {
+            var key = SourcePositionIndex.IdentityOf(stmt, defaultSchema);
+            if (key is null) continue;
+            if (firstSeen.ContainsKey(key)) continue;   // first-occurrence wins
+            var (line, col) = SourcePositionIndex.LineCol(sourceText, stmt.Position);
+            firstSeen[key] = (relFile, line, col);
+        }
+    }
+
+    /// <summary>
+    /// Scans the merged model for duplicate definitions and emits a structured <see cref="Diagnostic"/>
+    /// for each group of duplicates. Each diagnostic carries a <see cref="RelatedLocation"/> pointing at
+    /// the prior (first) definition when the position map knows where it was first seen.
+    /// </summary>
+    private static IEnumerable<Diagnostic> FindDuplicates(
+        DatabaseModel model,
+        Dictionary<string, (string RelFile, int Line, int Col)>? firstSeen = null)
+    {
+        RelatedLocation[] PriorDef(string identityKey)
+        {
+            if (firstSeen is null) return Array.Empty<RelatedLocation>();
+            if (!firstSeen.TryGetValue(identityKey, out var pos)) return Array.Empty<RelatedLocation>();
+            return new[] { new RelatedLocation(pos.RelFile, pos.Line, pos.Col, "first defined here") };
+        }
+
         foreach (var dup in model.Tables.GroupBy(t => $"{t.Schema}.{t.Name}".ToLowerInvariant()).Where(g => g.Count() > 1))
-            yield return $"Duplicate table definition: {dup.Key} (defined {dup.Count()} times).";
+        {
+            var msg = $"Duplicate table definition: {dup.Key} (defined {dup.Count()} times).";
+            yield return Diagnostic.FromBuild(msg) with
+            {
+                Related = PriorDef($"table:{dup.Key}"),
+            };
+        }
 
         foreach (var dup in model.Views.GroupBy(v => $"{v.Schema}.{v.Name}".ToLowerInvariant()).Where(g => g.Count() > 1))
-            yield return $"Duplicate view definition: {dup.Key} (defined {dup.Count()} times).";
+        {
+            var msg = $"Duplicate view definition: {dup.Key} (defined {dup.Count()} times).";
+            yield return Diagnostic.FromBuild(msg) with
+            {
+                Related = PriorDef($"view:{dup.Key}"),
+            };
+        }
 
         foreach (var dup in model.Functions.GroupBy(f => f.Signature.ToLowerInvariant()).Where(g => g.Count() > 1))
-            yield return $"Duplicate function definition: {dup.Key} (defined {dup.Count()} times).";
+        {
+            var msg = $"Duplicate function definition: {dup.Key} (defined {dup.Count()} times).";
+            yield return Diagnostic.FromBuild(msg) with
+            {
+                Related = PriorDef($"function:{dup.Key}"),
+            };
+        }
 
         foreach (var dup in model.Indexes.GroupBy(i => $"{i.Schema}.{i.Name}".ToLowerInvariant()).Where(g => g.Count() > 1))
-            yield return $"Duplicate index definition: {dup.Key} (defined {dup.Count()} times).";
+        {
+            var msg = $"Duplicate index definition: {dup.Key} (defined {dup.Count()} times).";
+            yield return Diagnostic.FromBuild(msg) with
+            {
+                Related = PriorDef($"index:{dup.Key}"),
+            };
+        }
     }
 }
 
-public sealed record ProjectBuildResult(
-    DatabaseModel Model,
-    IReadOnlyList<string> Diagnostics,
-    IReadOnlyList<string> Files)
+/// <summary>
+/// The outcome of a <see cref="DatabaseProject"/> build. Carries the merged model, the list of build
+/// problems (both as unified <see cref="Diagnostic"/> objects and as backwards-compatible strings), and
+/// the set of parsed source files.
+/// </summary>
+public sealed record ProjectBuildResult
 {
-    public bool HasErrors => Diagnostics.Count > 0;
+    public DatabaseModel Model { get; init; }
+
+    /// <summary>
+    /// All build problems as fully-structured <see cref="Diagnostic"/> values. Each diagnostic carries
+    /// file/line/col/severity/code and — for duplicate-definition problems — a <c>Related</c> location
+    /// pointing at the prior definition. Use this instead of <see cref="Diagnostics"/> when you need
+    /// the structured form (e.g. the contract layer, editors, SARIF writers).
+    /// </summary>
+    public IReadOnlyList<Diagnostics.Diagnostic> UnifiedDiagnostics { get; init; }
+
+    /// <summary>
+    /// Backwards-compatible string projection of <see cref="UnifiedDiagnostics"/>, using
+    /// <see cref="Diagnostics.Diagnostic.ToString"/>. Kept so existing code that iterates/stringifies
+    /// diagnostics (CLI text output, <c>string.Join</c>, string-predicate <c>Assert.Contains</c>) keeps
+    /// compiling without changes. For new code, prefer <see cref="UnifiedDiagnostics"/>.
+    /// </summary>
+    public IReadOnlyList<string> Diagnostics { get; init; }
+
+    public IReadOnlyList<string> Files { get; init; }
+
+    public bool HasErrors => UnifiedDiagnostics.Count > 0;
+
+    /// <summary>Initializes the result from the unified diagnostic list; the string shim is derived automatically.</summary>
+    public ProjectBuildResult(DatabaseModel model, IReadOnlyList<Diagnostics.Diagnostic> unifiedDiagnostics, IReadOnlyList<string> files)
+    {
+        Model = model;
+        UnifiedDiagnostics = unifiedDiagnostics;
+        Diagnostics = unifiedDiagnostics.Select(d => d.ToString()).ToList();
+        Files = files;
+    }
 }

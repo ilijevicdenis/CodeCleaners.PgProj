@@ -14,6 +14,8 @@ public enum ContractSeverity { Info, Warning, Error }
 /// One diagnostic, shaped so an editor can map it straight onto a Problems-panel entry. This is the
 /// single diagnostic shape reused across every verb (build/analyze/compare/publish). <see cref="File"/>
 /// is project-relative when known; <see cref="Line"/>/<see cref="Col"/> are 1-based, 0 when unknown.
+/// <see cref="Related"/> is omitted from the wire when null/empty (additive; old readers that do not
+/// understand it safely ignore it — contract version stays "1.0").
 /// </summary>
 public sealed record DiagnosticDto
 {
@@ -32,6 +34,32 @@ public sealed record DiagnosticDto
 
     /// <summary>1-based column, 0 when unknown.</summary>
     public int Col { get; init; }
+
+    /// <summary>
+    /// Secondary source locations the diagnostic refers to (e.g. the prior definition of a duplicate).
+    /// Null — and omitted from the wire JSON — when there are no related locations.
+    /// </summary>
+    public IReadOnlyList<RelatedLocationDto>? Related { get; init; }
+}
+
+/// <summary>
+/// A secondary source location carried by a <see cref="DiagnosticDto"/>. Mirrors the engine's
+/// <c>RelatedLocation</c> on the wire: project-relative <see cref="File"/> (null if unknown),
+/// 1-based <see cref="Line"/>/<see cref="Col"/> (0 when unknown), and an optional human note.
+/// </summary>
+public sealed record RelatedLocationDto
+{
+    /// <summary>Project-relative source file, or null when the location has no file anchor.</summary>
+    public string? File { get; init; }
+
+    /// <summary>1-based line, 0 when unknown.</summary>
+    public int Line { get; init; }
+
+    /// <summary>1-based column, 0 when unknown.</summary>
+    public int Col { get; init; }
+
+    /// <summary>Optional human-readable note, e.g. "first defined here".</summary>
+    public string? Message { get; init; }
 }
 
 /// <summary>A counts roll-up shared by the verb reports (so a UI can render badges without re-counting).</summary>
