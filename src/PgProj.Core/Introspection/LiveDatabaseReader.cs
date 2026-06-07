@@ -693,11 +693,18 @@ public sealed class LiveDatabaseReader
             var usingExpr = r.IsDBNull(5) ? null : r.GetString(5);
             var checkExpr = r.IsDBNull(6) ? null : r.GetString(6);
 
+            // Roles the policy applies to (#103). PUBLIC is polroles {0} → reconstructed as TO PUBLIC.
+            var roles = r.IsDBNull(7) ? Array.Empty<string>() : r.GetFieldValue<string[]>(7);
+
             var forCmd = cmdLetter switch { 'r' => "SELECT", 'a' => "INSERT", 'w' => "UPDATE", 'd' => "DELETE", _ => "ALL" };
             var body = $"CREATE POLICY {name} ON {on} AS {(permissive ? "PERMISSIVE" : "RESTRICTIVE")} FOR {forCmd}";
+            if (roles.Length > 0)
+                body += " TO " + string.Join(", ", roles.Select(role => role.Equals("public", StringComparison.OrdinalIgnoreCase) ? "PUBLIC" : SqlEmitter.Quote(role)));
             if (!string.IsNullOrWhiteSpace(usingExpr)) body += $" USING ({usingExpr})";
             if (!string.IsNullOrWhiteSpace(checkExpr)) body += $" WITH CHECK ({checkExpr})";
-            // Roles (TO ...) are omitted from this reconstruction, so don't body-compare.
+            // TO PUBLIC is the policy default, so a source that writes it and one that omits it both map to
+            // polroles {0}; NormalizeRawBody can't reconcile that, so policies stay identity-only (not
+            // body-compared) to avoid phantom diffs — the reconstructed roles are for extract fidelity.
             list.Add(MakeRaw(ObjectKind.Policy, schema, name, $"policy:{name} on {on}", body + ";", on, bodyComparable: false));
         }
         return list;

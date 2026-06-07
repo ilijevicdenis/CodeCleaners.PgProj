@@ -214,7 +214,10 @@ public sealed record CatalogQueries
     public string Policies { get; init; } = @"
             SELECT n.nspname, c.relname, pol.polname, pol.polcmd, pol.polpermissive,
                    pg_get_expr(pol.polqual, pol.polrelid) AS using_expr,
-                   pg_get_expr(pol.polwithcheck, pol.polrelid) AS check_expr
+                   pg_get_expr(pol.polwithcheck, pol.polrelid) AS check_expr,
+                   CASE WHEN pol.polroles = '{0}'::oid[] THEN ARRAY['public']
+                        ELSE ARRAY(SELECT r.rolname FROM pg_roles r WHERE r.oid = ANY(pol.polroles) ORDER BY r.rolname)
+                   END AS roles
             FROM pg_policy pol
             JOIN pg_class c ON c.oid = pol.polrelid
             JOIN pg_namespace n ON n.oid = c.relnamespace
