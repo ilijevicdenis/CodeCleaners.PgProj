@@ -4,6 +4,7 @@ using System.Text.RegularExpressions;
 using PgProj.Core.Analysis;
 using PgProj.Core.Comparison;
 using PgProj.Core.Model;
+using UnifiedDiagnostic = PgProj.Core.Diagnostics.Diagnostic;
 
 namespace PgProj.Core.Contracts;
 
@@ -37,25 +38,35 @@ public static class ContractMappers
         return new DiagnosticSummaryDto { Errors = e, Warnings = w, Infos = i };
     }
 
+    // ---- unified diagnostic → wire shape --------------------------------------------------------
+
+    /// <summary>
+    /// The single mapping from the unified <see cref="UnifiedDiagnostic"/> onto the wire
+    /// <see cref="DiagnosticDto"/>. Every other diagnostic source funnels through the unified type and
+    /// then this method, so no field (code/severity/file/line/col/target) is ever dropped in the contract layer.
+    /// </summary>
+    public static DiagnosticDto ToDto(UnifiedDiagnostic d) => new()
+    {
+        RuleId = d.Code,
+        Severity = (ContractSeverity)(int)d.Severity,
+        Message = d.Message,
+        Target = d.Target,
+        File = d.File,
+        Line = d.Line,
+        Col = d.Column,
+    };
+
     // ---- analyzer findings (RuleId/Severity/Message/Target) -------------------------------------
 
     /// <summary>
     /// Maps an analyzer <see cref="Diagnostic"/> to the wire shape, resolving its source anchor via the
-    /// position index when the target is a schema-qualified object the index knows about.
+    /// position index when the target is a schema-qualified object the index knows about. Routes through
+    /// the unified <see cref="UnifiedDiagnostic"/> so the analyzer and contract layers share one shape.
     /// </summary>
     public static DiagnosticDto ToDto(Diagnostic d, SourcePositionIndex? positions)
     {
         var pos = ResolveAnalyzerTarget(d.Target, positions);
-        return new DiagnosticDto
-        {
-            RuleId = d.RuleId,
-            Severity = (ContractSeverity)(int)d.Severity,
-            Message = d.Message,
-            Target = d.Target,
-            File = pos?.File,
-            Line = pos?.Line ?? 0,
-            Col = pos?.Col ?? 0,
-        };
+        return ToDto(UnifiedDiagnostic.FromAnalyzer(d, pos?.File, pos?.Line ?? 0, pos?.Col ?? 0));
     }
 
     /// <summary>An analyzer target is a schema-qualified object name; try every kind the index holds.</summary>
@@ -87,24 +98,24 @@ public static class ContractMappers
     /// form <c>"rel/file.sql: line:col: message"</c> (parser diagnostics) or a free-form message
     /// (duplicate/parse-failure). Build problems are always errors (the build gate fails on any of them).
     /// </summary>
-    public static DiagnosticDto ToBuildDto(string raw)
+    public static DiagnosticDto ToBuildDto(string raw) => ToDto(ToUnifiedBuild(raw));
+
+    /// <summary>
+    /// Parses a project build-diagnostic string into the unified <see cref="UnifiedDiagnostic"/> (file/line/col
+    /// when the parser-style prefix is present, otherwise a file-or-bare build error). Shared by the contract
+    /// mapper and any consumer that wants the structured form rather than the DTO.
+    /// </summary>
+    public static UnifiedDiagnostic ToUnifiedBuild(string raw)
     {
         var m = BuildDiag.Match(raw);
         if (m.Success)
         {
             var line = m.Groups["line"].Success ? int.Parse(m.Groups["line"].Value) : 0;
             var col = m.Groups["col"].Success ? int.Parse(m.Groups["col"].Value) : 0;
-            return new DiagnosticDto
-            {
-                RuleId = "BUILD",
-                Severity = ContractSeverity.Error,
-                Message = m.Groups["msg"].Value.Trim(),
-                File = m.Groups["file"].Value.Replace('\\', '/'),
-                Line = line,
-                Col = col,
-            };
+            return UnifiedDiagnostic.FromParser(
+                m.Groups["msg"].Value.Trim(), m.Groups["file"].Value.Replace('\\', '/'), line, col);
         }
-        return new DiagnosticDto { RuleId = "BUILD", Severity = ContractSeverity.Error, Message = raw };
+        return UnifiedDiagnostic.FromBuild(raw);
     }
 
     // ---- schema changes -------------------------------------------------------------------------

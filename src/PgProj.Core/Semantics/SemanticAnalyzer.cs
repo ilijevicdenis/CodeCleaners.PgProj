@@ -3,11 +3,17 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using PgProj.Core.Syntax;
+using UnifiedDiagnostic = PgProj.Core.Diagnostics.Diagnostic;
 
 namespace PgProj.Core.Semantics;
 
 /// <summary>A semantic problem found without executing the statement (the kind that breaks a deploy).</summary>
-public sealed record SemanticDiagnostic(string Message);
+public sealed record SemanticDiagnostic(string Message)
+{
+    /// <summary>Lift this semantic problem into the unified compiler-style diagnostic (always an error; code <c>SEM</c>).</summary>
+    public UnifiedDiagnostic ToUnified(string? file = null, int line = 0, int column = 0) =>
+        UnifiedDiagnostic.FromSemantic(Message, file, line, column);
+}
 
 /// <summary>
 /// Static semantic analysis over the PgParser AST: it catches mistakes a syntactically-valid script
@@ -39,6 +45,19 @@ public sealed class SemanticAnalyzer
         _scriptAlters = result.Statements.OfType<AlterStatement>().Any();
         foreach (var stmt in result.Statements) AnalyzeStatement(stmt);
         return _diags;
+    }
+
+    /// <summary>
+    /// Same analysis as <see cref="Analyze"/>, returning the unified compiler-style diagnostics with the
+    /// caller-supplied source anchor stamped on each finding (the semantic checks share one statement's
+    /// position). Lets the reference/build layers carry file/line/col instead of bare messages.
+    /// </summary>
+    public IReadOnlyList<UnifiedDiagnostic> AnalyzeUnified(ParseResult result, string? file = null, int line = 0, int column = 0)
+    {
+        var found = Analyze(result);
+        var lifted = new List<UnifiedDiagnostic>(found.Count);
+        foreach (var d in found) lifted.Add(d.ToUnified(file, line, column));
+        return lifted;
     }
 
     private void Report(string msg) => _diags.Add(new SemanticDiagnostic(msg));
