@@ -73,7 +73,30 @@ public static class Canonicalizer
     public static string NormalizeTriggerBody(string s)
     {
         var b = NormalizeRawBody(s).Replace("execute procedure", "execute function");
+        b = CanonicalizeTriggerEvents(b);
         return CollapseWhenDoubleParens(b);
+    }
+
+    // pg_get_triggerdef renders the fired events in a fixed catalog order (insert, delete, update, truncate)
+    // regardless of how the source wrote them, so an unchanged "AFTER INSERT OR UPDATE OR DELETE" would
+    // otherwise phantom-diff against the catalog's "insert or delete or update". Sort the OR-separated event
+    // list (the segment between the timing keyword and the " on <table>") into a stable order on both sides.
+    private static string CanonicalizeTriggerEvents(string b)
+    {
+        var evStart = -1;
+        foreach (var t in new[] { "instead of ", "after ", "before " })
+        {
+            var i = b.IndexOf(t, StringComparison.Ordinal);
+            if (i >= 0) { evStart = i + t.Length; break; }
+        }
+        if (evStart < 0) return b;
+        var onIdx = b.IndexOf(" on ", evStart, StringComparison.Ordinal);
+        if (onIdx < 0) return b;
+        var events = b.Substring(evStart, onIdx - evStart).Split(" or ");
+        if (events.Length < 2) return b;
+        for (var i = 0; i < events.Length; i++) events[i] = events[i].Trim();
+        Array.Sort(events, StringComparer.Ordinal);
+        return b[..evStart] + string.Join(" or ", events) + b[onIdx..];
     }
 
     // Peel ONE redundant balanced paren pair immediately following `when(` so `when((expr))` ≡ `when(expr)`.
