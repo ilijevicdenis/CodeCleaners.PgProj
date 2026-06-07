@@ -180,6 +180,12 @@ A great bug report includes:
 
 Parser/grammar gaps are especially welcome — each becomes a corpus case so it never regresses.
 
+## Roadmap & progress
+
+Where the project is heading and what has shipped — the master delivery tracker, updated on every
+delivered milestone: **[docs/reference/PROGRESS.md](docs/reference/PROGRESS.md)**
+(milestones mirror the [GitHub milestones](https://github.com/ilijevicdenis/CodeCleaners.PgProj/milestones)).
+
 ## License
 
 © 2026 **CodeCleaners d.o.o.** — https://code-cleaners.com/. All rights reserved.
