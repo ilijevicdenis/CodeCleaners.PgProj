@@ -106,7 +106,34 @@ public sealed class LiveDatabaseReader
         model.Sequences.AddRange(sequencesTask.Result);
         model.Functions.AddRange(functionsTask.Result);
         foreach (var t in rawTasks) model.Objects.AddRange(t.Result);
+
+        // DETERMINISM (issue #59): the raw reads above fan out across ~25 parallel tasks and a few
+        // build their lists from Dictionary enumeration (enum/composite types), so the merged
+        // `Objects` order is not stable run-to-run or machine-to-machine. Impose a total, culture-
+        // independent order so the introspected model — and everything derived from it (canonical
+        // form, hash, diff, deploy script) — is byte-reproducible. Phase ordering still dominates the
+        // generated script (the comparer sorts by phase, stably), so this only canonicalises the
+        // within-phase tie-break; it cannot reorder a dependency across phases.
+        model.Objects.Sort(CompareCanonical);
         return model;
+    }
+
+    /// <summary>
+    /// Total, culture-independent ordering for raw objects: (kind, schema, name, identity). Used to
+    /// canonicalise the parallel-merged <see cref="DatabaseModel.Objects"/> so introspection is
+    /// byte-reproducible. <see cref="RawObjectDefinition.Identity"/> is unique, so this is a strict
+    /// total order — the final tie-break never falls through. Ordinal string compares keep it
+    /// identical regardless of the current culture.
+    /// </summary>
+    public static int CompareCanonical(RawObjectDefinition a, RawObjectDefinition b)
+    {
+        var c = ((int)a.Kind).CompareTo((int)b.Kind);
+        if (c != 0) return c;
+        c = string.CompareOrdinal(a.Schema, b.Schema);
+        if (c != 0) return c;
+        c = string.CompareOrdinal(a.Name, b.Name);
+        if (c != 0) return c;
+        return string.CompareOrdinal(a.Identity, b.Identity);
     }
 
     private async Task<List<SchemaDefinition>> ReadSchemasAsync(NpgsqlConnection conn, CancellationToken ct)
