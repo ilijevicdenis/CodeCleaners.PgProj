@@ -35,6 +35,84 @@ public static class RawObjectMeta
     /// </summary>
     public static bool ComparesByIdentityOnly(ObjectKind kind) => ObjectKindRegistry.Get(kind).ComparesByIdentityOnly;
 
+    /// <summary>
+    /// The key two raw objects are paired on by the comparer (issue #61). For most kinds this is just the
+    /// stored <see cref="RawObjectDefinition.Identity"/>. A few kinds historically built mismatching
+    /// identities between a project parse and a live-catalog reconstruction; for those we derive a canonical
+    /// key both sides agree on so an unchanged object round-trips without a phantom create:
+    /// <list type="bullet">
+    ///   <item><b>Cast</b> — <c>cast:&lt;src&gt;-&gt;&lt;tgt&gt;</c> from the <c>(src AS tgt)</c> name,
+    ///     reconciling the parser's <c>cast:(src as tgt)</c> with the reader's <c>cast:src-&gt;tgt</c>.</item>
+    ///   <item><b>Operator</b> — <c>operator:&lt;schema.symbol&gt;</c> (the text before the first <c>(</c>),
+    ///     reconciling the parser capturing the whole options paren with the reader capturing arg types.</item>
+    ///   <item><b>OperatorClass / OperatorFamily</b> — <c>&lt;kind&gt;:&lt;schema.name&gt; using &lt;method&gt;</c>
+    ///     with any doubled schema (the parser's <c>afd.afd.name</c> bug) collapsed.</item>
+    /// </list>
+    /// The key is lower-cased and whitespace-collapsed so casing/spacing never splits a pair.
+    /// </summary>
+    public static string ComparisonKey(RawObjectDefinition def) => def.Kind switch
+    {
+        ObjectKind.Cast          => "cast:" + CastKey(def),
+        ObjectKind.Operator      => "operator:" + SymbolBeforeParen(StripIdentityTag(def.Identity, "operator")),
+        ObjectKind.OperatorClass => "operatorclass:" + CollapseDoubledSchema(StripIdentityTag(def.Identity, "operatorclass")),
+        ObjectKind.OperatorFamily=> "operatorfamily:" + CollapseDoubledSchema(StripIdentityTag(def.Identity, "operatorfamily")),
+        // Comments are paired on their canonical BODY rather than their stored identity (issue #61): both a
+        // project parse and a live-catalog reconstruction emit a `COMMENT ON <target> IS '<text>'` statement,
+        // and NormalizeRawBody folds the casing/whitespace/punct-spacing/quoting differences between the two
+        // spellings of the same comment so an unchanged comment round-trips with no phantom create.
+        ObjectKind.Comment       => "comment:" + Canonicalizer.NormalizeRawBody(def.Body),
+        _ => def.Identity,
+    };
+
+    // Build a cast key from the object's name, which is "(src AS tgt)" on both sides, OR fall back to the
+    // stored identity (handles the reader's `cast:src->tgt` form, which has no parsable name).
+    private static string CastKey(RawObjectDefinition def)
+    {
+        var name = def.Name ?? "";
+        var asIdx = name.IndexOf(" AS ", StringComparison.OrdinalIgnoreCase);
+        if (name.StartsWith("(", StringComparison.Ordinal) && asIdx > 0)
+        {
+            var src = name[1..asIdx].Trim();
+            var tgt = name[(asIdx + 4)..].TrimEnd(')').Trim();
+            return Squash($"{src}->{tgt}");
+        }
+        // Identity already in `cast:src->tgt` form (reader) — drop the tag and squash.
+        return Squash(StripIdentityTag(def.Identity, "cast"));
+    }
+
+    private static string StripIdentityTag(string identity, string tag)
+    {
+        var prefix = tag + ":";
+        return identity.StartsWith(prefix, StringComparison.OrdinalIgnoreCase) ? identity[prefix.Length..] : identity;
+    }
+
+    // The operator's "schema.symbol", i.e. everything before the first '(' (parser: options paren; reader:
+    // arg-type paren) — both reduce to the same symbol token.
+    private static string SymbolBeforeParen(string s)
+    {
+        var p = s.IndexOf('(');
+        return Squash((p >= 0 ? s[..p] : s)).Replace(" ", "");
+    }
+
+    // Collapse a doubled leading schema ("afd.afd.name" -> "afd.name") produced by the historic operator-
+    // class/family identity bug, so the parser and reader keys converge.
+    private static string CollapseDoubledSchema(string s)
+    {
+        s = Squash(s);
+        var dot = s.IndexOf('.');
+        if (dot > 0)
+        {
+            var schema = s[..dot];
+            var rest = s[(dot + 1)..];
+            if (rest.StartsWith(schema + ".", StringComparison.OrdinalIgnoreCase))
+                s = rest; // drop the duplicated schema segment
+        }
+        return s;
+    }
+
+    private static string Squash(string s) =>
+        System.Text.RegularExpressions.Regex.Replace((s ?? "").Trim(), @"\s+", " ").ToLowerInvariant();
+
     /// <summary>Renders a DROP for the object (empty for comments, which are not dropped).</summary>
     public static string DropSql(RawObjectDefinition def)
     {

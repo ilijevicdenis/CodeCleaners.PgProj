@@ -228,15 +228,72 @@ public sealed record CatalogQueries
             JOIN pg_namespace np ON np.oid = p.pronamespace
             ORDER BY e.evtname;";
 
+    // Comments across every object class that COMMENT ON supports (issue #61). Each branch returns a uniform
+    // (target, description) pair where `target` is the exact `<KIND> <name>` text a hand-written
+    // `COMMENT ON <target> IS …` would carry, so the reconstructed statement round-trips against the source.
+    // Relations split into TABLE/VIEW/MATERIALIZED VIEW/FOREIGN TABLE/INDEX/SEQUENCE by relkind; columns,
+    // schemas, functions/procedures, types vs domains, and table-scoped triggers each have their own branch.
     public string Comments { get; init; } = @"
-            SELECT n.nspname, c.relname, a.attname, d.description, c.relkind
+            -- relation-level (table / view / matview / foreign table / index / sequence)
+            SELECT (CASE c.relkind
+                        WHEN 'r' THEN 'TABLE ' WHEN 'p' THEN 'TABLE '
+                        WHEN 'v' THEN 'VIEW ' WHEN 'm' THEN 'MATERIALIZED VIEW '
+                        WHEN 'f' THEN 'FOREIGN TABLE ' WHEN 'i' THEN 'INDEX '
+                        WHEN 'S' THEN 'SEQUENCE ' ELSE 'TABLE ' END)
+                   || n.nspname || '.' || c.relname AS target,
+                   d.description
             FROM pg_description d
-            JOIN pg_class c ON c.oid = d.objoid
+            JOIN pg_class c ON c.oid = d.objoid AND d.objsubid = 0
             JOIN pg_namespace n ON n.oid = c.relnamespace
-            LEFT JOIN pg_attribute a ON a.attrelid = c.oid AND a.attnum = d.objsubid
-            WHERE c.relkind IN ('r','p','v','m','f')
+            WHERE c.relkind IN ('r','p','v','m','f','i','S')
               AND n.nspname NOT IN ('pg_catalog','information_schema') AND n.nspname NOT LIKE 'pg_%'
-            ORDER BY n.nspname, c.relname, d.objsubid;";
+          UNION ALL
+            -- column-level
+            SELECT 'COLUMN ' || n.nspname || '.' || c.relname || '.' || a.attname AS target, d.description
+            FROM pg_description d
+            JOIN pg_class c ON c.oid = d.objoid AND d.objsubid > 0
+            JOIN pg_namespace n ON n.oid = c.relnamespace
+            JOIN pg_attribute a ON a.attrelid = c.oid AND a.attnum = d.objsubid
+            WHERE n.nspname NOT IN ('pg_catalog','information_schema') AND n.nspname NOT LIKE 'pg_%'
+          UNION ALL
+            -- schema
+            SELECT 'SCHEMA ' || n.nspname AS target, d.description
+            FROM pg_shdescription d JOIN pg_namespace n ON n.oid = d.objoid
+            WHERE d.classoid = 'pg_namespace'::regclass
+              AND n.nspname NOT IN ('pg_catalog','information_schema') AND n.nspname NOT LIKE 'pg_%'
+          UNION ALL
+            SELECT 'SCHEMA ' || n.nspname AS target, d.description
+            FROM pg_description d JOIN pg_namespace n ON n.oid = d.objoid
+            WHERE d.classoid = 'pg_namespace'::regclass
+              AND n.nspname NOT IN ('pg_catalog','information_schema') AND n.nspname NOT LIKE 'pg_%'
+          UNION ALL
+            -- function / procedure (identity args spell the overload, matching a hand-written signature)
+            SELECT (CASE WHEN p.prokind = 'p' THEN 'PROCEDURE ' ELSE 'FUNCTION ' END)
+                   || n.nspname || '.' || p.proname || '(' || pg_get_function_identity_arguments(p.oid) || ')' AS target,
+                   d.description
+            FROM pg_description d
+            JOIN pg_proc p ON p.oid = d.objoid
+            JOIN pg_namespace n ON n.oid = p.pronamespace
+            WHERE n.nspname NOT IN ('pg_catalog','information_schema') AND n.nspname NOT LIKE 'pg_%'
+          UNION ALL
+            -- type vs domain
+            SELECT (CASE WHEN t.typtype = 'd' THEN 'DOMAIN ' ELSE 'TYPE ' END)
+                   || n.nspname || '.' || t.typname AS target, d.description
+            FROM pg_description d
+            JOIN pg_type t ON t.oid = d.objoid
+            JOIN pg_namespace n ON n.oid = t.typnamespace
+            WHERE n.nspname NOT IN ('pg_catalog','information_schema') AND n.nspname NOT LIKE 'pg_%'
+              AND (t.typrelid = 0 OR EXISTS (SELECT 1 FROM pg_class cc WHERE cc.oid=t.typrelid AND cc.relkind='c'))
+              AND NOT EXISTS (SELECT 1 FROM pg_type e WHERE e.typarray = t.oid)
+          UNION ALL
+            -- trigger (table-scoped)
+            SELECT 'TRIGGER ' || tg.tgname || ' ON ' || n.nspname || '.' || c.relname AS target, d.description
+            FROM pg_description d
+            JOIN pg_trigger tg ON tg.oid = d.objoid
+            JOIN pg_class c ON c.oid = tg.tgrelid
+            JOIN pg_namespace n ON n.oid = c.relnamespace
+            WHERE n.nspname NOT IN ('pg_catalog','information_schema') AND n.nspname NOT LIKE 'pg_%'
+            ORDER BY 1;";
 
     public string Conversions { get; init; } = @"
             SELECT n.nspname, c.conname,

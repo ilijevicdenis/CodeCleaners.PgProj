@@ -415,24 +415,24 @@ public sealed class LiveDatabaseReader
 
     private async Task<List<RawObjectDefinition>> ReadCommentsAsync(NpgsqlConnection conn, CancellationToken ct)
     {
+        // The query (issue #61) returns a uniform (target, description) per comment across ALL object classes
+        // — relation/column/schema/function/procedure/type/domain/trigger — where `target` is the exact
+        // `<KIND> <name>` a hand-written COMMENT ON would carry. The comparer pairs comments on their
+        // canonical body (RawObjectMeta.ComparisonKey), so the identity here is informational; we still build
+        // it in the parser's `comment:<normalized target>` shape for readability/extract file naming.
         var sql = _q.Comments;
 
         var list = new List<RawObjectDefinition>();
+        var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         await using var cmd = new NpgsqlCommand(sql, conn);
         await using var r = await cmd.ExecuteReaderAsync(ct);
         while (await r.ReadAsync(ct))
         {
-            var schema = r.GetString(0);
-            var rel = r.GetString(1);
-            var col = r.IsDBNull(2) ? null : r.GetString(2);
-            var desc = r.GetString(3).Replace("'", "''");
-            var relkind = ReadChar(r, 4, 'r');
-            // A view/matview/foreign-table needs its own COMMENT keyword — COMMENT ON TABLE rejects them.
-            var relWord = relkind switch { 'v' => "VIEW", 'm' => "MATERIALIZED VIEW", 'f' => "FOREIGN TABLE", _ => "TABLE" };
-
-            var (target, identity) = col is null
-                ? ($"{relWord} {schema}.{rel}", $"comment:{relWord.ToLowerInvariant()} {schema}.{rel}")
-                : ($"COLUMN {schema}.{rel}.{col}", $"comment:column {schema}.{rel}.{col}");
+            var target = r.GetString(0);
+            if (r.IsDBNull(1)) continue;
+            var desc = r.GetString(1).Replace("'", "''");
+            var identity = $"comment:{target.ToLowerInvariant()}";
+            if (!seen.Add(identity)) continue; // de-dup the two schema-comment branches (shared vs local catalog)
             list.Add(MakeRaw(ObjectKind.Comment, "", "", identity, $"COMMENT ON {target} IS '{desc}';"));
         }
         return list;
