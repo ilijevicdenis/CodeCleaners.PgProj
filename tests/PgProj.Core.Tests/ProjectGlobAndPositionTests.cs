@@ -164,7 +164,7 @@ public sealed class ProjectGlobAndPositionTests : IDisposable
     }
 
     [Fact]
-    public void Parallel_build_persists_positions_in_deterministic_file_order()
+    public async Task Parallel_build_persists_positions_in_deterministic_file_order()
     {
         Write("Par.pgproj", """
             <Project>
@@ -176,7 +176,7 @@ public sealed class ProjectGlobAndPositionTests : IDisposable
             Write($"Tables/t{i}.sql", $"\nCREATE TABLE public.t{i} (id int);");
 
         var project = DatabaseProject.Load(Path.Combine(_dir, "Par.pgproj"));
-        var built = project.BuildAsync().GetAwaiter().GetResult();
+        var built = await project.BuildAsync();
 
         for (var i = 0; i < 6; i++)
         {
