@@ -35,6 +35,28 @@ public sealed class LiveDatabaseReader
 
     public LiveDatabaseReader(PostgresVersionProfile profile) => _q = profile.CatalogQueries;
 
+    /// <summary>One raw-object introspection read: returns its objects for the connection it is given.</summary>
+    private delegate Task<List<RawObjectDefinition>> RawObjectReader(NpgsqlConnection conn, CancellationToken ct);
+
+    /// <summary>
+    /// The raw-object reader registry (issue #44): the single, ordered list of every raw-object read the
+    /// introspector runs. Adding a raw kind = add its reader here (its catalog SQL lives on the
+    /// <see cref="PostgresVersionProfile"/>, its metadata in <see cref="Extensibility.ObjectKindRegistry"/>) —
+    /// no edit to <see cref="ReadAsync"/>'s fan-out. (Readers don't map 1:1 to kinds — e.g. enum/composite/
+    /// range/shell all yield <c>Type</c>, and existence-objects yield several — so this is a reader list,
+    /// not a per-kind dispatch.)
+    /// </summary>
+    private RawObjectReader[] RawObjectReaders =>
+    [
+        ReadExtensionsAsync, ReadTypedTablesAsync, ReadEnumTypesAsync, ReadCompositeTypesAsync,
+        ReadRangeTypesAsync, ReadShellTypesAsync, ReadCollationsAsync, ReadAggregatesAsync,
+        ReadDomainsAsync, ReadTriggersAsync, ReadRulesAsync, ReadPoliciesAsync, ReadEventTriggersAsync,
+        ReadCommentsAsync, ReadConversionsAsync, ReadForeignDataWrappersAsync, ReadServersAsync,
+        ReadStatisticsAsync, ReadCastsAsync, ReadForeignTablesAsync, ReadOperatorsAsync,
+        ReadOperatorFamiliesAsync, ReadOperatorClassesAsync, ReadTextSearchDictionariesAsync,
+        ReadTextSearchConfigurationsAsync, ReadPublicationsAsync, ReadExistenceObjectsAsync,
+    ];
+
     public async Task<DatabaseModel> ReadAsync(string connectionString, CancellationToken ct = default)
     {
         using var gate = new SemaphoreSlim(MaxConcurrentReads);
@@ -62,36 +84,17 @@ public sealed class LiveDatabaseReader
         var sequencesTask = Read(c => ReadSequencesAsync(c, ct));
         var functionsTask = Read(c => ReadFunctionsAsync(c, ct));
 
-        var rawTasks = new[]
+        // Raw-object reads come from the reader registry (issue #44) — one entry per reader, the single
+        // place a new raw kind's introspection is registered. Each runs on its own pooled connection
+        // under the concurrency gate; merge order doesn't matter (model.Objects is sorted canonically
+        // after merge, #59).
+        var readers = RawObjectReaders;
+        var rawTasks = new Task<List<RawObjectDefinition>>[readers.Length];
+        for (var i = 0; i < readers.Length; i++)
         {
-            Read(c => ReadExtensionsAsync(c, ct)),
-            Read(c => ReadTypedTablesAsync(c, ct)),
-            Read(c => ReadEnumTypesAsync(c, ct)),
-            Read(c => ReadCompositeTypesAsync(c, ct)),
-            Read(c => ReadRangeTypesAsync(c, ct)),
-            Read(c => ReadShellTypesAsync(c, ct)),
-            Read(c => ReadCollationsAsync(c, ct)),
-            Read(c => ReadAggregatesAsync(c, ct)),
-            Read(c => ReadDomainsAsync(c, ct)),
-            Read(c => ReadTriggersAsync(c, ct)),
-            Read(c => ReadRulesAsync(c, ct)),
-            Read(c => ReadPoliciesAsync(c, ct)),
-            Read(c => ReadEventTriggersAsync(c, ct)),
-            Read(c => ReadCommentsAsync(c, ct)),
-            Read(c => ReadConversionsAsync(c, ct)),
-            Read(c => ReadForeignDataWrappersAsync(c, ct)),
-            Read(c => ReadServersAsync(c, ct)),
-            Read(c => ReadStatisticsAsync(c, ct)),
-            Read(c => ReadCastsAsync(c, ct)),
-            Read(c => ReadForeignTablesAsync(c, ct)),
-            Read(c => ReadOperatorsAsync(c, ct)),
-            Read(c => ReadOperatorFamiliesAsync(c, ct)),
-            Read(c => ReadOperatorClassesAsync(c, ct)),
-            Read(c => ReadTextSearchDictionariesAsync(c, ct)),
-            Read(c => ReadTextSearchConfigurationsAsync(c, ct)),
-            Read(c => ReadPublicationsAsync(c, ct)),
-            Read(c => ReadExistenceObjectsAsync(c, ct)),
-        };
+            var reader = readers[i];
+            rawTasks[i] = Read(c => reader(c, ct));
+        }
 
         // ---- wave 2: table-dependent reads, started as soon as the table map is ready ----
         // INVARIANT: these run concurrently and mutate the SAME shared TableDefinition objects, so
