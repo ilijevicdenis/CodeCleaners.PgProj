@@ -141,8 +141,10 @@ public sealed class SemanticValidator
     /// </summary>
     private void ValidateTrigger(RawCreateStatement trg)
     {
+        if (trg.Trigger is not { } td) return;           // not a parsed CREATE TRIGGER with captured detail
+
         // Target table existence — only when qualified into a managed (non-external, non-system) schema.
-        if (trg.OnSchema is { } onSchema && trg.OnTable is { } onTable
+        if (td.OnSchema is { } onSchema && td.OnTable is { } onTable
             && _catalog.SchemaManaged(onSchema) && !_catalog.SchemaIsExternal(onSchema)
             && !_catalog.HasRelation(onSchema, onTable))
         {
@@ -154,9 +156,9 @@ public sealed class SemanticValidator
         // Target function: resolve the overload(s) by name (search_path-aware). Trigger functions take no
         // declared args, so a name match is the right lookup. Only error when the function RESOLVED and its
         // return type is KNOWN and is not a trigger return type — never on an unresolved / unknown-return fn.
-        var fnName = trg.TriggerFunctionName;
+        var fnName = td.FunctionName;
         if (fnName is null) return;
-        var overloads = trg.TriggerFunctionSchema is { } fs
+        var overloads = td.FunctionSchema is { } fs
             ? _symbols.FunctionOverloads(fs, fnName)
             : _catalog.SearchPath.Schemas.SelectMany(s => _symbols.FunctionOverloads(s, fnName)).Distinct().ToList();
         if (overloads.Count == 0) return;               // function not known here — don't guess (external/extension)
@@ -168,7 +170,7 @@ public sealed class SemanticValidator
 
         var rt = withReturn[0].ReturnType!;
         Add(trg.Position,
-            $"function \"{QualFn(trg.TriggerFunctionSchema, fnName)}\" must return type trigger (returns \"{rt}\")",
+            $"function \"{QualFn(td.FunctionSchema, fnName)}\" must return type trigger (returns \"{rt}\")",
             Related(withReturn[0].Fqn));
     }
 

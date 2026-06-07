@@ -35,8 +35,6 @@ public sealed partial class PgParser
 
         c.ExpectWord("ON");
         var (onSchema, onTable) = ParseQualifiedName(c);
-        node.OnSchema = onSchema;
-        node.OnTable = onTable;
         node.OnObject = onSchema is null ? onTable : $"{onSchema}.{onTable}";
 
         if (constraint)                                  // CONSTRAINT trigger: optional FROM table, deferrability
@@ -74,8 +72,11 @@ public sealed partial class PgParser
         c.ExpectWord("EXECUTE");
         if (!c.MatchWord("FUNCTION")) c.ExpectWord("PROCEDURE");
         var (fnSchema, fnName) = ParseQualifiedName(c);
-        node.TriggerFunctionSchema = fnSchema;
-        node.TriggerFunctionName = fnName;
+        node.Trigger = new TriggerDetail
+        {
+            OnSchema = onSchema, OnTable = onTable,
+            FunctionSchema = fnSchema, FunctionName = fnName,
+        };
         if (!c.AtSymbol('(')) throw new ParseException("expected '(' for the trigger function arguments", c.Here);
         c.SkipBalancedParens();
 

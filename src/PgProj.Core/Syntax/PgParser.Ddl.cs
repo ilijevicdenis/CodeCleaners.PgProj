@@ -226,7 +226,7 @@ public sealed partial class PgParser
         if (o.MatchWord("RETURNS"))
         {
             if (o.MatchWord("TABLE")) { returnsTable = true; returnsSet = true; if (!o.AtSymbol('(')) throw new ParseException("expected '(' after RETURNS TABLE", o.Here); o.SkipBalancedParens(); }
-            else { if (o.MatchWord("SETOF")) returnsSet = true; var rt = ParseCastType(o); node.ReturnType = rt.Trim(); if (rt.Trim().Equals("void", System.StringComparison.OrdinalIgnoreCase)) node.ReturnsVoid = true; }
+            else { if (o.MatchWord("SETOF")) returnsSet = true; var rt = ParseCastType(o).Trim(); node.ReturnType = rt; if (rt.Equals("void", System.StringComparison.OrdinalIgnoreCase)) node.ReturnsVoid = true; }
         }
         node.ReturnsSetof = returnsSet;
         if (hasOut && returnsTable) throw new ParseException("cannot use OUT parameters together with RETURNS TABLE", o.Here);

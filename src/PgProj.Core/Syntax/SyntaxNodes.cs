@@ -102,17 +102,25 @@ public sealed class RawCreateStatement : SqlStatement
     public string? Name { get; set; }
     public string? OnObject { get; set; }   // "schema.table" for trigger/rule/policy
 
-    // ---- CREATE TRIGGER detail (semantic validation, #48) — additive, set only by ParseCreateTrigger.
-    // The model/comparer never read these (they re-derive from SourceText); they let the semantic
-    // validator resolve the trigger's target relation + the function it EXECUTEs without a re-parse.
-    /// <summary>The trigger's target relation schema (the <c>ON schema.table</c>), when written qualified.</summary>
-    public string? OnSchema { get; set; }
-    /// <summary>The trigger's target relation name (the <c>ON … table</c>), for a CREATE TRIGGER.</summary>
-    public string? OnTable { get; set; }
-    /// <summary>The schema of the function the trigger EXECUTEs, when written qualified.</summary>
-    public string? TriggerFunctionSchema { get; set; }
-    /// <summary>The unqualified name of the function the trigger EXECUTEs (FUNCTION/PROCEDURE), for a CREATE TRIGGER.</summary>
-    public string? TriggerFunctionName { get; set; }
+    // CREATE TRIGGER detail for semantic validation (#48). Held behind ONE nullable reference rather than
+    // four inline string fields, so the (very numerous) non-trigger raw statements pay only a single
+    // null pointer, and the detail object is allocated only for an actual trigger. The model/comparer
+    // never read it (they re-derive from SourceText); it lets the validator resolve the trigger's target
+    // relation + the function it EXECUTEs without a re-parse.
+    public TriggerDetail? Trigger { get; set; }
+}
+
+/// <summary>The target relation + EXECUTEd function of a CREATE TRIGGER, captured for #48 validation.</summary>
+public sealed class TriggerDetail
+{
+    /// <summary>Target relation schema (the <c>ON schema.table</c>), when written qualified.</summary>
+    public string? OnSchema { get; init; }
+    /// <summary>Target relation name (the <c>ON … table</c>).</summary>
+    public string? OnTable { get; init; }
+    /// <summary>Schema of the function the trigger EXECUTEs, when written qualified.</summary>
+    public string? FunctionSchema { get; init; }
+    /// <summary>Unqualified name of the function the trigger EXECUTEs (FUNCTION/PROCEDURE).</summary>
+    public string? FunctionName { get; init; }
 }
 
 public sealed class CreateViewStatement : SqlStatement
