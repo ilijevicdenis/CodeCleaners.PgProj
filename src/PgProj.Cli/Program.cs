@@ -409,6 +409,12 @@ public static class Program
                 Console.WriteLine($"Published {changes.Count} change(s) successfully.");
             }
         }
+        catch (Npgsql.PostgresException ex)
+        {
+            // Enrich the server's bare SQLSTATE with its symbolic condition name + class (PgErrorCodes).
+            Console.Error.WriteLine($"Deploy failed: {ex.Message}  [{PgProj.Core.Diagnostics.PgErrorCodes.Describe(ex.SqlState)}]");
+            return ExitCode.DeployError;
+        }
         catch (Npgsql.NpgsqlException ex)
         {
             Console.Error.WriteLine($"Deploy failed: {ex.Message}");
@@ -442,7 +448,8 @@ public static class Program
             return 0;
         }
 
-        Console.Error.WriteLine($"Invalid: {outcome.Error}" + (outcome.SqlState is null ? "" : $"  [{outcome.SqlState}]"));
+        Console.Error.WriteLine($"Invalid: {outcome.Error}" +
+            (outcome.SqlState is null ? "" : $"  [{PgProj.Core.Diagnostics.PgErrorCodes.Describe(outcome.SqlState)}]"));
         if (outcome.Position > 0) Console.Error.WriteLine($"  near script position {outcome.Position}");
         return ExitCode.ValidationFailed;
     }
