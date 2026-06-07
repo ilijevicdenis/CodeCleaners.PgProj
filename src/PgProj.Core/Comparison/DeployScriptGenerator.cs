@@ -82,6 +82,28 @@ public sealed class DeployOptions
 
     /// <summary>Target PostgreSQL major version the script is generated for. Null = the project/profile default.</summary>
     public string? TargetPostgresVersion { get; init; }
+
+    /// <summary>
+    /// How a possible-data-loss change (risk <see cref="RiskLevel.DataLoss"/>+) is emitted when it is NOT
+    /// hard-blocked (<see cref="BlockOnPossibleDataLoss"/> is off). <see cref="DataLossHandling.Include"/> is
+    /// the default — today's behaviour, the statement is emitted live. <see cref="DataLossHandling.Comment"/>
+    /// emits it commented-out (a reviewer can uncomment); <see cref="DataLossHandling.Omit"/> drops it and
+    /// leaves only a marker. (#56)
+    /// </summary>
+    public DataLossHandling DataLossHandling { get; init; } = DataLossHandling.Include;
+}
+
+/// <summary>How the generator emits an un-blocked possible-data-loss change (#56). Default = Include.</summary>
+public enum DataLossHandling
+{
+    /// <summary>Emit the statement live (today's behaviour — the default).</summary>
+    Include = 0,
+
+    /// <summary>Emit the statement commented-out so a reviewer can opt in by uncommenting.</summary>
+    Comment = 1,
+
+    /// <summary>Omit the statement entirely, leaving only a skipped-marker comment.</summary>
+    Omit = 2,
 }
 
 /// <summary>Thrown by the block-on-data-loss gate when a deploy would apply a possible-data-loss change.</summary>
@@ -106,7 +128,27 @@ public sealed class DataLossBlockedException : Exception
 /// </summary>
 public sealed class DeployScriptGenerator
 {
+    /// <summary>
+    /// Generate from a computed <see cref="DeploymentPlan"/> (#55). The plan's skeleton pass runs first
+    /// (flagged in the script when present), then its dependency-ordered changes. A plan with no skeleton
+    /// pass and the default options produces output equivalent to the change-list overload — the planner's
+    /// acyclic ordering is the stable phase order. The skeleton steps are <see cref="SchemaChange"/>s
+    /// themselves (negative phase), so they fold naturally into the same emission path.
+    /// </summary>
+    public string Generate(DeploymentPlan plan, DeployOptions? options = null)
+        => Generate(plan.AllSteps, options);
+
     public string Generate(IReadOnlyList<SchemaChange> changes, DeployOptions? options = null)
+        => Generate(changes, options, profile: null);
+
+    /// <summary>
+    /// As <see cref="Generate(IReadOnlyList{SchemaChange}, DeployOptions)"/> but with an explicit version
+    /// profile (#43/#56). When <paramref name="profile"/> is null it is resolved from
+    /// <see cref="DeployOptions.TargetPostgresVersion"/> (so the default path is unchanged). Pass an explicit
+    /// profile to drive version-aware DDL against a specific <see cref="Versioning.ObjectCapabilities"/> set.
+    /// </summary>
+    public string Generate(IReadOnlyList<SchemaChange> changes, DeployOptions? options,
+        Versioning.PostgresVersionProfile? profile)
     {
         options ??= new DeployOptions();
 
@@ -114,7 +156,14 @@ public sealed class DeployScriptGenerator
         // blocked deploy yields nothing. Default-off, so existing callers are unaffected.
         GuardAgainstDataLoss(changes, options);
 
-        var ordered = changes.OrderBy(c => c.Phase).ToList();
+        // Include/exclude object-type filtering at generation (#56). Both default to empty = include all, so
+        // the default path is the full change set, unchanged.
+        var filtered = FilterByObjectType(changes, options);
+
+        // The version profile that drives version-aware DDL (ALTER-vs-recreate via ObjectCapabilities, #43/#56).
+        profile ??= Versioning.PostgresVersionProfile.ForTarget(options.TargetPostgresVersion);
+
+        var ordered = filtered.OrderBy(c => c.Phase).ToList();
         var scripts = options.Scripts ?? new DeployScriptBundle();
 
         // Substitute SQLCMD variables in the deploy scripts up front so an unresolved token fails fast
@@ -137,6 +186,10 @@ public sealed class DeployScriptGenerator
             if (options.Variables is not null)
                 foreach (var line in options.Variables.BannerLines())
                     sb.AppendLine(line);
+            // Verbose header lines (#56): extra context (target version, timeouts, options) — minimal by default.
+            if (options.Verbose)
+                foreach (var line in VerboseHeaderLines(options, profile))
+                    sb.AppendLine(line);
             sb.AppendLine("-- ============================================================");
             sb.AppendLine();
         }
@@ -154,15 +207,14 @@ public sealed class DeployScriptGenerator
             sb.AppendLine();
         }
 
+        // Timeout preamble (#56). Null = leave the server default (today's behaviour ⇒ nothing emitted).
+        AppendTimeouts(sb, options);
+
         // pre → schema diff → post
         AppendScriptSection(sb, "pre-deployment", scripts.Pre?.Name, preBody);
 
         foreach (var change in ordered)
-        {
-            sb.AppendLine($"-- {change.Describe()}");
-            sb.AppendLine(change.ToSql());
-            sb.AppendLine();
-        }
+            AppendChange(sb, change, options, profile);
 
         AppendScriptSection(sb, "post-deployment", scripts.Post?.Name, postBody);
 
@@ -170,6 +222,149 @@ public sealed class DeployScriptGenerator
             sb.AppendLine("COMMIT;");
 
         return sb.ToString();
+    }
+
+    // ---- #56 option-aware emission helpers -------------------------------------------------------
+
+    /// <summary>
+    /// Include/exclude object-type filtering (#56). <see cref="DeployOptions.IncludeOnlyObjectTypes"/> wins
+    /// when non-empty (only those types are kept); otherwise <see cref="DeployOptions.ExcludeObjectTypes"/>
+    /// removes the listed types. Both empty (the default) ⇒ the change set is returned unchanged.
+    /// </summary>
+    private static IReadOnlyList<SchemaChange> FilterByObjectType(IReadOnlyList<SchemaChange> changes, DeployOptions options)
+    {
+        var include = options.IncludeOnlyObjectTypes;
+        var exclude = options.ExcludeObjectTypes;
+        if (include.Count == 0 && exclude.Count == 0) return changes;
+
+        var includeSet = new HashSet<string>(include, StringComparer.OrdinalIgnoreCase);
+        var excludeSet = new HashSet<string>(exclude, StringComparer.OrdinalIgnoreCase);
+
+        var kept = new List<SchemaChange>(changes.Count);
+        foreach (var c in changes)
+        {
+            var type = SchemaCompareObjectType.Of(c);
+            if (includeSet.Count > 0) { if (includeSet.Contains(type)) kept.Add(c); }
+            else if (!excludeSet.Contains(type)) kept.Add(c);
+        }
+        return kept;
+    }
+
+    /// <summary>The verbose extra-context header lines (#56). Empty unless <see cref="DeployOptions.Verbose"/>.</summary>
+    private static IEnumerable<string> VerboseHeaderLines(DeployOptions options, Versioning.PostgresVersionProfile profile)
+    {
+        yield return $"-- target PostgreSQL: {profile.MajorVersion}";
+        yield return $"-- prefer-ALTER: {(options.PreferAlterOverRecreate ? "on" : "off")}; " +
+                     $"idempotent: {(options.IdempotentIfExists ? "on" : "off")}; " +
+                     $"data-loss handling: {options.DataLossHandling.ToString().ToLowerInvariant()}";
+        if (options.StatementTimeoutMs is { } st) yield return $"-- statement_timeout: {st} ms";
+        if (options.LockTimeoutMs is { } lt) yield return $"-- lock_timeout: {lt} ms";
+    }
+
+    /// <summary>Emit the SET statement_timeout / SET lock_timeout preamble (#56). No-op when both are null.</summary>
+    private static void AppendTimeouts(StringBuilder sb, DeployOptions options)
+    {
+        var any = false;
+        if (options.StatementTimeoutMs is { } st) { sb.AppendLine($"SET statement_timeout = {st};"); any = true; }
+        if (options.LockTimeoutMs is { } lt) { sb.AppendLine($"SET lock_timeout = {lt};"); any = true; }
+        if (any) sb.AppendLine();
+    }
+
+    /// <summary>
+    /// Emit one change with the #56 options applied: data-loss handling (include/comment/omit), idempotent
+    /// IF [NOT] EXISTS rewriting, version-aware ALTER-vs-recreate, and verbose rationale. With default options
+    /// this is byte-identical to the original <c>-- describe \n change.ToSql() \n</c> shape.
+    /// </summary>
+    private static void AppendChange(StringBuilder sb, SchemaChange change, DeployOptions options,
+        Versioning.PostgresVersionProfile profile)
+    {
+        // Data-loss handling for un-blocked DataLoss changes (#54 risk + #56). Default = Include (live).
+        if (options.DataLossHandling != DataLossHandling.Include &&
+            RiskAnalyzer.Default.Classify(change).Level >= RiskLevel.DataLoss)
+        {
+            if (options.DataLossHandling == DataLossHandling.Omit)
+            {
+                sb.AppendLine($"-- [omitted: possible data loss] {change.Describe()}");
+                sb.AppendLine();
+                return;
+            }
+            // Comment: keep the statement but commented out so a reviewer can opt in.
+            sb.AppendLine($"-- [commented: possible data loss] {change.Describe()}");
+            foreach (var line in change.ToSql().Split('\n'))
+                sb.AppendLine("-- " + line.TrimEnd('\r'));
+            sb.AppendLine();
+            return;
+        }
+
+        sb.AppendLine($"-- {change.Describe()}");
+        if (options.Verbose)
+        {
+            var risk = RiskAnalyzer.Default.Classify(change);
+            sb.AppendLine($"--   risk: {risk.Level}; phase: {change.Phase}");
+        }
+        sb.AppendLine(RenderSql(change, options, profile));
+        sb.AppendLine();
+    }
+
+    /// <summary>
+    /// Render a change's SQL with the #56 idempotent option applied. Idempotent rewriting adds
+    /// <c>IF [NOT] EXISTS</c> to the CREATE/DROP forms that accept it where the base SQL did not already
+    /// carry it; with the option off (default) the base <see cref="SchemaChange.ToSql"/> is returned verbatim.
+    /// </summary>
+    private static string RenderSql(SchemaChange change, DeployOptions options,
+        Versioning.PostgresVersionProfile profile)
+    {
+        // Version-aware DDL (#43/#56): if the target version lacks an in-place ALTER path that this change
+        // relies on, the in-place ALTER would fail — surface that rather than emit invalid SQL. The default
+        // (latest) profile has every ALTER path, so this branch is inert on the default path.
+        if (change is AlterColumnChange ac && !CanAlterColumnOn(ac, profile.ObjectCapabilities))
+            return VersionFallbackComment(ac, profile);
+
+        var sql = change.ToSql();
+        if (options.IdempotentIfExists) sql = MakeIdempotent(change, sql);
+        return sql;
+    }
+
+    // Which column facets actually differ, and whether the target version can ALTER them all in place.
+    private static bool CanAlterColumnOn(AlterColumnChange ac, Versioning.ObjectCapabilities caps)
+    {
+        var typeChanged = ac.Old.DataType != ac.New.DataType;
+        var nullabilityChanged = ac.Old.IsNullable != ac.New.IsNullable;
+        var defaultChanged = (ac.Old.Default ?? "") != (ac.New.Default ?? "");
+        return caps.CanAlterColumn(typeChanged, nullabilityChanged, defaultChanged);
+    }
+
+    private static string VersionFallbackComment(AlterColumnChange ac, Versioning.PostgresVersionProfile profile) =>
+        $"-- [skipped on PostgreSQL {profile.MajorVersion}: in-place ALTER COLUMN not supported for this change] " +
+        $"{ac.Describe()}; a table/column rebuild is required.";
+
+    /// <summary>
+    /// Add <c>IF [NOT] EXISTS</c> to the statements that support it and do not already carry it. Scoped to
+    /// the unambiguous, dialect-safe cases: <c>CREATE TABLE</c>, <c>CREATE INDEX</c>, <c>CREATE VIEW</c>,
+    /// <c>CREATE MATERIALIZED VIEW</c>, and table/column/constraint DROPs. <c>CREATE OR REPLACE</c> is already
+    /// idempotent (left as-is); <c>CREATE SCHEMA/SEQUENCE</c> already emit IF NOT EXISTS unconditionally.
+    /// </summary>
+    private static string MakeIdempotent(SchemaChange change, string sql) => change switch
+    {
+        CreateTableChange       => InsertAfter(sql, "CREATE TABLE ", "IF NOT EXISTS "),
+        CreateIndexChange ix    => InsertAfter(sql, ix.Index.IsUnique ? "CREATE UNIQUE INDEX " : "CREATE INDEX ", "IF NOT EXISTS "),
+        AddColumnChange         => InsertAfter(sql, "ADD COLUMN ", "IF NOT EXISTS "),
+        DropColumnChange        => InsertAfter(sql, "DROP COLUMN ", "IF EXISTS "),
+        DropConstraintChange    => InsertAfter(sql, "DROP CONSTRAINT ", "IF EXISTS "),
+        DropForeignKeyChange    => InsertAfter(sql, "DROP CONSTRAINT ", "IF EXISTS "),
+        DropPrimaryKeyChange    => InsertAfter(sql, "DROP CONSTRAINT ", "IF EXISTS "),
+        _ => sql, // DROP TABLE/VIEW/INDEX, CREATE SCHEMA/SEQUENCE already carry IF [NOT] EXISTS; OR REPLACE is idempotent.
+    };
+
+    // Insert <paramref name="insert"/> immediately after the first occurrence of <paramref name="anchor"/>,
+    // unless the guard is already present right there (so re-running is safe and we never double-insert).
+    private static string InsertAfter(string sql, string anchor, string insert)
+    {
+        var idx = sql.IndexOf(anchor, StringComparison.Ordinal);
+        if (idx < 0) return sql;
+        var at = idx + anchor.Length;
+        if (sql.AsSpan(at).StartsWith(insert)) return sql; // already idempotent
+        return sql[..at] + insert + sql[at..];
     }
 
     /// <summary>
