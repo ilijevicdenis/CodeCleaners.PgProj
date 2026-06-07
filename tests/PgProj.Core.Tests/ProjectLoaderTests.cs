@@ -169,4 +169,86 @@ public class ProjectLoaderTests : IDisposable
         Assert.Empty(result.Diagnostics);
         Assert.Single(result.Model.Tables);
     }
+
+    // ── DefaultSqlItems (issue #39) ──────────────────────────────────────────
+
+    /// <summary>
+    /// A project with no &lt;Build Include&gt; at all should still pick up every *.sql file via
+    /// the SDK default-include behaviour.  This mirrors what Sdk.props injects at the MSBuild
+    /// level and verifies the engine-level fallback produces the same result.
+    /// </summary>
+    [Fact]
+    public void No_Build_items_declared_auto_includes_all_sql_files()
+    {
+        var proj = Write("Auto.pgproj", """
+            <Project>
+              <PropertyGroup><Name>Auto</Name><DefaultSchema>app</DefaultSchema></PropertyGroup>
+            </Project>
+            """);
+        Write("Tables/customers.sql", "CREATE TABLE app.customers (id int PRIMARY KEY);");
+        Write("Tables/orders.sql",    "CREATE TABLE app.orders (id int PRIMARY KEY);");
+
+        var project = DatabaseProject.Load(proj);
+        // Engine must derive the default glob when none are declared.
+        Assert.Single(project.IncludePatterns);
+        Assert.Equal("**/*.sql", project.IncludePatterns[0]);
+
+        var result = project.Build();
+        Assert.Empty(result.Diagnostics);
+        Assert.Equal(2, result.Model.Tables.Count);
+        Assert.Equal(2, result.Files.Count);
+    }
+
+    /// <summary>
+    /// Setting EnableDefaultSqlItems=false and omitting &lt;Build Include&gt; should produce an
+    /// empty file set — the user has explicitly opted out of auto-include.
+    /// </summary>
+    [Fact]
+    public void EnableDefaultSqlItems_false_suppresses_auto_include()
+    {
+        var proj = Write("NoAuto.pgproj", """
+            <Project>
+              <PropertyGroup>
+                <Name>NoAuto</Name>
+                <EnableDefaultSqlItems>false</EnableDefaultSqlItems>
+              </PropertyGroup>
+            </Project>
+            """);
+        Write("Tables/t.sql", "CREATE TABLE public.t (id int);");
+
+        var project = DatabaseProject.Load(proj);
+        // With auto-include disabled and no explicit items, IncludePatterns must be empty.
+        Assert.Empty(project.IncludePatterns);
+
+        var result = project.Build();
+        Assert.Empty(result.Files);
+        Assert.Empty(result.Model.Tables);
+    }
+
+    /// <summary>
+    /// Double-include guard: a project that declares &lt;Build Include="**/*.sql" /&gt; explicitly
+    /// (matching what older projects had) must resolve each file exactly once even though
+    /// EnableDefaultSqlItems=true would also match the same files.  MSBuild deduplicates at the
+    /// item level; ResolveSqlFiles deduplicates at the path level — no file is parsed twice.
+    /// </summary>
+    [Fact]
+    public void Explicit_glob_same_as_default_does_not_double_include_files()
+    {
+        // Project declares the same catch-all that the SDK would inject automatically.
+        // IncludePatterns will contain ["**/*.sql", "**/*.sql"] after Load, which is what
+        // would happen if both the SDK default AND the user declaration were present.
+        var proj = Write("Dup.pgproj", """
+            <Project>
+              <PropertyGroup><Name>Dup</Name></PropertyGroup>
+              <ItemGroup><Build Include="**/*.sql" /></ItemGroup>
+            </Project>
+            """);
+        Write("Tables/t.sql", "CREATE TABLE public.t (id int);");
+
+        var result = DatabaseProject.Load(proj).Build();
+        // ResolveSqlFiles must deduplicate: exactly one file, no duplicate-definition diagnostic.
+        Assert.Single(result.Files);
+        Assert.Empty(result.Diagnostics);
+        Assert.Single(result.Model.Tables);
+    }
 }

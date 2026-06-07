@@ -93,9 +93,10 @@ You don't need a full project to check your scripts — point a one-line `.pgpro
    <!-- myschema/MySchema.pgproj -->
    <Project>
      <PropertyGroup><Name>MySchema</Name><DefaultSchema>public</DefaultSchema></PropertyGroup>
-     <ItemGroup><Build Include="**/*.sql" /></ItemGroup>
    </Project>
    ```
+
+   All `*.sql` files in the folder are included automatically — no `<Build Include>` needed.
 
 2. **Parse / lint — offline, no database:**
 
@@ -146,11 +147,13 @@ feature).
     <DefaultSchema>app</DefaultSchema>
     <TargetPostgresVersion>17</TargetPostgresVersion>
   </PropertyGroup>
-  <ItemGroup>
-    <Build Include="**/*.sql" />
-  </ItemGroup>
 </Project>
 ```
+
+The SDK auto-includes every `**/*.sql` file in the project folder — no `<Build Include>` is
+needed.  To opt out and control item inclusion yourself, add
+`<EnableDefaultSqlItems>false</EnableDefaultSqlItems>` to the `<PropertyGroup>` and declare your
+own `<Build Include="..." />` items.
 
 It is intentionally MSBuild-shaped so a future Visual Studio project system / build SDK can adopt
 it without changing the file format. Files whose name starts with `_` are treated as non-source.
