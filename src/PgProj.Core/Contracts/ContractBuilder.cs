@@ -21,13 +21,14 @@ public static class ContractBuilder
     public static async Task<BuildReportDto> BuildAsync(DatabaseProject project, bool includeTree = true)
     {
         var result = await project.BuildAsync();
-        var diagnostics = result.Diagnostics.Select(ContractMappers.ToBuildDto).ToList();
+        // Use UnifiedDiagnostics (carries related locations) → ToDto preserves the Related field on the wire.
+        var diagnostics = result.UnifiedDiagnostics.Select(ContractMappers.ToDto).ToList();
         var positions = includeTree ? SourcePositionIndex.Build(project) : null;
 
         return new BuildReportDto
         {
             Project = project.Name,
-            Success = result.Diagnostics.Count == 0,
+            Success = result.UnifiedDiagnostics.Count == 0,
             FileCount = result.Files.Count,
             Model = ContractMappers.SummaryOf(result.Model),
             Summary = ContractMappers.SummaryOf(diagnostics),
