@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using PgProj.Core.Model;
+using PgProj.Core.Versioning;
 
 namespace PgProj.Core.Comparison;
 
@@ -24,6 +25,15 @@ public sealed class ComparerOptions
 public sealed class SchemaComparer
 {
     private static readonly Regex Whitespace = new(@"\s+", RegexOptions.Compiled);
+
+    // The version profile's ObjectCapabilities decide ALTER-vs-recreate (e.g. whether a changed table
+    // column can be migrated in place). Defaults to the latest profile so existing parameterless callers
+    // are unaffected; pass a profile (selected from TargetPostgresVersion) to diff for an older target.
+    private readonly ObjectCapabilities _capabilities;
+
+    public SchemaComparer() : this(PostgresVersionProfile.Latest) { }
+
+    public SchemaComparer(PostgresVersionProfile profile) => _capabilities = profile.ObjectCapabilities;
 
     // Schema-qualified-name key with the model's identifier semantics (OrdinalIgnoreCase, mirroring
     // DatabaseModel.NameEquals). Used to pre-index target/source collections so the per-object lookups
@@ -115,14 +125,33 @@ public sealed class SchemaComparer
                 continue;
             }
 
-            // Columns present in source but not target -> add.
+            // Columns present in source but not target -> add. A changed column is migrated in place
+            // (AlterColumnChange) only when the version profile's ObjectCapabilities says every differing
+            // facet (type / nullability / default) is ALTER-able on the target; otherwise the column must
+            // be recreated (drop + re-add). The latest profile permits all three, so this is behaviour-
+            // preserving by default — the decision is no longer an inline version branch.
             foreach (var col in src.Columns)
             {
                 var existing = tgt.FindColumn(col.Name);
                 if (existing is null)
+                {
                     changes.Add(new AddColumnChange(src.Schema, src.Name, col));
+                }
                 else if (!ColumnsEqual(existing, col))
-                    changes.Add(new AlterColumnChange(src.Schema, src.Name, existing, col));
+                {
+                    var typeChanged = !string.Equals(existing.DataType, col.DataType, StringComparison.OrdinalIgnoreCase);
+                    var nullabilityChanged = existing.IsNullable != col.IsNullable;
+                    var defaultChanged = !DefaultsEqual(existing.Default, col.Default);
+
+                    if (_capabilities.CanAlterColumn(typeChanged, nullabilityChanged, defaultChanged))
+                        changes.Add(new AlterColumnChange(src.Schema, src.Name, existing, col));
+                    else
+                    {
+                        // No in-place ALTER path on this target version → recreate the column.
+                        changes.Add(new DropColumnChange(src.Schema, src.Name, existing.Name));
+                        changes.Add(new AddColumnChange(src.Schema, src.Name, col));
+                    }
+                }
             }
 
             // Columns present in target but not source -> drop (guarded).

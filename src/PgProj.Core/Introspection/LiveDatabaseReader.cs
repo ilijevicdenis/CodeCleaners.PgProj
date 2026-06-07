@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Npgsql;
 using PgProj.Core.Comparison;
 using PgProj.Core.Model;
+using PgProj.Core.Versioning;
 
 namespace PgProj.Core.Introspection;
 
@@ -24,6 +25,15 @@ namespace PgProj.Core.Introspection;
 public sealed class LiveDatabaseReader
 {
     private const int MaxConcurrentReads = 8;
+
+    // The catalog SQL this reader issues is sourced from the active version profile's CatalogQueries —
+    // no SQL literals live in this file anymore. Defaults to the latest profile; pass an older profile
+    // (or one selected from a project's TargetPostgresVersion) to introspect with that version's queries.
+    private readonly CatalogQueries _q;
+
+    public LiveDatabaseReader() : this(PostgresVersionProfile.Latest) { }
+
+    public LiveDatabaseReader(PostgresVersionProfile profile) => _q = profile.CatalogQueries;
 
     public async Task<DatabaseModel> ReadAsync(string connectionString, CancellationToken ct = default)
     {
@@ -139,7 +149,7 @@ public sealed class LiveDatabaseReader
 
     private async Task<List<SchemaDefinition>> ReadSchemasAsync(NpgsqlConnection conn, CancellationToken ct)
     {
-        const string sql = "SELECT nspname FROM pg_namespace ORDER BY nspname;";
+        var sql = _q.Schemas;
         var list = new List<SchemaDefinition>();
         await using var cmd = new NpgsqlCommand(sql, conn);
         await using var r = await cmd.ExecuteReaderAsync(ct);
@@ -157,22 +167,7 @@ public sealed class LiveDatabaseReader
     private async Task<(List<TableDefinition> Tables, Dictionary<string, TableDefinition> ByKey)> ReadTablesAndColumnsAsync(
         NpgsqlConnection conn, CancellationToken ct)
     {
-        const string sql = @"
-            SELECT n.nspname, c.relname, a.attname,
-                   format_type(a.atttypid, a.atttypmod) AS datatype,
-                   a.attnotnull, pg_get_expr(d.adbin, d.adrelid) AS default_expr,
-                   a.attidentity, a.attgenerated
-            FROM pg_attribute a
-            JOIN pg_class c ON c.oid = a.attrelid
-            JOIN pg_namespace n ON n.oid = c.relnamespace
-            LEFT JOIN pg_attrdef d ON d.adrelid = a.attrelid AND d.adnum = a.attnum
-            WHERE c.relkind IN ('r','p') AND a.attnum > 0 AND NOT a.attisdropped
-              -- Typed tables (CREATE TABLE … OF <type>) are reconstructed in their `OF type` form by
-              -- ReadTypedTablesAsync; flattening them to a column list here would both lose that nature
-              -- and double-list the table, so skip them in the finely-modelled read.
-              AND c.reloftype = 0
-              AND n.nspname NOT IN ('pg_catalog','information_schema') AND n.nspname NOT LIKE 'pg_%'
-            ORDER BY n.nspname, c.relname, a.attnum;";
+        var sql = _q.TablesAndColumns;
 
         var tables = new List<TableDefinition>();
         var byKey = new Dictionary<string, TableDefinition>(StringComparer.OrdinalIgnoreCase);
@@ -218,16 +213,7 @@ public sealed class LiveDatabaseReader
 
     private async Task ReadConstraintsAsync(NpgsqlConnection conn, Dictionary<string, TableDefinition> tables, CancellationToken ct)
     {
-        const string sql = @"
-            SELECT n.nspname, c.relname, con.conname, con.contype, a.attname, k.ord
-            FROM pg_constraint con
-            JOIN pg_class c ON c.oid = con.conrelid
-            JOIN pg_namespace n ON n.oid = c.relnamespace
-            JOIN LATERAL unnest(con.conkey) WITH ORDINALITY AS k(attnum, ord) ON true
-            JOIN pg_attribute a ON a.attrelid = con.conrelid AND a.attnum = k.attnum
-            WHERE con.contype IN ('p','u')
-              AND n.nspname NOT IN ('pg_catalog','information_schema')
-            ORDER BY n.nspname, c.relname, con.conname, k.ord;";
+        var sql = _q.Constraints;
 
         var pk = new Dictionary<(string, string, string), List<string>>();
         var uq = new Dictionary<(string, string, string), List<string>>();
@@ -258,14 +244,7 @@ public sealed class LiveDatabaseReader
 
     private async Task ReadChecksAsync(NpgsqlConnection conn, Dictionary<string, TableDefinition> tables, CancellationToken ct)
     {
-        const string sql = @"
-            SELECT n.nspname, c.relname, con.conname, pg_get_constraintdef(con.oid) AS def
-            FROM pg_constraint con
-            JOIN pg_class c ON c.oid = con.conrelid
-            JOIN pg_namespace n ON n.oid = c.relnamespace
-            WHERE con.contype = 'c'
-              AND n.nspname NOT IN ('pg_catalog','information_schema') AND n.nspname NOT LIKE 'pg_%'
-            ORDER BY n.nspname, c.relname, con.conname;";
+        var sql = _q.Checks;
 
         await using var cmd = new NpgsqlCommand(sql, conn);
         await using var r = await cmd.ExecuteReaderAsync(ct);
@@ -284,22 +263,7 @@ public sealed class LiveDatabaseReader
 
     private async Task ReadForeignKeysAsync(NpgsqlConnection conn, Dictionary<string, TableDefinition> tables, CancellationToken ct)
     {
-        const string sql = @"
-            SELECT n.nspname, c.relname, con.conname,
-                   a.attname AS col, k.ord,
-                   rn.nspname AS ref_schema, rc.relname AS ref_table, ra.attname AS ref_col,
-                   con.confdeltype, con.confupdtype
-            FROM pg_constraint con
-            JOIN pg_class c ON c.oid = con.conrelid
-            JOIN pg_namespace n ON n.oid = c.relnamespace
-            JOIN pg_class rc ON rc.oid = con.confrelid
-            JOIN pg_namespace rn ON rn.oid = rc.relnamespace
-            JOIN LATERAL unnest(con.conkey) WITH ORDINALITY AS k(attnum, ord) ON true
-            JOIN pg_attribute a ON a.attrelid = con.conrelid AND a.attnum = k.attnum
-            JOIN LATERAL unnest(con.confkey) WITH ORDINALITY AS rk(attnum, ord) ON rk.ord = k.ord
-            JOIN pg_attribute ra ON ra.attrelid = con.confrelid AND ra.attnum = rk.attnum
-            WHERE con.contype = 'f' AND n.nspname NOT IN ('pg_catalog','information_schema')
-            ORDER BY n.nspname, c.relname, con.conname, k.ord;";
+        var sql = _q.ForeignKeys;
 
         var fks = new Dictionary<(string, string, string), (List<string> cols, string rs, string rt, List<string> refCols, char del, char upd)>();
 
@@ -348,18 +312,7 @@ public sealed class LiveDatabaseReader
 
     private async Task<List<IndexDefinition>> ReadIndexesAsync(NpgsqlConnection conn, CancellationToken ct)
     {
-        const string sql = @"
-            SELECT n.nspname, c.relname AS tbl, ic.relname AS idx, ix.indisunique,
-                   am.amname, pg_get_indexdef(ix.indexrelid) AS def
-            FROM pg_index ix
-            JOIN pg_class ic ON ic.oid = ix.indexrelid
-            JOIN pg_class c ON c.oid = ix.indrelid
-            JOIN pg_namespace n ON n.oid = c.relnamespace
-            JOIN pg_am am ON am.oid = ic.relam
-            WHERE NOT ix.indisprimary
-              AND NOT EXISTS (SELECT 1 FROM pg_constraint con WHERE con.conindid = ix.indexrelid)
-              AND n.nspname NOT IN ('pg_catalog','information_schema') AND n.nspname NOT LIKE 'pg_%'
-            ORDER BY n.nspname, ic.relname;";
+        var sql = _q.Indexes;
 
         var list = new List<IndexDefinition>();
         await using var cmd = new NpgsqlCommand(sql, conn);
@@ -399,12 +352,7 @@ public sealed class LiveDatabaseReader
 
     private async Task<List<ViewDefinition>> ReadViewsAsync(NpgsqlConnection conn, CancellationToken ct)
     {
-        const string sql = @"
-            SELECT n.nspname, c.relname, pg_get_viewdef(c.oid, true) AS def, c.relkind
-            FROM pg_class c
-            JOIN pg_namespace n ON n.oid = c.relnamespace
-            WHERE c.relkind IN ('v','m') AND n.nspname NOT IN ('pg_catalog','information_schema') AND n.nspname NOT LIKE 'pg_%'
-            ORDER BY n.nspname, c.relname;";
+        var sql = _q.Views;
 
         var list = new List<ViewDefinition>();
         await using var cmd = new NpgsqlCommand(sql, conn);
@@ -417,12 +365,7 @@ public sealed class LiveDatabaseReader
     private async Task<List<SequenceDefinition>> ReadSequencesAsync(NpgsqlConnection conn, CancellationToken ct)
     {
         // pg_sequences (PG 10+) exposes every configured option directly.
-        const string sql = @"
-            SELECT schemaname, sequencename, data_type::text,
-                   increment_by, min_value, max_value, start_value, cache_size, cycle
-            FROM pg_sequences
-            WHERE schemaname NOT IN ('pg_catalog','information_schema') AND schemaname NOT LIKE 'pg_%'
-            ORDER BY schemaname, sequencename;";
+        var sql = _q.Sequences;
 
         var list = new List<SequenceDefinition>();
         await using var cmd = new NpgsqlCommand(sql, conn);
@@ -444,15 +387,7 @@ public sealed class LiveDatabaseReader
 
     private async Task<List<FunctionDefinition>> ReadFunctionsAsync(NpgsqlConnection conn, CancellationToken ct)
     {
-        const string sql = @"
-            SELECT n.nspname, p.proname,
-                   pg_get_function_identity_arguments(p.oid) AS args,
-                   pg_get_functiondef(p.oid) AS def
-            FROM pg_proc p
-            JOIN pg_namespace n ON n.oid = p.pronamespace
-            WHERE n.nspname NOT IN ('pg_catalog','information_schema') AND n.nspname NOT LIKE 'pg_%'
-              AND p.prokind IN ('f','p')
-            ORDER BY n.nspname, p.proname;";
+        var sql = _q.Functions;
 
         var list = new List<FunctionDefinition>();
         await using var cmd = new NpgsqlCommand(sql, conn);
@@ -477,15 +412,7 @@ public sealed class LiveDatabaseReader
 
     private async Task<List<RawObjectDefinition>> ReadCommentsAsync(NpgsqlConnection conn, CancellationToken ct)
     {
-        const string sql = @"
-            SELECT n.nspname, c.relname, a.attname, d.description, c.relkind
-            FROM pg_description d
-            JOIN pg_class c ON c.oid = d.objoid
-            JOIN pg_namespace n ON n.oid = c.relnamespace
-            LEFT JOIN pg_attribute a ON a.attrelid = c.oid AND a.attnum = d.objsubid
-            WHERE c.relkind IN ('r','p','v','m','f')
-              AND n.nspname NOT IN ('pg_catalog','information_schema') AND n.nspname NOT LIKE 'pg_%'
-            ORDER BY n.nspname, c.relname, d.objsubid;";
+        var sql = _q.Comments;
 
         var list = new List<RawObjectDefinition>();
         await using var cmd = new NpgsqlCommand(sql, conn);
@@ -511,7 +438,7 @@ public sealed class LiveDatabaseReader
     private async Task<List<RawObjectDefinition>> ReadExtensionsAsync(NpgsqlConnection conn, CancellationToken ct)
     {
         var list = new List<RawObjectDefinition>();
-        await using var cmd = new NpgsqlCommand("SELECT extname FROM pg_extension ORDER BY extname;", conn);
+        await using var cmd = new NpgsqlCommand(_q.Extensions, conn);
         await using var r = await cmd.ExecuteReaderAsync(ct);
         while (await r.ReadAsync(ct))
         {
@@ -529,21 +456,7 @@ public sealed class LiveDatabaseReader
     // nature instead of flattening it to a plain column-list CREATE TABLE.
     private async Task<List<RawObjectDefinition>> ReadTypedTablesAsync(NpgsqlConnection conn, CancellationToken ct)
     {
-        const string sql = @"
-            SELECT n.nspname, c.relname,
-                   tn.nspname AS type_schema, t.typname AS type_name,
-                   (SELECT string_agg(a.attname, ', ' ORDER BY k.ord)
-                      FROM pg_constraint con
-                      JOIN LATERAL unnest(con.conkey) WITH ORDINALITY AS k(attnum, ord) ON true
-                      JOIN pg_attribute a ON a.attrelid = con.conrelid AND a.attnum = k.attnum
-                      WHERE con.conrelid = c.oid AND con.contype = 'p') AS pk_cols
-            FROM pg_class c
-            JOIN pg_namespace n ON n.oid = c.relnamespace
-            JOIN pg_type t ON t.oid = c.reloftype
-            JOIN pg_namespace tn ON tn.oid = t.typnamespace
-            WHERE c.relkind IN ('r','p') AND c.reloftype <> 0
-              AND n.nspname NOT IN ('pg_catalog','information_schema') AND n.nspname NOT LIKE 'pg_%'
-            ORDER BY n.nspname, c.relname;";
+        var sql = _q.TypedTables;
 
         var list = new List<RawObjectDefinition>();
         await using var cmd = new NpgsqlCommand(sql, conn);
@@ -564,13 +477,7 @@ public sealed class LiveDatabaseReader
 
     private async Task<List<RawObjectDefinition>> ReadEnumTypesAsync(NpgsqlConnection conn, CancellationToken ct)
     {
-        const string sql = @"
-            SELECT n.nspname, t.typname, e.enumlabel
-            FROM pg_type t
-            JOIN pg_namespace n ON n.oid = t.typnamespace
-            JOIN pg_enum e ON e.enumtypid = t.oid
-            WHERE n.nspname NOT IN ('pg_catalog','information_schema') AND n.nspname NOT LIKE 'pg_%'
-            ORDER BY n.nspname, t.typname, e.enumsortorder;";
+        var sql = _q.EnumTypes;
 
         var labels = new Dictionary<(string, string), List<string>>();
         await using (var cmd = new NpgsqlCommand(sql, conn))
@@ -593,15 +500,7 @@ public sealed class LiveDatabaseReader
 
     private async Task<List<RawObjectDefinition>> ReadCompositeTypesAsync(NpgsqlConnection conn, CancellationToken ct)
     {
-        const string sql = @"
-            SELECT n.nspname, t.typname, a.attname, format_type(a.atttypid, a.atttypmod)
-            FROM pg_type t
-            JOIN pg_namespace n ON n.oid = t.typnamespace
-            JOIN pg_class c ON c.oid = t.typrelid
-            JOIN pg_attribute a ON a.attrelid = c.oid AND a.attnum > 0 AND NOT a.attisdropped
-            WHERE t.typtype = 'c' AND c.relkind = 'c'
-              AND n.nspname NOT IN ('pg_catalog','information_schema') AND n.nspname NOT LIKE 'pg_%'
-            ORDER BY n.nspname, t.typname, a.attnum;";
+        var sql = _q.CompositeTypes;
 
         var attrs = new Dictionary<(string, string), List<string>>();
         await using (var cmd = new NpgsqlCommand(sql, conn))
@@ -623,13 +522,7 @@ public sealed class LiveDatabaseReader
 
     private async Task<List<RawObjectDefinition>> ReadRangeTypesAsync(NpgsqlConnection conn, CancellationToken ct)
     {
-        const string sql = @"
-            SELECT n.nspname, t.typname, format_type(r.rngsubtype, NULL) AS subtype
-            FROM pg_range r
-            JOIN pg_type t ON t.oid = r.rngtypid
-            JOIN pg_namespace n ON n.oid = t.typnamespace
-            WHERE n.nspname NOT IN ('pg_catalog','information_schema') AND n.nspname NOT LIKE 'pg_%'
-            ORDER BY n.nspname, t.typname;";
+        var sql = _q.RangeTypes;
 
         var list = new List<RawObjectDefinition>();
         await using var cmd = new NpgsqlCommand(sql, conn);
@@ -648,13 +541,7 @@ public sealed class LiveDatabaseReader
     // types are excluded by the typisdefined filter.
     private async Task<List<RawObjectDefinition>> ReadShellTypesAsync(NpgsqlConnection conn, CancellationToken ct)
     {
-        const string sql = @"
-            SELECT n.nspname, t.typname
-            FROM pg_type t
-            JOIN pg_namespace n ON n.oid = t.typnamespace
-            WHERE NOT t.typisdefined AND t.typtype <> 'b'
-              AND n.nspname NOT IN ('pg_catalog','information_schema') AND n.nspname NOT LIKE 'pg_%'
-            ORDER BY n.nspname, t.typname;";
+        var sql = _q.ShellTypes;
 
         var list = new List<RawObjectDefinition>();
         await using var cmd = new NpgsqlCommand(sql, conn);
@@ -670,13 +557,7 @@ public sealed class LiveDatabaseReader
 
     private async Task<List<RawObjectDefinition>> ReadCollationsAsync(NpgsqlConnection conn, CancellationToken ct)
     {
-        const string sql = @"
-            SELECT n.nspname, c.collname, c.collprovider, c.collisdeterministic,
-                   c.collcollate, c.collctype, c.colllocale
-            FROM pg_collation c
-            JOIN pg_namespace n ON n.oid = c.collnamespace
-            WHERE n.nspname NOT IN ('pg_catalog','information_schema') AND n.nspname NOT LIKE 'pg_%'
-            ORDER BY n.nspname, c.collname;";
+        var sql = _q.Collations;
 
         var list = new List<RawObjectDefinition>();
         await using var cmd = new NpgsqlCommand(sql, conn);
@@ -710,19 +591,7 @@ public sealed class LiveDatabaseReader
 
     private async Task<List<RawObjectDefinition>> ReadAggregatesAsync(NpgsqlConnection conn, CancellationToken ct)
     {
-        const string sql = @"
-            SELECT n.nspname, p.proname,
-                   pg_get_function_identity_arguments(p.oid) AS args,
-                   a.aggtransfn::regproc::text AS sfunc,
-                   format_type(a.aggtranstype, NULL) AS stype,
-                   NULLIF(a.aggfinalfn, 0)::regproc::text AS finalfunc,
-                   NULLIF(a.aggcombinefn, 0)::regproc::text AS combinefunc,
-                   a.agginitval AS initcond
-            FROM pg_aggregate a
-            JOIN pg_proc p ON p.oid = a.aggfnoid
-            JOIN pg_namespace n ON n.oid = p.pronamespace
-            WHERE n.nspname NOT IN ('pg_catalog','information_schema') AND n.nspname NOT LIKE 'pg_%'
-            ORDER BY n.nspname, p.proname;";
+        var sql = _q.Aggregates;
 
         var list = new List<RawObjectDefinition>();
         await using var cmd = new NpgsqlCommand(sql, conn);
@@ -747,16 +616,7 @@ public sealed class LiveDatabaseReader
 
     private async Task<List<RawObjectDefinition>> ReadDomainsAsync(NpgsqlConnection conn, CancellationToken ct)
     {
-        const string sql = @"
-            SELECT n.nspname, t.typname, format_type(t.typbasetype, t.typtypmod) AS basetype,
-                   t.typnotnull, t.typdefault,
-                   (SELECT string_agg(pg_get_constraintdef(c.oid), ' ')
-                      FROM pg_constraint c WHERE c.contypid = t.oid AND c.contype = 'c') AS checks
-            FROM pg_type t
-            JOIN pg_namespace n ON n.oid = t.typnamespace
-            WHERE t.typtype = 'd'
-              AND n.nspname NOT IN ('pg_catalog','information_schema') AND n.nspname NOT LIKE 'pg_%'
-            ORDER BY n.nspname, t.typname;";
+        var sql = _q.Domains;
 
         var list = new List<RawObjectDefinition>();
         await using var cmd = new NpgsqlCommand(sql, conn);
@@ -781,14 +641,7 @@ public sealed class LiveDatabaseReader
 
     private async Task<List<RawObjectDefinition>> ReadTriggersAsync(NpgsqlConnection conn, CancellationToken ct)
     {
-        const string sql = @"
-            SELECT n.nspname, c.relname, t.tgname, pg_get_triggerdef(t.oid, true) AS def
-            FROM pg_trigger t
-            JOIN pg_class c ON c.oid = t.tgrelid
-            JOIN pg_namespace n ON n.oid = c.relnamespace
-            WHERE NOT t.tgisinternal
-              AND n.nspname NOT IN ('pg_catalog','information_schema') AND n.nspname NOT LIKE 'pg_%'
-            ORDER BY n.nspname, c.relname, t.tgname;";
+        var sql = _q.Triggers;
 
         var list = new List<RawObjectDefinition>();
         await using var cmd = new NpgsqlCommand(sql, conn);
@@ -805,14 +658,7 @@ public sealed class LiveDatabaseReader
 
     private async Task<List<RawObjectDefinition>> ReadRulesAsync(NpgsqlConnection conn, CancellationToken ct)
     {
-        const string sql = @"
-            SELECT n.nspname, c.relname, r.rulename, pg_get_ruledef(r.oid, true) AS def
-            FROM pg_rewrite r
-            JOIN pg_class c ON c.oid = r.ev_class
-            JOIN pg_namespace n ON n.oid = c.relnamespace
-            WHERE r.rulename <> '_RETURN'
-              AND n.nspname NOT IN ('pg_catalog','information_schema') AND n.nspname NOT LIKE 'pg_%'
-            ORDER BY n.nspname, c.relname, r.rulename;";
+        var sql = _q.Rules;
 
         var list = new List<RawObjectDefinition>();
         await using var cmd = new NpgsqlCommand(sql, conn);
@@ -829,15 +675,7 @@ public sealed class LiveDatabaseReader
 
     private async Task<List<RawObjectDefinition>> ReadPoliciesAsync(NpgsqlConnection conn, CancellationToken ct)
     {
-        const string sql = @"
-            SELECT n.nspname, c.relname, pol.polname, pol.polcmd, pol.polpermissive,
-                   pg_get_expr(pol.polqual, pol.polrelid) AS using_expr,
-                   pg_get_expr(pol.polwithcheck, pol.polrelid) AS check_expr
-            FROM pg_policy pol
-            JOIN pg_class c ON c.oid = pol.polrelid
-            JOIN pg_namespace n ON n.oid = c.relnamespace
-            WHERE n.nspname NOT IN ('pg_catalog','information_schema') AND n.nspname NOT LIKE 'pg_%'
-            ORDER BY n.nspname, c.relname, pol.polname;";
+        var sql = _q.Policies;
 
         var list = new List<RawObjectDefinition>();
         await using var cmd = new NpgsqlCommand(sql, conn);
@@ -864,12 +702,7 @@ public sealed class LiveDatabaseReader
 
     private async Task<List<RawObjectDefinition>> ReadEventTriggersAsync(NpgsqlConnection conn, CancellationToken ct)
     {
-        const string sql = @"
-            SELECT e.evtname, e.evtevent, np.nspname, p.proname
-            FROM pg_event_trigger e
-            JOIN pg_proc p ON p.oid = e.evtfoid
-            JOIN pg_namespace np ON np.oid = p.pronamespace
-            ORDER BY e.evtname;";
+        var sql = _q.EventTriggers;
 
         var list = new List<RawObjectDefinition>();
         await using var cmd = new NpgsqlCommand(sql, conn);
@@ -902,8 +735,7 @@ public sealed class LiveDatabaseReader
         // Conversion, FDW, Server, Cast, and column-based Statistics now have real DDL reconstruction
         // (below); the rest stay existence-only until they get a clean reconstruction too.
         // Expression statistics (stxexprs set) we don't reconstruct yet → keep existence-only.
-        await Schema(ObjectKind.Statistics, "statistics",
-            "SELECT n.nspname, s.stxname FROM pg_statistic_ext s JOIN pg_namespace n ON n.oid=s.stxnamespace WHERE s.stxexprs IS NOT NULL");
+        await Schema(ObjectKind.Statistics, "statistics", _q.StatisticsExistence);
         return list;
     }
 
@@ -911,22 +743,7 @@ public sealed class LiveDatabaseReader
 
     private async Task<List<RawObjectDefinition>> ReadOperatorsAsync(NpgsqlConnection conn, CancellationToken ct)
     {
-        const string sql = @"
-            SELECT n.nspname, o.oprname,
-                   CASE WHEN o.oprleft  <> 0 THEN format_type(o.oprleft,  NULL) END AS leftarg,
-                   CASE WHEN o.oprright <> 0 THEN format_type(o.oprright, NULL) END AS rightarg,
-                   o.oprcode::regproc::text AS func,
-                   (SELECT cn.nspname||'.'||c.oprname FROM pg_operator c JOIN pg_namespace cn ON cn.oid=c.oprnamespace WHERE c.oid=o.oprcom)    AS commutator,
-                   (SELECT gn.nspname||'.'||g.oprname FROM pg_operator g JOIN pg_namespace gn ON gn.oid=g.oprnamespace WHERE g.oid=o.oprnegate) AS negator,
-                   CASE WHEN o.oprrest <> 0 THEN o.oprrest::regproc::text END AS res,
-                   CASE WHEN o.oprjoin <> 0 THEN o.oprjoin::regproc::text END AS joi,
-                   o.oprcanmerge, o.oprcanhash
-            FROM pg_operator o
-            JOIN pg_namespace n ON n.oid = o.oprnamespace
-            WHERE n.nspname NOT IN ('pg_catalog','information_schema') AND n.nspname NOT LIKE 'pg_%'
-              AND NOT EXISTS (SELECT 1 FROM pg_depend d WHERE d.classid='pg_operator'::regclass
-                                AND d.objid=o.oid AND d.deptype IN ('i','a','e'))
-            ORDER BY n.nspname, o.oprname;";
+        var sql = _q.Operators;
 
         var list = new List<RawObjectDefinition>();
         await using var cmd = new NpgsqlCommand(sql, conn);
@@ -960,17 +777,7 @@ public sealed class LiveDatabaseReader
     // CLASS (the class carries an 'a' dep on them) are skipped; that class re-creates its family itself.
     private async Task<List<RawObjectDefinition>> ReadOperatorFamiliesAsync(NpgsqlConnection conn, CancellationToken ct)
     {
-        const string sql = @"
-            SELECT n.nspname, f.opfname, am.amname
-            FROM pg_opfamily f
-            JOIN pg_namespace n ON n.oid = f.opfnamespace
-            JOIN pg_am am ON am.oid = f.opfmethod
-            WHERE n.nspname NOT IN ('pg_catalog','information_schema') AND n.nspname NOT LIKE 'pg_%'
-              AND NOT EXISTS (SELECT 1 FROM pg_depend d WHERE d.classid='pg_opclass'::regclass
-                                AND d.refobjid=f.oid AND d.deptype='a')
-              AND NOT EXISTS (SELECT 1 FROM pg_depend d WHERE d.classid='pg_opfamily'::regclass
-                                AND d.objid=f.oid AND d.deptype='e')
-            ORDER BY n.nspname, f.opfname;";
+        var sql = _q.OperatorFamilies;
 
         var list = new List<RawObjectDefinition>();
         await using var cmd = new NpgsqlCommand(sql, conn);
@@ -989,23 +796,7 @@ public sealed class LiveDatabaseReader
 
     private async Task<List<RawObjectDefinition>> ReadOperatorClassesAsync(NpgsqlConnection conn, CancellationToken ct)
     {
-        const string sql = @"
-            SELECT n.nspname, c.opcname, c.opcdefault,
-                   format_type(c.opcintype, NULL) AS intype,
-                   am.amname AS method,
-                   c.opcfamily, c.opcintype,
-                   fn.nspname AS famschema, f.opfname AS famname,
-                   EXISTS(SELECT 1 FROM pg_depend d WHERE d.classid='pg_opclass'::regclass
-                            AND d.objid=c.oid AND d.refobjid=c.opcfamily AND d.deptype='a') AS autofam
-            FROM pg_opclass c
-            JOIN pg_namespace n  ON n.oid  = c.opcnamespace
-            JOIN pg_am am        ON am.oid = c.opcmethod
-            JOIN pg_opfamily f   ON f.oid  = c.opcfamily
-            JOIN pg_namespace fn ON fn.oid = f.opfnamespace
-            WHERE n.nspname NOT IN ('pg_catalog','information_schema') AND n.nspname NOT LIKE 'pg_%'
-              AND NOT EXISTS (SELECT 1 FROM pg_depend d WHERE d.classid='pg_opclass'::regclass
-                                AND d.objid=c.oid AND d.deptype='e')   -- skip extension opclasses
-            ORDER BY n.nspname, c.opcname;";
+        var sql = _q.OperatorClasses;
 
         var headers = new List<(string Schema, string Name, bool Default, string IntType, string Method,
                                 uint Family, uint OpcIntType, string FamSchema, string FamName, bool AutoFam)>();
@@ -1020,12 +811,7 @@ public sealed class LiveDatabaseReader
         {
             var members = new List<string>();
 
-            const string amopSql = @"
-                SELECT amopstrategy, amopopr::regoperator::text, amoppurpose,
-                       NULLIF(amopsortfamily,0)::regclass::text
-                FROM pg_amop
-                WHERE amopfamily=@fam AND amoplefttype=@t AND amoprighttype=@t
-                ORDER BY amoppurpose, amopstrategy;";
+            var amopSql = _q.OperatorClassAmOps;
             await using (var oc = new NpgsqlCommand(amopSql, conn))
             {
                 oc.Parameters.AddWithValue("fam", NpgsqlTypes.NpgsqlDbType.Oid, h.Family);
@@ -1042,11 +828,7 @@ public sealed class LiveDatabaseReader
                 }
             }
 
-            const string amprocSql = @"
-                SELECT amprocnum, amproc::regprocedure::text
-                FROM pg_amproc
-                WHERE amprocfamily=@fam AND amproclefttype=@t AND amprocrighttype=@t
-                ORDER BY amprocnum;";
+            var amprocSql = _q.OperatorClassAmProcs;
             await using (var pc = new NpgsqlCommand(amprocSql, conn))
             {
                 pc.Parameters.AddWithValue("fam", NpgsqlTypes.NpgsqlDbType.Oid, h.Family);
@@ -1068,14 +850,7 @@ public sealed class LiveDatabaseReader
 
     private async Task<List<RawObjectDefinition>> ReadTextSearchDictionariesAsync(NpgsqlConnection conn, CancellationToken ct)
     {
-        const string sql = @"
-            SELECT n.nspname, d.dictname, tn.nspname||'.'||t.tmplname AS template, d.dictinitoption
-            FROM pg_ts_dict d
-            JOIN pg_namespace n  ON n.oid  = d.dictnamespace
-            JOIN pg_ts_template t ON t.oid = d.dicttemplate
-            JOIN pg_namespace tn ON tn.oid = t.tmplnamespace
-            WHERE n.nspname NOT IN ('pg_catalog','information_schema') AND n.nspname NOT LIKE 'pg_%'
-            ORDER BY n.nspname, d.dictname;";
+        var sql = _q.TextSearchDictionaries;
 
         var list = new List<RawObjectDefinition>();
         await using var cmd = new NpgsqlCommand(sql, conn);
@@ -1095,15 +870,7 @@ public sealed class LiveDatabaseReader
     private async Task<List<RawObjectDefinition>> ReadTextSearchConfigurationsAsync(NpgsqlConnection conn, CancellationToken ct)
     {
         // Pass 1: the configurations (and their parser). Read fully before issuing per-config map queries.
-        const string cfgSql = @"
-            SELECT n.nspname, c.cfgname, c.oid, c.cfgparser,
-                   pn.nspname||'.'||p.prsname AS parser
-            FROM pg_ts_config c
-            JOIN pg_namespace n  ON n.oid  = c.cfgnamespace
-            JOIN pg_ts_parser p  ON p.oid  = c.cfgparser
-            JOIN pg_namespace pn ON pn.oid = p.prsnamespace
-            WHERE n.nspname NOT IN ('pg_catalog','information_schema') AND n.nspname NOT LIKE 'pg_%'
-            ORDER BY n.nspname, c.cfgname;";
+        var cfgSql = _q.TextSearchConfigurations;
 
         var configs = new List<(string Schema, string Name, uint Oid, uint Parser, string ParserName)>();
         await using (var cmd = new NpgsqlCommand(cfgSql, conn))
@@ -1118,15 +885,7 @@ public sealed class LiveDatabaseReader
             sb.Append($"CREATE TEXT SEARCH CONFIGURATION {c.Schema}.{c.Name} (PARSER = {c.ParserName});");
 
             // Pass 2: token-type → dictionary-list mappings, one ADD MAPPING per token type.
-            const string mapSql = @"
-                SELECT tt.alias, string_agg(dn.nspname||'.'||d.dictname, ', ' ORDER BY m.mapseqno) AS dicts
-                FROM pg_ts_config_map m
-                JOIN pg_ts_dict d ON d.oid = m.mapdict
-                JOIN pg_namespace dn ON dn.oid = d.dictnamespace
-                JOIN ts_token_type(@parser) tt ON tt.tokid = m.maptokentype
-                WHERE m.mapcfg = @cfg
-                GROUP BY tt.alias, m.maptokentype
-                ORDER BY m.maptokentype;";
+            var mapSql = _q.TextSearchConfigurationMap;
             await using var mc = new NpgsqlCommand(mapSql, conn);
             mc.Parameters.AddWithValue("parser", NpgsqlTypes.NpgsqlDbType.Oid, c.Parser);
             mc.Parameters.AddWithValue("cfg", NpgsqlTypes.NpgsqlDbType.Oid, c.Oid);
@@ -1144,16 +903,7 @@ public sealed class LiveDatabaseReader
 
     private async Task<List<RawObjectDefinition>> ReadConversionsAsync(NpgsqlConnection conn, CancellationToken ct)
     {
-        const string sql = @"
-            SELECT n.nspname, c.conname,
-                   pg_encoding_to_char(c.conforencoding) AS src,
-                   pg_encoding_to_char(c.contoencoding) AS dst,
-                   c.conproc::regproc::text AS func,
-                   c.condefault
-            FROM pg_conversion c
-            JOIN pg_namespace n ON n.oid = c.connamespace
-            WHERE n.nspname NOT IN ('pg_catalog','information_schema') AND n.nspname NOT LIKE 'pg_%'
-            ORDER BY n.nspname, c.conname;";
+        var sql = _q.Conversions;
 
         var list = new List<RawObjectDefinition>();
         await using var cmd = new NpgsqlCommand(sql, conn);
@@ -1171,13 +921,7 @@ public sealed class LiveDatabaseReader
 
     private async Task<List<RawObjectDefinition>> ReadForeignDataWrappersAsync(NpgsqlConnection conn, CancellationToken ct)
     {
-        const string sql = @"
-            SELECT w.fdwname,
-                   NULLIF(w.fdwhandler,0)::regproc::text AS handler,
-                   NULLIF(w.fdwvalidator,0)::regproc::text AS validator,
-                   w.fdwoptions
-            FROM pg_foreign_data_wrapper w
-            ORDER BY w.fdwname;";
+        var sql = _q.ForeignDataWrappers;
 
         var list = new List<RawObjectDefinition>();
         await using var cmd = new NpgsqlCommand(sql, conn);
@@ -1196,11 +940,7 @@ public sealed class LiveDatabaseReader
 
     private async Task<List<RawObjectDefinition>> ReadServersAsync(NpgsqlConnection conn, CancellationToken ct)
     {
-        const string sql = @"
-            SELECT s.srvname, w.fdwname, s.srvtype, s.srvversion, s.srvoptions
-            FROM pg_foreign_server s
-            JOIN pg_foreign_data_wrapper w ON w.oid = s.srvfdw
-            ORDER BY s.srvname;";
+        var sql = _q.Servers;
 
         var list = new List<RawObjectDefinition>();
         await using var cmd = new NpgsqlCommand(sql, conn);
@@ -1221,21 +961,7 @@ public sealed class LiveDatabaseReader
     private async Task<List<RawObjectDefinition>> ReadStatisticsAsync(NpgsqlConnection conn, CancellationToken ct)
     {
         // Column-based extended statistics only (stxexprs IS NULL); expression stats stay existence-only.
-        const string sql = @"
-            SELECT n.nspname, s.stxname,
-                   (s.stxrelid::regclass)::text AS tbl,
-                   (SELECT string_agg(a.attname, ', ' ORDER BY k.ord)
-                      FROM unnest(s.stxkeys) WITH ORDINALITY AS k(attnum, ord)
-                      JOIN pg_attribute a ON a.attrelid = s.stxrelid AND a.attnum = k.attnum) AS cols,
-                   ARRAY(SELECT CASE k WHEN 'd' THEN 'ndistinct' WHEN 'f' THEN 'dependencies'
-                                       WHEN 'm' THEN 'mcv' END
-                         FROM unnest(s.stxkind) AS k
-                         WHERE k IN ('d','f','m')) AS kinds
-            FROM pg_statistic_ext s
-            JOIN pg_namespace n ON n.oid = s.stxnamespace
-            WHERE s.stxexprs IS NULL
-              AND n.nspname NOT IN ('pg_catalog','information_schema') AND n.nspname NOT LIKE 'pg_%'
-            ORDER BY n.nspname, s.stxname;";
+        var sql = _q.Statistics;
 
         var list = new List<RawObjectDefinition>();
         await using var cmd = new NpgsqlCommand(sql, conn);
@@ -1257,24 +983,7 @@ public sealed class LiveDatabaseReader
     private async Task<List<RawObjectDefinition>> ReadCastsAsync(NpgsqlConnection conn, CancellationToken ct)
     {
         // User casts only: those touching a user-schema type or function (built-in casts are excluded).
-        const string sql = @"
-            SELECT format_type(c.castsource, NULL) AS src,
-                   format_type(c.casttarget, NULL) AS tgt,
-                   CASE WHEN c.castfunc <> 0 THEN c.castfunc::regprocedure::text END AS func,
-                   c.castcontext, c.castmethod
-            FROM pg_cast c
-            WHERE (EXISTS (SELECT 1 FROM pg_type t JOIN pg_namespace n ON n.oid = t.typnamespace
-                          WHERE t.oid IN (c.castsource, c.casttarget)
-                            AND n.nspname NOT IN ('pg_catalog','information_schema') AND n.nspname NOT LIKE 'pg_%')
-               OR EXISTS (SELECT 1 FROM pg_proc p JOIN pg_namespace n ON n.oid = p.pronamespace
-                          WHERE p.oid = c.castfunc
-                            AND n.nspname NOT IN ('pg_catalog','information_schema') AND n.nspname NOT LIKE 'pg_%'))
-              -- exclude casts PostgreSQL auto-creates (e.g. range↔multirange) or that belong to an
-              -- extension; those reappear on their own when the owning object is created.
-              AND NOT EXISTS (SELECT 1 FROM pg_depend d
-                              WHERE d.classid = 'pg_cast'::regclass AND d.objid = c.oid
-                                AND d.deptype IN ('i','a','e'))
-            ORDER BY 1, 2;";
+        var sql = _q.Casts;
 
         var list = new List<RawObjectDefinition>();
         await using var cmd = new NpgsqlCommand(sql, conn);
@@ -1300,20 +1009,7 @@ public sealed class LiveDatabaseReader
 
     private async Task<List<RawObjectDefinition>> ReadForeignTablesAsync(NpgsqlConnection conn, CancellationToken ct)
     {
-        const string sql = @"
-            SELECT n.nspname, c.relname, s.srvname, ft.ftoptions,
-                   (SELECT string_agg(
-                              a.attname || ' ' || format_type(a.atttypid, a.atttypmod)
-                              || CASE WHEN a.attnotnull THEN ' NOT NULL' ELSE '' END,
-                              ', ' ORDER BY a.attnum)
-                      FROM pg_attribute a
-                      WHERE a.attrelid = c.oid AND a.attnum > 0 AND NOT a.attisdropped) AS cols
-            FROM pg_foreign_table ft
-            JOIN pg_class c ON c.oid = ft.ftrelid
-            JOIN pg_namespace n ON n.oid = c.relnamespace
-            JOIN pg_foreign_server s ON s.oid = ft.ftserver
-            WHERE n.nspname NOT IN ('pg_catalog','information_schema') AND n.nspname NOT LIKE 'pg_%'
-            ORDER BY n.nspname, c.relname;";
+        var sql = _q.ForeignTables;
 
         var list = new List<RawObjectDefinition>();
         await using var cmd = new NpgsqlCommand(sql, conn);
@@ -1333,20 +1029,7 @@ public sealed class LiveDatabaseReader
 
     private async Task<List<RawObjectDefinition>> ReadPublicationsAsync(NpgsqlConnection conn, CancellationToken ct)
     {
-        const string sql = @"
-            SELECT p.pubname, p.puballtables, p.pubinsert, p.pubupdate, p.pubdelete, p.pubtruncate, p.pubviaroot,
-                   (SELECT string_agg(quote_ident(n.nspname)||'.'||quote_ident(c.relname), ', '
-                                      ORDER BY n.nspname, c.relname)
-                      FROM pg_publication_rel pr
-                      JOIN pg_class c ON c.oid = pr.prrelid
-                      JOIN pg_namespace n ON n.oid = c.relnamespace
-                      WHERE pr.prpubid = p.oid) AS tables,
-                   (SELECT string_agg(quote_ident(n.nspname), ', ' ORDER BY n.nspname)
-                      FROM pg_publication_namespace pn
-                      JOIN pg_namespace n ON n.oid = pn.pnnspid
-                      WHERE pn.pnpubid = p.oid) AS schemas
-            FROM pg_publication p
-            ORDER BY p.pubname;";
+        var sql = _q.Publications;
 
         var list = new List<RawObjectDefinition>();
         await using var cmd = new NpgsqlCommand(sql, conn);
