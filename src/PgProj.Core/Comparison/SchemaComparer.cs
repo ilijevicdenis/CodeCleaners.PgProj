@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 using PgProj.Core.Model;
 
 namespace PgProj.Core.Comparison;
@@ -23,8 +22,6 @@ public sealed class ComparerOptions
 /// </summary>
 public sealed class SchemaComparer
 {
-    private static readonly Regex Whitespace = new(@"\s+", RegexOptions.Compiled);
-
     // Schema-qualified-name key with the model's identifier semantics (OrdinalIgnoreCase, mirroring
     // DatabaseModel.NameEquals). Used to pre-index target/source collections so the per-object lookups
     // are O(1) instead of a linear FirstOrDefault scan — the comparer was O(n·m) over object counts.
@@ -347,38 +344,19 @@ public sealed class SchemaComparer
         return na == nb;
     }
 
-    // Strip explicit casts so a project default ('active') matches the catalog's
-    // ('active'::character varying), and collapse to a canonical form.
-    private static readonly Regex CastSuffix = new(@"::\s*""?[A-Za-z][A-Za-z0-9_ ]*""?(\[\])?", RegexOptions.Compiled);
-
-    private string NormalizeDefault(string? d) =>
-        string.IsNullOrWhiteSpace(d) ? string.Empty : NormalizeText(CastSuffix.Replace(d, string.Empty));
-
-    // Canonicalize dollar-quote tags ($function$ -> $$) so a hand-written function body matches the
-    // catalog's pg_get_functiondef rendering, which picks its own tag.
-    private static readonly Regex DollarTag = new(@"\$[A-Za-z0-9_]*\$", RegexOptions.Compiled);
-
-    // pg_get_viewdef adds a result-type cast to literals (0 -> 0::bigint). Strip casts on numeric/
-    // string LITERALS only (not column/expression casts), so a view round-trips with zero diff.
-    private static readonly Regex LiteralCast = new(@"(\b\d+(?:\.\d+)?|'[^']*')::[a-z0-9_]+", RegexOptions.Compiled);
-    // Reconcile punctuation spacing: our Token.Render is tight ("a,b" / "x=y") while pg_get_viewdef
-    // is spaced ("a, b" / "x = y"). A space is only meaningful between two word characters.
-    private static readonly Regex PunctSpace = new(@"\s*([^\w\s])\s*", RegexOptions.Compiled);
+    // Canonicalization (NormalizeText/NormalizeDefault/NormalizeBody/NormalizeRawBody) now lives in
+    // Canonicalizer — a single source of truth shared with Model/Identity/CanonicalHash (issue #42),
+    // so the semantic hash hashes byte-for-byte the same canonical text the comparer diffs on. These
+    // are thin delegates kept so the rest of this file reads unchanged.
+    private static string NormalizeDefault(string? d) => Canonicalizer.NormalizeDefault(d);
 
     /// <summary>Body comparison for verbatim objects: case-, whitespace-, punctuation-spacing-, dollar-tag-, literal-cast- and trailing-`;`-agnostic.</summary>
-    private static string NormalizeBody(string s)
-        => PunctSpace.Replace(LiteralCast.Replace(NormalizeText(DollarTag.Replace(s, "$$$$")), "$1"), "$1").TrimEnd(';', ' ');
-
-    // `IF NOT EXISTS` is an idempotency hint on CREATE, not part of the object's definition: the live
-    // reader emits it (so a re-deploy is replayable) while a project file may omit it. Drop it before
-    // comparison so `CREATE EXTENSION x` and `CREATE EXTENSION IF NOT EXISTS x` don't register a diff.
-    private static readonly Regex IfNotExists = new(@"\bif\s+not\s+exists\b", RegexOptions.Compiled);
+    private static string NormalizeBody(string s) => Canonicalizer.NormalizeBody(s);
 
     /// <summary>Raw single-statement DDL additionally ignores identifier quoting — the catalog reader
     /// quotes names (e.g. <c>CREATE EXTENSION "btree_gist"</c>) that a project usually writes bare —
     /// and the <c>IF NOT EXISTS</c> idempotency hint.</summary>
-    private static string NormalizeRawBody(string s) =>
-        Whitespace.Replace(IfNotExists.Replace(NormalizeBody(s.Replace("\"", "")), " "), " ").Trim();
+    private static string NormalizeRawBody(string s) => Canonicalizer.NormalizeRawBody(s);
 
     private static bool IndexesEqual(IndexDefinition a, IndexDefinition b) =>
         a.IsUnique == b.IsUnique
@@ -395,6 +373,5 @@ public sealed class SchemaComparer
         + "->" + fk.ReferencedSchema.ToLowerInvariant() + "." + fk.ReferencedTable.ToLowerInvariant()
         + "(" + string.Join(",", fk.ReferencedColumns.Select(c => c.ToLowerInvariant())) + ")";
 
-    private static string NormalizeText(string s) =>
-        Whitespace.Replace(s.Trim(), " ").ToLowerInvariant();
+    private static string NormalizeText(string s) => Canonicalizer.NormalizeText(s);
 }
