@@ -22,7 +22,7 @@ deliverable subtasks; **complex issues are broken into smaller subtasks when imp
 | **M2** | Semantic Core — Identity & Foundations | EP-SEMCORE | #42, #43, #44, #45, #46, #39 | 6 / 6 | ✅ | [milestone/2](https://github.com/ilijevicdenis/CodeCleaners.PgProj/milestone/2) |
 | **M3** | Semantic Core — Binding & Validation | EP-SEMCORE | #47, #48, #50, #51 | 4 / 4 | ✅ | [milestone/3](https://github.com/ilijevicdenis/CodeCleaners.PgProj/milestone/3) |
 | **M4** | Diff, Risk, Deploy & Incremental | EP-SEMCORE | #52, #53, #54, #55, #56, #57, #58, #61, #64 | 8 / 9 | 🟡 | [milestone/4](https://github.com/ilijevicdenis/CodeCleaners.PgProj/milestone/4) |
-| **M5** | SSDT Parity — Editor UI | parity #27 | #31, #24, #25, #26 | 0 / 4 | ⬜ | [milestone/5](https://github.com/ilijevicdenis/CodeCleaners.PgProj/milestone/5) |
+| **M5** | SSDT Parity — Editor UI | parity #27 | #31, #24, #25, #26 | 1 / 4 | 🟡 | [milestone/5](https://github.com/ilijevicdenis/CodeCleaners.PgProj/milestone/5) |
 | **M6** | Performance & Engine Backlog | perf #12 | #8, #10 | 0 / 6 † | ⬜ | [milestone/6](https://github.com/ilijevicdenis/CodeCleaners.PgProj/milestone/6) |
 
 † M6 only carries the two *open* perf items; most of the allocation campaign already landed on `main`
@@ -121,15 +121,19 @@ EP-SEMCORE Parts B+C, Phases 10–15 & 18. **8/9 — all phases delivered; #61 c
 - ✅ **#64** — round-trip idempotency (finely-modelled) *(delivered with #53/#61)*
 - 🟡 **#61** — round-trip idempotency (remaining raw kinds) *(cast/operator/op-class/op-family delivered; Trigger + function-comment fidelity gaps remain — tracked here)*
 
-### M5 · SSDT Parity — Editor UI ⬜
+### M5 · SSDT Parity — Editor UI 🟡
 
 The "same experience" UI stream (#27). Depends on the engine JSON contract (already landed) and the
-semantic core for live features.
+semantic core for live features. **1/4 — the .NET language-service foundation is in; the editor-client
+epics (#24/#25/#26) are TypeScript/VSIX builds outside the .NET+PG18 test harness.**
 
-- ⬜ **#31** — EP-LSP: resident language service (`pgproj serve` / LSP) for live parsing
-- ⬜ **#24** — EP-VSCODE: VS Code extension (primary UI)
-- ⬜ **#25** — EP-VS: Visual Studio experience
-- ⬜ **#26** — EP-DESIGNER: graphical table designer
+- ✅ **#31** — EP-LSP: resident language service (`pgproj serve` / LSP) for live parsing
+  *(delivered; `PgProj.Lsp` + `pgproj serve` STDIO LSP host — didOpen/didChange→debounced publishDiagnostics
+  [verdict identical to build], definition/hover/completion; pure handlers unit-tested [16 tests]; doc at
+  `docs/LSP_LANGUAGE_SERVER.md`. This is the backend every editor client attaches to.)*
+- ⬜ **#24** — EP-VSCODE: VS Code extension (primary UI) — *TypeScript; attaches to `pgproj serve`; needs a Node/`@vscode/test-electron` toolchain*
+- ⬜ **#25** — EP-VS: Visual Studio experience — *VSIX/C#; needs the VS SDK + Apex UI tests*
+- ⬜ **#26** — EP-DESIGNER: graphical table designer — *P2; UI on top of #24/#25*
 
 ### M6 · Performance & Engine Backlog ⬜
 
@@ -147,6 +151,7 @@ Newest first. One line per delivered issue/milestone; this is the audit trail of
 
 | Date | Milestone | Item | Commit | Notes |
 |------|-----------|------|--------|-------|
+| 2026-06-07 | M5 | #31 EP-LSP resident language service (`pgproj serve`) | merge of `milestone/m5-editor-ui` | New `PgProj.Lsp` + `serve` verb; STDIO LSP over the engine (debounced diagnostics = build verdict; definition/hover/completion). 16 LSP tests; corpus/goldens unaffected. Editor-client epics #24/#25/#26 remain (TypeScript/VSIX, separate toolchain). |
 | 2026-06-07 | M4 | #52 #53 #54 #55 #56 #57 #58 #64 + #61 (partial) — snapshots, identity diff, risk, planning, gen, incremental, options, round-trip | merge of `milestone/m4-diff-deploy` | Three dependency-ordered worktree-agent waves. PG18 suite 22,471 pass / 0 fail / 0 skip; allocation neutral; defaults byte-identical. #61 trigger + function-comment round-trip gaps remain (tracked). |
 | 2026-06-07 | M3 | #47 #48 #50 #51 — binding, validation, dependency graph, canonical hardening (**completes M3**) | merge of `milestone/m3-binding-validation` | Two worktree-agent waves (#47/#51 then #48/#50 on the bound model). PG18 suite 22,363 pass / 0 fail / 0 skip; goldens byte-identical. Parse allocation +0.35% (tightened from +1.16% — ColumnRef single-slot, trigger detail behind one ref). |
 | 2026-06-07 | M2 | #44 IProjectObject contract + object-kind registry (**completes M2**) | merge of `feature/44-iprojectobject-registry` | Contract + registry; every per-kind switch (RawObjectMeta, SchemaCompareObjectType, LiveDatabaseReader fan-out, ModelBuilder.BuildRaw) collapsed into one ObjectKindRegistry table. Golden byte-identical; PG18 suite 22,301 pass / 0 fail / 0 skip. |
