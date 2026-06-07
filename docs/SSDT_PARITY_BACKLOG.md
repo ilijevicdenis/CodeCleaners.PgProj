@@ -295,9 +295,9 @@ VS support is still "preview".
 - As a developer, I want IntelliSense/go-to-definition in `.sql` files driven by the project model.
 
 **Tasks**
-- [ ] **Route A (faster): make `.pgproj` a clean `dotnet build` citizen** — finish `PgProj.Sdk`, package it on NuGet, so VS's generic project handling builds/cleans it; surface publish via a build target + a lightweight tool-window or external-tools entry. *(Leverages existing Sdk.props/targets.)*
-- [ ] **Route B (full): a VSIX project system / project flavor** — Solution Explorer integration, project properties pages (build output, database settings, SQLCMD variables, target platform), publish dialog, schema-compare window, table designer. Large; phase behind EP-RPC + EP-VSCODE.
-- [ ] Language service for `.sql` IntelliSense from the project model (reuse parser + EP-RPC model-tree).
+- [x] **Route A (faster): make `.pgproj` a clean `dotnet build` citizen** — `PgProj.Sdk` finished and **NuGet-packable** (`dotnet pack src/PgProj.Sdk` → carries the CLI under `tools/`); VS's generic project handling builds/cleans/**publishes** it. Build → model + `.pgpkg`; **Publish** is a real MSBuild target (`-t:Publish`, real/diff-dry-run/offline-preview shapes). Validated: sample `.pgproj` build (model byte-equal to the CLI's), pack, and a packaged-SDK consumer build. See `docs/VISUAL_STUDIO.md` / `src/PgProj.Sdk/README.md`.
+- [~] **Route B (full): a VSIX project system / project flavor** — **scaffolded** under `editors/vs/` (own solution, excluded from `PgProj.slnx`; needs VS + the VS SDK to build — not buildable headless): project factory/flavor, the four property pages (build output, database settings, SQLCMD variables, target platform), Publish dialog command, Schema Compare window, `.vsct`/manifest. Bodies marked `// SCAFFOLD`. Table designer still deferred to EP-DESIGNER.
+- [x] Language service for `.sql` IntelliSense from the project model — **VS `ILanguageClient` scaffold** (`editors/vs/.../LanguageClient/`) launches the existing `pgproj serve` LSP (#31), same server VS Code uses (`docs/LSP_LANGUAGE_SERVER.md`).
 - [ ] `slngen`-style solution grouping for multiple `.pgproj`s (matrix row *Solution management*).
 
 ---
