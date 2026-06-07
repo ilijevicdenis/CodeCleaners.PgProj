@@ -4,7 +4,7 @@
 > SSDT-for-PostgreSQL parity and is the single place to read "where are we now". It is **updated on
 > every delivered milestone** (see [Update contract](#update-contract) below).
 
-**Last updated:** 2026-06-07 (M1 + M2 complete) · **Streams:** semantic core (EP-SEMCORE #41) ·
+**Last updated:** 2026-06-07 (M1 + M2 + M3 complete) · **Streams:** semantic core (EP-SEMCORE #41) ·
 SSDT parity (#27) · performance (#12)
 
 Legend: ✅ delivered · 🟡 in progress · ⬜ not started · ⛔ blocked.
@@ -20,7 +20,7 @@ deliverable subtasks; **complex issues are broken into smaller subtasks when imp
 |---|-----------|--------|--------|------|--------|--------|
 | **M1** | Determinism & Diagnostics Foundations | cross-cutting | #59, #49, #36, #37, #60, #62, #63 | 7 / 7 | ✅ | [milestone/1](https://github.com/ilijevicdenis/CodeCleaners.PgProj/milestone/1) |
 | **M2** | Semantic Core — Identity & Foundations | EP-SEMCORE | #42, #43, #44, #45, #46, #39 | 6 / 6 | ✅ | [milestone/2](https://github.com/ilijevicdenis/CodeCleaners.PgProj/milestone/2) |
-| **M3** | Semantic Core — Binding & Validation | EP-SEMCORE | #47, #48, #50, #51 | 0 / 4 | ⬜ | [milestone/3](https://github.com/ilijevicdenis/CodeCleaners.PgProj/milestone/3) |
+| **M3** | Semantic Core — Binding & Validation | EP-SEMCORE | #47, #48, #50, #51 | 4 / 4 | ✅ | [milestone/3](https://github.com/ilijevicdenis/CodeCleaners.PgProj/milestone/3) |
 | **M4** | Diff, Risk, Deploy & Incremental | EP-SEMCORE | #52, #53, #54, #55, #56, #57, #58, #61, #64 | 0 / 9 | ⬜ | [milestone/4](https://github.com/ilijevicdenis/CodeCleaners.PgProj/milestone/4) |
 | **M5** | SSDT Parity — Editor UI | parity #27 | #31, #24, #25, #26 | 0 / 4 | ⬜ | [milestone/5](https://github.com/ilijevicdenis/CodeCleaners.PgProj/milestone/5) |
 | **M6** | Performance & Engine Backlog | perf #12 | #8, #10 | 0 / 6 † | ⬜ | [milestone/6](https://github.com/ilijevicdenis/CodeCleaners.PgProj/milestone/6) |
@@ -92,14 +92,20 @@ EP-SEMCORE foundational concepts + Phases 1–2. Unblocks the rest of the semant
   *(delivered in M2 merge; `SymbolTable`/`SymbolEntry` with StableId, signature overloads, reverse index)*
 - ✅ **#39** — simpler project format *(delivered in M2 merge; SDK auto-includes `**/*.sql`, `EnableDefaultSqlItems` opt-out)*
 
-### M3 · Semantic Core — Binding & Validation ⬜
+### M3 · Semantic Core — Binding & Validation ✅
 
-EP-SEMCORE Part A, Phases 3–8.
+EP-SEMCORE Part A, Phases 3–8. **Complete (4/4).**
 
-- ⬜ **#47** — Phases 3–4: semantic binding → Bound AST → Typed Semantic Model
-- ⬜ **#48** — Phase 5: validation depth (type safety, overload resolution, view/trigger/constraint validity)
-- ⬜ **#50** — Phases 6–7: dependency graph (Hard/Soft/Runtime edges) + circular-dependency detection
-- ⬜ **#51** — Phase 8: canonical model hardening (column-order, body canonicalization, type aliases)
+- ✅ **#47** — Phases 3–4: semantic binding → Bound AST → Typed Semantic Model
+  *(delivered; `Semantics/Binding/` — refs resolve to `SymbolEntry`, exprs carry `ResolvedType`, view/CTE
+  column inference, query API by symbol/location/reference for IDE features)*
+- ✅ **#48** — Phase 5: validation depth (type safety, overload resolution, view/trigger/constraint validity)
+  *(delivered; over the typed model with related locations; prove-before-erroring + managed-schema scoping
+  → no false positives)*
+- ✅ **#50** — Phases 6–7: dependency graph (Hard/Soft/Runtime edges) + circular-dependency detection
+  *(delivered; `Semantics/Dependencies/`, Tarjan-SCC cycles naming the full path, reverse-closure API for Phase 15)*
+- ✅ **#51** — Phase 8: canonical model hardening (column-order, body canonicalization, type aliases)
+  *(delivered; broadened TypeNormalizer, canonical expression form, canonicalization in the model, gated column-order)*
 
 ### M4 · Diff, Risk, Deploy & Incremental ⬜
 
@@ -139,6 +145,7 @@ Newest first. One line per delivered issue/milestone; this is the audit trail of
 
 | Date | Milestone | Item | Commit | Notes |
 |------|-----------|------|--------|-------|
+| 2026-06-07 | M3 | #47 #48 #50 #51 — binding, validation, dependency graph, canonical hardening (**completes M3**) | merge of `milestone/m3-binding-validation` | Two worktree-agent waves (#47/#51 then #48/#50 on the bound model). PG18 suite 22,363 pass / 0 fail / 0 skip; goldens byte-identical. Parse allocation +0.35% (tightened from +1.16% — ColumnRef single-slot, trigger detail behind one ref). |
 | 2026-06-07 | M2 | #44 IProjectObject contract + object-kind registry (**completes M2**) | merge of `feature/44-iprojectobject-registry` | Contract + registry; every per-kind switch (RawObjectMeta, SchemaCompareObjectType, LiveDatabaseReader fan-out, ModelBuilder.BuildRaw) collapsed into one ObjectKindRegistry table. Golden byte-identical; PG18 suite 22,301 pass / 0 fail / 0 skip. |
 | 2026-06-07 | M2 + M1 | #42 #43 #45 #46 #39 (M2) + #60 #62 #63 (M1 finishers) | merge of `milestone/m2-semantic-core` | Two dependency-phased worktree-agent waves + hand-resolved integration (unified #63/#45 position tracking onto `SourcePositionIndex`). **M1 now complete (7/7).** Validated against PG18: 22,294 pass / 0 fail / 0 skip; allocation neutral. M2 5/6 — #44 remains. |
 | 2026-06-07 | M1 | #49 unify diagnostics + #37 throwaway-DB isolation + #36 round-trip (scoped) + #60 golden-file | merge of `milestone/m1-foundations` | M1 wave delivered via 4 worktree agents + integration fixes (aggregate identity double-schema bug). Validated against PG18: 22,217 pass / 0 fail / 0 skip; allocation footprint unchanged (16.94 MB/op). #60 golden-file done; its hash/rename tests deferred to #42. Remaining M1: #62, #63. |
