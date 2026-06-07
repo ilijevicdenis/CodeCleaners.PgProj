@@ -31,6 +31,16 @@ public sealed class PhasedDeployer
         _maxConnections = Math.Max(1, maxConnections);
     }
 
+    /// <summary>
+    /// Execute a computed <see cref="DeploymentPlan"/> (#55). The plan's skeleton-pass steps carry a
+    /// negative phase, so they group ahead of every real change and run first (breaking a hard cycle); the
+    /// ordered changes then run in their dependency-refined phase order. For an acyclic plan with no skeleton
+    /// pass this is identical to <see cref="ExecuteAsync(IReadOnlyList{SchemaChange}, CancellationToken)"/> on
+    /// the same change set — the planner's acyclic order is the stable phase order.
+    /// </summary>
+    public Task ExecuteAsync(DeploymentPlan plan, CancellationToken ct = default)
+        => ExecuteAsync(plan.AllSteps, ct);
+
     public async Task ExecuteAsync(IReadOnlyList<SchemaChange> changes, CancellationToken ct = default)
     {
         // Phase numbers are sparse (10, 20, 21, 30, …) — group by distinct value, ascending.
