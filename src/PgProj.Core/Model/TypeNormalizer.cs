@@ -39,6 +39,19 @@ public static class TypeNormalizer
         ["timetz"] = "time with time zone",
         ["timestamp"] = "timestamp without time zone",
         ["time"] = "time without time zone",
+        // --- #51 additions -----------------------------------------------------------------------
+        // Bit-string: only `varbit` is a true alias (→ "bit varying"); `bit`/`bit varying` are already
+        // canonical. `bit` alone means bit(1) but we preserve the user's explicit length spec verbatim.
+        ["varbit"] = "bit varying",
+        // Pseudo / catalog-name spellings the live reader can emit for an unparenthesised numeric.
+        ["dec"] = "numeric",
+        // Geometric/network/uuid/json/xml/money/bytea have NO short aliases in Postgres — their only
+        // spelling IS the canonical one, so they intentionally pass through NormalizeCore unchanged:
+        //   bytea, jsonb, json, xml, money, uuid, inet, cidr, macaddr, macaddr8, point, line, lseg,
+        //   box, path, polygon, circle, tsvector, tsquery, interval.
+        // Listing them here as identity entries would be dead weight; documenting the pass-through is
+        // the contract. Domains and user-defined types likewise pass through (we cannot resolve a
+        // domain's base type without the catalog — that's a SymbolTable/#48 concern, not this layer).
     };
 
     private static readonly Regex Whitespace = new(@"\s+", RegexOptions.Compiled);

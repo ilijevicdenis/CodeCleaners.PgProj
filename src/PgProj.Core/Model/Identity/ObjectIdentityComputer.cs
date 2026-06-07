@@ -33,6 +33,18 @@ public sealed class ObjectIdentityComputer
 
     private int _nextId; // ObjectId allocator state; ids start at 1 (0 == ObjectId.None).
 
+    private readonly CanonicalFormOptions _options;
+
+    /// <summary>Default computer — positional column order, current behaviour. Goldens unchanged.</summary>
+    public ObjectIdentityComputer() : this(CanonicalFormOptions.Default) { }
+
+    /// <summary>
+    /// Computer with explicit canonical-form options. The only knob today is
+    /// <see cref="CanonicalFormOptions.IgnoreColumnOrder"/> (Phase-18 "ignore column order"); it is
+    /// OFF in <see cref="CanonicalFormOptions.Default"/> so the default ctor is fully behaviour-preserving.
+    /// </summary>
+    public ObjectIdentityComputer(CanonicalFormOptions options) => _options = options ?? CanonicalFormOptions.Default;
+
     private ObjectId NextId() => new(++_nextId);
 
     /// <summary>
@@ -99,7 +111,7 @@ public sealed class ObjectIdentityComputer
     public StableId StableIdOf(TableDefinition t)
     {
         var fp = new StringBuilder();
-        foreach (var c in t.Columns)
+        foreach (var c in OrderColumns(t.Columns))
             fp.Append(Field(N(c.Name), TypeNormalizer.Normalize(c.DataType), c.IsNullable ? "null" : "notnull"))
               .Append('|');
 
@@ -154,74 +166,90 @@ public sealed class ObjectIdentityComputer
     //  CanonicalHash — semantic hash of the canonical form (changes ONLY when meaning changes)
     // =================================================================================================
 
-    public CanonicalHash CanonicalHashOf(SchemaDefinition s) =>
-        CanonicalHash.From(KindSchema, N(s.Name));
+    // Each CanonicalHash is now simply hash(kind + canonical form): the CanonicalFormOf(...) accessors
+    // ARE the single source of truth for the meaning-only text, so IProjectObject.Canonicalize() and
+    // Hash() can never drift apart (issue #51, point 3). The form string is prefixed with its kind, so
+    // hashing it under the kind discriminator a second time is harmless and keeps the original framing.
+
+    public CanonicalHash CanonicalHashOf(SchemaDefinition s) => CanonicalHash.From(KindSchema, CanonicalFormOf(s));
 
     // The table's meaning = its full structural fingerprint (same canonical inputs as StableId). The FQN
     // is excluded here too, so a pure rename leaves CanonicalHash unchanged → engine reports Rename (via
     // the FQN check), not Alter. A real column/key/default change flips the fingerprint and the hash.
-    public CanonicalHash CanonicalHashOf(TableDefinition t) =>
-        CanonicalHash.From(KindTable, TableCanonicalForm(t));
+    public CanonicalHash CanonicalHashOf(TableDefinition t) => CanonicalHash.From(KindTable, CanonicalFormOf(t));
 
-    public CanonicalHash CanonicalHashOf(IndexDefinition i) =>
-        CanonicalHash.From(KindIndex, Field(
-            N(i.Schema), N(i.Table),
-            string.Join(",", i.Columns.Select(c => N(c).Replace("\"", ""))),
-            i.IsUnique ? "unique" : "",
-            N(i.Method ?? "btree"),
-            Canonicalizer.NormalizeText(i.WhereClause ?? "")));
+    public CanonicalHash CanonicalHashOf(IndexDefinition i) => CanonicalHash.From(KindIndex, CanonicalFormOf(i));
 
-    public CanonicalHash CanonicalHashOf(ViewDefinition v) =>
-        CanonicalHash.From(KindView, Field(v.IsMaterialized ? "mat" : "view", Canonicalizer.NormalizeBody(v.Body)));
+    public CanonicalHash CanonicalHashOf(ViewDefinition v) => CanonicalHash.From(KindView, CanonicalFormOf(v));
 
-    public CanonicalHash CanonicalHashOf(SequenceDefinition q) =>
-        CanonicalHash.From(KindSequence, Field(
-            q.DataType is null ? "" : TypeNormalizer.Normalize(q.DataType),
-            q.Increment?.ToString() ?? "", q.MinValue?.ToString() ?? "", q.MaxValue?.ToString() ?? "",
-            q.Start?.ToString() ?? "", q.Cache?.ToString() ?? "", q.Cycle ? "cycle" : ""));
+    public CanonicalHash CanonicalHashOf(SequenceDefinition q) => CanonicalHash.From(KindSequence, CanonicalFormOf(q));
 
     // The function's meaning = its canonical body (the same NormalizeBody the comparer diffs on), so a
     // cosmetic reformat of the body leaves CanonicalHash unchanged but a logic change flips it. Arg types
     // are folded in so two overloads with cosmetically-identical bodies still hash distinctly.
-    public CanonicalHash CanonicalHashOf(FunctionDefinition f) =>
-        CanonicalHash.From(KindFunction, Field(NormalizeArgTypes(f.ArgTypes), Canonicalizer.NormalizeBody(f.Body)));
+    public CanonicalHash CanonicalHashOf(FunctionDefinition f) => CanonicalHash.From(KindFunction, CanonicalFormOf(f));
 
     // Raw object meaning = its canonical DDL body (identity-only kinds fall back to the identity token,
     // mirroring the comparer's "compares by identity only" rule).
-    public CanonicalHash CanonicalHashOf(RawObjectDefinition o) =>
-        CanonicalHash.From(RawKind(o.Kind),
-            o.BodyComparable && !RawObjectMeta.ComparesByIdentityOnly(o.Kind)
-                ? Field(N(o.OnObject ?? ""), Canonicalizer.NormalizeRawBody(o.Body))
-                : N(o.Identity));
+    public CanonicalHash CanonicalHashOf(RawObjectDefinition o) => CanonicalHash.From(RawKind(o.Kind), CanonicalFormOf(o));
 
     // ---- shared canonical-form builders -----------------------------------------------------------
 
-    private static string TableCanonicalForm(TableDefinition t)
+    private string TableCanonicalForm(TableDefinition t)
     {
         var fp = new StringBuilder();
-        foreach (var c in t.Columns)
+        foreach (var c in OrderColumns(t.Columns))
             fp.Append(Field(N(c.Name), TypeNormalizer.Normalize(c.DataType), c.IsNullable ? "null" : "notnull",
                             c.IsIdentity ? "id:" + N(c.IdentityKind ?? "") : "",
                             c.IsSerial ? "serial" : "",
-                            c.GeneratedExpression is null ? "" : "gen:" + Canonicalizer.NormalizeText(c.GeneratedExpression),
-                            c.IsSerial ? "" : "def:" + Canonicalizer.NormalizeDefault(c.Default)))
+                            // Generated/CHECK/default are scalar EXPRESSIONS — fold redundant outer parens and
+                            // operator spacing (#51) so `(a>0)` ≡ `a > 0` in the semantic hash.
+                            c.GeneratedExpression is null ? "" : "gen:" + Canonicalizer.NormalizeExpression(c.GeneratedExpression),
+                            c.IsSerial ? "" : "def:" + Canonicalizer.NormalizeExpression(c.Default)))
               .Append('|');
         if (t.PrimaryKey is { } pk)
             fp.Append("pk:").Append(string.Join(",", pk.Columns.Select(N))).Append('|');
         foreach (var sig in t.Unique.Select(u => "uq:" + string.Join(",", u.Columns.Select(N))).OrderBy(x => x, StringComparer.Ordinal))
             fp.Append(sig).Append('|');
-        foreach (var sig in t.Checks.Select(c => "ck:" + Canonicalizer.NormalizeText(c.Expression)).OrderBy(x => x, StringComparer.Ordinal))
+        foreach (var sig in t.Checks.Select(c => "ck:" + Canonicalizer.NormalizeExpression(c.Expression)).OrderBy(x => x, StringComparer.Ordinal))
             fp.Append(sig).Append('|');
         foreach (var sig in t.ForeignKeys.Select(ForeignKeyFingerprint).OrderBy(x => x, StringComparer.Ordinal))
             fp.Append(sig).Append('|');
-        foreach (var sig in t.OtherConstraints.Select(o => "other:" + Canonicalizer.NormalizeText(o)).OrderBy(x => x, StringComparer.Ordinal))
+        foreach (var sig in t.OtherConstraints.Select(o => "other:" + Canonicalizer.NormalizeExpression(o)).OrderBy(x => x, StringComparer.Ordinal))
             fp.Append(sig).Append('|');
         if (!string.IsNullOrWhiteSpace(t.TrailingOptions))
             fp.Append("opts:").Append(Canonicalizer.NormalizeText(t.TrailingOptions)).Append('|');
         return fp.ToString();
     }
 
+    // ---- public canonical-form accessors (the exact strings hashed; used by IProjectObject.Canonicalize) ----
+    // Returning the canonical FORM (not just its hash) lets IProjectObject.Canonicalize() expose the same
+    // meaning-only string CanonicalHash is derived from, so a column/expression is never left un-normalized
+    // when TypeNormalizer would otherwise be bypassed. Prefixed with the kind so forms can't collide.
+
+    public string CanonicalFormOf(SchemaDefinition s) => Field(KindSchema, N(s.Name));
+    public string CanonicalFormOf(TableDefinition t) => Field(KindTable, TableCanonicalForm(t));
+    public string CanonicalFormOf(IndexDefinition i) => Field(KindIndex,
+        N(i.Schema), N(i.Table), string.Join(",", i.Columns.Select(c => N(c).Replace("\"", ""))),
+        i.IsUnique ? "unique" : "", N(i.Method ?? "btree"), Canonicalizer.NormalizeExpression(i.WhereClause ?? ""));
+    public string CanonicalFormOf(ViewDefinition v) => Field(KindView, v.IsMaterialized ? "mat" : "view", Canonicalizer.NormalizeBody(v.Body));
+    public string CanonicalFormOf(SequenceDefinition q) => Field(KindSequence,
+        q.DataType is null ? "" : TypeNormalizer.Normalize(q.DataType),
+        q.Increment?.ToString() ?? "", q.MinValue?.ToString() ?? "", q.MaxValue?.ToString() ?? "",
+        q.Start?.ToString() ?? "", q.Cache?.ToString() ?? "", q.Cycle ? "cycle" : "");
+    public string CanonicalFormOf(FunctionDefinition f) => Field(KindFunction, NormalizeArgTypes(f.ArgTypes), Canonicalizer.NormalizeBody(f.Body));
+    public string CanonicalFormOf(RawObjectDefinition o) => Field(RawKind(o.Kind),
+        o.BodyComparable && !RawObjectMeta.ComparesByIdentityOnly(o.Kind)
+            ? Field(N(o.OnObject ?? ""), Canonicalizer.NormalizeRawBody(o.Body))
+            : N(o.Identity));
+
     // ---- small helpers ----------------------------------------------------------------------------
+
+    // Honor the (gated, default-off) column-order normalization: when IgnoreColumnOrder is on, fold columns
+    // in a stable canonical (by lower-cased name) order so a pure reorder hashes identically. Off by default,
+    // columns are taken in declaration order — positional, matching the comparer / deploy script exactly.
+    private IEnumerable<ColumnDefinition> OrderColumns(IReadOnlyList<ColumnDefinition> columns) =>
+        _options.IgnoreColumnOrder ? columns.OrderBy(c => N(c.Name), StringComparer.Ordinal) : columns;
 
     // Identifier normalization: Postgres folds unquoted identifiers to lower case, and the model compares
     // names case-insensitively (DatabaseModel.NameEquals), so identity hashing lower-cases too.
