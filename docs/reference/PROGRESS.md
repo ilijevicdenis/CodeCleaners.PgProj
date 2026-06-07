@@ -4,10 +4,10 @@
 > SSDT-for-PostgreSQL parity and is the single place to read "where are we now". It is **updated on
 > every delivered milestone** (see [Update contract](#update-contract) below).
 
-**Last updated:** 2026-06-07 (M1–M4 complete) · **Streams:** semantic core (EP-SEMCORE #41) ·
-SSDT parity (#27) · performance (#12)
+**Last updated:** 2026-06-07 (M1–M4 complete; M5 foundation done, GUI clients deferred → #27) ·
+**Streams:** semantic core (EP-SEMCORE #41) · SSDT parity (#27) · performance (#12)
 
-Legend: ✅ delivered · 🟡 in progress · ⬜ not started · ⛔ blocked.
+Legend: ✅ delivered · 🟡 in progress · ⬜ not started · ⛔ blocked · ⏸️ deferred.
 
 ---
 
@@ -21,8 +21,8 @@ deliverable subtasks; **complex issues are broken into smaller subtasks when imp
 | **M1** | Determinism & Diagnostics Foundations | cross-cutting | #59, #49, #36, #37, #60, #62, #63 | 7 / 7 | ✅ | [milestone/1](https://github.com/ilijevicdenis/CodeCleaners.PgProj/milestone/1) |
 | **M2** | Semantic Core — Identity & Foundations | EP-SEMCORE | #42, #43, #44, #45, #46, #39 | 6 / 6 | ✅ | [milestone/2](https://github.com/ilijevicdenis/CodeCleaners.PgProj/milestone/2) |
 | **M3** | Semantic Core — Binding & Validation | EP-SEMCORE | #47, #48, #50, #51 | 4 / 4 | ✅ | [milestone/3](https://github.com/ilijevicdenis/CodeCleaners.PgProj/milestone/3) |
-| **M4** | Diff, Risk, Deploy & Incremental | EP-SEMCORE | #52, #53, #54, #55, #56, #57, #58, #61, #64 | 8 / 9 | 🟡 | [milestone/4](https://github.com/ilijevicdenis/CodeCleaners.PgProj/milestone/4) |
-| **M5** | SSDT Parity — Editor UI | parity #27 | #31, #24, #25, #26 | 1 / 4 | 🟡 | [milestone/5](https://github.com/ilijevicdenis/CodeCleaners.PgProj/milestone/5) |
+| **M4** | Diff, Risk, Deploy & Incremental | EP-SEMCORE | #52, #53, #54, #55, #56, #57, #58, #61, #64 | 9 / 9 | ✅ | [milestone/4](https://github.com/ilijevicdenis/CodeCleaners.PgProj/milestone/4) |
+| **M5** | SSDT Parity — Editor UI | parity #27 | #31 *(clients #24/#25/#26 → #27)* | 1 / 1 | ✅ | [milestone/5](https://github.com/ilijevicdenis/CodeCleaners.PgProj/milestone/5) |
 | **M6** | Performance & Engine Backlog | perf #12 | #8, #10 | 0 / 6 † | ⬜ | [milestone/6](https://github.com/ilijevicdenis/CodeCleaners.PgProj/milestone/6) |
 
 † M6 only carries the two *open* perf items; most of the allocation campaign already landed on `main`
@@ -107,9 +107,9 @@ EP-SEMCORE Part A, Phases 3–8. **Complete (4/4).**
 - ✅ **#51** — Phase 8: canonical model hardening (column-order, body canonicalization, type aliases)
   *(delivered; broadened TypeNormalizer, canonical expression form, canonicalization in the model, gated column-order)*
 
-### M4 · Diff, Risk, Deploy & Incremental 🟡
+### M4 · Diff, Risk, Deploy & Incremental ✅
 
-EP-SEMCORE Parts B+C, Phases 10–15 & 18. **8/9 — all phases delivered; #61 carries a small round-trip tail.**
+EP-SEMCORE Parts B+C, Phases 10–15 & 18. **Complete (9/9).**
 
 - ✅ **#52** — Phase 10: schema snapshots *(delivered; `schema.snapshot` offline compare endpoint + staleness + `pgproj snapshot` CLI)*
 - ✅ **#53** — Phase 11: identity-based diff *(delivered; gated rename detection + structured function/unique/sequence/enum deltas)*
@@ -119,21 +119,22 @@ EP-SEMCORE Parts B+C, Phases 10–15 & 18. **8/9 — all phases delivered; #61 c
 - ✅ **#57** — Phase 15: incremental analysis & object cache *(delivered; CanonicalHash-keyed cache, reverse-closure invalidation)*
 - ✅ **#58** — Phase 18: options & profiles *(delivered; comparison-equivalence options, ComparisonProfile, block-on-data-loss gate wired to risk)*
 - ✅ **#64** — round-trip idempotency (finely-modelled) *(delivered with #53/#61)*
-- 🟡 **#61** — round-trip idempotency (remaining raw kinds) *(cast/operator/op-class/op-family delivered; Trigger + function-comment fidelity gaps remain — tracked here)*
+- ✅ **#61** — round-trip idempotency (remaining raw kinds) *(cast/operator/op-class/op-family + Trigger [event-order canonicalized] + function-comment [types-only signature] — all round-trip clean against PG18, in the guard)*
 
-### M5 · SSDT Parity — Editor UI 🟡
+### M5 · SSDT Parity — Editor UI ✅ *(foundation; GUI clients deferred)*
 
-The "same experience" UI stream (#27). Depends on the engine JSON contract (already landed) and the
-semantic core for live features. **1/4 — the .NET language-service foundation is in; the editor-client
-epics (#24/#25/#26) are TypeScript/VSIX builds outside the .NET+PG18 test harness.**
+The "same experience" UI stream (#27). The **.NET language-service foundation that every editor attaches
+to is delivered**; the GUI-client epics are deferred (by decision) to a dedicated effort with the proper
+editor toolchain (Node + `@vscode/test-electron`; the VS SDK + Apex UI tests) where they can be
+E2E-validated — they live on under the SSDT-parity tracker [#27] and `docs/SSDT_PARITY_BACKLOG.md`.
 
 - ✅ **#31** — EP-LSP: resident language service (`pgproj serve` / LSP) for live parsing
   *(delivered; `PgProj.Lsp` + `pgproj serve` STDIO LSP host — didOpen/didChange→debounced publishDiagnostics
   [verdict identical to build], definition/hover/completion; pure handlers unit-tested [16 tests]; doc at
   `docs/LSP_LANGUAGE_SERVER.md`. This is the backend every editor client attaches to.)*
-- ⬜ **#24** — EP-VSCODE: VS Code extension (primary UI) — *TypeScript; attaches to `pgproj serve`; needs a Node/`@vscode/test-electron` toolchain*
-- ⬜ **#25** — EP-VS: Visual Studio experience — *VSIX/C#; needs the VS SDK + Apex UI tests*
-- ⬜ **#26** — EP-DESIGNER: graphical table designer — *P2; UI on top of #24/#25*
+- ⏸️ **#24** — EP-VSCODE: VS Code extension (primary UI) — *deferred → #27 (TypeScript; needs Node/`@vscode/test-electron`)*
+- ⏸️ **#25** — EP-VS: Visual Studio experience — *deferred → #27 (VSIX/C#; needs VS SDK + Apex UI tests)*
+- ⏸️ **#26** — EP-DESIGNER: graphical table designer — *deferred → #27 (P2; UI on top of #24/#25)*
 
 ### M6 · Performance & Engine Backlog ⬜
 
@@ -151,6 +152,8 @@ Newest first. One line per delivered issue/milestone; this is the audit trail of
 
 | Date | Milestone | Item | Commit | Notes |
 |------|-----------|------|--------|-------|
+| 2026-06-07 | M4 | #61 round-trip tail closed (trigger event order + function-comment types-only signature) | merge of `fix/61-trigger-comment-roundtrip` | Completes M4 (9/9). Both gaps verified fixed against PG18; round-trip guard now covers all raw kinds AllFeaturesDb exercises. |
+| 2026-06-07 | M5 | M5 closed: #31 delivered; GUI clients #24/#25/#26 deferred → #27 | — | The .NET language-service foundation is the M5 deliverable; the editor GUIs are a separate toolchain effort tracked under the SSDT-parity epic. |
 | 2026-06-07 | M5 | #31 EP-LSP resident language service (`pgproj serve`) | merge of `milestone/m5-editor-ui` | New `PgProj.Lsp` + `serve` verb; STDIO LSP over the engine (debounced diagnostics = build verdict; definition/hover/completion). 16 LSP tests; corpus/goldens unaffected. Editor-client epics #24/#25/#26 remain (TypeScript/VSIX, separate toolchain). |
 | 2026-06-07 | M4 | #52 #53 #54 #55 #56 #57 #58 #64 + #61 (partial) — snapshots, identity diff, risk, planning, gen, incremental, options, round-trip | merge of `milestone/m4-diff-deploy` | Three dependency-ordered worktree-agent waves. PG18 suite 22,471 pass / 0 fail / 0 skip; allocation neutral; defaults byte-identical. #61 trigger + function-comment round-trip gaps remain (tracked). |
 | 2026-06-07 | M3 | #47 #48 #50 #51 — binding, validation, dependency graph, canonical hardening (**completes M3**) | merge of `milestone/m3-binding-validation` | Two worktree-agent waves (#47/#51 then #48/#50 on the bound model). PG18 suite 22,363 pass / 0 fail / 0 skip; goldens byte-identical. Parse allocation +0.35% (tightened from +1.16% — ColumnRef single-slot, trigger detail behind one ref). |
