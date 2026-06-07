@@ -4,7 +4,7 @@
 > SSDT-for-PostgreSQL parity and is the single place to read "where are we now". It is **updated on
 > every delivered milestone** (see [Update contract](#update-contract) below).
 
-**Last updated:** 2026-06-07 (M1–M4 complete; M5 foundation done, GUI clients deferred → #27) ·
+**Last updated:** 2026-06-07 (M1–M4 + M6 complete; M5 foundation done, GUI clients deferred → #27) ·
 **Streams:** semantic core (EP-SEMCORE #41) · SSDT parity (#27) · performance (#12)
 
 Legend: ✅ delivered · 🟡 in progress · ⬜ not started · ⛔ blocked · ⏸️ deferred.
@@ -23,10 +23,7 @@ deliverable subtasks; **complex issues are broken into smaller subtasks when imp
 | **M3** | Semantic Core — Binding & Validation | EP-SEMCORE | #47, #48, #50, #51 | 4 / 4 | ✅ | [milestone/3](https://github.com/ilijevicdenis/CodeCleaners.PgProj/milestone/3) |
 | **M4** | Diff, Risk, Deploy & Incremental | EP-SEMCORE | #52, #53, #54, #55, #56, #57, #58, #61, #64 | 9 / 9 | ✅ | [milestone/4](https://github.com/ilijevicdenis/CodeCleaners.PgProj/milestone/4) |
 | **M5** | SSDT Parity — Editor UI | parity #27 | #31 *(clients #24/#25/#26 → #27)* | 1 / 1 | ✅ | [milestone/5](https://github.com/ilijevicdenis/CodeCleaners.PgProj/milestone/5) |
-| **M6** | Performance & Engine Backlog | perf #12 | #8, #10 | 0 / 6 † | ⬜ | [milestone/6](https://github.com/ilijevicdenis/CodeCleaners.PgProj/milestone/6) |
-
-† M6 only carries the two *open* perf items; most of the allocation campaign already landed on `main`
-(see [`docs/parser-performance.md`](../parser-performance.md) and tracker #12).
+| **M6** | Performance & Engine Backlog | perf #12 | #8, #10 | 2 / 2 | ✅ | [milestone/6](https://github.com/ilijevicdenis/CodeCleaners.PgProj/milestone/6) |
 
 **Already shipped (not milestoned — do not rebuild):** the headless engine — `build`, `compare`,
 `publish`, `validate`, `extract`, `drift`, `analyze`, `PgProj.Sdk`, and **100% parser accept/reject
@@ -136,13 +133,12 @@ E2E-validated — they live on under the SSDT-parity tracker [#27] and `docs/SSD
 - ⏸️ **#25** — EP-VS: Visual Studio experience — *deferred → #27 (VSIX/C#; needs VS SDK + Apex UI tests)*
 - ⏸️ **#26** — EP-DESIGNER: graphical table designer — *deferred → #27 (P2; UI on top of #24/#25)*
 
-### M6 · Performance & Engine Backlog ⬜
+### M6 · Performance & Engine Backlog ✅
 
-Open items from the perf/deploy-sync tracker (#12). Benchmark-gated (bytes/op); the corpus must stay
-byte-identical.
+Open items from the perf/deploy-sync tracker (#12). Benchmark-gated (bytes/op); corpus byte-identical. **Complete (2/2).**
 
-- ⬜ **#8** — reduce `ModelBuilder` allocation (AddTable hotspot) — *gated on #7 production-metric spike*
-- ⬜ **#10** — profile the comparer / diff path (`CompareBenchmarks`) — *gated on #7*
+- ✅ **#8** — reduce `ModelBuilder` allocation *(delivered; lazy table-constraint lists — All 16.16→16.06 MB/op, Table bucket 1.77→1.66; dashboard stage #24. Safe-by-construction, no footgun.)*
+- ✅ **#10** — profile the comparer / diff path (`CompareBenchmarks`) *(delivered; representative `CompareBenchmarks` + comparer fast-paths — −19% to −40% allocated/op across the compare path; behavior-preserving.)*
 
 ---
 
@@ -152,6 +148,7 @@ Newest first. One line per delivered issue/milestone; this is the audit trail of
 
 | Date | Milestone | Item | Commit | Notes |
 |------|-----------|------|--------|-------|
+| 2026-06-07 | M6 | #8 lazy table-constraint lists + #10 comparer fast-paths (**completes M6**) | merge of `milestone/m6-performance` | Two safe, BDN-measured allocation wins: parse+build All 16.16→16.06 MB/op (dashboard stage #24); comparer −19..−40%/op on a now-representative CompareBenchmarks. Corpus + goldens byte-identical; full suite green vs PG18. |
 | 2026-06-07 | M4 | #61 round-trip tail closed (trigger event order + function-comment types-only signature) | merge of `fix/61-trigger-comment-roundtrip` | Completes M4 (9/9). Both gaps verified fixed against PG18; round-trip guard now covers all raw kinds AllFeaturesDb exercises. |
 | 2026-06-07 | M5 | M5 closed: #31 delivered; GUI clients #24/#25/#26 deferred → #27 | — | The .NET language-service foundation is the M5 deliverable; the editor GUIs are a separate toolchain effort tracked under the SSDT-parity epic. |
 | 2026-06-07 | M5 | #31 EP-LSP resident language service (`pgproj serve`) | merge of `milestone/m5-editor-ui` | New `PgProj.Lsp` + `serve` verb; STDIO LSP over the engine (debounced diagnostics = build verdict; definition/hover/completion). 16 LSP tests; corpus/goldens unaffected. Editor-client epics #24/#25/#26 remain (TypeScript/VSIX, separate toolchain). |
