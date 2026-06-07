@@ -1,4 +1,5 @@
 using System.Linq;
+using PgProj.Core.Comparison;
 using PgProj.Core.Extensibility;
 using PgProj.Core.Model;
 using PgProj.Core.Model.Identity;
@@ -88,6 +89,31 @@ public sealed class ProjectObjectRegistryTests
                 var diags = parser.Parse(sql).Diagnostics;
                 Assert.True(diags.Count == 0, $"{token} {obj.QualifiedName} DDL did not re-parse: {string.Join(" | ", diags)}");
             }
+        }
+    }
+
+    [Fact]
+    public void Every_object_kind_is_registered_so_none_falls_back_to_default()
+    {
+        // Guard for the #44 switch-removal: a new ObjectKind enum value without a registry row would
+        // silently use the "other"/phase-50/Other fallback. This fails loudly instead.
+        var registered = ObjectKindRegistry.Kinds.ToHashSet();
+        foreach (ObjectKind kind in System.Enum.GetValues<ObjectKind>())
+            Assert.True(registered.Contains(kind), $"ObjectKind.{kind} has no ObjectKindRegistry row");
+    }
+
+    [Fact]
+    public void RawObjectMeta_and_SchemaCompareObjectType_read_from_the_registry()
+    {
+        // Proves the legacy per-kind switches are gone — the accessors now reflect the registry table.
+        foreach (ObjectKind kind in System.Enum.GetValues<ObjectKind>())
+        {
+            var d = ObjectKindRegistry.Get(kind);
+            Assert.Equal(d.Phase, RawObjectMeta.Phase(kind));
+            Assert.Equal(d.Folder, RawObjectMeta.Folder(kind));
+            Assert.Equal(d.ComparesByIdentityOnly, RawObjectMeta.ComparesByIdentityOnly(kind));
+            Assert.Equal(d.IsDestructiveRecreate, RawObjectMeta.IsDestructiveRecreate(kind));
+            Assert.Equal(d.TypeToken, SchemaCompareObjectType.OfKind(kind));
         }
     }
 

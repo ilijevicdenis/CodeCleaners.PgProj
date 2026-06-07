@@ -23,15 +23,18 @@ Every kind is an [`IProjectObject`](../../src/PgProj.Core/Extensibility/IProject
 Most kinds are captured verbatim with a stable identity (`RawObjectDefinition`). To add one:
 
 1. Add the value to the [`ObjectKind`](../../src/PgProj.Core/Model/RawObject.cs) enum.
-2. Register its metadata in [`RawObjectMeta`](../../src/PgProj.Core/Comparison/RawObjectMeta.cs):
-   deploy `Phase`, `DropSql`/`DropKeyword`/`DropTarget`, `Folder`, and — if its live reconstruction
-   can't be textually faithful — `ComparesByIdentityOnly`.
-3. Add its token to [`SchemaCompareObjectType.OfKind`](../../src/PgProj.Core/Comparison/SchemaCompareObjectType.cs).
-4. Register its **catalog query** on the [`PostgresVersionProfile`](../../src/PgProj.Core/Versioning/CatalogQueries.cs)
+2. Add **one row** to [`ObjectKindRegistry`](../../src/PgProj.Core/Extensibility/ObjectKindRegistry.cs)
+   — the single per-kind table: compare-filter token, deploy `Phase`, extract `Folder`, DROP keyword +
+   `DropTargetStyle`, and the `ComparesByIdentityOnly` / `IsDestructiveRecreate` flags. (This one row
+   replaces what used to be edits to six separate `switch` statements in `RawObjectMeta` and
+   `SchemaCompareObjectType` — those now read from the registry.)
+3. Register its **catalog query** on the [`PostgresVersionProfile`](../../src/PgProj.Core/Versioning/CatalogQueries.cs)
    (`CatalogQueries`) and read it in `LiveDatabaseReader`.
 
-That's it: `ProjectObjectKind.For(kind)` then surfaces the metadata, `RawProjectObject` wraps it, and
-the `ProjectObjectRegistry` includes it — diff/codegen/extract pick it up with **no further edits**.
+That's it: `RawObjectMeta` / `SchemaCompareObjectType` / `ProjectObjectKind` all surface the metadata
+from the registry row, `RawProjectObject` wraps it, and the `ProjectObjectRegistry` includes it —
+diff/codegen/extract pick it up with **no further edits**. (A conformance test fails the build if an
+`ObjectKind` has no registry row.)
 
 ## Checklist — a **finely-modelled** kind
 
@@ -43,6 +46,12 @@ record, an `ObjectIdentityComputer` overload (`Identify`/`StableIdOf`/`Canonical
 ## Status
 
 The contract, registry, per-kind metadata, and adapters for all current kinds are in place and
-covered by `ProjectObjectRegistryTests`. The remaining migration — routing `SchemaComparer` /
-`DeployScriptGenerator` / `LiveDatabaseReader` to drive the registry so the legacy per-kind switches
-can be deleted — is tracked as the completion of #44.
+covered by `ProjectObjectRegistryTests`. The per-kind `switch` statements in `RawObjectMeta` (phase /
+drop / folder / compare flags) and `SchemaCompareObjectType.OfKind` have been **collapsed into the
+single `ObjectKindRegistry` table** — those accessors are now thin reads over it (behavior proven
+unchanged by the golden deploy-script tests).
+
+Remaining for full #44 closure: `LiveDatabaseReader` still fans out to a per-kind `ReadXxxAsync`
+method per kind (the catalog SQL itself already moved behind the `PostgresVersionProfile` in #43);
+turning introspection into a fully registry-driven "each kind self-registers its reader" form is the
+last increment.

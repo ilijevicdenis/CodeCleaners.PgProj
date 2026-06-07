@@ -44,32 +44,9 @@ public static class SchemaCompareObjectType
         _ => "other",
     };
 
-    /// <summary>The object-type token for a raw-object <see cref="ObjectKind"/>.</summary>
-    public static string OfKind(ObjectKind kind) => kind switch
-    {
-        ObjectKind.Extension => "extension",
-        ObjectKind.Language => "language",
-        ObjectKind.Type => "type",
-        ObjectKind.Domain => "domain",
-        ObjectKind.Collation => "collation",
-        ObjectKind.Conversion => "conversion",
-        ObjectKind.Cast => "cast",
-        ObjectKind.Operator or ObjectKind.OperatorClass or ObjectKind.OperatorFamily => "operator",
-        ObjectKind.Aggregate => "aggregate",
-        ObjectKind.Trigger => "trigger",
-        ObjectKind.Rule => "rule",
-        ObjectKind.Policy => "policy",
-        ObjectKind.EventTrigger => "eventtrigger",
-        ObjectKind.Statistics => "statistics",
-        ObjectKind.ForeignDataWrapper or ObjectKind.Server or ObjectKind.UserMapping or ObjectKind.ForeignTable => "foreigndata",
-        ObjectKind.TextSearchConfiguration or ObjectKind.TextSearchDictionary
-            or ObjectKind.TextSearchParser or ObjectKind.TextSearchTemplate => "textsearch",
-        ObjectKind.Transform => "transform",
-        ObjectKind.Publication => "publication",
-        ObjectKind.Comment => "comment",
-        ObjectKind.Table => "table",
-        _ => "other",
-    };
+    /// <summary>The object-type token for a raw-object <see cref="ObjectKind"/>.
+    /// Reads the single <see cref="Extensibility.ObjectKindRegistry"/> (issue #44) instead of a switch.</summary>
+    public static string OfKind(ObjectKind kind) => Extensibility.ObjectKindRegistry.Get(kind).TypeToken;
 
     /// <summary>
     /// Canonicalizes a user-supplied filter token (case-insensitive, with a few friendly aliases such as

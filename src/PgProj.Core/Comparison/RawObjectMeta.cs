@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using PgProj.Core.Extensibility;
 using PgProj.Core.Model;
 
 namespace PgProj.Core.Comparison;
@@ -7,119 +8,49 @@ namespace PgProj.Core.Comparison;
 /// <summary>
 /// Per-kind metadata for the generic raw-object mechanism: deploy phase (dependency ordering),
 /// whether recreating is destructive, how to DROP it, and where <c>extract</c> files it.
+///
+/// The per-kind data now lives in the single <see cref="ObjectKindRegistry"/> (issue #44) — the methods
+/// below are thin accessors over it, replacing the parallel per-kind <c>switch</c> statements this class
+/// used to carry. Adding a kind = one registry row, not six switch edits. Values are unchanged (the
+/// golden-file deploy-script tests prove it).
 /// </summary>
 public static class RawObjectMeta
 {
     /// <summary>Deploy ordering. Lower runs first. Aligned with the core change phases in SchemaChange.</summary>
-    public static int Phase(ObjectKind kind) => kind switch
-    {
-        ObjectKind.Extension => 5,
-        ObjectKind.Language => 6,
-        ObjectKind.Collation => 12,
-        ObjectKind.TextSearchParser => 12,
-        ObjectKind.TextSearchTemplate => 12,
-        ObjectKind.TextSearchDictionary => 13,
-        ObjectKind.TextSearchConfiguration => 14,   // after its dictionaries (ADD MAPPING references them)
-        ObjectKind.Type => 14,
-        ObjectKind.Domain => 15,
-        ObjectKind.Conversion => 16,
-        ObjectKind.ForeignDataWrapper => 36,
-        ObjectKind.Server => 37,
-        ObjectKind.UserMapping => 38,
-        ObjectKind.ForeignTable => 42,
-        ObjectKind.Statistics => 66,
-        ObjectKind.Aggregate => 82, // needs its state/final functions
-        ObjectKind.Operator => 82,
-        ObjectKind.OperatorFamily => 82,
-        ObjectKind.OperatorClass => 83,   // after operators/functions/families it references in AS …
-        ObjectKind.Cast => 82,
-        ObjectKind.Transform => 82,
-        ObjectKind.Trigger => 85,
-        ObjectKind.Rule => 86,
-        ObjectKind.Policy => 87,
-        ObjectKind.EventTrigger => 88,
-        ObjectKind.Publication => 84, // after the tables it lists (FOR TABLE …)
-        ObjectKind.Table => 43, // after base tables (40), before foreign keys (70)
-        ObjectKind.Comment => 99, // last — every referenced object exists by now
-        _ => 50,
-    };
+    public static int Phase(ObjectKind kind) => ObjectKindRegistry.Get(kind).Phase;
 
     /// <summary>Recreating these drops dependent data/columns, so it requires --allow-drops.</summary>
-    public static bool IsDestructiveRecreate(ObjectKind kind) =>
-        kind is ObjectKind.Type or ObjectKind.Domain or ObjectKind.ForeignTable or ObjectKind.Table;
+    public static bool IsDestructiveRecreate(ObjectKind kind) => ObjectKindRegistry.Get(kind).IsDestructiveRecreate;
 
     /// <summary>
     /// Kinds whose live introspection reconstructs a <em>canonical</em> DDL that is semantically equal
     /// to the hand-written source but never textually matches it — and which no whitespace/case/quote
     /// normalization can reconcile — so they must be compared by <em>identity</em> only (presence ==
     /// equal), never by body. Comparing their bodies produces phantom non-destructive diffs on every
-    /// round-trip (extract / drift / pull) for an unchanged object. Examples that motivate each:
-    /// <list type="bullet">
-    /// <item><c>Extension</c> — source <c>CREATE EXTENSION btree_gist</c> vs reader
-    ///   <c>CREATE EXTENSION IF NOT EXISTS "btree_gist"</c>; also <c>VERSION</c>/<c>SCHEMA</c> clauses.</item>
-    /// <item><c>TextSearchConfiguration</c> — source <c>(COPY = pg_catalog.english) … ALTER MAPPING</c>
-    ///   vs reader <c>(PARSER = …) … one ADD MAPPING per token type</c>: a structurally different,
-    ///   re-ordered statement set for the same end state.</item>
-    /// <item><c>TextSearchDictionary</c> — option spelling/ordering (<c>dictinitoption</c> rendering).</item>
-    /// <item><c>ForeignDataWrapper</c>/<c>Server</c> — handler/validator and OPTIONS(...) formatting.</item>
-    /// <item><c>Statistics</c> — source <c>(ndistinct, dependencies, mcv) ON a, b FROM t</c> vs the reader's
-    ///   canonical kind/column ordering and <c>regclass</c>-rendered table; semantically equal, never textual.</item>
-    /// <item><c>Aggregate</c> — source option spelling/spacing/order (<c>SFUNC=</c>, <c>INITCOND</c>) vs the
-    ///   reader's canonical <c>CREATE AGGREGATE</c> rendering; identity (schema.name(args)) is the stable key.</item>
-    /// </list>
+    /// round-trip (extract / drift / pull) for an unchanged object. (Per-kind flag in
+    /// <see cref="ObjectKindRegistry"/>; motivating cases: Extension, text-search dict/config, FDW/Server,
+    /// Statistics, Aggregate — canonical reconstruction never textually matches hand-written source.)
     /// Identity already encodes the object's stable name, so an identity match means "the same object
     /// exists on both sides"; a genuine rename/drop is still caught (different identity → create/drop).
     /// </summary>
-    public static bool ComparesByIdentityOnly(ObjectKind kind) => kind switch
-    {
-        ObjectKind.Extension
-            or ObjectKind.TextSearchDictionary
-            or ObjectKind.TextSearchConfiguration
-            or ObjectKind.ForeignDataWrapper
-            or ObjectKind.Server
-            or ObjectKind.Statistics
-            or ObjectKind.Aggregate => true,
-        _ => false,
-    };
-
-    private static string DropKeyword(ObjectKind kind) => kind switch
-    {
-        ObjectKind.OperatorClass => "OPERATOR CLASS",
-        ObjectKind.OperatorFamily => "OPERATOR FAMILY",
-        ObjectKind.EventTrigger => "EVENT TRIGGER",
-        ObjectKind.ForeignDataWrapper => "FOREIGN DATA WRAPPER",
-        ObjectKind.UserMapping => "USER MAPPING",
-        ObjectKind.ForeignTable => "FOREIGN TABLE",
-        ObjectKind.TextSearchConfiguration => "TEXT SEARCH CONFIGURATION",
-        ObjectKind.TextSearchDictionary => "TEXT SEARCH DICTIONARY",
-        ObjectKind.TextSearchParser => "TEXT SEARCH PARSER",
-        ObjectKind.TextSearchTemplate => "TEXT SEARCH TEMPLATE",
-        _ => kind.ToString().ToUpperInvariant(),
-    };
+    public static bool ComparesByIdentityOnly(ObjectKind kind) => ObjectKindRegistry.Get(kind).ComparesByIdentityOnly;
 
     /// <summary>Renders a DROP for the object (empty for comments, which are not dropped).</summary>
     public static string DropSql(RawObjectDefinition def)
     {
         if (def.Kind == ObjectKind.Comment) return string.Empty;
-        return $"DROP {DropKeyword(def.Kind)} IF EXISTS {DropTarget(def)};";
+        var d = ObjectKindRegistry.Get(def.Kind);
+        return $"DROP {d.DropKeyword(def.Kind)} IF EXISTS {DropTarget(def, d.DropStyle)};";
     }
 
-    private static string DropTarget(RawObjectDefinition def) => def.Kind switch
+    // The only per-kind variation left is the DROP target shape; it switches on the descriptor's
+    // DropStyle (4 cases), not on each ObjectKind.
+    private static string DropTarget(RawObjectDefinition def, DropTargetStyle style) => style switch
     {
-        // table-scoped
-        ObjectKind.Trigger or ObjectKind.Rule or ObjectKind.Policy =>
-            $"{SqlEmitter.Quote(def.Name)} ON {QualifyString(def.OnObject ?? "")}",
-        // schema-qualified
-        ObjectKind.Type or ObjectKind.Domain or ObjectKind.Collation or ObjectKind.Conversion
-            or ObjectKind.Statistics or ObjectKind.ForeignTable or ObjectKind.Table or ObjectKind.TextSearchConfiguration
-            or ObjectKind.TextSearchDictionary or ObjectKind.TextSearchParser or ObjectKind.TextSearchTemplate =>
-            SqlEmitter.Qualified(def.Schema, def.Name),
-        // global name
-        ObjectKind.Extension or ObjectKind.Language or ObjectKind.Server
-            or ObjectKind.ForeignDataWrapper or ObjectKind.EventTrigger or ObjectKind.Publication =>
-            SqlEmitter.Quote(def.Name),
-        // signature / verbatim (aggregate, operator, cast, opclass/family, transform, user mapping)
-        _ => def.Name,
+        DropTargetStyle.TableScoped => $"{SqlEmitter.Quote(def.Name)} ON {QualifyString(def.OnObject ?? "")}",
+        DropTargetStyle.SchemaQualified => SqlEmitter.Qualified(def.Schema, def.Name),
+        DropTargetStyle.GlobalName => SqlEmitter.Quote(def.Name),
+        _ => def.Name, // Signature / verbatim
     };
 
     private static string QualifyString(string schemaDotName)
@@ -130,31 +61,7 @@ public static class RawObjectMeta
             : SqlEmitter.Quote(schemaDotName);
     }
 
-    public static string Folder(ObjectKind kind) => kind switch
-    {
-        ObjectKind.Extension => "Extensions",
-        ObjectKind.Language => "Languages",
-        ObjectKind.Type => "Types",
-        ObjectKind.Domain => "Domains",
-        ObjectKind.Collation => "Collations",
-        ObjectKind.Conversion => "Conversions",
-        ObjectKind.Cast => "Casts",
-        ObjectKind.Operator or ObjectKind.OperatorClass or ObjectKind.OperatorFamily => "Operators",
-        ObjectKind.Aggregate => "Aggregates",
-        ObjectKind.Trigger => "Triggers",
-        ObjectKind.Rule => "Rules",
-        ObjectKind.Policy => "Policies",
-        ObjectKind.EventTrigger => "EventTriggers",
-        ObjectKind.Statistics => "Statistics",
-        ObjectKind.ForeignDataWrapper or ObjectKind.Server or ObjectKind.UserMapping or ObjectKind.ForeignTable => "ForeignData",
-        ObjectKind.TextSearchConfiguration or ObjectKind.TextSearchDictionary
-            or ObjectKind.TextSearchParser or ObjectKind.TextSearchTemplate => "TextSearch",
-        ObjectKind.Transform => "Transforms",
-        ObjectKind.Publication => "Publications",
-        ObjectKind.Comment => "Comments",
-        ObjectKind.Table => "Tables",
-        _ => "Other",
-    };
+    public static string Folder(ObjectKind kind) => ObjectKindRegistry.Get(kind).Folder;
 
     /// <summary>A filesystem-safe file name derived from the object's identity.</summary>
     public static string FileName(RawObjectDefinition def)
