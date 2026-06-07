@@ -71,7 +71,11 @@ public sealed class Tokenizer
         if (!_intern) return _s.Substring(start, length);
         if (_interner is null)
         {
-            _interner = new Dictionary<string, string>(StringComparer.Ordinal);
+            // Pre-size to a distinct-string estimate so the dictionary skips most of its doubling-resize
+            // churn — the Entry[]/bucket-int[] backing arrays became a top allocator once string literals
+            // started interning. SQL is highly repetitive, so distinct spellings are a small fraction of the
+            // input length; under-estimate (~0.8%) to avoid over-allocating a too-large backing array.
+            _interner = new Dictionary<string, string>(_s.Length / 128 + 16, StringComparer.Ordinal);
             _lookup = _interner.GetAlternateLookup<ReadOnlySpan<char>>();
         }
         if (_lookup.TryGetValue(span, out var cached)) return cached;
