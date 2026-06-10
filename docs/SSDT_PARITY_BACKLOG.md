@@ -1,5 +1,10 @@
 # SSDT-for-PostgreSQL — Feature Parity Backlog
 
+> **[HISTORICAL REFERENCE]** This document is the original parity backlog and is no longer
+> maintained — most "❌ missing" entries below have since shipped. The source of truth for
+> current status is **`docs/reference/PROGRESS.md`** (M7 SSDT-parity milestone) and the GitHub
+> issue tracker. Kept for the terminology map and the original scoping rationale.
+
 > Goal: give PostgreSQL developers the **same declarative-database-project experience** that SQL
 > Server developers get from **SQL Server Data Tools (SSDT) / the Microsoft.Build.Sql SDK / the SQL
 > Database Projects extension** — including the **same UI**, so a Visual Studio (and VS Code) user

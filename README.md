@@ -271,6 +271,11 @@ Where the project is heading and what has shipped — the master delivery tracke
 delivered milestone: **[docs/reference/PROGRESS.md](docs/reference/PROGRESS.md)**
 (milestones mirror the [GitHub milestones](https://github.com/ilijevicdenis/CodeCleaners.PgProj/milestones)).
 
+Known deferred items (tracked there with the technical reason): base-type introspection (needs C
+I/O functions in the server), transform introspection (needs C internal-typed functions), NuGet
+restore of `<PackageReference>` `.pgpkg`s (use `<ArtifactReference>` meanwhile), and the editable
+table designer.
+
 ## License
 
 © 2026 **CodeCleaners d.o.o.** — https://code-cleaners.com/. All rights reserved.

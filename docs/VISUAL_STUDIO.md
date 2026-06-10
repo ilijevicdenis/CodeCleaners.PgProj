@@ -21,22 +21,25 @@ dotnet build sample/SampleDb/SampleDb.pgproj -c Release      # build a sample ->
 dotnet pack  src/PgProj.Sdk -c Release -o artifacts/sdk-pack # produce PgProj.Sdk.0.1.0.nupkg
 ```
 
-## Route B — VSIX project system ⏳ (scaffolded, not buildable here)
+## Route B — VS extensions (two-extension hybrid for VS 2026+)
 
-A full Visual Studio extension lives under [`editors/vs/`](../editors/vs/README.md): a `.pgproj`
-project flavor (Solution Explorer object tree), property pages (build output, database settings,
-SQLCMD variables, target platform), a Publish dialog, a Schema Compare window, and an `ILanguageClient`
-that launches `pgproj serve` for `.sql` IntelliSense/go-to-definition.
+Route B lives under [`editors/vs/`](../editors/vs/README.md) (the authoritative doc) and is a
+**two-extension hybrid**:
 
-> Route B targets .NET Framework + the **Visual Studio SDK** and can only be built inside **Visual
-> Studio 2022 with the extension-development workload**. It is a **scaffold** (structure + integration
-> seams marked `// SCAFFOLD`), kept in its own `editors/vs/PgProj.VisualStudio.sln`, **excluded from
-> `PgProj.slnx`** and from `dotnet test`. It was **not** built/run in the headless environment where
-> it was scaffolded.
+- **`PgProj.VisualStudio`** — a modern **VisualStudio.Extensibility** OOP extension (net10): Publish +
+  Schema Compare commands, a Remote-UI Schema Compare tool window, and `.sql` IntelliSense via an
+  in-process LSP provider. The engine (`PgProj.Core`/`PgProj.Lsp`) is linked **in-process** (no
+  `pgproj` subprocess); publish goes through the same shared `PublishService` as the CLI, so the
+  deploy script and strategy are identical. **Builds and packages headless** with the .NET 10 SDK.
+- **`PgProj.VisualStudio.ProjectSystem`** — a classic in-proc **VSSDK** extension (net472) that
+  authors the `.pgproj` **project type** (the one thing the OOP model has no API for). It compiles and
+  packages a `.vsix` with the VS 2026 full MSBuild, but the project factory / property pages are
+  **stubs** — a *structural scaffold, not a working project system*. Stage 1+ (actually loading a
+  `.pgproj`, File→New→Project, property pages, F5) is unproven and needs interactive VS 2026.
 
-The extension holds **no engine logic**: build/publish delegate to the Route-A SDK targets, the object
-tree is a view over `pgproj model-tree --format json`, and Schema Compare renders
-`pgproj compare … --format json`.
+> Both extensions are intentionally **excluded from `PgProj.slnx`** and from `dotnet test`; the OOP
+> extension has its own `editors/vs/PgProj.VisualStudio.slnx`. Even with neither installed, Route A
+> alone makes a `.pgproj` an Open/Build/Publish citizen in Visual Studio.
 
 ## How `.sql` IntelliSense attaches (both editors)
 
@@ -44,8 +47,9 @@ tree is a view over `pgproj model-tree --format json`, and Schema Compare render
 
 - **VS Code (#24):** `vscode-languageclient` spawns `pgproj serve` with `transport: stdio`,
   `DocumentSelector { language: "sql" }`.
-- **Visual Studio (#25):** `PgProjLanguageClient : ILanguageClient` — `ActivateAsync` spawns
-  `pgproj serve` and returns its stdout/stdin pair; MEF binds it to the `.sql` content type.
+- **Visual Studio (#25):** the OOP extension's `PgProjLanguageServerProvider` hosts `LspServer`
+  **in-process** over an in-memory `FullDuplexStream` pair — no subprocess; same server, different
+  transport.
 
 Both pass the workspace folder so the server resolves the `.pgproj`; the capabilities advertised at
 `initialize` (diagnostics, definition, hover, completion) are the contract. No client-specific code
