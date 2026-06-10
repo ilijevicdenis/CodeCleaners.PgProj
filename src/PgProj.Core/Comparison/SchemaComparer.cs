@@ -593,6 +593,12 @@ public sealed class SchemaComparer
         var tgtByKey = new Dictionary<string, RawObjectDefinition>(StringComparer.OrdinalIgnoreCase);
         foreach (var o in target.Objects) tgtByKey.TryAdd(RawObjectMeta.ComparisonKey(o), o);
 
+        // Target table names for the typed/partition-table presence check below, indexed ONCE on first
+        // use instead of a linear Tables scan per raw table object — that scan was quadratic on a
+        // heavily partitioned schema, where every partition child is a raw `table:` object (same fix
+        // shape as Fix E). Lazy: models with no raw table objects never pay for the set.
+        HashSet<(string, string)>? tgtTableNames = null;
+
         foreach (var src in source.Objects)
         {
             tgtByKey.TryGetValue(RawObjectMeta.ComparisonKey(src), out var tgt);
@@ -601,10 +607,15 @@ public sealed class SchemaComparer
                 // A typed/partition table (CREATE TABLE … OF type / PARTITION OF) is modeled in the
                 // project as a raw `table:` object, but the live reader returns it as a real
                 // TableDefinition — so treat it as present when the catalog has that table.
-                if (src.Kind == ObjectKind.Table
-                    && target.Tables.Any(t => string.Equals(t.Schema, src.Schema, StringComparison.OrdinalIgnoreCase)
-                                           && string.Equals(t.Name, src.Name, StringComparison.OrdinalIgnoreCase)))
-                    continue;
+                if (src.Kind == ObjectKind.Table)
+                {
+                    if (tgtTableNames is null)
+                    {
+                        tgtTableNames = new HashSet<(string, string)>(QualifiedName);
+                        foreach (var t in target.Tables) tgtTableNames.Add((t.Schema, t.Name));
+                    }
+                    if (tgtTableNames.Contains((src.Schema, src.Name))) continue;
+                }
                 changes.Add(new CreateRawObjectChange(src));
             }
             else if (src.BodyComparable && tgt.BodyComparable

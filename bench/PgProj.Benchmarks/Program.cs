@@ -30,7 +30,71 @@ public static class Program
         if (args.Length > 0 && args[0] == "modeltypes") { ModelTypes(args.Length > 1 ? args[1] : "All"); return; }
         if (args.Length > 0 && args[0] == "alloctypes") { AllocTypes(args.Length > 1 ? args[1] : "All"); return; }
         if (args.Length > 0 && args[0] == "retention") { RetentionProbe(args.Length > 1 ? args[1] : "All"); return; }
+        if (args.Length > 0 && args[0] == "buildwall") { BuildWallProbe(); return; }
         BenchmarkSwitcher.FromAssembly(typeof(Program).Assembly).Run(args, new BenchConfig());
+    }
+
+    // Deterministic wall-clock probe for the parallel build (DOP-tuning gate): generates on-disk
+    // projects of several file counts, then reports the MEDIAN of many BuildAsync iterations (median
+    // beats mean for scheduler jitter). Serial Build() is printed as the reference line. Wall-clock —
+    // not bytes/op — is the metric here, because a worker-count change barely moves allocation.
+    private static void BuildWallProbe()
+    {
+        Console.WriteLine($"BuildAsync wall-clock probe — cores={Environment.ProcessorCount}");
+        foreach (var n in new[] { 2, 10, 24, 50, 200 })
+        {
+            var dir = Path.Combine(Path.GetTempPath(), "pgproj_wall_" + Guid.NewGuid().ToString("N"));
+            Directory.CreateDirectory(dir);
+            try
+            {
+                var proj = Path.Combine(dir, "Bench.pgproj");
+                File.WriteAllText(proj, """
+                    <Project><PropertyGroup><Name>Bench</Name><DefaultSchema>app</DefaultSchema></PropertyGroup>
+                    <ItemGroup><Build Include="**/*.sql" /></ItemGroup></Project>
+                    """);
+                File.WriteAllText(Path.Combine(dir, "00_schema.sql"), "CREATE SCHEMA app;");
+                for (var i = 0; i < n; i++)
+                    File.WriteAllText(Path.Combine(dir, $"t{i:D4}.sql"), $$"""
+                        CREATE TABLE app.t{{i:D4}} (
+                            id          bigint PRIMARY KEY,
+                            parent_id   bigint REFERENCES app.t0000 (id),
+                            code        varchar(32) NOT NULL,
+                            name        text NOT NULL DEFAULT 'unnamed',
+                            amount      numeric(18,4) NOT NULL DEFAULT 0,
+                            is_active   boolean NOT NULL DEFAULT true,
+                            created_at  timestamptz NOT NULL DEFAULT now(),
+                            payload     jsonb,
+                            CONSTRAINT ck_t{{i:D4}}_amount CHECK (amount >= 0)
+                        );
+                        CREATE INDEX ix_t{{i:D4}}_code ON app.t{{i:D4}} (code);
+                        """);
+
+                var project = PgProj.Core.Project.DatabaseProject.Load(proj);
+                for (var i = 0; i < 5; i++) _ = project.BuildAsync().GetAwaiter().GetResult();   // warm up + JIT
+
+                var iters = n >= 200 ? 40 : 120;
+                var par = new double[iters];
+                for (var i = 0; i < iters; i++)
+                {
+                    var sw = Stopwatch.StartNew();
+                    _ = project.BuildAsync().GetAwaiter().GetResult();
+                    par[i] = sw.Elapsed.TotalMilliseconds;
+                }
+                var ser = new double[iters];
+                for (var i = 0; i < iters; i++)
+                {
+                    var sw = Stopwatch.StartNew();
+                    _ = project.Build();
+                    ser[i] = sw.Elapsed.TotalMilliseconds;
+                }
+                Array.Sort(par); Array.Sort(ser);
+                Console.WriteLine($"  files={n + 1,4}  BuildAsync median={par[iters / 2],8:N3} ms  min={par[0],8:N3} ms   |  serial Build median={ser[iters / 2],8:N3} ms");
+            }
+            finally
+            {
+                try { Directory.Delete(dir, recursive: true); } catch { /* best effort */ }
+            }
+        }
     }
 
     // Allocation-by-TYPE for the parse+model pipeline, via the runtime's GC AllocationTick events
