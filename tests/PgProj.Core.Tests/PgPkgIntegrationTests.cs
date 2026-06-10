@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using PgProj.Core.Comparison;
 using PgProj.Core.Introspection;
+using PgProj.Core.Publishing;
 using PgProj.Core.Model;
 using PgProj.Core.Packaging;
 using PgProj.Core.Project;

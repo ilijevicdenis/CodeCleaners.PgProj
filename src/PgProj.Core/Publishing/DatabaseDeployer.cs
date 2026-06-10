@@ -2,7 +2,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Npgsql;
 
-namespace PgProj.Core.Introspection;
+namespace PgProj.Core.Publishing;
 
 /// <summary>Executes a generated deployment script against a live Postgres server.</summary>
 public sealed class DatabaseDeployer

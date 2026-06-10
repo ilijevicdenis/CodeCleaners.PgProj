@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Npgsql;
 using PgProj.Core.Comparison;
 
-namespace PgProj.Core.Introspection;
+namespace PgProj.Core.Publishing;
 
 /// <summary>
 /// Executes an ordered set of <see cref="SchemaChange"/>s with intra-phase parallelism and
