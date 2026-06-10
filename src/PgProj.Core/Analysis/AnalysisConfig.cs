@@ -113,7 +113,7 @@ public sealed class AnalysisConfig
                 {
                     var id = rule.Name.Trim();
                     if (id.Length == 0) continue;
-                    if (!PgAnalyzer.IsKnownRule(id) && !(extraKnownRuleIds?.Contains(id) ?? false)) continue; // ignore unknown ids
+                    if (!PgAnalyzer.IsKnownRule(id) && !ModelAnalyzer.IsKnownRule(id) && !(extraKnownRuleIds?.Contains(id) ?? false)) continue; // ignore unknown ids
                     if (rule.Value.ValueKind != JsonValueKind.Object) continue;
 
                     bool? enabled = null;
@@ -150,8 +150,8 @@ public sealed class AnalysisConfig
         foreach (var (rawId, rawVal) in ruleArgs)
         {
             var id = rawId.Trim();
-            if (!PgAnalyzer.IsKnownRule(id) && !(extraKnownRuleIds?.Contains(id) ?? false))
-                throw new CliRuleException($"Unknown analysis rule '{id}'. Known rules: {string.Join(", ", PgAnalyzer.RuleIds)}.");
+            if (!PgAnalyzer.IsKnownRule(id) && !ModelAnalyzer.IsKnownRule(id) && !(extraKnownRuleIds?.Contains(id) ?? false))
+                throw new CliRuleException($"Unknown analysis rule '{id}'. Known rules: {string.Join(", ", PgAnalyzer.RuleIds.Concat(ModelAnalyzer.RuleIds))}.");
 
             var val = (rawVal ?? string.Empty).Trim().ToLowerInvariant();
             var existing = map.TryGetValue(id, out var e) ? e : new RuleOverride();

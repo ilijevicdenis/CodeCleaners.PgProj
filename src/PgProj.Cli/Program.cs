@@ -14,6 +14,7 @@ using PgProj.Core.Model;
 using PgProj.Core.Packaging;
 using PgProj.Core.Project;
 using PgProj.Core.Project.References;
+using PgProj.Core.Publishing;
 using PgProj.Core.Snapshot;
 using PgProj.Core.Templates;
 
@@ -352,37 +353,33 @@ public static class Program
         // Target-platform gate (EP-TARGET): never publish syntax newer than <TargetPostgresVersion>.
         if (TargetVersionGateBlocks(project, args)) return ExitCode.AnalysisBlocked;
 
-        var versionProfile = ProfileFor(project); // PG version profile from TargetPostgresVersion
-        var target = await ReadTarget(args, versionProfile);
-
-        var changes = new SchemaComparer(versionProfile).Compare(source, target, new ComparerOptions
+        // The compare → deploy-script → deploy core is the shared PublishService (one code path with the
+        // VS extension / any editor). The CLI keeps owning source-building, the gates above, dry-run /
+        // output presentation, and exit-code mapping.
+        var connection = RequireConnection(args);
+        var service = new PublishService();
+        var plan = await service.PlanAsync(project, source, connection, new PublishPlanOptions
         {
-            DropObjectsNotInSource = allowDrops,
-        });
-
-        var variables = BuildVariableResolver(project, args, profile);
-        var script = new DeployScriptGenerator().Generate(changes, new DeployOptions
-        {
+            AllowDrops = allowDrops,
             WrapInTransaction = wrapInTransaction,
-            Scripts = LoadDeployScripts(project),
-            Variables = variables,
+            ProfileVariables = profile?.Variables,
+            VariableOverrides = ParseCliVars(args),
         });
 
         var outPath = GetOption(args, "-o", "--output");
         if (outPath is not null)
         {
-            File.WriteAllText(outPath, script);
+            File.WriteAllText(outPath, plan.Script);
             Console.WriteLine($"Deploy script written to {outPath}");
         }
 
         if (HasFlag(args, "--dry-run"))
         {
-            Console.WriteLine(outPath is null ? script : "(dry run — not executed)");
+            Console.WriteLine(outPath is null ? plan.Script : "(dry run — not executed)");
             return 0;
         }
 
-        var scripts = LoadDeployScripts(project);
-        if (changes.Count == 0 && (scripts is null || scripts.IsEmpty))
+        if (plan.NothingToDo)
         {
             Console.WriteLine("Nothing to publish — target already matches the project.");
             return 0;
@@ -391,23 +388,12 @@ public static class Program
         // A server-side failure while applying the script is a distinct CI failure class (EP-CICD):
         // map it to ExitCode.DeployError so a pipeline can alert specifically on a failed deploy
         // (vs a build/analysis problem that never touched the target).
+        var parallel = HasFlag(args, "--parallel");
         try
         {
-            // --parallel runs the diff phase-by-phase, but pre/post deploy scripts have no phase model and
-            // must bracket the diff inside one transaction — so fall back to the whole-script deployer when
-            // deploy scripts are present (still strict all-or-nothing).
-            if (HasFlag(args, "--parallel") && (scripts is null || scripts.IsEmpty))
-            {
-                // Intra-phase parallelism with phase barriers (phase-level atomicity).
-                await new PhasedDeployer(RequireConnection(args)).ExecuteAsync(changes);
-                Console.WriteLine($"Published {changes.Count} change(s) successfully (parallel, phased).");
-            }
-            else
-            {
-                // Default: whole script in one transaction (strict all-or-nothing).
-                await new DatabaseDeployer().ExecuteAsync(RequireConnection(args), script);
-                Console.WriteLine($"Published {changes.Count} change(s) successfully.");
-            }
+            await service.ApplyAsync(plan, connection, parallel);
+            Console.WriteLine($"Published {plan.ChangeCount} change(s) successfully" +
+                              (parallel && !plan.HasDeployScripts ? " (parallel, phased)." : "."));
         }
         catch (Npgsql.PostgresException ex)
         {
@@ -572,21 +558,21 @@ public static class Program
     {
         var cli = new CliArgs(args);
         var project = DatabaseProject.Load(RequirePositional(args, "project file"));
-        var (config, rules) = ResolveAnalysis(project, cli);   // config + external rule packs (#79)
+        var (config, rules, modelRules) = ResolveAnalysis(project, cli);   // config + external rule packs (#79)
         var strict = HasFlag(args, "--strict");
 
         switch (cli.Format)
         {
             case OutputFormat.Json:
             {
-                var report = ContractBuilder.Analyze(project, strict, config, rules);
+                var report = ContractBuilder.Analyze(project, strict, config, rules, modelRules);
                 EmitJson(report);
                 return report.Blocked ? ExitCode.AnalysisBlocked : ExitCode.Success;
             }
             case OutputFormat.Sarif:
             {
                 var positions = SourcePositionIndex.Build(project);
-                var findings = RunAnalysis(project, config, rules, out _);
+                var findings = RunAnalysis(project, config, rules, modelRules, out _);
                 Console.WriteLine(new SarifWriter().Write(findings, positions));
                 var blocked = findings.Any(f => f.Severity == DiagnosticSeverity.Error)
                               || (strict && findings.Any(f => f.Severity == DiagnosticSeverity.Warning));
@@ -594,7 +580,7 @@ public static class Program
             }
             default:
             {
-                var findings = RunAnalysis(project, config, rules, out var ruleCount);
+                var findings = RunAnalysis(project, config, rules, modelRules, out var ruleCount);
                 Console.WriteLine($"Analyzed '{project.Name}': {ruleCount} rule(s).");
                 return ReportFindings(findings, strict, alwaysReport: true) ? ExitCode.AnalysisBlocked : ExitCode.Success;
             }
@@ -702,17 +688,24 @@ public static class Program
     // ---- shared analysis gate -----------------------------------------------------------
 
     private static IReadOnlyList<Diagnostic> RunAnalysis(DatabaseProject project, AnalysisConfig config,
-        IReadOnlyList<IPgRule> externalRules, out int ruleCount)
+        IReadOnlyList<IPgRule> externalRules, IReadOnlyList<IModelRule> externalModelRules, out int ruleCount)
     {
-        ruleCount = PgAnalyzer.RuleCount + externalRules.Count;
+        ruleCount = PgAnalyzer.RuleCount + ModelAnalyzer.RuleCount + externalRules.Count + externalModelRules.Count;
         var analyzer = new PgAnalyzer(config);
         var findings = new List<Diagnostic>();
+        var model = new PgProj.Core.Model.DatabaseModel();
+        var modelBuilder = new PgProj.Core.Syntax.ModelBuilder();
         foreach (var file in project.ResolveSqlFiles())
         {
             var parsed = new PgProj.Core.Syntax.PgParser().Parse(PgProj.Core.Project.SourceReader.ReadAllText(file));
             findings.AddRange(analyzer.Analyze(parsed));
             findings.AddRange(ExternalRules.Run(externalRules, parsed, config));   // EP-ANALYSIS+ #79
+            modelBuilder.Build(parsed, model);   // accumulate the merged model for the model-level pass
         }
+
+        // Model-level pass: cross-file rules over the merged model (PG014 + external IModelRules).
+        findings.AddRange(new ModelAnalyzer(config).Analyze(model));
+        findings.AddRange(ExternalModelRules.Run(externalModelRules, model, config));
         return findings;
     }
 
@@ -722,11 +715,12 @@ public static class Program
     /// overrides layered on top (CLI wins). A malformed <c>--rule</c> or an unloadable rule pack surfaces as a
     /// usage error.
     /// </summary>
-    private static (AnalysisConfig Config, IReadOnlyList<IPgRule> Rules) ResolveAnalysis(DatabaseProject project, CliArgs cli)
+    private static (AnalysisConfig Config, IReadOnlyList<IPgRule> Rules, IReadOnlyList<IModelRule> ModelRules)
+        ResolveAnalysis(DatabaseProject project, CliArgs cli)
     {
         try
         {
-            return AnalysisSetup.Resolve(project.ProjectFilePath, cli.GetKeyValues("--rule"));
+            return AnalysisSetup.ResolveAll(project.ProjectFilePath, cli.GetKeyValues("--rule"));
         }
         catch (CliRuleException ex) { throw new CliUsageException(ex.Message); }
         catch (RulePackException ex) { throw new CliUsageException(ex.Message); }
@@ -759,8 +753,8 @@ public static class Program
         // No project (source was a pre-built .pgpkg) → nothing to re-analyze; it was gated at build time.
         if (project is null) return false;
         if (HasFlag(args, "--no-analyze")) return false;
-        var (config, rules) = ResolveAnalysis(project, new CliArgs(args));
-        var findings = RunAnalysis(project, config, rules, out _);
+        var (config, rules, modelRules) = ResolveAnalysis(project, new CliArgs(args));
+        var findings = RunAnalysis(project, config, rules, modelRules, out _);
         var blocked = ReportFindings(findings, HasFlag(args, "--strict"), alwaysReport: false);
         if (blocked) Console.Error.WriteLine("Aborted by analysis gate (pass --no-analyze to skip).");
         return blocked;

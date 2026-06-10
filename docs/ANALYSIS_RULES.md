@@ -16,7 +16,17 @@
 | PG007 | Info | `SELECT *` in a view body |
 | PG008 | Info | `numeric`/`decimal` column without precision/scale |
 | PG009 | Info | `LIMIT` without `ORDER BY` |
+| PG010 | Info | Blank-padded `char(n)`/`character(n)` column (use `text`/`varchar`) |
+| PG011 | Info | `timestamp` without time zone column (use `timestamptz`) |
+| PG012 | Info | `serial`/`bigserial`/`smallserial` column (use `GENERATED … AS IDENTITY`) |
+| PG013 | Info | `money` column (locale-dependent; use `numeric`) |
+| PG014 | Warning | Foreign key without a covering index (model-level — see below) |
 | PGV### | Error | Syntax newer than the project's `TargetPostgresVersion` (version gating, EP-TARGET) |
+
+PG001–PG013 are **per-file** rules over the parsed AST. **PG014 is a model-level rule**: it runs once
+over the merged project model, so it sees relationships that span files (the FK in one file, its
+covering index in another). Coverage counts the primary key, unique constraints, and any non-partial
+index whose **leading columns** (any order) are exactly the FK's columns.
 
 ## Configuring rules — `.pgproj.analysis.json`
 
@@ -63,8 +73,13 @@ Ship your own rules in a separate assembly — the DacFx contributor-model analo
 
 2. Build the DLL and list it under `rulePacks` (paths resolve relative to the `.pgproj`).
 
-`pgproj` discovers every **public, parameterless-constructible** `IPgRule` and runs it alongside the
-built-ins. Pack rule ids participate in the same `rules` config (enable/severity) and SARIF output. Notes:
+2b. For a **cross-object rule** implement `IModelRule` instead — same shape, but `Analyze` receives the
+   **merged `DatabaseModel`** (after every file is lowered and merged), so it can see relationships that
+   span files, exactly like the built-in PG014. Both rule shapes can live in the same pack DLL.
+
+`pgproj` discovers every **public, parameterless-constructible** `IPgRule` and `IModelRule` and runs
+them alongside the built-ins. Pack rule ids participate in the same `rules` config (enable/severity)
+and SARIF output. Notes:
 
 - Each pack loads in an isolated `AssemblyLoadContext` that shares `PgProj.Core` with the host (so the
   `IPgRule` type unifies) but resolves the pack's own private dependencies next to its DLL.

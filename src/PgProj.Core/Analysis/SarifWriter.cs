@@ -42,7 +42,7 @@ public sealed class SarifWriter
             Name = ToolName,
             Version = toolVersion ?? typeof(SarifWriter).Assembly.GetName().Version?.ToString() ?? "0.0.0",
             InformationUri = "https://github.com/codecleaners/pgproj",
-            Rules = PgAnalyzer.RuleDefaults.Select(r => new SarifRule
+            Rules = PgAnalyzer.RuleDefaults.Concat(ModelAnalyzer.RuleDefaults).Select(r => new SarifRule
             {
                 Id = r.Id,
                 Name = r.Id,

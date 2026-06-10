@@ -18,27 +18,34 @@ namespace PgProj.Core.Analysis;
 public static class RulePackLoader
 {
     /// <summary>Discovers every public, parameterless-constructible <see cref="IPgRule"/> in the given assemblies.</summary>
-    public static IReadOnlyList<IPgRule> FromAssemblies(IEnumerable<Assembly> assemblies)
+    public static IReadOnlyList<IPgRule> FromAssemblies(IEnumerable<Assembly> assemblies) =>
+        Discover<IPgRule>(assemblies, r => r.Id);
+
+    /// <summary>Discovers every public, parameterless-constructible <see cref="IModelRule"/> in the given assemblies.</summary>
+    public static IReadOnlyList<IModelRule> ModelRulesFromAssemblies(IEnumerable<Assembly> assemblies) =>
+        Discover<IModelRule>(assemblies, r => r.Id);
+
+    private static IReadOnlyList<T> Discover<T>(IEnumerable<Assembly> assemblies, Func<T, string> idOf) where T : class
     {
-        var rules = new List<IPgRule>();
+        var rules = new List<T>();
         var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         foreach (var asm in assemblies)
         {
             foreach (var type in SafeGetTypes(asm))
             {
                 if (type is null || type.IsAbstract || type.IsInterface) continue;
-                if (!typeof(IPgRule).IsAssignableFrom(type)) continue;
+                if (!typeof(T).IsAssignableFrom(type)) continue;
                 if (type.GetConstructor(Type.EmptyTypes) is null) continue;
 
-                IPgRule rule;
-                try { rule = (IPgRule)Activator.CreateInstance(type)!; }
+                T rule;
+                try { rule = (T)Activator.CreateInstance(type)!; }
                 catch (Exception ex)
                 {
                     throw new RulePackException($"Could not instantiate rule '{type.FullName}': {ex.Message}", ex);
                 }
-                if (string.IsNullOrWhiteSpace(rule.Id))
+                if (string.IsNullOrWhiteSpace(idOf(rule)))
                     throw new RulePackException($"Rule '{type.FullName}' has an empty Id.");
-                if (seen.Add(rule.Id)) rules.Add(rule);   // first wins on a duplicate id
+                if (seen.Add(idOf(rule))) rules.Add(rule);   // first wins on a duplicate id
             }
         }
         return rules;
@@ -46,10 +53,24 @@ public static class RulePackLoader
 
     /// <summary>
     /// Loads each rule-pack DLL at <paramref name="paths"/> (relative paths resolved against
-    /// <paramref name="baseDir"/>) and discovers its rules. A missing or unloadable pack throws
+    /// <paramref name="baseDir"/>) and discovers its per-file rules. A missing or unloadable pack throws
     /// <see cref="RulePackException"/>.
     /// </summary>
-    public static IReadOnlyList<IPgRule> FromPaths(IEnumerable<string> paths, string? baseDir = null)
+    public static IReadOnlyList<IPgRule> FromPaths(IEnumerable<string> paths, string? baseDir = null) =>
+        FromAssemblies(LoadAssemblies(paths, baseDir));
+
+    /// <summary>
+    /// Loads each rule-pack DLL once and discovers BOTH rule shapes: per-file <see cref="IPgRule"/>s and
+    /// model-level <see cref="IModelRule"/>s. The preferred entry point for hosts that run the full gate.
+    /// </summary>
+    public static (IReadOnlyList<IPgRule> FileRules, IReadOnlyList<IModelRule> ModelRules) AllFromPaths(
+        IEnumerable<string> paths, string? baseDir = null)
+    {
+        var assemblies = LoadAssemblies(paths, baseDir);
+        return (FromAssemblies(assemblies), ModelRulesFromAssemblies(assemblies));
+    }
+
+    private static List<Assembly> LoadAssemblies(IEnumerable<string> paths, string? baseDir)
     {
         var assemblies = new List<Assembly>();
         foreach (var p in paths)
@@ -65,7 +86,7 @@ public static class RulePackLoader
                 throw new RulePackException($"Could not load rule pack '{full}': {ex.Message}", ex);
             }
         }
-        return FromAssemblies(assemblies);
+        return assemblies;
     }
 
     private static IEnumerable<Type?> SafeGetTypes(Assembly asm)

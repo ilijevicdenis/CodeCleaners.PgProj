@@ -13,24 +13,36 @@ namespace PgProj.Core.Analysis;
 /// </summary>
 public static class AnalysisSetup
 {
-    /// <summary>The resolved analysis config plus the external rules to run alongside the built-in analyzer.</summary>
+    /// <summary>The resolved analysis config plus the external per-file rules (back-compat shape).</summary>
     public static (AnalysisConfig Config, IReadOnlyList<IPgRule> Rules) Resolve(
+        string projectFilePath, IReadOnlyDictionary<string, string>? cliRuleArgs = null)
+    {
+        var (config, rules, _) = ResolveAll(projectFilePath, cliRuleArgs);
+        return (config, rules);
+    }
+
+    /// <summary>
+    /// The resolved analysis config plus BOTH external rule shapes — per-file <see cref="IPgRule"/>s and
+    /// model-level <see cref="IModelRule"/>s — loaded from the sidecar's <c>rulePacks</c> in one pass.
+    /// </summary>
+    public static (AnalysisConfig Config, IReadOnlyList<IPgRule> Rules, IReadOnlyList<IModelRule> ModelRules) ResolveAll(
         string projectFilePath, IReadOnlyDictionary<string, string>? cliRuleArgs = null)
     {
         var dir = Path.GetDirectoryName(Path.GetFullPath(projectFilePath));
 
         // Pass 1: just to learn the rulePacks declared by the sidecar.
         var pre = AnalysisConfig.LoadForProject(projectFilePath);
-        var rules = pre.RulePackPaths.Count == 0
-            ? (IReadOnlyList<IPgRule>)Array.Empty<IPgRule>()
-            : RulePackLoader.FromPaths(pre.RulePackPaths, dir);
+        var (rules, modelRules) = pre.RulePackPaths.Count == 0
+            ? ((IReadOnlyList<IPgRule>)Array.Empty<IPgRule>(), (IReadOnlyList<IModelRule>)Array.Empty<IModelRule>())
+            : RulePackLoader.AllFromPaths(pre.RulePackPaths, dir);
 
         // Pass 2: build the config knowing the external ids, then layer CLI overrides on top.
-        var ids = new HashSet<string>(rules.Select(r => r.Id), StringComparer.OrdinalIgnoreCase);
+        var ids = new HashSet<string>(rules.Select(r => r.Id).Concat(modelRules.Select(r => r.Id)),
+            StringComparer.OrdinalIgnoreCase);
         var config = AnalysisConfig.LoadForProject(projectFilePath, ids);
         if (cliRuleArgs is { Count: > 0 })
             config = config.WithCliOverrides(cliRuleArgs, ids);
 
-        return (config, rules);
+        return (config, rules, modelRules);
     }
 }

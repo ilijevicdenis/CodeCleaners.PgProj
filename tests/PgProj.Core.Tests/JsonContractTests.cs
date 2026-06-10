@@ -38,7 +38,7 @@ public class JsonContractTests
     {
         var report = ContractBuilder.Analyze(SampleProject(), strict: false);
         Assert.Equal(JsonContract.SchemaVersion, report.SchemaVersion);
-        Assert.Equal(PgAnalyzer.RuleCount, report.RuleCount);
+        Assert.Equal(PgAnalyzer.RuleCount + ModelAnalyzer.RuleCount, report.RuleCount);
     }
 
     [Fact]

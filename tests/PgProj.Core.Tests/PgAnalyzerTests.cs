@@ -70,6 +70,46 @@ public class PgAnalyzerTests
     }
 
     [Fact]
+    public void PG010_blank_padded_char()
+    {
+        Assert.Contains(A("CREATE TABLE s.t (a int PRIMARY KEY, code char(3));"), x => x.RuleId == "PG010" && x.Severity == DiagnosticSeverity.Info);
+        Assert.Contains(A("CREATE TABLE s.t (a int PRIMARY KEY, code character(3));"), x => x.RuleId == "PG010");
+        Assert.Contains(A("CREATE TABLE s.t (a int PRIMARY KEY, code char);"), x => x.RuleId == "PG010");
+        // varchar / character varying / text are fine.
+        Assert.DoesNotContain(A("CREATE TABLE s.t (a int PRIMARY KEY, code varchar(3));"), x => x.RuleId == "PG010");
+        Assert.DoesNotContain(A("CREATE TABLE s.t (a int PRIMARY KEY, code character varying(3));"), x => x.RuleId == "PG010");
+        Assert.DoesNotContain(A("CREATE TABLE s.t (a int PRIMARY KEY, code text);"), x => x.RuleId == "PG010");
+    }
+
+    [Fact]
+    public void PG011_timestamp_without_time_zone()
+    {
+        Assert.Contains(A("CREATE TABLE s.t (a int PRIMARY KEY, at timestamp);"), x => x.RuleId == "PG011" && x.Severity == DiagnosticSeverity.Info);
+        Assert.Contains(A("CREATE TABLE s.t (a int PRIMARY KEY, at timestamp(3));"), x => x.RuleId == "PG011");
+        Assert.Contains(A("CREATE TABLE s.t (a int PRIMARY KEY, at timestamp without time zone);"), x => x.RuleId == "PG011");
+        // The tz-aware forms are fine.
+        Assert.DoesNotContain(A("CREATE TABLE s.t (a int PRIMARY KEY, at timestamptz);"), x => x.RuleId == "PG011");
+        Assert.DoesNotContain(A("CREATE TABLE s.t (a int PRIMARY KEY, at timestamp with time zone);"), x => x.RuleId == "PG011");
+    }
+
+    [Fact]
+    public void PG012_serial_column()
+    {
+        Assert.Contains(A("CREATE TABLE s.t (id serial PRIMARY KEY);"), x => x.RuleId == "PG012" && x.Severity == DiagnosticSeverity.Info);
+        Assert.Contains(A("CREATE TABLE s.t (id bigserial PRIMARY KEY);"), x => x.RuleId == "PG012");
+        Assert.Contains(A("CREATE TABLE s.t (id smallserial PRIMARY KEY);"), x => x.RuleId == "PG012");
+        // Identity columns are the recommended form — never flagged.
+        Assert.DoesNotContain(A("CREATE TABLE s.t (id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY);"), x => x.RuleId == "PG012");
+    }
+
+    [Fact]
+    public void PG013_money_column()
+    {
+        Assert.Contains(A("CREATE TABLE s.t (a int PRIMARY KEY, price money);"), x => x.RuleId == "PG013" && x.Severity == DiagnosticSeverity.Info);
+        Assert.DoesNotContain(A("CREATE TABLE s.t (a int PRIMARY KEY, price numeric(12,2));"), x => x.RuleId == "PG013");
+    }
+
+    [Fact]
     public void Clean_statements_produce_no_findings()
     {
         Assert.Empty(A("CREATE FUNCTION s.f(x int) RETURNS int LANGUAGE sql IMMUTABLE AS $$ SELECT x $$;"));
