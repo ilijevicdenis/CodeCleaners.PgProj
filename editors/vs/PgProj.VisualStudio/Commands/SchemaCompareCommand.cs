@@ -1,39 +1,67 @@
-// EP-VS #25 Route B — "Schema Compare" command. SCAFFOLD (requires the VS SDK to build).
-using System;
-using System.ComponentModel.Design;
-using Microsoft.VisualStudio.Shell;
-using Task = System.Threading.Tasks.Task;
+// EP-VS #25 Route B (modern). "Schema Compare" command — runs the engine's comparer IN-PROCESS and
+// opens the Schema Compare tool window over the resulting change set (no subprocess, no JSON round-trip).
+using Microsoft.VisualStudio.Extensibility;
+using Microsoft.VisualStudio.Extensibility.Commands;
+using Microsoft.VisualStudio.Extensibility.Shell;
+using PgProj.VisualStudio.Engine;
+using PgProj.VisualStudio.ToolWindows;
 
-namespace PgProj.VisualStudio.Commands
+namespace PgProj.VisualStudio.Commands;
+
+/// <summary>
+/// Compares the selected <c>.pgproj</c> against the configured PostgreSQL target and shows the result in
+/// the <see cref="SchemaCompareToolWindow"/>. The comparison is the engine's two-way comparer
+/// (<see cref="PgProjEngine.CompareAsync"/>); the window only renders the resulting change set.
+/// </summary>
+[VisualStudioContribution]
+internal sealed class SchemaCompareCommand : Command
 {
-    /// <summary>
-    /// Opens the Schema Compare tool window for the selected .pgproj. The compare itself is the
-    /// engine's two-way comparer (`pgproj compare --source X --target Y -o diff.json --format json`,
-    /// EP-SCHEMACOMPARE) — the window renders that structured diff and lets the user pick a target
-    /// (project / .pgpkg / .schema.snapshot / live DB) and apply selected changes.
-    /// </summary>
-    internal sealed class SchemaCompareCommand
+    public SchemaCompareCommand(VisualStudioExtensibility extensibility)
+        : base(extensibility)
     {
-        private readonly AsyncPackage _package;
+    }
 
-        private SchemaCompareCommand(AsyncPackage package, OleMenuCommandService commandService)
+    /// <inheritdoc/>
+    public override CommandConfiguration CommandConfiguration => new("%PgProj.SchemaCompare.DisplayName%")
+    {
+        Placements = [CommandPlacement.KnownPlacements.ExtensionsMenu],
+        Icon = new(ImageMoniker.KnownValues.CompareFiles, IconSettings.IconAndText),
+        EnabledWhen = ActivationConstraint.ClientContext(ClientContextKey.Shell.ActiveSelectionFileName, @"\.pgproj$"),
+    };
+
+    /// <inheritdoc/>
+    public override async Task ExecuteCommandAsync(IClientContext context, CancellationToken cancellationToken)
+    {
+        var selectedUri = await context.GetSelectedPathAsync(cancellationToken);
+        var project = PgProjContext.FindNearestProject(selectedUri?.LocalPath);
+        if (project is null)
         {
-            _package = package;
-            var id = new CommandID(PgProjGuids.CommandSet, PgProjGuids.SchemaCompareCommandId);
-            commandService.AddCommand(new MenuCommand(Execute, id));
+            await this.Extensibility.Shell().ShowPromptAsync(
+                "No .pgproj found for the current selection.", PromptOptions.OK, cancellationToken);
+            return;
         }
 
-        public static async Task InitializeAsync(AsyncPackage package)
+        var target = PgProjContext.ResolveConnection();
+        if (target is null)
         {
-            await package.JoinableTaskFactory.SwitchToMainThreadAsync();
-            var commandService = await package.GetServiceAsync(typeof(IMenuCommandService)) as OleMenuCommandService;
-            if (commandService != null)
-                _ = new SchemaCompareCommand(package, commandService);
+            await this.Extensibility.Shell().ShowPromptAsync(
+                $"No compare target is set. Define {PgProjContext.ConnectionEnvVar} with a PostgreSQL connection " +
+                "string (the live database to compare against), then try again.",
+                PromptOptions.OK,
+                cancellationToken);
+            return;
         }
 
-        private void Execute(object sender, EventArgs e)
+        try
         {
-            // SCAFFOLD: show the SchemaCompareToolWindow, seeded with the selected project as source.
+            var result = await PgProjEngine.CompareAsync(project, target, cancellationToken);
+            SchemaCompareState.SetLatest(SchemaCompareViewModelFactory.From(Path.GetFileName(project), result));
+            await this.Extensibility.Shell().ShowToolWindowAsync<SchemaCompareToolWindow>(activate: true, cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            await this.Extensibility.Shell().ShowPromptAsync(
+                $"Schema compare failed: {ex.Message}", PromptOptions.OK, cancellationToken);
         }
     }
 }

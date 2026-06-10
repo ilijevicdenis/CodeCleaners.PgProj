@@ -1,0 +1,88 @@
+<Project>
+
+  <!--
+    ============================================================================================
+    PgProj Visual Studio PROJECT SYSTEM (EP-VS #25 Route B, SSDT-parity path).
+
+    The in-process VSSDK extension that gives `.pgproj` a real Visual Studio project experience:
+    a File->New->Project template, a Solution Explorer object tree, project-node operations
+    (Build/Publish/Schema Compare/Import), property pages, and WPF editors. This is the classic
+    in-proc model (the modern out-of-process VisualStudio.Extensibility model cannot author a
+    project type) — SDK-style csproj on net472, per Microsoft's current VSSDK guidance.
+
+    The `.sql` IntelliSense stays in the sibling modern OOP extension (PgProj.VisualStudio).
+
+    BUILD: with the VS 2026 MSBuild (Microsoft.VSSDK.BuildTools brings the VSIX targets). Own
+    solution; NOT in PgProj.slnx / `dotnet test`.
+
+    EXPLICIT SDK IMPORTS (not the `Sdk="..."` attribute) are required so that the VSSDK
+    `Microsoft.VsSDK.targets` import below lands AFTER the SDK's Sdk.targets. That ordering matters:
+    VsSDK.targets statically defines $(ResourceManifest)=$(IntermediateOutputPath)\resources.json,
+    and $(IntermediateOutputPath) is only set by Sdk.targets — import VsSDK.targets too early and the
+    path collapses to a drive-root "\resources.json" (VSSDK1207 access-denied).
+    ============================================================================================
+  -->
+
+  <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />
+
+  <PropertyGroup>
+    <!-- In-proc VS extensions run on the IDE's .NET Framework runtime. net472 is the VSSDK baseline
+         (a VS 2022-targeted extension loads in VS 2026 via its extension-compatibility support). -->
+    <TargetFramework>net472</TargetFramework>
+    <RootNamespace>PgProj.VisualStudio.ProjectSystem</RootNamespace>
+    <AssemblyName>PgProj.VisualStudio.ProjectSystem</AssemblyName>
+    <UseWPF>true</UseWPF>
+    <LangVersion>latest</LangVersion>
+
+    <!-- VSIX packaging (SDK-style VSSDK support). -->
+    <GeneratePkgDefFile>true</GeneratePkgDefFile>
+    <IncludeAssemblyInVSIXContainer>true</IncludeAssemblyInVSIXContainer>
+    <IncludeDebugSymbolsInVSIXContainer>false</IncludeDebugSymbolsInVSIXContainer>
+    <CreateVsixContainer>true</CreateVsixContainer>
+    <DeployExtension>false</DeployExtension>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.VSSDK.BuildTools" Version="17.14.2120">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.VisualStudio.SDK" Version="17.14.40262" ExcludeAssets="runtime" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- MenuCommandService / OleMenuCommandService (System.ComponentModel.Design) live here. -->
+    <Reference Include="System.Design" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <VSCTCompile Include="PgProjCommands.vsct">
+      <ResourceName>Menus.ctmenu</ResourceName>
+    </VSCTCompile>
+    <None Include="source.extension.vsixmanifest">
+      <SubType>Designer</SubType>
+    </None>
+    <!-- The manifest's <License>LICENSE</License> names an in-archive path; package the repo-root
+         LICENSE at the vsix root so the VSSDK file-list check (VSSDK1310) is satisfied. Must be
+         Content (not None): GetVsixSourceItems only collects @(Content) with IncludeInVSIX=true.
+         Link with no directory → empty VSIXSubPath → file lands at the archive root as "LICENSE". -->
+    <Content Include="..\..\..\LICENSE" Link="LICENSE">
+      <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
+
+  <!--
+    The Microsoft.VSSDK.BuildTools package auto-imports only build/*.props|.targets (which set up
+    VsSDKInstall + env vars); it does NOT import the file that defines the VSIX build targets
+    (CreateVsixContainer / GetVsixSourceItems / DetokenizeVsixManifestFile). Classic VSSDK projects
+    import it explicitly, so an SDK-style VSSDK project must do the same or the build emits only the
+    dll with no .vsix container. Must follow Sdk.targets (see header note on $(IntermediateOutputPath)).
+    $(VsSDKInstall) is defined by the package's auto-imported props.
+  -->
+  <Import Project="$(VsSDKInstall)\Microsoft.VsSDK.targets"
+          Condition="Exists('$(VsSDKInstall)\Microsoft.VsSDK.targets')" />
+
+</Project>

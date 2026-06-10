@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  VSIX manifest for the PgProj Visual Studio extension (EP-VS #25 Route B).
-  SCAFFOLD: declares the package, the .pgproj project-type asset, the language-client asset, and the
-  install targets. Processed by Microsoft.VSSDK.BuildTools at build time (VS SDK required).
+  VSIX manifest for the PgProj Visual Studio PROJECT SYSTEM (classic in-proc VSSDK, EP-VS #25 Route B).
+  Declares the VsPackage, the .pgproj project-type asset, and the MEF components. The .sql IntelliSense
+  (language client/server) lives in the sibling modern OOP extension (PgProj.VisualStudio), NOT here.
+  Processed by Microsoft.VSSDK.BuildTools at build time (VS SDK required).
 -->
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
   <Metadata>
@@ -10,12 +11,14 @@
     <DisplayName>PgProj — PostgreSQL Database Projects</DisplayName>
     <Description xml:space="preserve">Open, build, and publish PostgreSQL database projects (.pgproj) from Solution Explorer with the same verbs as a SQL Server project: build to a model/.pgpkg, Publish, Schema Compare, and .sql IntelliSense driven by the project model (via the pgproj language server). Route B of the SSDT-for-PostgreSQL parity effort.</Description>
     <MoreInfo>https://github.com/ilijevicdenis/CodeCleaners.PgProj</MoreInfo>
-    <License>..\..\..\LICENSE</License>
+    <License>LICENSE</License>
     <Tags>postgresql;pgproj;database;ssdt;schema-compare;sql</Tags>
   </Metadata>
   <Installation>
-    <!-- Community/Professional/Enterprise, VS 2022 (17.x). -->
-    <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[17.0,18.0)">
+    <!-- All SKUs (Community is the base SKU → installs on Pro/Enterprise too), VS 2022 (17.x) through
+         VS 2026 (18.x). The range MUST include 18.x or the extension is not offered for VS 2026: the
+         InstallationTarget version is a hard gate VS enforces, separate from net472 binary compat. -->
+    <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[17.0,19.0)">
       <ProductArchitecture>amd64</ProductArchitecture>
     </InstallationTarget>
   </Installation>
@@ -23,7 +26,7 @@
     <Dependency Id="Microsoft.Framework.NDP" DisplayName="Microsoft .NET Framework" d:Source="Manual" Version="[4.7.2,)" />
   </Dependencies>
   <Prerequisites>
-    <Prerequisite Id="Microsoft.VisualStudio.Component.CoreEditor" Version="[17.0,18.0)" DisplayName="Visual Studio core editor" />
+    <Prerequisite Id="Microsoft.VisualStudio.Component.CoreEditor" Version="[17.0,19.0)" DisplayName="Visual Studio core editor" />
   </Prerequisites>
   <Assets>
     <Asset Type="Microsoft.VisualStudio.VsPackage" d:Source="Project" d:ProjectName="%CurrentProject%" Path="|%CurrentProject%;PkgdefProjectOutputGroup|" />
