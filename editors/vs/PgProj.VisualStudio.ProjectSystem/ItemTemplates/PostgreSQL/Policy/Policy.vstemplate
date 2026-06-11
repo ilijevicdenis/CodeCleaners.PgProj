@@ -1,0 +1,13 @@
+<VSTemplate Version="3.0.0" Type="Item" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
+  <TemplateData>
+    <Name>Row-Level-Security Policy (PostgreSQL)</Name>
+    <Description>A CREATE POLICY script (row-level security). Policy names are per-table; point it at a real table and keep the file in that schema's folder.</Description>
+    <ProjectType>PgProj</ProjectType>
+    <TemplateID>PgProj.Item.Policy</TemplateID>
+    <DefaultName>policy1.sql</DefaultName>
+    <SortOrder>90</SortOrder>
+  </TemplateData>
+  <TemplateContent>
+    <ProjectItem ReplaceParameters="true" TargetFileName="$fileinputname$.sql">Policy.sql</ProjectItem>
+  </TemplateContent>
+</VSTemplate>

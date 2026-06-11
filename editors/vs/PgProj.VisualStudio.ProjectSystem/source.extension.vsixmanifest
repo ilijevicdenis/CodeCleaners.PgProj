@@ -31,7 +31,10 @@
   <Assets>
     <Asset Type="Microsoft.VisualStudio.VsPackage" d:Source="Project" d:ProjectName="%CurrentProject%" Path="|%CurrentProject%;PkgdefProjectOutputGroup|" />
     <Asset Type="Microsoft.VisualStudio.MefComponent" d:Source="Project" d:ProjectName="%CurrentProject%" Path="|%CurrentProject%|" />
-    <!-- The .pgproj project type (CPS project flavor / factory). -->
+    <!-- The .pgproj project type (CPS registration + MEF exports in this assembly). -->
     <Asset Type="Microsoft.VisualStudio.ProjectType" d:Source="Project" d:ProjectName="%CurrentProject%" Path="|%CurrentProject%|" />
+    <!-- Folder-based templates: VS scans these VSIX directories recursively for .vstemplate files. -->
+    <Asset Type="Microsoft.VisualStudio.ProjectTemplate" d:Source="File" Path="ProjectTemplates" />
+    <Asset Type="Microsoft.VisualStudio.ItemTemplate" d:Source="File" Path="ItemTemplates" />
   </Assets>
 </PackageManifest>

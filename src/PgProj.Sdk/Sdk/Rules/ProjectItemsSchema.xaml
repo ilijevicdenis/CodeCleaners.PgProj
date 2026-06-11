@@ -1,0 +1,13 @@
+<!--
+  PgProj items schema for the Visual Studio project system (CPS). Declares this SDK's item
+  vocabulary so Solution Explorer renders a .pgproj's contents: Build is the .sql source item type
+  (the SSDT-compatible name the engine reads), None carries pre/post-deploy scripts via BuildAction
+  metadata, Folder enables new-folder support. Command-line MSBuild never reads this file.
+-->
+<ProjectSchemaDefinitions xmlns="http://schemas.microsoft.com/build/2009/properties">
+  <ItemType Name="Build" DisplayName="SQL source" />
+  <ItemType Name="None" DisplayName="None" />
+  <ItemType Name="Folder" DisplayName="Folder" />
+  <ContentType Name="PgSqlSource" DisplayName="PostgreSQL source" ItemType="Build" />
+  <FileExtension Name=".sql" ContentType="PgSqlSource" />
+</ProjectSchemaDefinitions>

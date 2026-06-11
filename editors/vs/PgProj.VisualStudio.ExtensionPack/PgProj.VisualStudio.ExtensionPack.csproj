@@ -1,0 +1,65 @@
+<Project>
+
+  <!--
+    ============================================================================================
+    PgProj Visual Studio EXTENSION PACK (EP-VS #25) — MARKETPLACE reference form.
+
+    A content-only VSIX that ships no code; its only payload is the manifest's REFERENCE <Dependency>
+    list (the two PgProj extensions, by Id). When installed FROM THE MARKETPLACE, VS resolves and
+    installs each dependency individually. This pack does NOT bundle the child vsixes — embedding a
+    VisualStudio.Extensibility (OOP) extension in a pack is unsupported (VSIXInstaller throws). For
+    OFFLINE/private install use editors/vs/install-pgproj.cmd instead.
+
+    BUILD: with the VS 2026 MSBuild (Microsoft.VSSDK.BuildTools brings the VSIX targets). NOT in
+    PgProj.slnx / `dotnet test`. No build-order dependency on the children (it references them by Id,
+    not by file); but to actually publish, the two child extensions must be on the Marketplace with
+    Ids/versions matching the manifest.
+
+    EXPLICIT SDK IMPORTS + VsSDK.targets after Sdk.targets: same requirement (and same reason) as the
+    project-system csproj — see that file's header and the CLAUDE.md Lab Note (2026-06-09).
+    ============================================================================================
+  -->
+
+  <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />
+
+  <PropertyGroup>
+    <TargetFramework>net472</TargetFramework>
+    <RootNamespace>PgProj.VisualStudio.ExtensionPack</RootNamespace>
+    <AssemblyName>PgProj.VisualStudio.ExtensionPack</AssemblyName>
+    <LangVersion>latest</LangVersion>
+
+    <!-- Content-only pack: emit the .vsix container but keep this project's own (empty) assembly,
+         pkgdef and symbols OUT of it. The only files in the archive are the manifest and LICENSE. -->
+    <GeneratePkgDefFile>false</GeneratePkgDefFile>
+    <IncludeAssemblyInVSIXContainer>false</IncludeAssemblyInVSIXContainer>
+    <IncludeDebugSymbolsInVSIXContainer>false</IncludeDebugSymbolsInVSIXContainer>
+    <CreateVsixContainer>true</CreateVsixContainer>
+    <DeployExtension>false</DeployExtension>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.VSSDK.BuildTools" Version="17.14.2120">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="source.extension.vsixmanifest">
+      <SubType>Designer</SubType>
+    </None>
+
+    <!-- The manifest's <License>LICENSE</License> names an in-archive path; package the repo-root
+         LICENSE at the vsix root (Content + IncludeInVSIX; Link with no dir → archive root). -->
+    <Content Include="..\..\..\LICENSE" Link="LICENSE">
+      <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
+
+  <Import Project="$(VsSDKInstall)\Microsoft.VsSDK.targets"
+          Condition="Exists('$(VsSDKInstall)\Microsoft.VsSDK.targets')" />
+
+</Project>

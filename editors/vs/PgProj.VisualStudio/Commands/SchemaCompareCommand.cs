@@ -24,8 +24,12 @@ internal sealed class SchemaCompareCommand : Command
     /// <inheritdoc/>
     public override CommandConfiguration CommandConfiguration => new("%PgProj.SchemaCompare.DisplayName%")
     {
-        Placements = [CommandPlacement.KnownPlacements.ExtensionsMenu],
+        // Same placement/visibility policy as PublishCommand: .pgproj project context menu only
+        // (the classic extension's VSCT group, values inlined for the compile-time evaluator),
+        // no Extensions-menu entry.
+        Placements = [CommandPlacement.VsctParent(new Guid("b0000000-0000-0000-0000-0000000000a2"), 0x1020, priority: 0x0101)],
         Icon = new(ImageMoniker.KnownValues.CompareFiles, IconSettings.IconAndText),
+        VisibleWhen = ActivationConstraint.ClientContext(ClientContextKey.Shell.ActiveSelectionFileName, @"\.pgproj$"),
         EnabledWhen = ActivationConstraint.ClientContext(ClientContextKey.Shell.ActiveSelectionFileName, @"\.pgproj$"),
     };
 

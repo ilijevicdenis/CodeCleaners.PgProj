@@ -1,48 +1,35 @@
-// EP-VS #25 Route B — the VS AsyncPackage entry point. SCAFFOLD (requires the VS SDK to build).
-using System;
+// EP-VS #25 Route B — the VS AsyncPackage entry point (classic in-proc, net472).
 using System.Runtime.InteropServices;
-using System.Threading;
 using Microsoft.VisualStudio.Shell;
-using Task = System.Threading.Tasks.Task;
 
 namespace PgProj.VisualStudio
 {
     /// <summary>
-    /// The extension's package. Registers the .pgproj project factory, the commands (Publish /
-    /// Schema Compare), the properties pages, and the Schema Compare tool window. Loads on solution
-    /// open and when a .pgproj is present.
+    /// The project-system package. It is intentionally thin: the .pgproj project type itself is a
+    /// CPS contribution (see <c>ProjectSystem/PgProjProjectType.cs</c> — registration attribute +
+    /// MEF exports, no factory code in this package), and the working database commands live in the
+    /// sibling OOP extension. What this package carries:
+    ///   * the pkgdef registrations (project type, templates, UIContext rule) harvested from this
+    ///     assembly's attributes at build time;
+    ///   * the .vsct command table that defines the .pgproj project context-menu group the OOP
+    ///     extension's commands are placed into;
+    ///   * the "PgProj project present" UIContext — activated by VS itself (no package load needed)
+    ///     when the solution contains a project with the PgProj capability, so database controls
+    ///     show only when a PostgreSQL database project is actually open.
     /// </summary>
     [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
-    [InstalledProductRegistration("PgProj — PostgreSQL Database Projects", "Open/build/publish .pgproj in Visual Studio.", "0.1.0")]
+    [InstalledProductRegistration("PgProj — PostgreSQL Database Projects", "PostgreSQL database projects (.pgproj) in Visual Studio: project type, templates, build and publish.", "0.1.0")]
     [Guid(PgProjGuids.PackageGuidString)]
     [ProvideMenuResource("Menus.ctmenu", 1)]
-    // The .pgproj project factory (Route B project system). The actual factory is in ProjectSystem/.
-    [ProvideProjectFactory(
-        typeof(PgProj.VisualStudio.ProjectSystem.PgProjProjectFactory),
-        "PgProj PostgreSQL Database Project",
-        "PostgreSQL Database Projects (*.pgproj)#100",
-        "pgproj", "pgproj",
-        @".\NullPath",
-        LanguageVsTemplate = "PgProj")]
-    // Auto-load when a .pgproj solution is open so the language client + commands are available.
-    [ProvideAutoLoad(Microsoft.VisualStudio.Shell.Interop.UIContextGuids80.SolutionExists, PackageAutoLoadFlags.BackgroundLoad)]
-    [ProvideToolWindow(typeof(PgProj.VisualStudio.ToolWindows.SchemaCompareToolWindow))]
+    // Term/expression rule: the context turns on exactly while some loaded project declares the
+    // PgProj capability (declared by PgProj.Sdk's Sdk.props and the project-type registration).
+    [ProvideUIContextRule(PgProjGuids.PgProjLoadedUIContextGuidString,
+        name: "PgProj project present",
+        expression: "PgProj",
+        termNames: new[] { "PgProj" },
+        termValues: new[] { "SolutionHasProjectCapability:PgProj" })]
     public sealed class PgProjPackage : AsyncPackage
     {
-        protected override async Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
-        {
-            await base.InitializeAsync(cancellationToken, progress);
-            await JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
-
-            // Register the project factory for *.pgproj.
-            RegisterProjectFactory(new ProjectSystem.PgProjProjectFactory(this));
-
-            // Wire commands (Publish / Schema Compare).
-            await Commands.PublishCommand.InitializeAsync(this);
-            await Commands.SchemaCompareCommand.InitializeAsync(this);
-
-            // NOTE: the .sql LanguageClient (LanguageClient/PgProjLanguageClient.cs) is a MEF export
-            // and is activated by VS automatically for the registered content type — no code here.
-        }
+        // No InitializeAsync override: every contribution is registration-driven (pkgdef/MEF/VSCT).
     }
 }

@@ -27,8 +27,14 @@ internal sealed class PublishCommand : Command
     /// <inheritdoc/>
     public override CommandConfiguration CommandConfiguration => new("%PgProj.Publish.DisplayName%")
     {
-        Placements = [CommandPlacement.KnownPlacements.ExtensionsMenu],
+        // Lives on the .pgproj project-node context menu, NOT on the Extensions menu: database
+        // controls appear only when a PostgreSQL database project is selected. The VSCT parent is
+        // the group owned by the classic project-system extension (PgProj.VisualStudio.ProjectSystem:
+        // PgProjGuids.CommandSetGuidString + ProjectContextGroupId — keep in sync). Values must be
+        // inlined: the Extensibility compile-time evaluator (CEE0018) rejects user-defined helpers.
+        Placements = [CommandPlacement.VsctParent(new Guid("b0000000-0000-0000-0000-0000000000a2"), 0x1020, priority: 0x0100)],
         Icon = new(ImageMoniker.KnownValues.Extension, IconSettings.IconAndText),
+        VisibleWhen = ActivationConstraint.ClientContext(ClientContextKey.Shell.ActiveSelectionFileName, @"\.pgproj$"),
         EnabledWhen = ActivationConstraint.ClientContext(ClientContextKey.Shell.ActiveSelectionFileName, @"\.pgproj$"),
     };
 

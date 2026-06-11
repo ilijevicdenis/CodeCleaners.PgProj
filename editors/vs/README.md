@@ -5,7 +5,7 @@ Two routes give Visual Studio users the same database-project experience SSDT gi
 | Route | What | Status | Buildable in this repo? |
 |---|---|---|---|
 | **A** | `.pgproj` builds/publishes via the **MSBuild SDK** (`PgProj.Sdk`), opened by VS's built-in generic SDK-style project support | **Done + validated** | ✅ yes (`dotnet build` / `dotnet pack`) |
-| **B** | A **two-extension hybrid** for VS 2026+: a modern **VisualStudio.Extensibility** OOP extension (Publish & Schema Compare commands, a Schema Compare tool window, `.sql` IntelliSense via an LSP provider) **plus** a classic in-proc **VSSDK project system** that authors the `.pgproj` project type (File→New→Project, Solution Explorer tree, property pages) | **OOP: builds + packages headless. Project system: compiles + packages a `.vsix` with VS 2026 MSBuild; runtime/F5 still unproven (scaffold).** | ⚠️ partly — OOP via `dotnet build`; the project system needs the VS 2026 full MSBuild (`dotnet` cannot build a classic VSIX) |
+| **B** | A **two-extension hybrid** for VS 2026+: a modern **VisualStudio.Extensibility** OOP extension (Publish & Schema Compare commands, a Schema Compare tool window, `.sql` IntelliSense via an LSP provider) **plus** a classic in-proc **VSSDK project system** that authors the `.pgproj` project type (CPS registration, File→New→Project template, Add New Item templates per database object, Solution Explorer tree) | **OOP: builds + packages headless. Project system: real CPS project type + templates implemented; compiles + packages a `.vsix` with VS 2026 MSBuild; runtime/F5 verification pending (manual).** | ⚠️ partly — OOP via `dotnet build`; the project system needs the VS 2026 full MSBuild (`dotnet` cannot build a classic VSIX) |
 
 > **Why two extensions (the hybrid).** The out-of-process VisualStudio.Extensibility model has **no API to
 > author a custom project type** — Project Query only reads/modifies *existing* projects. So the `.pgproj`
@@ -16,6 +16,61 @@ Two routes give Visual Studio users the same database-project experience SSDT gi
 > (`PgProj.Core`/`PgProj.Lsp`). (Route A's `PgProj.Sdk` independently makes `.pgproj` an Open/Build/Publish
 > citizen via VS's generic SDK-project support, so even without the project-system extension installed a VS
 > user can build/publish a `.pgproj`.)
+
+> **One install, though.** Two *extensions* does not mean two *installs* — but **how** you get to one
+> install depends on the channel (see [Distribution & install](#distribution--install) below). The short
+> version: locally, run `editors/vs/install-pgproj.cmd` (installs both vsixes in one go); on the Visual
+> Studio Marketplace, ship the reference **extension pack** for genuine one-click install.
+
+### Distribution & install
+
+The project type and the commands/LSP are **two extensions** by necessity (a project type must be a classic
+in-proc net472 extension; the engine-linked commands/LSP must be a modern OOP net10 extension — different
+hosts, different toolchains, one identity each). They cannot be merged into a single installable `.vsix`,
+and a pack **cannot embed** the OOP extension: `VSIXInstaller` rejects a nested VisualStudio.Extensibility
+extension with *"Cannot install a VisualStudio.Extensibility extension … Must unzip and call the finalizer."*
+So "one install" is delivered per channel:
+
+| Channel | Mechanism | Artifact | One-gesture install? |
+|---|---|---|---|
+| **Local — project type** | `VSIXInstaller` (unsigned, per-user) | `PgProj.VisualStudio.ProjectSystem.vsix` | ✅ `editors/vs/install-pgproj.cmd` |
+| **Local — OOP commands/LSP** | **NOT** via `VSIXInstaller` (it can't finalize an OOP extension); use **F5** (experimental instance) or **VS → Manage Extensions → Install from disk** on the signed vsix | `PgProj.VisualStudio.vsix` (sign with `sign-oop.ps1`) | ⚠️ in-IDE only / F5 |
+| **VS Marketplace** | a **reference** extension pack — lists both by Id, VS resolves each from the Marketplace and installs it individually (its own correct, signed+finalized flow) | `PgProj.VisualStudio.ExtensionPack.vsix` + the two listings | ✅ one click on the pack listing |
+| **NuGet** | `PgProj.Sdk` MSBuild SDK (build/publish in VS/CLI/CI, **no extension**) **and** the `pgproj` CLI as a .NET tool | `PgProj.Sdk.<v>.nupkg`, `PgProj.Cli.<v>.nupkg` | n/a (not an IDE extension) |
+
+> **Hard limit on local OOP install.** `VSIXInstaller.exe` (the command-line/double-click installer)
+> **cannot install a VisualStudio.Extensibility (OOP) extension** — it bails with *"must unzip and call
+> the finalizer instead"* regardless of signing or elevation. Only the VS IDE, the VS setup engine, and
+> the Marketplace run that finalizer. So the OOP half (`PgProj.VisualStudio`) installs locally **only**
+> through *VS → Manage Extensions → Install from disk* (sign it first with `sign-oop.ps1`) or via **F5**
+> into the experimental instance. The classic project-system extension has no such limit.
+
+- **Build everything:** `editors/vs/build-vsix.cmd [Debug|Release]` builds the two extensions + the
+  reference pack in order, auto-detecting the VS 2026 MSBuild. (Batch scripts here are kept CRLF/ASCII —
+  see the CLAUDE.md Lab Note; the Write tool's LF output silently breaks `cmd`.)
+- **Make the project type loadable:** `editors/vs/setup-local-sdk-feed.cmd` (run once). A new `.pgproj`
+  uses `<Project Sdk="PgProj.Sdk/0.1.0">`; without that SDK resolvable, VS errors *"the referenced SDK
+  cannot be found"* and won't load the project. This packs `PgProj.Sdk` into a local NuGet feed and
+  registers it, so the resolver restores it (publishing `PgProj.Sdk` to nuget.org later replaces this).
+  Undo with `dotnet nuget remove source pgproj-local`.
+- **Install locally:** `editors/vs/install-pgproj.cmd [Debug|Release]` — close VS first; it
+  `/uninstall`s any prior PgProj extensions (so a same-version dev rebuild actually replaces, not "already
+  installed") then installs the **project-system** extension. It does *not* install the OOP extension —
+  VSIXInstaller can't (see the hard-limit note above); the script prints the F5 / Install-from-disk
+  guidance for that half.
+- **Sign the OOP extension** (for Manage Extensions → Install from disk): `editors/vs/sign-oop.ps1` —
+  self-signs + trusts a dev cert and signs the vsix. Runtime note: the signer (OpenVsixSignTool) ships
+  targeting .NET Core 2.1 (EOL, not installed); the script rolls it forward to the **latest installed**
+  runtime via `DOTNET_ROLL_FORWARD=LatestMajor` — it never uses 2.1.
+- **Marketplace pack:** `PgProj.VisualStudio.ExtensionPack` is now the **reference** form (no bundled
+  vsixes). It is a Marketplace-only artifact — double-clicking it locally fails because the dependency Ids
+  resolve against the Marketplace. Publish the two child extensions first; the pack's `<Dependency>` Ids +
+  versions must match the published children. Auto-updates are automatic on the Marketplace (bump a version,
+  VS updates the installed extension), so the local uninstall-first step is not needed there.
+- **CLI as a .NET tool (NuGet):** `dotnet pack src/PgProj.Cli` → `PgProj.Cli.<v>.nupkg`, then
+  `dotnet tool install -g PgProj.Cli` exposes the `pgproj` command for scripting/CI (build, compare,
+  publish, snapshot, drift, …). The package bundles the engine (`PgProj.Core`/`PgProj.Lsp`/Npgsql); it is
+  the same CLI the `PgProj.Sdk` SDK carries under `tools/` for MSBuild, just runnable on its own.
 
 ---
 
@@ -51,7 +106,8 @@ The extension **links the engine in-process** — it `<ProjectReference>`s `PgPr
 and calls them directly (no `pgproj` subprocess, no JSON round-trip). The engine remains the single place
 build/compare/publish/LSP logic lives; the extension is the VS presentation over it.
 
-- **Commands** (`Extensions` menu, enabled when a `.pgproj` is selected): **Schema Compare** calls
+- **Commands** (the `.pgproj` **project-node context menu** — no Extensions-menu entries; visible
+  *and* enabled only when the selection is a `.pgproj`): **Schema Compare** calls
   `SchemaCompare.RunAsync`; **Publish** runs the same gates as the CLI (static analysis via
   `ContractBuilder.Analyze`, target-version via `TargetVersionAnalyzer`) and then the shared
   `PgProj.Core.Publishing.PublishService` (`PlanAsync` → `ApplyAsync`) — the **single** publish code
@@ -86,14 +142,13 @@ editors/vs/
       SchemaCompareViewModel.cs                 view models + factory (built from the engine's SchemaChangeSet)
       SchemaCompareState.cs                     command → tool-window hand-off (latest view model)
   PgProj.VisualStudio.ProjectSystem/           CLASSIC in-proc VSSDK extension (net472) — the .pgproj project type
-    PgProj.VisualStudio.ProjectSystem.csproj   explicit-SDK-import csproj; VSSDK.BuildTools + VisualStudio.SDK; builds the .vsix
-    source.extension.vsixmanifest               VsPackage + ProjectType + MEF assets; InstallationTarget [17.0,19.0)
-    PgProjCommands.vsct / PgProjGuids.cs        command table (compiled to an embedded .cto) + GUIDs
-    PgProjPackage.cs                            AsyncPackage host
-    ProjectSystem/PgProj*ProjectFactory.cs      .pgproj project factory + unconfigured project (scaffold)
-    Properties/*PropertiesPage.cs               Build / Database / SqlCmdVariables / TargetPlatform property pages (scaffold)
-    Commands/*Command.cs                        Publish + Schema Compare menu commands
-    ToolWindows/SchemaCompareToolWindow.cs      tool window host
+    PgProj.VisualStudio.ProjectSystem.csproj   explicit-SDK-import csproj; VSSDK.BuildTools + VisualStudio.SDK + ProjectSystem.SDK (CPS)
+    source.extension.vsixmanifest               VsPackage + ProjectType + MEF + ProjectTemplate/ItemTemplate assets; [17.0,19.0)
+    PgProjCommands.vsct / PgProjGuids.cs        the .pgproj project context-menu GROUP (commands live in the OOP extension) + GUIDs
+    PgProjPackage.cs                            thin AsyncPackage: pkgdef host + "PgProj project present" UIContext rule
+    ProjectSystem/PgProjProjectType.cs          the CPS project type (ProjectTypeRegistration + MEF exports; no factory code)
+    ProjectTemplates/PostgreSQL/...             File→New→Project: "PostgreSQL Database Project" (empty .pgproj)
+    ItemTemplates/PostgreSQL/...                Add New Item: Schema/Table/View/Function/Procedure/Sequence/Trigger/Type/Policy
 ```
 
 ### `.sql` IntelliSense — how the LSP provider attaches
@@ -169,10 +224,34 @@ explicit `<Import Sdk="…">` not the `Sdk="…"` attribute, else `$(Intermediat
 VSSDK1207), and `<License>` referenced by its in-archive name + packaged as a `Content` item with
 `IncludeInVSIX` (else VSSDK1310). See the CLAUDE.md Lab Note (2026-06-09) for the full recipe.
 
-> **Status: scaffold.** It compiles and produces a valid `.vsix`, but the project factory / property
-> pages are stubs. Stage 1+ (a real CPS project type that actually loads a `.pgproj`, File→New→Project,
-> node ops, WPF editors, and F5 into the experimental instance) is **unproven** and needs interactive
-> VS 2026 — it cannot be validated headless. The project is currently standalone (no engine
+### What it now implements (Stages 1–3, headless-verified 2026-06-11)
+
+- **CPS project type** (`ProjectSystem/PgProjProjectType.cs`): `ProjectTypeRegistrationAttribute`
+  (from `Microsoft.VisualStudio.ProjectSystem.SDK` 17.9.380 — the attribute is in
+  `ProjectSystem.VS.dll`, which the bare `Microsoft.VisualStudio.ProjectSystem` package does NOT
+  carry) + the canonical Unconfigured/Configured MEF exports. The generated pkgdef points the
+  project-type GUID at the CPS factory package and applies `Capabilities=PgProj` +
+  `Language(VsTemplate)=PgProj`. No hand-written factory/hierarchy: CPS evaluates the MSBuild
+  project (PgProj.Sdk), shows the item tree, and routes Build/Rebuild/Clean/Publish to the SDK's
+  targets. The SDK side declares `<ProjectCapability Include="PgProj"/>` and a
+  `Rules/ProjectItemsSchema.xaml` (Build/None/Folder item types, `.sql` content type) plus a no-op
+  `CompileDesignTime` target for CPS design-time builds.
+- **File→New→Project**: folder-based VSIX project template "PostgreSQL Database Project"
+  (`ProjectTemplates/`), tagged SQL/Windows/Linux/Database for the VS 2019+ New Project dialog.
+- **Add New Item**: nine folder-based item templates (`ItemTemplates/`) — Schema, Table, View,
+  Function, Procedure, Sequence, Trigger, Type, RLS Policy — using `$fileinputname$` so a file
+  named `app.customers.sql` yields `CREATE TABLE app.customers (…)`. **Database objects are grouped
+  by schema** via the folder-per-schema convention (`public/`, `app/`, … with `schema.object.sql`
+  files) that the project template documents and the Schema item template bootstraps.
+- **Database controls only when a PgProj project is present**: a `ProvideUIContextRule` UIContext
+  (`SolutionHasProjectCapability:PgProj`), and the OOP extension's commands sit on the .pgproj
+  project context menu gated by `VisibleWhen`/`EnabledWhen` — the Extensions menu carries nothing.
+
+> **Status: runtime/F5 verification pending (manual).** Everything above compiles and packages into
+> the `.vsix` headless (template manifests generated, pkgdef registrations confirmed by inspection),
+> but loading a `.pgproj` through CPS, the New Project listing, Add New Item filtering, and the
+> context-menu merge of the two extensions need an interactive VS 2026 F5 pass. Stage 4+ (property
+> pages as CPS XAML rules, WPF editors) is not started. The project is standalone (no engine
 > `ProjectReference`; not in `PgProj.VisualStudio.slnx`).
 
 ### Follow-ups
@@ -186,6 +265,8 @@ VSSDK1207), and `<License>` referenced by its in-archive name + packaged as a `C
   dry-run) once the dialog surface is wired.
 - Let the Schema Compare window pick the target (project / `.pgpkg` / `.schema.snapshot` / live DB) and
   apply selected changes, not just project→DB.
-- VS SDK UI tests (open solution, Publish/Compare from the Extensions menu, completion in `.sql`).
-- **Project system → Stage 1:** make the `.pgproj` project factory load a real project (CPS object tree),
-  add the File→New→Project template, wire the property pages to the `.pgproj` XML, and prove F5 in VS 2026.
+- **F5 verification pass** (manual, interactive VS 2026): install both VSIXes, New Project →
+  "PostgreSQL Database Project", add items per schema folder, Build/Publish from Solution Explorer,
+  Publish/Schema Compare on the project context menu (and absent from the Extensions menu).
+- **Project system → Stage 4:** property pages as CPS XAML rules wired to the `.pgproj` XML
+  (DefaultSchema, TargetPostgresVersion, publish settings); then Stage 5 WPF editors.

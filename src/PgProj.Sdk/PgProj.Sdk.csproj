@@ -72,6 +72,7 @@
     <ItemGroup>
       <TfmSpecificPackageFile Include="$(MSBuildThisFileDirectory)Sdk\Sdk.props" PackagePath="Sdk\Sdk.props" />
       <TfmSpecificPackageFile Include="$(MSBuildThisFileDirectory)Sdk\Sdk.targets" PackagePath="Sdk\Sdk.targets" />
+      <TfmSpecificPackageFile Include="$(MSBuildThisFileDirectory)Sdk\Rules\ProjectItemsSchema.xaml" PackagePath="Sdk\Rules\ProjectItemsSchema.xaml" />
       <TfmSpecificPackageFile Include="@(_PgProjCliFile)" PackagePath="tools\%(_PgProjCliFile.RecursiveDir)" />
     </ItemGroup>
   </Target>

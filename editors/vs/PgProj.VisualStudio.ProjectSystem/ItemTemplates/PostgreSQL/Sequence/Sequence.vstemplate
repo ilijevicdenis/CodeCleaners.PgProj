@@ -1,0 +1,13 @@
+<VSTemplate Version="3.0.0" Type="Item" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
+  <TemplateData>
+    <Name>Sequence (PostgreSQL)</Name>
+    <Description>A CREATE SEQUENCE script. Name it schema.sequence and keep it in that schema's folder.</Description>
+    <ProjectType>PgProj</ProjectType>
+    <TemplateID>PgProj.Item.Sequence</TemplateID>
+    <DefaultName>public.sequence1.sql</DefaultName>
+    <SortOrder>60</SortOrder>
+  </TemplateData>
+  <TemplateContent>
+    <ProjectItem ReplaceParameters="true" TargetFileName="$fileinputname$.sql">Sequence.sql</ProjectItem>
+  </TemplateContent>
+</VSTemplate>

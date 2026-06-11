@@ -1,0 +1,13 @@
+<VSTemplate Version="3.0.0" Type="Item" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
+  <TemplateData>
+    <Name>Schema (PostgreSQL)</Name>
+    <Description>A CREATE SCHEMA script. Name it after the schema (e.g. app.sql), then create a folder with the same name for the schema's objects.</Description>
+    <ProjectType>PgProj</ProjectType>
+    <TemplateID>PgProj.Item.Schema</TemplateID>
+    <DefaultName>schema1.sql</DefaultName>
+    <SortOrder>10</SortOrder>
+  </TemplateData>
+  <TemplateContent>
+    <ProjectItem ReplaceParameters="true" TargetFileName="$fileinputname$.sql">Schema.sql</ProjectItem>
+  </TemplateContent>
+</VSTemplate>

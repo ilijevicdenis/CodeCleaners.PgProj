@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  EP-VS #25 — the MARKETPLACE EXTENSION PACK (reference form).
+
+  A content-only VSIX that ships no code; it lists the two PgProj extensions as REFERENCE
+  dependencies so installing this pack from the Visual Studio Marketplace installs both:
+    * PgProj.VisualStudio.ProjectSystem  (classic net472) — the .pgproj project type + templates
+    * PgProj.VisualStudio                (modern net10 OOP) — Publish / Schema Compare / .sql LSP
+
+  IMPORTANT — this is a MARKETPLACE artifact, NOT a local installer. Each <Dependency> is referenced
+  by Id only (NO d:InstallSource="Embed", NO bundled vsix): on install VS resolves each Id against
+  the Marketplace and installs it INDIVIDUALLY, through its own correct install pipeline. That is the
+  whole point — a VisualStudio.Extensibility (OOP) extension CANNOT be embedded/nested inside a pack
+  (VSIXInstaller throws "Cannot install a VisualStudio.Extensibility extension … Must unzip and call
+  the finalizer"), but it installs fine as a separately-resolved Marketplace dependency. Publishing
+  flow: publish both child extensions to the Marketplace first, then this pack; the Ids/versions
+  below MUST match the published children. For OFFLINE/private install use editors/vs/install-pgproj.cmd
+  (it runs VSIXInstaller on each child vsix directly), not this pack.
+
+  The two are SEPARATE extensions because VS forces it: a project type must be a classic in-proc
+  extension, while the engine-linked commands/LSP must be a modern OOP extension.
+-->
+<PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
+  <Metadata>
+    <Identity Id="PgProj.VisualStudio.Pack.b0000000-0026" Version="0.1.0" Language="en-US" Publisher="CodeCleaners d.o.o." />
+    <DisplayName>PgProj for PostgreSQL — Database Projects</DisplayName>
+    <Description xml:space="preserve">PostgreSQL database projects (.pgproj) in Visual Studio, in one install. Bundles the .pgproj project type (File→New→Project, Add New Item per database object grouped by schema, Build/Publish from Solution Explorer) and the Publish / Schema Compare commands + .sql IntelliSense. SSDT-for-PostgreSQL parity.</Description>
+    <MoreInfo>https://github.com/ilijevicdenis/CodeCleaners.PgProj</MoreInfo>
+    <License>LICENSE</License>
+    <Tags>postgresql;pgproj;database;ssdt;schema-compare;sql</Tags>
+  </Metadata>
+  <Installation>
+    <!-- VS 2022 (17.x) through VS 2026 (18.x); the children gate themselves identically. -->
+    <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[17.0,19.0)">
+      <ProductArchitecture>amd64</ProductArchitecture>
+    </InstallationTarget>
+  </Installation>
+  <Prerequisites>
+    <Prerequisite Id="Microsoft.VisualStudio.Component.CoreEditor" Version="[17.0,19.0)" DisplayName="Visual Studio core editor" />
+  </Prerequisites>
+  <Dependencies>
+    <!-- Reference dependencies (no Embed, no Location): VS resolves each Id from the Marketplace and
+         installs it on its own. Id/Version MUST match the published child extensions' <Identity>. -->
+    <!-- Classic project-system extension. -->
+    <Dependency d:Source="Installed"
+                Id="PgProj.VisualStudio.b0000000-0025"
+                DisplayName="PgProj PostgreSQL project type"
+                Version="[0.1.0,)" />
+    <!-- Modern OOP extension. -->
+    <Dependency d:Source="Installed"
+                Id="PgProj.VisualStudio.b0000000-0000-0000-0000-000000000025"
+                DisplayName="PgProj PostgreSQL commands"
+                Version="[1.0.0.0,)" />
+  </Dependencies>
+</PackageManifest>

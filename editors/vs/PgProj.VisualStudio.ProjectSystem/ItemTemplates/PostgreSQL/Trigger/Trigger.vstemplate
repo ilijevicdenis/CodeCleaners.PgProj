@@ -1,0 +1,13 @@
+<VSTemplate Version="3.0.0" Type="Item" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
+  <TemplateData>
+    <Name>Trigger (PostgreSQL)</Name>
+    <Description>A CREATE TRIGGER script. Trigger names are per-table (not schema-qualified); keep the file in the table's schema folder.</Description>
+    <ProjectType>PgProj</ProjectType>
+    <TemplateID>PgProj.Item.Trigger</TemplateID>
+    <DefaultName>trigger1.sql</DefaultName>
+    <SortOrder>80</SortOrder>
+  </TemplateData>
+  <TemplateContent>
+    <ProjectItem ReplaceParameters="true" TargetFileName="$fileinputname$.sql">Trigger.sql</ProjectItem>
+  </TemplateContent>
+</VSTemplate>

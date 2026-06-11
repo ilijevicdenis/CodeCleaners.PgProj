@@ -1,8 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  EP-VS #25 Route B — command table for the PgProj VS extension. SCAFFOLD.
-  Adds "Publish" and "Schema Compare" to the .pgproj project context menu. Compiled by
-  Microsoft.VSSDK.BuildTools (VS SDK). GUIDs match PgProjGuids.cs.
+  EP-VS #25 Route B — command table for the PgProj project-system extension.
+
+  Defines ONLY the .pgproj project-node context-menu group. The working database commands
+  (Publish / Schema Compare) are contributed by the sibling OOP extension (PgProj.VisualStudio),
+  which places them into this group via CommandPlacement.VsctParent(guidPgProjCmdSet, 0x1020) —
+  see its Commands/PgProjProjectSystemMenus.cs. Keeping the group here (and the commands there)
+  means no Extensions-menu entries and a single implementation of each command.
+  GUIDs/IDs mirror PgProjGuids.cs.
 -->
 <CommandTable xmlns="http://schemas.microsoft.com/VisualStudio/2005-10-18/CommandTable" xmlns:xs="http://www.w3.org/2001/XMLSchema">
   <Extern href="stdidcmd.h" />
@@ -11,35 +16,20 @@
   <Commands package="guidPgProjPackage">
     <Groups>
       <Group guid="guidPgProjCmdSet" id="PgProjProjectContextGroup" priority="0x0600">
-        <!-- IDM_VS_CTXT_PROJNODE: the project node context menu. -->
+        <!-- IDM_VS_CTXT_PROJNODE: the project node context menu. The group renders only when it
+             has visible members; the OOP commands gate themselves on a .pgproj selection, so other
+             project types never see a PgProj entry. -->
         <Parent guid="guidSHLMainMenu" id="IDM_VS_CTXT_PROJNODE" />
       </Group>
     </Groups>
-
-    <Buttons>
-      <Button guid="guidPgProjCmdSet" id="cmdidPublish" priority="0x0100" type="Button">
-        <Parent guid="guidPgProjCmdSet" id="PgProjProjectContextGroup" />
-        <Strings>
-          <ButtonText>Publish…</ButtonText>
-        </Strings>
-      </Button>
-      <Button guid="guidPgProjCmdSet" id="cmdidSchemaCompare" priority="0x0101" type="Button">
-        <Parent guid="guidPgProjCmdSet" id="PgProjProjectContextGroup" />
-        <Strings>
-          <ButtonText>Schema Compare…</ButtonText>
-        </Strings>
-      </Button>
-    </Buttons>
   </Commands>
 
   <Symbols>
     <!-- Must match PgProjGuids.PackageGuidString. -->
     <GuidSymbol name="guidPgProjPackage" value="{b0000000-0000-0000-0000-000000000025}" />
-    <!-- Must match PgProjGuids.CommandSetGuidString. -->
+    <!-- Must match PgProjGuids.CommandSetGuidString (mirrored by the OOP extension). -->
     <GuidSymbol name="guidPgProjCmdSet" value="{b0000000-0000-0000-0000-0000000000a2}">
       <IDSymbol name="PgProjProjectContextGroup" value="0x1020" />
-      <IDSymbol name="cmdidPublish" value="0x0100" />
-      <IDSymbol name="cmdidSchemaCompare" value="0x0101" />
     </GuidSymbol>
   </Symbols>
 </CommandTable>

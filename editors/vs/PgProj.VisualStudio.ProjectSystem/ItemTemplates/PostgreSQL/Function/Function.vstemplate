@@ -1,0 +1,13 @@
+<VSTemplate Version="3.0.0" Type="Item" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
+  <TemplateData>
+    <Name>Function (PostgreSQL)</Name>
+    <Description>A CREATE FUNCTION script (plpgsql). Name it schema.function (e.g. app.count_active) and keep it in that schema's folder.</Description>
+    <ProjectType>PgProj</ProjectType>
+    <TemplateID>PgProj.Item.Function</TemplateID>
+    <DefaultName>public.function1.sql</DefaultName>
+    <SortOrder>40</SortOrder>
+  </TemplateData>
+  <TemplateContent>
+    <ProjectItem ReplaceParameters="true" TargetFileName="$fileinputname$.sql">Function.sql</ProjectItem>
+  </TemplateContent>
+</VSTemplate>

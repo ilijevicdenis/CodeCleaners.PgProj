@@ -48,11 +48,22 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.SDK" Version="17.14.40262" ExcludeAssets="runtime" />
+    <!-- CPS (Common Project System) — the .pgproj project type. NOT part of the
+         Microsoft.VisualStudio.SDK meta-package; the .SDK id is the CPS meta package that carries
+         BOTH Microsoft.VisualStudio.ProjectSystem.dll and ProjectSystem.VS.dll (where
+         ProjectTypeRegistrationAttribute lives — the bare "Microsoft.VisualStudio.ProjectSystem"
+         package has only the core dll). Latest stable as of 2026-06. ExcludeAssets=runtime like
+         the VS SDK reference: pkgdef harvesting (CreatePkgDef) resolves the registration attribute
+         from compile references, and without it the package's transitive runtime payload
+         (System.Text.Encodings.Web.dll) leaks into the VSIX. -->
+    <PackageReference Include="Microsoft.VisualStudio.ProjectSystem.SDK" Version="17.9.380" ExcludeAssets="runtime" />
   </ItemGroup>
 
   <ItemGroup>
     <!-- MenuCommandService / OleMenuCommandService (System.ComponentModel.Design) live here. -->
     <Reference Include="System.Design" />
+    <!-- MEF v1 attributes ([Export]/[Import]/[ImportingConstructor]) used by the CPS exports. -->
+    <Reference Include="System.ComponentModel.Composition" />
   </ItemGroup>
 
   <ItemGroup>
@@ -67,6 +78,17 @@
          Content (not None): GetVsixSourceItems only collects @(Content) with IncludeInVSIX=true.
          Link with no directory → empty VSIXSubPath → file lands at the archive root as "LICENSE". -->
     <Content Include="..\..\..\LICENSE" Link="LICENSE">
+      <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Content>
+    <!-- Folder-based VS templates (no .zip needed since VS 2017): the New Project template and the
+         per-database-object Add New Item templates, packaged at the same relative paths inside the
+         VSIX and declared as ProjectTemplate / ItemTemplate assets in the manifest. -->
+    <Content Include="ProjectTemplates\**\*">
+      <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Content>
+    <Content Include="ItemTemplates\**\*">
       <IncludeInVSIX>true</IncludeInVSIX>
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Content>
