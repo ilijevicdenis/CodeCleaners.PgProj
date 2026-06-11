@@ -22,7 +22,30 @@
         <Parent guid="guidSHLMainMenu" id="IDM_VS_CTXT_PROJNODE" />
       </Group>
     </Groups>
+
+    <Buttons>
+      <!-- Import Database lives IN-PROC (here), not in the OOP extension: a local OOP extension
+           cannot be installed into the main VS 2026 instance at all (VSIXInstaller refuses to
+           finalize it, the new Extension Manager has no install-from-disk, and an unzipped copy
+           registers but never loads). The handler shells out to the bundled pgproj CLI (tools\)
+           because the engine is net10 and this assembly is net472. -->
+      <Button guid="guidPgProjCmdSet" id="cmdidImportDatabase" priority="0x0103" type="Button">
+        <Parent guid="guidPgProjCmdSet" id="PgProjProjectContextGroup" />
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <CommandFlag>DefaultInvisible</CommandFlag>
+        <Strings>
+          <ButtonText>Import Database (PgProj)…</ButtonText>
+        </Strings>
+      </Button>
+    </Buttons>
   </Commands>
+
+  <!-- Coarse pre-package-load gating: the button shows only while a PgProj project is in the
+       solution (the a4 UIContext rule). Fine gating (selected node is a .pgproj) happens in the
+       command's BeforeQueryStatus once the package loads. -->
+  <VisibilityConstraints>
+    <VisibilityItem guid="guidPgProjCmdSet" id="cmdidImportDatabase" context="guidPgProjLoadedUIContext" />
+  </VisibilityConstraints>
 
   <Symbols>
     <!-- Must match PgProjGuids.PackageGuidString. -->
@@ -30,6 +53,9 @@
     <!-- Must match PgProjGuids.CommandSetGuidString (mirrored by the OOP extension). -->
     <GuidSymbol name="guidPgProjCmdSet" value="{b0000000-0000-0000-0000-0000000000a2}">
       <IDSymbol name="PgProjProjectContextGroup" value="0x1020" />
+      <IDSymbol name="cmdidImportDatabase" value="0x0103" />
     </GuidSymbol>
+    <!-- Must match PgProjGuids.PgProjLoadedUIContextGuidString. -->
+    <GuidSymbol name="guidPgProjLoadedUIContext" value="{b0000000-0000-0000-0000-0000000000a4}" />
   </Symbols>
 </CommandTable>

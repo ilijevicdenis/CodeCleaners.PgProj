@@ -64,6 +64,8 @@
     <Reference Include="System.Design" />
     <!-- MEF v1 attributes ([Export]/[Import]/[ImportingConstructor]) used by the CPS exports. -->
     <Reference Include="System.ComponentModel.Composition" />
+    <!-- DPAPI (ProtectedData) for the per-project remembered connection (ConnectionStore). -->
+    <Reference Include="System.Security" />
   </ItemGroup>
 
   <ItemGroup>
@@ -106,5 +108,30 @@
   -->
   <Import Project="$(VsSDKInstall)\Microsoft.VsSDK.targets"
           Condition="Exists('$(VsSDKInstall)\Microsoft.VsSDK.targets')" />
+
+  <!--
+    Bundle the pgproj CLI under tools\ inside the VSIX: the in-proc Import Database command shells
+    out to it (the engine is net10; this assembly is net472). Framework-dependent publish, same
+    payload the PgProj.Sdk nupkg carries. Gather the staged files into their OWN item before mapping
+    so %(RecursiveDir) anchors to the stage dir (see the 2026-06-07 packaging lab note); no trailing
+    separator on the stage dir, else the closing quote on the publish command line gets escaped.
+  -->
+  <Target Name="_PgProjBundleCliInVsix" BeforeTargets="GetVsixSourceItems">
+    <PropertyGroup>
+      <_PgProjCliStage>$(MSBuildProjectDirectory)\obj\pgproj-cli</_PgProjCliStage>
+    </PropertyGroup>
+    <Message Importance="high" Text="PgProj VSIX: publishing the pgproj CLI payload into $(_PgProjCliStage)" />
+    <Exec Command="dotnet publish &quot;$(MSBuildProjectDirectory)\..\..\..\src\PgProj.Cli\PgProj.Cli.csproj&quot; -c Release -f net10.0 -o &quot;$(_PgProjCliStage)&quot; --nologo -p:PublishReadyToRun=false --self-contained false" />
+    <ItemGroup>
+      <_PgProjCliVsixFile Include="$(_PgProjCliStage)\**\*" />
+    </ItemGroup>
+    <ItemGroup>
+      <Content Include="@(_PgProjCliVsixFile)">
+        <IncludeInVSIX>true</IncludeInVSIX>
+        <VSIXSubPath>tools\%(_PgProjCliVsixFile.RecursiveDir)</VSIXSubPath>
+        <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+      </Content>
+    </ItemGroup>
+  </Target>
 
 </Project>

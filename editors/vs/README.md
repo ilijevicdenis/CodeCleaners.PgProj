@@ -38,12 +38,15 @@ So "one install" is delivered per channel:
 | **VS Marketplace** | a **reference** extension pack — lists both by Id, VS resolves each from the Marketplace and installs it individually (its own correct, signed+finalized flow) | `PgProj.VisualStudio.ExtensionPack.vsix` + the two listings | ✅ one click on the pack listing |
 | **NuGet** | `PgProj.Sdk` MSBuild SDK (build/publish in VS/CLI/CI, **no extension**) **and** the `pgproj` CLI as a .NET tool | `PgProj.Sdk.<v>.nupkg`, `PgProj.Cli.<v>.nupkg` | n/a (not an IDE extension) |
 
-> **Hard limit on local OOP install.** `VSIXInstaller.exe` (the command-line/double-click installer)
-> **cannot install a VisualStudio.Extensibility (OOP) extension** — it bails with *"must unzip and call
-> the finalizer instead"* regardless of signing or elevation. Only the VS IDE, the VS setup engine, and
-> the Marketplace run that finalizer. So the OOP half (`PgProj.VisualStudio`) installs locally **only**
-> through *VS → Manage Extensions → Install from disk* (sign it first with `sign-oop.ps1`) or via **F5**
-> into the experimental instance. The classic project-system extension has no such limit.
+> **Hard limit on local OOP install (tightened 2026-06-11).** A local OOP extension **cannot be
+> installed into the main VS 2026 instance at all**: `VSIXInstaller.exe` bails with *"must unzip and
+> call the finalizer instead"* regardless of signing/elevation, the VS 2026 Extension Manager has **no
+> Install-from-disk UI**, and the xcopy route (unzip into the instance's `Extensions\` +
+> `devenv /updateconfiguration`) registers the identity but VS never loads it (verified live). Local
+> OOP = **F5 experimental instance only**; main-instance OOP = **Marketplace only**. Consequence:
+> user-facing commands that must work in the locally-installed product live in the **classic** in-proc
+> extension and shell out to the VSIX-bundled `pgproj` CLI (`tools\`) — the first such command is
+> **Import Database…**. The classic project-system extension itself installs fine via the script.
 
 - **Build everything:** `editors/vs/build-vsix.cmd [Debug|Release]` builds the two extensions + the
   reference pack in order, auto-detecting the VS 2026 MSBuild. (Batch scripts here are kept CRLF/ASCII —
@@ -257,6 +260,14 @@ VSSDK1207), and `<License>` referenced by its in-archive name + packaged as a `C
 
 ### What it now implements (Stages 1–3, headless-verified 2026-06-11)
 
+- **Import Database… (in-proc, works in the locally-installed product)**: a WPF dialog
+  (`Commands/ImportDatabaseDialog.cs`) on the `.pgproj` context menu — connection (prefilled from the
+  shared per-project DPAPI store, else `PGPROJ_CONNECTION`), **Load Objects** (runs the **VSIX-bundled
+  pgproj CLI**'s `extract` into a temp dir; doubles as the connection test), a checkable object list,
+  overwrite + remember-connection toggles, and Import copies the checked `.sql` units into the project
+  (the SDK auto-glob picks them up). In-proc because a local OOP extension cannot install into the main
+  instance (see the hard-limit note above); the CLI subprocess is the engine bridge (net472 ↔ net10),
+  bundled under `tools\` by the `_PgProjBundleCliInVsix` target.
 - **CPS project type** (`ProjectSystem/PgProjProjectType.cs`): `ProjectTypeRegistrationAttribute`
   (from `Microsoft.VisualStudio.ProjectSystem.SDK` 17.9.380 — the attribute is in
   `ProjectSystem.VS.dll`, which the bare `Microsoft.VisualStudio.ProjectSystem` package does NOT

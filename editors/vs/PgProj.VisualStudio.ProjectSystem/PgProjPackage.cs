@@ -1,18 +1,22 @@
 // EP-VS #25 Route B — the VS AsyncPackage entry point (classic in-proc, net472).
 using System.Runtime.InteropServices;
+using System.Threading;
 using Microsoft.VisualStudio.Shell;
+using PgProj.VisualStudio.ProjectSystem.Commands;
+using Task = System.Threading.Tasks.Task;
 
 namespace PgProj.VisualStudio
 {
     /// <summary>
     /// The project-system package. It is intentionally thin: the .pgproj project type itself is a
     /// CPS contribution (see <c>ProjectSystem/PgProjProjectType.cs</c> — registration attribute +
-    /// MEF exports, no factory code in this package), and the working database commands live in the
-    /// sibling OOP extension. What this package carries:
+    /// MEF exports, no factory code in this package). What this package carries:
     ///   * the pkgdef registrations (project type, templates, UIContext rule) harvested from this
     ///     assembly's attributes at build time;
-    ///   * the .vsct command table that defines the .pgproj project context-menu group the OOP
-    ///     extension's commands are placed into;
+    ///   * the .vsct command table that defines the .pgproj project context-menu group (the OOP
+    ///     extension places Publish/Schema Compare into it when present);
+    ///   * the IN-PROC "Import Database…" command — in-proc because a local OOP extension cannot be
+    ///     installed into the main VS 2026 instance (only F5/Marketplace run its finalizer);
     ///   * the "PgProj project present" UIContext — activated by VS itself (no package load needed)
     ///     when the solution contains a project with the PgProj capability, so database controls
     ///     show only when a PostgreSQL database project is actually open.
@@ -30,6 +34,11 @@ namespace PgProj.VisualStudio
         termValues: new[] { "SolutionHasProjectCapability:PgProj" })]
     public sealed class PgProjPackage : AsyncPackage
     {
-        // No InitializeAsync override: every contribution is registration-driven (pkgdef/MEF/VSCT).
+        /// <summary>Wires the in-proc menu commands (VS loads the package on first invoke).</summary>
+        protected override async Task InitializeAsync(CancellationToken cancellationToken, System.IProgress<ServiceProgressData> progress)
+        {
+            await base.InitializeAsync(cancellationToken, progress);
+            await ImportDatabaseCommand.InitializeAsync(this);
+        }
     }
 }

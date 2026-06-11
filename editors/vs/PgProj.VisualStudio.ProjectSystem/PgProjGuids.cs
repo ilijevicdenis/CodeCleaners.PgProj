@@ -27,6 +27,9 @@ namespace PgProj.VisualStudio
         /// <summary>The .pgproj project-node context-menu group (mirrored in PgProjCommands.vsct).</summary>
         public const int ProjectContextGroupId = 0x1020;
 
+        /// <summary>The in-proc Import Database command (mirrored in PgProjCommands.vsct).</summary>
+        public const int ImportDatabaseCommandId = 0x0103;
+
         /// <summary>
         /// UIContext that is active iff the open solution contains a PgProj project
         /// (SolutionHasProjectCapability:PgProj). Database controls key their visibility on it.
