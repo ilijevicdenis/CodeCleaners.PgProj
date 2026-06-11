@@ -1,37 +1,26 @@
-// EP-VS #25 Route B (modern). The hand-off between the Schema Compare command and its tool window.
+// EP-VS #25 Route B (modern) + #116. The shared Schema Compare session between the command and the
+// tool window.
+using Microsoft.VisualStudio.Extensibility;
+
 namespace PgProj.VisualStudio.ToolWindows;
 
 /// <summary>
-/// Holds the most recent Schema Compare view model so the tool window can render it when it opens. The
-/// command builds the view model (from the engine's change set) and stores it here, then calls
-/// <c>ShowToolWindowAsync</c>; the window reads <see cref="Latest"/> on <c>GetContentAsync</c>. (A shared
-/// singleton is the simplest seam between a command and a tool window — they are separate contributions.)
+/// Holds the single Schema Compare session (<see cref="SchemaCompareViewModel"/>) so the command can
+/// seed it (source/target + first compare) and the tool window renders the same live instance when it
+/// opens. (A shared singleton is the simplest seam between a command and a tool window — they are
+/// separate contributions.)
 /// </summary>
 internal static class SchemaCompareState
 {
     private static readonly Lock Gate = new();
+    private static SchemaCompareViewModel? session;
 
-    private static SchemaCompareViewModel latest = new()
-    {
-        Summary = "No schema comparison has been run yet.",
-    };
-
-    public static void SetLatest(SchemaCompareViewModel viewModel)
+    /// <summary>The session view model, created on first use.</summary>
+    public static SchemaCompareViewModel GetOrCreate(VisualStudioExtensibility extensibility)
     {
         lock (Gate)
         {
-            latest = viewModel;
-        }
-    }
-
-    public static SchemaCompareViewModel Latest
-    {
-        get
-        {
-            lock (Gate)
-            {
-                return latest;
-            }
+            return session ??= new SchemaCompareViewModel(extensibility);
         }
     }
 }

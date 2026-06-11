@@ -43,4 +43,23 @@ internal static class PgProjContext
     /// </summary>
     public static string? ResolveConnection()
         => Environment.GetEnvironmentVariable(ConnectionEnvVar) is { Length: > 0 } conn ? conn : null;
+
+    /// <summary>
+    /// The default publish profile next to the project, if one exists: <c>&lt;Name&gt;.pgpublish.json</c>
+    /// first, else the single <c>*.pgpublish.json</c> in the project directory. Used to prefill the
+    /// Publish dialog; the user can point it anywhere else.
+    /// </summary>
+    public static string? FindDefaultProfile(string projectPath)
+    {
+        var dir = Path.GetDirectoryName(projectPath);
+        if (string.IsNullOrEmpty(dir))
+            return null;
+
+        var named = Path.Combine(dir, Path.GetFileNameWithoutExtension(projectPath) + ".pgpublish.json");
+        if (File.Exists(named))
+            return named;
+
+        var all = Directory.EnumerateFiles(dir, "*.pgpublish.json", SearchOption.TopDirectoryOnly).Take(2).ToList();
+        return all.Count == 1 ? all[0] : null;
+    }
 }

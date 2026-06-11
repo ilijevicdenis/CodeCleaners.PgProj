@@ -63,9 +63,44 @@ internal static class PgProjEngine
 
     /// <summary>Builds the deploy plan (compare + deploy script) via the shared <see cref="PublishService"/>.</summary>
     public static Task<PublishPlan> PlanAsync(DatabaseProject project, DatabaseModel model, string connectionString, CancellationToken cancellationToken)
-        => new PublishService().PlanAsync(project, model, connectionString, new PublishPlanOptions(), cancellationToken);
+        => PlanAsync(project, model, connectionString, new PublishPlanOptions(), cancellationToken);
+
+    /// <summary>Builds the deploy plan with explicit options (the Publish dialog's allow-drops / transaction / variables).</summary>
+    public static Task<PublishPlan> PlanAsync(DatabaseProject project, DatabaseModel model, string connectionString, PublishPlanOptions options, CancellationToken cancellationToken)
+        => new PublishService().PlanAsync(project, model, connectionString, options, cancellationToken);
 
     /// <summary>Applies a plan to the target (whole-script, one transaction).</summary>
     public static Task ApplyAsync(PublishPlan plan, string connectionString, CancellationToken cancellationToken)
         => new PublishService().ApplyAsync(plan, connectionString, parallel: false, cancellationToken);
+
+    /// <summary>The deploy script for the currently-included subset of a Schema Compare change set.</summary>
+    public static string ScriptIncluded(SchemaChangeSet changeSet)
+        => changeSet.ScriptIncluded(new DeployOptions());
+
+    /// <summary>
+    /// Applies the currently-included subset of a Schema Compare change set to a live target — the same
+    /// script <see cref="ScriptIncluded"/> shows, executed by the engine's transactional deployer.
+    /// </summary>
+    public static Task ApplyIncludedAsync(SchemaChangeSet changeSet, string connectionString, CancellationToken cancellationToken)
+        => new DatabaseDeployer().ExecuteAsync(connectionString, changeSet.ScriptIncluded(new DeployOptions()), cancellationToken);
+
+    /// <summary>
+    /// Parses the dialog's <c>Name=Value;Name2=Value2</c> SQLCMD-variable override string (the same shape
+    /// the SDK's PgProjPublishVariables property uses). Returns null when there is nothing to override.
+    /// </summary>
+    public static Dictionary<string, string>? ParseVariableOverrides(string? text)
+    {
+        if (string.IsNullOrWhiteSpace(text))
+            return null;
+
+        var result = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var pair in text.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+        {
+            var separator = pair.IndexOf('=');
+            if (separator <= 0)
+                throw new InvalidOperationException($"Variable override '{pair}' is not Name=Value.");
+            result[pair[..separator].Trim()] = pair[(separator + 1)..].Trim();
+        }
+        return result.Count == 0 ? null : result;
+    }
 }

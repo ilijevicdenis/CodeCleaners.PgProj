@@ -59,6 +59,7 @@
     <!-- Remote UI control markup is a serialized data template embedded into the assembly — it is
          NOT compiled WPF (UseWpf is intentionally OFF). Mark it as an embedded resource. -->
     <EmbeddedResource Include="ToolWindows\SchemaCompareControl.xaml" />
+    <EmbeddedResource Include="PublishDialog\PublishDialogControl.xaml" />
   </ItemGroup>
 
 </Project>

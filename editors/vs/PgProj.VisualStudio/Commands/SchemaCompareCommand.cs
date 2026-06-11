@@ -1,5 +1,6 @@
-// EP-VS #25 Route B (modern). "Schema Compare" command — runs the engine's comparer IN-PROCESS and
-// opens the Schema Compare tool window over the resulting change set (no subprocess, no JSON round-trip).
+// EP-VS #25 Route B (modern) + #116. "Schema Compare" command — seeds the interactive Schema Compare
+// tool window (source = the selected .pgproj, target = PGPROJ_CONNECTION when set) and runs the first
+// compare IN-PROCESS. Source/target can then be re-picked inside the window itself.
 using Microsoft.VisualStudio.Extensibility;
 using Microsoft.VisualStudio.Extensibility.Commands;
 using Microsoft.VisualStudio.Extensibility.Shell;
@@ -9,9 +10,11 @@ using PgProj.VisualStudio.ToolWindows;
 namespace PgProj.VisualStudio.Commands;
 
 /// <summary>
-/// Compares the selected <c>.pgproj</c> against the configured PostgreSQL target and shows the result in
-/// the <see cref="SchemaCompareToolWindow"/>. The comparison is the engine's two-way comparer
-/// (<see cref="PgProjEngine.CompareAsync"/>); the window only renders the resulting change set.
+/// Opens the <see cref="SchemaCompareToolWindow"/> for the selected <c>.pgproj</c>. The window is an
+/// interactive session over the engine's selectable change set: source/target pickers (project /
+/// .pgpkg / .schema.snapshot / live connection), a checkable diff, and Generate Script / Apply. When
+/// <c>PGPROJ_CONNECTION</c> is set the first compare runs immediately; otherwise the window opens with
+/// the source prefilled and waits for a target.
 /// </summary>
 [VisualStudioContribution]
 internal sealed class SchemaCompareCommand : Command
@@ -45,27 +48,16 @@ internal sealed class SchemaCompareCommand : Command
             return;
         }
 
-        var target = PgProjContext.ResolveConnection();
-        if (target is null)
-        {
-            await this.Extensibility.Shell().ShowPromptAsync(
-                $"No compare target is set. Define {PgProjContext.ConnectionEnvVar} with a PostgreSQL connection " +
-                "string (the live database to compare against), then try again.",
-                PromptOptions.OK,
-                cancellationToken);
-            return;
-        }
+        var session = SchemaCompareState.GetOrCreate(this.Extensibility);
+        session.SourceSpec = project;
+        if (PgProjContext.ResolveConnection() is { } connection && session.TargetSpec.Trim().Length == 0)
+            session.TargetSpec = connection;
 
-        try
-        {
-            var result = await PgProjEngine.CompareAsync(project, target, cancellationToken);
-            SchemaCompareState.SetLatest(SchemaCompareViewModelFactory.From(Path.GetFileName(project), result));
-            await this.Extensibility.Shell().ShowToolWindowAsync<SchemaCompareToolWindow>(activate: true, cancellationToken);
-        }
-        catch (Exception ex)
-        {
-            await this.Extensibility.Shell().ShowPromptAsync(
-                $"Schema compare failed: {ex.Message}", PromptOptions.OK, cancellationToken);
-        }
+        await this.Extensibility.Shell().ShowToolWindowAsync<SchemaCompareToolWindow>(activate: true, cancellationToken);
+
+        if (session.TargetSpec.Trim().Length > 0)
+            await session.CompareAsync(cancellationToken);
+        else
+            session.Summary = $"Source: {Path.GetFileName(project)}. Enter a target (connection string, .pgproj, .pgpkg, or .schema.snapshot) and Compare.";
     }
 }

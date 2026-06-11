@@ -1,18 +1,25 @@
-// EP-VS #25 Route B (modern). "Publish" command — compares the selected .pgproj to the target and
-// applies the deploy script IN-PROCESS via the engine (PgProj.Core), streaming progress to an Output channel.
+// EP-VS #25 Route B (modern) + #115. "Publish" command — a modal publish dialog (connection,
+// profile, SQLCMD variables, options, generate-script), then the engine IN-PROCESS via the shared
+// PublishService, streaming progress to an Output channel.
 using Microsoft.VisualStudio.Extensibility;
 using Microsoft.VisualStudio.Extensibility.Commands;
 using Microsoft.VisualStudio.Extensibility.Documents;
 using Microsoft.VisualStudio.Extensibility.Shell;
+using Microsoft.VisualStudio.RpcContracts.Notifications;
+using PgProj.Core.Deployment;
+using PgProj.Core.Publishing;
 using PgProj.VisualStudio.Engine;
+using PgProj.VisualStudio.PublishDialog;
 
 namespace PgProj.VisualStudio.Commands;
 
 /// <summary>
-/// Publishes the selected <c>.pgproj</c> to a live PostgreSQL server. It compares the project to the
-/// target (read-only) to show the change/destructive counts, confirms, then applies the engine's deploy
-/// script. All comparison + deploy logic is the engine's (<see cref="PgProjEngine"/>); the connection
-/// comes from <c>PGPROJ_CONNECTION</c> (never stored in the project).
+/// Publishes the selected <c>.pgproj</c> to a live PostgreSQL server. A modal dialog collects the
+/// connection, an optional <c>.pgpublish.json</c> profile, SQLCMD variable overrides, and options
+/// (allow-drops / no-transaction / generate-script-only) — mirroring the SQL Server publish flow.
+/// All comparison + deploy logic is the engine's (<see cref="PgProjEngine"/> →
+/// <c>PgProj.Core.Publishing.PublishService</c>, the same single code path the CLI uses), so the VS
+/// publish produces the identical deploy script. The connection string is never stored.
 /// </summary>
 [VisualStudioContribution]
 internal sealed class PublishCommand : Command
@@ -54,12 +61,26 @@ internal sealed class PublishCommand : Command
             return;
         }
 
-        var connection = PgProjContext.ResolveConnection();
-        if (connection is null)
+        // The dialog: connection (prefilled from PGPROJ_CONNECTION), profile (prefilled when one sits
+        // next to the project), variables, options. Cancel = no work.
+        var dialogModel = new PublishDialogViewModel
+        {
+            ProjectName = $"Publish '{Path.GetFileName(project)}'",
+            ConnectionString = PgProjContext.ResolveConnection() ?? string.Empty,
+            ProfilePath = PgProjContext.FindDefaultProfile(project) ?? string.Empty,
+        };
+        using var dialogControl = new PublishDialogControl(dialogModel);
+        var confirmed = await this.Extensibility.Shell().ShowDialogAsync(
+            dialogControl, "Publish PgProj Database", DialogOption.OKCancel, cancellationToken);
+        if (confirmed != DialogResult.OK)
+            return;
+
+        var connection = dialogModel.ConnectionString.Trim();
+        if (connection.Length == 0)
         {
             await this.Extensibility.Shell().ShowPromptAsync(
-                $"No publish connection is set. Define the {PgProjContext.ConnectionEnvVar} environment variable " +
-                "with your target PostgreSQL connection string, then try again.",
+                "A target connection string is required (the plan is a diff against the live target). " +
+                "For an offline create-script preview use `pgproj script` or a dry-run Publish via the SDK.",
                 PromptOptions.OK,
                 cancellationToken);
             return;
@@ -67,6 +88,30 @@ internal sealed class PublishCommand : Command
 
         try
         {
+            // Profile (options + variables). Dialog values beat the profile, the profile beats the
+            // project defaults — the same precedence the CLI applies to its flags.
+            PublishProfile? profile = null;
+            var profilePath = dialogModel.ProfilePath.Trim();
+            if (profilePath.Length > 0)
+            {
+                if (!File.Exists(profilePath))
+                {
+                    await this.Extensibility.Shell().ShowPromptAsync(
+                        $"Publish profile not found: {profilePath}", PromptOptions.OK, cancellationToken);
+                    return;
+                }
+                profile = PublishProfile.Load(profilePath);
+                await WriteLineAsync($"Using publish profile {profilePath}.", cancellationToken);
+            }
+
+            var options = new PublishPlanOptions
+            {
+                AllowDrops = dialogModel.AllowDrops || profile?.Options.AllowDrops == true,
+                WrapInTransaction = !dialogModel.NoTransaction && profile?.Options.WrapInTransaction != false,
+                ProfileVariables = profile?.Variables,
+                VariableOverrides = PgProjEngine.ParseVariableOverrides(dialogModel.Variables),
+            };
+
             await WriteLineAsync($"Building '{Path.GetFileName(project)}'…", cancellationToken);
             var (databaseProject, model) = await PgProjEngine.LoadProjectAsync(project, cancellationToken);
 
@@ -82,13 +127,27 @@ internal sealed class PublishCommand : Command
             }
 
             await WriteLineAsync("Comparing against the target…", cancellationToken);
-            var plan = await PgProjEngine.PlanAsync(databaseProject, model, connection, cancellationToken);
+            var plan = await PgProjEngine.PlanAsync(databaseProject, model, connection, options, cancellationToken);
 
             if (plan.NothingToDo)
             {
                 await WriteLineAsync("Nothing to publish — target already matches the project.", cancellationToken);
                 await this.Extensibility.Shell().ShowPromptAsync(
                     "Nothing to publish — the target already matches the project.", PromptOptions.OK, cancellationToken);
+                return;
+            }
+
+            if (dialogModel.GenerateScriptOnly)
+            {
+                // The dry-run shape: write the deploy script (leading '_' keeps the CLI globber from
+                // re-parsing it as a schema source) and open it in the editor instead of executing.
+                var scriptPath = Path.Combine(
+                    Path.GetDirectoryName(project)!, "bin",
+                    "_" + Path.GetFileNameWithoutExtension(project) + ".deploy.sql");
+                Directory.CreateDirectory(Path.GetDirectoryName(scriptPath)!);
+                await File.WriteAllTextAsync(scriptPath, plan.Script, cancellationToken);
+                await WriteLineAsync($"Deploy script written: {scriptPath}", cancellationToken);
+                await this.Extensibility.Documents().OpenTextDocumentAsync(new Uri(scriptPath), cancellationToken);
                 return;
             }
 
