@@ -18,6 +18,7 @@ internal sealed class PublishDialogViewModel : NotifyPropertyChangedObject
     private bool allowDrops;
     private bool noTransaction;
     private bool generateScriptOnly;
+    private bool rememberConnection = true;
 
     /// <summary>The project file name shown in the dialog header.</summary>
     [DataMember]
@@ -73,5 +74,16 @@ internal sealed class PublishDialogViewModel : NotifyPropertyChangedObject
     {
         get => this.generateScriptOnly;
         set => this.SetProperty(ref this.generateScriptOnly, value);
+    }
+
+    /// <summary>
+    /// Remember the connection for this project after it is used successfully (DPAPI-encrypted in the
+    /// per-user store — never in the .pgproj/profile). Unchecking also forgets a stored one.
+    /// </summary>
+    [DataMember]
+    public bool RememberConnection
+    {
+        get => this.rememberConnection;
+        set => this.SetProperty(ref this.rememberConnection, value);
     }
 }

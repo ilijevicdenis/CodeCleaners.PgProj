@@ -44,6 +44,9 @@
     <PackageReference Include="Microsoft.VisualStudio.Extensibility.Sdk" Version="17.14.40608" />
     <!-- Build targets that package the project into a .vsix and run the contribution analyzers. -->
     <PackageReference Include="Microsoft.VisualStudio.Extensibility.Build" Version="17.14.40608" />
+    <!-- DPAPI (CurrentUser) for the per-project remembered connection (ConnectionStore) — the
+         extension is net10.0-windows only, so the Windows-only API is fine. -->
+    <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="10.0.0" />
   </ItemGroup>
 
   <ItemGroup>

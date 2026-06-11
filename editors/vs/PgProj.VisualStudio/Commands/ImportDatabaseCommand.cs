@@ -58,7 +58,7 @@ internal sealed class ImportDatabaseCommand : Command
 
         var dialogModel = new ImportDatabaseDialogViewModel
         {
-            ConnectionString = PgProjContext.ResolveConnection() ?? string.Empty,
+            ConnectionString = ConnectionStore.TryGet(project) ?? PgProjContext.ResolveConnection() ?? string.Empty,
         };
         using var dialogControl = new ImportDatabaseDialogControl(dialogModel);
         var confirmed = await this.Extensibility.Shell().ShowDialogAsync(
@@ -73,6 +73,14 @@ internal sealed class ImportDatabaseCommand : Command
                 "Nothing to import — load the objects and check at least one before OK.", PromptOptions.OK, cancellationToken);
             return;
         }
+
+        // Loaded units exist, so this connection introspected successfully — persist or forget it
+        // per the checkbox, so the next PgProj dialog prefills it for this project.
+        var usedConnection = dialogModel.ConnectionString.Trim();
+        if (dialogModel.RememberConnection && usedConnection.Length > 0)
+            ConnectionStore.Save(project, usedConnection);
+        else if (!dialogModel.RememberConnection)
+            ConnectionStore.Forget(project);
 
         try
         {

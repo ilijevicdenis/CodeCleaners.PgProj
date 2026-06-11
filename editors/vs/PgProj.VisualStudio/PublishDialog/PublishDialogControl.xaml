@@ -17,6 +17,7 @@
       <RowDefinition Height="Auto" />
       <RowDefinition Height="Auto" />
       <RowDefinition Height="Auto" />
+      <RowDefinition Height="Auto" />
     </Grid.RowDefinitions>
 
     <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"
@@ -38,9 +39,11 @@
     <CheckBox Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" IsChecked="{Binding NoTransaction, Mode=TwoWay}"
               Content="Do not wrap the deploy script in a transaction" Margin="0,0,0,4" />
     <CheckBox Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2" IsChecked="{Binding GenerateScriptOnly, Mode=TwoWay}"
-              Content="Generate the deploy script only (do not execute)" Margin="0,0,0,8" />
+              Content="Generate the deploy script only (do not execute)" Margin="0,0,0,4" />
+    <CheckBox Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="2" IsChecked="{Binding RememberConnection, Mode=TwoWay}"
+              Content="Remember this connection for this project (encrypted, current user only)" Margin="0,0,0,8" />
 
-    <TextBlock Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="2" TextWrapping="Wrap" Opacity="0.7"
-               Text="The connection string is used for this publish only — it is never written to the project or the profile." />
+    <TextBlock Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="2" TextWrapping="Wrap" Opacity="0.7"
+               Text="The connection string is never written to the project or the profile. Remembering stores it DPAPI-encrypted under your Windows profile (%APPDATA%\pgproj) for prefill next time." />
   </Grid>
 </DataTemplate>

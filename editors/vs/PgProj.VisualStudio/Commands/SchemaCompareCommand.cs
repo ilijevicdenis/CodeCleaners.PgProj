@@ -50,8 +50,11 @@ internal sealed class SchemaCompareCommand : Command
 
         var session = SchemaCompareState.GetOrCreate(this.Extensibility);
         session.SourceSpec = project;
-        if (PgProjContext.ResolveConnection() is { } connection && session.TargetSpec.Trim().Length == 0)
+        if (session.TargetSpec.Trim().Length == 0 &&
+            (ConnectionStore.TryGet(project) ?? PgProjContext.ResolveConnection()) is { } connection)
+        {
             session.TargetSpec = connection;
+        }
 
         await this.Extensibility.Shell().ShowToolWindowAsync<SchemaCompareToolWindow>(activate: true, cancellationToken);
 

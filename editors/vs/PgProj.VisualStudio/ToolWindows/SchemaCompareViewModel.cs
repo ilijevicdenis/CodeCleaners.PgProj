@@ -124,6 +124,14 @@ internal sealed class SchemaCompareViewModel : NotifyPropertyChangedObject
             this.Summary = result.ChangeSet.InSync
                 ? $"{result.Source.DisplayName} → {result.Target.DisplayName}: in sync."
                 : $"{result.Source.DisplayName} → {result.Target.DisplayName}: {result.ChangeSet.Count} change(s), {result.ChangeSet.DestructiveCount} destructive.";
+
+            // A live target that just compared successfully is worth remembering for the source
+            // project, so every PgProj dialog prefills it next time (enter the connection once).
+            if (result.Target.Kind == EndpointKind.LiveDatabase &&
+                source.EndsWith(".pgproj", StringComparison.OrdinalIgnoreCase) && File.Exists(source))
+            {
+                ConnectionStore.Save(source, target);
+            }
         }
         catch (Exception ex)
         {

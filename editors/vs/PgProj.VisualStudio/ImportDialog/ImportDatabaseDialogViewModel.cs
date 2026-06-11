@@ -21,6 +21,7 @@ internal sealed class ImportDatabaseDialogViewModel : NotifyPropertyChangedObjec
     private string connectionString = string.Empty;
     private string status = "Enter a connection string, then Load Objects.";
     private bool overwriteExisting;
+    private bool rememberConnection = true;
     private bool isBusy;
 
     public ImportDatabaseDialogViewModel()
@@ -57,6 +58,17 @@ internal sealed class ImportDatabaseDialogViewModel : NotifyPropertyChangedObjec
     {
         get => this.overwriteExisting;
         set => this.SetProperty(ref this.overwriteExisting, value);
+    }
+
+    /// <summary>
+    /// Remember the connection for this project after a successful import (DPAPI-encrypted in the
+    /// per-user store — never in the .pgproj). Unchecking also forgets a stored one.
+    /// </summary>
+    [DataMember]
+    public bool RememberConnection
+    {
+        get => this.rememberConnection;
+        set => this.SetProperty(ref this.rememberConnection, value);
     }
 
     /// <summary>True while a connect/introspect runs (disables the buttons).</summary>

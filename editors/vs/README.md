@@ -118,8 +118,15 @@ build/compare/publish/LSP logic lives; the extension is the VS presentation over
   `PgProj.Core.Publishing.PublishService` (`PlanAsync` → `ApplyAsync`) — the **single** publish code
   path, so VS publish and CLI publish produce the identical deploy script and use the identical deploy
   strategy (including pre/post-deploy scripts + SQLCMD variables).
+- **Enter the connection once** — all three dialogs share a per-project remembered connection
+  (`Engine/ConnectionStore.cs`): after a connection is used successfully (publish planned, compare
+  ran, objects loaded), it is stored **DPAPI-encrypted for the current Windows user** in
+  `%APPDATA%\pgproj\connections.json`, keyed by project path, and every PgProj dialog prefills it
+  next time. It is **never** written into the `.pgproj` or a `.pgpublish.json` (committed files stay
+  secret-free); the "Remember" checkbox is on by default, and unchecking it forgets the stored
+  entry. Prefill order: remembered connection → `PGPROJ_CONNECTION` → empty.
 - **Import Database…** (the SSDT "Import Database" analogue) — a modal dialog with the connection
-  field (prefilled from `PGPROJ_CONNECTION`), a **Test Connection** probe through the in-process
+  field (prefilled as above), a **Test Connection** probe through the in-process
   Npgsql engine, and a **checkable object list** (the same per-object file units `pgproj extract`
   writes — a table's unit carries its FKs + indexes). OK writes the checked objects into the
   project's extract-layout folders (`Tables/`, `Views/`, …); existing files are skipped unless

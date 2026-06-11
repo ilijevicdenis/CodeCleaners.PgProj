@@ -61,12 +61,13 @@ internal sealed class PublishCommand : Command
             return;
         }
 
-        // The dialog: connection (prefilled from PGPROJ_CONNECTION), profile (prefilled when one sits
-        // next to the project), variables, options. Cancel = no work.
+        // The dialog: connection (prefilled from the per-project remembered store, else
+        // PGPROJ_CONNECTION), profile (prefilled when one sits next to the project), variables,
+        // options. Cancel = no work.
         var dialogModel = new PublishDialogViewModel
         {
             ProjectName = $"Publish '{Path.GetFileName(project)}'",
-            ConnectionString = PgProjContext.ResolveConnection() ?? string.Empty,
+            ConnectionString = ConnectionStore.TryGet(project) ?? PgProjContext.ResolveConnection() ?? string.Empty,
             ProfilePath = PgProjContext.FindDefaultProfile(project) ?? string.Empty,
         };
         using var dialogControl = new PublishDialogControl(dialogModel);
@@ -128,6 +129,13 @@ internal sealed class PublishCommand : Command
 
             await WriteLineAsync("Comparing against the target…", cancellationToken);
             var plan = await PgProjEngine.PlanAsync(databaseProject, model, connection, options, cancellationToken);
+
+            // The connection just worked (the plan read the target) — persist or forget it per the
+            // checkbox, so the next dialog prefills without re-entering. Never saved on failure.
+            if (dialogModel.RememberConnection)
+                ConnectionStore.Save(project, connection);
+            else
+                ConnectionStore.Forget(project);
 
             if (plan.NothingToDo)
             {

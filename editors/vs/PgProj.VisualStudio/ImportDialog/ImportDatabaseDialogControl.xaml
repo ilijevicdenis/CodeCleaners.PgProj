@@ -27,7 +27,9 @@
       <Button Content="Load Objects" Command="{Binding LoadObjectsCommand}" Padding="10,2" Margin="0,0,6,0" />
       <Button Content="Include All" Command="{Binding IncludeAllCommand}" Padding="10,2" Margin="0,0,6,0" />
       <Button Content="Exclude All" Command="{Binding ExcludeAllCommand}" Padding="10,2" Margin="0,0,12,0" />
-      <CheckBox IsChecked="{Binding OverwriteExisting, Mode=TwoWay}" Content="Overwrite existing files" VerticalAlignment="Center" />
+      <CheckBox IsChecked="{Binding OverwriteExisting, Mode=TwoWay}" Content="Overwrite existing files" VerticalAlignment="Center" Margin="0,0,12,0" />
+      <CheckBox IsChecked="{Binding RememberConnection, Mode=TwoWay}" Content="Remember connection" VerticalAlignment="Center"
+                ToolTip="Stores the connection DPAPI-encrypted under your Windows profile (never in the .pgproj) so PgProj dialogs prefill it for this project." />
     </StackPanel>
 
     <TextBlock Grid.Row="2"
