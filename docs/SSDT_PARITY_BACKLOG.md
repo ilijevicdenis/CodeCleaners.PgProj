@@ -66,7 +66,8 @@ The headless engine is in good shape. These epics are **complete** and only need
 > **Reality check (2026-06-07):** the per-epic task checklists in §3 below are the *original* backlog and
 > were not all re-ticked. Treat the list above + `PROGRESS.md` M7 as the source of truth for what's done;
 > the genuinely-open work is **EP-ANALYSIS+ tail, EP-COVERAGE (introspection, tracked in `reference/COVERAGE.md`),
-> EP-CICD (planning), EP-VS Route B, EP-DESIGNER deepening.**
+> EP-DESIGNER deepening.** (EP-CICD was removed from scope; EP-VS Route B + slngen grouping shipped
+> 2026-06-11 — #113–#118 closed, manual F5 pass outstanding.)
 
 ---
 
@@ -327,9 +328,9 @@ VS support is still "preview".
 
 **Tasks**
 - [x] **Route A (faster): make `.pgproj` a clean `dotnet build` citizen** — `PgProj.Sdk` finished and **NuGet-packable** (`dotnet pack src/PgProj.Sdk` → carries the CLI under `tools/`); VS's generic project handling builds/cleans/**publishes** it. Build → model + `.pgpkg`; **Publish** is a real MSBuild target (`-t:Publish`, real/diff-dry-run/offline-preview shapes). Validated: sample `.pgproj` build (model byte-equal to the CLI's), pack, and a packaged-SDK consumer build. See `docs/VISUAL_STUDIO.md` / `src/PgProj.Sdk/README.md`.
-- [~] **Route B (full): a VSIX project system / project flavor** — **scaffolded** under `editors/vs/` (own solution, excluded from `PgProj.slnx`; needs VS + the VS SDK to build — not buildable headless): project factory/flavor, the four property pages (build output, database settings, SQLCMD variables, target platform), Publish dialog command, Schema Compare window, `.vsct`/manifest. Bodies marked `// SCAFFOLD`. Table designer still deferred to EP-DESIGNER.
-- [x] Language service for `.sql` IntelliSense from the project model — **VS `ILanguageClient` scaffold** (`editors/vs/.../LanguageClient/`) launches the existing `pgproj serve` LSP (#31), same server VS Code uses (`docs/LSP_LANGUAGE_SERVER.md`).
-- [ ] `slngen`-style solution grouping for multiple `.pgproj`s (matrix row *Solution management*).
+- [x] **Route B (full): the two-extension hybrid** — delivered 2026-06-11 (#113–#117, `editors/vs/README.md`): real CPS project type + File→New→Project + nine item templates in the classic extension (#113), `.vsct`/manifest wiring with the OOP commands mounted on the project context menu (#117), the four property pages as CPS XAML rules shipped by `PgProj.Sdk` (#114, incl. new `PgProjPublishVariables` → `--var` publish wiring), a modal Publish dialog (connection/profile/variables/options/generate-script) (#115), and an interactive Schema Compare window (source/target pickers, checkable diff, Generate Script / Apply over the engine's `SelectableChange` set) (#116). Headless builds green; the runtime F5 pass is manual. Table designer still deferred to EP-DESIGNER.
+- [x] Language service for `.sql` IntelliSense from the project model — the OOP extension hosts `PgProj.Lsp`'s `LspServer` in-process (same server VS Code uses, `docs/LSP_LANGUAGE_SERVER.md`).
+- [x] `slngen`-style solution grouping for multiple `.pgproj`s (matrix row *Solution management*) — `pgproj sln new|add|list` over `PgProj.Core.Solutions` (canonical `.slnx`, folders mirror the directory tree, idempotent regeneration) (#118).
 
 ---
 
@@ -371,7 +372,7 @@ Matrix *Command line tools / CI-CD* (GitHub `sql-action`, Azure DevOps task).
 | Create new empty project | ⚠️ EP-TEMPLATES | ❌ EP-VSCODE | ❌ EP-VS |
 | Create project from existing DB | ✅ `extract` | ❌ EP-VSCODE | ❌ EP-VS |
 | Open existing SDK-style project | ✅ `.pgproj` | ❌ EP-VSCODE | ❌ EP-VS |
-| Solution management | ❌ EP-VS (slngen-style) | n/a | ❌ EP-VS |
+| Solution management | ✅ `sln new/add/list` | n/a | ✅ `.slnx` loads natively |
 | Build | ✅ `build` | ❌ EP-VSCODE | ⚠️ EP-SDK |
 | Publish to server | ✅ `publish` | ❌ EP-VSCODE | ❌ EP-VS |
 | Publish to local dev instance | ✅ (any conn) | ❌ EP-VSCODE | ❌ EP-VS |

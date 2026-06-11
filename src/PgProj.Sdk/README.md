@@ -29,6 +29,7 @@ in the `.pgproj` or on the command line:
 | `PgProjPublishProfile` | a `.pgpublish.json` profile (options + SQLCMD variables) |
 | `PgProjPublishAllowDrops` | `true` → allow destructive changes |
 | `PgProjPublishDryRun` | `true` → do not execute; write the deploy script instead |
+| `PgProjPublishVariables` | SQLCMD variable overrides, `Name=Value;Name2=Value2` → repeated `--var` flags (they beat the profile, which beats the project's `SqlCmdVariable` defaults) |
 | `PgProjPublishExtraArgs` | extra `pgproj publish` flags |
 
 Three shapes:
@@ -46,6 +47,15 @@ dotnet build MyDb.pgproj -t:Publish -p:PgProjPublishDryRun=true
 
 Never hard-code a connection string in a committed `.pgproj`; pass it at publish time (or via the
 `PGPROJ_CONNECTION` environment variable, which `pgproj` also honors).
+
+### Project Properties pages in Visual Studio (EP-VS #114)
+
+The SDK ships four CPS property pages (`Sdk/Rules/*.xaml`) that VS renders for a loaded `.pgproj`:
+**Database Settings** (Name, DefaultSchema, publish profile, allow-drops), **Target Platform**
+(TargetPostgresVersion dropdown — gates the build via the engine's version analysis), **Build Output**
+(output dir / model / package paths, the default-`.sql`-glob switch), and **SQLCMD Variables**
+(`PgProjPublishVariables` overrides). Values persist as plain properties in the `.pgproj`; command-line
+MSBuild ignores the page files.
 
 ## Two consumption modes
 

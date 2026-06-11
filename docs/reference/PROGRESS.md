@@ -4,9 +4,11 @@
 > SSDT-for-PostgreSQL parity and is the single place to read "where are we now". It is **updated on
 > every delivered milestone** (see [Update contract](#update-contract) below).
 
-**Last updated:** 2026-06-08 (M1–M6 complete; **M7 substantially delivered** — audit closed 27 redundant
-issues; then EP-COVERAGE introspection, EP-ANALYSIS+ external rule packs + new rules, and a complete SQLSTATE
-table all shipped & verified vs PG18; EP-CICD removed; base types/transforms backlogged) ·
+**Last updated:** 2026-06-11 (M1–M6 complete; **M7 substantially delivered** — audit closed 27 redundant
+issues; EP-COVERAGE introspection, EP-ANALYSIS+ external rule packs + new rules, and a complete SQLSTATE
+table shipped & verified vs PG18; EP-CICD removed; base types/transforms backlogged; **EP-VS #111 done**:
+CPS project type, property pages, Publish dialog, interactive Schema Compare, `pgproj sln` grouping —
+manual F5 pass outstanding) ·
 **Streams:** semantic core (EP-SEMCORE #41) · SSDT parity (#27) · performance (#12)
 
 Legend: ✅ delivered · 🟡 in progress · ⬜ not started · ⛔ blocked · ⏸️ deferred.
@@ -26,7 +28,7 @@ deliverable subtasks; **complex issues are broken into smaller subtasks when imp
 | **M4** | Diff, Risk, Deploy & Incremental | EP-SEMCORE | #52, #53, #54, #55, #56, #57, #58, #61, #64 | 9 / 9 | ✅ | [milestone/4](https://github.com/ilijevicdenis/CodeCleaners.PgProj/milestone/4) |
 | **M5** | SSDT Parity — Editor UI | parity #27 | #31, #24, #25, #26 | 4 / 4 | ✅ | [milestone/5](https://github.com/ilijevicdenis/CodeCleaners.PgProj/milestone/5) |
 | **M6** | Performance & Engine Backlog | perf #12 | #8, #10 | 2 / 2 | ✅ | [milestone/6](https://github.com/ilijevicdenis/CodeCleaners.PgProj/milestone/6) |
-| **M7** | SSDT Parity — Engine, Tooling & Coverage | parity #27 / coverage | 8 epics in scope (EP-CICD #71 removed); #66–#70,#72,#111,#112 | 6 / 8 | 🟡 | [milestone/7](https://github.com/ilijevicdenis/CodeCleaners.PgProj/milestone/7) |
+| **M7** | SSDT Parity — Engine, Tooling & Coverage | parity #27 / coverage | 8 epics in scope (EP-CICD #71 removed); #66–#70,#72,#111,#112 | 7 / 8 | 🟡 | [milestone/7](https://github.com/ilijevicdenis/CodeCleaners.PgProj/milestone/7) |
 
 **Already shipped (not milestoned — do not rebuild):** the headless engine — `build`, `compare`,
 `publish`, `validate`, `extract`, `drift`, `analyze`, `PgProj.Sdk`, and **100% parser accept/reject
@@ -167,7 +169,7 @@ is a `tracking` issue; tasks are linked children.
 **Open / in progress:**
 - 🟡 **#72** — **EP-COVERAGE**: live-server introspection. **Done:** matview (#100), COMMENT ON (#105), aggregate (#106), cast/operator/op-class/family (#107), EXCLUDE (#98), EVENT TRIGGER tags (#104), POLICY `TO` roles (#103), USER MAPPING + **LANGUAGE** (#108), PARTITION/INHERITS (#99), index opclass/ordering (#101), expression statistics (#110), **TEXT SEARCH PARSER/TEMPLATE (#109)** — plus (already in code) collation/conversion/FDW/server/foreign-table/TS-config+dict/range/column-statistics/publications. **Backlog (genuinely need C functions in the PG server — in practice shipped via an extension):** base types (#102), transforms (#108 tail). All shipped work verified against PG18 on `milestone/m7-ssdt-parity`.
 - ❌ **#71** — **EP-CICD**: **removed from M7 scope** (user decision). #97 (stable exit-code contract) was already delivered (`ExitCode.cs` + `ExitCodeContractTests` + `docs/CICD.md`) → closed done; the unbuilt GitHub Action / Azure DevOps task / container-image tickets (#94/#95/#96) closed as not-planned; the opt-in `ci/azure-devops/` template removed. The CLI stays CI-friendly via the documented exit codes + `--fail-on-changes`/`--dry-run`.
-- ⬜ **#111** — **EP-VS**: Visual Studio Route B VSIX + slngen grouping — children #113–#118 (M5 shipped Route A SDK build/publish + LSP client; Route B needs VS + the VS SDK, not buildable headless).
+- ✅ **#111** — **EP-VS**: Visual Studio Route B VSIX + slngen grouping — all six children #113–#118 delivered 2026-06-11: real CPS `.pgproj` project type + templates + VS-loadable SDK (#113), `.vsct`/manifest wiring (#117), four property pages as `PgProj.Sdk` CPS rules incl. `PgProjPublishVariables`→`--var` (#114), modal Publish dialog (#115), interactive Schema Compare window with pickers/checkable diff/Generate Script/Apply (#116), and `pgproj sln new|add|list` solution grouping (#118, `PgProj.Core.Solutions`, 15 tests). Both VSIXes build headless-green (`editors/vs/build-vsix.cmd`); the runtime F5 pass in VS 2026 is manual (`editors/vs/README.md` follow-ups).
 - ⬜ **#112** — **EP-DESIGNER**: editable designer + PG-specific surfaces — children #119–#120 (M5 #26 shipped read/round-trip; this deepens to editable + partitioning/identity/RLS/EXCLUDE).
 
 > As each remaining child ships on `milestone/m7-ssdt-parity`, follow the
@@ -182,6 +184,7 @@ Newest first. One line per delivered issue/milestone; this is the audit trail of
 
 | Date | Milestone | Item | Commit | Notes |
 |------|-----------|------|--------|-------|
+| 2026-06-11 | M7 | **EP-VS done** (#111) — CPS `.pgproj` project type + templates + VS-loadable SDK (#113), `.vsct`/manifest (#117), four property pages as SDK CPS rules + `PgProjPublishVariables`→`--var` (#114), modal Publish dialog (#115), interactive Schema Compare window (#116), `pgproj sln` solution grouping (#118) | `a1fa294`, `a59737e`, `9be4cb2`, `1e7422f` on `milestone/m7-ssdt-parity` | Headless: both VSIXes 0-warn/0-err, SDK packs with rules, full suite 22,526 pass / 0 fail (15 new `SolutionGroupingTests`); `--var` forwarding verified end-to-end via offline dry-run. Manual F5 pass in VS 2026 outstanding (README follow-ups). |
 | 2026-06-08 | M7 | **EP-COVERAGE introspection** — EXCLUDE (#98), EVENT TRIGGER tags (#104), POLICY `TO` roles (#103), USER MAPPING + LANGUAGE (#108), PARTITION/INHERITS (#99), index opclass/ordering (#101), expression statistics (#110), TS PARSER/TEMPLATE (#109) | `8e2c387`…`ff1de45` on `milestone/m7-ssdt-parity` | One reader per kind (+ a parser fix for `CREATE USER MAPPING`); each verified vs PG18 by the deploy→read-back→reparse→re-deploy round-trip; goldens regenerated. #104 (event-trigger tags) and #101 (index ordering) also fixed latent silent phantom diffs. Full suite 25,044 pass / 0 fail. |
 | 2026-06-08 | M7 | **EP-ANALYSIS+ done** — external rule packs (#79: `IPgRule`+`RulePackLoader`) + PG006 missing-PK / PG008 untyped-numeric (#81 partial); epic #67 closed | `f3a7639`, `f734255` | 7 rule-pack tests + analyzer tests; doc `docs/ANALYSIS_RULES.md`. #81 stays open as ongoing rule backlog. |
 | 2026-06-08 | M7 | **Complete SQLSTATE table** — `PgErrorCodes` (262 codes / 43 classes from PostgreSQL `errcodes.txt`); `validate`/`publish` errors now enriched (`42704 undefined_object (class 42: …)`) | `e0a28ef` | 11 tests; central test `DropSampleSql` now drops the global `afd_plpgsql` language. Full suite 25,055 pass / 0 fail. |

@@ -5,7 +5,7 @@ Two routes give Visual Studio users the same database-project experience SSDT gi
 | Route | What | Status | Buildable in this repo? |
 |---|---|---|---|
 | **A** | `.pgproj` builds/publishes via the **MSBuild SDK** (`PgProj.Sdk`), opened by VS's built-in generic SDK-style project support | **Done + validated** | ✅ yes (`dotnet build` / `dotnet pack`) |
-| **B** | A **two-extension hybrid** for VS 2026+: a modern **VisualStudio.Extensibility** OOP extension (Publish & Schema Compare commands, a Schema Compare tool window, `.sql` IntelliSense via an LSP provider) **plus** a classic in-proc **VSSDK project system** that authors the `.pgproj` project type (CPS registration, File→New→Project template, Add New Item templates per database object, Solution Explorer tree) | **OOP: builds + packages headless. Project system: real CPS project type + templates implemented; compiles + packages a `.vsix` with VS 2026 MSBuild; runtime/F5 verification pending (manual).** | ⚠️ partly — OOP via `dotnet build`; the project system needs the VS 2026 full MSBuild (`dotnet` cannot build a classic VSIX) |
+| **B** | A **two-extension hybrid** for VS 2026+: a modern **VisualStudio.Extensibility** OOP extension (modal **Publish dialog**, **interactive Schema Compare** tool window with pickers/checkable diff/script/apply, `.sql` IntelliSense via an LSP provider) **plus** a classic in-proc **VSSDK project system** that authors the `.pgproj` project type (CPS registration, File→New→Project template, Add New Item templates per database object, Solution Explorer tree, four Project Properties pages via `PgProj.Sdk` CPS rules) | **Feature-complete for #111 (children #113–#118 closed 2026-06-11); both extensions build + package headless-green; runtime/F5 verification pending (manual).** | ⚠️ partly — OOP via `dotnet build`; the project system needs the VS 2026 full MSBuild (`dotnet` cannot build a classic VSIX) |
 
 > **Why two extensions (the hybrid).** The out-of-process VisualStudio.Extensibility model has **no API to
 > author a custom project type** — Project Query only reads/modifies *existing* projects. So the `.pgproj`
@@ -107,14 +107,23 @@ and calls them directly (no `pgproj` subprocess, no JSON round-trip). The engine
 build/compare/publish/LSP logic lives; the extension is the VS presentation over it.
 
 - **Commands** (the `.pgproj` **project-node context menu** — no Extensions-menu entries; visible
-  *and* enabled only when the selection is a `.pgproj`): **Schema Compare** calls
-  `SchemaCompare.RunAsync`; **Publish** runs the same gates as the CLI (static analysis via
-  `ContractBuilder.Analyze`, target-version via `TargetVersionAnalyzer`) and then the shared
+  *and* enabled only when the selection is a `.pgproj`): **Schema Compare** seeds the interactive
+  tool window (below); **Publish** opens a **modal publish dialog** (#115 — Remote UI via
+  `ShowDialogAsync`): target connection (prefilled from `PGPROJ_CONNECTION`), an optional
+  `.pgpublish.json` profile (prefilled when one sits next to the project), SQLCMD variable overrides
+  (`Name=Value;…` — dialog beats profile beats project defaults, the CLI precedence), allow-drops,
+  no-transaction, and a **generate-script-only** mode that writes `bin/_<name>.deploy.sql` and opens
+  it. After OK it runs the same gates as the CLI (static analysis via `ContractBuilder.Analyze`,
+  target-version via `TargetVersionAnalyzer`) and then the shared
   `PgProj.Core.Publishing.PublishService` (`PlanAsync` → `ApplyAsync`) — the **single** publish code
   path, so VS publish and CLI publish produce the identical deploy script and use the identical deploy
   strategy (including pre/post-deploy scripts + SQLCMD variables).
-- **Schema Compare tool window** — a Remote UI control rendering the engine's `SchemaChangeSet` (view
-  models built straight from the change objects).
+- **Schema Compare tool window** (#116) — an **interactive session** over the engine's selectable
+  change set: source/target pickers (each a `.pgproj`, `.pgpkg`, `.schema.snapshot`, or a connection
+  string — resolved by the engine's `EndpointResolver`), a **checkable diff** (stable change ids +
+  risk column), Include All / Exclude All, **Generate Script** (the engine's `ScriptIncluded` →
+  `bin/_<name>.compare.sql`, opened in the editor), and **Apply** (the included subset via
+  `DatabaseDeployer`; live-DB targets only; confirms destructive counts; re-compares afterwards).
 - **`.sql` Language Server Provider** — hosts `PgProj.Lsp`'s `LspServer` **in-process** on one end of an
   in-memory `FullDuplexStream`, handing VS the other end as a duplex pipe. Same server the VS Code
   extension drives over STDIO; here the transport is an in-process pipe.
@@ -132,15 +141,18 @@ editors/vs/
       PgProjEngine.cs                           in-proc engine calls: CompareAsync + DeployAsync (PgProj.Core)
       PgProjContext.cs                          find the nearest .pgproj + resolve PGPROJ_CONNECTION
     Commands/
-      PublishCommand.cs                         Publish → compare + deploy in-proc, streamed to an Output channel
-      SchemaCompareCommand.cs                   Compare in-proc → tool window
+      PublishCommand.cs                         Publish → modal dialog → gates + plan + apply in-proc, streamed to an Output channel
+      SchemaCompareCommand.cs                   seeds the interactive Schema Compare session + first compare
     LanguageServer/
       PgProjLanguageServerProvider.cs           LanguageServerProvider + .sql DocumentType; hosts LspServer in-proc
+    PublishDialog/
+      PublishDialogControl.cs / .xaml           Remote UI modal dialog (ShowDialogAsync) body
+      PublishDialogViewModel.cs                 connection / profile / variables / options the command reads back
     ToolWindows/
       SchemaCompareToolWindow.cs                ToolWindow hosting the Remote UI control
-      SchemaCompareControl.cs / .xaml           Remote UI control + serialized data template
-      SchemaCompareViewModel.cs                 view models + factory (built from the engine's SchemaChangeSet)
-      SchemaCompareState.cs                     command → tool-window hand-off (latest view model)
+      SchemaCompareControl.cs / .xaml           Remote UI control + serialized data template (pickers + checkable diff)
+      SchemaCompareViewModel.cs                 the interactive session: compare / include-exclude / script / apply
+      SchemaCompareState.cs                     command ↔ tool-window shared session (singleton view model)
   PgProj.VisualStudio.ProjectSystem/           CLASSIC in-proc VSSDK extension (net472) — the .pgproj project type
     PgProj.VisualStudio.ProjectSystem.csproj   explicit-SDK-import csproj; VSSDK.BuildTools + VisualStudio.SDK + ProjectSystem.SDK (CPS)
     source.extension.vsixmanifest               VsPackage + ProjectType + MEF + ProjectTemplate/ItemTemplate assets; [17.0,19.0)
@@ -257,16 +269,20 @@ VSSDK1207), and `<License>` referenced by its in-archive name + packaged as a `C
 ### Follow-ups
 
 - Bump `Microsoft.VisualStudio.Extensibility.*` to the VS 2026 (18.x) feed version when available.
-- **Publish parity — DONE:** the shared `PgProj.Core.Publishing.PublishService` is now the single publish
-  code path for both the CLI (`Program.Publish`) and this extension (gates + pre/post-deploy scripts +
-  SQLCMD variables included). Remaining smaller gaps vs the CLI: reference resolution/validation on build,
-  a `--parallel` toggle, and loading a `.pgpublish.json` profile (the extension uses defaults today).
-- Replace the env-var connection with a Remote UI publish dialog (connection / profile / allow-drops /
-  dry-run) once the dialog surface is wired.
-- Let the Schema Compare window pick the target (project / `.pgpkg` / `.schema.snapshot` / live DB) and
-  apply selected changes, not just project→DB.
+- **Publish parity — DONE** (incl. #115): the shared `PgProj.Core.Publishing.PublishService` is the single
+  publish code path for both the CLI (`Program.Publish`) and this extension, and the modal Publish dialog
+  now carries profile loading, SQLCMD variable overrides, allow-drops / no-transaction, and
+  generate-script-only. Remaining smaller gaps vs the CLI: a `--parallel` toggle and reference
+  resolution/validation on build.
+- **Schema Compare — DONE** (#116): source/target pickers (project / `.pgpkg` / `.schema.snapshot` /
+  live DB), checkable diff, Generate Script, Apply-selected. Possible deepening: per-object-type filter
+  chips and persisted selections (`SelectedIds` round-trip).
+- **Property pages — DONE** (#114): the four pages ship as CPS XAML rules in `PgProj.Sdk/Sdk/Rules/`
+  (Database Settings, Target Platform, Build Output, SQLCMD Variables), persisting into the `.pgproj`.
+  Stage 5 (WPF designers) remains EP-DESIGNER territory.
+- **Solution grouping — DONE** (#118): `pgproj sln new|add|list` generates/updates a canonical `.slnx`
+  over every `.pgproj` (folders mirror the directory tree; idempotent re-runs).
 - **F5 verification pass** (manual, interactive VS 2026): install both VSIXes, New Project →
   "PostgreSQL Database Project", add items per schema folder, Build/Publish from Solution Explorer,
-  Publish/Schema Compare on the project context menu (and absent from the Extensions menu).
-- **Project system → Stage 4:** property pages as CPS XAML rules wired to the `.pgproj` XML
-  (DefaultSchema, TargetPostgresVersion, publish settings); then Stage 5 WPF editors.
+  Publish dialog + interactive Schema Compare on the project context menu (and absent from the
+  Extensions menu), the four Project Properties pages reading/writing the `.pgproj`.
