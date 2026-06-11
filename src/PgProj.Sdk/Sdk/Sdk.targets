@@ -74,8 +74,17 @@
   <Target Name="Publish" DependsOnTargets="_PgProjResolveCli;Build">
     <Error Condition="'$(PgProjPublishConnection)' == '' And '$(PgProjPublishDryRun)' != 'true'"
            Text="pgproj Publish needs a target: set &lt;PgProjPublishConnection&gt; in the .pgproj (or pass -p:PgProjPublishConnection=...), or do a dry run with -p:PgProjPublishDryRun=true (offline create-script preview, no server needed). A publish profile alone (PgProjPublishProfile) does not carry the connection string - that is supplied here or via PGPROJ_CONNECTION." />
+    <!-- SQLCMD variable overrides (the SQLCMD Variables property page / PgProjPublishVariables):
+         semicolon-separated Name=Value pairs become repeated var flags. Computed inside the target
+         because item expansion is not available while static properties evaluate. -->
+    <ItemGroup Condition="'$(PgProjPublishVariables)' != ''">
+      <_PgProjPublishVar Include="$(PgProjPublishVariables)" />
+    </ItemGroup>
+    <PropertyGroup>
+      <_PgProjVarArgs Condition="'$(PgProjPublishVariables)' != ''">@(_PgProjPublishVar->'--var &quot;%(Identity)&quot;', ' ')</_PgProjVarArgs>
+    </PropertyGroup>
     <Message Importance="high" Text="pgproj: publishing database project '$(MSBuildProjectName)' (offline create-script preview)" Condition="'$(_PgProjOfflineDryRun)' == 'true'" />
     <Message Importance="high" Text="pgproj: publishing database project '$(MSBuildProjectName)'" Condition="'$(_PgProjOfflineDryRun)' != 'true'" />
-    <Exec Command="$(_PgProjCliInvocation) $(_PgProjPublishArgs)" />
+    <Exec Command="$(_PgProjCliInvocation) $(_PgProjPublishArgs) $(_PgProjVarArgs)" />
   </Target>
 </Project>

@@ -74,9 +74,24 @@
       * ProjectCapability "PgProj" identifies a database project to CPS - the project-system extension
         keys its MEF AppliesTo exports and the SolutionHasProjectCapability:PgProj UIContext on it.
       * The items schema teaches Solution Explorer this SDK's vocabulary (Build = .sql source).
+      * The four Project-Properties pages (EP-VS #114): Database Settings, Target Platform,
+        Build Output, SQLCMD Variables - CPS generic rules persisting into this .pgproj.
+        Command-line MSBuild ignores all of these.
   -->
   <ItemGroup>
     <ProjectCapability Include="PgProj" />
     <PropertyPageSchema Include="$(MSBuildThisFileDirectory)Rules\ProjectItemsSchema.xaml" />
+    <PropertyPageSchema Include="$(MSBuildThisFileDirectory)Rules\DatabaseSettingsPage.xaml">
+      <Context>Project</Context>
+    </PropertyPageSchema>
+    <PropertyPageSchema Include="$(MSBuildThisFileDirectory)Rules\TargetPlatformPage.xaml">
+      <Context>Project</Context>
+    </PropertyPageSchema>
+    <PropertyPageSchema Include="$(MSBuildThisFileDirectory)Rules\BuildOutputPage.xaml">
+      <Context>Project</Context>
+    </PropertyPageSchema>
+    <PropertyPageSchema Include="$(MSBuildThisFileDirectory)Rules\SqlCmdVariablesPage.xaml">
+      <Context>Project</Context>
+    </PropertyPageSchema>
   </ItemGroup>
 </Project>

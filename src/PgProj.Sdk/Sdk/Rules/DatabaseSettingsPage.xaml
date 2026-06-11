@@ -1,0 +1,43 @@
+<!--
+  Project-properties page: Database Settings (EP-VS #114, SSDT "Project Settings" analogue).
+  Rendered by the VS project system (CPS) for any loaded .pgproj; values persist as plain
+  properties in the .pgproj PropertyGroup (no Configuration condition). Command-line MSBuild
+  never reads this file.
+-->
+<Rule Name="PgProjDatabaseSettings"
+      DisplayName="Database Settings"
+      Description="PostgreSQL database project settings."
+      PageTemplate="generic"
+      Order="100"
+      xmlns="http://schemas.microsoft.com/build/2009/properties">
+
+  <Rule.DataSource>
+    <DataSource Persistence="ProjectFile" HasConfigurationCondition="False" SourceOfDefaultValue="AfterContext" />
+  </Rule.DataSource>
+
+  <Rule.Categories>
+    <Category Name="General" DisplayName="General" />
+    <Category Name="Publish" DisplayName="Publish defaults" />
+  </Rule.Categories>
+
+  <StringProperty Name="Name"
+                  DisplayName="Database name"
+                  Category="General"
+                  Description="The logical database/project name. Defaults to the project file name when empty." />
+
+  <StringProperty Name="DefaultSchema"
+                  DisplayName="Default schema"
+                  Category="General"
+                  Description="The schema an unqualified object name resolves to (PostgreSQL default: public)." />
+
+  <StringProperty Name="PgProjPublishProfile"
+                  DisplayName="Publish profile (.pgpublish.json)"
+                  Category="Publish"
+                  Subtype="file"
+                  Description="Optional publish profile carrying options and SQLCMD variable overrides. The connection string is never stored in the project or the profile; supply it at publish time (PgProjPublishConnection or PGPROJ_CONNECTION)." />
+
+  <BoolProperty Name="PgProjPublishAllowDrops"
+                DisplayName="Allow destructive changes on publish"
+                Category="Publish"
+                Description="When true, publish may drop objects that exist in the target database but not in the project (the allow-drops flag)." />
+</Rule>

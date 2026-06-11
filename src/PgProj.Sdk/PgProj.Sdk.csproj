@@ -73,6 +73,10 @@
       <TfmSpecificPackageFile Include="$(MSBuildThisFileDirectory)Sdk\Sdk.props" PackagePath="Sdk\Sdk.props" />
       <TfmSpecificPackageFile Include="$(MSBuildThisFileDirectory)Sdk\Sdk.targets" PackagePath="Sdk\Sdk.targets" />
       <TfmSpecificPackageFile Include="$(MSBuildThisFileDirectory)Sdk\Rules\ProjectItemsSchema.xaml" PackagePath="Sdk\Rules\ProjectItemsSchema.xaml" />
+      <TfmSpecificPackageFile Include="$(MSBuildThisFileDirectory)Sdk\Rules\DatabaseSettingsPage.xaml" PackagePath="Sdk\Rules\DatabaseSettingsPage.xaml" />
+      <TfmSpecificPackageFile Include="$(MSBuildThisFileDirectory)Sdk\Rules\TargetPlatformPage.xaml" PackagePath="Sdk\Rules\TargetPlatformPage.xaml" />
+      <TfmSpecificPackageFile Include="$(MSBuildThisFileDirectory)Sdk\Rules\BuildOutputPage.xaml" PackagePath="Sdk\Rules\BuildOutputPage.xaml" />
+      <TfmSpecificPackageFile Include="$(MSBuildThisFileDirectory)Sdk\Rules\SqlCmdVariablesPage.xaml" PackagePath="Sdk\Rules\SqlCmdVariablesPage.xaml" />
       <TfmSpecificPackageFile Include="@(_PgProjCliFile)" PackagePath="tools\%(_PgProjCliFile.RecursiveDir)" />
     </ItemGroup>
   </Target>
