@@ -370,7 +370,7 @@ Matrix *Command line tools / CI-CD* (GitHub `sql-action`, Azure DevOps task).
 | Feature (MS matrix) | pgproj CLI/engine | pgproj VS Code (planned) | pgproj VS (planned) |
 |---|---|---|---|
 | Create new empty project | ⚠️ EP-TEMPLATES | ❌ EP-VSCODE | ❌ EP-VS |
-| Create project from existing DB | ✅ `extract` | ❌ EP-VSCODE | ❌ EP-VS |
+| Create project from existing DB | ✅ `extract` | ❌ EP-VSCODE | ✅ Import Database… dialog |
 | Open existing SDK-style project | ✅ `.pgproj` | ❌ EP-VSCODE | ❌ EP-VS |
 | Solution management | ✅ `sln new/add/list` | n/a | ✅ `.slnx` loads natively |
 | Build | ✅ `build` | ❌ EP-VSCODE | ⚠️ EP-SDK |

@@ -60,6 +60,7 @@
          NOT compiled WPF (UseWpf is intentionally OFF). Mark it as an embedded resource. -->
     <EmbeddedResource Include="ToolWindows\SchemaCompareControl.xaml" />
     <EmbeddedResource Include="PublishDialog\PublishDialogControl.xaml" />
+    <EmbeddedResource Include="ImportDialog\ImportDatabaseDialogControl.xaml" />
   </ItemGroup>
 
 </Project>

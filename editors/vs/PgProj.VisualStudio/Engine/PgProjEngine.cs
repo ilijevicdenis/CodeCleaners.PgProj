@@ -85,6 +85,29 @@ internal static class PgProjEngine
         => new DatabaseDeployer().ExecuteAsync(connectionString, changeSet.ScriptIncluded(new DeployOptions()), cancellationToken);
 
     /// <summary>
+    /// Lightweight connectivity probe for the Import/Publish dialogs: opens the connection and asks the
+    /// server its version. Throws (with Npgsql's message) when unreachable/unauthorized.
+    /// </summary>
+    public static async Task<string> TestConnectionAsync(string connectionString, CancellationToken cancellationToken)
+    {
+        await using var connection = new Npgsql.NpgsqlConnection(connectionString);
+        await connection.OpenAsync(cancellationToken);
+        await using var command = new Npgsql.NpgsqlCommand("SELECT version()", connection);
+        return (string?)await command.ExecuteScalarAsync(cancellationToken) ?? "PostgreSQL";
+    }
+
+    /// <summary>
+    /// Introspects a live database and returns the per-object file units the CLI's <c>extract</c> would
+    /// write (relative path → SQL; a table's unit carries its FKs + indexes). The Import dialog lists
+    /// these as the selectable objects and writes only the checked ones into the project.
+    /// </summary>
+    public static async Task<IReadOnlyDictionary<string, string>> ReadDatabaseFileUnitsAsync(string connectionString, CancellationToken cancellationToken)
+    {
+        var model = await new PgProj.Core.Introspection.LiveDatabaseReader().ReadAsync(connectionString, cancellationToken);
+        return DdlExporter.ExportFiles(model);
+    }
+
+    /// <summary>
     /// Parses the dialog's <c>Name=Value;Name2=Value2</c> SQLCMD-variable override string (the same shape
     /// the SDK's PgProjPublishVariables property uses). Returns null when there is nothing to override.
     /// </summary>

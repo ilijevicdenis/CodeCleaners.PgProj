@@ -118,6 +118,14 @@ build/compare/publish/LSP logic lives; the extension is the VS presentation over
   `PgProj.Core.Publishing.PublishService` (`PlanAsync` → `ApplyAsync`) — the **single** publish code
   path, so VS publish and CLI publish produce the identical deploy script and use the identical deploy
   strategy (including pre/post-deploy scripts + SQLCMD variables).
+- **Import Database…** (the SSDT "Import Database" analogue) — a modal dialog with the connection
+  field (prefilled from `PGPROJ_CONNECTION`), a **Test Connection** probe through the in-process
+  Npgsql engine, and a **checkable object list** (the same per-object file units `pgproj extract`
+  writes — a table's unit carries its FKs + indexes). OK writes the checked objects into the
+  project's extract-layout folders (`Tables/`, `Views/`, …); existing files are skipped unless
+  *Overwrite existing files* is checked, and the SDK's `**/*.sql` auto-glob makes the imports Build
+  items immediately. (VS's built-in Connect-to-Database/DDEX dialog is deliberately not used — there
+  is no maintained PostgreSQL DDEX provider, so it can't produce an Npgsql connection.)
 - **Schema Compare tool window** (#116) — an **interactive session** over the engine's selectable
   change set: source/target pickers (each a `.pgproj`, `.pgpkg`, `.schema.snapshot`, or a connection
   string — resolved by the engine's `EndpointResolver`), a **checkable diff** (stable change ids +
@@ -143,11 +151,15 @@ editors/vs/
     Commands/
       PublishCommand.cs                         Publish → modal dialog → gates + plan + apply in-proc, streamed to an Output channel
       SchemaCompareCommand.cs                   seeds the interactive Schema Compare session + first compare
+      ImportDatabaseCommand.cs                  Import Database → modal dialog → writes checked extract units into the project
     LanguageServer/
       PgProjLanguageServerProvider.cs           LanguageServerProvider + .sql DocumentType; hosts LspServer in-proc
     PublishDialog/
       PublishDialogControl.cs / .xaml           Remote UI modal dialog (ShowDialogAsync) body
       PublishDialogViewModel.cs                 connection / profile / variables / options the command reads back
+    ImportDialog/
+      ImportDatabaseDialogControl.cs / .xaml    Remote UI modal dialog body (connection + Test Connection + object checkboxes)
+      ImportDatabaseDialogViewModel.cs          loads the engine's extract units; the command writes the checked ones
     ToolWindows/
       SchemaCompareToolWindow.cs                ToolWindow hosting the Remote UI control
       SchemaCompareControl.cs / .xaml           Remote UI control + serialized data template (pickers + checkable diff)
