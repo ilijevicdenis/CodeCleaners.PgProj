@@ -16,6 +16,7 @@ using PgProj.Core.Project;
 using PgProj.Core.Project.References;
 using PgProj.Core.Publishing;
 using PgProj.Core.Snapshot;
+using PgProj.Core.Solutions;
 using PgProj.Core.Templates;
 
 namespace PgProj.Cli;
@@ -52,6 +53,7 @@ public static class Program
                 "script" => await Script(args),
                 "pkg" => await Pkg(args),
                 "profile" => Profile(args),
+                "sln" => Sln(args),
                 "serve" => await Serve(args),
                 "help" or "--help" or "-h" => PrintUsageReturn(ExitCode.Success),
                 _ => Fail($"Unknown command '{args[0]}'."),
@@ -112,6 +114,59 @@ public static class Program
         var result = Scaffolder.Add(projectArg, kind, nameArg, force);
         Console.WriteLine($"Added {kind} → {result.RelativePath}");
         return 0;
+    }
+
+    // ---- sln (slngen-style solution grouping for multiple .pgproj) -----------------------
+
+    private static int Sln(string[] args)
+    {
+        var positionals = args.Skip(1).Where(a => !a.StartsWith('-')).ToList();
+        var sub = positionals.FirstOrDefault()?.ToLowerInvariant()
+            ?? throw new CliUsageException("Usage: pgproj sln new <name> [-o <dir>] [--root <dir>] | sln add <solution.slnx> <project.pgproj...> | sln list <solution.slnx>");
+
+        switch (sub)
+        {
+            case "new":
+            {
+                var name = positionals.ElementAtOrDefault(1)
+                    ?? throw new CliUsageException("Usage: pgproj sln new <name> [-o <dir>] [--root <dir>]");
+                var outDir = GetOption(args, "-o", "--output") ?? ".";
+                var root = GetOption(args, "--root");
+
+                var result = SolutionGrouper.Generate(name, outDir, root);
+                Console.WriteLine($"Solution {result.SolutionPath} — {result.Solution.Projects.Count} project(s), {result.AddedProjects.Count} added:");
+                foreach (var p in result.AddedProjects)
+                    Console.WriteLine($"  + {p}");
+                if (result.Solution.Projects.Count == 0)
+                    Console.WriteLine($"  (no .pgproj found under {Path.GetFullPath(root ?? outDir)})");
+                return 0;
+            }
+            case "add":
+            {
+                if (positionals.Count < 3)
+                    throw new CliUsageException("Usage: pgproj sln add <solution.slnx> <project.pgproj...>");
+
+                var result = SolutionGrouper.Add(positionals[1], positionals.Skip(2));
+                foreach (var p in result.AddedProjects)
+                    Console.WriteLine($"  + {p}");
+                Console.WriteLine($"Solution {result.SolutionPath} — {result.Solution.Projects.Count} project(s), {result.AddedProjects.Count} added.");
+                return 0;
+            }
+            case "list":
+            {
+                var solutionPath = positionals.ElementAtOrDefault(1)
+                    ?? throw new CliUsageException("Usage: pgproj sln list <solution.slnx>");
+
+                var solution = SlnxDocument.Load(solutionPath);
+                foreach (var (folder, projects) in solution.Folders)
+                    foreach (var p in projects)
+                        Console.WriteLine(folder.Length == 0 ? p : $"{folder}  {p}");
+                Console.WriteLine($"{solution.Projects.Count} project(s).");
+                return 0;
+            }
+            default:
+                throw new CliUsageException($"Unknown sln subcommand '{sub}' (expected new, add, or list).");
+        }
     }
 
     // ---- build --------------------------------------------------------------------------
@@ -1148,6 +1203,9 @@ public static class Program
           pgproj model-tree <project.pgproj> [--format json]   (objects + source positions, for editors)
           pgproj describe-table <table.sql> [--table schema.name] [--default-schema public]   (one table's model as JSON, for the graphical designer)
           pgproj emit-table <table.json | -> [-o table.sql]     (round-trip the designer's table JSON back to .sql via the engine emitter)
+          pgproj sln new <name> [-o <dir>] [--root <dir>]      (slngen-style: group every .pgproj under root into <name>.slnx; re-run to pick up new projects)
+          pgproj sln add <solution.slnx> <project.pgproj...>   (add projects to an existing .slnx; solution folders mirror the directory tree)
+          pgproj sln list <solution.slnx>                      (print the solution's folders + projects)
           pgproj serve [<workspace-dir>] [--debounce <ms>]     (resident LSP language server over STDIO — live diagnostics/definition/hover/completion)
 
         Options:
