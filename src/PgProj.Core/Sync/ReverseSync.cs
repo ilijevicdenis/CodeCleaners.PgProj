@@ -174,7 +174,7 @@ public static class ReverseSync
     /// <summary>The canonical file unit a single change rolls up to (matches <see cref="DdlExporter"/> keys).</summary>
     private static string? CanonicalUnit(SchemaChange ch, DatabaseModel projectModel) => ch switch
     {
-        CreateSchemaChange c => $"Schemas/{c.Schema}.sql",
+        CreateSchemaChange c => DdlExporter.SchemaUnit(c.Schema),
         CreateSequenceChange c => Seq(c.Sequence.Schema, c.Sequence.Name),
         AlterSequenceChange c => Seq(c.Sequence.Schema, c.Sequence.Name),
         CreateTableChange c => Tbl(c.Table.Schema, c.Table.Name),
@@ -193,17 +193,17 @@ public static class ReverseSync
         DropTableChange c => Tbl(c.Schema, c.Name),
         CreateOrReplaceViewChange c => View(c.View.Schema, c.View.Name),
         DropViewChange c => View(c.Schema, c.Name),
-        CreateOrReplaceFunctionChange c => $"Functions/{c.Function.Schema}.{c.Function.Name}.sql",
+        CreateOrReplaceFunctionChange c => DdlExporter.FunctionUnit(c.Function),
         CreateRawObjectChange c => Raw(c.Def),
         RecreateRawObjectChange c => Raw(c.Def),
         DropRawObjectChange c => Raw(c.Def),
         _ => null,
     };
 
-    private static string Tbl(string s, string n) => $"Tables/{s}.{n}.sql";
-    private static string View(string s, string n) => $"Views/{s}.{n}.sql";
-    private static string Seq(string s, string n) => $"Sequences/{s}.{n}.sql";
-    private static string Raw(RawObjectDefinition d) => $"{RawObjectMeta.Folder(d.Kind)}/{RawObjectMeta.FileName(d)}";
+    private static string Tbl(string s, string n) => DdlExporter.TableUnit(s, n);
+    private static string View(string s, string n) => DdlExporter.ViewUnit(s, n);
+    private static string Seq(string s, string n) => DdlExporter.SequenceUnit(s, n);
+    private static string Raw(RawObjectDefinition d) => DdlExporter.RawUnit(d);
 
     // A dropped index carries no table; find it in the project to learn which table file owns it.
     private static string? ResolveIndexTable(DropIndexChange c, DatabaseModel projectModel) =>
@@ -215,11 +215,12 @@ public static class ReverseSync
     private static string Describe(IEnumerable<string> units) =>
         string.Join(", ", units.Select(Describe));
 
-    private static string Describe(string unit)   // "Tables/afd.customer.sql" -> "afd.customer (Tables)"
+    private static string Describe(string unit)   // "afd/Tables/customer.sql" -> "afd.customer (Tables)"
     {
-        var slash = unit.IndexOf('/');
-        var folder = slash > 0 ? unit[..slash] : "";
-        var name = Path.GetFileNameWithoutExtension(unit);
+        var segments = unit.Replace('\\', '/').Split('/');
+        var name = Path.GetFileNameWithoutExtension(segments[^1]);
+        var folder = segments.Length >= 2 ? segments[^2] : "";
+        if (segments.Length >= 3) name = $"{segments[^3]}.{name}";   // schema/Kind/name.sql
         return folder.Length > 0 ? $"{name} ({folder})" : name;
     }
 }

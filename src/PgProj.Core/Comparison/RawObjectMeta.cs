@@ -141,12 +141,16 @@ public static class RawObjectMeta
 
     public static string Folder(ObjectKind kind) => ObjectKindRegistry.Get(kind).Folder;
 
-    /// <summary>A filesystem-safe file name derived from the object's identity.</summary>
-    public static string FileName(RawObjectDefinition def)
+    /// <summary>
+    /// A filesystem-safe file name derived from the object's identity. Pass
+    /// <paramref name="includeSchema"/> = false when the file lives inside its schema's folder
+    /// (the SSDT-style layout) so the schema isn't repeated in the name.
+    /// </summary>
+    public static string FileName(RawObjectDefinition def, bool includeSchema = true)
     {
         var basis = string.IsNullOrEmpty(def.Name)
             ? def.Identity
-            : (string.IsNullOrEmpty(def.Schema) ? def.Name : $"{def.Schema}.{def.Name}");
+            : (string.IsNullOrEmpty(def.Schema) || !includeSchema ? def.Name : $"{def.Schema}.{def.Name}");
         var safe = new string(basis.Select(c => char.IsLetterOrDigit(c) || c == '.' || c == '_' ? c : '_').ToArray());
         return safe.Trim('_') is { Length: > 0 } s ? s + ".sql" : "object.sql";
     }

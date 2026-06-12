@@ -72,10 +72,11 @@ public sealed class ReverseSyncTests : IDisposable
         var plan = await ReverseSync.PlanAsync(project, Live("CREATE TABLE public.t (id int); CREATE TABLE public.t2 (id int);"));
 
         var created = Assert.Single(plan.FileChanges, f => f.Kind == ProjectFileChangeKind.Create);
-        Assert.Equal("Tables/public.t2.sql", created.RelativePath.Replace('\\', '/'));
+        // New-in-DB objects are filed at the canonical SSDT-style "schema/Kind/name.sql" path.
+        Assert.Equal("public/Tables/t2.sql", created.RelativePath.Replace('\\', '/'));
 
         ReverseSync.Apply(project, plan);
-        Assert.True(File.Exists(Path.Combine(_dir, "Tables", "public.t2.sql")));
+        Assert.True(File.Exists(Path.Combine(_dir, "public", "Tables", "t2.sql")));
         Assert.Contains(project.Build().Model.Tables, t => DatabaseModel.NameEquals(t.Name, "t2"));
     }
 
