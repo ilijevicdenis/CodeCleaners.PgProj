@@ -1,9 +1,8 @@
 # SSDT-for-PostgreSQL — Feature Parity Backlog
 
-> **[HISTORICAL REFERENCE]** This document is the original parity backlog and is no longer
-> maintained — most "❌ missing" entries below have since shipped. The source of truth for
-> current status is **`docs/reference/PROGRESS.md`** (M7 SSDT-parity milestone) and the GitHub
-> issue tracker. Kept for the terminology map and the original scoping rationale.
+> **[STATUS-REFRESHED 2026-06-12]** The §3 epic write-ups are the original scoping spec; their
+> checklists are NOT re-ticked. **§1, §2 and §4 reflect current reality** (re-audited 2026-06-12).
+> The rolling source of truth remains **`docs/reference/PROGRESS.md`** + the GitHub issue tracker.
 
 > Goal: give PostgreSQL developers the **same declarative-database-project experience** that SQL
 > Server developers get from **SQL Server Data Tools (SSDT) / the Microsoft.Build.Sql SDK / the SQL
@@ -21,18 +20,18 @@
 | SQL Server / SSDT | pgproj equivalent | Status |
 |---|---|---|
 | `.sqlproj` (SDK-style `Microsoft.Build.Sql`) | `.pgproj` (`PgProj.Sdk`) | ✅ exists |
-| `.dacpac` (portable, referenceable build artifact) | `*.model.json` today → **`.pgpkg`** (proposed portable package) | ⚠️ partial |
-| `SqlPackage` CLI | `pgproj` CLI | ✅ exists |
+| `.dacpac` (portable, referenceable build artifact) | **`.pgpkg`** (manifest+model+sources; deterministic; `verify` equivalence) | ✅ exists |
+| `SqlPackage` CLI | `pgproj` CLI (incl. DeployReport → `deploy-report`, DacpacVerify → `verify`) | ✅ exists |
 | `Microsoft.SqlServer.DacFx` (.NET library) | `PgProj.Core` | ✅ exists |
-| SSDT (Visual Studio) | **VS / VS Code extension** | ❌ missing |
-| SQL Database Projects extension (VS Code) | **pgproj VS Code extension** | ❌ missing |
-| Schema Compare | `compare` / `drift` engine | ⚠️ engine yes, UI/two-way no |
-| Publish profile (`.publish.xml`) | **publish profile** (`.pgpublish.json`) | ❌ missing |
-| SQLCMD variables `$(Var)` | **project variables** `$(Var)` | ❌ missing |
-| Pre/Post-deployment scripts | **pre/post-deploy scripts** | ❌ missing |
-| Target platform (`Sql160`…) | `TargetPostgresVersion` (16/17/18) | ⚠️ parsed, not enforced |
-| Code analysis rules (SA-rules) | `PgAnalyzer` (PG001–PG009) | ⚠️ 7 rules, not configurable |
-| Database/Project/Package references | — | ❌ missing |
+| SSDT (Visual Studio) | VSIX pair: .pgproj project type, templates, property pages, Publish, Schema Compare, Import, file-level Sync, full PG editor (coloring/IntelliSense/diagnostics/F12/peek) — validated 115/115 E2E | ✅ exists |
+| SQL Database Projects extension (VS Code) | pgproj VS Code extension (LSP client, webviews) | ✅ exists |
+| Schema Compare | two-way `SchemaCompare` engine + VS interactive window + VS Code webview | ✅ exists |
+| Publish profile (`.publish.xml`) | `.pgpublish.json` (CLI>profile>default); full DacDeployOptions family tracked in #140 | ✅ exists |
+| SQLCMD variables `$(Var)` | project variables + profile/CLI overrides (`--var`) | ✅ exists |
+| Pre/Post-deployment scripts | pre/post-deploy scripts spliced into the deploy script | ✅ exists |
+| Target platform (`Sql160`…) | `TargetPostgresVersion` enforced (`PGV###` gate) | ✅ exists |
+| Code analysis rules (SA-rules) | `PgAnalyzer`+`ModelAnalyzer` (PG001–PG014, PGV###), per-rule config, external rule packs, SARIF, `SuppressWarnings`/`TreatWarningsAsErrors` | ✅ exists |
+| Database/Project/Package references | `ProjectReference`/`ArtifactReference` (.pgpkg) resolved into the catalog; NuGet `PackageReference` open (#133) | ⚠️ partial |
 
 Legend: ✅ done · ⚠️ partial · ❌ not started.
 
@@ -63,11 +62,31 @@ The headless engine is in good shape. These epics are **complete** and only need
 - **EP-VSCODE / EP-VS Route A / EP-DESIGNER (read+round-trip)** — delivered in M5 (#24/#25/#26/#31).
 - **EP-ANALYSIS+** 🟡 — per-rule config + `--rule` + SARIF done; **open:** external rule packs, growing the rule set.
 
-> **Reality check (2026-06-07):** the per-epic task checklists in §3 below are the *original* backlog and
-> were not all re-ticked. Treat the list above + `PROGRESS.md` M7 as the source of truth for what's done;
-> the genuinely-open work is **EP-ANALYSIS+ tail, EP-COVERAGE (introspection, tracked in `reference/COVERAGE.md`),
-> EP-DESIGNER deepening.** (EP-CICD was removed from scope; EP-VS Route B + slngen grouping shipped
-> 2026-06-11 — #113–#118 closed, manual F5 pass outstanding.)
+**Delivered 2026-06-12 (the installed-product wave):**
+
+- **VS editor experience FIXED + VALIDATED** — three silent editor-chain breaks root-caused (per-user
+  MEF cache, content-type overwrite at load, CodeRemote LSP-activation gate); PostgreSQL classifier;
+  live diagnostics = build verdict (reference/semantic gate + cross-file invalidation); a
+  **115-scenario real-user E2E suite** (FlaUI+DTE, Hyper-V VM, dockerized PG18 sample DB) runs
+  115/115 against the installed product (#145).
+- **EP-LSP deepening** ✅ — query-alias-aware completion/F12/hover; column-precise Go To / Peek
+  Definition; `serve <workspace-dir>`; `PGPROJ_LSP_LOG` wire trace (#144).
+- **EP-SYNC file-level** ✅ — `pgproj sync-file` + the VS "Sync with Database…" command: per-file
+  diff vs the live DB with take-DB / push-local (destructive-gated) / cancel (#143).
+- **EP-DEPLOYREPORT** ✅ — `pgproj deploy-report` / `publish --report-only`: apply-free planned-change
+  report with per-op RiskAnalyzer verdicts + `blocksOnDataLoss` gate, JSON+XML (#141).
+- **EP-PKG verify** ✅ — `pgproj verify <a.pgpkg> <b.pgpkg>`: model+sources+options equivalence,
+  stamps excluded (build-determinism gate), the DacpacVerify analogue (#138).
+- **EP-BUILD policy** ✅ — `.pgproj` `SuppressWarnings` + `TreatWarningsAsErrors` (shared
+  `BuildWarningPolicy`, CLI ≡ in-proc) + `--verbose` structured build diagnostics (#135).
+- Analyzer fixes (#65): PG004 modifier-tolerant, PG009 checks view bodies.
+
+> **Reality check (2026-06-12):** the per-epic task checklists in §3 below are the *original* backlog and
+> were not all re-ticked — treat §2 + `PROGRESS.md` as truth. **Genuinely open:** EP-ANALYSIS+ rule
+> backlog (#81), EP-COVERAGE blocked tail (#72: #102/#108 need C functions in the server), editable
+> EP-DESIGNER (#112/#119/#120), and the wave-3 epics — snapshot workflow (#142), refactorlog (#136),
+> CONCURRENTLY deploys (#137), data extract/BACPAC (#134), NuGet package references (#133), data
+> compare (#132), PL/pgSQL unit testing (#139), full publish-options family (#140).
 
 ---
 
@@ -79,7 +98,7 @@ Each has **user stories** (As a … I want … so that …) and **engineering ta
 
 ---
 
-### EP-PKG — Portable build artifact (the `.dacpac` analogue) — **P0**
+### EP-PKG — Portable build artifact (the `.dacpac` analogue) — **P0** — ✅ DONE (+ `verify` #138; data/BACPAC #134 and snapshot workflow #142 open)
 
 SSDT's whole model hinges on the `.dacpac`: one portable, versioned, referenceable file that is the
 build output, the unit of deployment, and the unit of reference. pgproj emits a `bin/*.model.json`
@@ -103,7 +122,7 @@ referenced, shipped, and deployed without the source tree.
 
 ---
 
-### EP-REF — Database / project / package references — **P0/P1**
+### EP-REF — Database / project / package references — **P0/P1** — ✅ DONE except NuGet `PackageReference` (#133)
 
 SSDT lets a project reference another project, a `.dacpac`, or a NuGet package, with resolution of
 cross-database names. Mirrors matrix rows *Project references / DACPAC references / Package references*.
@@ -125,7 +144,7 @@ cross-database names. Mirrors matrix rows *Project references / DACPAC reference
 
 ---
 
-### EP-VARS — Project variables (SQLCMD-variable analogue) — **P0**
+### EP-VARS — Project variables (SQLCMD-variable analogue) — **P0** — ✅ DONE
 
 SSDT parameterizes deploys with `$(Var)` SQLCMD variables (e.g. environment name, linked-server name).
 Matrix row *SQLCMD variables*. Postgres deploys need the same: tokenized values resolved at
@@ -148,7 +167,7 @@ publish/script time, overridable per environment.
 
 ---
 
-### EP-DEPLOYSCRIPTS — Pre / post-deployment scripts — **P0**
+### EP-DEPLOYSCRIPTS — Pre / post-deployment scripts — **P0** — ✅ DONE
 
 Matrix row *Pre-deployment and post-deployment scripts*. Idempotent data seeds, grants, refreshes that
 run around the schema diff.
@@ -167,7 +186,7 @@ run around the schema diff.
 
 ---
 
-### EP-TARGET — Target-platform enforcement (version-aware validation) — **P1**
+### EP-TARGET — Target-platform enforcement (version-aware validation) — **P1** — ✅ DONE
 
 > ✅ **DELIVERED** (M7 audit 2026-06-07, issue #66). `Analysis/TargetVersionAnalyzer.cs` + `Versioning/PgVersionCapabilities`/`SupportedFeatures` + `PGV###`; gate wired into build/publish/validate. Tests `TargetVersionTests`/`VersionProfileTests`. Tasks below are historical.
 
@@ -187,7 +206,7 @@ SQL2017 target. Mirrors matrix row *Target platform*.
 
 ---
 
-### EP-ANALYSIS+ — Configurable code analysis & extensibility — **P1**
+### EP-ANALYSIS+ — Configurable code analysis & extensibility — **P1** — 🟡 config/packs/SARIF/suppression done; rule backlog open (#81)
 
 > 🟡 **MOSTLY DELIVERED** (M7, issue #67). Done: per-rule config `Analysis/AnalysisConfig.cs` (`.pgproj.analysis.json`), CLI `--rule`, SARIF (`Analysis/SarifWriter.cs`), and **#79 external rule packs** (`IPgRule` + `RulePackLoader` isolated-`AssemblyLoadContext` discovery + `rulePacks` config; doc `docs/ANALYSIS_RULES.md`). **Open: #81** grow the rule set.
 
@@ -209,7 +228,7 @@ SSDT lets you enable/disable rules and set severity, plus third-party rule packs
 
 ---
 
-### EP-PROFILE — Publish profiles — **P1**
+### EP-PROFILE — Publish profiles — **P1** — ✅ DONE (full DacDeployOptions family open, #140)
 
 > ✅ **DELIVERED** (M7 audit 2026-06-07, issue #68). `Deployment/PublishProfile.cs` (secret-whitelisted `.pgpublish.json`), `profile create` verb, `--profile` on publish/script/compare (CLI>profile>default). Tests `PublishProfileTests`. Tasks below are historical.
 
@@ -229,7 +248,7 @@ A reusable file capturing target connection + variables + publish options.
 
 ---
 
-### EP-SCHEMACOMPARE — First-class two-way Schema Compare — **P1**
+### EP-SCHEMACOMPARE — First-class two-way Schema Compare — **P1** — ✅ DONE (engine + VS window + VS Code webview + file-level Sync #143)
 
 > ✅ **DELIVERED** (M7 audit 2026-06-07, issue #69). `Comparison/SchemaCompare.cs` unified two-way API (source/target ∈ project/pkg/snapshot/live via `EndpointResolver`), selectable `SchemaChangeSet`, `--output diff.json`, `--exclude`. Tests `SchemaCompareTests`. Tasks below are historical.
 
@@ -250,7 +269,7 @@ either direction. Matrix rows *Schema comparison project↔database*.
 
 ---
 
-### EP-TEMPLATES — New-object templates & `dotnet new` — **P1**
+### EP-TEMPLATES — New-object templates & `dotnet new` — **P1** — ✅ DONE (+ VS item/project templates)
 
 > ✅ **DELIVERED** (M7 audit 2026-06-07, issue #70). `Templates/*` (`Scaffolder`/`TemplateCatalog`), `add`/`new project` verbs, `dotnet new` pack at `templates/PgProj.Templates.csproj`. Tests `TemplateTests`/`TemplateIntegrationTests`. Tasks below are historical.
 
@@ -270,7 +289,7 @@ Matrix rows *New object templates* + *Create new empty project / from existing d
 
 ---
 
-### EP-VSCODE — VS Code extension (primary UI) — **P0**
+### EP-VSCODE — VS Code extension (primary UI) — **P0** — ✅ DONE (M5 #24)
 
 This is the big one for "same UI". The modern SSDT-style experience *is* the **SQL Database Projects
 extension for VS Code**. Replicate its surface for pgproj. Mirrors the entire *Visual Studio Code*
@@ -298,7 +317,7 @@ column of the matrix + the extension UX page.
 
 ---
 
-### EP-RPC — Engine service surface for editors — **P0 (enabler for EP-VSCODE/EP-VS)**
+### EP-RPC — Engine service surface for editors — **P0 (enabler)** — ✅ DONE (JSON contract + `serve` LSP #17/#31)
 
 SSDT tooling talks to DacFx in-process / via a service. To feed two editors without duplicating logic,
 expose the engine over a stable JSON contract.
@@ -315,7 +334,7 @@ expose the engine over a stable JSON contract.
 
 ---
 
-### EP-VS — Visual Studio experience — **P1/P2**
+### EP-VS — Visual Studio experience — **P1/P2** — ✅ DONE (#25/#111/#145; editor chain validated 115/115 in the installed product)
 
 "Same UI so Visual Studio users have the same experience." Two routes — recommend starting with the
 lighter one and the SDK, since even Microsoft ships the modern experience in VS Code first and SDK-style
@@ -334,7 +353,7 @@ VS support is still "preview".
 
 ---
 
-### EP-DESIGNER — Graphical table designer — **P2**
+### EP-DESIGNER — Graphical table designer — **P2** — ⚠️ read + .sql round-trip done (#26); editable designer open (#112/#119/#120)
 
 Matrix row *Graphical table designer* (SSDT-only today). High effort; the diff/round-trip engine makes
 it feasible later (edit model → emit `.sql`).
@@ -349,7 +368,7 @@ it feasible later (edit model → emit `.sql`).
 
 ---
 
-### EP-CICD — CI/CD integration — **P1**
+### EP-CICD — CI/CD integration — **P1** — ❌ REMOVED from scope (user decision; exit-code contract + local gates kept, see docs/CICD.md)
 
 Matrix *Command line tools / CI-CD* (GitHub `sql-action`, Azure DevOps task).
 
@@ -365,37 +384,39 @@ Matrix *Command line tools / CI-CD* (GitHub `sql-action`, Azure DevOps task).
 
 ---
 
-## 4. Parity matrix (pgproj vs the Microsoft *SQL Projects Tools* table)
+## 4. Parity matrix (pgproj vs the Microsoft *SQL Projects Tools* table) — re-audited 2026-06-12
 
-| Feature (MS matrix) | pgproj CLI/engine | pgproj VS Code (planned) | pgproj VS (planned) |
+| Feature (MS matrix) | pgproj CLI/engine | pgproj VS Code | pgproj Visual Studio |
 |---|---|---|---|
-| Create new empty project | ⚠️ EP-TEMPLATES | ❌ EP-VSCODE | ❌ EP-VS |
-| Create project from existing DB | ✅ `extract` | ❌ EP-VSCODE | ✅ Import Database… dialog |
-| Open existing SDK-style project | ✅ `.pgproj` | ❌ EP-VSCODE | ❌ EP-VS |
+| Create new empty project | ✅ `new project` / `dotnet new` | ✅ | ✅ File→New template |
+| Create project from existing DB | ✅ `extract` | ⚠️ via CLI | ✅ Import Database… dialog |
+| Open existing SDK-style project | ✅ `.pgproj` | ✅ | ✅ CPS project type |
 | Solution management | ✅ `sln new/add/list` | n/a | ✅ `.slnx` loads natively |
-| Build | ✅ `build` | ❌ EP-VSCODE | ⚠️ EP-SDK |
-| Publish to server | ✅ `publish` | ❌ EP-VSCODE | ❌ EP-VS |
-| Publish to local dev instance | ✅ (any conn) | ❌ EP-VSCODE | ❌ EP-VS |
-| Publish options/properties | ✅ flags | ❌ EP-VSCODE | ❌ EP-VS |
-| Target platform updatable | ⚠️ EP-TARGET | ❌ EP-VSCODE | ❌ EP-VS |
-| SQLCMD variables | ❌ EP-VARS | ❌ EP-VSCODE | ❌ EP-VS |
-| Project references | ❌ EP-REF | ❌ EP-VSCODE | ❌ EP-VS |
-| DACPAC/package references | ❌ EP-REF / EP-PKG | ❌ EP-VSCODE | ❌ EP-VS |
-| Publish profile creation | ❌ EP-PROFILE | ❌ EP-VSCODE | ❌ EP-VS |
-| Add `.sql` by dropping in folder | ✅ globbing | ❌ EP-VSCODE | ❌ EP-VS |
-| Exclude `.sql` from build | ✅ (`_` prefix) → ⚠️ make explicit | ❌ EP-VSCODE | ❌ EP-VS |
-| Pre/post-deploy scripts | ❌ EP-DEPLOYSCRIPTS | ❌ EP-VSCODE | ❌ EP-VS |
-| New object templates | ❌ EP-TEMPLATES | ❌ EP-VSCODE | ❌ EP-VS |
+| Build | ✅ `build` (+ `--verbose`, warning policy) | ✅ | ✅ SDK + IDE build |
+| Publish to server / local instance | ✅ `publish` (transactional/phased) | ✅ webview | ✅ Publish dialog |
+| Publish options/properties | ✅ flags + `.pgpublish.json` (#140 grows the family) | ✅ | ✅ property pages |
+| Deploy report (plan w/o apply) | ✅ `deploy-report` (JSON/XML, risk + data-loss gate) | ⚠️ via CLI | ⚠️ via CLI |
+| Package equivalence (DacpacVerify) | ✅ `verify` (exit 0/6) | ⚠️ via CLI | ⚠️ via CLI |
+| Target platform updatable + enforced | ✅ `TargetPostgresVersion` + `PGV###` | ✅ | ✅ property page |
+| SQLCMD variables | ✅ `$(Var)` + `--var`/profile | ✅ | ✅ variables page |
+| Project references | ✅ `ProjectReference` | ✅ | ✅ |
+| DACPAC/package references | ✅ `ArtifactReference` (.pgpkg); NuGet #133 | ⚠️ | ⚠️ |
+| Publish profile creation | ✅ `profile create` | ✅ | ✅ |
+| Add `.sql` by dropping in folder | ✅ globbing (`EnableDefaultSqlItems`) | ✅ | ✅ explicit-items mode too |
+| Exclude `.sql` from build | ✅ `Build Remove`/`Exclude` + `_` prefix | ✅ | ✅ |
+| Pre/post-deploy scripts | ✅ spliced + SQLCMD vars | ✅ | ✅ |
+| New object templates | ✅ `add` + `dotnet new` | ✅ | ✅ Add New Item (per schema) |
 | Organize into folders | ✅ | ✅ | ✅ |
-| Schema compare project↔DB (both ways) | ✅ `compare`/`drift` | ❌ EP-SCHEMACOMPARE | ❌ EP-VS |
-| Graphical table designer | ❌ EP-DESIGNER | ❌ EP-DESIGNER | ❌ EP-DESIGNER |
-| Code analysis enable/disable GUI | ⚠️ EP-ANALYSIS+ | ❌ EP-VSCODE | ❌ EP-VS |
-| Run code analysis | ✅ `analyze` | ❌ EP-VSCODE | ❌ EP-VS |
-| Object rename/refactor | ❌ EP-VS | ❌ | ❌ EP-VS |
-| IntelliSense from project model | ❌ EP-VS (lang service) | ❌ | ❌ EP-VS |
-
----
-
+| Schema compare project↔DB (both ways) | ✅ `compare`/`drift`/`pull` | ✅ webview | ✅ interactive window |
+| **File-level sync (beyond SSDT)** | ✅ `sync-file` | ⚠️ via CLI | ✅ diff + take-DB/push-local |
+| Graphical table designer | ✅ `describe-table`/`emit-table` round-trip | ⚠️ read-only webview | ❌ editable (#112/#119/#120) |
+| Code analysis configure/suppress | ✅ per-rule config, packs, SARIF, `SuppressWarnings`/`TreatWarningsAsErrors` | ✅ | ✅ |
+| Run code analysis | ✅ `analyze` | ✅ | ✅ build gate |
+| Object rename/refactor (refactorlog) | ❌ #136 | ❌ | ❌ |
+| IntelliSense from project model | ✅ `serve` LSP (alias-aware, column-precise nav) | ✅ | ✅ incl. coloring/F12/peek — validated 115/115 |
+| Database unit testing | ❌ #139 | ❌ | ❌ |
+| Data compare | ❌ #132 | ❌ | ❌ |
+| Schema + data package (BACPAC) | ❌ #134 | ❌ | ❌ |
 ## 5. Suggested phasing
 
 **Phase 1 — engine completeness (unblocks everything, all P0):**
