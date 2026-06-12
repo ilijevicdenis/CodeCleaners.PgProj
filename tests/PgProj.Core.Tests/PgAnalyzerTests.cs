@@ -50,6 +50,36 @@ public class PgAnalyzerTests
     }
 
     [Fact]
+    public void PG004_fires_through_modifiers_between_verb_and_object_keyword()
+    {
+        // #65: TEMP/OR REPLACE/UNIQUE (and friends) between the verb and the object keyword
+        // defeated the old regex - a function body mutating schema was silently unflagged.
+        string Fn(string body) =>
+            $"CREATE FUNCTION s.f() RETURNS void LANGUAGE plpgsql VOLATILE AS $$ BEGIN {body} END $$;";
+
+        Assert.Contains(A(Fn("CREATE TEMP TABLE scratch (x int);")), x => x.RuleId == "PG004");
+        Assert.Contains(A(Fn("CREATE TEMPORARY TABLE scratch (x int);")), x => x.RuleId == "PG004");
+        Assert.Contains(A(Fn("CREATE UNLOGGED TABLE scratch (x int);")), x => x.RuleId == "PG004");
+        Assert.Contains(A(Fn("CREATE OR REPLACE VIEW s.v AS SELECT 1;")), x => x.RuleId == "PG004");
+        Assert.Contains(A(Fn("CREATE UNIQUE INDEX ix ON s.t (a);")), x => x.RuleId == "PG004");
+        Assert.Contains(A(Fn("CREATE MATERIALIZED VIEW s.mv AS SELECT 1;")), x => x.RuleId == "PG004");
+        Assert.Contains(A(Fn("DROP INDEX CONCURRENTLY s.ix;")), x => x.RuleId == "PG004");
+        // the plain form keeps firing, and a body with no DDL stays clean
+        Assert.Contains(A(Fn("CREATE TABLE scratch (x int);")), x => x.RuleId == "PG004");
+        Assert.DoesNotContain(A(Fn("INSERT INTO s.t VALUES (1);")), x => x.RuleId == "PG004");
+    }
+
+    [Fact]
+    public void PG009_fires_inside_view_bodies()
+    {
+        // #65: views are where LIMIT realistically lives in a declarative schema - the old check
+        // only ran on bare top-level SELECTs, so PG009 effectively never fired.
+        Assert.Contains(A("CREATE VIEW s.v AS SELECT id FROM s.t LIMIT 10;"), x => x.RuleId == "PG009");
+        Assert.DoesNotContain(A("CREATE VIEW s.v AS SELECT id FROM s.t ORDER BY id LIMIT 10;"), x => x.RuleId == "PG009");
+        Assert.DoesNotContain(A("CREATE VIEW s.v AS SELECT id FROM s.t;"), x => x.RuleId == "PG009");
+    }
+
+    [Fact]
     public void PG006_table_without_primary_key()
     {
         Assert.Contains(A("CREATE TABLE s.t (a int, b text);"), x => x.RuleId == "PG006" && x.Severity == DiagnosticSeverity.Info);

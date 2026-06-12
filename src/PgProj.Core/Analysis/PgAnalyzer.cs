@@ -111,7 +111,9 @@ public sealed class PgAnalyzer
         var body = bm.Success ? bm.Groups[2].Value.ToLowerInvariant() : "";
         if (Regex.IsMatch(body, @"\bexecute\b"))
             Emit(diags, "PG002", "Dynamic SQL (EXECUTE) in a function body — ensure inputs are quoted (quote_ident/format).", sig);
-        if (Regex.IsMatch(body, @"\b(create|alter|drop)\s+(table|view|index|sequence|schema|type|function|materialized)\b"))
+        // optional modifiers between the verb and the object keyword (TEMP/UNLOGGED/OR REPLACE/
+        // UNIQUE/GLOBAL/LOCAL/MATERIALIZED/CONCURRENTLY) must not defeat the match (#65)
+        if (Regex.IsMatch(body, @"\b(create|alter|drop)\s+(?:(?:or\s+replace|global|local|temp(?:orary)?|unlogged|unique|materialized|concurrently)\s+)*(table|view|index|sequence|schema|type|function)\b"))
             Emit(diags, "PG004", "Schema mutation (CREATE/ALTER/DROP) inside a function body.", sig);
     }
 
@@ -178,6 +180,12 @@ public sealed class PgAnalyzer
     {
         if (Regex.IsMatch(v.BodyText, @"\bselect\b[^;]*\*", RegexOptions.IgnoreCase))
             Emit(diags, "PG007", "SELECT * in a view body is brittle to underlying column changes.", Q(v.Schema, v.Name));
+
+        // PG009 inside view bodies — the realistic home of LIMIT in a declarative schema; a bare
+        // top-level SELECT (the only place this fired before #65) almost never occurs in a project.
+        if (Regex.IsMatch(v.BodyText, @"\blimit\b", RegexOptions.IgnoreCase)
+            && !Regex.IsMatch(v.BodyText, @"\border\s+by\b", RegexOptions.IgnoreCase))
+            Emit(diags, "PG009", "LIMIT without ORDER BY returns a non-deterministic subset.", Q(v.Schema, v.Name));
     }
 
     private void CheckLimit(SelectQuery? q, string target, List<Diagnostic> diags)
