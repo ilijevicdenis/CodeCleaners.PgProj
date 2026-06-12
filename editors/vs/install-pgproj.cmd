@@ -55,6 +55,17 @@ echo Installing the project-system extension (.pgproj project type + templates).
 "!VSIXI!" "%PROJSYS%"
 if errorlevel 1 ( echo ERROR: project-system install failed/cancelled. & exit /b 1 )
 
+rem --- 3) force VS to rebuild its merged command-table / pkgdef caches. Without this, a reinstall
+rem        that keeps the same extension version can leave the cached menu table stale and newly
+rem        added context-menu buttons (e.g. Import Database) silently never appear. ---
+set "DEVENV=!VSIXI:VSIXInstaller.exe=devenv.exe!"
+if exist "!DEVENV!" (
+  echo Refreshing the VS configuration caches - takes a moment...
+  "!DEVENV!" /updateconfiguration
+) else (
+  echo WARNING: devenv.exe not found next to VSIXInstaller; run "devenv /updateconfiguration" manually.
+)
+
 echo.
 echo ============================================================================================
 echo  Project-system extension installed. Launch Visual Studio 2026 to use:

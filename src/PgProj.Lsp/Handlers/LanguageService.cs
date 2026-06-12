@@ -162,6 +162,145 @@ public sealed class LanguageService
         return new Location(targetUri, new Protocol.Range(pos, pos));
     }
 
+    /// <summary>
+    /// Find-all-references: resolve the identifier at the cursor to a model object, then scan every
+    /// project file (open buffers take precedence over disk) for identifier occurrences of its name.
+    /// Matching is lexical-but-token-aware: plain and <c>"quoted"</c> identifiers match case-insensitively,
+    /// line/block comments (nested, per PostgreSQL) and single-quoted string literals are skipped, and
+    /// dollar-quoted bodies are scanned (function bodies are exactly where references live). When
+    /// <paramref name="includeDeclaration"/> is false the occurrence on the object's defining line is dropped.
+    /// </summary>
+    public async Task<IReadOnlyList<Location>> ReferencesAsync(string uri, Position position, bool includeDeclaration = true, CancellationToken ct = default)
+    {
+        var doc = _store.Get(uri);
+        if (doc is null) return Array.Empty<Location>();
+        var tree = await BuildModelTreeAsync(ct).ConfigureAwait(false);
+        if (tree is null) return Array.Empty<Location>();
+
+        var word = WordUnder(doc, position);
+        var node = ResolveNode(tree, word, defaultSchemaOf(tree));
+        if (node is null || string.IsNullOrEmpty(node.Name)) return Array.Empty<Location>();
+
+        var locations = new List<Location>();
+        foreach (var (fileUri, text, relPath) in EnumerateWorkspaceTexts())
+        {
+            ct.ThrowIfCancellationRequested();
+            LineIndex? lines = null;
+            foreach (var (start, end) in IdentifierOccurrences(text, node.Name))
+            {
+                lines ??= new LineIndex(text);
+                var (sl, sc) = lines.PositionOf(start);
+                if (!includeDeclaration && node.File is not null && node.Line > 0
+                    && PathEquals(relPath ?? "", node.File) && sl == node.Line - 1)
+                    continue;
+                var (el, ec) = lines.PositionOf(end);
+                locations.Add(new Location(fileUri, new Protocol.Range(new Position(sl, sc), new Position(el, ec))));
+            }
+        }
+        return locations;
+    }
+
+    /// <summary>
+    /// Every text in scope for a workspace-wide scan: with a project, its resolved .sql files (an open
+    /// buffer's live text wins over disk); without one, just the open buffers. Yields the document URI,
+    /// the text, and the project-relative path (null in loose mode).
+    /// </summary>
+    private IEnumerable<(string Uri, string Text, string? RelativePath)> EnumerateWorkspaceTexts()
+    {
+        if (_projectFilePath is not null && File.Exists(_projectFilePath))
+        {
+            var project = DatabaseProject.Load(_projectFilePath);
+            foreach (var abs in project.ResolveSqlFiles())
+            {
+                var fileUri = DocumentUri.FromPath(abs);
+                var text = _store.Get(fileUri)?.Text;
+                if (text is null)
+                {
+                    try { text = File.ReadAllText(abs); }
+                    catch { continue; } // unreadable file → not a reference source
+                }
+                yield return (fileUri, text, Path.GetRelativePath(project.ProjectDirectory, abs).Replace('\\', '/'));
+            }
+            yield break;
+        }
+
+        foreach (var d in _store.All)
+            yield return (d.Uri, d.Text, null);
+    }
+
+    /// <summary>
+    /// Yields the [start, end) spans where <paramref name="name"/> occurs as a whole identifier — bare
+    /// (<c>name</c>) or quoted (<c>"name"</c>), case-insensitive — skipping <c>--</c> line comments,
+    /// nested <c>/* */</c> block comments, and single-quoted literals (with <c>''</c> escapes).
+    /// </summary>
+    internal static IEnumerable<(int Start, int End)> IdentifierOccurrences(string text, string name)
+    {
+        static bool IsIdent(char c) => char.IsLetterOrDigit(c) || c == '_';
+
+        var i = 0;
+        while (i < text.Length)
+        {
+            var c = text[i];
+
+            if (c == '-' && i + 1 < text.Length && text[i + 1] == '-')
+            {
+                while (i < text.Length && text[i] != '\n') i++;
+                continue;
+            }
+            if (c == '/' && i + 1 < text.Length && text[i + 1] == '*')
+            {
+                var depth = 1;
+                i += 2;
+                while (i < text.Length && depth > 0)
+                {
+                    if (text[i] == '/' && i + 1 < text.Length && text[i + 1] == '*') { depth++; i += 2; }
+                    else if (text[i] == '*' && i + 1 < text.Length && text[i + 1] == '/') { depth--; i += 2; }
+                    else i++;
+                }
+                continue;
+            }
+            if (c == '\'')
+            {
+                i++;
+                while (i < text.Length)
+                {
+                    if (text[i] == '\'')
+                    {
+                        if (i + 1 < text.Length && text[i + 1] == '\'') { i += 2; continue; } // '' escape
+                        i++;
+                        break;
+                    }
+                    i++;
+                }
+                continue;
+            }
+            if (c == '"')
+            {
+                var start = i + 1;
+                var j = start;
+                while (j < text.Length && text[j] != '"') j++;
+                if (j < text.Length)
+                {
+                    if (j - start == name.Length && string.Compare(text, start, name, 0, name.Length, StringComparison.OrdinalIgnoreCase) == 0)
+                        yield return (start, j);
+                    i = j + 1;
+                    continue;
+                }
+                i = j;
+                continue;
+            }
+            if (IsIdent(c))
+            {
+                var start = i;
+                while (i < text.Length && IsIdent(text[i])) i++;
+                if (i - start == name.Length && string.Compare(text, start, name, 0, name.Length, StringComparison.OrdinalIgnoreCase) == 0)
+                    yield return (start, i);
+                continue;
+            }
+            i++;
+        }
+    }
+
     /// <summary>Hover: a markdown card describing the object the cursor's identifier resolves to.</summary>
     public async Task<Hover?> HoverAsync(string uri, Position position, CancellationToken ct = default)
     {

@@ -144,7 +144,8 @@ namespace PgProj.VisualStudio.ProjectSystem.Commands
             }
 
             objectList.Items.Clear();
-            // One row per extracted .sql unit, relative path (Tables/app.customers.sql, …).
+            // One row per extracted .sql unit, SSDT-style schema-first relative path
+            // (app/Tables/customers.sql, app/Procedures/refresh.sql, …).
             // The extract-generated .pgproj scaffold is NOT offered — the user already has a project.
             var units = Directory.EnumerateFiles(extractDir, "*.sql", SearchOption.AllDirectories)
                 .Select(f => f.Substring(extractDir.Length + 1).Replace('\\', '/'))
@@ -195,6 +196,16 @@ namespace PgProj.VisualStudio.ProjectSystem.Commands
                 {
                     failures.Add($"{unit}: {ex.Message}");
                 }
+            }
+
+            // Nudge CPS to re-evaluate the project: the SDK's **/*.sql glob is only re-expanded when
+            // the project file changes, so without this the imported files exist on disk but never
+            // appear in Solution Explorer until a manual unload/reload. Touching the timestamp makes
+            // VS re-read the project (no content change, so nothing to merge).
+            if (written > 0)
+            {
+                try { File.SetLastWriteTimeUtc(projectPath, DateTime.UtcNow); }
+                catch { /* best effort — worst case the user reloads the project manually */ }
             }
 
             // The connection just worked (the objects came from it) — persist or forget per the checkbox.

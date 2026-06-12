@@ -36,6 +36,12 @@
 
     <!-- VSIX packaging (SDK-style VSSDK support). -->
     <GeneratePkgDefFile>true</GeneratePkgDefFile>
+    <!-- Emit "CodeBase"="$PackageFolder$\<dll>" (not "Assembly"="<strong name>") into the pkgdef.
+         A VSIX-deployed assembly is NOT on the CLR probing path, so name-based registration makes
+         package creation fail at load time with FileNotFoundException. Belt and braces with
+         RegisterUsing=CodeBase on the PackageRegistration attribute (CreatePkgDef honors this
+         property; the attribute alone was not sufficient with BuildTools 17.14). -->
+    <RegisterWithCodebase>true</RegisterWithCodebase>
     <IncludeAssemblyInVSIXContainer>true</IncludeAssemblyInVSIXContainer>
     <IncludeDebugSymbolsInVSIXContainer>false</IncludeDebugSymbolsInVSIXContainer>
     <CreateVsixContainer>true</CreateVsixContainer>
@@ -72,6 +78,14 @@
     <VSCTCompile Include="PgProjCommands.vsct">
       <ResourceName>Menus.ctmenu</ResourceName>
     </VSCTCompile>
+    <!-- Package strings (editor factory display name). MergeWithCTO folds the compiled .vsct into
+         this resource (named VSPackage, the classic layout), replacing the synthesized
+         _EmptyResource the build used while the project had no resx. Update (not Include): the
+         .NET SDK already globs *.resx into EmbeddedResource. -->
+    <EmbeddedResource Update="VSPackage.resx">
+      <MergeWithCTO>true</MergeWithCTO>
+      <ManifestResourceName>VSPackage</ManifestResourceName>
+    </EmbeddedResource>
     <None Include="source.extension.vsixmanifest">
       <SubType>Designer</SubType>
     </None>

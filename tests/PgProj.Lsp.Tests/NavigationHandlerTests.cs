@@ -92,4 +92,63 @@ public sealed class NavigationHandlerTests
         Assert.Contains("id", labels);
         Assert.Contains("name", labels);
     }
+
+    [Fact]
+    public async Task References_finds_occurrences_across_project_files()
+    {
+        var (svc, _, tp, useUri) = Fixture();
+        using var _tp = tp;
+
+        // Cursor on "customer" in the view's FROM clause → expect the defining CREATE TABLE
+        // occurrence AND the view's reference.
+        var text = "CREATE VIEW public.v AS SELECT id FROM public.customer;\n";
+        var col = text.IndexOf("customer", System.StringComparison.Ordinal) + 1;
+        var refs = await svc.ReferencesAsync(useUri, new Position(0, col));
+
+        Assert.Equal(2, refs.Count);
+        Assert.Contains(refs, r => r.Uri.EndsWith("customer.sql"));
+        Assert.Contains(refs, r => r.Uri.EndsWith("v.sql"));
+    }
+
+    [Fact]
+    public async Task References_skips_comments_and_string_literals()
+    {
+        var tp = new TempProject();
+        using var _tp = tp;
+        var sql = "CREATE TABLE public.widget (id int);\n"
+                + "-- widget in a line comment\n"
+                + "/* widget in a /* nested */ block comment */\n"
+                + "CREATE VIEW public.w AS SELECT 'widget' AS lit, id FROM widget;\n";
+        var uri = tp.UriFor("w.sql");
+        tp.WriteSql("w.sql", sql);
+
+        var store = new DocumentStore();
+        store.Open(uri, sql, 1);
+        var svc = new LanguageService(store, tp.ProjectFilePath);
+
+        var col = sql.IndexOf("public.widget", System.StringComparison.Ordinal) + "public.w".Length;
+        var refs = await svc.ReferencesAsync(uri, new Position(0, col));
+
+        // The CREATE TABLE occurrence + the FROM reference; not the comment/literal mentions.
+        Assert.Equal(2, refs.Count);
+    }
+
+    [Fact]
+    public async Task References_matches_quoted_identifiers()
+    {
+        var tp = new TempProject();
+        using var _tp = tp;
+        var sql = "CREATE TABLE public.geo (id int);\nCREATE VIEW public.gv AS SELECT id FROM \"geo\";\n";
+        var uri = tp.UriFor("g.sql");
+        tp.WriteSql("g.sql", sql);
+
+        var store = new DocumentStore();
+        store.Open(uri, sql, 1);
+        var svc = new LanguageService(store, tp.ProjectFilePath);
+
+        var col = sql.IndexOf("geo", System.StringComparison.Ordinal) + 1;
+        var refs = await svc.ReferencesAsync(uri, new Position(0, col));
+
+        Assert.Equal(2, refs.Count); // bare definition + quoted reference
+    }
 }

@@ -62,6 +62,7 @@ public sealed record ServerCapabilities
     public TextDocumentSyncOptions TextDocumentSync { get; init; } = new();
     public bool DefinitionProvider { get; init; } = true;
     public bool HoverProvider { get; init; } = true;
+    public bool ReferencesProvider { get; init; } = true;
     public CompletionOptions CompletionProvider { get; init; } = new();
 }
 
@@ -127,6 +128,19 @@ public sealed record TextDocumentPositionParams
 {
     public required TextDocumentIdentifier TextDocument { get; init; }
     public required Position Position { get; init; }
+}
+
+/// <summary>The <c>textDocument/references</c> request's extra context.</summary>
+public sealed record ReferenceContext
+{
+    public bool IncludeDeclaration { get; init; } = true;
+}
+
+public sealed record ReferenceParams
+{
+    public required TextDocumentIdentifier TextDocument { get; init; }
+    public required Position Position { get; init; }
+    public ReferenceContext Context { get; init; } = new();
 }
 
 public sealed record MarkupContent

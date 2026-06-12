@@ -138,6 +138,16 @@ public sealed class LspServer : IDisposable
                 break;
             }
 
+            case "textDocument/references":
+            {
+                var p = Decode<ReferenceParams>(msg);
+                var refs = p is null
+                    ? Array.Empty<Location>()
+                    : await _service.ReferencesAsync(p.TextDocument.Uri, p.Position, p.Context.IncludeDeclaration, ct).ConfigureAwait(false);
+                await Respond(JsonRpcMessage.ResultFor(msg.Id, refs)).ConfigureAwait(false);
+                break;
+            }
+
             case "textDocument/hover":
             {
                 var p = Decode<TextDocumentPositionParams>(msg);
