@@ -47,6 +47,7 @@ public static class Program
                 "drift" => await Drift(args),
                 "pull" => await Pull(args),
                 "sync-file" => await SyncFile(args),
+                "deploy-report" => await DeployReport(args),
                 "analyze" => Analyze(args),
                 "model-tree" => await ModelTree(args),
                 "describe-table" => DescribeTable(args),
@@ -389,6 +390,9 @@ public static class Program
 
     private static async Task<int> Publish(string[] args)
     {
+        // EP-DEPLOYREPORT alias: `publish --report-only` = `deploy-report` (plan, report, never apply).
+        if (HasFlag(args, "--report-only")) return await DeployReport(args);
+
         var profile = LoadProfile(args);            // EP-PROFILE: CLI flags override profile values.
         var (source, project) = await BuildSourceOrThrowAsync(args);
         var allowDrops = ResolveAllowDrops(args, profile);
@@ -909,6 +913,56 @@ public static class Program
         return true;
     }
 
+    // ---- deploy-report (EP-DEPLOYREPORT #141: planned-change report, never applies) -------
+
+    /// <summary>
+    /// <c>pgproj deploy-report &lt;project|pkg&gt; --connection &lt;conn&gt; [-o report.json] [--format xml]</c>:
+    /// the machine-readable plan of what a publish WOULD change against the live target — the
+    /// SqlPackage DeployReport analogue for CI approval gates. Computed by the SAME
+    /// <see cref="PublishService.PlanAsync"/> a real publish runs (profile + --var + --allow-drops
+    /// + --no-transaction + --parallel all honored), but the target is only ever READ.
+    /// </summary>
+    private static async Task<int> DeployReport(string[] args)
+    {
+        var profile = LoadProfile(args);            // EP-PROFILE: CLI flags override profile values.
+        var (source, project) = await BuildSourceOrThrowAsync(args);
+        var connection = RequireConnection(args);
+
+        var plan = await new PublishService().PlanAsync(project, source, connection, new PublishPlanOptions
+        {
+            AllowDrops = ResolveAllowDrops(args, profile),
+            WrapInTransaction = ResolveWrapInTransaction(args, profile),
+            ProfileVariables = profile?.Variables,
+            VariableOverrides = ParseCliVars(args),
+        });
+
+        var report = DeployReportBuilder.Build(plan,
+            source: new SchemaCompareEndpointDto
+            {
+                Kind = project is null ? "package" : "project",
+                DisplayName = SourceName(project),
+            },
+            target: new SchemaCompareEndpointDto { Kind = "liveDatabase", DisplayName = "(database)" },
+            parallelRequested: HasFlag(args, "--parallel"));
+
+        var xml = string.Equals(GetOption(args, "--format"), "xml", StringComparison.OrdinalIgnoreCase);
+        var payload = xml ? DeployReportBuilder.SerializeXml(report) : DeployReportBuilder.Serialize(report);
+
+        var outPath = GetOption(args, "-o", "--output");
+        if (outPath is null)
+        {
+            Console.WriteLine(payload);
+        }
+        else
+        {
+            File.WriteAllText(outPath, payload);
+            Console.WriteLine($"Deploy report written to {outPath} " +
+                $"({report.ChangeCount} change(s), {report.DestructiveCount} destructive" +
+                $"{(report.BlocksOnDataLoss ? ", BLOCKS ON DATA LOSS" : "")}).");
+        }
+        return 0;
+    }
+
     // ---- references (EP-REF) ------------------------------------------------------------
 
     /// <summary>
@@ -1269,6 +1323,7 @@ public static class Program
           pgproj snapshot --connection <conn> -o <db.schema.snapshot>                    (introspect a live DB once → a portable schema.snapshot for offline compare)
           pgproj drift   <project.pgproj> --connection <conn> [--fail-on-drift]         (preview project files that differ from the DB; --fail-on-drift exits 6 on drift)
           pgproj pull    <project.pgproj> --connection <conn> [--dry-run] [--allow-deletes]   (rewrite project files FROM the DB — scenario 3)
+          pgproj deploy-report <project.pgproj|.pgpkg> --connection <conn> [-o report.json] [--format xml] [--profile <file>] [--var N=V] [--allow-drops] [--parallel]   (planned-change report, never applies - DeployReport analogue; alias: publish --report-only)
           pgproj sync-file <project.pgproj> --file <rel.sql> --connection <conn> [--apply-to-local | --apply-to-db [--allow-drops] [--dry-run]]   (one file vs the DB: JSON state for editors, or apply either direction)
           pgproj analyze <project.pgproj> [--strict]    (static safety analysis over the AST)
           pgproj model-tree <project.pgproj> [--format json]   (objects + source positions, for editors)

@@ -39,11 +39,14 @@ public sealed record PublishPlanOptions
 /// </summary>
 public sealed class PublishPlan
 {
-    public PublishPlan(IReadOnlyList<SchemaChange> changes, string script, bool hasDeployScripts)
+    public PublishPlan(IReadOnlyList<SchemaChange> changes, string script, bool hasDeployScripts,
+        bool hasPreDeployScript = false, bool hasPostDeployScript = false)
     {
         Changes = changes;
         Script = script;
         HasDeployScripts = hasDeployScripts;
+        HasPreDeployScript = hasPreDeployScript;
+        HasPostDeployScript = hasPostDeployScript;
     }
 
     public IReadOnlyList<SchemaChange> Changes { get; }
@@ -53,6 +56,12 @@ public sealed class PublishPlan
 
     /// <summary>True when the project declares pre/post-deploy scripts spliced around the diff.</summary>
     public bool HasDeployScripts { get; }
+
+    /// <summary>Whether a pre-deploy script is spliced before the diff (reported by deploy-report).</summary>
+    public bool HasPreDeployScript { get; }
+
+    /// <summary>Whether a post-deploy script is spliced after the diff (reported by deploy-report).</summary>
+    public bool HasPostDeployScript { get; }
 
     public int ChangeCount => Changes.Count;
 
@@ -104,7 +113,8 @@ public sealed class PublishService
             Variables = variables,
         });
 
-        return new PublishPlan(changes, script, hasDeployScripts: bundle is { IsEmpty: false });
+        return new PublishPlan(changes, script, hasDeployScripts: bundle is { IsEmpty: false },
+            hasPreDeployScript: bundle?.Pre is not null, hasPostDeployScript: bundle?.Post is not null);
     }
 
     /// <summary>
