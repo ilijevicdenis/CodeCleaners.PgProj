@@ -1,0 +1,35 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    FlaUI-driven E2E smoke tests for the INSTALLED PgProj Visual Studio extension (EP-VS).
+    They launch the real main-instance VS 2026 with a scratch .pgproj solution and assert the
+    PostgreSQL editor experience end-to-end through UI Automation:
+      * syntax coloring   (UIA TextPattern foreground-color attributes)
+      * IntelliSense      (completion popup lists project tables)
+      * semantic check    (unresolved relation -> Error List entry, on an UNSAVED buffer)
+
+    Prerequisites on the machine that runs them:
+      * VS 2026 with the PgProj.VisualStudio.ProjectSystem VSIX installed (editors\vs\install-pgproj.cmd)
+      * the local PgProj.Sdk feed registered (editors\vs\setup-local-sdk-feed.cmd)
+      * an interactive desktop session, and NO other devenv.exe running (the harness refuses to
+        kill someone's IDE; it owns only the instance it launches)
+
+    Deliberately NOT in PgProj.slnx / the default `dotnet test` sweep (same policy as the VSIX
+    projects). Run explicitly:  dotnet test editors\vs\PgProj.VisualStudio.UiTests
+  -->
+
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FlaUI.UIA3" Version="5.0.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.13.0" />
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.0.2" />
+  </ItemGroup>
+
+</Project>

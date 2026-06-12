@@ -1,0 +1,27 @@
+# The standing local PostgreSQL 18 every "real" test layer points at:
+#   * the env-gated integration tests in tests/PgProj.Core.Tests (PGPROJ_TEST_CONNECTION) — they
+#     create their own throwaway databases on this server and drop them afterward;
+#   * the VS E2E harness (editors/vs/PgProj.VisualStudio.UiTests) — extracts the seeded sample
+#     database into the scratch .pgproj it opens in Visual Studio;
+#   * ad-hoc CLI runs (pgproj extract/compare/publish/validate/drift) during development.
+#
+# Start/stop via tests/sample-db/sample-db.ps1 (it also prints the connection strings).
+# The published port is fixed (15432) so connection strings are stable across machines, and bound
+# to 0.0.0.0 so a Hyper-V test VM can reach the host's Docker over the virtual switch.
+services:
+  pgproj-sample-db:
+    image: postgres:18
+    container_name: pgproj-sample-db
+    environment:
+      POSTGRES_PASSWORD: pgproj
+      POSTGRES_DB: sampledb
+    ports:
+      - "15432:5432"
+    volumes:
+      # Seed scripts run once, on first start with an empty data dir (alphabetical order).
+      - ./init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d sampledb"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
