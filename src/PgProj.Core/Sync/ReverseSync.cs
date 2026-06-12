@@ -111,6 +111,22 @@ public static class ReverseSync
 
     // ---- mapping helpers ---------------------------------------------------------------------
 
+    /// <summary>The canonical units (DdlExporter keys) defined by ONE project file — the basis for
+    /// file-scoped operations like <see cref="FileSync"/>. Empty when the file defines none.</summary>
+    public static async Task<IReadOnlyList<string>> UnitsOfFileAsync(DatabaseProject project, string relativeFile)
+    {
+        var (_, fileToUnits) = await MapProjectFilesAsync(project);
+        var wanted = relativeFile.Replace('/', Path.DirectorySeparatorChar).Replace('\\', Path.DirectorySeparatorChar);
+        foreach (var (rel, units) in fileToUnits)
+            if (string.Equals(rel.Replace('/', Path.DirectorySeparatorChar), wanted, StringComparison.OrdinalIgnoreCase))
+                return units;
+        return Array.Empty<string>();
+    }
+
+    /// <summary>Public face of <see cref="CanonicalUnit"/> for file-scoped change filtering.</summary>
+    public static string? UnitOf(SchemaChange change, DatabaseModel modelForIndexResolution) =>
+        CanonicalUnit(change, modelForIndexResolution);
+
     /// <summary>
     /// canonical-unit → owning project file, and the inverse. Built by parsing each project file in
     /// isolation and asking <see cref="DdlExporter"/> what canonical unit(s) it would emit — so the
