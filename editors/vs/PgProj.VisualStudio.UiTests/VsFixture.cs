@@ -94,6 +94,11 @@ public sealed class VsFixture : IDisposable
 
         BaselineText = GetBufferText();
 
+        // The Error List pane must EXIST for the UIA diagnostic scans — a fresh VS instance has it
+        // closed, and ErrorListShows silently returns false forever (the wire log proved the server
+        // publishing diagnostics that "never appeared"; they were arriving into a closed window).
+        Dte.Invoke(d => d.ExecuteCommand("View.ErrorList", ""));
+
         // Project ownership is necessary but NOT sufficient: a doc opened during CPS
         // materialization keeps the plain-text editor even after the project claims the file
         // (DTE reports "Plain Text" for our pgsql buffer too, so language can't discriminate).
@@ -131,18 +136,25 @@ public sealed class VsFixture : IDisposable
         }
     }
 
-    /// <summary>True when the VSIX-bundled `pgproj serve` child process is alive.</summary>
+    /// <summary>
+    /// True when the VSIX-bundled `pgproj serve` child process is alive. The listing is UNFILTERED
+    /// and matched in C#: the Where-Object-filtered variant returned false against a demonstrably
+    /// running server (quoting/marshaling of the inline scriptblock through ProcessStartInfo), and
+    /// the unfiltered CommandLine dump is the exact form the forensics proved reliable.
+    /// </summary>
     public bool IsLspServerRunning()
     {
         try
         {
             var psi = new System.Diagnostics.ProcessStartInfo("powershell.exe",
-                "-NoProfile -Command \"(Get-CimInstance Win32_Process -Filter \\\"Name='dotnet.exe'\\\" | Where-Object { $_.CommandLine -match 'PgProj.Cli' -and $_.CommandLine -match 'serve' }).Count\"")
+                "-NoProfile -Command \"(Get-CimInstance Win32_Process -Filter \\\"Name='dotnet.exe'\\\").CommandLine\"")
             { RedirectStandardOutput = true, UseShellExecute = false, CreateNoWindow = true };
             using var p = System.Diagnostics.Process.Start(psi)!;
-            var output = p.StandardOutput.ReadToEnd().Trim();
+            var output = p.StandardOutput.ReadToEnd();
             p.WaitForExit();
-            return int.TryParse(output, out var n) && n > 0;
+            return output.Split('\n').Any(l =>
+                l.IndexOf("PgProj.Cli", StringComparison.OrdinalIgnoreCase) >= 0
+                && l.IndexOf("serve", StringComparison.OrdinalIgnoreCase) >= 0);
         }
         catch
         {

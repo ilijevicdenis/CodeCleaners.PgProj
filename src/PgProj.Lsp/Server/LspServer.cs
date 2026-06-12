@@ -62,6 +62,8 @@ public sealed class LspServer : IDisposable
             try { msg = JsonRpcMessage.FromJson(json); }
             catch { await Respond(JsonRpcMessage.ErrorFor(null, LspErrorCodes.ParseError, "Invalid JSON.")).ConfigureAwait(false); continue; }
 
+            WireLog($"<- {msg.Method ?? "(response)"} {Snippet(msg)}");
+
             if (msg.Method == "exit") return _shutdownRequested ? 0 : 1;
 
             // Per the spec, the server rejects any request other than `initialize` before it is initialized.
@@ -216,8 +218,34 @@ public sealed class LspServer : IDisposable
         });
     }
 
-    private Task PublishAsync(PublishDiagnosticsParams p) =>
-        Notify("textDocument/publishDiagnostics", p);
+    private Task PublishAsync(PublishDiagnosticsParams p)
+    {
+        WireLog($"-> publishDiagnostics {p.Uri} ({p.Diagnostics.Count})");
+        return Notify("textDocument/publishDiagnostics", p);
+    }
+
+    /// <summary>
+    /// Opt-in wire trace: set <c>PGPROJ_LSP_LOG</c> to a file path and every inbound method (with
+    /// its document uri) and outbound publish is appended — the tool for "the client never sent
+    /// didOpen for that document" class investigations. Off (zero cost) when the variable is unset.
+    /// </summary>
+    private static readonly string? WireLogPath = Environment.GetEnvironmentVariable("PGPROJ_LSP_LOG");
+
+    private static void WireLog(string line)
+    {
+        if (WireLogPath is null) return;
+        try { File.AppendAllText(WireLogPath, $"{DateTime.UtcNow:HH:mm:ss.fff} {line}\n"); } catch { }
+    }
+
+    private static string Snippet(JsonRpcMessage msg)
+    {
+        try
+        {
+            var uri = msg.Params?["textDocument"]?["uri"]?.GetValue<string>();
+            return uri ?? "";
+        }
+        catch { return ""; }
+    }
 
     private Task Notify(string method, object @params) =>
         _writer.WriteAsync(JsonRpcMessage.Notification(method, @params).ToJson());

@@ -199,6 +199,25 @@ public sealed class CrossFileScenarios
                 .Replace("Views", "Tables"), "*.sql").First();
         _vs.Dte.Invoke(d => d.ItemOperations.OpenFile(tableFile));
         var original = _vs.GetBufferText();
+
+        // The SECOND opened document can hit the same claim race the fixture guards the view
+        // against: prove it is wired to the LSP (a broken edit must produce a diagnostic for THIS
+        // file) before running the real scenario — close/reopen until it is.
+        var tableName = Path.GetFileName(tableFile);
+        for (var attempt = 1; attempt <= 4; attempt++)
+        {
+            _vs.SetBufferText("CREATE TABLE wired_probe (broken\n");
+            if (Retry.WhileFalse(() => _vs.ErrorListShows(tableName),
+                    timeout: TimeSpan.FromSeconds(15), interval: TimeSpan.FromMilliseconds(500)).Result)
+                break;
+            _vs.Dte.Invoke(d => d.ActiveDocument.Close(2 /* vsSaveChangesNo */));
+            System.Threading.Thread.Sleep(3000);
+            _vs.Dte.Invoke(d => d.ItemOperations.OpenFile(tableFile));
+            Assert.True(attempt < 4, "the table document never wired to the LSP across 4 open attempts");
+        }
+        _vs.SetBufferText(original);
+        Retry.WhileTrue(() => _vs.ErrorListShows(tableName),
+            timeout: TimeSpan.FromSeconds(15), interval: TimeSpan.FromMilliseconds(500));
         try
         {
             _vs.SetBufferText("-- table definition deleted by user\n");
