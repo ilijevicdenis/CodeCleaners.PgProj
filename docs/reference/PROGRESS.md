@@ -4,11 +4,11 @@
 > SSDT-for-PostgreSQL parity and is the single place to read "where are we now". It is **updated on
 > every delivered milestone** (see [Update contract](#update-contract) below).
 
-**Last updated:** 2026-06-11 (M1–M6 complete; **M7 substantially delivered** — audit closed 27 redundant
-issues; EP-COVERAGE introspection, EP-ANALYSIS+ external rule packs + new rules, and a complete SQLSTATE
-table shipped & verified vs PG18; EP-CICD removed; base types/transforms backlogged; **EP-VS #111 done**:
-CPS project type, property pages, Publish dialog, interactive Schema Compare, `pgproj sln` grouping —
-manual F5 pass outstanding) ·
+**Last updated:** 2026-06-12 (M1–M6 complete; **M7 substantially delivered** — and the VS experience is
+now VALIDATED IN THE INSTALLED PRODUCT: a 115-scenario VM E2E suite (FlaUI+DTE, real sample database)
+found and fixed three silent editor-chain breaks (per-user MEF cache, content-type overwrite, CodeRemote
+LSP gate), live diagnostics reached build parity (+ cross-file invalidation), navigation/completion are
+alias-aware and column-precise, and a file-level Sync-with-Database command shipped) ·
 **Streams:** semantic core (EP-SEMCORE #41) · SSDT parity (#27) · performance (#12)
 
 Legend: ✅ delivered · 🟡 in progress · ⬜ not started · ⛔ blocked · ⏸️ deferred.
@@ -184,6 +184,7 @@ Newest first. One line per delivered issue/milestone; this is the audit trail of
 
 | Date | Milestone | Item | Commit | Notes |
 |------|-----------|------|--------|-------|
+| 2026-06-12 | M7 | **VS experience validated in the installed product + hardened** — three silent editor-chain breaks fixed (per-user MEF cache skipped by `/updateconfiguration`; VsBufferDetectLangSID content-type overwrite; CodeRemote base required for LSP activation); PostgreSQL classifier; live diagnostics = build verdict (reference/semantic gate + cross-file invalidation); alias-aware completion/F12/hover + column-precise definition; `pgproj sync-file` + in-VS file-level Sync-with-Database (diff + take-DB/push-local/cancel); CURRENT_USER validator false positive | `d9e75dd`, `9343c5b`, `ca59e68`, `077dbde` on `milestone/m7-ssdt-parity` | Validated by a NEW 115-scenario real-user E2E suite (FlaUI+DTE-over-ROT, Hyper-V VM, dockerized PG18 sample DB `tests/sample-db`): round 6 = 113/115 with the last two fixed (peek expectation, disconnected-session trap). Engine suites green: 25,086 Core (0 skips with PGPROJ_TEST_CONNECTION) + 28 LSP. This closes the "manual F5 pass outstanding" follow-up from EP-VS #111. |
 | 2026-06-11 | M7 | **EP-VS done** (#111) — CPS `.pgproj` project type + templates + VS-loadable SDK (#113), `.vsct`/manifest (#117), four property pages as SDK CPS rules + `PgProjPublishVariables`→`--var` (#114), modal Publish dialog (#115), interactive Schema Compare window (#116), `pgproj sln` solution grouping (#118) | `a1fa294`, `a59737e`, `9be4cb2`, `1e7422f` on `milestone/m7-ssdt-parity` | Headless: both VSIXes 0-warn/0-err, SDK packs with rules, full suite 22,526 pass / 0 fail (15 new `SolutionGroupingTests`); `--var` forwarding verified end-to-end via offline dry-run. Manual F5 pass in VS 2026 outstanding (README follow-ups). |
 | 2026-06-08 | M7 | **EP-COVERAGE introspection** — EXCLUDE (#98), EVENT TRIGGER tags (#104), POLICY `TO` roles (#103), USER MAPPING + LANGUAGE (#108), PARTITION/INHERITS (#99), index opclass/ordering (#101), expression statistics (#110), TS PARSER/TEMPLATE (#109) | `8e2c387`…`ff1de45` on `milestone/m7-ssdt-parity` | One reader per kind (+ a parser fix for `CREATE USER MAPPING`); each verified vs PG18 by the deploy→read-back→reparse→re-deploy round-trip; goldens regenerated. #104 (event-trigger tags) and #101 (index ordering) also fixed latent silent phantom diffs. Full suite 25,044 pass / 0 fail. |
 | 2026-06-08 | M7 | **EP-ANALYSIS+ done** — external rule packs (#79: `IPgRule`+`RulePackLoader`) + PG006 missing-PK / PG008 untyped-numeric (#81 partial); epic #67 closed | `f3a7639`, `f734255` | 7 rule-pack tests + analyzer tests; doc `docs/ANALYSIS_RULES.md`. #81 stays open as ongoing rule backlog. |
