@@ -20,6 +20,28 @@
     <!-- A database project has no assembly/refs; keep NoTargets from adding framework reference items. -->
     <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
     <NoWarn>$(NoWarn);NU1604</NoWarn>
+
+    <!--
+      Keep the MANAGED (.NET) project-system design-time machinery OUT of this project. When VS's
+      MSBuild evaluates any Microsoft.NET.Sdk-based project (NoTargets composes on it), it imports
+      Microsoft.Managed.DesignTime.targets, which injects the full managed capability suite
+      (".NET", DependenciesTree, LaunchProfiles, ...) and the managed item schemas
+      (Compile/Content/None rules). Those capabilities activate the dotnet-project-system's MEF
+      components - including its Solution Explorer tree handling, which only renders the item
+      types IT knows, so our Build (.sql) items silently never appear in the tree. These are the
+      documented opt-outs that file defines (it also force-disables the DefineCommon* base set,
+      which is fine: this SDK ships its own ProjectItemsSchema + Build/None/Folder rules).
+      `dotnet build` never sees any of this (the targets live in the VS MSBuild folder only).
+    -->
+    <DefineCommonManagedCapabilities Condition="'$(DefineCommonManagedCapabilities)' == ''">false</DefineCommonManagedCapabilities>
+    <DefineCommonManagedItemSchemas Condition="'$(DefineCommonManagedItemSchemas)' == ''">false</DefineCommonManagedItemSchemas>
+    <DefineCommonManagedReferenceSchemas Condition="'$(DefineCommonManagedReferenceSchemas)' == ''">false</DefineCommonManagedReferenceSchemas>
+    <!-- NoTargets' Sdk.targets prepends Microsoft.Managed.DesignTime.targets to
+         CustomBeforeMicrosoftCommonTargets unless this flag says the language targets already
+         handled it. The capabilities that file injects UNCONDITIONALLY (".NET", ...) are what
+         activate the managed project system on this project, so block the import outright; the
+         DefineCommonManaged* switches above stay as defense-in-depth should it load anyway. -->
+    <ManagedLanguageTargetsGotImported>true</ManagedLanguageTargetsGotImported>
   </PropertyGroup>
 
   <!-- The common MSBuild infrastructure (the piece the IDE requires). Imported before our own items
@@ -73,14 +95,51 @@
     Visual Studio project-system support:
       * ProjectCapability "PgProj" identifies a database project to CPS - the project-system extension
         keys its MEF AppliesTo exports and the SolutionHasProjectCapability:PgProj UIContext on it.
-      * The items schema teaches Solution Explorer this SDK's vocabulary (Build = .sql source).
+      * The items schema declares this SDK's item vocabulary; the per-item-type File/BrowseObject
+        rules (Build/None/Folder) are what make CPS actually RENDER those items in Solution
+        Explorer - without a File-context rule binding the item type, files exist in the project
+        but never appear in the tree (this mirrors how the managed project system registers
+        Compile/Content/None under MSBuild\Microsoft\VisualStudio\Managed).
       * The four Project-Properties pages (EP-VS #114): Database Settings, Target Platform,
         Build Output, SQLCMD Variables - CPS generic rules persisting into this .pgproj.
         Command-line MSBuild ignores all of these.
   -->
   <ItemGroup>
     <ProjectCapability Include="PgProj" />
-    <PropertyPageSchema Include="$(MSBuildThisFileDirectory)Rules\ProjectItemsSchema.xaml" />
+    <!--
+      Source-item capabilities (mirroring Microsoft.Managed.DesignTime.targets) - without these CPS
+      does not treat the project's items as source items at all, so NOTHING renders in Solution
+      Explorer no matter how correct the item schema and rules are:
+        DeclaredSourceItems  - the project declares source items (our Build glob);
+        UserSourceItems      - the user may add/remove items from the IDE;
+        UseFileGlobs         - glob-aware item edits (an added file covered by **/*.sql writes no
+                               explicit item; renames/deletes update the project minimally);
+        ShowMissingItemTypes - render items of types that lack rules via temporary generated rules
+                               (safety net so an unruled item type degrades to "shown, generic"
+                               instead of invisible).
+    -->
+    <ProjectCapability Include="DeclaredSourceItems" />
+    <ProjectCapability Include="UserSourceItems" />
+    <ProjectCapability Include="UseFileGlobs" />
+    <ProjectCapability Include="ShowMissingItemTypes" />
+    <PropertyPageSchema Include="$(MSBuildThisFileDirectory)Rules\ProjectItemsSchema.xaml">
+      <Context>Project</Context>
+    </PropertyPageSchema>
+    <PropertyPageSchema Include="$(MSBuildThisFileDirectory)Rules\Build.xaml">
+      <Context>File</Context>
+    </PropertyPageSchema>
+    <PropertyPageSchema Include="$(MSBuildThisFileDirectory)Rules\Build.BrowseObject.xaml">
+      <Context>BrowseObject</Context>
+    </PropertyPageSchema>
+    <PropertyPageSchema Include="$(MSBuildThisFileDirectory)Rules\None.xaml">
+      <Context>File</Context>
+    </PropertyPageSchema>
+    <PropertyPageSchema Include="$(MSBuildThisFileDirectory)Rules\None.BrowseObject.xaml">
+      <Context>BrowseObject</Context>
+    </PropertyPageSchema>
+    <PropertyPageSchema Include="$(MSBuildThisFileDirectory)Rules\Folder.xaml">
+      <Context>File;BrowseObject</Context>
+    </PropertyPageSchema>
     <PropertyPageSchema Include="$(MSBuildThisFileDirectory)Rules\DatabaseSettingsPage.xaml">
       <Context>Project</Context>
     </PropertyPageSchema>

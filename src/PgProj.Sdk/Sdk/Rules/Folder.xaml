@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Folder rule (File + BrowseObject contexts) — enables proper new-folder support and folder
+  properties. Direct mirror of the managed project system's Folder.xaml; note the special
+  Persistence="ProjectFileFolderItems" data source.
+-->
+<Rule Name="Folder"
+      Description="Folder Properties"
+      DisplayName="General"
+      PageTemplate="generic"
+      PropertyPagesHidden="true"
+      xmlns="http://schemas.microsoft.com/build/2009/properties">
+  <Rule.Categories>
+    <Category Name="Misc"
+              DisplayName="Misc" />
+  </Rule.Categories>
+
+  <Rule.DataSource>
+    <DataSource HasConfigurationCondition="False"
+                ItemType="Folder"
+                Persistence="ProjectFileFolderItems"
+                SourceOfDefaultValue="AfterContext" />
+  </Rule.DataSource>
+
+  <StringProperty Name="FolderName"
+                  Category="Misc"
+                  Description="Name of this folder."
+                  DisplayName="Folder Name"
+                  ReadOnly="true" />
+
+  <StringProperty Name="FullPath"
+                  Category="Misc"
+                  Description="Location of the folder."
+                  DisplayName="Full Path"
+                  ReadOnly="true">
+    <StringProperty.DataSource>
+      <DataSource PersistedName="FullPath"
+                  Persistence="Intrinsic"
+                  SourceOfDefaultValue="AfterContext" />
+    </StringProperty.DataSource>
+  </StringProperty>
+
+  <StringProperty Name="Identity"
+                  ReadOnly="true"
+                  Visible="false">
+    <StringProperty.DataSource>
+      <DataSource PersistedName="Identity"
+                  Persistence="Intrinsic"
+                  SourceOfDefaultValue="AfterContext" />
+    </StringProperty.DataSource>
+  </StringProperty>
+
+  <BoolProperty Name="Visible"
+                Visible="false" />
+</Rule>
