@@ -138,7 +138,10 @@ public sealed partial class PgParser
         if (c.MatchWords("TEXT", "SEARCH")) return ParseCreateTextSearch(c);
         if (c.AtWord("UNIQUE") || c.AtWord("INDEX")) return ParseCreateIndex(c);
         if (c.AtAnyWord("FUNCTION", "PROCEDURE")) return ParseCreateFunction(c);
-        if (c.AtAnyWord("ROLE", "USER", "GROUP")) { var k = c.Advance().Value.ToUpperInvariant(); c.ExpectIdentifier(); ConsumeRest(c); return new CommandStatement { Kind = "CREATE " + k }; }
+        // CREATE USER MAPPING is a schema object (a raw object), NOT a CREATE USER role command — let it fall
+        // through to ParseCreateGeneric so it is modelled (deploys/extracts) instead of discarded (#108).
+        if (c.AtAnyWord("ROLE", "USER", "GROUP") && !(c.AtWord("USER") && c.Peek(1)?.IsWord("MAPPING") == true))
+        { var k = c.Advance().Value.ToUpperInvariant(); c.ExpectIdentifier(); ConsumeRest(c); return new CommandStatement { Kind = "CREATE " + k }; }
         // PUBLICATION falls through to ParseCreateGeneric → RawCreateStatement → modelled as a raw object
         // (so it deploys + extracts), not discarded as a CommandStatement.
         if (c.MatchWord("SUBSCRIPTION"))

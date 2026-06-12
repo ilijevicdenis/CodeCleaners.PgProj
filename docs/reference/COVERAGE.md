@@ -21,36 +21,37 @@ Legend: ✅ full · ◑ partial · ⬜ not yet · `raw` = handled by the generic
 | CREATE TABLE — CHECK constraint | ✅ | ✅ | ✅ | column + named table-level (LIM-103) |
 | CREATE TABLE — GENERATED … STORED | ✅ | ✅ | ✅ | expression retained (LIM-104) |
 | CREATE TABLE — identity ALWAYS/BY DEFAULT | ✅ | ✅ | ✅ | LIM-009 |
-| CREATE TABLE — EXCLUDE constraint | ✅ | ✅ | ⬜ | captured + scripted verbatim; introspection pending |
-| CREATE TABLE — INHERITS / PARTITION BY / WITH | ◑ | ◑ | ⬜ | trailing clauses round-trip (LIM-101) |
-| CREATE TABLE — PARTITION OF / OF type | `raw` | `raw` | ⬜ | captured verbatim as raw Table object |
+| CREATE TABLE — EXCLUDE constraint | ✅ | ✅ | ✅ | introspected via pg_get_constraintdef into OtherConstraints (#98) |
+| CREATE TABLE — INHERITS / PARTITION BY / WITH | ◑ | ◑ | ✅ | PARTITION BY + INHERITS introspected to TrailingOptions (#99); WITH storage params still off by default |
+| CREATE TABLE — PARTITION OF / OF type | `raw` | `raw` | ✅ | `OF type` (`ReadTypedTablesAsync`) + `PARTITION OF` (`ReadPartitionChildrenAsync`) (#99) |
 | ALTER TABLE (as deploy output) | n/a | ✅ | n/a | ADD/ALTER/DROP COLUMN (+USING), PK, FK, CHECK |
-| CREATE INDEX (+ partial/INCLUDE/opclass) | ✅ | ✅ | ◑ | expression/opclass compare is textual (LIM-005) |
-| CREATE STATISTICS | `raw` | `raw` | ◑ | existence-only introspection |
+| CREATE INDEX (+ partial/INCLUDE/opclass) | ✅ | ✅ | ✅ | opclass/expression introspected; redundant ASC/NULLS defaults folded so they round-trip (#101) |
+| CREATE STATISTICS | `raw` | `raw` | ✅ | column-based (`ReadStatisticsAsync`) + expression stats via pg_get_statisticsobjdef (`ReadExpressionStatisticsAsync`, #110) |
 | CREATE SEQUENCE (+ options) | ✅ | ✅ | ✅ | AS/INCREMENT/MIN/MAX/START/CACHE/CYCLE (LIM-102) |
 | CREATE VIEW | ✅ | ✅ | ✅ | body compared normalized (LIM-003) |
-| CREATE MATERIALIZED VIEW | ✅ | ✅ | ◑ | introspected as view; matview flag on extract pending |
+| CREATE MATERIALIZED VIEW | ✅ | ✅ | ✅ | matview flag introspected via relkind (`ReadViewsAsync`) |
 | CREATE FUNCTION / PROCEDURE | ✅ | ✅ | ✅ | overloads disambiguated by arg types (LIM-002) |
-| CREATE AGGREGATE | `raw` | `raw` | ⬜ | |
-| CREATE TYPE — enum/composite/range/base | `raw` | `raw` | ◑ | enum + composite introspected; range/base pending |
+| CREATE AGGREGATE | `raw` | `raw` | ✅ | introspected (`ReadAggregatesAsync`: SFUNC/STYPE/FINALFUNC/…) |
+| CREATE TYPE — enum/composite/range/base | `raw` | `raw` | ◑ | enum + composite + range introspected; **base types deferred** (#102 — need C I/O functions, see backlog) |
 | CREATE DOMAIN | `raw` | `raw` | ✅ | introspected (base type + constraints) |
 | CREATE TRIGGER | `raw` | `raw` | ✅ | via pg_get_triggerdef |
-| CREATE EVENT TRIGGER | `raw` | `raw` | ◑ | reconstructed (tags omitted) |
+| CREATE EVENT TRIGGER | `raw` | `raw` | ✅ | reconstructed incl. WHEN TAG IN; body-comparable (#104) |
 | CREATE RULE | `raw` | `raw` | ✅ | via pg_get_ruledef |
-| CREATE POLICY (RLS) | `raw` | `raw` | ◑ | reconstructed (TO roles omitted) |
+| CREATE POLICY (RLS) | `raw` | `raw` | ✅ | reconstructed incl. TO roles; identity-only compare (#103) |
 | CREATE EXTENSION | `raw` | `raw` | ✅ | |
-| CREATE LANGUAGE | `raw` | `raw` | ⬜ | procedural-language (xplang) |
-| CREATE TRANSFORM | `raw` | `raw` | ⬜ | |
-| CREATE COLLATION | `raw` | `raw` | ◑ | existence-only introspection |
-| CREATE CAST | `raw` | `raw` | ⬜ | |
-| CREATE CONVERSION | `raw` | `raw` | ◑ | existence-only introspection |
-| CREATE OPERATOR / CLASS / FAMILY | `raw` | `raw` | ⬜ | |
-| CREATE TEXT SEARCH CONFIG/DICT | `raw` | `raw` | ◑ | existence-only introspection |
-| CREATE TEXT SEARCH PARSER/TEMPLATE | `raw` | `raw` | ⬜ | |
-| CREATE FOREIGN TABLE | `raw` | `raw` | ◑ | existence-only introspection |
-| CREATE FOREIGN DATA WRAPPER / SERVER | `raw` | `raw` | ◑ | existence-only introspection |
-| CREATE USER MAPPING | `raw` | `raw` | ⬜ | references a role but defines schema |
-| COMMENT ON … | `raw` | `raw` | ⬜ | comment text is schema metadata |
+| CREATE PUBLICATION | `raw` | `raw` | ✅ | introspected (`ReadPublicationsAsync`) |
+| CREATE LANGUAGE | `raw` | `raw` | ✅ | introspected (`ReadLanguagesAsync`: handler/inline/validator, non-extension) (#108) |
+| CREATE TRANSFORM | `raw` | `raw` | ⬜ | **deferred** (#108 — needs C `internal`-typed transform functions, see backlog) |
+| CREATE COLLATION | `raw` | `raw` | ✅ | introspected (`ReadCollationsAsync`: provider/locale/deterministic) |
+| CREATE CAST | `raw` | `raw` | ✅ | introspected (`ReadCastsAsync`, user casts) |
+| CREATE CONVERSION | `raw` | `raw` | ✅ | introspected (`ReadConversionsAsync`) |
+| CREATE OPERATOR / CLASS / FAMILY | `raw` | `raw` | ✅ | full DDL reconstruction (`ReadOperators/OperatorClasses/OperatorFamiliesAsync`) |
+| CREATE TEXT SEARCH CONFIG/DICT | `raw` | `raw` | ✅ | introspected (`ReadTextSearchConfigurations/DictionariesAsync`) |
+| CREATE TEXT SEARCH PARSER/TEMPLATE | `raw` | `raw` | ✅ | introspected from support-function regprocs (`ReadTextSearchParsers/TemplatesAsync`) (#109) |
+| CREATE FOREIGN TABLE | `raw` | `raw` | ✅ | introspected (`ReadForeignTablesAsync`: columns/server/options) |
+| CREATE FOREIGN DATA WRAPPER / SERVER | `raw` | `raw` | ✅ | full DDL reconstruction (`ReadForeignDataWrappers/ServersAsync`) |
+| CREATE USER MAPPING | `raw` | `raw` | ✅ | parser fix + `ReadUserMappingsAsync` (FOR user SERVER server +OPTIONS) (#108) |
+| COMMENT ON … | `raw` | `raw` | ✅ | introspected across all object classes (`ReadCommentsAsync`) |
 
 ## Raw-object mechanism
 
@@ -67,5 +68,10 @@ Diff rule: missing on target → emit body; body changed → `DROP … IF EXISTS
 — trigger/rule/policy/etc. — do not). Comments never drop; a change just re-emits.
 
 The introspection column is where the remaining work concentrates: project-side build/script/
-project-vs-project compare already cover everything; live-server compare/publish/extract cover the
-✅/◑ rows and will be filled in kind-by-kind (see BUGS.md LIM-1xx).
+project-vs-project compare already cover everything; live-server compare/publish/extract already cover
+all ✅ rows. The remaining ⬜/◑ are tracked under **EP-COVERAGE (#72)** on milestone M7. **Done:** EXCLUDE
+constraints (#98), EVENT TRIGGER tags (#104), POLICY `TO` roles (#103), USER MAPPING + LANGUAGE (#108),
+PARTITION/INHERITS (#99), index opclass/ordering (#101), expression statistics (#110), TEXT SEARCH
+PARSER/TEMPLATE (#109). **Deferred to backlog** (genuinely need C functions loaded into the PG server,
+which in practice ship via an extension and are then introspected as extension-owned): **base types
+(#102)** and **transforms (#108 tail)**. See also BUGS.md LIM-1xx.

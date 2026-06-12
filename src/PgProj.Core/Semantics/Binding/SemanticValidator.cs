@@ -385,6 +385,18 @@ public sealed class SemanticValidator
         }
     }
 
+    /// <summary>
+    /// PostgreSQL's parameterless special values: SQL keywords that are legal as bare expressions
+    /// and tokenise like identifiers. (With a precision argument — <c>current_time(3)</c> — they
+    /// parse as function calls instead and never reach the ColumnRef path.)
+    /// </summary>
+    private static readonly HashSet<string> SqlSpecialValues = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "current_user", "session_user", "current_role", "user",
+        "current_catalog", "current_schema",
+        "current_date", "current_time", "current_timestamp", "localtime", "localtimestamp",
+    };
+
     private void ValidateBoundConstraint(BoundExpr e, ConstraintScope scope, int anchor)
     {
         switch (e)
@@ -392,6 +404,10 @@ public sealed class SemanticValidator
             case BoundColumnRef cr when cr.Parts.Count > 0:
             {
                 string colName = cr.Parts[^1];
+                // SQL parameterless special values (DEFAULT current_user, CHECK (... < current_date), …)
+                // parse as bare ColumnRefs but are keywords, not columns — only when unqualified
+                // (PostgreSQL reserves them, so a real column by that name can only appear qualified/quoted).
+                if (cr.Parts.Count == 1 && SqlSpecialValues.Contains(colName)) break;
                 // a qualified ref must qualify THIS table; if it qualifies another we can't be sure → skip
                 if (cr.Parts.Count >= 2 && !cr.Parts[^2].Equals(scope.Table, StringComparison.OrdinalIgnoreCase)) break;
                 if (scope.Find(colName) is null)

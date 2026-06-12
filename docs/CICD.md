@@ -28,6 +28,18 @@ Convention (loose, not enforced): `0` success; `1`–`2` usage/unexpected; `3`�
 caught before touching a server; `6`–`8` outcomes that required talking to (or comparing against) a
 live database.
 
+## Reproducibility gate: `pgproj verify`
+
+`pgproj verify <a.pgpkg> <b.pgpkg>` asserts two packages are THE SAME THING - canonical model,
+embedded .sql sources, and manifest options (identity stamps excluded, so rebuilds of identical
+sources pass). Exit `0` = equivalent, `6` (Drift) = any difference; `--format json` / `-o` emit
+the structured report naming each drifting object/source/option. Wire it locally (consistent with
+this repo's no-online-CI posture) wherever reproducibility matters:
+
+- **build determinism** - build the same project twice, `verify` the two .pgpkg artifacts;
+- **conversion proofs** - old layout vs new layout of the same database project;
+- **extract round-trips** - package two extracts of the same database and `verify` them.
+
 ### How pipelines should branch
 
 - **Pass/fail only** — the default for most steps. Any non-zero fails the stage.
@@ -90,27 +102,6 @@ The deploy must never happen without a human in the loop:
 4. **Secrets, not inline.** Pass the connection string via `connection:` mapped from
    `${{ secrets.PGPROJ_CONNECTION }}`; the action feeds it through the `PGPROJ_CONNECTION` env var so it
    never appears on the command line or in logs.
-
-## Azure DevOps
-
-A step template lives at `ci/azure-devops/pgproj-template.yml`. It installs the .NET 10 SDK,
-publishes the CLI, runs the requested verb, and (for `build`) publishes the model as a pipeline
-artifact.
-
-```yaml
-steps:
-  - template: ci/azure-devops/pgproj-template.yml
-    parameters:
-      project: $(Build.SourcesDirectory)/sample/SampleDb/SampleDb.pgproj
-      command: build
-      strict: true
-```
-
-**Approval & dry-run gating (Azure DevOps):** run `build` in a CI stage, then put the `publish`
-(no dry-run) step inside a *deployment job* that targets an **Environment** with an **Approvals and
-checks → Approvals** gate. Use `dryRun: true` on PR validation builds. Map the connection from a
-**secret** pipeline variable to the template's `connection` parameter (it is exported only as the
-`PGPROJ_CONNECTION` env var for the CLI step).
 
 ## Container image
 

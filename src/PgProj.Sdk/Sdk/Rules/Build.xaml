@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  File-context rule for the Build item type (.sql sources). CPS only renders items in Solution
+  Explorer when their item type has a File-context rule whose DataSource binds the type — the
+  ProjectItemsSchema ItemType declaration alone is not enough. Mirrors the shape of the managed
+  project system's Content.xaml (MSBuild\Microsoft\VisualStudio\Managed).
+-->
+<Rule Name="Build"
+      PageTemplate="generic"
+      PropertyPagesHidden="true"
+      xmlns="http://schemas.microsoft.com/build/2009/properties">
+  <Rule.DataSource>
+    <DataSource HasConfigurationCondition="False"
+                ItemType="Build"
+                Persistence="ProjectFile"
+                SourceOfDefaultValue="AfterContext" />
+  </Rule.DataSource>
+
+  <DynamicEnumProperty Name="{}{ItemType}"
+                       EnumProvider="ItemTypes" />
+
+  <StringProperty Name="Link"
+                  Visible="false">
+    <StringProperty.DataSource>
+      <DataSource PersistenceStyle="Attribute"
+                  SourceOfDefaultValue="AfterContext" />
+    </StringProperty.DataSource>
+  </StringProperty>
+
+  <BoolProperty Name="Visible"
+                Visible="false" />
+</Rule>

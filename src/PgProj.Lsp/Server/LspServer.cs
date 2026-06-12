@@ -28,12 +28,18 @@ public sealed class LspServer : IDisposable
     private bool _initialized;
     private volatile bool _shutdownRequested;
 
-    public LspServer(Stream input, Stream output, int debounceMs = 150)
+    /// <param name="workspaceRoot">
+    /// Optional directory to resolve the <c>.pgproj</c> from immediately (the CLI's positional
+    /// <c>serve &lt;workspace-dir&gt;</c>). Acts as the fallback when the client's <c>initialize</c>
+    /// carries no usable rootUri/rootPath — without it such a client silently degrades to
+    /// loose-buffer mode (parse-only diagnostics, no project model).
+    /// </param>
+    public LspServer(Stream input, Stream output, int debounceMs = 150, string? workspaceRoot = null)
     {
         _reader = new LspMessageReader(input);
         _writer = new LspMessageWriter(output);
         _scheduler = new DebouncedAnalysisScheduler(debounceMs);
-        _service = new LanguageService(_store);
+        _service = new LanguageService(_store, WorkspaceProject.FindProjectFile(workspaceRoot));
     }
 
     /// <summary>The document store (exposed for tests/diagnostics).</summary>
@@ -55,6 +61,8 @@ public sealed class LspServer : IDisposable
             JsonRpcMessage msg;
             try { msg = JsonRpcMessage.FromJson(json); }
             catch { await Respond(JsonRpcMessage.ErrorFor(null, LspErrorCodes.ParseError, "Invalid JSON.")).ConfigureAwait(false); continue; }
+
+            WireLog($"<- {msg.Method ?? "(response)"} {Snippet(msg)}");
 
             if (msg.Method == "exit") return _shutdownRequested ? 0 : 1;
 
@@ -99,7 +107,7 @@ public sealed class LspServer : IDisposable
                 if (p is not null)
                 {
                     _store.Open(p.TextDocument.Uri, p.TextDocument.Text, p.TextDocument.Version);
-                    ScheduleDiagnostics(p.TextDocument.Uri);
+                    ScheduleDiagnosticsForAllOpenDocuments();
                 }
                 break;
             }
@@ -112,7 +120,7 @@ public sealed class LspServer : IDisposable
                     // Sync kind = Full → the last change carries the whole new document text.
                     var text = p.ContentChanges[^1].Text;
                     _store.Change(p.TextDocument.Uri, text, p.TextDocument.Version);
-                    ScheduleDiagnostics(p.TextDocument.Uri);
+                    ScheduleDiagnosticsForAllOpenDocuments();
                 }
                 break;
             }
@@ -135,6 +143,16 @@ public sealed class LspServer : IDisposable
                 var p = Decode<TextDocumentPositionParams>(msg);
                 var loc = p is null ? null : await _service.DefinitionAsync(p.TextDocument.Uri, p.Position, ct).ConfigureAwait(false);
                 await Respond(JsonRpcMessage.ResultFor(msg.Id, (object?)loc)).ConfigureAwait(false);
+                break;
+            }
+
+            case "textDocument/references":
+            {
+                var p = Decode<ReferenceParams>(msg);
+                var refs = p is null
+                    ? Array.Empty<Location>()
+                    : await _service.ReferencesAsync(p.TextDocument.Uri, p.Position, p.Context.IncludeDeclaration, ct).ConfigureAwait(false);
+                await Respond(JsonRpcMessage.ResultFor(msg.Id, refs)).ConfigureAwait(false);
                 break;
             }
 
@@ -165,9 +183,23 @@ public sealed class LspServer : IDisposable
     {
         var p = Decode<InitializeParams>(msg);
         var rootPath = p?.RootPath ?? (p?.RootUri is { } u ? DocumentUri.ToPath(u) : null);
-        var projectFile = WorkspaceProject.FindProjectFile(rootPath);
+        // The handshake root wins when it yields a project; otherwise keep the constructor's
+        // workspace-root resolution (a client that sends no/odd rootUri must not downgrade us).
+        var projectFile = WorkspaceProject.FindProjectFile(rootPath) ?? _service.ProjectFilePath;
         _service = new LanguageService(_store, projectFile);
         _initialized = true;
+    }
+
+    /// <summary>
+    /// Cross-file invalidation: a change in ANY buffer re-diagnoses EVERY open document — deleting
+    /// a table definition in one file must light up the dependent views the user has open. The
+    /// per-uri debounce keeps a typing burst to one build per document, and open-doc counts are
+    /// small, so re-running all of them is cheap.
+    /// </summary>
+    private void ScheduleDiagnosticsForAllOpenDocuments()
+    {
+        foreach (var doc in _store.All)
+            ScheduleDiagnostics(doc.Uri);
     }
 
     /// <summary>Debounced re-parse → publishDiagnostics for one document (dropping a stale-version result).</summary>
@@ -186,8 +218,34 @@ public sealed class LspServer : IDisposable
         });
     }
 
-    private Task PublishAsync(PublishDiagnosticsParams p) =>
-        Notify("textDocument/publishDiagnostics", p);
+    private Task PublishAsync(PublishDiagnosticsParams p)
+    {
+        WireLog($"-> publishDiagnostics {p.Uri} ({p.Diagnostics.Count})");
+        return Notify("textDocument/publishDiagnostics", p);
+    }
+
+    /// <summary>
+    /// Opt-in wire trace: set <c>PGPROJ_LSP_LOG</c> to a file path and every inbound method (with
+    /// its document uri) and outbound publish is appended — the tool for "the client never sent
+    /// didOpen for that document" class investigations. Off (zero cost) when the variable is unset.
+    /// </summary>
+    private static readonly string? WireLogPath = Environment.GetEnvironmentVariable("PGPROJ_LSP_LOG");
+
+    private static void WireLog(string line)
+    {
+        if (WireLogPath is null) return;
+        try { File.AppendAllText(WireLogPath, $"{DateTime.UtcNow:HH:mm:ss.fff} {line}\n"); } catch { }
+    }
+
+    private static string Snippet(JsonRpcMessage msg)
+    {
+        try
+        {
+            var uri = msg.Params?["textDocument"]?["uri"]?.GetValue<string>();
+            return uri ?? "";
+        }
+        catch { return ""; }
+    }
 
     private Task Notify(string method, object @params) =>
         _writer.WriteAsync(JsonRpcMessage.Notification(method, @params).ToJson());

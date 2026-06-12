@@ -5,6 +5,7 @@ using Npgsql;
 using PgProj.Core.Comparison;
 using PgProj.Core.Deployment;
 using PgProj.Core.Introspection;
+using PgProj.Core.Publishing;
 using PgProj.Core.Model;
 using PgProj.Core.Project;
 using Xunit;

@@ -1,39 +1,66 @@
-// EP-VS #25 Route B — "Schema Compare" command. SCAFFOLD (requires the VS SDK to build).
-using System;
-using System.ComponentModel.Design;
-using Microsoft.VisualStudio.Shell;
-using Task = System.Threading.Tasks.Task;
+// EP-VS #25 Route B (modern) + #116. "Schema Compare" command — seeds the interactive Schema Compare
+// tool window (source = the selected .pgproj, target = PGPROJ_CONNECTION when set) and runs the first
+// compare IN-PROCESS. Source/target can then be re-picked inside the window itself.
+using Microsoft.VisualStudio.Extensibility;
+using Microsoft.VisualStudio.Extensibility.Commands;
+using Microsoft.VisualStudio.Extensibility.Shell;
+using PgProj.VisualStudio.Engine;
+using PgProj.VisualStudio.ToolWindows;
 
-namespace PgProj.VisualStudio.Commands
+namespace PgProj.VisualStudio.Commands;
+
+/// <summary>
+/// Opens the <see cref="SchemaCompareToolWindow"/> for the selected <c>.pgproj</c>. The window is an
+/// interactive session over the engine's selectable change set: source/target pickers (project /
+/// .pgpkg / .schema.snapshot / live connection), a checkable diff, and Generate Script / Apply. When
+/// <c>PGPROJ_CONNECTION</c> is set the first compare runs immediately; otherwise the window opens with
+/// the source prefilled and waits for a target.
+/// </summary>
+[VisualStudioContribution]
+internal sealed class SchemaCompareCommand : Command
 {
-    /// <summary>
-    /// Opens the Schema Compare tool window for the selected .pgproj. The compare itself is the
-    /// engine's two-way comparer (`pgproj compare --source X --target Y -o diff.json --format json`,
-    /// EP-SCHEMACOMPARE) — the window renders that structured diff and lets the user pick a target
-    /// (project / .pgpkg / .schema.snapshot / live DB) and apply selected changes.
-    /// </summary>
-    internal sealed class SchemaCompareCommand
+    public SchemaCompareCommand(VisualStudioExtensibility extensibility)
+        : base(extensibility)
     {
-        private readonly AsyncPackage _package;
+    }
 
-        private SchemaCompareCommand(AsyncPackage package, OleMenuCommandService commandService)
+    /// <inheritdoc/>
+    public override CommandConfiguration CommandConfiguration => new("%PgProj.SchemaCompare.DisplayName%")
+    {
+        // Same placement/visibility policy as PublishCommand: .pgproj project context menu only
+        // (the classic extension's VSCT group, values inlined for the compile-time evaluator),
+        // no Extensions-menu entry.
+        Placements = [CommandPlacement.VsctParent(new Guid("b0000000-0000-0000-0000-0000000000a2"), 0x1020, priority: 0x0101)],
+        Icon = new(ImageMoniker.KnownValues.CompareFiles, IconSettings.IconAndText),
+        VisibleWhen = ActivationConstraint.ClientContext(ClientContextKey.Shell.ActiveSelectionFileName, @"\.pgproj$"),
+        EnabledWhen = ActivationConstraint.ClientContext(ClientContextKey.Shell.ActiveSelectionFileName, @"\.pgproj$"),
+    };
+
+    /// <inheritdoc/>
+    public override async Task ExecuteCommandAsync(IClientContext context, CancellationToken cancellationToken)
+    {
+        var selectedUri = await context.GetSelectedPathAsync(cancellationToken);
+        var project = PgProjContext.FindNearestProject(selectedUri?.LocalPath);
+        if (project is null)
         {
-            _package = package;
-            var id = new CommandID(PgProjGuids.CommandSet, PgProjGuids.SchemaCompareCommandId);
-            commandService.AddCommand(new MenuCommand(Execute, id));
+            await this.Extensibility.Shell().ShowPromptAsync(
+                "No .pgproj found for the current selection.", PromptOptions.OK, cancellationToken);
+            return;
         }
 
-        public static async Task InitializeAsync(AsyncPackage package)
+        var session = SchemaCompareState.GetOrCreate(this.Extensibility);
+        session.SourceSpec = project;
+        if (session.TargetSpec.Trim().Length == 0 &&
+            (ConnectionStore.TryGet(project) ?? PgProjContext.ResolveConnection()) is { } connection)
         {
-            await package.JoinableTaskFactory.SwitchToMainThreadAsync();
-            var commandService = await package.GetServiceAsync(typeof(IMenuCommandService)) as OleMenuCommandService;
-            if (commandService != null)
-                _ = new SchemaCompareCommand(package, commandService);
+            session.TargetSpec = connection;
         }
 
-        private void Execute(object sender, EventArgs e)
-        {
-            // SCAFFOLD: show the SchemaCompareToolWindow, seeded with the selected project as source.
-        }
+        await this.Extensibility.Shell().ShowToolWindowAsync<SchemaCompareToolWindow>(activate: true, cancellationToken);
+
+        if (session.TargetSpec.Trim().Length > 0)
+            await session.CompareAsync(cancellationToken);
+        else
+            session.Summary = $"Source: {Path.GetFileName(project)}. Enter a target (connection string, .pgproj, .pgpkg, or .schema.snapshot) and Compare.";
     }
 }

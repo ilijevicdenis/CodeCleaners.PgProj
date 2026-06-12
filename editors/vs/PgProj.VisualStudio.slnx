@@ -1,0 +1,14 @@
+<Solution>
+  <!-- Standalone solution for the modern PgProj VS extension. Deliberately separate from PgProj.slnx
+       (the cross-platform engine) — this targets VS 2026 + the Extensibility build tools and is NOT part
+       of `dotnet test`.
+
+       The two engine projects are listed here because the VSIX <ProjectReference>s them: Visual Studio's
+       restore is solution-scoped, so they must be in THIS solution for VS to find their project info and
+       restore them. (This does not add them to PgProj.slnx, nor to the `dotnet test` gates.) -->
+  <Project Path="PgProj.VisualStudio/PgProj.VisualStudio.csproj" />
+  <Folder Name="/engine/">
+    <Project Path="../../src/PgProj.Core/PgProj.Core.csproj" />
+    <Project Path="../../src/PgProj.Lsp/PgProj.Lsp.csproj" />
+  </Folder>
+</Solution>

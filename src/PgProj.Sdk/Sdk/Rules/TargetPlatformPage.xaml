@@ -1,0 +1,33 @@
+<!--
+  Project-properties page: Target Platform (EP-VS #114, the SSDT "Target platform" dropdown).
+  Selecting a version gates the build/publish through the engine's TargetVersionAnalyzer (PGV###
+  diagnostics) so syntax newer than the chosen PostgreSQL major fails fast. Persisted as the
+  TargetPostgresVersion property in the .pgproj.
+-->
+<Rule Name="PgProjTargetPlatform"
+      DisplayName="Target Platform"
+      Description="The PostgreSQL version this project targets."
+      PageTemplate="generic"
+      Order="200"
+      xmlns="http://schemas.microsoft.com/build/2009/properties">
+
+  <Rule.DataSource>
+    <DataSource Persistence="ProjectFile" HasConfigurationCondition="False" SourceOfDefaultValue="AfterContext" />
+  </Rule.DataSource>
+
+  <Rule.Categories>
+    <Category Name="General" DisplayName="General" />
+  </Rule.Categories>
+
+  <EnumProperty Name="TargetPostgresVersion"
+                DisplayName="Target PostgreSQL version"
+                Category="General"
+                Description="Builds and publishes fail when the project uses syntax newer than this major version (version-aware validation). Leave unset in the .pgproj to skip version gating.">
+    <EnumValue Name="13" DisplayName="PostgreSQL 13" />
+    <EnumValue Name="14" DisplayName="PostgreSQL 14" />
+    <EnumValue Name="15" DisplayName="PostgreSQL 15" />
+    <EnumValue Name="16" DisplayName="PostgreSQL 16" />
+    <EnumValue Name="17" DisplayName="PostgreSQL 17" />
+    <EnumValue Name="18" DisplayName="PostgreSQL 18" />
+  </EnumProperty>
+</Rule>

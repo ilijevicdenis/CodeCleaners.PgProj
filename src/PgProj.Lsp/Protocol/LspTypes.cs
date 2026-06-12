@@ -54,7 +54,12 @@ public sealed record TextDocumentSyncOptions
 
 public sealed record CompletionOptions
 {
-    public IReadOnlyList<string> TriggerCharacters { get; init; } = new[] { ".", " " };
+    /// <summary>
+    /// Just the dot: a space trigger pops completion after EVERY word — noisy as UX (the popup
+    /// flickers open on plain prose typing) and it made automated runs flaky. Explicit invoke
+    /// (Ctrl+Space) covers the "list everything here" case.
+    /// </summary>
+    public IReadOnlyList<string> TriggerCharacters { get; init; } = new[] { "." };
 }
 
 public sealed record ServerCapabilities
@@ -62,6 +67,7 @@ public sealed record ServerCapabilities
     public TextDocumentSyncOptions TextDocumentSync { get; init; } = new();
     public bool DefinitionProvider { get; init; } = true;
     public bool HoverProvider { get; init; } = true;
+    public bool ReferencesProvider { get; init; } = true;
     public CompletionOptions CompletionProvider { get; init; } = new();
 }
 
@@ -127,6 +133,19 @@ public sealed record TextDocumentPositionParams
 {
     public required TextDocumentIdentifier TextDocument { get; init; }
     public required Position Position { get; init; }
+}
+
+/// <summary>The <c>textDocument/references</c> request's extra context.</summary>
+public sealed record ReferenceContext
+{
+    public bool IncludeDeclaration { get; init; } = true;
+}
+
+public sealed record ReferenceParams
+{
+    public required TextDocumentIdentifier TextDocument { get; init; }
+    public required Position Position { get; init; }
+    public ReferenceContext Context { get; init; } = new();
 }
 
 public sealed record MarkupContent

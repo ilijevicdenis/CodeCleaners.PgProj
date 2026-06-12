@@ -1,0 +1,27 @@
+<!--
+  Project-properties page: SQLCMD Variables (EP-VS #114, the SSDT "SQLCMD Variables" page analogue).
+  Project-level DEFAULTS live as SqlCmdVariable items in the .pgproj (Include=name, DefaultValue
+  metadata) - the engine reads those directly. This page carries the publish-time OVERRIDES the SDK
+  forwards to the CLI as repeated var flags, plus where the overrides come from at publish.
+  Precedence at publish: these overrides beat the profile, the profile beats the project defaults.
+-->
+<Rule Name="PgProjSqlCmdVariables"
+      DisplayName="SQLCMD Variables"
+      Description="SQLCMD variable overrides applied when this project is published."
+      PageTemplate="generic"
+      Order="400"
+      xmlns="http://schemas.microsoft.com/build/2009/properties">
+
+  <Rule.DataSource>
+    <DataSource Persistence="ProjectFile" HasConfigurationCondition="False" SourceOfDefaultValue="AfterContext" />
+  </Rule.DataSource>
+
+  <Rule.Categories>
+    <Category Name="Overrides" DisplayName="Publish-time overrides" />
+  </Rule.Categories>
+
+  <StringProperty Name="PgProjPublishVariables"
+                  DisplayName="Variable overrides (Name=Value;Name2=Value2)"
+                  Category="Overrides"
+                  Description="Semicolon-separated Name=Value pairs forwarded to publish as variable overrides. They override the publish profile, which overrides the SqlCmdVariable DefaultValue items declared in the project file." />
+</Rule>

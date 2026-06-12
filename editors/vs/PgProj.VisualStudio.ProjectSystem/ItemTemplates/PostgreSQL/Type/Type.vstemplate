@@ -1,0 +1,13 @@
+<VSTemplate Version="3.0.0" Type="Item" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
+  <TemplateData>
+    <Name>Type (PostgreSQL)</Name>
+    <Description>A CREATE TYPE script (enum or composite). Name it schema.type and keep it in that schema's folder.</Description>
+    <ProjectType>PgProj</ProjectType>
+    <TemplateID>PgProj.Item.Type</TemplateID>
+    <DefaultName>public.type1.sql</DefaultName>
+    <SortOrder>70</SortOrder>
+  </TemplateData>
+  <TemplateContent>
+    <ProjectItem ReplaceParameters="true" TargetFileName="$fileinputname$.sql">Type.sql</ProjectItem>
+  </TemplateContent>
+</VSTemplate>

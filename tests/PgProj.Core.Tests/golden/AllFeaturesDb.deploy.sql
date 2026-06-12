@@ -1,12 +1,15 @@
 -- ============================================================
 -- PgProj deployment script
--- 69 change(s)
+-- 74 change(s)
 -- ============================================================
 
 BEGIN;
 
 -- Create extension btree_gist
 CREATE EXTENSION IF NOT EXISTS btree_gist;
+
+-- Create language afd_plpgsql
+CREATE LANGUAGE afd_plpgsql HANDLER plpgsql_call_handler INLINE plpgsql_inline_handler VALIDATOR plpgsql_validator;
 
 -- Create schema afd
 CREATE SCHEMA IF NOT EXISTS "afd";
@@ -16,6 +19,12 @@ CREATE SCHEMA IF NOT EXISTS "reporting";
 
 -- Create collation afd.case_insensitive
 CREATE COLLATION afd.case_insensitive(PROVIDER=icu,LOCALE='und-u-ks-level2',DETERMINISTIC=false);
+
+-- Create textsearchparser afd.myparser
+CREATE TEXT SEARCH PARSER afd.myparser(START=prsd_start,GETTOKEN=prsd_nexttoken,END=prsd_end,LEXTYPES=prsd_lextype);
+
+-- Create textsearchtemplate afd.mytmpl
+CREATE TEXT SEARCH TEMPLATE afd.mytmpl(INIT=dsimple_init,LEXIZE=dsimple_lexize);
 
 -- Create textsearchdictionary afd.english_dict
 CREATE TEXT SEARCH DICTIONARY afd.english_dict(TEMPLATE=pg_catalog.simple,STOPWORDS=english);
@@ -52,6 +61,9 @@ CREATE FOREIGN DATA WRAPPER dummy_fdw NO HANDLER NO VALIDATOR OPTIONS(debug 'tru
 
 -- Create server dummy_server
 CREATE SERVER dummy_server FOREIGN DATA WRAPPER dummy_fdw OPTIONS(host 'localhost',dbname 'remote');
+
+-- Create usermapping FOR PUBLIC SERVER dummy_server
+CREATE USER MAPPING FOR PUBLIC SERVER dummy_server OPTIONS(user 'remote_bob');
 
 -- Create table afd.base_entity
 CREATE TABLE "afd"."base_entity" (
@@ -181,6 +193,9 @@ CREATE INDEX "customers_region_gist" ON "afd"."customers" USING gist (region);
 
 -- Create index afd.customers_tags_gin
 CREATE INDEX "customers_tags_gin" ON "afd"."customers" USING gin (tags);
+
+-- Create statistics afd.customers_expr_stats
+CREATE STATISTICS afd.customers_expr_stats ON(lower(full_name)),tenant_id FROM afd.customers;
 
 -- Create statistics afd.customers_stats
 CREATE STATISTICS afd.customers_stats(ndistinct,dependencies,mcv) ON tenant_id,status,is_active FROM afd.customers;

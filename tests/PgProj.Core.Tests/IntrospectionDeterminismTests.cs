@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using PgProj.Core.Comparison;
 using PgProj.Core.Introspection;
+using PgProj.Core.Publishing;
 using PgProj.Core.Model;
 using PgProj.Core.Project;
 
@@ -128,7 +129,8 @@ internal static class LiveReaderTestSupport
 {
     public const string DropSampleSql =
         "DROP PUBLICATION IF EXISTS customer_pub; DROP SCHEMA IF EXISTS afd CASCADE; " +
-        "DROP SCHEMA IF EXISTS reporting CASCADE; DROP FOREIGN DATA WRAPPER IF EXISTS dummy_fdw CASCADE;";
+        "DROP SCHEMA IF EXISTS reporting CASCADE; DROP FOREIGN DATA WRAPPER IF EXISTS dummy_fdw CASCADE; " +
+        "DROP LANGUAGE IF EXISTS afd_plpgsql CASCADE;";   // global object (not in a dropped schema)
 
     public static string FindSampleProject()
     {

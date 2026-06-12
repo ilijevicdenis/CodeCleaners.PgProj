@@ -946,6 +946,14 @@
       "BodyComparable": true
     },
     {
+      "Kind": 1,
+      "Schema": "",
+      "Name": "afd_plpgsql",
+      "Identity": "language:afd_plpgsql",
+      "Body": "CREATE LANGUAGE afd_plpgsql HANDLER plpgsql_call_handler INLINE plpgsql_inline_handler VALIDATOR plpgsql_validator",
+      "BodyComparable": true
+    },
+    {
       "Kind": 8,
       "Schema": "afd",
       "Name": "afd.int_minmax_ops USING btree",
@@ -985,6 +993,14 @@
       "Identity": "rule:orders_no_delete on afd.orders",
       "Body": "CREATE RULE orders_no_delete AS ON DELETE TO afd.orders DO INSTEAD NOTHING",
       "OnObject": "afd.orders",
+      "BodyComparable": true
+    },
+    {
+      "Kind": 15,
+      "Schema": "afd",
+      "Name": "customers_expr_stats",
+      "Identity": "statistics:afd.customers_expr_stats",
+      "Body": "CREATE STATISTICS afd.customers_expr_stats ON(lower(full_name)),tenant_id FROM afd.customers",
       "BodyComparable": true
     },
     {
@@ -1036,6 +1052,22 @@
       "BodyComparable": true
     },
     {
+      "Kind": 22,
+      "Schema": "afd",
+      "Name": "myparser",
+      "Identity": "textsearchparser:afd.myparser",
+      "Body": "CREATE TEXT SEARCH PARSER afd.myparser(START=prsd_start,GETTOKEN=prsd_nexttoken,END=prsd_end,LEXTYPES=prsd_lextype)",
+      "BodyComparable": true
+    },
+    {
+      "Kind": 23,
+      "Schema": "afd",
+      "Name": "mytmpl",
+      "Identity": "textsearchtemplate:afd.mytmpl",
+      "Body": "CREATE TEXT SEARCH TEMPLATE afd.mytmpl(INIT=dsimple_init,LEXIZE=dsimple_lexize)",
+      "BodyComparable": true
+    },
+    {
       "Kind": 11,
       "Schema": "afd",
       "Name": "customers_touch",
@@ -1083,6 +1115,14 @@
       "Name": "shell_type",
       "Identity": "type:afd.shell_type",
       "Body": "CREATE TYPE afd.shell_type",
+      "BodyComparable": true
+    },
+    {
+      "Kind": 18,
+      "Schema": "",
+      "Name": "FOR PUBLIC SERVER dummy_server",
+      "Identity": "usermapping:for public server dummy_server",
+      "Body": "CREATE USER MAPPING FOR PUBLIC SERVER dummy_server OPTIONS(user \u0027remote_bob\u0027)",
       "BodyComparable": true
     }
   ]

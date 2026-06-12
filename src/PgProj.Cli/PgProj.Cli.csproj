@@ -25,7 +25,28 @@
          to native so the runtime JITs far less at startup (pure codegen-ahead, no behaviour change; applies
          on `dotnet publish`). -->
     <InvariantGlobalization>true</InvariantGlobalization>
-    <PublishReadyToRun>true</PublishReadyToRun>
+    <!-- R2R only when a RID is set: it requires one, and a `dotnet tool` package is RID-agnostic IL,
+         so an unconditional `true` breaks `dotnet pack` (PackAsTool publish has no RID → NETSDK1095).
+         Nothing is lost — the SDK's CLI publish already passes PublishReadyToRun=false, and a plain
+         `dotnet publish` without a RID can't R2R anyway; deployment publishes that set a RID still get it. -->
+    <PublishReadyToRun Condition="'$(RuntimeIdentifier)' != ''">true</PublishReadyToRun>
+  </PropertyGroup>
+
+  <!--
+    Ship the CLI as a .NET tool:  `dotnet tool install -g PgProj.Cli`  exposes the `pgproj` command.
+    This is the standalone CLI distribution for scripting/CI; the PgProj.Sdk NuGet bundles the same
+    CLI under tools/ for MSBuild, but this makes `pgproj` runnable on its own. `dotnet pack` produces
+    the tool package (PgProj.Cli.<Version>.nupkg); it is not produced by `dotnet build`/`dotnet test`.
+  -->
+  <PropertyGroup>
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>pgproj</ToolCommandName>
+    <PackageId>PgProj.Cli</PackageId>
+    <Version>0.1.0</Version>
+    <Authors>CodeCleaners d.o.o.</Authors>
+    <Description>pgproj — PostgreSQL declarative database project CLI: build a .pgproj to a model/.pgpkg, compare schemas, and publish (deploy) to a server. Same engine as the PgProj.Sdk MSBuild SDK and the Visual Studio / VS Code extensions.</Description>
+    <PackageTags>postgresql;pgproj;database;ssdt;schema-compare;cli;dotnet-tool</PackageTags>
+    <PackageProjectUrl>https://github.com/ilijevicdenis/CodeCleaners.PgProj</PackageProjectUrl>
   </PropertyGroup>
 
 </Project>

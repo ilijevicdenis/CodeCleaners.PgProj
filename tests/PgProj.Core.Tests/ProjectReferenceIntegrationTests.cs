@@ -3,6 +3,7 @@ using System.IO;
 using System.Threading.Tasks;
 using PgProj.Core.Comparison;
 using PgProj.Core.Introspection;
+using PgProj.Core.Publishing;
 using PgProj.Core.Model;
 using PgProj.Core.Project;
 using PgProj.Core.Project.References;

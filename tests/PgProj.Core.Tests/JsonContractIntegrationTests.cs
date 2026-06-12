@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using PgProj.Core.Comparison;
 using PgProj.Core.Contracts;
 using PgProj.Core.Introspection;
+using PgProj.Core.Publishing;
 using PgProj.Core.Model;
 using PgProj.Core.Project;
 using Xunit;

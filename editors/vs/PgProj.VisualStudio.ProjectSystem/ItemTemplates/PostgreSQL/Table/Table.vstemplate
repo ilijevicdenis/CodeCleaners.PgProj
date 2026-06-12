@@ -1,0 +1,13 @@
+<VSTemplate Version="3.0.0" Type="Item" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
+  <TemplateData>
+    <Name>Table (PostgreSQL)</Name>
+    <Description>A CREATE TABLE script. Name it schema.table (e.g. app.customers) and keep it in that schema's folder.</Description>
+    <ProjectType>PgProj</ProjectType>
+    <TemplateID>PgProj.Item.Table</TemplateID>
+    <DefaultName>public.table1.sql</DefaultName>
+    <SortOrder>20</SortOrder>
+  </TemplateData>
+  <TemplateContent>
+    <ProjectItem ReplaceParameters="true" TargetFileName="$fileinputname$.sql">Table.sql</ProjectItem>
+  </TemplateContent>
+</VSTemplate>

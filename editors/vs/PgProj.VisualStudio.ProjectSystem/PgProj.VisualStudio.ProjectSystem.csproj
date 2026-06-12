@@ -1,0 +1,151 @@
+<Project>
+
+  <!--
+    ============================================================================================
+    PgProj Visual Studio PROJECT SYSTEM (EP-VS #25 Route B, SSDT-parity path).
+
+    The in-process VSSDK extension that gives `.pgproj` a real Visual Studio project experience:
+    a File->New->Project template, a Solution Explorer object tree, project-node operations
+    (Build/Publish/Schema Compare/Import), property pages, and WPF editors. This is the classic
+    in-proc model (the modern out-of-process VisualStudio.Extensibility model cannot author a
+    project type) — SDK-style csproj on net472, per Microsoft's current VSSDK guidance.
+
+    The `.sql` IntelliSense stays in the sibling modern OOP extension (PgProj.VisualStudio).
+
+    BUILD: with the VS 2026 MSBuild (Microsoft.VSSDK.BuildTools brings the VSIX targets). Own
+    solution; NOT in PgProj.slnx / `dotnet test`.
+
+    EXPLICIT SDK IMPORTS (not the `Sdk="..."` attribute) are required so that the VSSDK
+    `Microsoft.VsSDK.targets` import below lands AFTER the SDK's Sdk.targets. That ordering matters:
+    VsSDK.targets statically defines $(ResourceManifest)=$(IntermediateOutputPath)\resources.json,
+    and $(IntermediateOutputPath) is only set by Sdk.targets — import VsSDK.targets too early and the
+    path collapses to a drive-root "\resources.json" (VSSDK1207 access-denied).
+    ============================================================================================
+  -->
+
+  <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />
+
+  <PropertyGroup>
+    <!-- In-proc VS extensions run on the IDE's .NET Framework runtime. net472 is the VSSDK baseline
+         (a VS 2022-targeted extension loads in VS 2026 via its extension-compatibility support). -->
+    <TargetFramework>net472</TargetFramework>
+    <RootNamespace>PgProj.VisualStudio.ProjectSystem</RootNamespace>
+    <AssemblyName>PgProj.VisualStudio.ProjectSystem</AssemblyName>
+    <UseWPF>true</UseWPF>
+    <LangVersion>latest</LangVersion>
+
+    <!-- VSIX packaging (SDK-style VSSDK support). -->
+    <GeneratePkgDefFile>true</GeneratePkgDefFile>
+    <!-- Emit "CodeBase"="$PackageFolder$\<dll>" (not "Assembly"="<strong name>") into the pkgdef.
+         A VSIX-deployed assembly is NOT on the CLR probing path, so name-based registration makes
+         package creation fail at load time with FileNotFoundException. Belt and braces with
+         RegisterUsing=CodeBase on the PackageRegistration attribute (CreatePkgDef honors this
+         property; the attribute alone was not sufficient with BuildTools 17.14). -->
+    <RegisterWithCodebase>true</RegisterWithCodebase>
+    <IncludeAssemblyInVSIXContainer>true</IncludeAssemblyInVSIXContainer>
+    <IncludeDebugSymbolsInVSIXContainer>false</IncludeDebugSymbolsInVSIXContainer>
+    <CreateVsixContainer>true</CreateVsixContainer>
+    <DeployExtension>false</DeployExtension>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.VSSDK.BuildTools" Version="17.14.2120">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.VisualStudio.SDK" Version="17.14.40262" ExcludeAssets="runtime" />
+    <!-- CPS (Common Project System) — the .pgproj project type. NOT part of the
+         Microsoft.VisualStudio.SDK meta-package; the .SDK id is the CPS meta package that carries
+         BOTH Microsoft.VisualStudio.ProjectSystem.dll and ProjectSystem.VS.dll (where
+         ProjectTypeRegistrationAttribute lives — the bare "Microsoft.VisualStudio.ProjectSystem"
+         package has only the core dll). Latest stable as of 2026-06. ExcludeAssets=runtime like
+         the VS SDK reference: pkgdef harvesting (CreatePkgDef) resolves the registration attribute
+         from compile references, and without it the package's transitive runtime payload
+         (System.Text.Encodings.Web.dll) leaks into the VSIX. -->
+    <PackageReference Include="Microsoft.VisualStudio.ProjectSystem.SDK" Version="17.9.380" ExcludeAssets="runtime" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- MenuCommandService / OleMenuCommandService (System.ComponentModel.Design) live here. -->
+    <Reference Include="System.Design" />
+    <!-- MEF v1 attributes ([Export]/[Import]/[ImportingConstructor]) used by the CPS exports. -->
+    <Reference Include="System.ComponentModel.Composition" />
+    <!-- DPAPI (ProtectedData) for the per-project remembered connection (ConnectionStore). -->
+    <Reference Include="System.Security" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <VSCTCompile Include="PgProjCommands.vsct">
+      <ResourceName>Menus.ctmenu</ResourceName>
+    </VSCTCompile>
+    <!-- Package strings (editor factory display name). MergeWithCTO folds the compiled .vsct into
+         this resource (named VSPackage, the classic layout), replacing the synthesized
+         _EmptyResource the build used while the project had no resx. Update (not Include): the
+         .NET SDK already globs *.resx into EmbeddedResource. -->
+    <EmbeddedResource Update="VSPackage.resx">
+      <MergeWithCTO>true</MergeWithCTO>
+      <ManifestResourceName>VSPackage</ManifestResourceName>
+    </EmbeddedResource>
+    <None Include="source.extension.vsixmanifest">
+      <SubType>Designer</SubType>
+    </None>
+    <!-- The manifest's <License>LICENSE</License> names an in-archive path; package the repo-root
+         LICENSE at the vsix root so the VSSDK file-list check (VSSDK1310) is satisfied. Must be
+         Content (not None): GetVsixSourceItems only collects @(Content) with IncludeInVSIX=true.
+         Link with no directory → empty VSIXSubPath → file lands at the archive root as "LICENSE". -->
+    <Content Include="..\..\..\LICENSE" Link="LICENSE">
+      <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Content>
+    <!-- Folder-based VS templates (no .zip needed since VS 2017): the New Project template and the
+         per-database-object Add New Item templates, packaged at the same relative paths inside the
+         VSIX and declared as ProjectTemplate / ItemTemplate assets in the manifest. -->
+    <Content Include="ProjectTemplates\**\*">
+      <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Content>
+    <Content Include="ItemTemplates\**\*">
+      <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
+
+  <!--
+    The Microsoft.VSSDK.BuildTools package auto-imports only build/*.props|.targets (which set up
+    VsSDKInstall + env vars); it does NOT import the file that defines the VSIX build targets
+    (CreateVsixContainer / GetVsixSourceItems / DetokenizeVsixManifestFile). Classic VSSDK projects
+    import it explicitly, so an SDK-style VSSDK project must do the same or the build emits only the
+    dll with no .vsix container. Must follow Sdk.targets (see header note on $(IntermediateOutputPath)).
+    $(VsSDKInstall) is defined by the package's auto-imported props.
+  -->
+  <Import Project="$(VsSDKInstall)\Microsoft.VsSDK.targets"
+          Condition="Exists('$(VsSDKInstall)\Microsoft.VsSDK.targets')" />
+
+  <!--
+    Bundle the pgproj CLI under tools\ inside the VSIX: the in-proc Import Database command shells
+    out to it (the engine is net10; this assembly is net472). Framework-dependent publish, same
+    payload the PgProj.Sdk nupkg carries. Gather the staged files into their OWN item before mapping
+    so %(RecursiveDir) anchors to the stage dir (see the 2026-06-07 packaging lab note); no trailing
+    separator on the stage dir, else the closing quote on the publish command line gets escaped.
+  -->
+  <Target Name="_PgProjBundleCliInVsix" BeforeTargets="GetVsixSourceItems">
+    <PropertyGroup>
+      <_PgProjCliStage>$(MSBuildProjectDirectory)\obj\pgproj-cli</_PgProjCliStage>
+    </PropertyGroup>
+    <Message Importance="high" Text="PgProj VSIX: publishing the pgproj CLI payload into $(_PgProjCliStage)" />
+    <Exec Command="dotnet publish &quot;$(MSBuildProjectDirectory)\..\..\..\src\PgProj.Cli\PgProj.Cli.csproj&quot; -c Release -f net10.0 -o &quot;$(_PgProjCliStage)&quot; --nologo -p:PublishReadyToRun=false --self-contained false" />
+    <ItemGroup>
+      <_PgProjCliVsixFile Include="$(_PgProjCliStage)\**\*" />
+    </ItemGroup>
+    <ItemGroup>
+      <Content Include="@(_PgProjCliVsixFile)">
+        <IncludeInVSIX>true</IncludeInVSIX>
+        <VSIXSubPath>tools\%(_PgProjCliVsixFile.RecursiveDir)</VSIXSubPath>
+        <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+      </Content>
+    </ItemGroup>
+  </Target>
+
+</Project>

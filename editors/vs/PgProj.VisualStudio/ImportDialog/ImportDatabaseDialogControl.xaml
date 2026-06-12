@@ -1,0 +1,56 @@
+<!-- EP-VS "Import Database…". Remote UI data template for the import dialog (embedded resource,
+     serialized data template, NOT compiled WPF — keep to the Remote UI supported surface).
+     OK/Cancel come from ShowDialogAsync's DialogOption; this template is only the body. -->
+<DataTemplate xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <Grid Margin="12" MinWidth="560" MinHeight="420">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="*" />
+      <RowDefinition Height="Auto" />
+    </Grid.RowDefinitions>
+
+    <Grid Grid.Row="0" Margin="0,0,0,6">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="Auto" />
+        <ColumnDefinition Width="*" />
+      </Grid.ColumnDefinitions>
+      <TextBlock Grid.Column="0" Text="Connection:" VerticalAlignment="Center" Margin="0,0,8,0" />
+      <TextBox Grid.Column="1" Text="{Binding ConnectionString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+               ToolTip="Npgsql connection string of the database to import (e.g. Host=localhost;Database=app;Username=postgres;Password=...). Used for this import only — never stored." />
+    </Grid>
+
+    <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,6">
+      <Button Content="Test Connection" Command="{Binding TestConnectionCommand}" Padding="10,2" Margin="0,0,6,0" />
+      <Button Content="Load Objects" Command="{Binding LoadObjectsCommand}" Padding="10,2" Margin="0,0,6,0" />
+      <Button Content="Include All" Command="{Binding IncludeAllCommand}" Padding="10,2" Margin="0,0,6,0" />
+      <Button Content="Exclude All" Command="{Binding ExcludeAllCommand}" Padding="10,2" Margin="0,0,12,0" />
+      <CheckBox IsChecked="{Binding OverwriteExisting, Mode=TwoWay}" Content="Overwrite existing files" VerticalAlignment="Center" Margin="0,0,12,0" />
+      <CheckBox IsChecked="{Binding RememberConnection, Mode=TwoWay}" Content="Remember connection" VerticalAlignment="Center"
+                ToolTip="Stores the connection DPAPI-encrypted under your Windows profile (never in the .pgproj) so PgProj dialogs prefill it for this project." />
+    </StackPanel>
+
+    <TextBlock Grid.Row="2"
+               Text="{Binding Status}"
+               FontWeight="Bold"
+               TextWrapping="Wrap"
+               Margin="0,0,0,6" />
+
+    <ListView Grid.Row="3" ItemsSource="{Binding Objects}">
+      <ListView.ItemTemplate>
+        <DataTemplate>
+          <StackPanel Orientation="Horizontal">
+            <CheckBox IsChecked="{Binding IsIncluded, Mode=TwoWay}" VerticalAlignment="Center" Margin="0,0,6,0" />
+            <TextBlock Text="{Binding Kind}" Width="120" Opacity="0.8" />
+            <TextBlock Text="{Binding Name}" />
+          </StackPanel>
+        </DataTemplate>
+      </ListView.ItemTemplate>
+    </ListView>
+
+    <TextBlock Grid.Row="4" TextWrapping="Wrap" Opacity="0.7" Margin="0,6,0,0"
+               Text="OK imports the checked objects as .sql files into the project (extract layout: Tables/, Views/, Functions/, … — a table's file includes its foreign keys and indexes). The build auto-includes them." />
+  </Grid>
+</DataTemplate>

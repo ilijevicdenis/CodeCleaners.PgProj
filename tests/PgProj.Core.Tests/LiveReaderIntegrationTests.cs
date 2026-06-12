@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using PgProj.Core.Comparison;
 using PgProj.Core.Introspection;
+using PgProj.Core.Publishing;
 using PgProj.Core.Model;
 using PgProj.Core.Project;
 using PgProj.Core.Syntax;
@@ -56,13 +57,39 @@ public sealed class LiveReaderIntegrationTests : IClassFixture<ThrowawayDatabase
         Assert.Contains(live.Objects, o => o.Kind == ObjectKind.Server && o.Body.Contains("CREATE SERVER"));
         Assert.Contains(live.Objects, o => o.Kind == ObjectKind.Conversion && o.Body.Contains("CONVERSION"));
         Assert.Contains(live.Objects, o => o.Kind == ObjectKind.Statistics && o.Body.Contains("CREATE STATISTICS"));
+        // #110: expression statistics (stxexprs set) reconstructed in full via pg_get_statisticsobjdef.
+        Assert.Contains(live.Objects, o => o.Kind == ObjectKind.Statistics
+            && DatabaseModel.NameEquals(o.Name, "customers_expr_stats") && o.Body.Contains("lower"));
         Assert.Contains(live.Objects, o => o.Kind == ObjectKind.Cast && o.Body.Contains("CREATE CAST"));
         Assert.Contains(live.Objects, o => o.Kind == ObjectKind.ForeignTable && o.Body.Contains("CREATE FOREIGN TABLE"));
         Assert.Contains(live.Objects, o => o.Kind == ObjectKind.Operator && o.Body.Contains("CREATE OPERATOR"));
         Assert.Contains(live.Objects, o => o.Kind == ObjectKind.TextSearchDictionary && o.Body.Contains("CREATE TEXT SEARCH DICTIONARY"));
         Assert.Contains(live.Objects, o => o.Kind == ObjectKind.TextSearchConfiguration && o.Body.Contains("ADD MAPPING"));
+        // #109/#108: TS parser/template + procedural language reconstructed from their support-function regprocs.
+        Assert.Contains(live.Objects, o => o.Kind == ObjectKind.TextSearchParser && o.Body.Contains("CREATE TEXT SEARCH PARSER") && o.Body.Contains("prsd_start"));
+        Assert.Contains(live.Objects, o => o.Kind == ObjectKind.TextSearchTemplate && o.Body.Contains("CREATE TEXT SEARCH TEMPLATE") && o.Body.Contains("dsimple_lexize"));
+        Assert.Contains(live.Objects, o => o.Kind == ObjectKind.Language && o.Body.Contains("CREATE LANGUAGE afd_plpgsql") && o.Body.Contains("HANDLER"));
         Assert.Contains(live.Objects, o => o.Kind == ObjectKind.OperatorClass && o.Body.Contains("CREATE OPERATOR CLASS"));
         Assert.Contains(live.Objects, o => o.Kind == ObjectKind.Publication && o.Body.Contains("CREATE PUBLICATION") && o.Body.Contains("FOR TABLE"));
+        // #104: event-trigger reconstruction now carries the WHEN TAG IN (...) filter (was omitted).
+        Assert.Contains(live.Objects, o => o.Kind == ObjectKind.EventTrigger
+            && o.Body.Contains("WHEN TAG IN") && o.Body.Contains("'CREATE TABLE'"));
+        // #103: policy reconstruction now carries the TO roles clause (was omitted).
+        Assert.Contains(live.Objects, o => o.Kind == ObjectKind.Policy && o.Body.Contains(" TO PUBLIC"));
+        // #98: EXCLUDE constraints are introspected into TableDefinition.OtherConstraints.
+        Assert.Contains(live.Tables, t => t.OtherConstraints.Any(c => c.Contains("EXCLUDE")));
+        // #108: user mappings are introspected (FOR <user> SERVER <server> [OPTIONS …]).
+        Assert.Contains(live.Objects, o => o.Kind == ObjectKind.UserMapping
+            && o.Body.Contains("CREATE USER MAPPING") && o.Body.Contains("SERVER dummy_server"));
+        // #99: partitioning + inheritance round-trip. Parent carries PARTITION BY; children are raw
+        // PARTITION OF objects (not flattened to standalone tables); an INHERITS child carries INHERITS.
+        Assert.Contains(live.Tables, t => DatabaseModel.NameEquals(t.Name, "events")
+            && (t.TrailingOptions ?? "").Contains("PARTITION BY"));
+        Assert.Contains(live.Objects, o => o.Kind == ObjectKind.Table
+            && DatabaseModel.NameEquals(o.Name, "events_2024") && o.Body.Contains("PARTITION OF"));
+        Assert.DoesNotContain(live.Tables, t => DatabaseModel.NameEquals(t.Name, "events_2024")); // not double-modelled
+        Assert.Contains(live.Tables, t => DatabaseModel.NameEquals(t.Name, "document")
+            && (t.TrailingOptions ?? "").Contains("INHERITS"));
 
         // Every exported object's DDL must re-parse cleanly — this is the "complete the parser" check.
         var unparseable = DdlExporter.ExportFiles(live)
@@ -109,6 +136,17 @@ public sealed class LiveReaderIntegrationTests : IClassFixture<ThrowawayDatabase
             .ToList();
         Assert.True(rawChurn.Count == 0, "phantom raw-object diffs on project→live round-trip (scoped kinds):\n" + string.Join("\n", rawChurn));
 
+        // #98: with EXCLUDE constraints introspected, a project→live round-trip no longer reports a phantom
+        // "add EXCLUDE" table-constraint change (these are AddRawTableConstraintChange, not a raw object).
+        var exChurn = roundTrip.OfType<AddRawTableConstraintChange>().Where(c => c.Clause.Contains("EXCLUDE")).ToList();
+        Assert.True(exChurn.Count == 0, "phantom EXCLUDE-constraint diffs on project→live round-trip:\n"
+            + string.Join("\n", exChurn.Select(c => c.Clause)));
+
+        // #101: opclass/expression/ordering indexes (e.g. `lower(full_name) text_pattern_ops ASC NULLS LAST`)
+        // must not churn a phantom drop+recreate just because pg_get_indexdef omits the redundant defaults.
+        var idxChurn = roundTrip.Where(c => c is CreateIndexChange or DropIndexChange).Select(c => c.ToSql()).ToList();
+        Assert.True(idxChurn.Count == 0, "phantom index diffs on project→live round-trip:\n" + string.Join("\n", idxChurn));
+
         // Gold-standard round-trip: the extracted model must itself re-deploy cleanly — this proves
         // every reconstructed raw-object DDL (aggregates, FDW/server/foreign table, collation, …) is
         // valid and correctly ordered, not just parseable.
@@ -118,7 +156,7 @@ public sealed class LiveReaderIntegrationTests : IClassFixture<ThrowawayDatabase
         // within the same throwaway DB.
         var recreate = new SchemaComparer().Compare(live, new DatabaseModel());
         var script2 = new DeployScriptGenerator().Generate(recreate, new DeployOptions { WrapInTransaction = true });
-        await deployer.ExecuteAsync(conn, "DROP PUBLICATION IF EXISTS customer_pub; DROP SCHEMA IF EXISTS afd CASCADE; DROP SCHEMA IF EXISTS reporting CASCADE; DROP FOREIGN DATA WRAPPER IF EXISTS dummy_fdw CASCADE;");
+        await deployer.ExecuteAsync(conn, "DROP PUBLICATION IF EXISTS customer_pub; DROP SCHEMA IF EXISTS afd CASCADE; DROP SCHEMA IF EXISTS reporting CASCADE; DROP FOREIGN DATA WRAPPER IF EXISTS dummy_fdw CASCADE; DROP LANGUAGE IF EXISTS afd_plpgsql CASCADE;");
         await deployer.ExecuteAsync(conn, script2);
     }
 

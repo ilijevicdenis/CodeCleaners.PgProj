@@ -1,0 +1,44 @@
+<!--
+  Project-properties page: Build Output (EP-VS #114, the SSDT "Build" page analogue).
+  Where `pgproj build` writes the model (.model.json, the .dacpac analogue) and the portable
+  package (.pgpkg), plus the default .sql glob switch. Persisted in the .pgproj PropertyGroup.
+-->
+<Rule Name="PgProjBuildOutput"
+      DisplayName="Build Output"
+      Description="Build artifacts of the database project."
+      PageTemplate="generic"
+      Order="300"
+      xmlns="http://schemas.microsoft.com/build/2009/properties">
+
+  <Rule.DataSource>
+    <DataSource Persistence="ProjectFile" HasConfigurationCondition="False" SourceOfDefaultValue="AfterContext" />
+  </Rule.DataSource>
+
+  <Rule.Categories>
+    <Category Name="Output" DisplayName="Output" />
+    <Category Name="Sources" DisplayName="Sources" />
+  </Rule.Categories>
+
+  <StringProperty Name="PgProjOutputDir"
+                  DisplayName="Output directory"
+                  Category="Output"
+                  Subtype="folder"
+                  Description="Where build artifacts are written. Default: bin under the project directory." />
+
+  <StringProperty Name="PgProjOutput"
+                  DisplayName="Model output (.model.json)"
+                  Category="Output"
+                  Subtype="file"
+                  Description="The built schema model, the .dacpac analogue. Default: &lt;output directory&gt;\&lt;project name&gt;.model.json." />
+
+  <StringProperty Name="PgProjPackage"
+                  DisplayName="Package output (.pgpkg)"
+                  Category="Output"
+                  Subtype="file"
+                  Description="The portable schema package. Default: &lt;output directory&gt;\&lt;project name&gt;.pgpkg." />
+
+  <BoolProperty Name="EnableDefaultSqlItems"
+                DisplayName="Include every .sql automatically"
+                Category="Sources"
+                Description="When true (default), every .sql under the project (except bin/obj) is a Build item. Set false to declare Build items explicitly in the project file." />
+</Rule>

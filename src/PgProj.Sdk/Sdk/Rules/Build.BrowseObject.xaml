@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Properties-window (BrowseObject) rule for Build items: what shows in F4 when a .sql file is
+  selected in Solution Explorer. Build Action lets a file be retyped (Build <-> None), File
+  Name / Full Path are the standard read-only intrinsics.
+-->
+<Rule Name="Build"
+      Description="SQL source file properties"
+      DisplayName="SQL Source"
+      PageTemplate="generic"
+      PropertyPagesHidden="true"
+      xmlns="http://schemas.microsoft.com/build/2009/properties">
+  <Rule.Categories>
+    <Category Name="Advanced"
+              DisplayName="Advanced" />
+    <Category Name="Misc"
+              DisplayName="Misc" />
+  </Rule.Categories>
+
+  <Rule.DataSource>
+    <DataSource HasConfigurationCondition="False"
+                ItemType="Build"
+                Persistence="ProjectFile"
+                SourceOfDefaultValue="AfterContext" />
+  </Rule.DataSource>
+
+  <DynamicEnumProperty Name="{}{ItemType}"
+                       Category="Advanced"
+                       Description="How the file relates to the database model build."
+                       DisplayName="Build Action"
+                       EnumProvider="ItemTypes" />
+
+  <StringProperty Name="FileNameAndExtension"
+                  Category="Misc"
+                  Description="Name of the file."
+                  DisplayName="File Name"
+                  ReadOnly="true">
+    <StringProperty.DataSource>
+      <DataSource ItemType="Build"
+                  PersistedName="FileNameAndExtension"
+                  Persistence="Intrinsic"
+                  SourceOfDefaultValue="AfterContext" />
+    </StringProperty.DataSource>
+  </StringProperty>
+
+  <StringProperty Name="FullPath"
+                  Category="Misc"
+                  Description="Location of the file."
+                  DisplayName="Full Path"
+                  ReadOnly="true">
+    <StringProperty.DataSource>
+      <DataSource ItemType="Build"
+                  PersistedName="FullPath"
+                  Persistence="Intrinsic"
+                  SourceOfDefaultValue="AfterContext" />
+    </StringProperty.DataSource>
+  </StringProperty>
+
+  <BoolProperty Name="Visible"
+                Visible="false" />
+</Rule>

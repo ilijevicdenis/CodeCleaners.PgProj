@@ -59,6 +59,56 @@ public sealed class DiagnosticsHandlerTests
     }
 
     [Fact]
+    public async Task Unresolved_relation_in_a_view_is_reported_like_the_build_reference_gate()
+    {
+        using var tp = new TempProject();
+        tp.WriteSql("tables/customers.sql", "CREATE TABLE public.customers (id int NOT NULL, name text);\n");
+        var rel = "views/v_bad.sql";
+        var sql = "CREATE VIEW public.v_bad AS SELECT id FROM public.no_such_table;\n";
+        tp.WriteSql(rel, sql);
+        var uri = tp.UriFor(rel);
+
+        var store = new DocumentStore();
+        store.Open(uri, sql, 1);
+        var svc = new LanguageService(store, tp.ProjectFilePath);
+
+        var diags = await svc.DiagnoseAsync(uri);
+        var hit = Assert.Single(diags.Diagnostics, x => x.Message.Contains("no_such_table"));
+        Assert.Equal(LspSeverity.Error, hit.Severity);
+
+        // Point the view at the real table → the finding clears.
+        store.Change(uri, "CREATE VIEW public.v_bad AS SELECT id FROM public.customers;\n", 2);
+        var fixedDiags = await svc.DiagnoseAsync(uri);
+        Assert.Empty(fixedDiags.Diagnostics);
+    }
+
+    [Fact]
+    public async Task Deleting_a_table_definition_in_an_unsaved_buffer_flags_the_dependent_view()
+    {
+        using var tp = new TempProject();
+        var tableRel = "tables/customers.sql";
+        tp.WriteSql(tableRel, "CREATE TABLE public.customers (id int NOT NULL);\n");
+        var viewRel = "views/v_customers.sql";
+        var viewSql = "CREATE VIEW public.v_customers AS SELECT id FROM public.customers;\n";
+        tp.WriteSql(viewRel, viewSql);
+
+        var store = new DocumentStore();
+        var viewUri = tp.UriFor(viewRel);
+        store.Open(viewUri, viewSql, 1);
+        var svc = new LanguageService(store, tp.ProjectFilePath);
+
+        // Both files consistent → clean.
+        Assert.Empty((await svc.DiagnoseAsync(viewUri)).Diagnostics);
+
+        // The user deletes the table definition in the editor WITHOUT saving — the overlay must make
+        // the view's live diagnostics report the now-missing relation.
+        var tableUri = tp.UriFor(tableRel);
+        store.Open(tableUri, "-- table removed\n", 2);
+        var diags = await svc.DiagnoseAsync(viewUri);
+        Assert.Contains(diags.Diagnostics, x => x.Message.Contains("public.customers") && x.Message.Contains("does not exist"));
+    }
+
+    [Fact]
     public async Task Live_diagnostics_agree_with_batch_build_for_a_sample_of_inputs()
     {
         var samples = new[]
@@ -77,10 +127,13 @@ public sealed class DiagnosticsHandlerTests
             tp.WriteSql(rel, sql);
             var uri = tp.UriFor(rel);
 
-            // Batch path: exactly what `pgproj build` would report for this single-file project.
+            // Batch path: exactly what `pgproj build` would report for this single-file project —
+            // the model build's unified diagnostics PLUS the reference/semantic gate it runs after.
             var project = DatabaseProject.Load(tp.ProjectFilePath);
             var build = await project.BuildAsync();
-            var batchErrors = build.UnifiedDiagnostics.Count;
+            var resolution = new PgProj.Core.Project.References.ReferenceResolver().Resolve(project);
+            var refGate = PgProj.Core.Project.References.ReferenceValidator.Validate(project, resolution);
+            var batchErrors = build.UnifiedDiagnostics.Count + resolution.Diagnostics.Count + refGate.Count;
 
             // Live path: same file open in the server, no edits (buffer == disk).
             var store = new DocumentStore();

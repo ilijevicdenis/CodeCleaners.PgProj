@@ -14,7 +14,9 @@ using PgProj.Core.Model;
 using PgProj.Core.Packaging;
 using PgProj.Core.Project;
 using PgProj.Core.Project.References;
+using PgProj.Core.Publishing;
 using PgProj.Core.Snapshot;
+using PgProj.Core.Solutions;
 using PgProj.Core.Templates;
 
 namespace PgProj.Cli;
@@ -44,6 +46,9 @@ public static class Program
                 "snapshot" => await Snapshot(args),
                 "drift" => await Drift(args),
                 "pull" => await Pull(args),
+                "sync-file" => await SyncFile(args),
+                "deploy-report" => await DeployReport(args),
+                "verify" => Verify(args),
                 "analyze" => Analyze(args),
                 "model-tree" => await ModelTree(args),
                 "describe-table" => DescribeTable(args),
@@ -51,6 +56,7 @@ public static class Program
                 "script" => await Script(args),
                 "pkg" => await Pkg(args),
                 "profile" => Profile(args),
+                "sln" => Sln(args),
                 "serve" => await Serve(args),
                 "help" or "--help" or "-h" => PrintUsageReturn(ExitCode.Success),
                 _ => Fail($"Unknown command '{args[0]}'."),
@@ -111,6 +117,59 @@ public static class Program
         var result = Scaffolder.Add(projectArg, kind, nameArg, force);
         Console.WriteLine($"Added {kind} → {result.RelativePath}");
         return 0;
+    }
+
+    // ---- sln (slngen-style solution grouping for multiple .pgproj) -----------------------
+
+    private static int Sln(string[] args)
+    {
+        var positionals = args.Skip(1).Where(a => !a.StartsWith('-')).ToList();
+        var sub = positionals.FirstOrDefault()?.ToLowerInvariant()
+            ?? throw new CliUsageException("Usage: pgproj sln new <name> [-o <dir>] [--root <dir>] | sln add <solution.slnx> <project.pgproj...> | sln list <solution.slnx>");
+
+        switch (sub)
+        {
+            case "new":
+            {
+                var name = positionals.ElementAtOrDefault(1)
+                    ?? throw new CliUsageException("Usage: pgproj sln new <name> [-o <dir>] [--root <dir>]");
+                var outDir = GetOption(args, "-o", "--output") ?? ".";
+                var root = GetOption(args, "--root");
+
+                var result = SolutionGrouper.Generate(name, outDir, root);
+                Console.WriteLine($"Solution {result.SolutionPath} — {result.Solution.Projects.Count} project(s), {result.AddedProjects.Count} added:");
+                foreach (var p in result.AddedProjects)
+                    Console.WriteLine($"  + {p}");
+                if (result.Solution.Projects.Count == 0)
+                    Console.WriteLine($"  (no .pgproj found under {Path.GetFullPath(root ?? outDir)})");
+                return 0;
+            }
+            case "add":
+            {
+                if (positionals.Count < 3)
+                    throw new CliUsageException("Usage: pgproj sln add <solution.slnx> <project.pgproj...>");
+
+                var result = SolutionGrouper.Add(positionals[1], positionals.Skip(2));
+                foreach (var p in result.AddedProjects)
+                    Console.WriteLine($"  + {p}");
+                Console.WriteLine($"Solution {result.SolutionPath} — {result.Solution.Projects.Count} project(s), {result.AddedProjects.Count} added.");
+                return 0;
+            }
+            case "list":
+            {
+                var solutionPath = positionals.ElementAtOrDefault(1)
+                    ?? throw new CliUsageException("Usage: pgproj sln list <solution.slnx>");
+
+                var solution = SlnxDocument.Load(solutionPath);
+                foreach (var (folder, projects) in solution.Folders)
+                    foreach (var p in projects)
+                        Console.WriteLine(folder.Length == 0 ? p : $"{folder}  {p}");
+                Console.WriteLine($"{solution.Projects.Count} project(s).");
+                return 0;
+            }
+            default:
+                throw new CliUsageException($"Unknown sln subcommand '{sub}' (expected new, add, or list).");
+        }
     }
 
     // ---- build --------------------------------------------------------------------------
@@ -332,6 +391,9 @@ public static class Program
 
     private static async Task<int> Publish(string[] args)
     {
+        // EP-DEPLOYREPORT alias: `publish --report-only` = `deploy-report` (plan, report, never apply).
+        if (HasFlag(args, "--report-only")) return await DeployReport(args);
+
         var profile = LoadProfile(args);            // EP-PROFILE: CLI flags override profile values.
         var (source, project) = await BuildSourceOrThrowAsync(args);
         var allowDrops = ResolveAllowDrops(args, profile);
@@ -352,37 +414,33 @@ public static class Program
         // Target-platform gate (EP-TARGET): never publish syntax newer than <TargetPostgresVersion>.
         if (TargetVersionGateBlocks(project, args)) return ExitCode.AnalysisBlocked;
 
-        var versionProfile = ProfileFor(project); // PG version profile from TargetPostgresVersion
-        var target = await ReadTarget(args, versionProfile);
-
-        var changes = new SchemaComparer(versionProfile).Compare(source, target, new ComparerOptions
+        // The compare → deploy-script → deploy core is the shared PublishService (one code path with the
+        // VS extension / any editor). The CLI keeps owning source-building, the gates above, dry-run /
+        // output presentation, and exit-code mapping.
+        var connection = RequireConnection(args);
+        var service = new PublishService();
+        var plan = await service.PlanAsync(project, source, connection, new PublishPlanOptions
         {
-            DropObjectsNotInSource = allowDrops,
-        });
-
-        var variables = BuildVariableResolver(project, args, profile);
-        var script = new DeployScriptGenerator().Generate(changes, new DeployOptions
-        {
+            AllowDrops = allowDrops,
             WrapInTransaction = wrapInTransaction,
-            Scripts = LoadDeployScripts(project),
-            Variables = variables,
+            ProfileVariables = profile?.Variables,
+            VariableOverrides = ParseCliVars(args),
         });
 
         var outPath = GetOption(args, "-o", "--output");
         if (outPath is not null)
         {
-            File.WriteAllText(outPath, script);
+            File.WriteAllText(outPath, plan.Script);
             Console.WriteLine($"Deploy script written to {outPath}");
         }
 
         if (HasFlag(args, "--dry-run"))
         {
-            Console.WriteLine(outPath is null ? script : "(dry run — not executed)");
+            Console.WriteLine(outPath is null ? plan.Script : "(dry run — not executed)");
             return 0;
         }
 
-        var scripts = LoadDeployScripts(project);
-        if (changes.Count == 0 && (scripts is null || scripts.IsEmpty))
+        if (plan.NothingToDo)
         {
             Console.WriteLine("Nothing to publish — target already matches the project.");
             return 0;
@@ -391,23 +449,18 @@ public static class Program
         // A server-side failure while applying the script is a distinct CI failure class (EP-CICD):
         // map it to ExitCode.DeployError so a pipeline can alert specifically on a failed deploy
         // (vs a build/analysis problem that never touched the target).
+        var parallel = HasFlag(args, "--parallel");
         try
         {
-            // --parallel runs the diff phase-by-phase, but pre/post deploy scripts have no phase model and
-            // must bracket the diff inside one transaction — so fall back to the whole-script deployer when
-            // deploy scripts are present (still strict all-or-nothing).
-            if (HasFlag(args, "--parallel") && (scripts is null || scripts.IsEmpty))
-            {
-                // Intra-phase parallelism with phase barriers (phase-level atomicity).
-                await new PhasedDeployer(RequireConnection(args)).ExecuteAsync(changes);
-                Console.WriteLine($"Published {changes.Count} change(s) successfully (parallel, phased).");
-            }
-            else
-            {
-                // Default: whole script in one transaction (strict all-or-nothing).
-                await new DatabaseDeployer().ExecuteAsync(RequireConnection(args), script);
-                Console.WriteLine($"Published {changes.Count} change(s) successfully.");
-            }
+            await service.ApplyAsync(plan, connection, parallel);
+            Console.WriteLine($"Published {plan.ChangeCount} change(s) successfully" +
+                              (parallel && !plan.HasDeployScripts ? " (parallel, phased)." : "."));
+        }
+        catch (Npgsql.PostgresException ex)
+        {
+            // Enrich the server's bare SQLSTATE with its symbolic condition name + class (PgErrorCodes).
+            Console.Error.WriteLine($"Deploy failed: {ex.Message}  [{PgProj.Core.Diagnostics.PgErrorCodes.Describe(ex.SqlState)}]");
+            return ExitCode.DeployError;
         }
         catch (Npgsql.NpgsqlException ex)
         {
@@ -442,7 +495,8 @@ public static class Program
             return 0;
         }
 
-        Console.Error.WriteLine($"Invalid: {outcome.Error}" + (outcome.SqlState is null ? "" : $"  [{outcome.SqlState}]"));
+        Console.Error.WriteLine($"Invalid: {outcome.Error}" +
+            (outcome.SqlState is null ? "" : $"  [{PgProj.Core.Diagnostics.PgErrorCodes.Describe(outcome.SqlState)}]"));
         if (outcome.Position > 0) Console.Error.WriteLine($"  near script position {outcome.Position}");
         return ExitCode.ValidationFailed;
     }
@@ -559,27 +613,92 @@ public static class Program
     private static string Mark(PgProj.Core.Sync.ProjectFileChange fc) =>
         fc.IsDestructive ? "!" : fc.Kind == PgProj.Core.Sync.ProjectFileChangeKind.Create ? "+" : "~";
 
+    // ---- sync-file (FILE-scoped two-way sync — drives the editors' "Sync with Database") -----
+
+    /// <summary>
+    /// <c>pgproj sync-file &lt;project&gt; --file &lt;relative.sql&gt; --connection &lt;conn&gt;</c>:
+    /// inspect one project file against the live database. Default output is JSON (machine-readable,
+    /// for the Visual Studio command): status + both texts for the diff. With
+    /// <c>--apply-to-local</c> the database's version is written into the file; with
+    /// <c>--apply-to-db</c> a migration limited to the file's objects is generated and executed
+    /// (<c>--dry-run</c> prints it instead; <c>--allow-drops</c> permits destructive steps).
+    /// </summary>
+    private static async Task<int> SyncFile(string[] args)
+    {
+        var project = DatabaseProject.Load(RequirePositional(args, "project file"));
+        var relFile = GetOption(args, "--file")
+            ?? throw new ArgumentException("sync-file needs --file <project-relative .sql path>.");
+        var live = await ReadTarget(args);
+
+        var state = await PgProj.Core.Sync.FileSync.InspectAsync(project, live, relFile);
+
+        if (HasFlag(args, "--apply-to-local"))
+        {
+            if (state.Status == PgProj.Core.Sync.FileSync.FileSyncStatus.Identical)
+            {
+                Console.WriteLine("Already in sync — nothing written.");
+                return 0;
+            }
+            PgProj.Core.Sync.FileSync.ApplyToLocal(project, state);
+            Console.WriteLine(state.Status == PgProj.Core.Sync.FileSync.FileSyncStatus.OnlyLocal
+                ? $"Deleted {state.RelativePath} (its objects no longer exist in the database)."
+                : $"Wrote the database's version into {state.RelativePath}.");
+            return 0;
+        }
+
+        if (HasFlag(args, "--apply-to-db"))
+        {
+            var (script, count, destructive) = await PgProj.Core.Sync.FileSync.BuildPushScriptAsync(
+                project, live, relFile, allowDrops: HasFlag(args, "--allow-drops"));
+            if (count == 0)
+            {
+                Console.WriteLine("Already in sync — nothing to push.");
+                return 0;
+            }
+            if (HasFlag(args, "--dry-run"))
+            {
+                Console.WriteLine($"-- {count} change(s){(destructive ? ", DESTRUCTIVE steps included" : "")}");
+                Console.WriteLine(script);
+                return 0;
+            }
+            await new PgProj.Core.Publishing.DatabaseDeployer().ExecuteAsync(RequireConnection(args), script);
+            Console.WriteLine($"Pushed {count} change(s) from {state.RelativePath} to the database.");
+            return 0;
+        }
+
+        // default: machine-readable inspection for editor hosts
+        EmitJson(new
+        {
+            file = state.RelativePath,
+            status = state.Status.ToString(),
+            summary = state.Summary,
+            localText = state.LocalText,
+            databaseText = state.DatabaseText,
+        });
+        return 0;
+    }
+
     // ---- analyze (static analysis over the AST) -----------------------------------------
 
     private static int Analyze(string[] args)
     {
         var cli = new CliArgs(args);
         var project = DatabaseProject.Load(RequirePositional(args, "project file"));
-        var config = LoadAnalysisConfig(project, cli);
+        var (config, rules, modelRules) = ResolveAnalysis(project, cli);   // config + external rule packs (#79)
         var strict = HasFlag(args, "--strict");
 
         switch (cli.Format)
         {
             case OutputFormat.Json:
             {
-                var report = ContractBuilder.Analyze(project, strict, config);
+                var report = ContractBuilder.Analyze(project, strict, config, rules, modelRules);
                 EmitJson(report);
                 return report.Blocked ? ExitCode.AnalysisBlocked : ExitCode.Success;
             }
             case OutputFormat.Sarif:
             {
                 var positions = SourcePositionIndex.Build(project);
-                var findings = RunAnalysis(project, config, out _);
+                var findings = RunAnalysis(project, config, rules, modelRules, out _);
                 Console.WriteLine(new SarifWriter().Write(findings, positions));
                 var blocked = findings.Any(f => f.Severity == DiagnosticSeverity.Error)
                               || (strict && findings.Any(f => f.Severity == DiagnosticSeverity.Warning));
@@ -587,9 +706,11 @@ public static class Program
             }
             default:
             {
-                var findings = RunAnalysis(project, config, out var ruleCount);
+                var policy = PgProj.Core.Analysis.BuildWarningPolicy.FromProject(project);
+                var findings = policy.Apply(RunAnalysis(project, config, rules, modelRules, out var ruleCount));
                 Console.WriteLine($"Analyzed '{project.Name}': {ruleCount} rule(s).");
-                return ReportFindings(findings, strict, alwaysReport: true) ? ExitCode.AnalysisBlocked : ExitCode.Success;
+                return ReportFindings(findings, strict || policy.TreatWarningsAsErrors, alwaysReport: true)
+                    ? ExitCode.AnalysisBlocked : ExitCode.Success;
             }
         }
     }
@@ -687,39 +808,54 @@ public static class Program
         Console.SetOut(Console.Error);
 
         var debounce = int.TryParse(GetOption(args, "--debounce"), out var d) ? d : 150;
+        // The optional positional workspace root (first non-option token after the verb). It seeds
+        // project resolution for clients whose `initialize` carries no usable rootUri (VS does this
+        // when launched per-buffer) — without it the server degrades to parse-only diagnostics.
+        var workspaceRoot = args.Length > 1 && !args[1].StartsWith("-", StringComparison.Ordinal) ? args[1] : null;
         using var input = Console.OpenStandardInput();
-        using var server = new PgProj.Lsp.Server.LspServer(input, realOut, debounce);
+        using var server = new PgProj.Lsp.Server.LspServer(input, realOut, debounce, workspaceRoot);
         return await server.RunAsync();
     }
 
     // ---- shared analysis gate -----------------------------------------------------------
 
-    private static IReadOnlyList<Diagnostic> RunAnalysis(DatabaseProject project, AnalysisConfig config, out int ruleCount)
+    private static IReadOnlyList<Diagnostic> RunAnalysis(DatabaseProject project, AnalysisConfig config,
+        IReadOnlyList<IPgRule> externalRules, IReadOnlyList<IModelRule> externalModelRules, out int ruleCount)
     {
-        ruleCount = PgAnalyzer.RuleCount;
+        ruleCount = PgAnalyzer.RuleCount + ModelAnalyzer.RuleCount + externalRules.Count + externalModelRules.Count;
         var analyzer = new PgAnalyzer(config);
         var findings = new List<Diagnostic>();
+        var model = new PgProj.Core.Model.DatabaseModel();
+        var modelBuilder = new PgProj.Core.Syntax.ModelBuilder();
         foreach (var file in project.ResolveSqlFiles())
-            findings.AddRange(analyzer.Analyze(new PgProj.Core.Syntax.PgParser().Parse(PgProj.Core.Project.SourceReader.ReadAllText(file))));
+        {
+            var parsed = new PgProj.Core.Syntax.PgParser().Parse(PgProj.Core.Project.SourceReader.ReadAllText(file));
+            findings.AddRange(analyzer.Analyze(parsed));
+            findings.AddRange(ExternalRules.Run(externalRules, parsed, config));   // EP-ANALYSIS+ #79
+            modelBuilder.Build(parsed, model);   // accumulate the merged model for the model-level pass
+        }
+
+        // Model-level pass: cross-file rules over the merged model (PG014 + external IModelRules).
+        findings.AddRange(new ModelAnalyzer(config).Analyze(model));
+        findings.AddRange(ExternalModelRules.Run(externalModelRules, model, config));
         return findings;
     }
 
     /// <summary>
-    /// Resolves the analysis configuration for a verb: the <c>.pgproj.analysis.json</c> sidecar next to the
-    /// project, with CLI <c>--rule RULEID=off|on|severity</c> overrides layered on top (CLI wins).
-    /// A malformed <c>--rule</c> surfaces as a usage error.
+    /// Resolves the analysis configuration + external rule packs for a verb: the <c>.pgproj.analysis.json</c>
+    /// sidecar next to the project (incl. its <c>rulePacks</c>), with CLI <c>--rule RULEID=off|on|severity</c>
+    /// overrides layered on top (CLI wins). A malformed <c>--rule</c> or an unloadable rule pack surfaces as a
+    /// usage error.
     /// </summary>
-    private static AnalysisConfig LoadAnalysisConfig(DatabaseProject project, CliArgs cli)
+    private static (AnalysisConfig Config, IReadOnlyList<IPgRule> Rules, IReadOnlyList<IModelRule> ModelRules)
+        ResolveAnalysis(DatabaseProject project, CliArgs cli)
     {
         try
         {
-            return AnalysisConfig.LoadForProject(project.ProjectFilePath)
-                                 .WithCliOverrides(cli.GetKeyValues("--rule"));
+            return AnalysisSetup.ResolveAll(project.ProjectFilePath, cli.GetKeyValues("--rule"));
         }
-        catch (CliRuleException ex)
-        {
-            throw new CliUsageException(ex.Message);
-        }
+        catch (CliRuleException ex) { throw new CliUsageException(ex.Message); }
+        catch (RulePackException ex) { throw new CliUsageException(ex.Message); }
     }
 
     /// <summary>Prints findings and returns true if the gate should block (errors, or warnings under --strict).</summary>
@@ -749,9 +885,25 @@ public static class Program
         // No project (source was a pre-built .pgpkg) → nothing to re-analyze; it was gated at build time.
         if (project is null) return false;
         if (HasFlag(args, "--no-analyze")) return false;
-        var config = LoadAnalysisConfig(project, new CliArgs(args));
-        var findings = RunAnalysis(project, config, out _);
-        var blocked = ReportFindings(findings, HasFlag(args, "--strict"), alwaysReport: false);
+        var (config, rules, modelRules) = ResolveAnalysis(project, new CliArgs(args));
+
+        // EP-BUILD (#135): the project warning policy applies at the gate - suppressed codes never
+        // count, TreatWarningsAsErrors promotes like --strict. With --verbose the gate emits the
+        // full structured per-rule/per-object diagnostics with file:line provenance (the same
+        // contract path the editors consume), so CLI and in-proc behavior agree by construction.
+        var policy = PgProj.Core.Analysis.BuildWarningPolicy.FromProject(project);
+        if (HasFlag(args, "--verbose"))
+        {
+            var report = ContractBuilder.Analyze(project, HasFlag(args, "--strict"), config, rules, modelRules);
+            Console.WriteLine($"verbose analysis: {report.RuleCount} rule(s); {policy.Describe()}");
+            foreach (var d in report.Diagnostics)
+                Console.WriteLine($"  [{d.Severity}] {d.RuleId} {d.File}({d.Line},{d.Col}) {d.Target}: {d.Message}");
+            if (report.Blocked) Console.Error.WriteLine("Aborted by static analysis.");
+            return report.Blocked;
+        }
+
+        var findings = policy.Apply(RunAnalysis(project, config, rules, modelRules, out _));
+        var blocked = ReportFindings(findings, HasFlag(args, "--strict") || policy.TreatWarningsAsErrors, alwaysReport: false);
         if (blocked) Console.Error.WriteLine("Aborted by analysis gate (pass --no-analyze to skip).");
         return blocked;
     }
@@ -780,6 +932,86 @@ public static class Program
         return true;
     }
 
+    // ---- deploy-report (EP-DEPLOYREPORT #141: planned-change report, never applies) -------
+
+    /// <summary>
+    /// <c>pgproj deploy-report &lt;project|pkg&gt; --connection &lt;conn&gt; [-o report.json] [--format xml]</c>:
+    /// the machine-readable plan of what a publish WOULD change against the live target — the
+    /// SqlPackage DeployReport analogue for CI approval gates. Computed by the SAME
+    /// <see cref="PublishService.PlanAsync"/> a real publish runs (profile + --var + --allow-drops
+    /// + --no-transaction + --parallel all honored), but the target is only ever READ.
+    /// </summary>
+    private static async Task<int> DeployReport(string[] args)
+    {
+        var profile = LoadProfile(args);            // EP-PROFILE: CLI flags override profile values.
+        var (source, project) = await BuildSourceOrThrowAsync(args);
+        var connection = RequireConnection(args);
+
+        var plan = await new PublishService().PlanAsync(project, source, connection, new PublishPlanOptions
+        {
+            AllowDrops = ResolveAllowDrops(args, profile),
+            WrapInTransaction = ResolveWrapInTransaction(args, profile),
+            ProfileVariables = profile?.Variables,
+            VariableOverrides = ParseCliVars(args),
+        });
+
+        var report = DeployReportBuilder.Build(plan,
+            source: new SchemaCompareEndpointDto
+            {
+                Kind = project is null ? "package" : "project",
+                DisplayName = SourceName(project),
+            },
+            target: new SchemaCompareEndpointDto { Kind = "liveDatabase", DisplayName = "(database)" },
+            parallelRequested: HasFlag(args, "--parallel"));
+
+        var xml = string.Equals(GetOption(args, "--format"), "xml", StringComparison.OrdinalIgnoreCase);
+        var payload = xml ? DeployReportBuilder.SerializeXml(report) : DeployReportBuilder.Serialize(report);
+
+        var outPath = GetOption(args, "-o", "--output");
+        if (outPath is null)
+        {
+            Console.WriteLine(payload);
+        }
+        else
+        {
+            File.WriteAllText(outPath, payload);
+            Console.WriteLine($"Deploy report written to {outPath} " +
+                $"({report.ChangeCount} change(s), {report.DestructiveCount} destructive" +
+                $"{(report.BlocksOnDataLoss ? ", BLOCKS ON DATA LOSS" : "")}).");
+        }
+        return 0;
+    }
+
+    // ---- verify (EP-PKG #138: package equivalence - the DacpacVerify analogue) -----------
+
+    /// <summary>
+    /// <c>pgproj verify &lt;a.pgpkg&gt; &lt;b.pgpkg&gt; [--format json] [-o report.json]</c>: are two
+    /// packages the same thing? Asserts model + embedded-source + manifest-option equivalence
+    /// (identity stamps excluded, so rebuilds of the same sources verify equivalent). Exit 0 on
+    /// pass, <see cref="ExitCode.Drift"/> on any difference - a local CI reproducibility gate for
+    /// conversions, extract round-trips, and build determinism. Read-only; no database.
+    /// </summary>
+    private static int Verify(string[] args)
+    {
+        var positionals = args.Skip(1).Where(a => !a.StartsWith("-", StringComparison.Ordinal)).ToList();
+        if (positionals.Count < 2)
+            return Fail("verify needs two package paths: pgproj verify <a.pgpkg> <b.pgpkg>");
+
+        var pkgA = PgProj.Core.Packaging.PgPkg.Read(positionals[0]);
+        var pkgB = PgProj.Core.Packaging.PgPkg.Read(positionals[1]);
+        var report = PgProj.Core.Packaging.PackageVerifier.Verify(pkgA, pkgB,
+            labelA: Path.GetFileName(positionals[0]), labelB: Path.GetFileName(positionals[1]));
+
+        var payload = WantsJson(args) || string.Equals(GetOption(args, "--format"), "json", StringComparison.OrdinalIgnoreCase)
+            ? PgProj.Core.Packaging.PackageVerifier.Serialize(report)
+            : PgProj.Core.Packaging.PackageVerifier.RenderText(report);
+
+        var outPath = GetOption(args, "-o", "--output");
+        if (outPath is null) Console.WriteLine(payload);
+        else { File.WriteAllText(outPath, payload); Console.WriteLine($"Verify report written to {outPath} ({(report.Equivalent ? "PASS" : "FAIL")})."); }
+
+        return report.Equivalent ? ExitCode.Success : ExitCode.Drift;
+    }
     // ---- references (EP-REF) ------------------------------------------------------------
 
     /// <summary>
@@ -1140,10 +1372,16 @@ public static class Program
           pgproj snapshot --connection <conn> -o <db.schema.snapshot>                    (introspect a live DB once → a portable schema.snapshot for offline compare)
           pgproj drift   <project.pgproj> --connection <conn> [--fail-on-drift]         (preview project files that differ from the DB; --fail-on-drift exits 6 on drift)
           pgproj pull    <project.pgproj> --connection <conn> [--dry-run] [--allow-deletes]   (rewrite project files FROM the DB — scenario 3)
+          pgproj verify <a.pgpkg> <b.pgpkg> [--format json] [-o report.json]   (package equivalence: model + sources + options; exit 6 on drift - DacpacVerify analogue)
+          pgproj deploy-report <project.pgproj|.pgpkg> --connection <conn> [-o report.json] [--format xml] [--profile <file>] [--var N=V] [--allow-drops] [--parallel]   (planned-change report, never applies - DeployReport analogue; alias: publish --report-only)
+          pgproj sync-file <project.pgproj> --file <rel.sql> --connection <conn> [--apply-to-local | --apply-to-db [--allow-drops] [--dry-run]]   (one file vs the DB: JSON state for editors, or apply either direction)
           pgproj analyze <project.pgproj> [--strict]    (static safety analysis over the AST)
           pgproj model-tree <project.pgproj> [--format json]   (objects + source positions, for editors)
           pgproj describe-table <table.sql> [--table schema.name] [--default-schema public]   (one table's model as JSON, for the graphical designer)
           pgproj emit-table <table.json | -> [-o table.sql]     (round-trip the designer's table JSON back to .sql via the engine emitter)
+          pgproj sln new <name> [-o <dir>] [--root <dir>]      (slngen-style: group every .pgproj under root into <name>.slnx; re-run to pick up new projects)
+          pgproj sln add <solution.slnx> <project.pgproj...>   (add projects to an existing .slnx; solution folders mirror the directory tree)
+          pgproj sln list <solution.slnx>                      (print the solution's folders + projects)
           pgproj serve [<workspace-dir>] [--debounce <ms>]     (resident LSP language server over STDIO — live diagnostics/definition/hover/completion)
 
         Options:

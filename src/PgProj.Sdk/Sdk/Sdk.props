@@ -1,33 +1,64 @@
 <!--
-  PgProj MSBuild SDK — props.
-  Imported at the top of a .pgproj (either explicitly via <Import .../> when consumed from source,
-  or automatically by MSBuild's SDK resolver via <Project Sdk="PgProj.Sdk/x.y.z">). Establishes
-  defaults so a database project builds with the same `dotnet build` / Visual Studio gesture as any
-  other project.
+  PgProj MSBuild SDK - props.
+
+  Composed on Microsoft.Build.NoTargets so a .pgproj imports the common MSBuild infrastructure
+  (Microsoft.Common.props/.targets) and therefore LOADS in the Visual Studio project system - while
+  Build/Publish still route to the pgproj CLI (see Sdk.targets). Without the common imports VS
+  reports "the project is missing some critical imports or the referenced SDK cannot be found" and
+  refuses to load it; `dotnet build` works regardless because it only needs our Build target, but the
+  IDE requires the full project-system contract that Microsoft.Common provides.
 -->
 <Project>
   <PropertyGroup>
+    <!-- NoTargets/Common.props read these, so set them BEFORE importing NoTargets (below). A database
+         project compiles nothing, but the project system still needs a TargetFramework to evaluate;
+         netstandard2.0 is inert here - NoTargets resolves no framework references. -->
+    <TargetFramework Condition="'$(TargetFramework)' == ''">netstandard2.0</TargetFramework>
+    <!-- No implicit compile-item globbing: the only items are our <Build> .sql sources. -->
+    <EnableDefaultItems Condition="'$(EnableDefaultItems)' == ''">false</EnableDefaultItems>
     <Configuration Condition="'$(Configuration)' == ''">Debug</Configuration>
+    <!-- A database project has no assembly/refs; keep NoTargets from adding framework reference items. -->
+    <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
+    <NoWarn>$(NoWarn);NU1604</NoWarn>
 
     <!--
-      How the pgproj CLI is invoked. Two modes (resolved in Sdk.targets):
+      Keep the MANAGED (.NET) project-system design-time machinery OUT of this project. When VS's
+      MSBuild evaluates any Microsoft.NET.Sdk-based project (NoTargets composes on it), it imports
+      Microsoft.Managed.DesignTime.targets, which injects the full managed capability suite
+      (".NET", DependenciesTree, LaunchProfiles, ...) and the managed item schemas
+      (Compile/Content/None rules). Those capabilities activate the dotnet-project-system's MEF
+      components - including its Solution Explorer tree handling, which only renders the item
+      types IT knows, so our Build (.sql) items silently never appear in the tree. These are the
+      documented opt-outs that file defines (it also force-disables the DefineCommon* base set,
+      which is fine: this SDK ships its own ProjectItemsSchema + Build/None/Folder rules).
+      `dotnet build` never sees any of this (the targets live in the VS MSBuild folder only).
+    -->
+    <DefineCommonManagedCapabilities Condition="'$(DefineCommonManagedCapabilities)' == ''">false</DefineCommonManagedCapabilities>
+    <DefineCommonManagedItemSchemas Condition="'$(DefineCommonManagedItemSchemas)' == ''">false</DefineCommonManagedItemSchemas>
+    <DefineCommonManagedReferenceSchemas Condition="'$(DefineCommonManagedReferenceSchemas)' == ''">false</DefineCommonManagedReferenceSchemas>
+    <!-- NoTargets' Sdk.targets prepends Microsoft.Managed.DesignTime.targets to
+         CustomBeforeMicrosoftCommonTargets unless this flag says the language targets already
+         handled it. The capabilities that file injects UNCONDITIONALLY (".NET", ...) are what
+         activate the managed project system on this project, so block the import outright; the
+         DefineCommonManaged* switches above stay as defense-in-depth should it load anyway. -->
+    <ManagedLanguageTargetsGotImported>true</ManagedLanguageTargetsGotImported>
+  </PropertyGroup>
 
-      1. From-source (this repo): PgProjCliProject points at the CLI .csproj and the targets run it
-         with `dotnet run` (the project flag). Detected when this Sdk.props sits next to the CLI
-         source (../../PgProj.Cli alongside src/PgProj.Sdk/Sdk/).
+  <!-- The common MSBuild infrastructure (the piece the IDE requires). Imported before our own items
+       and the properties that depend on Common-provided values (e.g. output paths). -->
+  <Import Project="Sdk.props" Sdk="Microsoft.Build.NoTargets" Version="3.7.134" />
 
-      2. From a packaged SDK (NuGet): the .nupkg carries a framework-dependent publish of the CLI
-         under tools/. The targets then run `dotnet <tools>/PgProj.Cli.dll`. PgProjCliDll points at it.
-
-      A consumer can override either property to force a specific invocation (e.g. point PgProjCliDll
-      at a self-built CLI).
+  <PropertyGroup>
+    <!--
+      How the pgproj CLI is invoked (resolved in Sdk.targets). Two modes:
+        1. From-source (this repo): PgProjCliProject points at the CLI .csproj, run with `dotnet run`.
+        2. Packaged SDK (NuGet): the .nupkg carries a framework-dependent CLI under tools/; run as
+           `dotnet <tools>/PgProj.Cli.dll`. PgProjCliDll points at it.
+      Override either property to force a specific invocation (e.g. a self-built CLI).
     -->
     <_PgProjCliSourceCandidate>$([MSBuild]::NormalizePath('$(MSBuildThisFileDirectory)..\..\PgProj.Cli\PgProj.Cli.csproj'))</_PgProjCliSourceCandidate>
     <_PgProjCliDllCandidate>$([MSBuild]::NormalizePath('$(MSBuildThisFileDirectory)..\tools\PgProj.Cli.dll'))</_PgProjCliDllCandidate>
-
-    <!-- Packaged-SDK CLI payload (tools/PgProj.Cli.dll next to the Sdk/ folder). Wins when present. -->
     <PgProjCliDll Condition="'$(PgProjCliDll)' == '' And Exists('$(_PgProjCliDllCandidate)')">$(_PgProjCliDllCandidate)</PgProjCliDll>
-    <!-- From-source CLI project. Used only when no packaged DLL was found. -->
     <PgProjCliProject Condition="'$(PgProjCliProject)' == '' And '$(PgProjCliDll)' == '' And Exists('$(_PgProjCliSourceCandidate)')">$(_PgProjCliSourceCandidate)</PgProjCliProject>
 
     <!-- Build artifacts. The JSON model is the .dacpac analogue; the .pgpkg is the portable package. -->
@@ -35,38 +66,91 @@
     <PgProjOutput Condition="'$(PgProjOutput)' == ''">$(PgProjOutputDir)\$(MSBuildProjectName).model.json</PgProjOutput>
     <PgProjPackage Condition="'$(PgProjPackage)' == ''">$(PgProjOutputDir)\$(MSBuildProjectName).pgpkg</PgProjPackage>
 
-    <!-- So IDEs that key off these don't choke on an unfamiliar project type. -->
     <DefaultLanguageSourceExtension>.sql</DefaultLanguageSourceExtension>
 
     <!--
-      Publish settings (surfaced to VS's right-click -> Publish). A .pgproj sets these (or passes
-      them on the command line: `dotnet build -t:Publish -p:PgProjPublishConnection=...`):
-        <PgProjPublishConnection>  the Npgsql connection string to deploy to (required for Publish)
-        <PgProjPublishProfile>     a .pgpublish.json profile (options + SQLCMD variables)
-        <PgProjPublishAllowDrops>  true -> allow destructive changes
-        <PgProjPublishExtraArgs>   any extra `pgproj publish` flags (e.g. the no-transaction switch)
-      Never hard-code a connection string in a committed .pgproj — prefer a profile or pass at build time.
+      Publish settings (surfaced to VS's right-click Publish), set in the .pgproj or on the command
+      line (-p:PgProjPublishConnection=...):
+        PgProjPublishConnection  the Npgsql connection string to deploy to (required for Publish)
+        PgProjPublishProfile     a .pgpublish.json profile (options + SQLCMD variables)
+        PgProjPublishAllowDrops  true allows destructive changes
+        PgProjPublishExtraArgs   extra `pgproj publish` flags (e.g. the no-transaction switch)
+      Never hard-code a connection string in a committed .pgproj - prefer a profile or pass at build time.
     -->
     <PgProjPublishAllowDrops Condition="'$(PgProjPublishAllowDrops)' == ''">false</PgProjPublishAllowDrops>
 
-    <!--
-      Auto-include opt-out: set <EnableDefaultSqlItems>false</EnableDefaultSqlItems> in your
-      project to manage <Build Include="..." /> entries yourself (e.g. when you want only a subset
-      of .sql files, or when you need full control over item order).  Mirrors the
-      MSBuild.Sdk.SqlProj / .NET SDK DefaultItems escape hatch.
-    -->
+    <!-- Opt out of the default .sql glob with EnableDefaultSqlItems=false to manage <Build> yourself. -->
     <EnableDefaultSqlItems Condition="'$(EnableDefaultSqlItems)' == ''">true</EnableDefaultSqlItems>
   </PropertyGroup>
 
   <!--
-    Default glob: auto-include every **.sql in the project tree when EnableDefaultSqlItems is
-    true.  Placed in Sdk.props (evaluated before the user's ItemGroups) so that if the user also
-    declares <Build Include="**/*.sql" /> the two entries share the same resolved item identities
-    and MSBuild silently deduplicates them — no file is parsed twice.  If the user includes a
-    more-specific glob or explicit file paths those items union correctly with this catch-all.
-    bin/** and obj/** are excluded to keep generated artefacts out of the model.
+    Default glob: auto-include every **.sql when EnableDefaultSqlItems is true. If the user also
+    declares <Build Include="**/*.sql" /> the resolved identities dedupe. bin/obj are excluded.
   -->
   <ItemGroup Condition="'$(EnableDefaultSqlItems)' == 'true'">
     <Build Include="**/*.sql" Exclude="bin/**/*.sql;obj/**/*.sql" />
+  </ItemGroup>
+
+  <!--
+    Visual Studio project-system support:
+      * ProjectCapability "PgProj" identifies a database project to CPS - the project-system extension
+        keys its MEF AppliesTo exports and the SolutionHasProjectCapability:PgProj UIContext on it.
+      * The items schema declares this SDK's item vocabulary; the per-item-type File/BrowseObject
+        rules (Build/None/Folder) are what make CPS actually RENDER those items in Solution
+        Explorer - without a File-context rule binding the item type, files exist in the project
+        but never appear in the tree (this mirrors how the managed project system registers
+        Compile/Content/None under MSBuild\Microsoft\VisualStudio\Managed).
+      * The four Project-Properties pages (EP-VS #114): Database Settings, Target Platform,
+        Build Output, SQLCMD Variables - CPS generic rules persisting into this .pgproj.
+        Command-line MSBuild ignores all of these.
+  -->
+  <ItemGroup>
+    <ProjectCapability Include="PgProj" />
+    <!--
+      Source-item capabilities (mirroring Microsoft.Managed.DesignTime.targets) - without these CPS
+      does not treat the project's items as source items at all, so NOTHING renders in Solution
+      Explorer no matter how correct the item schema and rules are:
+        DeclaredSourceItems  - the project declares source items (our Build glob);
+        UserSourceItems      - the user may add/remove items from the IDE;
+        UseFileGlobs         - glob-aware item edits (an added file covered by **/*.sql writes no
+                               explicit item; renames/deletes update the project minimally);
+        ShowMissingItemTypes - render items of types that lack rules via temporary generated rules
+                               (safety net so an unruled item type degrades to "shown, generic"
+                               instead of invisible).
+    -->
+    <ProjectCapability Include="DeclaredSourceItems" />
+    <ProjectCapability Include="UserSourceItems" />
+    <ProjectCapability Include="UseFileGlobs" />
+    <ProjectCapability Include="ShowMissingItemTypes" />
+    <PropertyPageSchema Include="$(MSBuildThisFileDirectory)Rules\ProjectItemsSchema.xaml">
+      <Context>Project</Context>
+    </PropertyPageSchema>
+    <PropertyPageSchema Include="$(MSBuildThisFileDirectory)Rules\Build.xaml">
+      <Context>File</Context>
+    </PropertyPageSchema>
+    <PropertyPageSchema Include="$(MSBuildThisFileDirectory)Rules\Build.BrowseObject.xaml">
+      <Context>BrowseObject</Context>
+    </PropertyPageSchema>
+    <PropertyPageSchema Include="$(MSBuildThisFileDirectory)Rules\None.xaml">
+      <Context>File</Context>
+    </PropertyPageSchema>
+    <PropertyPageSchema Include="$(MSBuildThisFileDirectory)Rules\None.BrowseObject.xaml">
+      <Context>BrowseObject</Context>
+    </PropertyPageSchema>
+    <PropertyPageSchema Include="$(MSBuildThisFileDirectory)Rules\Folder.xaml">
+      <Context>File;BrowseObject</Context>
+    </PropertyPageSchema>
+    <PropertyPageSchema Include="$(MSBuildThisFileDirectory)Rules\DatabaseSettingsPage.xaml">
+      <Context>Project</Context>
+    </PropertyPageSchema>
+    <PropertyPageSchema Include="$(MSBuildThisFileDirectory)Rules\TargetPlatformPage.xaml">
+      <Context>Project</Context>
+    </PropertyPageSchema>
+    <PropertyPageSchema Include="$(MSBuildThisFileDirectory)Rules\BuildOutputPage.xaml">
+      <Context>Project</Context>
+    </PropertyPageSchema>
+    <PropertyPageSchema Include="$(MSBuildThisFileDirectory)Rules\SqlCmdVariablesPage.xaml">
+      <Context>Project</Context>
+    </PropertyPageSchema>
   </ItemGroup>
 </Project>

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Properties-window (BrowseObject) rule for None items. BuildAction (the SDK's deploy-script
+  marker metadata: PreDeploy / PostDeploy) is surfaced read-write so a script can be flagged
+  without hand-editing the .pgproj.
+-->
+<Rule Name="None"
+      Description="File properties"
+      DisplayName="File"
+      PageTemplate="generic"
+      PropertyPagesHidden="true"
+      xmlns="http://schemas.microsoft.com/build/2009/properties">
+  <Rule.Categories>
+    <Category Name="Advanced"
+              DisplayName="Advanced" />
+    <Category Name="Misc"
+              DisplayName="Misc" />
+  </Rule.Categories>
+
+  <Rule.DataSource>
+    <DataSource HasConfigurationCondition="False"
+                ItemType="None"
+                Persistence="ProjectFile"
+                SourceOfDefaultValue="AfterContext" />
+  </Rule.DataSource>
+
+  <DynamicEnumProperty Name="{}{ItemType}"
+                       Category="Advanced"
+                       Description="How the file relates to the database model build."
+                       DisplayName="Build Action"
+                       EnumProvider="ItemTypes" />
+
+  <StringProperty Name="BuildAction"
+                  Category="Advanced"
+                  Description="Deploy-script role: PreDeploy or PostDeploy (empty for a plain file)."
+                  DisplayName="Deploy Script Role" />
+
+  <StringProperty Name="FileNameAndExtension"
+                  Category="Misc"
+                  Description="Name of the file."
+                  DisplayName="File Name"
+                  ReadOnly="true">
+    <StringProperty.DataSource>
+      <DataSource ItemType="None"
+                  PersistedName="FileNameAndExtension"
+                  Persistence="Intrinsic"
+                  SourceOfDefaultValue="AfterContext" />
+    </StringProperty.DataSource>
+  </StringProperty>
+
+  <StringProperty Name="FullPath"
+                  Category="Misc"
+                  Description="Location of the file."
+                  DisplayName="Full Path"
+                  ReadOnly="true">
+    <StringProperty.DataSource>
+      <DataSource ItemType="None"
+                  PersistedName="FullPath"
+                  Persistence="Intrinsic"
+                  SourceOfDefaultValue="AfterContext" />
+    </StringProperty.DataSource>
+  </StringProperty>
+
+  <BoolProperty Name="Visible"
+                Visible="false" />
+</Rule>

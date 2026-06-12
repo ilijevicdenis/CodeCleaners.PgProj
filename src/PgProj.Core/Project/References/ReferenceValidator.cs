@@ -35,10 +35,15 @@ public static class ReferenceValidator
         var projectCatalog = new Catalog { DefaultSchema = project.DefaultSchema };
         var files = project.ResolveSqlFiles();
         var parsedByFile = new Dictionary<string, ParseResult>();
+        var textByFile = new Dictionary<string, string>();
 
         foreach (var file in files)
         {
-            var parsed = new PgParser().Parse(SourceReader.ReadAllText(file)); // LF-normalised (#62)
+            // LF-normalised + overlay/substitution-aware (#62): the validator must see the same text
+            // the build parses, including the LSP's unsaved-buffer overlay.
+            var text = project.ReadEffectiveText(file);
+            textByFile[file] = text;
+            var parsed = new PgParser().Parse(text);
             parsedByFile[file] = parsed;
             foreach (var stmt in parsed.Statements)
                 CatalogBuilder.Absorb(projectCatalog, stmt);
@@ -66,7 +71,7 @@ public static class ReferenceValidator
         {
             var parsed = parsedByFile[file];
             var rel = Path.GetRelativePath(project.ProjectDirectory, file).Replace('\\', '/');
-            var text = SourceReader.ReadAllText(file); // LF-normalised → positions match the parse (#62)
+            var text = textByFile[file]; // same effective text the parse above ran on → positions match
 
             // Analyze one statement at a time so every diagnostic can be attributed to that statement's
             // source position. The catalog already contains all project + external objects, so order of
@@ -101,12 +106,12 @@ public static class ReferenceValidator
         foreach (var file in files)
         {
             var rel = Path.GetRelativePath(project.ProjectDirectory, file).Replace('\\', '/');
-            validator.IndexFile(rel, SourceReader.ReadAllText(file), parsedByFile[file]);
+            validator.IndexFile(rel, textByFile[file], parsedByFile[file]);
         }
         foreach (var file in files)
         {
             var rel = Path.GetRelativePath(project.ProjectDirectory, file).Replace('\\', '/');
-            foreach (var d in validator.Validate(rel, SourceReader.ReadAllText(file), parsedByFile[file]))
+            foreach (var d in validator.Validate(rel, textByFile[file], parsedByFile[file]))
                 diagnostics.Add(new ReferenceValidationDiagnostic(d.File ?? rel, d.Line, d.Column, d.Message));
         }
 

@@ -47,8 +47,8 @@ public sealed class SarifWriterTests
         Assert.Equal("pgproj", driver.GetProperty("name").GetString());
 
         var ruleIds = driver.GetProperty("rules").EnumerateArray().Select(r => r.GetProperty("id").GetString()).ToList();
-        Assert.Equal(PgAnalyzer.RuleCount, ruleIds.Count);
-        foreach (var id in PgAnalyzer.RuleIds)
+        Assert.Equal(PgAnalyzer.RuleCount + ModelAnalyzer.RuleCount, ruleIds.Count);
+        foreach (var id in PgAnalyzer.RuleIds.Concat(ModelAnalyzer.RuleIds))
             Assert.Contains(id, ruleIds);
     }
 

@@ -1,5 +1,10 @@
 # SSDT-for-PostgreSQL — Feature Parity Backlog
 
+> **[HISTORICAL REFERENCE]** This document is the original parity backlog and is no longer
+> maintained — most "❌ missing" entries below have since shipped. The source of truth for
+> current status is **`docs/reference/PROGRESS.md`** (M7 SSDT-parity milestone) and the GitHub
+> issue tracker. Kept for the terminology map and the original scoping rationale.
+
 > Goal: give PostgreSQL developers the **same declarative-database-project experience** that SQL
 > Server developers get from **SQL Server Data Tools (SSDT) / the Microsoft.Build.Sql SDK / the SQL
 > Database Projects extension** — including the **same UI**, so a Visual Studio (and VS Code) user
@@ -46,6 +51,23 @@ The headless engine is in good shape. These epics are **complete** and only need
 - **EP-ANALYZE** — static AST safety rules (`analyze`, PG001–PG009).
 - **EP-SDK** — `PgProj.Sdk` MSBuild props/targets so `dotnet build` builds a `.pgproj`.
 - **EP-PARSER** — 100% accept/reject parity vs PostgreSQL 18 on a 21,743-statement corpus.
+
+**Delivered during the M-waves (this §3 list lagged the code — confirmed by the 2026-06-07 M7 audit, see
+[`reference/PROGRESS.md`](reference/PROGRESS.md) M7):**
+
+- **EP-PKG / EP-VARS / EP-DEPLOYSCRIPTS / EP-REF / EP-RPC** — Phase-1 engine completeness (waves 1–2).
+- **EP-TARGET** ✅ — version-aware validation (`TargetVersionAnalyzer` + `PgVersionCapabilities` table + `PGV###`; gate on build/publish/validate).
+- **EP-PROFILE** ✅ — `.pgpublish.json` + `profile create` + `--profile` (CLI>profile>default; secret-free).
+- **EP-SCHEMACOMPARE** ✅ — unified two-way `SchemaCompare` + selectable change set + `--output diff.json` + `--exclude`.
+- **EP-TEMPLATES** ✅ — object templates + `add`/`new project` + `dotnet new` pack (`templates/`).
+- **EP-VSCODE / EP-VS Route A / EP-DESIGNER (read+round-trip)** — delivered in M5 (#24/#25/#26/#31).
+- **EP-ANALYSIS+** 🟡 — per-rule config + `--rule` + SARIF done; **open:** external rule packs, growing the rule set.
+
+> **Reality check (2026-06-07):** the per-epic task checklists in §3 below are the *original* backlog and
+> were not all re-ticked. Treat the list above + `PROGRESS.md` M7 as the source of truth for what's done;
+> the genuinely-open work is **EP-ANALYSIS+ tail, EP-COVERAGE (introspection, tracked in `reference/COVERAGE.md`),
+> EP-DESIGNER deepening.** (EP-CICD was removed from scope; EP-VS Route B + slngen grouping shipped
+> 2026-06-11 — #113–#118 closed, manual F5 pass outstanding.)
 
 ---
 
@@ -147,6 +169,8 @@ run around the schema diff.
 
 ### EP-TARGET — Target-platform enforcement (version-aware validation) — **P1**
 
+> ✅ **DELIVERED** (M7 audit 2026-06-07, issue #66). `Analysis/TargetVersionAnalyzer.cs` + `Versioning/PgVersionCapabilities`/`SupportedFeatures` + `PGV###`; gate wired into build/publish/validate. Tests `TargetVersionTests`/`VersionProfileTests`. Tasks below are historical.
+
 `TargetPostgresVersion` (16/17/18) is parsed but not enforced. SSDT blocks SQL2022-only syntax on a
 SQL2017 target. Mirrors matrix row *Target platform*.
 
@@ -164,6 +188,8 @@ SQL2017 target. Mirrors matrix row *Target platform*.
 ---
 
 ### EP-ANALYSIS+ — Configurable code analysis & extensibility — **P1**
+
+> 🟡 **MOSTLY DELIVERED** (M7, issue #67). Done: per-rule config `Analysis/AnalysisConfig.cs` (`.pgproj.analysis.json`), CLI `--rule`, SARIF (`Analysis/SarifWriter.cs`), and **#79 external rule packs** (`IPgRule` + `RulePackLoader` isolated-`AssemblyLoadContext` discovery + `rulePacks` config; doc `docs/ANALYSIS_RULES.md`). **Open: #81** grow the rule set.
 
 Matrix rows *Code analysis enable/disable GUI* + *run code analysis*. Today rules are all-or-nothing.
 SSDT lets you enable/disable rules and set severity, plus third-party rule packs.
@@ -185,6 +211,8 @@ SSDT lets you enable/disable rules and set severity, plus third-party rule packs
 
 ### EP-PROFILE — Publish profiles — **P1**
 
+> ✅ **DELIVERED** (M7 audit 2026-06-07, issue #68). `Deployment/PublishProfile.cs` (secret-whitelisted `.pgpublish.json`), `profile create` verb, `--profile` on publish/script/compare (CLI>profile>default). Tests `PublishProfileTests`. Tasks below are historical.
+
 Matrix rows *Publish profile creation* + *Load connection details and SQLCMD variables from profile*.
 A reusable file capturing target connection + variables + publish options.
 
@@ -202,6 +230,8 @@ A reusable file capturing target connection + variables + publish options.
 ---
 
 ### EP-SCHEMACOMPARE — First-class two-way Schema Compare — **P1**
+
+> ✅ **DELIVERED** (M7 audit 2026-06-07, issue #69). `Comparison/SchemaCompare.cs` unified two-way API (source/target ∈ project/pkg/snapshot/live via `EndpointResolver`), selectable `SchemaChangeSet`, `--output diff.json`, `--exclude`. Tests `SchemaCompareTests`. Tasks below are historical.
 
 The engine diffs both directions (`compare` = project→DB, `drift`/`pull` = DB→project), but SSDT
 exposes a **single Schema Compare** surface with a reviewable, **selective** change list and apply in
@@ -221,6 +251,8 @@ either direction. Matrix rows *Schema comparison project↔database*.
 ---
 
 ### EP-TEMPLATES — New-object templates & `dotnet new` — **P1**
+
+> ✅ **DELIVERED** (M7 audit 2026-06-07, issue #70). `Templates/*` (`Scaffolder`/`TemplateCatalog`), `add`/`new project` verbs, `dotnet new` pack at `templates/PgProj.Templates.csproj`. Tests `TemplateTests`/`TemplateIntegrationTests`. Tasks below are historical.
 
 Matrix rows *New object templates* + *Create new empty project / from existing database*.
 
@@ -296,9 +328,9 @@ VS support is still "preview".
 
 **Tasks**
 - [x] **Route A (faster): make `.pgproj` a clean `dotnet build` citizen** — `PgProj.Sdk` finished and **NuGet-packable** (`dotnet pack src/PgProj.Sdk` → carries the CLI under `tools/`); VS's generic project handling builds/cleans/**publishes** it. Build → model + `.pgpkg`; **Publish** is a real MSBuild target (`-t:Publish`, real/diff-dry-run/offline-preview shapes). Validated: sample `.pgproj` build (model byte-equal to the CLI's), pack, and a packaged-SDK consumer build. See `docs/VISUAL_STUDIO.md` / `src/PgProj.Sdk/README.md`.
-- [~] **Route B (full): a VSIX project system / project flavor** — **scaffolded** under `editors/vs/` (own solution, excluded from `PgProj.slnx`; needs VS + the VS SDK to build — not buildable headless): project factory/flavor, the four property pages (build output, database settings, SQLCMD variables, target platform), Publish dialog command, Schema Compare window, `.vsct`/manifest. Bodies marked `// SCAFFOLD`. Table designer still deferred to EP-DESIGNER.
-- [x] Language service for `.sql` IntelliSense from the project model — **VS `ILanguageClient` scaffold** (`editors/vs/.../LanguageClient/`) launches the existing `pgproj serve` LSP (#31), same server VS Code uses (`docs/LSP_LANGUAGE_SERVER.md`).
-- [ ] `slngen`-style solution grouping for multiple `.pgproj`s (matrix row *Solution management*).
+- [x] **Route B (full): the two-extension hybrid** — delivered 2026-06-11 (#113–#117, `editors/vs/README.md`): real CPS project type + File→New→Project + nine item templates in the classic extension (#113), `.vsct`/manifest wiring with the OOP commands mounted on the project context menu (#117), the four property pages as CPS XAML rules shipped by `PgProj.Sdk` (#114, incl. new `PgProjPublishVariables` → `--var` publish wiring), a modal Publish dialog (connection/profile/variables/options/generate-script) (#115), and an interactive Schema Compare window (source/target pickers, checkable diff, Generate Script / Apply over the engine's `SelectableChange` set) (#116). Headless builds green; the runtime F5 pass is manual. Table designer still deferred to EP-DESIGNER.
+- [x] Language service for `.sql` IntelliSense from the project model — the OOP extension hosts `PgProj.Lsp`'s `LspServer` in-process (same server VS Code uses, `docs/LSP_LANGUAGE_SERVER.md`).
+- [x] `slngen`-style solution grouping for multiple `.pgproj`s (matrix row *Solution management*) — `pgproj sln new|add|list` over `PgProj.Core.Solutions` (canonical `.slnx`, folders mirror the directory tree, idempotent regeneration) (#118).
 
 ---
 
@@ -338,9 +370,9 @@ Matrix *Command line tools / CI-CD* (GitHub `sql-action`, Azure DevOps task).
 | Feature (MS matrix) | pgproj CLI/engine | pgproj VS Code (planned) | pgproj VS (planned) |
 |---|---|---|---|
 | Create new empty project | ⚠️ EP-TEMPLATES | ❌ EP-VSCODE | ❌ EP-VS |
-| Create project from existing DB | ✅ `extract` | ❌ EP-VSCODE | ❌ EP-VS |
+| Create project from existing DB | ✅ `extract` | ❌ EP-VSCODE | ✅ Import Database… dialog |
 | Open existing SDK-style project | ✅ `.pgproj` | ❌ EP-VSCODE | ❌ EP-VS |
-| Solution management | ❌ EP-VS (slngen-style) | n/a | ❌ EP-VS |
+| Solution management | ✅ `sln new/add/list` | n/a | ✅ `.slnx` loads natively |
 | Build | ✅ `build` | ❌ EP-VSCODE | ⚠️ EP-SDK |
 | Publish to server | ✅ `publish` | ❌ EP-VSCODE | ❌ EP-VS |
 | Publish to local dev instance | ✅ (any conn) | ❌ EP-VSCODE | ❌ EP-VS |

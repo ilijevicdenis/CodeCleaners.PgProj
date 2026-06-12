@@ -68,10 +68,15 @@
          in a single TfmSpecificPackageFile group corrupts the RecursiveDir metadata. -->
     <ItemGroup>
       <_PgProjCliFile Include="$(_PgProjCliStageDir)\**\*" />
+      <!-- Glob the whole Rules folder (own item, same RecursiveDir reasoning as the CLI files) so a
+           newly added rule xaml can never be silently left out of the package - a missing rule fails
+           soft in VS (items/pages just don't show), which is painful to diagnose. -->
+      <_PgProjRuleFile Include="$(MSBuildThisFileDirectory)Sdk\Rules\*.xaml" />
     </ItemGroup>
     <ItemGroup>
       <TfmSpecificPackageFile Include="$(MSBuildThisFileDirectory)Sdk\Sdk.props" PackagePath="Sdk\Sdk.props" />
       <TfmSpecificPackageFile Include="$(MSBuildThisFileDirectory)Sdk\Sdk.targets" PackagePath="Sdk\Sdk.targets" />
+      <TfmSpecificPackageFile Include="@(_PgProjRuleFile)" PackagePath="Sdk\Rules\%(_PgProjRuleFile.Filename)%(_PgProjRuleFile.Extension)" />
       <TfmSpecificPackageFile Include="@(_PgProjCliFile)" PackagePath="tools\%(_PgProjCliFile.RecursiveDir)" />
     </ItemGroup>
   </Target>

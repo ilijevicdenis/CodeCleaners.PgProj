@@ -1,0 +1,12 @@
+<Project Sdk="PgProj.Sdk/0.1.0" DefaultTargets="Build">
+  <PropertyGroup>
+    <Name>$safeprojectname$</Name>
+    <DefaultSchema>public</DefaultSchema>
+    <TargetPostgresVersion>18</TargetPostgresVersion>
+  </PropertyGroup>
+  <!-- Every *.sql under the project folder is included automatically (set
+       <EnableDefaultSqlItems>false</EnableDefaultSqlItems> above to manage <Build> items yourself).
+       Convention: group database objects in one folder per schema (public/, app/, ...) with files
+       named schema.object.sql. Start by adding a "Schema (PostgreSQL)" item, then add tables,
+       views and functions inside that schema's folder. -->
+</Project>

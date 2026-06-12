@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  VSIX manifest for the PgProj Visual Studio PROJECT SYSTEM (classic in-proc VSSDK, EP-VS #25 Route B).
+  Declares the VsPackage, the .pgproj project-type asset, and the MEF components. The .sql IntelliSense
+  (language client/server) lives in the sibling modern OOP extension (PgProj.VisualStudio), NOT here.
+  Processed by Microsoft.VSSDK.BuildTools at build time (VS SDK required).
+-->
+<PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
+  <Metadata>
+    <Identity Id="PgProj.VisualStudio.b0000000-0025" Version="0.1.0" Language="en-US" Publisher="CodeCleaners d.o.o." />
+    <DisplayName>PgProj — PostgreSQL Database Projects</DisplayName>
+    <Description xml:space="preserve">Open, build, and publish PostgreSQL database projects (.pgproj) from Solution Explorer with the same verbs as a SQL Server project: build to a model/.pgpkg, Publish, Schema Compare, and .sql IntelliSense driven by the project model (via the pgproj language server). Route B of the SSDT-for-PostgreSQL parity effort.</Description>
+    <MoreInfo>https://github.com/ilijevicdenis/CodeCleaners.PgProj</MoreInfo>
+    <License>LICENSE</License>
+    <Tags>postgresql;pgproj;database;ssdt;schema-compare;sql</Tags>
+  </Metadata>
+  <Installation>
+    <!-- All SKUs (Community is the base SKU → installs on Pro/Enterprise too), VS 2022 (17.x) through
+         VS 2026 (18.x). The range MUST include 18.x or the extension is not offered for VS 2026: the
+         InstallationTarget version is a hard gate VS enforces, separate from net472 binary compat. -->
+    <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[17.0,19.0)">
+      <ProductArchitecture>amd64</ProductArchitecture>
+    </InstallationTarget>
+  </Installation>
+  <Dependencies>
+    <Dependency Id="Microsoft.Framework.NDP" DisplayName="Microsoft .NET Framework" d:Source="Manual" Version="[4.7.2,)" />
+  </Dependencies>
+  <Prerequisites>
+    <Prerequisite Id="Microsoft.VisualStudio.Component.CoreEditor" Version="[17.0,19.0)" DisplayName="Visual Studio core editor" />
+  </Prerequisites>
+  <Assets>
+    <Asset Type="Microsoft.VisualStudio.VsPackage" d:Source="Project" d:ProjectName="%CurrentProject%" Path="|%CurrentProject%;PkgdefProjectOutputGroup|" />
+    <Asset Type="Microsoft.VisualStudio.MefComponent" d:Source="Project" d:ProjectName="%CurrentProject%" Path="|%CurrentProject%|" />
+    <!-- The .pgproj project type (CPS registration + MEF exports in this assembly). -->
+    <Asset Type="Microsoft.VisualStudio.ProjectType" d:Source="Project" d:ProjectName="%CurrentProject%" Path="|%CurrentProject%|" />
+    <!-- Folder-based templates: VS scans these VSIX directories recursively for .vstemplate files. -->
+    <Asset Type="Microsoft.VisualStudio.ProjectTemplate" d:Source="File" Path="ProjectTemplates" />
+    <Asset Type="Microsoft.VisualStudio.ItemTemplate" d:Source="File" Path="ItemTemplates" />
+  </Assets>
+</PackageManifest>

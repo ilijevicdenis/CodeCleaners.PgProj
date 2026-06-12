@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  EP-VS #25 Route B — command table for the PgProj project-system extension.
+
+  Defines ONLY the .pgproj project-node context-menu group. The working database commands
+  (Publish / Schema Compare) are contributed by the sibling OOP extension (PgProj.VisualStudio),
+  which places them into this group via CommandPlacement.VsctParent(guidPgProjCmdSet, 0x1020) —
+  see its Commands/PgProjProjectSystemMenus.cs. Keeping the group here (and the commands there)
+  means no Extensions-menu entries and a single implementation of each command.
+  GUIDs/IDs mirror PgProjGuids.cs.
+-->
+<CommandTable xmlns="http://schemas.microsoft.com/VisualStudio/2005-10-18/CommandTable" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <Extern href="stdidcmd.h" />
+  <Extern href="vsshlids.h" />
+
+  <Commands package="guidPgProjPackage">
+    <Groups>
+      <Group guid="guidPgProjCmdSet" id="PgProjProjectContextGroup" priority="0x0600">
+        <!-- IDM_VS_CTXT_PROJNODE: the project node context menu. The group renders only when it
+             has visible members; the OOP commands gate themselves on a .pgproj selection, so other
+             project types never see a PgProj entry. -->
+        <Parent guid="guidSHLMainMenu" id="IDM_VS_CTXT_PROJNODE" />
+      </Group>
+      <Group guid="guidPgProjCmdSet" id="PgProjItemContextGroup" priority="0x0600">
+        <!-- IDM_VS_CTXT_ITEMNODE: the project ITEM context menu - file-scoped database commands
+             (Sync with Database). Same gating model as the project group. -->
+        <Parent guid="guidSHLMainMenu" id="IDM_VS_CTXT_ITEMNODE" />
+      </Group>
+    </Groups>
+
+    <Buttons>
+      <!-- Import Database lives IN-PROC (here), not in the OOP extension: a local OOP extension
+           cannot be installed into the main VS 2026 instance at all (VSIXInstaller refuses to
+           finalize it, the new Extension Manager has no install-from-disk, and an unzipped copy
+           registers but never loads). The handler shells out to the bundled pgproj CLI (tools\)
+           because the engine is net10 and this assembly is net472. -->
+      <Button guid="guidPgProjCmdSet" id="cmdidImportDatabase" priority="0x0103" type="Button">
+        <Parent guid="guidPgProjCmdSet" id="PgProjProjectContextGroup" />
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <CommandFlag>DefaultInvisible</CommandFlag>
+        <Strings>
+          <ButtonText>Import Database (PgProj)…</ButtonText>
+        </Strings>
+      </Button>
+      <!-- File-scoped sync: right-click a .sql in a .pgproj - diff local vs the live database and
+           apply either direction. Handler shells the bundled CLI (sync-file verb). -->
+      <Button guid="guidPgProjCmdSet" id="cmdidSyncFile" priority="0x0104" type="Button">
+        <Parent guid="guidPgProjCmdSet" id="PgProjItemContextGroup" />
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <CommandFlag>DefaultInvisible</CommandFlag>
+        <Strings>
+          <ButtonText>Sync with Database (PgProj)…</ButtonText>
+        </Strings>
+      </Button>
+    </Buttons>
+  </Commands>
+
+  <!-- Coarse pre-package-load gating: the button shows only while a PgProj project is in the
+       solution (the a4 UIContext rule). Fine gating (selected node is a .pgproj) happens in the
+       command's BeforeQueryStatus once the package loads. -->
+  <VisibilityConstraints>
+    <VisibilityItem guid="guidPgProjCmdSet" id="cmdidImportDatabase" context="guidPgProjLoadedUIContext" />
+    <VisibilityItem guid="guidPgProjCmdSet" id="cmdidSyncFile" context="guidPgProjLoadedUIContext" />
+  </VisibilityConstraints>
+
+  <Symbols>
+    <!-- Must match PgProjGuids.PackageGuidString. -->
+    <GuidSymbol name="guidPgProjPackage" value="{b0000000-0000-0000-0000-000000000025}" />
+    <!-- Must match PgProjGuids.CommandSetGuidString (mirrored by the OOP extension). -->
+    <GuidSymbol name="guidPgProjCmdSet" value="{b0000000-0000-0000-0000-0000000000a2}">
+      <IDSymbol name="PgProjProjectContextGroup" value="0x1020" />
+      <IDSymbol name="cmdidImportDatabase" value="0x0103" />
+      <IDSymbol name="PgProjItemContextGroup" value="0x1021" />
+      <IDSymbol name="cmdidSyncFile" value="0x0104" />
+    </GuidSymbol>
+    <!-- Must match PgProjGuids.PgProjLoadedUIContextGuidString. -->
+    <GuidSymbol name="guidPgProjLoadedUIContext" value="{b0000000-0000-0000-0000-0000000000a4}" />
+  </Symbols>
+</CommandTable>

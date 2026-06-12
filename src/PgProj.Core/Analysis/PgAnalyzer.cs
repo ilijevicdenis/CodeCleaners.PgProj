@@ -14,8 +14,14 @@ namespace PgProj.Core.Analysis;
 ///   PG003 UPDATE/DELETE without a WHERE clause (whole-table mutation)
 ///   PG004 schema mutation (CREATE/ALTER/DROP) inside a function body
 ///   PG005 function without a declared volatility (defaults to VOLATILE)
+///   PG006 table without a PRIMARY KEY
 ///   PG007 SELECT * in a view body (brittle to column changes)
+///   PG008 numeric/decimal column without precision/scale
 ///   PG009 LIMIT without ORDER BY (non-deterministic result)
+///   PG010 blank-padded char(n) column (use text/varchar)
+///   PG011 timestamp WITHOUT time zone column (use timestamptz)
+///   PG012 serial column (use GENERATED ... AS IDENTITY)
+///   PG013 money column (locale-dependent; use numeric)
 /// Complements the semantic analyzer (catalog/type/structural). Function-body checks are textual
 /// because PgParser keeps bodies verbatim; everything else is AST-precise.
 /// </summary>
@@ -35,8 +41,14 @@ public sealed class PgAnalyzer
         new RuleInfo("PG003", DiagnosticSeverity.Warning, "UPDATE/DELETE without a WHERE clause"),
         new RuleInfo("PG004", DiagnosticSeverity.Warning, "Schema mutation inside a function body"),
         new RuleInfo("PG005", DiagnosticSeverity.Info,    "Function without a declared volatility"),
+        new RuleInfo("PG006", DiagnosticSeverity.Info,    "Table without a primary key"),
         new RuleInfo("PG007", DiagnosticSeverity.Info,    "SELECT * in a view body"),
+        new RuleInfo("PG008", DiagnosticSeverity.Info,    "numeric/decimal column without precision/scale"),
         new RuleInfo("PG009", DiagnosticSeverity.Info,    "LIMIT without ORDER BY"),
+        new RuleInfo("PG010", DiagnosticSeverity.Info,    "Blank-padded char(n) column"),
+        new RuleInfo("PG011", DiagnosticSeverity.Info,    "timestamp without time zone column"),
+        new RuleInfo("PG012", DiagnosticSeverity.Info,    "serial column instead of an identity column"),
+        new RuleInfo("PG013", DiagnosticSeverity.Info,    "money column"),
     };
 
     private static readonly Dictionary<string, RuleInfo> ById =
@@ -71,6 +83,7 @@ public sealed class PgAnalyzer
             switch (stmt)
             {
                 case CreateFunctionStatement f: AnalyzeFunction(f, diags); break;
+                case CreateTableStatement t: AnalyzeTable(t, diags); break;
                 case CreateViewStatement v: CheckSelectStar(v, diags); break;
                 case QueryStatement q: CheckLimit(q.Query, $"{q.Query.From?.Relations.Count}", diags); break;
                 case UpdateStatement u when u.Where is null && u.WhereCurrentOf is null:
@@ -98,14 +111,81 @@ public sealed class PgAnalyzer
         var body = bm.Success ? bm.Groups[2].Value.ToLowerInvariant() : "";
         if (Regex.IsMatch(body, @"\bexecute\b"))
             Emit(diags, "PG002", "Dynamic SQL (EXECUTE) in a function body — ensure inputs are quoted (quote_ident/format).", sig);
-        if (Regex.IsMatch(body, @"\b(create|alter|drop)\s+(table|view|index|sequence|schema|type|function|materialized)\b"))
+        // optional modifiers between the verb and the object keyword (TEMP/UNLOGGED/OR REPLACE/
+        // UNIQUE/GLOBAL/LOCAL/MATERIALIZED/CONCURRENTLY) must not defeat the match (#65)
+        if (Regex.IsMatch(body, @"\b(create|alter|drop)\s+(?:(?:or\s+replace|global|local|temp(?:orary)?|unlogged|unique|materialized|concurrently)\s+)*(table|view|index|sequence|schema|type|function)\b"))
             Emit(diags, "PG004", "Schema mutation (CREATE/ALTER/DROP) inside a function body.", sig);
     }
+
+    // numeric/decimal with no precision/scale (optionally an array), case-insensitive: "numeric", "decimal",
+    // "numeric []" — but NOT "numeric(10,2)". Such a column stores arbitrary precision, almost always a mistake.
+    private static readonly Regex BareNumeric = new(@"^(numeric|decimal)\s*(\[\s*\])?$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+
+    // PG010 — char / character (optionally (n), optionally an array), but NOT "character varying" and NOT
+    // the internal one-byte "char" (its type text keeps the quotes, so the anchor never matches it).
+    private static readonly Regex BlankPaddedChar = new(@"^char(acter)?\s*(\(\s*\d+\s*\))?\s*(\[\s*\])?$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+
+    // PG011 — timestamp / timestamp(p), bare or with an explicit WITHOUT TIME ZONE; "with time zone" never matches.
+    private static readonly Regex TimestampNoTz = new(@"^timestamp\s*(\(\s*\d+\s*\))?\s*(without\s+time\s+zone)?\s*(\[\s*\])?$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+
+    // PG012 — the serial pseudo-types (all six spellings).
+    private static readonly Regex SerialType = new(@"^(smallserial|bigserial|serial[248]?)$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+
+    // PG013 — money (optionally an array).
+    private static readonly Regex MoneyType = new(@"^money\s*(\[\s*\])?$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+
+    private void AnalyzeTable(CreateTableStatement t, List<Diagnostic> diags)
+    {
+        var target = Q(t.Schema, t.Name);
+
+        // PG006 — a real table with no PRIMARY KEY. Skip the forms whose key comes from elsewhere: PARTITION
+        // OF / OF type (no column list of their own) and LIKE-element tables (the source may add the PK).
+        if (!t.IsPartitionOrTyped && !t.HasLikeElement && !HasPrimaryKey(t))
+            Emit(diags, "PG006",
+                "Table has no PRIMARY KEY — rows can't be uniquely identified (affects updates, logical replication, and tooling).",
+                target);
+
+        // Per-column type lints. A column has exactly one type, so the checks are mutually exclusive.
+        foreach (var c in t.Columns)
+        {
+            var type = (c.Type.Text ?? "").Trim();
+            if (BareNumeric.IsMatch(type))
+                Emit(diags, "PG008",
+                    $"Column \"{c.Name}\" is {type} without precision/scale — specify numeric(p, s) (or a fixed-width type).",
+                    target);
+            else if (BlankPaddedChar.IsMatch(type))
+                Emit(diags, "PG010",
+                    $"Column \"{c.Name}\" is {type} — blank-padded char wastes space and surprises on comparison; use text or varchar.",
+                    target);
+            else if (TimestampNoTz.IsMatch(type))
+                Emit(diags, "PG011",
+                    $"Column \"{c.Name}\" is {type} — timestamp WITHOUT time zone loses the UTC instant; use timestamptz.",
+                    target);
+            else if (SerialType.IsMatch(type))
+                Emit(diags, "PG012",
+                    $"Column \"{c.Name}\" is {type} — prefer GENERATED ALWAYS AS IDENTITY (owned, ALTERable, no implicit sequence grants).",
+                    target);
+            else if (MoneyType.IsMatch(type))
+                Emit(diags, "PG013",
+                    $"Column \"{c.Name}\" is {type} — money is locale-dependent (lc_monetary) and loses precision on division; use numeric.",
+                    target);
+        }
+    }
+
+    private static bool HasPrimaryKey(CreateTableStatement t) =>
+        t.Constraints.Exists(k => k is PrimaryKeyConstraint)
+        || t.Columns.Exists(c => c.Constraints.Exists(k => k is InlinePrimaryKey));
 
     private void CheckSelectStar(CreateViewStatement v, List<Diagnostic> diags)
     {
         if (Regex.IsMatch(v.BodyText, @"\bselect\b[^;]*\*", RegexOptions.IgnoreCase))
             Emit(diags, "PG007", "SELECT * in a view body is brittle to underlying column changes.", Q(v.Schema, v.Name));
+
+        // PG009 inside view bodies — the realistic home of LIMIT in a declarative schema; a bare
+        // top-level SELECT (the only place this fired before #65) almost never occurs in a project.
+        if (Regex.IsMatch(v.BodyText, @"\blimit\b", RegexOptions.IgnoreCase)
+            && !Regex.IsMatch(v.BodyText, @"\border\s+by\b", RegexOptions.IgnoreCase))
+            Emit(diags, "PG009", "LIMIT without ORDER BY returns a non-deterministic subset.", Q(v.Schema, v.Name));
     }
 
     private void CheckLimit(SelectQuery? q, string target, List<Diagnostic> diags)

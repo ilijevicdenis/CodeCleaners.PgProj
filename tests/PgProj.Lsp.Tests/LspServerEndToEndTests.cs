@@ -89,6 +89,91 @@ public sealed class LspServerEndToEndTests
     }
 
     [Fact]
+    public async Task Constructor_workspace_root_carries_project_diagnostics_when_initialize_has_no_rootUri()
+    {
+        using var tp = new TempProject();
+        tp.WriteSql("tables/customers.sql", "CREATE TABLE public.customers (id int);\n");
+        var rel = "views/v.sql";
+        var sql = "CREATE VIEW public.v AS SELECT id FROM public.missing_table;\n";
+        tp.WriteSql(rel, sql);
+        var uri = tp.UriFor(rel);
+
+        var session = new[]
+        {
+            // No rootUri/rootPath at all — the VS generic LSP client can do this; the server must
+            // fall back to the workspace root it was constructed with (the CLI's positional).
+            JsonRpcMessage.Request("1", "initialize", new InitializeParams()).ToJson(),
+            JsonRpcMessage.Notification("initialized").ToJson(),
+            JsonRpcMessage.Notification("textDocument/didOpen", new DidOpenTextDocumentParams
+            {
+                TextDocument = new TextDocumentItem { Uri = uri, Version = 1, Text = sql },
+            }).ToJson(),
+            JsonRpcMessage.Request("2", "shutdown").ToJson(),
+            JsonRpcMessage.Notification("exit").ToJson(),
+        };
+
+        using var input = new MemoryStream(Frame(session));
+        using var output = new MemoryStream();
+        using var server = new LspServer(input, output, debounceMs: 20, workspaceRoot: tp.Dir);
+        var exit = await server.RunAsync();
+        Assert.Equal(0, exit);
+
+        var msgs = Drain(output.ToArray());
+        var publishes = msgs.Where(m => m.Method == "textDocument/publishDiagnostics").ToList();
+        Assert.NotEmpty(publishes);
+        var diags = publishes[^1].Params!["diagnostics"]!.AsArray();
+        Assert.Contains(diags, d => d!["message"]!.GetValue<string>().Contains("missing_table"));
+    }
+
+    [Fact]
+    public async Task Changing_one_document_rediagnoses_other_open_documents()
+    {
+        using var tp = new TempProject();
+        var tableRel = "tables/customers.sql";
+        var tableSql = "CREATE TABLE public.customers (id int);\n";
+        tp.WriteSql(tableRel, tableSql);
+        var viewRel = "views/v.sql";
+        var viewSql = "CREATE VIEW public.v AS SELECT id FROM public.customers;\n";
+        tp.WriteSql(viewRel, viewSql);
+        var tableUri = tp.UriFor(tableRel);
+        var viewUri = tp.UriFor(viewRel);
+
+        var session = new[]
+        {
+            JsonRpcMessage.Request("1", "initialize", new InitializeParams { RootUri = DocumentUriOf(tp.Dir) }).ToJson(),
+            JsonRpcMessage.Notification("initialized").ToJson(),
+            JsonRpcMessage.Notification("textDocument/didOpen", new DidOpenTextDocumentParams
+            {
+                TextDocument = new TextDocumentItem { Uri = viewUri, Version = 1, Text = viewSql },
+            }).ToJson(),
+            JsonRpcMessage.Notification("textDocument/didOpen", new DidOpenTextDocumentParams
+            {
+                TextDocument = new TextDocumentItem { Uri = tableUri, Version = 1, Text = tableSql },
+            }).ToJson(),
+            // the user deletes the table definition (UNSAVED) — the OPEN VIEW must re-diagnose
+            JsonRpcMessage.Notification("textDocument/didChange", new DidChangeTextDocumentParams
+            {
+                TextDocument = new VersionedTextDocumentIdentifier { Uri = tableUri, Version = 2 },
+                ContentChanges = new[] { new TextDocumentContentChangeEvent { Text = "-- gone\n" } },
+            }).ToJson(),
+            JsonRpcMessage.Request("2", "shutdown").ToJson(),
+            JsonRpcMessage.Notification("exit").ToJson(),
+        };
+
+        using var input = new MemoryStream(Frame(session));
+        using var output = new MemoryStream();
+        using var server = new LspServer(input, output, debounceMs: 20);
+        await server.RunAsync();
+
+        var msgs = Drain(output.ToArray());
+        var viewPublishes = msgs.Where(m => m.Method == "textDocument/publishDiagnostics"
+            && (string?)m.Params!["uri"]!.GetValue<string>() == viewUri).ToList();
+        Assert.NotEmpty(viewPublishes);
+        var last = viewPublishes[^1].Params!["diagnostics"]!.AsArray();
+        Assert.Contains(last, d => d!["message"]!.GetValue<string>().Contains("public.customers"));
+    }
+
+    [Fact]
     public async Task Request_before_initialize_is_rejected()
     {
         var session = new[]
