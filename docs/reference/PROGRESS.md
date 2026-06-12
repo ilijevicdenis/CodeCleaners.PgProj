@@ -184,6 +184,7 @@ Newest first. One line per delivered issue/milestone; this is the audit trail of
 
 | Date | Milestone | Item | Commit | Notes |
 |------|-----------|------|--------|-------|
+| 2026-06-12 | M7+ | **EP-BUILD done** (#135) - .pgproj SuppressWarnings + TreatWarningsAsErrors via shared BuildWarningPolicy in ContractBuilder.Analyze; `--verbose` structured diagnostics with file:line | `861a13c` | 7 tests; CLI gate and in-proc editor path identical by construction. |
 | 2026-06-12 | M7+ | **EP-PKG verify done** (#138) - `pgproj verify <a.pgpkg> <b.pgpkg>`: model+sources+options equivalence, stamps excluded, exit 0/6, JSON+text - the DacpacVerify analogue | `e63417c` | 8 tests incl. live extract round-trip; documented in docs/CICD.md as the local reproducibility gate. |
 | 2026-06-12 | M7+ | **EP-DEPLOYREPORT done** (#141) - `pgproj deploy-report` / `publish --report-only`: apply-free planned-change report from the shared publish plan; per-op RiskAnalyzer verdicts, blocksOnDataLoss gate, pre/post + strategy, JSON+XML | `221f503` | Integration-tested vs real PG incl. target-unchanged guarantee; suites 25,091 Core + 28 LSP. |
 | 2026-06-12 | - | **Analyzer fixes** (#65) - PG004 matches through TEMP/OR REPLACE/UNIQUE/... modifiers; PG009 checks view bodies | `9396875` | 11 regression cases. |
