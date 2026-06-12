@@ -47,8 +47,8 @@ sweep (same policy as the VSIX projects — needs an installed VS + desktop sess
 
 ## Status (2026-06-12): GREEN — and the harness found and fixed two product bugs
 
-The suite passes end-to-end in the Hyper-V VM against the installed product with the real sample
-database. Along the way it root-caused the originally reported "everything dead" state (see the
+The suite passes end-to-end - **115/115** in ~5 minutes - in the Hyper-V VM against the installed
+product with the real sample database. Along the way it root-caused the originally reported "everything dead" state (see the
 CLAUDE.md lab notes for the full story):
 
 1. **Coloring** — the buffer's file-load language detection overwrote the `pgsql` content type;
