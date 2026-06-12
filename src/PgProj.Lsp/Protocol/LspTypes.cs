@@ -54,7 +54,12 @@ public sealed record TextDocumentSyncOptions
 
 public sealed record CompletionOptions
 {
-    public IReadOnlyList<string> TriggerCharacters { get; init; } = new[] { ".", " " };
+    /// <summary>
+    /// Just the dot: a space trigger pops completion after EVERY word — noisy as UX (the popup
+    /// flickers open on plain prose typing) and it made automated runs flaky. Explicit invoke
+    /// (Ctrl+Space) covers the "list everything here" case.
+    /// </summary>
+    public IReadOnlyList<string> TriggerCharacters { get; init; } = new[] { "." };
 }
 
 public sealed record ServerCapabilities

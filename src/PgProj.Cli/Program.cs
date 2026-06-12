@@ -46,6 +46,7 @@ public static class Program
                 "snapshot" => await Snapshot(args),
                 "drift" => await Drift(args),
                 "pull" => await Pull(args),
+                "sync-file" => await SyncFile(args),
                 "analyze" => Analyze(args),
                 "model-tree" => await ModelTree(args),
                 "describe-table" => DescribeTable(args),
@@ -607,6 +608,71 @@ public static class Program
     private static string Mark(PgProj.Core.Sync.ProjectFileChange fc) =>
         fc.IsDestructive ? "!" : fc.Kind == PgProj.Core.Sync.ProjectFileChangeKind.Create ? "+" : "~";
 
+    // ---- sync-file (FILE-scoped two-way sync — drives the editors' "Sync with Database") -----
+
+    /// <summary>
+    /// <c>pgproj sync-file &lt;project&gt; --file &lt;relative.sql&gt; --connection &lt;conn&gt;</c>:
+    /// inspect one project file against the live database. Default output is JSON (machine-readable,
+    /// for the Visual Studio command): status + both texts for the diff. With
+    /// <c>--apply-to-local</c> the database's version is written into the file; with
+    /// <c>--apply-to-db</c> a migration limited to the file's objects is generated and executed
+    /// (<c>--dry-run</c> prints it instead; <c>--allow-drops</c> permits destructive steps).
+    /// </summary>
+    private static async Task<int> SyncFile(string[] args)
+    {
+        var project = DatabaseProject.Load(RequirePositional(args, "project file"));
+        var relFile = GetOption(args, "--file")
+            ?? throw new ArgumentException("sync-file needs --file <project-relative .sql path>.");
+        var live = await ReadTarget(args);
+
+        var state = await PgProj.Core.Sync.FileSync.InspectAsync(project, live, relFile);
+
+        if (HasFlag(args, "--apply-to-local"))
+        {
+            if (state.Status == PgProj.Core.Sync.FileSync.FileSyncStatus.Identical)
+            {
+                Console.WriteLine("Already in sync — nothing written.");
+                return 0;
+            }
+            PgProj.Core.Sync.FileSync.ApplyToLocal(project, state);
+            Console.WriteLine(state.Status == PgProj.Core.Sync.FileSync.FileSyncStatus.OnlyLocal
+                ? $"Deleted {state.RelativePath} (its objects no longer exist in the database)."
+                : $"Wrote the database's version into {state.RelativePath}.");
+            return 0;
+        }
+
+        if (HasFlag(args, "--apply-to-db"))
+        {
+            var (script, count, destructive) = await PgProj.Core.Sync.FileSync.BuildPushScriptAsync(
+                project, live, relFile, allowDrops: HasFlag(args, "--allow-drops"));
+            if (count == 0)
+            {
+                Console.WriteLine("Already in sync — nothing to push.");
+                return 0;
+            }
+            if (HasFlag(args, "--dry-run"))
+            {
+                Console.WriteLine($"-- {count} change(s){(destructive ? ", DESTRUCTIVE steps included" : "")}");
+                Console.WriteLine(script);
+                return 0;
+            }
+            await new PgProj.Core.Publishing.DatabaseDeployer().ExecuteAsync(RequireConnection(args), script);
+            Console.WriteLine($"Pushed {count} change(s) from {state.RelativePath} to the database.");
+            return 0;
+        }
+
+        // default: machine-readable inspection for editor hosts
+        EmitJson(new
+        {
+            file = state.RelativePath,
+            status = state.Status.ToString(),
+            summary = state.Summary,
+            localText = state.LocalText,
+            databaseText = state.DatabaseText,
+        });
+        return 0;
+    }
+
     // ---- analyze (static analysis over the AST) -----------------------------------------
 
     private static int Analyze(string[] args)
@@ -735,8 +801,12 @@ public static class Program
         Console.SetOut(Console.Error);
 
         var debounce = int.TryParse(GetOption(args, "--debounce"), out var d) ? d : 150;
+        // The optional positional workspace root (first non-option token after the verb). It seeds
+        // project resolution for clients whose `initialize` carries no usable rootUri (VS does this
+        // when launched per-buffer) — without it the server degrades to parse-only diagnostics.
+        var workspaceRoot = args.Length > 1 && !args[1].StartsWith("-", StringComparison.Ordinal) ? args[1] : null;
         using var input = Console.OpenStandardInput();
-        using var server = new PgProj.Lsp.Server.LspServer(input, realOut, debounce);
+        using var server = new PgProj.Lsp.Server.LspServer(input, realOut, debounce, workspaceRoot);
         return await server.RunAsync();
     }
 
@@ -1199,6 +1269,7 @@ public static class Program
           pgproj snapshot --connection <conn> -o <db.schema.snapshot>                    (introspect a live DB once → a portable schema.snapshot for offline compare)
           pgproj drift   <project.pgproj> --connection <conn> [--fail-on-drift]         (preview project files that differ from the DB; --fail-on-drift exits 6 on drift)
           pgproj pull    <project.pgproj> --connection <conn> [--dry-run] [--allow-deletes]   (rewrite project files FROM the DB — scenario 3)
+          pgproj sync-file <project.pgproj> --file <rel.sql> --connection <conn> [--apply-to-local | --apply-to-db [--allow-drops] [--dry-run]]   (one file vs the DB: JSON state for editors, or apply either direction)
           pgproj analyze <project.pgproj> [--strict]    (static safety analysis over the AST)
           pgproj model-tree <project.pgproj> [--format json]   (objects + source positions, for editors)
           pgproj describe-table <table.sql> [--table schema.name] [--default-schema public]   (one table's model as JSON, for the graphical designer)

@@ -166,6 +166,34 @@ public sealed class SemanticValidatorTests
         Assert.Empty(Run(sql));
     }
 
+    [Fact]
+    public void Sql_special_values_in_defaults_and_checks_are_not_column_references()
+    {
+        // Found by the sample-db round-trip (2026-06-12): DEFAULT CURRENT_USER parses as a bare
+        // ColumnRef and was flagged "column CURRENT_USER does not exist". All parameterless
+        // special values must pass, in any casing, in DEFAULT and CHECK alike.
+        const string sql =
+            "CREATE TABLE app.audit_log (\n" +
+            "    id int,\n" +
+            "    changed_by text NOT NULL DEFAULT CURRENT_USER,\n" +
+            "    session_owner text DEFAULT session_user,\n" +
+            "    db name DEFAULT current_catalog,\n" +
+            "    created date DEFAULT current_date,\n" +
+            "    stamped timestamptz DEFAULT Current_Timestamp,\n" +
+            "    CONSTRAINT not_future CHECK (created <= current_date)\n" +
+            ");";
+        Assert.Empty(Run(sql));
+    }
+
+    [Fact]
+    public void Genuinely_missing_column_in_default_is_still_flagged_next_to_special_values()
+    {
+        const string sql = "CREATE TABLE app.t (a int, b text DEFAULT CURRENT_USER, c int DEFAULT missing_col);";
+        var err = Assert.Single(Run(sql));
+        Assert.Contains("missing_col", err.Message);
+        Assert.Contains("does not exist", err.Message);
+    }
+
     // ---- TYPE SAFETY (comparisons) -------------------------------------------
 
     [Fact]

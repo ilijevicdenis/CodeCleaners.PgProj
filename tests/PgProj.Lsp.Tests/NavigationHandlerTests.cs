@@ -26,6 +26,125 @@ public sealed class NavigationHandlerTests
     }
 
     [Fact]
+    public async Task Definition_on_a_query_alias_resolves_to_the_aliased_table()
+    {
+        var tp = new TempProject();
+        using var _tp = tp;
+        tp.WriteSql("tables/orders.sql", "CREATE TABLE public.orders (id int, customer_id int);\n");
+        var sql = "SELECT o.id FROM public.orders o WHERE o.customer_id = 1;\n";
+        var uri = tp.UriFor("queries/q.sql");
+        tp.WriteSql("queries/q.sql", sql);
+        var store = new DocumentStore();
+        store.Open(uri, sql, 1);
+        var svc = new LanguageService(store, tp.ProjectFilePath);
+
+        // cursor on the alias usage "o" in "WHERE o.customer_id"
+        var col = sql.IndexOf("o.customer_id", System.StringComparison.Ordinal);
+        var loc = await svc.DefinitionAsync(uri, new Position(0, col));
+
+        Assert.NotNull(loc);
+        Assert.EndsWith("orders.sql", loc!.Uri);
+    }
+
+    [Fact]
+    public async Task Definition_on_an_alias_qualified_column_lands_on_the_columns_own_line()
+    {
+        var tp = new TempProject();
+        using var _tp = tp;
+        // one column per line so the column's line is distinguishable from the CREATE line
+        tp.WriteSql("tables/orders.sql",
+            "CREATE TABLE public.orders (\n" +
+            "    id integer,\n" +
+            "    customer_id integer,\n" +   // ← line 2 (0-based)
+            "    status text\n" +
+            ");\n");
+        var sql = "SELECT o.customer_id FROM public.orders o;\n";
+        var uri = tp.UriFor("queries/q.sql");
+        tp.WriteSql("queries/q.sql", sql);
+        var store = new DocumentStore();
+        store.Open(uri, sql, 1);
+        var svc = new LanguageService(store, tp.ProjectFilePath);
+
+        // caret ON the column segment
+        var col = sql.IndexOf("customer_id", System.StringComparison.Ordinal) + 3;
+        var loc = await svc.DefinitionAsync(uri, new Position(0, col));
+
+        Assert.NotNull(loc);
+        Assert.EndsWith("orders.sql", loc!.Uri);
+        Assert.Equal(2, loc.Range.Start.Line);   // the column's own line, not the CREATE line
+        Assert.Equal(4, loc.Range.Start.Character);
+
+        // caret ON the alias segment of the same chain → the CREATE line instead
+        var aliasCol = sql.IndexOf("o.customer_id", System.StringComparison.Ordinal);
+        var relLoc = await svc.DefinitionAsync(uri, new Position(0, aliasCol));
+        Assert.NotNull(relLoc);
+        Assert.Equal(0, relLoc!.Range.Start.Line);
+    }
+
+    [Fact]
+    public async Task Definition_on_a_schema_qualified_column_lands_on_the_columns_own_line()
+    {
+        var tp = new TempProject();
+        using var _tp = tp;
+        tp.WriteSql("tables/orders.sql",
+            "CREATE TABLE public.orders (\n    id integer,\n    status text\n);\n");
+        var sql = "SELECT public.orders.status FROM public.orders;\n";
+        var uri = tp.UriFor("queries/q.sql");
+        tp.WriteSql("queries/q.sql", sql);
+        var store = new DocumentStore();
+        store.Open(uri, sql, 1);
+        var svc = new LanguageService(store, tp.ProjectFilePath);
+
+        var col = sql.IndexOf("status", System.StringComparison.Ordinal) + 2;
+        var loc = await svc.DefinitionAsync(uri, new Position(0, col));
+
+        Assert.NotNull(loc);
+        Assert.EndsWith("orders.sql", loc!.Uri);
+        Assert.Equal(2, loc.Range.Start.Line);
+    }
+
+    [Fact]
+    public async Task Completion_after_alias_dot_offers_the_aliased_tables_columns()
+    {
+        var tp = new TempProject();
+        using var _tp = tp;
+        tp.WriteSql("tables/orders.sql", "CREATE TABLE public.orders (id int, customer_id int, status text);\n");
+        var sql = "SELECT 1 FROM public.orders o WHERE o.\n";
+        var uri = tp.UriFor("queries/q.sql");
+        tp.WriteSql("queries/q.sql", sql);
+        var store = new DocumentStore();
+        store.Open(uri, sql, 1);
+        var svc = new LanguageService(store, tp.ProjectFilePath);
+
+        var col = sql.IndexOf("o.\n", System.StringComparison.Ordinal) + 2; // right after the dot
+        var list = await svc.CompletionAsync(uri, new Position(0, col));
+
+        Assert.Contains(list.Items, i => i.Label == "customer_id");
+        Assert.Contains(list.Items, i => i.Label == "status");
+        Assert.DoesNotContain(list.Items, i => i.Label == "orders"); // columns, not schema members
+    }
+
+    [Fact]
+    public async Task Hover_on_an_alias_shows_the_aliased_relation()
+    {
+        var tp = new TempProject();
+        using var _tp = tp;
+        tp.WriteSql("tables/orders.sql", "CREATE TABLE public.orders (id int);\n");
+        var sql = "SELECT o.id FROM public.orders o;\n";
+        var uri = tp.UriFor("queries/q.sql");
+        tp.WriteSql("queries/q.sql", sql);
+        var store = new DocumentStore();
+        store.Open(uri, sql, 1);
+        var svc = new LanguageService(store, tp.ProjectFilePath);
+
+        var col = sql.IndexOf("o.id", System.StringComparison.Ordinal);
+        var hover = await svc.HoverAsync(uri, new Position(0, col));
+
+        Assert.NotNull(hover);
+        Assert.Contains("public.orders", hover!.Contents.Value);
+    }
+
+    [Fact]
     public async Task Definition_on_a_reference_resolves_to_the_defining_file_and_line()
     {
         var (svc, _, tp, useUri) = Fixture();

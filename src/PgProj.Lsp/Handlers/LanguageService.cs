@@ -9,6 +9,7 @@ using PgProj.Core.Contracts;
 using PgProj.Core.Diagnostics;
 using PgProj.Core.Model;
 using PgProj.Core.Project;
+using PgProj.Core.Project.References;
 using PgProj.Core.Syntax;
 using PgProj.Lsp.Protocol;
 using PgProj.Lsp.Workspace;
@@ -77,9 +78,30 @@ public sealed class LanguageService
             var project = WorkspaceProject.LoadWithOverlay(_projectFilePath, _store);
             var result = await project.BuildAsync(ct).ConfigureAwait(false);
             var rel = RelativePathOf(project, doc.Uri);
-            return result.UnifiedDiagnostics
+            var diags = result.UnifiedDiagnostics
                 .Where(d => d.File is null || PathEquals(d.File, rel))
                 .ToList();
+
+            // The reference/semantic gate `pgproj build` runs AFTER the model build (unresolved
+            // relations, bad columns, type errors). It is not part of UnifiedDiagnostics, so without
+            // this the live verdict misses exactly the findings SSDT users expect as they type.
+            // The validator reads through ReadEffectiveText, so the open-buffer overlay applies.
+            var resolution = new ReferenceResolver().Resolve(project);
+            foreach (var rd in resolution.Diagnostics)
+            {
+                // Same severity split as the CLI gate: a not-yet-restored PackageReference is a
+                // documented follow-up (warning); every other resolution failure is an error.
+                var severity = rd.Code == ReferenceErrorCodes.PackageRestoreNotImplemented
+                    ? DiagnosticSeverity.Warning
+                    : DiagnosticSeverity.Error;
+                diags.Add(new Diagnostic { Severity = severity, Code = rd.Code, Message = rd.Message });
+            }
+            foreach (var rv in ReferenceValidator.Validate(project, resolution))
+            {
+                if (!PathEquals(rv.RelativePath, rel)) continue;
+                diags.Add(Diagnostic.FromSemantic(rv.Message, rv.RelativePath, rv.Line, rv.Column));
+            }
+            return diags;
         }
 
         // Loose buffer: mirror the build's single-file path (parser diagnostics + a single-file dup scan).
@@ -145,7 +167,14 @@ public sealed class LanguageService
 
     // ---- definition / hover / completion (model-tree backed) -----------------------------
 
-    /// <summary>Go-to-definition: resolve the identifier at the cursor to the object's defining file:line.</summary>
+    /// <summary>
+    /// Go-to-definition, caret-segment aware. The cursor's dotted chain is split and resolution
+    /// follows WHICH segment the caret is on:
+    ///   * on an alias (<c>o</c> in <c>FROM sales.orders o … o.id</c>) → the aliased relation's CREATE;
+    ///   * on a relation (<c>orders</c> in <c>sales.orders</c>) → that relation's CREATE;
+    ///   * on a COLUMN qualified by either (<c>customer_id</c> in <c>o.customer_id</c> /
+    ///     <c>sales.orders.customer_id</c>) → the column's own line INSIDE the CREATE TABLE.
+    /// </summary>
     public async Task<Location?> DefinitionAsync(string uri, Position position, CancellationToken ct = default)
     {
         var doc = _store.Get(uri);
@@ -153,13 +182,74 @@ public sealed class LanguageService
         var tree = await BuildModelTreeAsync(ct).ConfigureAwait(false);
         if (tree is null) return null;
 
-        var word = WordUnder(doc, position);
-        var node = ResolveNode(tree, word, defaultSchemaOf(tree));
-        if (node?.File is null || node.Line <= 0) return null;
+        var offset = doc.Lines.OffsetOf(position.Line, position.Character);
+        var w = doc.Lines.WordAt(offset);
+        if (string.IsNullOrWhiteSpace(w.Word)) return null;
+        var chain = w.Word.Trim().TrimEnd('.');
+        var segments = chain.Split('.');
 
-        var targetUri = ResolveNodeUri(node);
+        // which segment is the caret on?
+        var caretSeg = segments.Length - 1;
+        var segStart = w.Start;
+        for (var i = 0; i < segments.Length; i++)
+        {
+            if (offset <= segStart + segments[i].Length) { caretSeg = i; break; }
+            segStart += segments[i].Length + 1;
+        }
+
+        // 1) the chain UP TO the caret as a relation/object (alias first when the caret is on it)
+        var caretPrefix = string.Join(".", segments.Take(caretSeg + 1));
+        var node = caretSeg == 0 ? ResolveAliasNode(tree, doc.Text, segments[0]) : null;
+        node ??= ResolveNode(tree, caretPrefix, defaultSchemaOf(tree));
+        if (node?.File is not null && node.Line > 0)
+            return LocationOf(node);
+
+        // 2) caret on a column segment: the chain BEFORE it names the relation (alias or qualified)
+        if (caretSeg > 0)
+        {
+            var relPrefix = string.Join(".", segments.Take(caretSeg));
+            var rel = ResolveAliasNode(tree, doc.Text, segments[0]);
+            if (rel is null || caretSeg > 1) rel = ResolveNode(tree, relPrefix, defaultSchemaOf(tree)) ?? rel;
+            var column = segments[caretSeg];
+            if (rel is not null && rel.Children.Any(c => c.Kind == "column" && NameEq(c.Name, column)))
+                return ColumnLocation(rel, column) ?? (rel.File is not null && rel.Line > 0 ? LocationOf(rel) : null);
+        }
+
+        return null;
+    }
+
+    private Location LocationOf(ModelTreeNodeDto node)
+    {
         var pos = new Position(Math.Max(0, node.Line - 1), Math.Max(0, node.Col - 1));
-        return new Location(targetUri, new Protocol.Range(pos, pos));
+        return new Location(ResolveNodeUri(node), new Protocol.Range(pos, pos));
+    }
+
+    /// <summary>
+    /// The column's own line inside its relation's CREATE statement: scan the defining file's
+    /// EFFECTIVE text (open buffer wins over disk) for the first identifier occurrence of the
+    /// column name at/after the relation's definition anchor.
+    /// </summary>
+    private Location? ColumnLocation(ModelTreeNodeDto relation, string column)
+    {
+        if (relation.File is null || relation.Line <= 0) return null;
+        var targetUri = ResolveNodeUri(relation);
+        var text = _store.Get(targetUri)?.Text;
+        if (text is null)
+        {
+            try { text = File.ReadAllText(DocumentUri.ToPath(targetUri)); }
+            catch { return null; }
+        }
+
+        var lines = new LineIndex(text);
+        var defOffset = lines.OffsetOfOneBased(relation.Line, Math.Max(1, relation.Col));
+        foreach (var (start, end) in IdentifierOccurrences(text, column))
+        {
+            if (start < defOffset) continue;
+            var (sl, sc) = lines.PositionOf(start);
+            var (el, ec) = lines.PositionOf(end);
+            return new Location(targetUri, new Protocol.Range(new Position(sl, sc), new Position(el, ec)));
+        }
+        return null;
     }
 
     /// <summary>
@@ -310,7 +400,7 @@ public sealed class LanguageService
         if (tree is null) return null;
 
         var word = WordUnder(doc, position);
-        var node = ResolveNode(tree, word, defaultSchemaOf(tree));
+        var node = ResolveAliasNode(tree, doc.Text, word) ?? ResolveNode(tree, word, defaultSchemaOf(tree));
         if (node is null) return null;
 
         var where = node.File is not null && node.Line > 0 ? $"\n\n_Defined in `{node.File}:{node.Line}`_" : "";
@@ -341,6 +431,12 @@ public sealed class LanguageService
             foreach (var t in tree.Nodes.Where(n => n.Kind == "table" && (NameEq(n.Name, container) || NameEq(n.QualifiedName, container))))
                 foreach (var c in t.Children.Where(c => c.Kind == "column"))
                     items.Add(new CompletionItem { Label = c.Name, Kind = CompletionItemKind.Field, Detail = c.QualifiedName });
+
+            // alias.  → the aliased relation's columns (FROM sales.orders o … o.<here>)
+            if (items.Count == 0 && ResolveAliasNode(tree, doc.Text, container) is { } aliased)
+                foreach (var c in aliased.Children.Where(c => c.Kind == "column"))
+                    items.Add(new CompletionItem { Label = c.Name, Kind = CompletionItemKind.Field, Detail = c.QualifiedName });
+
             return new CompletionList { Items = Dedupe(items) };
         }
 
@@ -374,6 +470,132 @@ public sealed class LanguageService
     }
 
     private static string defaultSchemaOf(ModelTreeDto _) => "public";
+
+    // ---- query-alias resolution ------------------------------------------------------------
+
+    /// <summary>
+    /// Resolves <paramref name="word"/> as a QUERY ALIAS declared anywhere in the document
+    /// (<c>FROM sales.orders o</c>, JOINs, UPDATE/DELETE targets, CTE bodies, view bodies) to the
+    /// aliased relation's model node — the basis for alias completion, definition and hover.
+    /// </summary>
+    private static ModelTreeNodeDto? ResolveAliasNode(ModelTreeDto tree, string documentText, string word)
+    {
+        if (string.IsNullOrWhiteSpace(word)) return null;
+        word = word.Trim().TrimEnd('.');
+        var aliases = CollectAliases(documentText);
+        // WordAt returns the whole dotted chain ("o.customer_id") — the alias is its first segment.
+        if (!aliases.TryGetValue(word, out var target))
+        {
+            var dot = word.IndexOf('.');
+            if (dot <= 0 || !aliases.TryGetValue(word[..dot], out target)) return null;
+        }
+        return tree.Nodes.FirstOrDefault(n =>
+            (n.Kind is "table" or "view" or "materializedView")
+            && NameEq(n.Name, target.Table)
+            && (target.Schema is null || NameEq(n.Schema, target.Schema)));
+    }
+
+    /// <summary>
+    /// Every <c>alias → relation</c> pair declared in the document: the parser-backed walk over
+    /// well-formed statements, UNIONED with a lexical scan — the statement being typed right now
+    /// is usually incomplete and unparsable, and that is exactly when alias completion matters.
+    /// Parser results win on conflicts.
+    /// </summary>
+    internal static Dictionary<string, (string? Schema, string Table)> CollectAliases(string text)
+    {
+        var map = new Dictionary<string, (string?, string)>(StringComparer.OrdinalIgnoreCase);
+
+        // lexical first (lowest fidelity): FROM/JOIN/UPDATE/INTO/USING <relation> [AS] <alias>
+        foreach (System.Text.RegularExpressions.Match m in AliasPattern.Matches(text))
+        {
+            var alias = m.Groups["alias"].Value;
+            if (NotAnAliasKeyword.Contains(alias)) continue;
+            var rel = m.Groups["rel"].Value;
+            var dot = rel.IndexOf('.');
+            map[alias] = dot > 0 ? (rel[..dot], rel[(dot + 1)..]) : (null, rel);
+        }
+
+        try
+        {
+            var parsed = new PgParser().Parse(text);
+            foreach (var stmt in parsed.Statements) CollectAliasesFromStatement(stmt, map);
+        }
+        catch { /* mid-typing text → the lexical pass already contributed what it could */ }
+        return map;
+    }
+
+    private static readonly System.Text.RegularExpressions.Regex AliasPattern = new(
+        @"\b(?:FROM|JOIN|UPDATE|INTO|USING)\s+(?<rel>[A-Za-z_]\w*(?:\.[A-Za-z_]\w*)?)\s+(?:AS\s+)?(?<alias>[A-Za-z_]\w*)\b",
+        System.Text.RegularExpressions.RegexOptions.IgnoreCase | System.Text.RegularExpressions.RegexOptions.Compiled);
+
+    private static readonly HashSet<string> NotAnAliasKeyword = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "where", "on", "join", "inner", "left", "right", "full", "cross", "natural", "lateral",
+        "group", "order", "having", "limit", "offset", "union", "intersect", "except", "set",
+        "using", "returning", "as", "values", "when", "then", "and", "or", "not",
+    };
+
+    private static void CollectAliasesFromStatement(SqlStatement stmt, Dictionary<string, (string?, string)> map)
+    {
+        switch (stmt)
+        {
+            case QueryStatement q: CollectAliasesFromQuery(q.Query, map); break;
+            case CreateTableAsStatement ctas: CollectAliasesFromQuery(ctas.Source, map); break;
+            case CreateViewStatement v:
+                try
+                {
+                    foreach (var s in new PgParser().Parse(v.BodyText).Statements)
+                        CollectAliasesFromStatement(s, map);
+                }
+                catch { /* exotic body → no aliases from it */ }
+                break;
+            case InsertStatement ins:
+                if (ins.Alias is { } ia && ins.Table is not null) map[ia] = (ins.Schema, ins.Table);
+                CollectAliasesFromQuery(ins.Source, map);
+                break;
+            case UpdateStatement up:
+                if (up.Alias is { } ua && up.Table is not null) map[ua] = (up.Schema, up.Table);
+                CollectAliasesFromFrom(up.From, map);
+                break;
+            case DeleteStatement del:
+                if (del.Alias is { } da && del.Table is not null) map[da] = (del.Schema, del.Table);
+                CollectAliasesFromFrom(del.Using, map);
+                break;
+        }
+    }
+
+    private static void CollectAliasesFromQuery(SelectQuery? q, Dictionary<string, (string?, string)> map)
+    {
+        if (q is null) return;
+        foreach (var cte in q.With) CollectAliasesFromQuery(cte.Query, map);
+        if (q.SetOp is not null)
+        {
+            CollectAliasesFromQuery(q.SetOp.Left, map);
+            CollectAliasesFromQuery(q.SetOp.Right, map);
+        }
+        CollectAliasesFromFrom(q.From, map);
+    }
+
+    private static void CollectAliasesFromFrom(FromClause? from, Dictionary<string, (string?, string)> map)
+    {
+        if (from is null) return;
+        foreach (var rel in from.Relations)
+        {
+            CollectAliasesFromTableRef(rel, map);
+            foreach (var j in rel.Joins) CollectAliasesFromTableRef(j.Right, map);
+        }
+    }
+
+    private static void CollectAliasesFromTableRef(TableRef rel, Dictionary<string, (string?, string)> map)
+    {
+        if (rel.Subquery is not null)
+        {
+            CollectAliasesFromQuery(rel.Subquery, map);
+            return;
+        }
+        if (rel.Alias is { } alias && rel.TableName is { } table)
+            map[alias] = (rel.Schema, table);
+    }
 
     /// <summary>Resolve a (possibly dotted) word to a model-tree node: exact qualified, then by bare name.</summary>
     private static ModelTreeNodeDto? ResolveNode(ModelTreeDto tree, string word, string defaultSchema)

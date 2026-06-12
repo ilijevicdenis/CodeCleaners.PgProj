@@ -80,6 +80,14 @@ public sealed record DatabaseProject
         return ObjectContentTransform(Path.GetRelativePath(ProjectDirectory, file), text);
     }
 
+    /// <summary>
+    /// One object file's text as the build would see it: LF-normalised, with
+    /// <see cref="ObjectContentTransform"/> applied when set. Consumers that re-read project files
+    /// outside the build (e.g. <see cref="References.ReferenceValidator"/>, the LSP's live overlay)
+    /// MUST go through this instead of the raw file, or unsaved-buffer/substitution state diverges.
+    /// </summary>
+    public string ReadEffectiveText(string file) => ReadSource(file);
+
     public static DatabaseProject Load(string projectFilePath)
     {
         var fullPath = Path.GetFullPath(projectFilePath);

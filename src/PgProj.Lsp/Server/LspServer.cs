@@ -28,12 +28,18 @@ public sealed class LspServer : IDisposable
     private bool _initialized;
     private volatile bool _shutdownRequested;
 
-    public LspServer(Stream input, Stream output, int debounceMs = 150)
+    /// <param name="workspaceRoot">
+    /// Optional directory to resolve the <c>.pgproj</c> from immediately (the CLI's positional
+    /// <c>serve &lt;workspace-dir&gt;</c>). Acts as the fallback when the client's <c>initialize</c>
+    /// carries no usable rootUri/rootPath — without it such a client silently degrades to
+    /// loose-buffer mode (parse-only diagnostics, no project model).
+    /// </param>
+    public LspServer(Stream input, Stream output, int debounceMs = 150, string? workspaceRoot = null)
     {
         _reader = new LspMessageReader(input);
         _writer = new LspMessageWriter(output);
         _scheduler = new DebouncedAnalysisScheduler(debounceMs);
-        _service = new LanguageService(_store);
+        _service = new LanguageService(_store, WorkspaceProject.FindProjectFile(workspaceRoot));
     }
 
     /// <summary>The document store (exposed for tests/diagnostics).</summary>
@@ -99,7 +105,7 @@ public sealed class LspServer : IDisposable
                 if (p is not null)
                 {
                     _store.Open(p.TextDocument.Uri, p.TextDocument.Text, p.TextDocument.Version);
-                    ScheduleDiagnostics(p.TextDocument.Uri);
+                    ScheduleDiagnosticsForAllOpenDocuments();
                 }
                 break;
             }
@@ -112,7 +118,7 @@ public sealed class LspServer : IDisposable
                     // Sync kind = Full → the last change carries the whole new document text.
                     var text = p.ContentChanges[^1].Text;
                     _store.Change(p.TextDocument.Uri, text, p.TextDocument.Version);
-                    ScheduleDiagnostics(p.TextDocument.Uri);
+                    ScheduleDiagnosticsForAllOpenDocuments();
                 }
                 break;
             }
@@ -175,9 +181,23 @@ public sealed class LspServer : IDisposable
     {
         var p = Decode<InitializeParams>(msg);
         var rootPath = p?.RootPath ?? (p?.RootUri is { } u ? DocumentUri.ToPath(u) : null);
-        var projectFile = WorkspaceProject.FindProjectFile(rootPath);
+        // The handshake root wins when it yields a project; otherwise keep the constructor's
+        // workspace-root resolution (a client that sends no/odd rootUri must not downgrade us).
+        var projectFile = WorkspaceProject.FindProjectFile(rootPath) ?? _service.ProjectFilePath;
         _service = new LanguageService(_store, projectFile);
         _initialized = true;
+    }
+
+    /// <summary>
+    /// Cross-file invalidation: a change in ANY buffer re-diagnoses EVERY open document — deleting
+    /// a table definition in one file must light up the dependent views the user has open. The
+    /// per-uri debounce keeps a typing burst to one build per document, and open-doc counts are
+    /// small, so re-running all of them is cheap.
+    /// </summary>
+    private void ScheduleDiagnosticsForAllOpenDocuments()
+    {
+        foreach (var doc in _store.All)
+            ScheduleDiagnostics(doc.Uri);
     }
 
     /// <summary>Debounced re-parse → publishDiagnostics for one document (dropping a stale-version result).</summary>
