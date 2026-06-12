@@ -25,6 +25,16 @@ public sealed record DatabaseProject
     public string Name { get; init; } = "Database";
     public string DefaultSchema { get; init; } = "public";
     public string? TargetPostgresVersion { get; init; }
+
+    /// <summary>
+    /// Build-warning codes to suppress at the build gate (<c>&lt;SuppressWarnings&gt;PG005;PGV001&lt;/SuppressWarnings&gt;</c>,
+    /// comma/semicolon separated) — the SSDT SuppressTSqlWarnings analogue (#135).
+    /// </summary>
+    public IReadOnlyList<string> SuppressedWarnings { get; init; } = System.Array.Empty<string>();
+
+    /// <summary>Promote non-suppressed build warnings to build-breaking errors (<c>&lt;TreatWarningsAsErrors&gt;</c>).</summary>
+    public bool TreatWarningsAsErrors { get; init; }
+
     public IReadOnlyList<string> IncludePatterns { get; init; } = new[] { "**/*.sql" };
 
     /// <summary>
@@ -132,6 +142,10 @@ public sealed record DatabaseProject
             DefaultSchema = Prop("DefaultSchema", "public"),
             TargetPostgresVersion = root.Descendants().Any(e => e.Name.LocalName.Equals("TargetPostgresVersion", StringComparison.OrdinalIgnoreCase))
                 ? Prop("TargetPostgresVersion", "") : null,
+            SuppressedWarnings = Prop("SuppressWarnings", "")
+                .Split(new[] { ',', ';' }, StringSplitOptions.RemoveEmptyEntries)
+                .Select(s => s.Trim()).Where(s => s.Length > 0).ToList(),
+            TreatWarningsAsErrors = bool.TryParse(Prop("TreatWarningsAsErrors", "false"), out var twae) && twae,
             IncludePatterns = includes,
             ExcludePatterns = excludes,
             PreDeployScriptPath = preDeploy,

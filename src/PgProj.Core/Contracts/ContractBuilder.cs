@@ -76,9 +76,14 @@ public static class ContractBuilder
         findings.AddRange(new ModelAnalyzer(config).Analyze(model));
         findings.AddRange(ExternalModelRules.Run(modelRules, model, cfg));
 
-        var diags = findings.Select(f => ContractMappers.ToDto(f, positions)).ToList();
+        // EP-BUILD (#135): the project's warning policy applies at the gate - suppressed codes
+        // vanish before counting, and TreatWarningsAsErrors promotes alongside the strict flag -
+        // so the in-proc editor path and the CLI agree by construction.
+        var policy = Analysis.BuildWarningPolicy.FromProject(project);
+        var effective = policy.Apply(findings);
+        var diags = effective.Select(f => ContractMappers.ToDto(f, positions)).ToList();
         var summary = ContractMappers.SummaryOf(diags);
-        var blocked = summary.Errors > 0 || (strict && summary.Warnings > 0);
+        var blocked = policy.IsBlocking(effective, strictFlag: strict);
 
         return new AnalyzeReportDto
         {

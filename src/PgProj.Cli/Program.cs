@@ -706,9 +706,11 @@ public static class Program
             }
             default:
             {
-                var findings = RunAnalysis(project, config, rules, modelRules, out var ruleCount);
+                var policy = PgProj.Core.Analysis.BuildWarningPolicy.FromProject(project);
+                var findings = policy.Apply(RunAnalysis(project, config, rules, modelRules, out var ruleCount));
                 Console.WriteLine($"Analyzed '{project.Name}': {ruleCount} rule(s).");
-                return ReportFindings(findings, strict, alwaysReport: true) ? ExitCode.AnalysisBlocked : ExitCode.Success;
+                return ReportFindings(findings, strict || policy.TreatWarningsAsErrors, alwaysReport: true)
+                    ? ExitCode.AnalysisBlocked : ExitCode.Success;
             }
         }
     }
@@ -884,8 +886,24 @@ public static class Program
         if (project is null) return false;
         if (HasFlag(args, "--no-analyze")) return false;
         var (config, rules, modelRules) = ResolveAnalysis(project, new CliArgs(args));
-        var findings = RunAnalysis(project, config, rules, modelRules, out _);
-        var blocked = ReportFindings(findings, HasFlag(args, "--strict"), alwaysReport: false);
+
+        // EP-BUILD (#135): the project warning policy applies at the gate - suppressed codes never
+        // count, TreatWarningsAsErrors promotes like --strict. With --verbose the gate emits the
+        // full structured per-rule/per-object diagnostics with file:line provenance (the same
+        // contract path the editors consume), so CLI and in-proc behavior agree by construction.
+        var policy = PgProj.Core.Analysis.BuildWarningPolicy.FromProject(project);
+        if (HasFlag(args, "--verbose"))
+        {
+            var report = ContractBuilder.Analyze(project, HasFlag(args, "--strict"), config, rules, modelRules);
+            Console.WriteLine($"verbose analysis: {report.RuleCount} rule(s); {policy.Describe()}");
+            foreach (var d in report.Diagnostics)
+                Console.WriteLine($"  [{d.Severity}] {d.RuleId} {d.File}({d.Line},{d.Col}) {d.Target}: {d.Message}");
+            if (report.Blocked) Console.Error.WriteLine("Aborted by static analysis.");
+            return report.Blocked;
+        }
+
+        var findings = policy.Apply(RunAnalysis(project, config, rules, modelRules, out _));
+        var blocked = ReportFindings(findings, HasFlag(args, "--strict") || policy.TreatWarningsAsErrors, alwaysReport: false);
         if (blocked) Console.Error.WriteLine("Aborted by analysis gate (pass --no-analyze to skip).");
         return blocked;
     }
