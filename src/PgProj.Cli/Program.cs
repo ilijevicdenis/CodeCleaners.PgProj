@@ -48,6 +48,7 @@ public static class Program
                 "pull" => await Pull(args),
                 "sync-file" => await SyncFile(args),
                 "deploy-report" => await DeployReport(args),
+                "verify" => Verify(args),
                 "analyze" => Analyze(args),
                 "model-tree" => await ModelTree(args),
                 "describe-table" => DescribeTable(args),
@@ -963,6 +964,36 @@ public static class Program
         return 0;
     }
 
+    // ---- verify (EP-PKG #138: package equivalence - the DacpacVerify analogue) -----------
+
+    /// <summary>
+    /// <c>pgproj verify &lt;a.pgpkg&gt; &lt;b.pgpkg&gt; [--format json] [-o report.json]</c>: are two
+    /// packages the same thing? Asserts model + embedded-source + manifest-option equivalence
+    /// (identity stamps excluded, so rebuilds of the same sources verify equivalent). Exit 0 on
+    /// pass, <see cref="ExitCode.Drift"/> on any difference - a local CI reproducibility gate for
+    /// conversions, extract round-trips, and build determinism. Read-only; no database.
+    /// </summary>
+    private static int Verify(string[] args)
+    {
+        var positionals = args.Skip(1).Where(a => !a.StartsWith("-", StringComparison.Ordinal)).ToList();
+        if (positionals.Count < 2)
+            return Fail("verify needs two package paths: pgproj verify <a.pgpkg> <b.pgpkg>");
+
+        var pkgA = PgProj.Core.Packaging.PgPkg.Read(positionals[0]);
+        var pkgB = PgProj.Core.Packaging.PgPkg.Read(positionals[1]);
+        var report = PgProj.Core.Packaging.PackageVerifier.Verify(pkgA, pkgB,
+            labelA: Path.GetFileName(positionals[0]), labelB: Path.GetFileName(positionals[1]));
+
+        var payload = WantsJson(args) || string.Equals(GetOption(args, "--format"), "json", StringComparison.OrdinalIgnoreCase)
+            ? PgProj.Core.Packaging.PackageVerifier.Serialize(report)
+            : PgProj.Core.Packaging.PackageVerifier.RenderText(report);
+
+        var outPath = GetOption(args, "-o", "--output");
+        if (outPath is null) Console.WriteLine(payload);
+        else { File.WriteAllText(outPath, payload); Console.WriteLine($"Verify report written to {outPath} ({(report.Equivalent ? "PASS" : "FAIL")})."); }
+
+        return report.Equivalent ? ExitCode.Success : ExitCode.Drift;
+    }
     // ---- references (EP-REF) ------------------------------------------------------------
 
     /// <summary>
@@ -1323,6 +1354,7 @@ public static class Program
           pgproj snapshot --connection <conn> -o <db.schema.snapshot>                    (introspect a live DB once → a portable schema.snapshot for offline compare)
           pgproj drift   <project.pgproj> --connection <conn> [--fail-on-drift]         (preview project files that differ from the DB; --fail-on-drift exits 6 on drift)
           pgproj pull    <project.pgproj> --connection <conn> [--dry-run] [--allow-deletes]   (rewrite project files FROM the DB — scenario 3)
+          pgproj verify <a.pgpkg> <b.pgpkg> [--format json] [-o report.json]   (package equivalence: model + sources + options; exit 6 on drift - DacpacVerify analogue)
           pgproj deploy-report <project.pgproj|.pgpkg> --connection <conn> [-o report.json] [--format xml] [--profile <file>] [--var N=V] [--allow-drops] [--parallel]   (planned-change report, never applies - DeployReport analogue; alias: publish --report-only)
           pgproj sync-file <project.pgproj> --file <rel.sql> --connection <conn> [--apply-to-local | --apply-to-db [--allow-drops] [--dry-run]]   (one file vs the DB: JSON state for editors, or apply either direction)
           pgproj analyze <project.pgproj> [--strict]    (static safety analysis over the AST)

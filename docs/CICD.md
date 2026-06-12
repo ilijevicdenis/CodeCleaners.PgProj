@@ -28,6 +28,18 @@ Convention (loose, not enforced): `0` success; `1`–`2` usage/unexpected; `3`�
 caught before touching a server; `6`–`8` outcomes that required talking to (or comparing against) a
 live database.
 
+## Reproducibility gate: `pgproj verify`
+
+`pgproj verify <a.pgpkg> <b.pgpkg>` asserts two packages are THE SAME THING - canonical model,
+embedded .sql sources, and manifest options (identity stamps excluded, so rebuilds of identical
+sources pass). Exit `0` = equivalent, `6` (Drift) = any difference; `--format json` / `-o` emit
+the structured report naming each drifting object/source/option. Wire it locally (consistent with
+this repo's no-online-CI posture) wherever reproducibility matters:
+
+- **build determinism** - build the same project twice, `verify` the two .pgpkg artifacts;
+- **conversion proofs** - old layout vs new layout of the same database project;
+- **extract round-trips** - package two extracts of the same database and `verify` them.
+
 ### How pipelines should branch
 
 - **Pass/fail only** — the default for most steps. Any non-zero fails the stage.
