@@ -60,6 +60,7 @@ namespace PgProj.VisualStudio
             await JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
             RegisterEditorFactory(new ProjectSystem.Editors.PgSqlEditorFactory());
             await ImportDatabaseCommand.InitializeAsync(this);
+            await SyncFileCommand.InitializeAsync(this);
         }
     }
 }

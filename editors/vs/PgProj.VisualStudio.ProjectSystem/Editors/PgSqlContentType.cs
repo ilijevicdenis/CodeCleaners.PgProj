@@ -2,6 +2,7 @@
 // PgProj language client (PostgreSQL diagnostics/IntelliSense via the bundled LSP server) and is
 // invisible to Visual Studio's built-in T-SQL components, which key on their own content type.
 using System.ComponentModel.Composition;
+using Microsoft.VisualStudio.LanguageServer.Client;
 using Microsoft.VisualStudio.Utilities;
 
 namespace PgProj.VisualStudio.ProjectSystem.Editors
@@ -16,8 +17,14 @@ namespace PgProj.VisualStudio.ProjectSystem.Editors
     {
         public const string Name = "pgsql";
 
+        // The CodeRemote base is a HARD requirement for LSP: the language-client broker only
+        // activates ILanguageClients whose content type derives from
+        // CodeRemoteContentDefinition.CodeRemoteContentTypeName — with plain "code" the client is
+        // composed but never started (no completion, no diagnostics; cost a full day to find).
+        // "code" is kept alongside it for the ordinary editor features (classifier etc.).
         [Export]
         [Name(Name)]
+        [BaseDefinition(CodeRemoteContentDefinition.CodeRemoteContentTypeName)]
         [BaseDefinition("code")]
         internal static ContentTypeDefinition PgSqlContentTypeDefinition;
     }

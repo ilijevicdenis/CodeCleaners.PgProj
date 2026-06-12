@@ -35,6 +35,35 @@ namespace PgProj.VisualStudio.ProjectSystem.Editors
 
         public int Close() => VSConstants.S_OK;
 
+        /// <summary>
+        /// Writes the claim/decline decision (with both identity probes' raw results) to the VS
+        /// ActivityLog, so a `devenv /log` run shows exactly why a .sql file did or didn't get the
+        /// PostgreSQL editor — this chain failed invisibly once already.
+        /// </summary>
+        private void LogDecision(string document, int typeGuidHr, Guid projectType, int capsHr, string capabilities, bool claimed, IVsHierarchy pvHierForName)
+        {
+            try
+            {
+                if (_vsServiceProvider.GetService(typeof(SVsActivityLog)) is not IVsActivityLog log) return;
+                string hierName = "<unknown>";
+                try
+                {
+                    if (pvHierForName is not null
+                        && ErrorHandler.Succeeded(pvHierForName.GetProperty(VSConstants.VSITEMID_ROOT,
+                               (int)__VSHPROPID.VSHPROPID_Name, out var nameObj)))
+                        hierName = nameObj as string ?? "<null>";
+                }
+                catch { }
+                log.LogEntry((uint)__ACTIVITYLOG_ENTRYTYPE.ALE_INFORMATION, "PgSqlEditorFactory",
+                    $"{(claimed ? "CLAIMED" : "DECLINED")} '{document}' — hierarchy='{hierName}'; TypeGuid hr=0x{typeGuidHr:X8} value={projectType:B}; " +
+                    $"Capabilities hr=0x{capsHr:X8} value='{capabilities}'");
+            }
+            catch
+            {
+                // logging must never affect the claim decision
+            }
+        }
+
         public int MapLogicalView(ref Guid rguidLogicalView, out string pbstrPhysicalView)
         {
             pbstrPhysicalView = null; // the text view is the only physical view
@@ -62,11 +91,26 @@ namespace PgProj.VisualStudio.ProjectSystem.Editors
                 return VSConstants.E_INVALIDARG;
 
             // Only files that live in a PgProj project. Anything else (SSDT projects, misc files)
-            // is declined so the next-priority editor factory takes over.
-            if (pvHier is null
-                || ErrorHandler.Failed(pvHier.GetGuidProperty(VSConstants.VSITEMID_ROOT,
-                       (int)__VSHPROPID.VSHPROPID_TypeGuid, out var projectType))
-                || projectType != new Guid(PgProjGuids.ProjectTypeGuidString))
+            // is declined so the next-priority editor factory takes over. Two project-identity
+            // probes, either suffices: the classic TypeGuid hierarchy property, and the CPS-native
+            // ProjectCapabilities string ("PgProj", declared by the SDK and the type registration)
+            // — a CPS hierarchy does not necessarily answer VSHPROPID_TypeGuid with the type guid.
+            if (pvHier is null)
+                return VSConstants.VS_E_UNSUPPORTEDFORMAT;
+
+            var typeGuidHr = pvHier.GetGuidProperty(VSConstants.VSITEMID_ROOT,
+                (int)__VSHPROPID.VSHPROPID_TypeGuid, out var projectType);
+            var typeMatch = ErrorHandler.Succeeded(typeGuidHr)
+                && projectType == new Guid(PgProjGuids.ProjectTypeGuidString);
+
+            var capsHr = pvHier.GetProperty(VSConstants.VSITEMID_ROOT,
+                (int)__VSHPROPID5.VSHPROPID_ProjectCapabilities, out var capsObj);
+            var capabilities = capsObj as string ?? string.Empty;
+            var capabilityMatch = ErrorHandler.Succeeded(capsHr)
+                && (" " + capabilities + " ").IndexOf(" PgProj ", StringComparison.OrdinalIgnoreCase) >= 0;
+
+            LogDecision(pszMkDocument, typeGuidHr, projectType, capsHr, capabilities, typeMatch || capabilityMatch, pvHier);
+            if (!typeMatch && !capabilityMatch)
                 return VSConstants.VS_E_UNSUPPORTEDFORMAT;
 
             var localRegistry = (ILocalRegistry)_vsServiceProvider.GetService(typeof(SLocalRegistry));
@@ -83,7 +127,13 @@ namespace PgProj.VisualStudio.ProjectSystem.Editors
                 finally { Marshal.Release(bufferPtr); }
                 ((IObjectWithSite)textLines).SetSite(_oleServiceProvider);
 
-                // The whole point: the buffer speaks PostgreSQL, not T-SQL.
+                // The whole point: the buffer speaks PostgreSQL, not T-SQL. Two settings, both
+                // required: the content type itself, AND turning OFF language detection — when the
+                // docdata loads the file (after this method returns), the buffer re-detects a
+                // language from the .sql extension and OVERWRITES the content type we just set;
+                // VsBufferDetectLangSID=false keeps the explicit assignment authoritative.
+                var detectLangKey = VSConstants.VsTextBufferUserDataGuid.VsBufferDetectLangSID_guid;
+                ((IVsUserData)textLines).SetData(ref detectLangKey, false);
                 var contentTypeKey = VSConstants.VsTextBufferUserDataGuid.VsBufferContentType_guid;
                 ((IVsUserData)textLines).SetData(ref contentTypeKey, PgSqlContentType.Name);
             }

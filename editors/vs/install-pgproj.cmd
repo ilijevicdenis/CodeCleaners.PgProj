@@ -66,6 +66,20 @@ if exist "!DEVENV!" (
   echo WARNING: devenv.exe not found next to VSIXInstaller; run "devenv /updateconfiguration" manually.
 )
 
+rem --- 4) purge the MEF ComponentModelCache so the next IDE start rebuilds it WITH this extension.
+rem        The /updateconfiguration pass above rebuilds the MEF cache itself, but in VS 2026 that
+rem        rebuild scans ONLY the per-machine extensions - the per-user dir (this install) is skipped,
+rem        so the pgsql content type / classifier / LSP client never compose and the PostgreSQL
+rem        editor silently loses IntelliSense, diagnostics and coloring. Deleting the cache forces
+rem        the first devenv run to rebuild it in-process, where per-user extensions ARE scanned. ---
+echo Purging the MEF component cache so VS re-scans the extension on next start...
+for /d %%d in ("%LOCALAPPDATA%\Microsoft\VisualStudio\18.0_*") do (
+  if exist "%%d\ComponentModelCache" (
+    rd /s /q "%%d\ComponentModelCache" 2>nul
+    echo   cleared: %%d\ComponentModelCache
+  )
+)
+
 echo.
 echo ============================================================================================
 echo  Project-system extension installed. Launch Visual Studio 2026 to use:

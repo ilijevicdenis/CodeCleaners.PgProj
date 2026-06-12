@@ -21,6 +21,11 @@
              project types never see a PgProj entry. -->
         <Parent guid="guidSHLMainMenu" id="IDM_VS_CTXT_PROJNODE" />
       </Group>
+      <Group guid="guidPgProjCmdSet" id="PgProjItemContextGroup" priority="0x0600">
+        <!-- IDM_VS_CTXT_ITEMNODE: the project ITEM context menu - file-scoped database commands
+             (Sync with Database). Same gating model as the project group. -->
+        <Parent guid="guidSHLMainMenu" id="IDM_VS_CTXT_ITEMNODE" />
+      </Group>
     </Groups>
 
     <Buttons>
@@ -37,6 +42,16 @@
           <ButtonText>Import Database (PgProj)…</ButtonText>
         </Strings>
       </Button>
+      <!-- File-scoped sync: right-click a .sql in a .pgproj - diff local vs the live database and
+           apply either direction. Handler shells the bundled CLI (sync-file verb). -->
+      <Button guid="guidPgProjCmdSet" id="cmdidSyncFile" priority="0x0104" type="Button">
+        <Parent guid="guidPgProjCmdSet" id="PgProjItemContextGroup" />
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <CommandFlag>DefaultInvisible</CommandFlag>
+        <Strings>
+          <ButtonText>Sync with Database (PgProj)…</ButtonText>
+        </Strings>
+      </Button>
     </Buttons>
   </Commands>
 
@@ -45,6 +60,7 @@
        command's BeforeQueryStatus once the package loads. -->
   <VisibilityConstraints>
     <VisibilityItem guid="guidPgProjCmdSet" id="cmdidImportDatabase" context="guidPgProjLoadedUIContext" />
+    <VisibilityItem guid="guidPgProjCmdSet" id="cmdidSyncFile" context="guidPgProjLoadedUIContext" />
   </VisibilityConstraints>
 
   <Symbols>
@@ -54,6 +70,8 @@
     <GuidSymbol name="guidPgProjCmdSet" value="{b0000000-0000-0000-0000-0000000000a2}">
       <IDSymbol name="PgProjProjectContextGroup" value="0x1020" />
       <IDSymbol name="cmdidImportDatabase" value="0x0103" />
+      <IDSymbol name="PgProjItemContextGroup" value="0x1021" />
+      <IDSymbol name="cmdidSyncFile" value="0x0104" />
     </GuidSymbol>
     <!-- Must match PgProjGuids.PgProjLoadedUIContextGuidString. -->
     <GuidSymbol name="guidPgProjLoadedUIContext" value="{b0000000-0000-0000-0000-0000000000a4}" />
