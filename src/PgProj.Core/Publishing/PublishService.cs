@@ -148,8 +148,16 @@ public sealed class PublishService
         var versionProfile = PostgresVersionProfile.ForTarget(project?.TargetPostgresVersion);
         var target = await new LiveDatabaseReader(versionProfile).ReadAsync(connectionString, cancellationToken);
 
+        // #136: consume the project's persisted refactor log BY DEFAULT (its presence is the opt-in) so a
+        // logged rename/move deploys as a data-preserving ALTER instead of DROP+CREATE. No project (a
+        // pre-built .pgpkg source) ⇒ no log here.
+        var refactorLog = project is not null
+            ? Refactoring.RefactorLog.LoadForProject(project.ProjectFilePath)
+            : null;
+
         var changes = new SchemaComparer(versionProfile).Compare(
-            sourceModel, target, new ComparerOptions { DropObjectsNotInSource = options.AllowDrops });
+            sourceModel, target,
+            new ComparerOptions { DropObjectsNotInSource = options.AllowDrops, RefactorLog = refactorLog });
 
         // #137 lock-minimizing rewrite applied here (not just in the generator) so the changes the phased
         // deployer applies carry the same CONCURRENTLY/NOT VALID flags the generated script shows.

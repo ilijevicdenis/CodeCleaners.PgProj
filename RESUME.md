@@ -58,9 +58,26 @@ Working branch: `milestone/m7-ssdt-parity` (PgProj repo at
 - Tests: `DeployScriptOptions140Tests.cs` (DB-free), `PublishProfileTests.cs` (round-trip/IsEmpty/
   ResolveDropSuppression), `DeployScriptIntegrationTests.cs` (live smart-defaults round-trip).
 
+## #136 — EP-REFACTOR persisted `.pgrefactorlog` (CORE DONE this session, committed)
+- Artifact `Refactoring/RefactorLog` (`{operation,objectType,oldName,newName}`, JSON, append-only,
+  conventional `<project>.pgrefactorlog`). Deploy planner consumes it BY DEFAULT via
+  `ComparerOptions.RefactorLog` (seeds the rename pre-pass; `MergePlans` makes the explicit log win over
+  the structural heuristic). New `RenameColumnChange` + `SetTableSchemaChange`; column renames handled in
+  `CompareTables`. `RiskAnalyzer` → renames/moves are Safe. CLI `rename`/`move-schema` rewrite `.sql`
+  (word-boundary qualified-name replace) + append the log (`RefactorEngine`). Tests: `RefactorLogTests`
+  + a live shadow-DB data-preservation proof.
+- **STILL OPEN in #136 (follow-up):** pack the `.pgrefactorlog` into `.pgpkg` (extend `Packaging/PgPkg.cs`
+  writer/reader + the build path + consume it when publishing from a package; mind the `sourceChecksum`
+  verify) and the **`expand-wildcards`** (SELECT *) refactor command. Column-rename CLI authoring (the
+  `.sql` rewrite for a column) is also deferred — the deploy planner already *consumes* logged column
+  renames; only the `rename`-command rewrite is table-scoped today.
+
 ## REMAINING OPEN ISSUES (priority from GitHub labels)
 
-- **#136 EP-REFACTOR persisted `.pgrefactorlog` — HIGH.** Committed artifact `{operation, oldStableId,
+- **(#136 follow-ups above: pgpkg packing + expand-wildcards + column-rename .sql authoring.)**
+
+- ~~#136 EP-REFACTOR persisted `.pgrefactorlog` — HIGH~~ (core delivered; see above). Original notes:
+  Committed artifact `{operation, oldStableId,
   newStableId, objectType}` packed into `.pgpkg` (extend `Packaging/PgPkg.cs`). Seed
   `IdentityDiffEngine`/`SchemaComparer` StableId old→new map from it BY DEFAULT so renames deploy as
   `ALTER ... RENAME`/`SET SCHEMA` (rename change records already exist in `IdentityDiffChanges.cs`, gated

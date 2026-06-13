@@ -62,6 +62,15 @@ public sealed class RiskAnalyzer
         DropConstraintChange => Warning("Drop a constraint; data is retained but no longer validated."),
         DropForeignKeyChange => Warning("Drop a foreign key; referential integrity is no longer enforced."),
 
+        // ---- data-preserving renames / schema moves (refactor log, #136) ------------------------
+        // These replace the destructive DROP+CREATE the name-keyed diff would otherwise infer; the object's
+        // data is kept in place, so they are SAFE (the whole point of the refactor log).
+        RenameTableChange => Safe("Rename a table in place (ALTER TABLE … RENAME); rows are preserved."),
+        RenameColumnChange => Safe("Rename a column in place (ALTER TABLE … RENAME COLUMN); column data is preserved."),
+        SetTableSchemaChange => Safe("Move a table to another schema (ALTER TABLE … SET SCHEMA); rows are preserved."),
+        RenameSequenceChange or RenameIndexChange or RenameViewChange or RenameFunctionChange =>
+            Safe("Rename an object in place (ALTER … RENAME); no data is lost."),
+
         // ---- raw objects ------------------------------------------------------------------------
         CreateRawObjectChange => Safe("Create a new object."),
         RecreateRawObjectChange r => ClassifyRecreate(r),

@@ -30,6 +30,15 @@ public sealed class ComparerOptions
     public bool DetectRenames { get; init; }
 
     /// <summary>
+    /// The project's persisted refactor log (#136). When present and non-empty, its logged renames /
+    /// schema-moves seed the rename pre-pass BY DEFAULT (no flag), so the deploy emits a data-preserving
+    /// <c>ALTER … RENAME</c>/<c>SET SCHEMA</c>/<c>RENAME COLUMN</c> instead of DROP+CREATE. Null/empty ⇒
+    /// today's behaviour. This is in addition to (and merges with) the structural <see cref="DetectRenames"/>
+    /// heuristic.
+    /// </summary>
+    public Refactoring.RefactorLog? RefactorLog { get; init; }
+
+    /// <summary>
     /// When true, two tables whose columns are identical but declared in a different order compare EQUAL
     /// (no <see cref="ColumnOrderChange"/> is emitted). Defaults to <c>false</c>: Postgres column order is
     /// physically meaningful, so by default a pure reorder is reported (as a benign, non-destructive,
@@ -135,10 +144,15 @@ public sealed class SchemaComparer
         options ??= new ComparerOptions();
         var changes = new List<SchemaChange>();
 
-        // Identity-based rename pre-pass (issue #53): when enabled, any structurally-unchanged object that
-        // only moved name becomes a single Rename and is recorded as "already matched" so the per-kind
-        // walks below skip its create AND its drop. Off by default → no plan → behaviour-preserving.
-        var plan = options.DetectRenames ? new IdentityDiffEngine().DetectRenames(source, target) : null;
+        // Rename pre-pass: the persisted refactor log (#136, consumed by default when present) and/or the
+        // structural heuristic (#53, opt-in via DetectRenames) yield table-level renames/moves. Either makes
+        // the per-kind walks skip the renamed object's create AND its drop. No log + no heuristic → no plan →
+        // behaviour-preserving. Column renames from the log are applied inside CompareTables.
+        IdentityDiffEngine.RenamePlan? plan = null;
+        if (options.RefactorLog is { IsEmpty: false } log)
+            plan = log.BuildTableRenamePlan(source, target);
+        if (options.DetectRenames)
+            plan = MergePlans(plan, new IdentityDiffEngine().DetectRenames(source, target));
         if (plan is not null) changes.AddRange(plan.Changes);
 
         CompareSchemas(source, target, changes);
@@ -153,6 +167,11 @@ public sealed class SchemaComparer
         // existing within-phase ordering the golden tests pin).
         return changes.OrderBy(c => c.Phase).ToList();
     }
+
+    // The explicit refactor log is authoritative: when it produced any rename it wins outright; otherwise the
+    // structural heuristic stands. This avoids emitting two RENAMEs for the same object when both are active.
+    private static IdentityDiffEngine.RenamePlan? MergePlans(IdentityDiffEngine.RenamePlan? log, IdentityDiffEngine.RenamePlan heuristic)
+        => log is { Changes.Count: > 0 } ? log : heuristic;
 
     private static void CompareSchemas(DatabaseModel source, DatabaseModel target, List<SchemaChange> changes)
     {
@@ -233,6 +252,17 @@ public sealed class SchemaComparer
                 continue;
             }
 
+            // Logged column renames (#136): emit ALTER TABLE … RENAME COLUMN (data-preserving) and remember
+            // the source NEW name and target OLD name so the add/drop walk below skips them — and so any
+            // parallel facet change on a renamed column still diffs (source new col vs target old col).
+            var colRenames = options.RefactorLog is { IsEmpty: false } rlog
+                ? rlog.ColumnRenamesFor(source, target, src, tgt)
+                : System.Array.Empty<(string Old, string New)>();
+            var renamedNewCols = new HashSet<string>(colRenames.Select(r => r.New), StringComparer.OrdinalIgnoreCase);
+            var renamedOldCols = new HashSet<string>(colRenames.Select(r => r.Old), StringComparer.OrdinalIgnoreCase);
+            foreach (var (oldCol, newCol) in colRenames)
+                changes.Add(new RenameColumnChange(src.Schema, src.Name, oldCol, newCol));
+
             // Columns present in source but not target -> add. A changed column is migrated in place
             // (AlterColumnChange) only when the version profile's ObjectCapabilities says every differing
             // facet (type / nullability / default) is ALTER-able on the target; otherwise the column must
@@ -240,6 +270,17 @@ public sealed class SchemaComparer
             // preserving by default — the decision is no longer an inline version branch.
             foreach (var col in src.Columns)
             {
+                // A renamed column: pair the source NEW column with the target OLD column (the RENAME already
+                // emitted) and diff only the remaining facets — never re-add it.
+                if (renamedNewCols.Contains(col.Name))
+                {
+                    var oldName = colRenames.First(r => DatabaseModel.NameEquals(r.New, col.Name)).Old;
+                    var renamedExisting = FindColumn(tgt, oldName, options);
+                    if (renamedExisting is not null && !ColumnsEqual(renamedExisting, col))
+                        changes.Add(new AlterColumnChange(src.Schema, src.Name, renamedExisting with { Name = col.Name }, col));
+                    continue;
+                }
+
                 var existing = FindColumn(tgt, col.Name, options);
                 if (existing is null)
                 {
@@ -262,10 +303,12 @@ public sealed class SchemaComparer
                 }
             }
 
-            // Columns present in target but not source -> drop (guarded).
+            // Columns present in target but not source -> drop (guarded). A column consumed by a logged
+            // rename (its OLD name) is NOT dropped — the RENAME COLUMN already accounted for it.
             if (options.DropObjectsNotInSource)
             {
-                foreach (var col in tgt.Columns.Where(c => FindColumn(src, c.Name, options) is null))
+                foreach (var col in tgt.Columns.Where(c => FindColumn(src, c.Name, options) is null
+                                                           && !renamedOldCols.Contains(c.Name)))
                     changes.Add(new DropColumnChange(src.Schema, src.Name, col.Name));
             }
 

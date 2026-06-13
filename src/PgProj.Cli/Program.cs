@@ -15,6 +15,7 @@ using PgProj.Core.Packaging;
 using PgProj.Core.Project;
 using PgProj.Core.Project.References;
 using PgProj.Core.Publishing;
+using PgProj.Core.Refactoring;
 using PgProj.Core.Snapshot;
 using PgProj.Core.Solutions;
 using PgProj.Core.Templates;
@@ -47,6 +48,8 @@ public static class Program
                 "drift" => await Drift(args),
                 "pull" => await Pull(args),
                 "sync-file" => await SyncFile(args),
+                "rename" => Rename(args),
+                "move-schema" => MoveSchema(args),
                 "deploy-report" => await DeployReport(args),
                 "verify" => Verify(args),
                 "analyze" => Analyze(args),
@@ -473,6 +476,43 @@ public static class Program
             return ExitCode.DeployError;
         }
         return 0;
+    }
+
+    // ---- refactor: rename / move-schema (rewrite .sql + append .pgrefactorlog atomically, #136) ----
+
+    private static int Rename(string[] args)
+    {
+        var p = args.Skip(1).Where(a => !a.StartsWith('-')).ToList();
+        if (p.Count < 3)
+            throw new CliUsageException("Usage: pgproj rename <project.pgproj> <schema.table> <new-name>");
+        return RunRefactor(p[0], proj => RefactorEngine.RenameTable(proj, p[1], p[2]));
+    }
+
+    private static int MoveSchema(string[] args)
+    {
+        var p = args.Skip(1).Where(a => !a.StartsWith('-')).ToList();
+        if (p.Count < 3)
+            throw new CliUsageException("Usage: pgproj move-schema <project.pgproj> <schema.table> <new-schema>");
+        return RunRefactor(p[0], proj => RefactorEngine.MoveTableToSchema(proj, p[1], p[2]));
+    }
+
+    private static int RunRefactor(string projectPath, Func<DatabaseProject, RefactorResult> refactor)
+    {
+        var project = DatabaseProject.Load(projectPath);
+        try
+        {
+            var r = refactor(project);
+            Console.WriteLine($"{r.Entry.OldName} -> {r.Entry.NewName}: {r.Replacements} replacement(s) across " +
+                              $"{r.ChangedFiles.Count} .sql file(s); recorded in {Path.GetFileName(RefactorLog.PathFor(project.ProjectFilePath))}.");
+            Console.WriteLine("The next publish will emit a data-preserving ALTER (not DROP+CREATE). " +
+                              "Review any unqualified references the rewrite could not see.");
+            return ExitCode.Success;
+        }
+        catch (RefactorException ex)
+        {
+            Console.Error.WriteLine($"error: {ex.Message}");
+            return ExitCode.Usage;
+        }
     }
 
     // ---- validate (apply to a throwaway temp DB in a rolled-back txn) --------------------
@@ -1457,6 +1497,8 @@ public static class Program
           pgproj verify <a.pgpkg> <b.pgpkg> [--format json] [-o report.json]   (package equivalence: model + sources + options; exit 6 on drift - DacpacVerify analogue)
           pgproj deploy-report <project.pgproj|.pgpkg> --connection <conn> [-o report.json] [--format xml] [--profile <file>] [--var N=V] [--allow-drops] [--parallel]   (planned-change report, never applies - DeployReport analogue; alias: publish --report-only)
           pgproj sync-file <project.pgproj> --file <rel.sql> --connection <conn> [--apply-to-local | --apply-to-db [--allow-drops] [--dry-run]]   (one file vs the DB: JSON state for editors, or apply either direction)
+          pgproj rename <project.pgproj> <schema.table> <new-name>      (rewrite .sql + record in .pgrefactorlog so the next publish ALTERs … RENAME instead of drop+create)
+          pgproj move-schema <project.pgproj> <schema.table> <new-schema>   (rewrite .sql + record a schema move so the next publish ALTERs … SET SCHEMA instead of drop+create)
           pgproj analyze <project.pgproj> [--strict]    (static safety analysis over the AST)
           pgproj model-tree <project.pgproj> [--format json]   (objects + source positions, for editors)
           pgproj describe-table <table.sql> [--table schema.name] [--default-schema public]   (one table's model as JSON, for the graphical designer)
