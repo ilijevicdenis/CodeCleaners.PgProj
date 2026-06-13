@@ -23,9 +23,10 @@ is undocumented here, so this table is guaranteed to stay in lockstep with the c
 | `6`  | `Drift` | Schema drift detected **and** gated on via `--fail-on-drift` (or `compare --fail-on-changes`). Detection succeeded; the non-zero code is the "out of sync" signal. | `compare`, `drift` |
 | `7`  | `DeployError` | The deploy failed while applying changes to the live database (server-side error during execution). | `publish` |
 | `8`  | `ValidationFailed` | Shadow validation failed: the project did not apply cleanly to a throwaway PostgreSQL database. | `validate` |
+| `9`  | `DataLossBlocked` | The publish was blocked by the possible-data-loss gate (`BlockOnPossibleDataLoss`, on by default). Re-run with `--allow-data-loss` (or `--allow-drops`) to proceed. | `publish` |
 
 Convention (loose, not enforced): `0` success; `1`–`2` usage/unexpected; `3`–`5` build-time problems
-caught before touching a server; `6`–`8` outcomes that required talking to (or comparing against) a
+caught before touching a server; `6`–`9` outcomes that required talking to (or comparing against) a
 live database.
 
 ## Reproducibility gate: `pgproj verify`

@@ -26,7 +26,7 @@
 | SSDT (Visual Studio) | VSIX pair: .pgproj project type, templates, property pages, Publish, Schema Compare, Import, file-level Sync, full PG editor (coloring/IntelliSense/diagnostics/F12/peek) — validated 115/115 E2E | ✅ exists |
 | SQL Database Projects extension (VS Code) | pgproj VS Code extension (LSP client, webviews) | ✅ exists |
 | Schema Compare | two-way `SchemaCompare` engine + VS interactive window + VS Code webview | ✅ exists |
-| Publish profile (`.publish.xml`) | `.pgpublish.json` (CLI>profile>default); full DacDeployOptions family tracked in #140 | ✅ exists |
+| Publish profile (`.publish.xml`) | `.pgpublish.json` (CLI>profile>default); full DacDeployOptions-equivalent family (#140) | ✅ exists |
 | SQLCMD variables `$(Var)` | project variables + profile/CLI overrides (`--var`) | ✅ exists |
 | Pre/Post-deployment scripts | pre/post-deploy scripts spliced into the deploy script | ✅ exists |
 | Target platform (`Sql160`…) | `TargetPostgresVersion` enforced (`PGV###` gate) | ✅ exists |
@@ -85,8 +85,10 @@ The headless engine is in good shape. These epics are **complete** and only need
 > were not all re-ticked — treat §2 + `PROGRESS.md` as truth. **Genuinely open:** EP-ANALYSIS+ rule
 > backlog (#81), EP-COVERAGE blocked tail (#72: #102/#108 need C functions in the server), editable
 > EP-DESIGNER (#112/#119/#120), and the wave-3 epics — snapshot workflow (#142), refactorlog (#136),
-> CONCURRENTLY deploys (#137), data extract/BACPAC (#134), NuGet package references (#133), data
-> compare (#132), PL/pgSQL unit testing (#139), full publish-options family (#140).
+> data extract/BACPAC (#134), NuGet package references (#133), data
+> compare (#132), PL/pgSQL unit testing (#139). **Closed since:** the full DacDeployOptions-equivalent
+> publish-options family (#140), lock-minimizing/CONCURRENTLY deploy (#137), and analyzer rules
+> PG015/PG016 (#81).
 
 ---
 
@@ -228,7 +230,7 @@ SSDT lets you enable/disable rules and set severity, plus third-party rule packs
 
 ---
 
-### EP-PROFILE — Publish profiles — **P1** — ✅ DONE (full DacDeployOptions family open, #140)
+### EP-PROFILE — Publish profiles — **P1** — ✅ DONE (full DacDeployOptions-equivalent family delivered, #140)
 
 > ✅ **DELIVERED** (M7 audit 2026-06-07, issue #68). `Deployment/PublishProfile.cs` (secret-whitelisted `.pgpublish.json`), `profile create` verb, `--profile` on publish/script/compare (CLI>profile>default). Tests `PublishProfileTests`. Tasks below are historical.
 
@@ -394,7 +396,7 @@ Matrix *Command line tools / CI-CD* (GitHub `sql-action`, Azure DevOps task).
 | Solution management | ✅ `sln new/add/list` | n/a | ✅ `.slnx` loads natively |
 | Build | ✅ `build` (+ `--verbose`, warning policy) | ✅ | ✅ SDK + IDE build |
 | Publish to server / local instance | ✅ `publish` (transactional/phased) | ✅ webview | ✅ Publish dialog |
-| Publish options/properties | ✅ flags + `.pgpublish.json` (#140 grows the family) | ✅ | ✅ property pages |
+| Publish options/properties | ✅ flags + `.pgpublish.json` — full DacDeployOptions-equivalent family (#140) | ✅ | ✅ property pages |
 | Deploy report (plan w/o apply) | ✅ `deploy-report` (JSON/XML, risk + data-loss gate) | ⚠️ via CLI | ⚠️ via CLI |
 | Package equivalence (DacpacVerify) | ✅ `verify` (exit 0/6) | ⚠️ via CLI | ⚠️ via CLI |
 | Target platform updatable + enforced | ✅ `TargetPostgresVersion` + `PGV###` | ✅ | ✅ property page |

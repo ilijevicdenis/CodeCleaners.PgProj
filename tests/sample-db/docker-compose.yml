@@ -12,6 +12,11 @@ services:
   pgproj-sample-db:
     image: postgres:18
     container_name: pgproj-sample-db
+    # The full Core suite runs many live-DB test classes in parallel, each provisioning its own
+    # throwaway template+work databases with pooled connections — that bursts well past the default
+    # 100 backends and shows up as intermittent "too many clients"/connection failures. Raise the cap
+    # so the live suite is deterministic (a reset is needed for this to take effect).
+    command: ["postgres", "-c", "max_connections=400"]
     environment:
       POSTGRES_PASSWORD: pgproj
       POSTGRES_DB: sampledb

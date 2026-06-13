@@ -22,6 +22,8 @@ namespace PgProj.Core.Analysis;
 ///   PG011 timestamp WITHOUT time zone column (use timestamptz)
 ///   PG012 serial column (use GENERATED ... AS IDENTITY)
 ///   PG013 money column (locale-dependent; use numeric)
+///   PG015 identifier with uppercase letters (case-fold footgun / forced quoting)
+///   PG016 identifier longer than 63 bytes (silently truncated by PostgreSQL)
 /// Complements the semantic analyzer (catalog/type/structural). Function-body checks are textual
 /// because PgParser keeps bodies verbatim; everything else is AST-precise.
 /// </summary>
@@ -49,6 +51,8 @@ public sealed class PgAnalyzer
         new RuleInfo("PG011", DiagnosticSeverity.Info,    "timestamp without time zone column"),
         new RuleInfo("PG012", DiagnosticSeverity.Info,    "serial column instead of an identity column"),
         new RuleInfo("PG013", DiagnosticSeverity.Info,    "money column"),
+        new RuleInfo("PG015", DiagnosticSeverity.Info,    "Identifier with uppercase letters (case-fold/quoting footgun)"),
+        new RuleInfo("PG016", DiagnosticSeverity.Warning, "Identifier longer than 63 bytes (silently truncated)"),
     };
 
     private static readonly Dictionary<string, RuleInfo> ById =
@@ -145,9 +149,13 @@ public sealed class PgAnalyzer
                 "Table has no PRIMARY KEY — rows can't be uniquely identified (affects updates, logical replication, and tooling).",
                 target);
 
+        // Identifier hygiene on the table name itself (PG015 casing, PG016 length).
+        CheckIdentifier(t.Name, "Table", target, diags);
+
         // Per-column type lints. A column has exactly one type, so the checks are mutually exclusive.
         foreach (var c in t.Columns)
         {
+            CheckIdentifier(c.Name, "Column", target, diags);
             var type = (c.Type.Text ?? "").Trim();
             if (BareNumeric.IsMatch(type))
                 Emit(diags, "PG008",
@@ -170,6 +178,30 @@ public sealed class PgAnalyzer
                     $"Column \"{c.Name}\" is {type} — money is locale-dependent (lc_monetary) and loses precision on division; use numeric.",
                     target);
         }
+    }
+
+    /// PostgreSQL's NAMEDATALEN is 64, so identifiers are silently truncated to 63 bytes (UTF-8).
+    private const int MaxIdentifierBytes = 63;
+
+    /// <summary>
+    /// PG015/PG016 identifier hygiene for one name (a table or column). PG015 flags an uppercase letter:
+    /// an unquoted mixed-case identifier is folded to lower-case by the server (you wrote <c>Customer</c>,
+    /// you get <c>customer</c>), and a quoted one forces double-quotes on every later reference — both are
+    /// avoidable by using lower_snake_case. PG016 flags a name PostgreSQL would silently truncate.
+    /// </summary>
+    private void CheckIdentifier(string? name, string role, string target, List<Diagnostic> diags)
+    {
+        if (string.IsNullOrEmpty(name)) return;
+
+        if (name.Any(char.IsUpper))
+            Emit(diags, "PG015",
+                $"{role} identifier \"{name}\" has uppercase letters — unquoted it folds to lower case, quoted it forces quoting everywhere; prefer lower_snake_case.",
+                target);
+
+        if (System.Text.Encoding.UTF8.GetByteCount(name) > MaxIdentifierBytes)
+            Emit(diags, "PG016",
+                $"{role} identifier \"{name}\" exceeds {MaxIdentifierBytes} bytes — PostgreSQL silently truncates it, which can collide with another object.",
+                target);
     }
 
     private static bool HasPrimaryKey(CreateTableStatement t) =>

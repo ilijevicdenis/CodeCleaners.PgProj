@@ -30,6 +30,41 @@ public sealed record PublishPlanOptions
 
     /// <summary>Highest-precedence SQLCMD variable overrides (CLI <c>--var N=V</c> / editor input).</summary>
     public IReadOnlyDictionary<string, string>? VariableOverrides { get; init; }
+
+    // ---- #140 DacDeployOptions-equivalent family (resolved: CLI > profile > built-in default) ----
+
+    /// <summary>Refuse to apply a possible-data-loss change (the publish default is to block).</summary>
+    public bool BlockOnPossibleDataLoss { get; init; }
+
+    /// <summary>Synthesize a default for a new <c>NOT NULL</c> column on a populated table.</summary>
+    public bool GenerateSmartDefaults { get; init; }
+
+    /// <summary>Validate new FK/CHECK constraints (default); off ⇒ emit them <c>NOT VALID</c>.</summary>
+    public bool ScriptNewConstraintValidation { get; init; } = true;
+
+    /// <summary>Permit object drop-and-recreate (the publish default is off so recreation is a blocked step).</summary>
+    public bool AllowTableRecreation { get; init; } = true;
+
+    /// <summary>Lock-minimizing deploy: CONCURRENTLY index ops + NOT VALID/VALIDATE constraints (#137).</summary>
+    public bool ConcurrentIndexOperations { get; init; }
+
+    /// <summary>Drop constraints not in source (default true; only relevant when <see cref="AllowDrops"/>).</summary>
+    public bool DropConstraintsNotInSource { get; init; } = true;
+
+    /// <summary>Drop indexes not in source (default true; only relevant when <see cref="AllowDrops"/>).</summary>
+    public bool DropIndexesNotInSource { get; init; } = true;
+
+    /// <summary>Per-session <c>statement_timeout</c> (ms); null ⇒ server default.</summary>
+    public int? CommandTimeoutMs { get; init; }
+
+    /// <summary>Per-session <c>lock_timeout</c> (ms); null ⇒ server default.</summary>
+    public int? LockTimeoutMs { get; init; }
+
+    /// <summary>Object-type tokens excluded from the diff entirely.</summary>
+    public IReadOnlyList<string> ExcludeObjectTypes { get; init; } = Array.Empty<string>();
+
+    /// <summary>Object-type tokens whose standalone DROP is suppressed.</summary>
+    public IReadOnlyList<string> DoNotDropObjectTypes { get; init; } = Array.Empty<string>();
 }
 
 /// <summary>
@@ -40,14 +75,23 @@ public sealed record PublishPlanOptions
 public sealed class PublishPlan
 {
     public PublishPlan(IReadOnlyList<SchemaChange> changes, string script, bool hasDeployScripts,
-        bool hasPreDeployScript = false, bool hasPostDeployScript = false)
+        bool hasPreDeployScript = false, bool hasPostDeployScript = false,
+        int? statementTimeoutMs = null, int? lockTimeoutMs = null)
     {
         Changes = changes;
         Script = script;
         HasDeployScripts = hasDeployScripts;
         HasPreDeployScript = hasPreDeployScript;
         HasPostDeployScript = hasPostDeployScript;
+        StatementTimeoutMs = statementTimeoutMs;
+        LockTimeoutMs = lockTimeoutMs;
     }
+
+    /// <summary>Per-session <c>statement_timeout</c> (ms) the phased deployer should SET; null ⇒ server default.</summary>
+    public int? StatementTimeoutMs { get; }
+
+    /// <summary>Per-session <c>lock_timeout</c> (ms) the phased deployer should SET; null ⇒ server default.</summary>
+    public int? LockTimeoutMs { get; }
 
     public IReadOnlyList<SchemaChange> Changes { get; }
 
@@ -69,6 +113,13 @@ public sealed class PublishPlan
 
     /// <summary>Nothing to apply: no schema changes AND no pre/post-deploy scripts to run.</summary>
     public bool NothingToDo => Changes.Count == 0 && !HasDeployScripts;
+
+    /// <summary>
+    /// True when any step must run outside the deploy transaction (CONCURRENTLY / VALIDATE, #137). Such a
+    /// plan MUST be applied statement-by-statement (the phased deployer) — a single whole-script command
+    /// would wrap the concurrent step in an implicit transaction and PostgreSQL would reject it.
+    /// </summary>
+    public bool HasNonTransactionalSteps => Changes.Any(c => c.RunsOutsideTransaction);
 }
 
 /// <summary>
@@ -100,6 +151,11 @@ public sealed class PublishService
         var changes = new SchemaComparer(versionProfile).Compare(
             sourceModel, target, new ComparerOptions { DropObjectsNotInSource = options.AllowDrops });
 
+        // #137 lock-minimizing rewrite applied here (not just in the generator) so the changes the phased
+        // deployer applies carry the same CONCURRENTLY/NOT VALID flags the generated script shows.
+        if (options.ConcurrentIndexOperations)
+            changes = LockMinimizer.Apply(changes);
+
         var bundle = project is null ? null : LoadDeployScripts(project);
         var variables = SqlCmdVariableResolver.Build(
             defaults: project?.SqlCmdVariableDefaults,
@@ -111,10 +167,19 @@ public sealed class PublishService
             WrapInTransaction = options.WrapInTransaction,
             Scripts = bundle,
             Variables = variables,
-        });
+            BlockOnPossibleDataLoss = options.BlockOnPossibleDataLoss,
+            GenerateSmartDefaults = options.GenerateSmartDefaults,
+            ScriptNewConstraintValidation = options.ScriptNewConstraintValidation,
+            AllowTableRecreation = options.AllowTableRecreation,
+            StatementTimeoutMs = options.CommandTimeoutMs,
+            LockTimeoutMs = options.LockTimeoutMs,
+            ExcludeObjectTypes = options.ExcludeObjectTypes,
+            DoNotDropObjectTypes = ResolveDropSuppression(options),
+        }, versionProfile);
 
         return new PublishPlan(changes, script, hasDeployScripts: bundle is { IsEmpty: false },
-            hasPreDeployScript: bundle?.Pre is not null, hasPostDeployScript: bundle?.Post is not null);
+            hasPreDeployScript: bundle?.Pre is not null, hasPostDeployScript: bundle?.Post is not null,
+            statementTimeoutMs: options.CommandTimeoutMs, lockTimeoutMs: options.LockTimeoutMs);
     }
 
     /// <summary>
@@ -125,10 +190,37 @@ public sealed class PublishService
     /// </summary>
     public async Task ApplyAsync(PublishPlan plan, string connectionString, bool parallel, CancellationToken cancellationToken = default)
     {
-        if (parallel && !plan.HasDeployScripts)
-            await new PhasedDeployer(connectionString).ExecuteAsync(plan.Changes, cancellationToken);
+        // #137: a plan with non-transactional steps (CONCURRENTLY / VALIDATE) MUST be applied
+        // statement-by-statement (the phased deployer detects CONCURRENTLY and runs it autocommit). The
+        // whole-script DatabaseDeployer would wrap the batch in one implicit transaction and PostgreSQL
+        // would reject the concurrent step.
+        if (plan.HasNonTransactionalSteps && plan.HasDeployScripts)
+            throw new InvalidOperationException(
+                "Lock-minimizing index operations (CONCURRENTLY) cannot be combined with pre/post-deploy " +
+                "scripts in a single apply — the concurrent steps run outside a transaction while the scripts " +
+                "need the whole-script path. Deploy without --concurrent-indexes, or remove the deploy scripts.");
+
+        if ((parallel || plan.HasNonTransactionalSteps) && !plan.HasDeployScripts)
+            // The whole-script path gets its timeouts from the generated SET preamble; the phased path runs
+            // changes directly, so the timeouts (#140) are passed to the deployer to SET per session.
+            await new PhasedDeployer(connectionString,
+                    statementTimeoutMs: plan.StatementTimeoutMs, lockTimeoutMs: plan.LockTimeoutMs)
+                .ExecuteAsync(plan.Changes, cancellationToken);
         else
             await new DatabaseDeployer().ExecuteAsync(connectionString, plan.Script, cancellationToken);
+    }
+
+    /// <summary>
+    /// Builds the set of object-type tokens whose DROP is suppressed, combining the explicit
+    /// <see cref="PublishPlanOptions.DoNotDropObjectTypes"/> list with the granular SqlPackage-style
+    /// <c>Drop*NotInSource</c> toggles (off ⇒ that kind's DROP is suppressed).
+    /// </summary>
+    public static IReadOnlyList<string> ResolveDropSuppression(PublishPlanOptions options)
+    {
+        var set = new HashSet<string>(options.DoNotDropObjectTypes, StringComparer.OrdinalIgnoreCase);
+        if (!options.DropConstraintsNotInSource) { set.Add("constraint"); set.Add("primarykey"); set.Add("foreignkey"); }
+        if (!options.DropIndexesNotInSource) set.Add("index");
+        return set.Count == 0 ? Array.Empty<string>() : set.ToArray();
     }
 
     /// <summary>Reads the project's single pre/post-deploy scripts into a bundle (null when it declares none).</summary>

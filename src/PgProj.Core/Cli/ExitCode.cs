@@ -39,4 +39,7 @@ public static class ExitCode
 
     /// <summary>Shadow-database validation found the project does not apply cleanly (EP-VALIDATE).</summary>
     public const int ValidationFailed = 8;
+
+    /// <summary>The publish was blocked by the possible-data-loss gate (<c>BlockOnPossibleDataLoss</c>, #140).</summary>
+    public const int DataLossBlocked = 9;
 }

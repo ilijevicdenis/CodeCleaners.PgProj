@@ -24,11 +24,32 @@ public sealed class PhasedDeployer
 {
     private readonly string _connectionString;
     private readonly int _maxConnections;
+    private readonly int? _statementTimeoutMs;
+    private readonly int? _lockTimeoutMs;
 
-    public PhasedDeployer(string connectionString, int maxConnections = 8)
+    public PhasedDeployer(string connectionString, int maxConnections = 8,
+        int? statementTimeoutMs = null, int? lockTimeoutMs = null)
     {
         _connectionString = connectionString;
         _maxConnections = Math.Max(1, maxConnections);
+        _statementTimeoutMs = statementTimeoutMs;
+        _lockTimeoutMs = lockTimeoutMs;
+    }
+
+    /// <summary>
+    /// Apply the per-session timeout SETs (#140). The whole-script <see cref="DatabaseDeployer"/> path gets
+    /// these from the generated preamble, but the phased path executes changes directly (one connection per
+    /// worker), so each freshly-opened connection must set them itself.
+    /// </summary>
+    private async Task ApplySessionTimeoutsAsync(NpgsqlConnection conn, CancellationToken token)
+    {
+        if (_statementTimeoutMs is null && _lockTimeoutMs is null) return;
+        var sets = new List<string>(2);
+        if (_statementTimeoutMs is { } s) sets.Add($"SET statement_timeout = {s};");
+        if (_lockTimeoutMs is { } l) sets.Add($"SET lock_timeout = {l};");
+        if (sets.Count == 0) return;
+        await using var cmd = new NpgsqlCommand(string.Join(' ', sets), conn);
+        await cmd.ExecuteNonQueryAsync(token);
     }
 
     /// <summary>
@@ -74,6 +95,7 @@ public sealed class PhasedDeployer
             {
                 await using var conn = new NpgsqlConnection(_connectionString);
                 await conn.OpenAsync(token);
+                await ApplySessionTimeoutsAsync(conn, token);
 
                 // CREATE INDEX CONCURRENTLY cannot run inside a transaction block; run autocommit.
                 var sql = change.ToSql();

@@ -65,6 +65,49 @@ public sealed class DeployOptions
     /// <summary>Emit idempotent <c>IF [NOT] EXISTS</c> guards where the dialect allows. Off by default.</summary>
     public bool IdempotentIfExists { get; init; }
 
+    // ---- #140 DacDeployOptions-family additions ------------------------------------------------
+
+    /// <summary>
+    /// When adding a <c>NOT NULL</c> column with no declared default, synthesize a type-appropriate
+    /// <c>DEFAULT</c> so the <c>ADD COLUMN</c> succeeds on a populated table (SqlPackage
+    /// <c>GenerateSmartDefaults</c>). Off by default (today's behaviour: the bare <c>ADD COLUMN … NOT NULL</c>
+    /// is emitted and fails on a non-empty table).
+    /// </summary>
+    public bool GenerateSmartDefaults { get; init; }
+
+    /// <summary>
+    /// Whether a newly added FK/CHECK constraint is validated against existing rows (SqlPackage
+    /// <c>ScriptNewConstraintValidation</c>). <c>true</c> (default) = plain <c>ADD CONSTRAINT</c> (validates,
+    /// taking a stronger lock); <c>false</c> = emit it <c>NOT VALID</c> (no scan of existing rows — the
+    /// lock-minimizing form; pair with a later <c>VALIDATE CONSTRAINT</c> step, see #137).
+    /// </summary>
+    public bool ScriptNewConstraintValidation { get; init; } = true;
+
+    /// <summary>
+    /// Permit a drop-and-recreate (<see cref="RecreateRawObjectChange"/>) when an in-place ALTER cannot
+    /// express the change (SqlPackage <c>AllowTableRecreation</c>). <c>true</c> (default in the generator =
+    /// today's behaviour); the publish path resolves it to <c>false</c> so an object recreation surfaces as a
+    /// blocked step (commented out) rather than a silent destructive rebuild.
+    /// </summary>
+    public bool AllowTableRecreation { get; init; } = true;
+
+    /// <summary>
+    /// Lock-minimizing deploy (#137 — the <c>PerformIndexOperationsOnline</c> analogue). When on, index
+    /// create/drop become <c>CONCURRENTLY</c> and named FK/CHECK adds become <c>NOT VALID</c> + a separate
+    /// <c>VALIDATE CONSTRAINT</c> pass; the concurrent/validate steps are emitted outside the BEGIN/COMMIT
+    /// (PostgreSQL forbids <c>CONCURRENTLY</c> in a transaction). Off by default (today's blocking DDL).
+    /// </summary>
+    public bool ConcurrentIndexOperations { get; init; }
+
+    /// <summary>
+    /// Object-type tokens whose <em>DROP</em> is suppressed even when drops are otherwise enabled (SqlPackage
+    /// <c>DoNotDropObjectType</c> + the granular <c>Drop*NotInSource</c> family). The object's CREATE/ALTER
+    /// still emits; only its standalone DROP is filtered out. Empty (default) = drop everything that was
+    /// produced. Recreations (<see cref="RecreateRawObjectChange"/>) are governed by
+    /// <see cref="AllowTableRecreation"/>, not by this list.
+    /// </summary>
+    public IReadOnlyList<string> DoNotDropObjectTypes { get; init; } = Array.Empty<string>();
+
     /// <summary>Object-type tokens to EXCLUDE from generation at the profile level (e.g. <c>extension</c>). Empty = include all.</summary>
     public IReadOnlyList<string> ExcludeObjectTypes { get; init; } = Array.Empty<string>();
 
@@ -160,6 +203,13 @@ public sealed class DeployScriptGenerator
         // the default path is the full change set, unchanged.
         var filtered = FilterByObjectType(changes, options);
 
+        // Lock-minimizing rewrite (#137): index ops → CONCURRENTLY, named FK/CHECK adds → NOT VALID + a
+        // VALIDATE pass. Idempotent (re-flagging an already-concurrent change is a no-op), so a caller that
+        // already transformed the list (e.g. PublishService, so the phased apply matches) can leave the
+        // option off here without double-transforming.
+        if (options.ConcurrentIndexOperations)
+            filtered = LockMinimizer.Apply(filtered);
+
         // The version profile that drives version-aware DDL (ALTER-vs-recreate via ObjectCapabilities, #43/#56).
         profile ??= Versioning.PostgresVersionProfile.ForTarget(options.TargetPostgresVersion);
 
@@ -201,7 +251,18 @@ public sealed class DeployScriptGenerator
             return sb.ToString();
         }
 
-        if (options.WrapInTransaction)
+        // #137: split steps that cannot live in the deploy transaction (CONCURRENTLY index ops, separate
+        // VALIDATE passes) from the rest. The transactional body keeps the BEGIN/COMMIT; the non-transactional
+        // steps are emitted afterward, each applied in autocommit. With the option off, `outside` is empty and
+        // the output is byte-identical to before.
+        var inTxn = ordered.Where(c => !c.RunsOutsideTransaction).ToList();
+        var outside = ordered.Where(c => c.RunsOutsideTransaction).ToList();
+
+        // Only open a transaction when there is a transactional body (changes or pre/post scripts); a deploy of
+        // nothing-but-concurrent-steps must not wrap an empty BEGIN/COMMIT (which would also serve no purpose).
+        var wrap = options.WrapInTransaction && (inTxn.Count > 0 || preBody is not null || postBody is not null);
+
+        if (wrap)
         {
             sb.AppendLine("BEGIN;");
             sb.AppendLine();
@@ -213,13 +274,22 @@ public sealed class DeployScriptGenerator
         // pre → schema diff → post
         AppendScriptSection(sb, "pre-deployment", scripts.Pre?.Name, preBody);
 
-        foreach (var change in ordered)
+        foreach (var change in inTxn)
             AppendChange(sb, change, options, profile);
 
         AppendScriptSection(sb, "post-deployment", scripts.Post?.Name, postBody);
 
-        if (options.WrapInTransaction)
+        if (wrap)
             sb.AppendLine("COMMIT;");
+
+        if (outside.Count > 0)
+        {
+            sb.AppendLine();
+            sb.AppendLine("-- ---- non-transactional steps (run outside any BEGIN/COMMIT: CONCURRENTLY / VALIDATE) ----");
+            sb.AppendLine();
+            foreach (var change in outside)
+                AppendChange(sb, change, options, profile);
+        }
 
         return sb.ToString();
     }
@@ -235,15 +305,23 @@ public sealed class DeployScriptGenerator
     {
         var include = options.IncludeOnlyObjectTypes;
         var exclude = options.ExcludeObjectTypes;
-        if (include.Count == 0 && exclude.Count == 0) return changes;
+        var noDrop = options.DoNotDropObjectTypes;
+        if (include.Count == 0 && exclude.Count == 0 && noDrop.Count == 0) return changes;
 
         var includeSet = new HashSet<string>(include, StringComparer.OrdinalIgnoreCase);
         var excludeSet = new HashSet<string>(exclude, StringComparer.OrdinalIgnoreCase);
+        var noDropSet = new HashSet<string>(noDrop, StringComparer.OrdinalIgnoreCase);
 
         var kept = new List<SchemaChange>(changes.Count);
         foreach (var c in changes)
         {
             var type = SchemaCompareObjectType.Of(c);
+
+            // DoNotDropObjectType / granular Drop*NotInSource (#140): suppress a standalone DROP of a listed
+            // kind. A recreation (drop+create) is NOT a standalone drop — it is gated by AllowTableRecreation.
+            if (noDropSet.Contains(type) && c.IsDestructive && c is not RecreateRawObjectChange)
+                continue;
+
             if (includeSet.Count > 0) { if (includeSet.Contains(type)) kept.Add(c); }
             else if (!excludeSet.Contains(type)) kept.Add(c);
         }
@@ -278,6 +356,17 @@ public sealed class DeployScriptGenerator
     private static void AppendChange(StringBuilder sb, SchemaChange change, DeployOptions options,
         Versioning.PostgresVersionProfile profile)
     {
+        // AllowTableRecreation gate (#140): a drop-and-recreate is the riskiest expressible change. With the
+        // option off, emit it commented-out so it surfaces in review rather than silently rebuilding.
+        if (!options.AllowTableRecreation && change is RecreateRawObjectChange)
+        {
+            sb.AppendLine($"-- [blocked: object recreation; set AllowTableRecreation to apply] {change.Describe()}");
+            foreach (var line in change.ToSql().Split('\n'))
+                sb.AppendLine("-- " + line.TrimEnd('\r'));
+            sb.AppendLine();
+            return;
+        }
+
         // Data-loss handling for un-blocked DataLoss changes (#54 risk + #56). Default = Include (live).
         if (options.DataLossHandling != DataLossHandling.Include &&
             RiskAnalyzer.Default.Classify(change).Level >= RiskLevel.DataLoss)
@@ -300,8 +389,21 @@ public sealed class DeployScriptGenerator
         if (options.Verbose)
         {
             var risk = RiskAnalyzer.Default.Classify(change);
-            sb.AppendLine($"--   risk: {risk.Level}; phase: {change.Phase}");
+            sb.AppendLine($"--   risk: {risk.Level}; phase: {change.Phase}" +
+                          (change.RunsOutsideTransaction ? "; lock: non-blocking (outside transaction)" : ""));
         }
+
+        // ADD COLUMN ... DEFAULT version gate (#137): PostgreSQL 11+ applies a column default as a fast
+        // metadata-only change; before 11 it rewrites the whole table under ACCESS EXCLUSIVE. Warn so the
+        // operator knows the lock/cost profile on an older target.
+        if (change is AddColumnChange addCol && !string.IsNullOrWhiteSpace(addCol.Column.Default)
+            && profile.MajorVersion is > 0 and < 11)
+            sb.AppendLine($"--   [warning: ADD COLUMN with DEFAULT rewrites the table under ACCESS EXCLUSIVE on PostgreSQL {profile.MajorVersion} (< 11); 11+ is metadata-only]");
+
+        // CONCURRENTLY can leave an INVALID index behind if the build fails — flag it so cleanup is expected.
+        if (change is CreateIndexChange { Concurrent: true } cic)
+            sb.AppendLine($"--   [note: a failed CONCURRENTLY build leaves an INVALID index '{cic.Index.Name}'; DROP INDEX it and retry]");
+
         sb.AppendLine(RenderSql(change, options, profile));
         sb.AppendLine();
     }
@@ -321,8 +423,58 @@ public sealed class DeployScriptGenerator
             return VersionFallbackComment(ac, profile);
 
         var sql = change.ToSql();
+
+        // GenerateSmartDefaults (#140): a NOT NULL column add with no default would fail on a populated table.
+        // Synthesize a type-appropriate DEFAULT so the ADD COLUMN succeeds (PG11+ applies it without a rewrite).
+        if (options.GenerateSmartDefaults && change is AddColumnChange add
+            && !add.Column.IsNullable && string.IsNullOrWhiteSpace(add.Column.Default)
+            && !add.Column.IsIdentity && add.Column.GeneratedExpression is null
+            && SmartDefaultFor(add.Column.DataType) is { } smart)
+            sql = InjectBeforeTerminator(sql, $" DEFAULT {smart}");
+
+        // ScriptNewConstraintValidation (#140): when off, add new FK/CHECK constraints NOT VALID so they skip
+        // the existing-row scan (lock-minimizing). #137 emits the follow-up VALIDATE CONSTRAINT step.
+        if (!options.ScriptNewConstraintValidation && change is AddForeignKeyChange or AddCheckConstraintChange)
+            sql = InjectBeforeTerminator(sql, " NOT VALID");
+
         if (options.IdempotentIfExists) sql = MakeIdempotent(change, sql);
         return sql;
+    }
+
+    /// <summary>
+    /// A type-appropriate non-null literal for <see cref="DeployOptions.GenerateSmartDefaults"/>. Returns null
+    /// for types we cannot safely synthesize (the caller then leaves the column without a default). The value
+    /// is a backfill only — it satisfies NOT NULL on existing rows; new code is expected to set real values.
+    /// </summary>
+    internal static string? SmartDefaultFor(string dataType)
+    {
+        var t = dataType.Trim().ToLowerInvariant();
+        var paren = t.IndexOf('(');
+        if (paren >= 0) t = t[..paren].Trim();
+        t = t.Replace("[]", "").Trim();
+        return t switch
+        {
+            "smallint" or "integer" or "int" or "int2" or "int4" or "int8" or "bigint"
+                or "numeric" or "decimal" or "real" or "double precision" or "float4" or "float8"
+                or "smallserial" or "serial" or "bigserial" => "0",
+            "boolean" or "bool" => "false",
+            "text" or "varchar" or "character varying" or "char" or "character" or "citext" or "name" => "''",
+            "bytea" => "'\\x'",
+            "json" or "jsonb" => "'{}'",
+            "uuid" => "'00000000-0000-0000-0000-000000000000'",
+            "date" => "CURRENT_DATE",
+            "time" or "time without time zone" or "time with time zone" or "timetz" => "CURRENT_TIME",
+            "timestamp" or "timestamp without time zone" or "timestamptz" or "timestamp with time zone" => "CURRENT_TIMESTAMP",
+            "interval" => "'0'",
+            _ => null,   // unknown/complex type — cannot safely synthesize a backfill default
+        };
+    }
+
+    /// <summary>Insert <paramref name="text"/> immediately before the statement's final <c>;</c> (or at the end).</summary>
+    private static string InjectBeforeTerminator(string sql, string text)
+    {
+        var i = sql.LastIndexOf(';');
+        return i < 0 ? sql + text : sql[..i] + text + sql[i..];
     }
 
     // Which column facets actually differ, and whether the target version can ALTER them all in place.

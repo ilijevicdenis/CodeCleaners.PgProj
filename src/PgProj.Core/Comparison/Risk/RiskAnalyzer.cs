@@ -36,10 +36,16 @@ public sealed class RiskAnalyzer
         CreateSequenceChange => Safe("Create a new sequence."),
         AlterSequenceChange => Safe("Adjust sequence options; existing rows are untouched."),
         CreateTableChange => Safe("Create a new table."),
-        CreateIndexChange => Warning("Create an index; takes a lock and scans the table.", rewrite: false, exclusiveLock: false),
+        // A concurrent build is non-blocking (SHARE UPDATE EXCLUSIVE, reads+writes continue) but can leave an
+        // INVALID index if it fails; a plain build takes a SHARE lock that blocks writes while it scans (#137).
+        CreateIndexChange { Concurrent: true } => Warning("Create an index CONCURRENTLY; non-blocking (reads/writes continue), but a failed build leaves an INVALID index to clean up.", rewrite: false, exclusiveLock: false),
+        CreateIndexChange => Warning("Create an index; blocks writes while it scans the table.", rewrite: false, exclusiveLock: false),
+        AddForeignKeyChange { NotValid: true } => Warning("Add a foreign key NOT VALID; instant, no existing-row scan (a separate VALIDATE pass checks rows non-blockingly)."),
         AddForeignKeyChange => Warning("Add a foreign key; validates existing rows under a lock."),
         AddPrimaryKeyChange => Warning("Add a primary key; builds a unique index and may reject existing rows."),
+        AddCheckConstraintChange { NotValid: true } => Warning("Add a check constraint NOT VALID; instant, no existing-row scan (a separate VALIDATE pass checks rows non-blockingly)."),
         AddCheckConstraintChange => Warning("Add a check constraint; validates existing rows."),
+        ValidateConstraintChange => Safe("Validate a constraint; scans rows under a SHARE UPDATE EXCLUSIVE lock (reads/writes continue)."),
         AddRawTableConstraintChange => Warning("Add a table constraint; may validate existing rows."),
         CreateOrReplaceViewChange => Safe("Create or replace a view; no table data is touched."),
         CreateOrReplaceFunctionChange => Safe("Create or replace a function; no table data is touched."),

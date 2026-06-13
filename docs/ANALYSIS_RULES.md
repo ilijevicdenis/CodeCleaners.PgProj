@@ -21,9 +21,12 @@
 | PG012 | Info | `serial`/`bigserial`/`smallserial` column (use `GENERATED … AS IDENTITY`) |
 | PG013 | Info | `money` column (locale-dependent; use `numeric`) |
 | PG014 | Warning | Foreign key without a covering index (model-level — see below) |
+| PG015 | Info | Identifier with uppercase letters (folds to lower-case unquoted, or forces quoting forever) |
+| PG016 | Warning | Identifier longer than 63 bytes (PostgreSQL silently truncates it) |
 | PGV### | Error | Syntax newer than the project's `TargetPostgresVersion` (version gating, EP-TARGET) |
 
-PG001–PG013 are **per-file** rules over the parsed AST. **PG014 is a model-level rule**: it runs once
+PG001–PG013, PG015 and PG016 are **per-file** rules over the parsed AST (PG015/PG016 check table and
+column identifiers). **PG014 is a model-level rule**: it runs once
 over the merged project model, so it sees relationships that span files (the FK in one file, its
 covering index in another). Coverage counts the primary key, unique constraints, and any non-partial
 index whose **leading columns** (any order) are exactly the FK's columns.

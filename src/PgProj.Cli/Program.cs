@@ -419,13 +419,18 @@ public static class Program
         // output presentation, and exit-code mapping.
         var connection = RequireConnection(args);
         var service = new PublishService();
-        var plan = await service.PlanAsync(project, source, connection, new PublishPlanOptions
+        PublishPlan plan;
+        try
         {
-            AllowDrops = allowDrops,
-            WrapInTransaction = wrapInTransaction,
-            ProfileVariables = profile?.Variables,
-            VariableOverrides = ParseCliVars(args),
-        });
+            plan = await service.PlanAsync(project, source, connection, BuildPublishPlanOptions(args, profile));
+        }
+        catch (DataLossBlockedException ex)
+        {
+            // BlockOnPossibleDataLoss gate (#140): a possible-data-loss step was planned and the gate is on.
+            Console.Error.WriteLine($"Publish blocked — {ex.Message}");
+            Console.Error.WriteLine("Re-run with --allow-data-loss to proceed (or --allow-drops for drop-not-in-source).");
+            return ExitCode.DataLossBlocked;
+        }
 
         var outPath = GetOption(args, "-o", "--output");
         if (outPath is not null)
@@ -1056,11 +1061,22 @@ public static class Program
         var profile = LoadProfile(args);            // EP-PROFILE: CLI flags override profile values.
         var (source, project) = await BuildSourceOrThrowAsync(args);
         var changes = new SchemaComparer().Compare(source, new DatabaseModel());
+        var opts = BuildPublishPlanOptions(args, profile);
         var script = new DeployScriptGenerator().Generate(changes, new DeployOptions
         {
-            WrapInTransaction = ResolveWrapInTransaction(args, profile),
+            WrapInTransaction = opts.WrapInTransaction,
             Scripts = LoadDeployScripts(project),
             Variables = BuildVariableResolver(project, args, profile),
+            // #140: the same option family the publish path honours (a from-empty create has no drops/
+            // data-loss, but smart-defaults, constraint validation, object-type filters and timeouts apply).
+            GenerateSmartDefaults = opts.GenerateSmartDefaults,
+            ScriptNewConstraintValidation = opts.ScriptNewConstraintValidation,
+            AllowTableRecreation = opts.AllowTableRecreation,
+            StatementTimeoutMs = opts.CommandTimeoutMs,
+            LockTimeoutMs = opts.LockTimeoutMs,
+            ExcludeObjectTypes = opts.ExcludeObjectTypes,
+            DoNotDropObjectTypes = PublishService.ResolveDropSuppression(opts),
+            ConcurrentIndexOperations = opts.ConcurrentIndexOperations,
         });
 
         var outPath = GetOption(args, "-o", "--output");
@@ -1238,6 +1254,71 @@ public static class Program
     private static bool ResolveWrapInTransaction(string[] args, PublishProfile? profile) =>
         !HasFlag(args, "--no-transaction") && (profile?.Options.WrapInTransaction ?? true);
 
+    // ---- #140 DacDeployOptions-family resolvers (CLI flag > profile > built-in default) ----
+
+    /// <summary>Block on a possible-data-loss step. Default block; <c>--allow-data-loss</c> opts out (CLI wins).</summary>
+    private static bool ResolveBlockOnDataLoss(string[] args, PublishProfile? profile) =>
+        !HasFlag(args, "--allow-data-loss") && (profile?.Options.BlockOnPossibleDataLoss ?? true);
+
+    /// <summary>Permit object drop-and-recreate. Default off for publish; <c>--allow-table-recreation</c> enables it.</summary>
+    private static bool ResolveAllowTableRecreation(string[] args, PublishProfile? profile) =>
+        HasFlag(args, "--allow-table-recreation") || (profile?.Options.AllowTableRecreation ?? false);
+
+    /// <summary>Synthesize a default for a new NOT NULL column. Default off; <c>--smart-defaults</c> enables it.</summary>
+    private static bool ResolveSmartDefaults(string[] args, PublishProfile? profile) =>
+        HasFlag(args, "--smart-defaults") || (profile?.Options.GenerateSmartDefaults ?? false);
+
+    /// <summary>Validate new FK/CHECK constraints. Default on; <c>--no-validate-constraints</c> emits them NOT VALID.</summary>
+    private static bool ResolveValidateConstraints(string[] args, PublishProfile? profile) =>
+        !HasFlag(args, "--no-validate-constraints") && (profile?.Options.ScriptNewConstraintValidation ?? true);
+
+    /// <summary>Parses a millisecond integer option (CLI then profile), or null. Throws on a non-integer value.</summary>
+    private static int? ResolveTimeout(string[] args, string flag, int? profileValue)
+    {
+        var raw = GetOption(args, flag);
+        if (raw is null) return profileValue;
+        if (!int.TryParse(raw, out var ms) || ms < 0)
+            throw new CliUsageException($"{flag} expects a non-negative integer (milliseconds); got '{raw}'.");
+        return ms;
+    }
+
+    /// <summary>Union of a repeatable comma-separated CLI option and a profile list (canonicalized tokens).</summary>
+    private static IReadOnlyList<string> ResolveObjectTypeList(string[] args, string flag, IReadOnlyList<string>? profileList)
+    {
+        var set = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        if (profileList is not null)
+            foreach (var t in profileList) set.Add(SchemaCompareObjectType.Parse(t));
+        foreach (var v in new CliArgs(args).GetOptionValues(flag))
+            foreach (var t in v.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+                set.Add(SchemaCompareObjectType.Parse(t));
+        return set.Count == 0 ? System.Array.Empty<string>() : set.ToArray();
+    }
+
+    /// <summary>
+    /// Resolves the full #140 publish-options family into a <see cref="PublishPlanOptions"/> with EP-PROFILE
+    /// precedence (CLI flag &gt; profile &gt; built-in default). Shared by <c>publish</c> so the service path
+    /// drives the same options the CLI flags express.
+    /// </summary>
+    private static PublishPlanOptions BuildPublishPlanOptions(string[] args, PublishProfile? profile) => new()
+    {
+        AllowDrops = ResolveAllowDrops(args, profile),
+        WrapInTransaction = ResolveWrapInTransaction(args, profile),
+        ProfileVariables = profile?.Variables,
+        VariableOverrides = ParseCliVars(args),
+        BlockOnPossibleDataLoss = ResolveBlockOnDataLoss(args, profile),
+        GenerateSmartDefaults = ResolveSmartDefaults(args, profile),
+        ScriptNewConstraintValidation = ResolveValidateConstraints(args, profile),
+        AllowTableRecreation = ResolveAllowTableRecreation(args, profile),
+        ConcurrentIndexOperations = HasFlag(args, "--concurrent-indexes") || HasFlag(args, "--minimize-locks")
+            || (profile?.Options.ConcurrentIndexOperations ?? false),
+        DropConstraintsNotInSource = !HasFlag(args, "--no-drop-constraints") && (profile?.Options.DropConstraintsNotInSource ?? true),
+        DropIndexesNotInSource = !HasFlag(args, "--no-drop-indexes") && (profile?.Options.DropIndexesNotInSource ?? true),
+        CommandTimeoutMs = ResolveTimeout(args, "--command-timeout", profile?.Options.CommandTimeoutMs),
+        LockTimeoutMs = ResolveTimeout(args, "--lock-timeout", profile?.Options.LockTimeoutMs),
+        ExcludeObjectTypes = ResolveObjectTypeList(args, "--exclude-type", profile?.Options.ExcludeObjectTypes),
+        DoNotDropObjectTypes = ResolveObjectTypeList(args, "--no-drop-type", profile?.Options.DoNotDropObjectTypes),
+    };
+
     /// <summary>Parses every <c>--var Name=Value</c> occurrence into a case-insensitive override map.</summary>
     private static IReadOnlyDictionary<string, string> ParseCliVars(string[] args) =>
         new CliArgs(args).GetKeyValues("--var");
@@ -1363,7 +1444,8 @@ public static class Program
           pgproj compare <project.pgproj|.pgpkg> --connection <conn> [--allow-drops] [--profile <file>]                 (one-way: project/package → live DB)
           pgproj compare --source <X> --target <Y> [-o diff.json] [--format json] [--exclude <type,...>] [--allow-drops] [--fail-on-changes]
                          (two-way Schema Compare; X and Y each a .pgproj, .pgpkg, .schema.snapshot, or connection string)
-          pgproj publish <project.pgproj|.pgpkg> --connection <conn> [--dry-run] [-o script.sql] [--allow-drops] [--no-transaction] [--parallel] [--strict] [--no-analyze] [--var N=V] [--substitute-objects] [--profile <file>]
+          pgproj publish <project.pgproj|.pgpkg> --connection <conn> [--dry-run] [-o script.sql] [--allow-drops] [--allow-data-loss] [--no-transaction] [--parallel] [--strict] [--no-analyze] [--var N=V] [--substitute-objects] [--profile <file>]
+                         [--smart-defaults] [--no-validate-constraints] [--allow-table-recreation] [--concurrent-indexes] [--no-drop-constraints] [--no-drop-indexes] [--no-drop-type <type,...>] [--exclude-type <type,...>] [--command-timeout <ms>] [--lock-timeout <ms>]
           pgproj validate <project.pgproj|.pgpkg> --connection <conn> [--strict] [--no-analyze]   (apply to a throwaway temp DB, rolled back)
           pgproj pkg inspect <file.pgpkg>                                              (dump the manifest + object inventory)
           pgproj profile create <out.pgpublish.json> [--target-version 18] [--connection-name <label>] [--var N=V] [--allow-drops] [--no-transaction]
@@ -1399,6 +1481,9 @@ public static class Program
           --no-package       build: skip writing the portable .pgpkg artifact
           --no-transaction   Do not wrap the deploy script in BEGIN/COMMIT
           --parallel         Publish with intra-phase parallelism (phase-level atomicity)
+          --concurrent-indexes  Lock-minimizing deploy: CREATE/DROP INDEX CONCURRENTLY + FK/CHECK NOT VALID then a separate VALIDATE (alias: --minimize-locks)
+          --allow-data-loss     publish: proceed past the possible-data-loss gate (which blocks by default → exit 9)
+          --smart-defaults      publish/script: synthesize a DEFAULT for a new NOT NULL column so it applies to a populated table
           --strict           Analysis gate: treat warnings as errors (build/publish fail on warnings)
           --no-analyze       Skip the static-analysis gate on build/publish
           --var Name=Value   Override a SqlCmdVariable (repeatable; CLI beats the profile, profile beats the project DefaultValue)

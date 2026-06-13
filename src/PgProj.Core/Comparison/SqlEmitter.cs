@@ -108,11 +108,13 @@ public static class SqlEmitter
         return sb.ToString();
     }
 
-    public static string CreateIndex(IndexDefinition ix)
+    public static string CreateIndex(IndexDefinition ix, bool concurrent = false)
     {
         var sb = new StringBuilder("CREATE ");
         if (ix.IsUnique) sb.Append("UNIQUE ");
-        sb.Append($"INDEX {Quote(ix.Name)} ON {Qualified(ix.Schema, ix.Table)}");
+        sb.Append("INDEX ");
+        if (concurrent) sb.Append("CONCURRENTLY ");
+        sb.Append($"{Quote(ix.Name)} ON {Qualified(ix.Schema, ix.Table)}");
         if (!string.IsNullOrEmpty(ix.Method)) sb.Append($" USING {ix.Method}");
         sb.Append($" ({string.Join(", ", ix.Columns)})");
         if (!string.IsNullOrEmpty(ix.WhereClause)) sb.Append($" WHERE {ix.WhereClause}");

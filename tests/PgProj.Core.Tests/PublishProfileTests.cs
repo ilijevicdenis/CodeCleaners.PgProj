@@ -441,6 +441,104 @@ public sealed class PublishProfileTests
         Assert.DoesNotContain("connectionString", json, StringComparison.OrdinalIgnoreCase);
     }
 
+    // ---- #140 DacDeployOptions-equivalent family: round-trip + shape + IsEmpty ----------------
+
+    [Fact]
+    public void DacDeployOptions_family_round_trips_every_new_member()
+    {
+        var profile = new PublishProfile
+        {
+            Options = new PublishProfileOptions
+            {
+                BlockOnPossibleDataLoss = true,
+                DropConstraintsNotInSource = false,
+                DropIndexesNotInSource = false,
+                GenerateSmartDefaults = true,
+                ScriptNewConstraintValidation = false,
+                AllowTableRecreation = true,
+                CommandTimeoutMs = 30000,
+                LockTimeoutMs = 5000,
+                ExcludeObjectTypes = new[] { "extension", "policy" },
+                DoNotDropObjectTypes = new[] { "index" },
+            },
+        };
+
+        var reloaded = PublishProfile.Parse(profile.ToJson());
+        var o = reloaded.Options;
+        Assert.True(o.BlockOnPossibleDataLoss);
+        Assert.False(o.DropConstraintsNotInSource);
+        Assert.False(o.DropIndexesNotInSource);
+        Assert.True(o.GenerateSmartDefaults);
+        Assert.False(o.ScriptNewConstraintValidation);
+        Assert.True(o.AllowTableRecreation);
+        Assert.Equal(30000, o.CommandTimeoutMs);
+        Assert.Equal(5000, o.LockTimeoutMs);
+        Assert.Equal(new[] { "extension", "policy" }, o.ExcludeObjectTypes);
+        Assert.Equal(new[] { "index" }, o.DoNotDropObjectTypes);
+    }
+
+    [Fact]
+    public void DacDeployOptions_family_uses_camelCase_and_omits_unset_members()
+    {
+        var json = new PublishProfile
+        {
+            Options = new PublishProfileOptions { BlockOnPossibleDataLoss = true, CommandTimeoutMs = 1000 },
+        }.ToJson();
+
+        Assert.Contains("\"blockOnPossibleDataLoss\"", json);
+        Assert.Contains("\"commandTimeoutMs\"", json);
+        // Members left unset are omitted (so an older tool's profile stays minimal and forward-compatible).
+        Assert.DoesNotContain("generateSmartDefaults", json);
+        Assert.DoesNotContain("allowTableRecreation", json);
+    }
+
+    [Fact]
+    public void Options_IsEmpty_is_true_only_when_no_member_is_set()
+    {
+        Assert.True(new PublishProfileOptions().IsEmpty);
+        Assert.True(new PublishProfileOptions { ExcludeObjectTypes = Array.Empty<string>() }.IsEmpty);
+        Assert.False(new PublishProfileOptions { BlockOnPossibleDataLoss = false }.IsEmpty);   // set-to-false is still "set"
+        Assert.False(new PublishProfileOptions { CommandTimeoutMs = 0 }.IsEmpty);
+        Assert.False(new PublishProfileOptions { DoNotDropObjectTypes = new[] { "index" } }.IsEmpty);
+
+        // A profile whose options are all-unset omits the whole "options" block.
+        Assert.DoesNotContain("options", new PublishProfile { Options = new PublishProfileOptions() }.ToJson());
+    }
+
+    [Fact]
+    public void New_options_remain_unset_after_an_empty_document_parse()
+    {
+        var o = PublishProfile.Parse("{}").Options;
+        Assert.Null(o.BlockOnPossibleDataLoss);
+        Assert.Null(o.GenerateSmartDefaults);
+        Assert.Null(o.CommandTimeoutMs);
+        Assert.Null(o.ExcludeObjectTypes);
+    }
+
+    // ---- ResolveDropSuppression: granular Drop*NotInSource → suppressed object-type tokens ----
+
+    [Fact]
+    public void ResolveDropSuppression_maps_granular_flags_and_explicit_list()
+    {
+        // All-on (default) and an empty list ⇒ nothing suppressed.
+        Assert.Empty(PgProj.Core.Publishing.PublishService.ResolveDropSuppression(
+            new PgProj.Core.Publishing.PublishPlanOptions()));
+
+        var suppressed = PgProj.Core.Publishing.PublishService.ResolveDropSuppression(
+            new PgProj.Core.Publishing.PublishPlanOptions
+            {
+                DropConstraintsNotInSource = false,
+                DropIndexesNotInSource = false,
+                DoNotDropObjectTypes = new[] { "sequence" },
+            });
+
+        Assert.Contains("constraint", suppressed);
+        Assert.Contains("foreignkey", suppressed);
+        Assert.Contains("primarykey", suppressed);
+        Assert.Contains("index", suppressed);
+        Assert.Contains("sequence", suppressed);
+    }
+
     private sealed class TempDir : IDisposable
     {
         public string Path { get; } =

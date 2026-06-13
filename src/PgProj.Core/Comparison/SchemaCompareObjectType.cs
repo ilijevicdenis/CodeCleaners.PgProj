@@ -31,7 +31,7 @@ public static class SchemaCompareObjectType
         AddPrimaryKeyChange or DropPrimaryKeyChange => "primarykey",
         AddForeignKeyChange or DropForeignKeyChange => "foreignkey",
         AddUniqueConstraintChange or DropUniqueConstraintChange => "constraint",
-        AddCheckConstraintChange or AddRawTableConstraintChange or DropConstraintChange => "constraint",
+        AddCheckConstraintChange or AddRawTableConstraintChange or DropConstraintChange or ValidateConstraintChange => "constraint",
 
         CreateIndexChange or DropIndexChange or RenameIndexChange => "index",
 
