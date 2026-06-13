@@ -621,8 +621,10 @@ public static class Program
 
     private static async Task<int> Extract(string[] args)
     {
+        var cli = new CliArgs(args);
         var outDir = GetOption(args, "-o", "--output") ?? "extracted";
-        var model = await new LiveDatabaseReader().ReadAsync(RequireConnection(args));
+        var conn = RequireConnection(args);
+        var model = await new LiveDatabaseReader().ReadAsync(conn);
         var files = DdlExporter.ExportFiles(model);
 
         foreach (var (rel, content) in files)
@@ -632,9 +634,28 @@ public static class Program
             File.WriteAllText(path, content);
         }
 
-        // Drop a .pgproj so the extracted folder is immediately buildable.
-        var projName = new Npgsql.NpgsqlConnectionStringBuilder(RequireConnection(args)).Database ?? "Extracted";
-        File.WriteAllText(Path.Combine(outDir, $"{projName}.pgproj"), DefaultProjectFile(projName));
+        // #134: optionally extract user-table data as an FK-ordered post-deploy seed (publish loads it after
+        // schema). --all-table-data takes every table; --table-data schema.table (repeatable) names a subset.
+        var allData = cli.HasFlag("--all-table-data");
+        var tableData = cli.GetOptionValues("--table-data")
+            .SelectMany(v => v.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+            .ToList();
+        var withData = allData || tableData.Count > 0;
+
+        var projName = new Npgsql.NpgsqlConnectionStringBuilder(conn).Database ?? "Extracted";
+        if (withData)
+        {
+            var dataSql = await PgProj.Core.Data.DataExporter.ExportAsync(conn, model, allData ? null : tableData);
+            var scriptsDir = Path.Combine(outDir, "Scripts");
+            Directory.CreateDirectory(scriptsDir);
+            File.WriteAllText(Path.Combine(scriptsDir, "PostDeploy.sql"), dataSql);
+            Console.WriteLine($"Extracted table data to Scripts/PostDeploy.sql ({(allData ? "all tables" : $"{tableData.Count} table(s)")}).");
+        }
+
+        // Drop a .pgproj so the extracted folder is immediately buildable (the data variant excludes the
+        // seed from Build and wires it as the PostDeploy script).
+        File.WriteAllText(Path.Combine(outDir, $"{projName}.pgproj"),
+            withData ? ProjectFileWithData(projName) : DefaultProjectFile(projName));
 
         Console.WriteLine($"Extracted {files.Count} object file(s) to {Path.GetFullPath(outDir)}");
         PrintModelSummary(model);
@@ -1665,6 +1686,23 @@ public static class Program
         </Project>
         """;
 
+    /// <summary>Project file for an extract that carried table data: the seed under Scripts/ is excluded from
+    /// Build and declared as the PostDeploy script, so a publish loads schema then the data (#134).</summary>
+    private static string ProjectFileWithData(string name) =>
+        $"""
+        <Project Sdk="PgProj.Sdk/0.1.0" DefaultTargets="Build">
+          <PropertyGroup>
+            <Name>{name}</Name>
+            <DefaultSchema>public</DefaultSchema>
+          </PropertyGroup>
+          <ItemGroup>
+            <Build Include="**/*.sql" />
+            <Build Remove="Scripts/**/*.sql" />
+            <None Include="Scripts/PostDeploy.sql"><BuildAction>PostDeploy</BuildAction></None>
+          </ItemGroup>
+        </Project>
+        """;
+
     private static void PrintUsage()
     {
         Console.WriteLine("""
@@ -1686,7 +1724,7 @@ public static class Program
           pgproj pkg inspect <file.pgpkg>                                              (dump the manifest + object inventory)
           pgproj profile create <out.pgpublish.json> [--target-version 18] [--connection-name <label>] [--var N=V] [--allow-drops] [--no-transaction]
                          (write a reusable publish profile from the current flags; the connection string is never stored)
-          pgproj extract --connection <conn> -o <outDir>
+          pgproj extract --connection <conn> -o <outDir> [--all-table-data | --table-data schema.table ...]   (reverse-engineer a live DB into a buildable project; the data flags add an FK-ordered post-deploy seed)
           pgproj snapshot --connection <conn> -o <db.schema.snapshot>                    (introspect a live DB once → a portable schema.snapshot for offline compare)
           pgproj snapshot create <project.pgproj> [-o <dir>]                            (project snapshot: a timestamped read-only Project_YYYYMMDD_HH-MM-SS.pgpkg under Snapshots/ — no DB)
           pgproj snapshot compare <A.pgpkg> <B.pgpkg|project.pgproj> [-o diff.json] [--format json]   (Schema Compare two snapshots / a snapshot vs the project)

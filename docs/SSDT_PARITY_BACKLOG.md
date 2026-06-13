@@ -85,13 +85,15 @@ The headless engine is in good shape. These epics are **complete** and only need
 > were not all re-ticked — treat §2 + `PROGRESS.md` as truth. **Genuinely open:** EP-ANALYSIS+ rule
 > backlog (#81), EP-COVERAGE blocked tail (#72: #102/#108 need C functions in the server), editable
 > EP-DESIGNER (#112/#119/#120), and the wave-3 epics —
-> data extract/BACPAC (#134), NuGet package references (#133), PL/pgSQL unit testing (#139). **Partially done:** refactorlog (#136) — artifact +
+> NuGet package references (#133), PL/pgSQL unit testing (#139). **Partially done:** refactorlog (#136) — artifact +
 > default deploy-as-ALTER consumption (table/column rename, schema move) + `rename`/`move-schema` CLI +
 > `.pgpkg` packing (publish-from-package consumes it) shipped; only `expand-wildcards` deferred.
 > **Closed since:** the full
 > DacDeployOptions-equivalent publish-options family (#140), lock-minimizing/CONCURRENTLY deploy (#137),
 > the project-snapshot CLI (#142: `snapshot create`/`compare`/`revert`/`import`), row-level data compare
-> (#132: `data-compare` diff + sync script + apply), and analyzer rules PG015/PG016 (#81).
+> (#132: `data-compare` diff + sync script + apply), table-data extract (#134: `extract --all-table-data`/
+> `--table-data` → an FK-ordered post-deploy seed; `.pgpkg`-embedded data variant deferred), and analyzer
+> rules PG015/PG016 (#81).
 
 ---
 
@@ -103,7 +105,7 @@ Each has **user stories** (As a … I want … so that …) and **engineering ta
 
 ---
 
-### EP-PKG — Portable build artifact (the `.dacpac` analogue) — **P0** — ✅ DONE (+ `verify` #138; snapshot workflow #142; data/BACPAC #134 open)
+### EP-PKG — Portable build artifact (the `.dacpac` analogue) — **P0** — ✅ DONE (+ `verify` #138; snapshot workflow #142; table-data extract #134 — `.pgpkg`-embedded data variant open)
 
 SSDT's whole model hinges on the `.dacpac`: one portable, versioned, referenceable file that is the
 build output, the unit of deployment, and the unit of reference. pgproj emits a `bin/*.model.json`
@@ -421,7 +423,7 @@ Matrix *Command line tools / CI-CD* (GitHub `sql-action`, Azure DevOps task).
 | IntelliSense from project model | ✅ `serve` LSP (alias-aware, column-precise nav) | ✅ | ✅ incl. coloring/F12/peek — validated 115/115 |
 | Database unit testing | ❌ #139 | ❌ | ❌ |
 | Data compare | ✅ `data-compare` (4-category diff + sync script + apply) (#132) | ⚠️ via CLI | ⚠️ via CLI |
-| Schema + data package (BACPAC) | ❌ #134 | ❌ | ❌ |
+| Schema + data package (BACPAC) | ⚠️ `extract --all-table-data`/`--table-data` → FK-ordered post-deploy seed (#134; `.pgpkg`-embedded data variant open) | ⚠️ via CLI | ⚠️ via CLI |
 ## 5. Suggested phasing
 
 **Phase 1 — engine completeness (unblocks everything, all P0):**
