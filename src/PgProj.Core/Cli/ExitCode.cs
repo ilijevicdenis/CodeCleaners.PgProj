@@ -42,4 +42,7 @@ public static class ExitCode
 
     /// <summary>The publish was blocked by the possible-data-loss gate (<c>BlockOnPossibleDataLoss</c>, #140).</summary>
     public const int DataLossBlocked = 9;
+
+    /// <summary>One or more database unit tests failed (<c>pgproj test</c>, #139).</summary>
+    public const int TestFailed = 10;
 }

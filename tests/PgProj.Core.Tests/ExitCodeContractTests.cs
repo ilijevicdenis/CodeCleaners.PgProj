@@ -32,6 +32,7 @@ public class ExitCodeContractTests
         ["DeployError"] = 7,
         ["ValidationFailed"] = 8,
         ["DataLossBlocked"] = 9,
+        ["TestFailed"] = 10,
     };
 
     private static IReadOnlyDictionary<string, int> ActualConstants() =>

@@ -84,16 +84,16 @@ The headless engine is in good shape. These epics are **complete** and only need
 > **Reality check (2026-06-12):** the per-epic task checklists in §3 below are the *original* backlog and
 > were not all re-ticked — treat §2 + `PROGRESS.md` as truth. **Genuinely open:** EP-ANALYSIS+ rule
 > backlog (#81), EP-COVERAGE blocked tail (#72: #102/#108 need C functions in the server), editable
-> EP-DESIGNER (#112/#119/#120), and the wave-3 epics —
-> NuGet package references (#133), PL/pgSQL unit testing (#139). **Partially done:** refactorlog (#136) — artifact +
+> EP-DESIGNER (#112/#119/#120), and NuGet package references (#133). **Partially done:** refactorlog (#136) — artifact +
 > default deploy-as-ALTER consumption (table/column rename, schema move) + `rename`/`move-schema` CLI +
 > `.pgpkg` packing (publish-from-package consumes it) shipped; only `expand-wildcards` deferred.
 > **Closed since:** the full
 > DacDeployOptions-equivalent publish-options family (#140), lock-minimizing/CONCURRENTLY deploy (#137),
 > the project-snapshot CLI (#142: `snapshot create`/`compare`/`revert`/`import`), row-level data compare
 > (#132: `data-compare` diff + sync script + apply), table-data extract (#134: `extract --all-table-data`/
-> `--table-data` → an FK-ordered post-deploy seed; `.pgpkg`-embedded data variant deferred), and analyzer
-> rules PG015/PG016 (#81).
+> `--table-data` → an FK-ordered post-deploy seed; `.pgpkg`-embedded data variant deferred), the PL/pgSQL
+> unit-test runner (#139: `pgproj test`, BEGIN…ROLLBACK isolation + predefined conditions + expected
+> SQLSTATE), and analyzer rules PG015/PG016 (#81).
 
 ---
 
@@ -421,7 +421,7 @@ Matrix *Command line tools / CI-CD* (GitHub `sql-action`, Azure DevOps task).
 | Run code analysis | ✅ `analyze` | ✅ | ✅ build gate |
 | Object rename/refactor (refactorlog) | ⚠️ `rename`/`move-schema` + `.pgrefactorlog` deploy-as-ALTER + `.pgpkg` packing (#136; only `expand-wildcards` open) | ❌ | ❌ |
 | IntelliSense from project model | ✅ `serve` LSP (alias-aware, column-precise nav) | ✅ | ✅ incl. coloring/F12/peek — validated 115/115 |
-| Database unit testing | ❌ #139 | ❌ | ❌ |
+| Database unit testing | ✅ `test` (BEGIN…ROLLBACK + predefined conditions + expected SQLSTATE) (#139; scaffolder open) | ⚠️ via CLI | ⚠️ via CLI |
 | Data compare | ✅ `data-compare` (4-category diff + sync script + apply) (#132) | ⚠️ via CLI | ⚠️ via CLI |
 | Schema + data package (BACPAC) | ⚠️ `extract --all-table-data`/`--table-data` → FK-ordered post-deploy seed (#134; `.pgpkg`-embedded data variant open) | ⚠️ via CLI | ⚠️ via CLI |
 ## 5. Suggested phasing

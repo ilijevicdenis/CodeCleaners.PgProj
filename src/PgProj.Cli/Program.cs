@@ -18,6 +18,7 @@ using PgProj.Core.Publishing;
 using PgProj.Core.Refactoring;
 using PgProj.Core.Snapshot;
 using PgProj.Core.Solutions;
+using PgProj.Core.Testing;
 using PgProj.Core.Templates;
 
 namespace PgProj.Cli;
@@ -51,6 +52,7 @@ public static class Program
                 "rename" => Rename(args),
                 "move-schema" => MoveSchema(args),
                 "data-compare" => await DataCompareCmd(args),
+                "test" => await Test(args),
                 "deploy-report" => await DeployReport(args),
                 "verify" => Verify(args),
                 "analyze" => Analyze(args),
@@ -524,6 +526,75 @@ public static class Program
         {
             Console.Error.WriteLine($"error: {ex.Message}");
             return ExitCode.Usage;
+        }
+    }
+
+    // ---- test (PL/pgSQL database unit tests over the shadow DB, #139) -------------------
+
+    private static async Task<int> Test(string[] args)
+    {
+        var project = DatabaseProject.Load(RequirePositional(args, "project file"));
+        var conn = RequireConnection(args);
+
+        // Discover *.test.sql under the project (kept out of the build by naming, run only here).
+        var files = Directory.Exists(project.ProjectDirectory)
+            ? Directory.EnumerateFiles(project.ProjectDirectory, "*.test.sql", SearchOption.AllDirectories)
+                       .OrderBy(f => f, StringComparer.Ordinal).ToList()
+            : new System.Collections.Generic.List<string>();
+        if (files.Count == 0) { Console.WriteLine("No *.test.sql files found in the project."); return ExitCode.Success; }
+
+        var tests = files.Select(f =>
+        {
+            var sql = File.ReadAllText(f);
+            return new TestCase(Path.GetRelativePath(project.ProjectDirectory, f), sql, PgUnitRunner.ParseExpectedSqlState(sql));
+        }).ToList();
+
+        // --deploy spins a throwaway shadow DB, deploys the project schema, runs the tests there, drops it.
+        var runConn = conn;
+        string? temp = null;
+        if (HasFlag(args, "--deploy"))
+        {
+            var build = await project.BuildAsync();
+            if (build.Diagnostics.Count > 0)
+            {
+                Console.Error.WriteLine($"Cannot test — build failed with {build.Diagnostics.Count} problem(s):");
+                foreach (var d in build.Diagnostics) Console.Error.WriteLine($"  - {d}");
+                return ExitCode.BuildError;
+            }
+            temp = "pgproj_test_" + Guid.NewGuid().ToString("N")[..16];
+            await using (var admin = new Npgsql.NpgsqlConnection(conn))
+            {
+                await admin.OpenAsync();
+                await using var create = new Npgsql.NpgsqlCommand($"CREATE DATABASE \"{temp}\"", admin);
+                await create.ExecuteNonQueryAsync();
+            }
+            runConn = new Npgsql.NpgsqlConnectionStringBuilder(conn) { Database = temp }.ConnectionString;
+            var schema = new DeployScriptGenerator().Generate(
+                new SchemaComparer().Compare(build.Model, new DatabaseModel()), new DeployOptions { WrapInTransaction = true });
+            await new DatabaseDeployer().ExecuteAsync(runConn, schema);
+        }
+
+        try
+        {
+            var result = await PgUnitRunner.RunAsync(runConn, tests);
+            foreach (var r in result.Results)
+            {
+                var mark = r.Status switch { TestStatus.Passed => "PASS", TestStatus.Failed => "FAIL", _ => "INC " };
+                Console.WriteLine($"  [{mark}] {r.Name}" + (r.Message is null ? "" : $" — {r.Message}"));
+            }
+            Console.WriteLine($"\n{result.Passed} passed, {result.Failed} failed, {result.Inconclusive} inconclusive ({result.Results.Count} total).");
+            return result.AllPassed ? ExitCode.Success : ExitCode.TestFailed;
+        }
+        finally
+        {
+            if (temp is not null)
+            {
+                Npgsql.NpgsqlConnection.ClearAllPools();
+                await using var admin = new Npgsql.NpgsqlConnection(conn);
+                await admin.OpenAsync();
+                await using var drop = new Npgsql.NpgsqlCommand($"DROP DATABASE IF EXISTS \"{temp}\" WITH (FORCE)", admin);
+                await drop.ExecuteNonQueryAsync();
+            }
         }
     }
 
@@ -1721,6 +1792,7 @@ public static class Program
           pgproj publish <project.pgproj|.pgpkg> --connection <conn> [--dry-run] [-o script.sql] [--allow-drops] [--allow-data-loss] [--no-transaction] [--parallel] [--strict] [--no-analyze] [--var N=V] [--substitute-objects] [--profile <file>]
                          [--smart-defaults] [--no-validate-constraints] [--allow-table-recreation] [--concurrent-indexes] [--no-drop-constraints] [--no-drop-indexes] [--no-drop-type <type,...>] [--exclude-type <type,...>] [--command-timeout <ms>] [--lock-timeout <ms>]
           pgproj validate <project.pgproj|.pgpkg> --connection <conn> [--strict] [--no-analyze]   (apply to a throwaway temp DB, rolled back)
+          pgproj test <project.pgproj> --connection <conn> [--deploy]   (run *.test.sql unit tests in BEGIN…ROLLBACK; --deploy applies the schema to a shadow DB first; exit 10 on a failed test)
           pgproj pkg inspect <file.pgpkg>                                              (dump the manifest + object inventory)
           pgproj profile create <out.pgpublish.json> [--target-version 18] [--connection-name <label>] [--var N=V] [--allow-drops] [--no-transaction]
                          (write a reusable publish profile from the current flags; the connection string is never stored)
