@@ -591,6 +591,131 @@ public static class Program
     /// </summary>
     private static async Task<int> Snapshot(string[] args)
     {
+        // Project-snapshot subcommands (#142) are distinct from the legacy live-DB capture (which takes
+        // --connection and no positional). Route on the first positional; anything else → the live form.
+        var sub = args.Skip(1).FirstOrDefault(a => !a.StartsWith('-'))?.ToLowerInvariant();
+        return sub switch
+        {
+            "create" => await SnapshotCreate(args),
+            "compare" => await SnapshotCompare(args),
+            "revert" => await SnapshotRevert(args),
+            "import" => SnapshotImport(args),
+            _ => await SnapshotLive(args),
+        };
+    }
+
+    // ---- project snapshots (#142): timestamped read-only .pgpkg baselines of the BUILT project model,
+    // with no database connection — distinct from the live-DB .schema.snapshot above. ----
+
+    private const string SnapshotsFolder = "Snapshots";
+
+    /// <summary>Default snapshot directory for a project: <c>&lt;projectDir&gt;/Snapshots</c>.</summary>
+    private static string SnapshotDir(string[] args, DatabaseProject project) =>
+        GetOption(args, "-o", "--output") ?? Path.Combine(project.ProjectDirectory, SnapshotsFolder);
+
+    private static async Task<int> SnapshotCreate(string[] args)
+    {
+        var p = args.Skip(1).Where(a => !a.StartsWith('-')).ToList();   // [create, <project>]
+        var projectPath = p.ElementAtOrDefault(1)
+            ?? throw new CliUsageException("Usage: pgproj snapshot create <project.pgproj> [-o <dir>]");
+        var project = DatabaseProject.Load(projectPath);
+
+        var result = await project.BuildAsync();
+        if (result.Diagnostics.Count > 0)
+        {
+            Console.Error.WriteLine($"Cannot snapshot — build failed with {result.Diagnostics.Count} problem(s):");
+            foreach (var d in result.Diagnostics) Console.Error.WriteLine($"  - {d}");
+            return ExitCode.BuildError;
+        }
+
+        var dir = SnapshotDir(args, project);
+        Directory.CreateDirectory(dir);
+        // Timestamp is generated at the CLI boundary (non-deterministic by design); the SSDT naming convention.
+        var stamp = DateTime.UtcNow.ToString("yyyyMMdd_HH-mm-ss", System.Globalization.CultureInfo.InvariantCulture);
+        var path = Path.Combine(dir, $"Project_{stamp}{PgPkg.Extension}");
+
+        var pkg = PgPkgBuilder.FromBuild(project, result.Model, result.Files, ToolVersion, UtcStamp());
+        pkg.Write(path);
+        try { File.SetAttributes(path, File.GetAttributes(path) | FileAttributes.ReadOnly); } catch { /* best effort */ }
+
+        Console.WriteLine($"Project snapshot written to {path} (read-only).");
+        Console.WriteLine($"  {pkg.Sources.Count} source(s), checksum {pkg.Manifest.SourceChecksum}");
+        Console.WriteLine($"Compare it later with: pgproj snapshot compare \"{path}\" <other.pgpkg|project.pgproj>");
+        return 0;
+    }
+
+    private static async Task<int> SnapshotCompare(string[] args)
+    {
+        var p = args.Skip(1).Where(a => !a.StartsWith('-')).ToList();   // [compare, A, B]
+        if (p.Count < 3)
+            throw new CliUsageException("Usage: pgproj snapshot compare <A.pgpkg> <B.pgpkg|project.pgproj> [-o diff.json] [--format json]");
+        // Reuse the unified two-way Schema Compare (EndpointResolver already accepts .pgpkg + .pgproj).
+        return await CompareTwoWay(new CliArgs(args), p[1], p[2]);
+    }
+
+    private static async Task<int> SnapshotRevert(string[] args)
+    {
+        var p = args.Skip(1).Where(a => !a.StartsWith('-')).ToList();   // [revert, <project>, <snapshot.pgpkg>]
+        if (p.Count < 3)
+            throw new CliUsageException("Usage: pgproj snapshot revert <project.pgproj> <snapshot.pgpkg> [--dry-run] [--allow-deletes]");
+        var project = DatabaseProject.Load(p[1]);
+        if (!PgPkg.IsPackagePath(p[2]))
+            throw new CliUsageException("snapshot revert expects a .pgpkg snapshot as the second argument.");
+
+        // The snapshot's model is the desired state; reverse-sync rewrites the project's .sql from it (the
+        // same emitter `pull` uses), so revert is byte-consistent with how the project authors SQL.
+        var snapshotModel = PgPkg.Read(Path.GetFullPath(p[2])).Model;
+        var allowDeletes = HasFlag(args, "--allow-deletes");
+        var plan = await PgProj.Core.Sync.ReverseSync.PlanAsync(project, snapshotModel,
+            new PgProj.Core.Sync.DriftOptions { AllowDeletes = allowDeletes });
+
+        if (!plan.HasDrift)
+        {
+            Console.WriteLine("Nothing to revert — the project already matches the snapshot.");
+            return 0;
+        }
+
+        Console.WriteLine($"{plan.FileChanges.Count} project file(s) will be {(HasFlag(args, "--dry-run") ? "changed" : "written")} to match the snapshot:");
+        foreach (var fc in plan.FileChanges)
+            Console.WriteLine($"  [{Mark(fc)}] {fc.Kind.ToString().ToLowerInvariant()} {fc.RelativePath} — {fc.Summary}");
+
+        if (HasFlag(args, "--dry-run"))
+        {
+            Console.WriteLine("\n(dry run — no files written)");
+            return 0;
+        }
+
+        var touched = PgProj.Core.Sync.ReverseSync.Apply(project, plan);
+        Console.WriteLine($"\nReverted {touched.Count} file(s) to the snapshot.");
+        if (!allowDeletes && plan.SchemaChanges.Any(c => c.IsDestructive))
+            Console.WriteLine("Note: objects absent from the snapshot were left in place (re-run with --allow-deletes to remove their files).");
+        return 0;
+    }
+
+    private static int SnapshotImport(string[] args)
+    {
+        var p = args.Skip(1).Where(a => !a.StartsWith('-')).ToList();   // [import, <project>, <external.pgpkg>]
+        if (p.Count < 3)
+            throw new CliUsageException("Usage: pgproj snapshot import <project.pgproj> <external.pgpkg> [-o <dir>]");
+        var project = DatabaseProject.Load(p[1]);
+        var srcPath = Path.GetFullPath(p[2]);
+        // Validate it is a real package before copying it in (also fails fast on a corrupt/tampered file).
+        var pkg = PgPkg.Read(srcPath);
+
+        var dir = SnapshotDir(args, project);
+        Directory.CreateDirectory(dir);
+        var dest = Path.Combine(dir, Path.GetFileName(srcPath));
+        if (File.Exists(dest)) { try { File.SetAttributes(dest, FileAttributes.Normal); } catch { } }
+        File.Copy(srcPath, dest, overwrite: true);
+        try { File.SetAttributes(dest, File.GetAttributes(dest) | FileAttributes.ReadOnly); } catch { /* best effort */ }
+
+        Console.WriteLine($"Imported snapshot '{pkg.Manifest.Name}' (built {pkg.Manifest.CreatedUtc}) → {dest} (read-only).");
+        Console.WriteLine($"It is now a selectable compare source: pgproj snapshot compare \"{dest}\" <other>");
+        return 0;
+    }
+
+    private static async Task<int> SnapshotLive(string[] args)
+    {
         var conn = RequireConnection(args);
         var outPath = GetOption(args, "-o", "--output")
                       ?? throw new CliUsageException("snapshot requires -o <file.schema.snapshot> (the output path).");
@@ -1503,6 +1628,10 @@ public static class Program
                          (write a reusable publish profile from the current flags; the connection string is never stored)
           pgproj extract --connection <conn> -o <outDir>
           pgproj snapshot --connection <conn> -o <db.schema.snapshot>                    (introspect a live DB once → a portable schema.snapshot for offline compare)
+          pgproj snapshot create <project.pgproj> [-o <dir>]                            (project snapshot: a timestamped read-only Project_YYYYMMDD_HH-MM-SS.pgpkg under Snapshots/ — no DB)
+          pgproj snapshot compare <A.pgpkg> <B.pgpkg|project.pgproj> [-o diff.json] [--format json]   (Schema Compare two snapshots / a snapshot vs the project)
+          pgproj snapshot revert <project.pgproj> <snapshot.pgpkg> [--dry-run] [--allow-deletes]      (rewrite the project .sql back to a snapshot via reverse-sync)
+          pgproj snapshot import <project.pgproj> <external.pgpkg> [-o <dir>]            (register an external snapshot as a selectable compare source under Snapshots/)
           pgproj drift   <project.pgproj> --connection <conn> [--fail-on-drift]         (preview project files that differ from the DB; --fail-on-drift exits 6 on drift)
           pgproj pull    <project.pgproj> --connection <conn> [--dry-run] [--allow-deletes]   (rewrite project files FROM the DB — scenario 3)
           pgproj verify <a.pgpkg> <b.pgpkg> [--format json] [-o report.json]   (package equivalence: model + sources + options; exit 6 on drift - DacpacVerify analogue)

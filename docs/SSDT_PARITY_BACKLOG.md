@@ -84,14 +84,15 @@ The headless engine is in good shape. These epics are **complete** and only need
 > **Reality check (2026-06-12):** the per-epic task checklists in §3 below are the *original* backlog and
 > were not all re-ticked — treat §2 + `PROGRESS.md` as truth. **Genuinely open:** EP-ANALYSIS+ rule
 > backlog (#81), EP-COVERAGE blocked tail (#72: #102/#108 need C functions in the server), editable
-> EP-DESIGNER (#112/#119/#120), and the wave-3 epics — snapshot workflow (#142),
+> EP-DESIGNER (#112/#119/#120), and the wave-3 epics —
 > data extract/BACPAC (#134), NuGet package references (#133), data
 > compare (#132), PL/pgSQL unit testing (#139). **Partially done:** refactorlog (#136) — artifact +
 > default deploy-as-ALTER consumption (table/column rename, schema move) + `rename`/`move-schema` CLI +
 > `.pgpkg` packing (publish-from-package consumes it) shipped; only `expand-wildcards` deferred.
 > **Closed since:** the full
 > DacDeployOptions-equivalent publish-options family (#140), lock-minimizing/CONCURRENTLY deploy (#137),
-> and analyzer rules PG015/PG016 (#81).
+> the project-snapshot CLI (#142: `snapshot create`/`compare`/`revert`/`import`), and analyzer rules
+> PG015/PG016 (#81).
 
 ---
 
@@ -103,7 +104,7 @@ Each has **user stories** (As a … I want … so that …) and **engineering ta
 
 ---
 
-### EP-PKG — Portable build artifact (the `.dacpac` analogue) — **P0** — ✅ DONE (+ `verify` #138; data/BACPAC #134 and snapshot workflow #142 open)
+### EP-PKG — Portable build artifact (the `.dacpac` analogue) — **P0** — ✅ DONE (+ `verify` #138; snapshot workflow #142; data/BACPAC #134 open)
 
 SSDT's whole model hinges on the `.dacpac`: one portable, versioned, referenceable file that is the
 build output, the unit of deployment, and the unit of reference. pgproj emits a `bin/*.model.json`
