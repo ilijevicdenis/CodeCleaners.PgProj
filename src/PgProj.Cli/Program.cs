@@ -50,6 +50,7 @@ public static class Program
                 "sync-file" => await SyncFile(args),
                 "rename" => Rename(args),
                 "move-schema" => MoveSchema(args),
+                "data-compare" => await DataCompareCmd(args),
                 "deploy-report" => await DeployReport(args),
                 "verify" => Verify(args),
                 "analyze" => Analyze(args),
@@ -524,6 +525,65 @@ public static class Program
             Console.Error.WriteLine($"error: {ex.Message}");
             return ExitCode.Usage;
         }
+    }
+
+    // ---- data-compare (row-level data diff + sync between two databases, #132) ----------
+
+    private static async Task<int> DataCompareCmd(string[] args)
+    {
+        var cli = new CliArgs(args);
+        var sourceConn = cli.GetOption("--source")
+            ?? throw new CliUsageException("data-compare needs --source <conn> and --target <conn>.");
+        var targetConn = cli.GetOption("--target")
+            ?? throw new CliUsageException("data-compare needs --source <conn> and --target <conn>.");
+        var tables = (cli.GetOption("--tables") ?? "")
+            .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
+        var result = await PgProj.Core.Data.DataCompare.CompareAsync(
+            sourceConn, targetConn, new PgProj.Core.Data.DataCompareOptions { Tables = tables });
+
+        var outPath = cli.GetOption("-o", "--output");
+        if (outPath is not null && outPath.EndsWith(".sql", StringComparison.OrdinalIgnoreCase))
+        {
+            File.WriteAllText(outPath, PgProj.Core.Data.DataCompare.GenerateSyncScript(result));
+            Console.WriteLine($"Sync script written to {outPath}");
+        }
+        else if (outPath is not null)
+        {
+            File.WriteAllText(outPath, System.Text.Json.JsonSerializer.Serialize(result, new System.Text.Json.JsonSerializerOptions
+            {
+                PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase,
+                WriteIndented = true,
+                Converters = { new System.Text.Json.Serialization.JsonStringEnumConverter() },
+            }));
+            Console.WriteLine($"Data diff written to {outPath}");
+        }
+
+        foreach (var t in result.Tables)
+            Console.WriteLine($"  {t.Schema}.{t.Table}: {t.DifferentCount} different, " +
+                              $"{t.OnlyInSourceCount} only-in-source, {t.OnlyInTargetCount} only-in-target, {t.IdenticalCount} identical");
+        foreach (var s in result.Skipped)
+            Console.WriteLine($"  (skipped {s.Qualified}: {s.Reason})");
+
+        if (cli.HasFlag("--apply"))
+        {
+            if (result.InSync) { Console.WriteLine("Data already in sync — nothing to apply."); return ExitCode.Success; }
+            var script = PgProj.Core.Data.DataCompare.GenerateSyncScript(result, wrapInTransaction: true);
+            try
+            {
+                await new DatabaseDeployer().ExecuteAsync(targetConn, script);
+                Console.WriteLine("Applied: the target's data now matches the source.");
+            }
+            catch (Npgsql.PostgresException ex)
+            {
+                Console.Error.WriteLine($"Data sync failed (rolled back): {ex.Message}  [{PgProj.Core.Diagnostics.PgErrorCodes.Describe(ex.SqlState)}]");
+                return ExitCode.DeployError;
+            }
+            return ExitCode.Success;
+        }
+
+        if (result.InSync) Console.WriteLine("Data is in sync.");
+        return cli.HasFlag("--fail-on-changes") && !result.InSync ? ExitCode.Drift : ExitCode.Success;
     }
 
     // ---- validate (apply to a throwaway temp DB in a rolled-back txn) --------------------
@@ -1639,6 +1699,7 @@ public static class Program
           pgproj sync-file <project.pgproj> --file <rel.sql> --connection <conn> [--apply-to-local | --apply-to-db [--allow-drops] [--dry-run]]   (one file vs the DB: JSON state for editors, or apply either direction)
           pgproj rename <project.pgproj> <schema.table> <new-name>      (rewrite .sql + record in .pgrefactorlog so the next publish ALTERs … RENAME instead of drop+create)
           pgproj move-schema <project.pgproj> <schema.table> <new-schema>   (rewrite .sql + record a schema move so the next publish ALTERs … SET SCHEMA instead of drop+create)
+          pgproj data-compare --source <conn> --target <conn> [--tables a,b] [-o diff.json | sync.sql] [--apply] [--fail-on-changes]   (row-level data diff; -o .sql writes a sync script; --apply runs it on the target in one transaction)
           pgproj analyze <project.pgproj> [--strict]    (static safety analysis over the AST)
           pgproj model-tree <project.pgproj> [--format json]   (objects + source positions, for editors)
           pgproj describe-table <table.sql> [--table schema.name] [--default-schema public]   (one table's model as JSON, for the graphical designer)
