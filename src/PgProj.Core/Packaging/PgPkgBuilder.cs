@@ -46,6 +46,10 @@ public static class PgPkgBuilder
             CreatedUtc: createdUtc,
             SourceChecksum: checksum);
 
-        return PgPkg.Create(manifest, model, sources);
+        // Carry the project's refactor log (#136) so a publish-from-package emits the same ALTERs.
+        var log = Refactoring.RefactorLog.LoadForProject(project.ProjectFilePath);
+        var refactorLogJson = log.IsEmpty ? null : log.ToJson();
+
+        return PgPkg.Create(manifest, model, sources, refactorLogJson);
     }
 }

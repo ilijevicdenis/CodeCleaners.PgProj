@@ -66,11 +66,13 @@ Working branch: `milestone/m7-ssdt-parity` (PgProj repo at
   `CompareTables`. `RiskAnalyzer` → renames/moves are Safe. CLI `rename`/`move-schema` rewrite `.sql`
   (word-boundary qualified-name replace) + append the log (`RefactorEngine`). Tests: `RefactorLogTests`
   + a live shadow-DB data-preservation proof.
-- **STILL OPEN in #136 (follow-up):** pack the `.pgrefactorlog` into `.pgpkg` (extend `Packaging/PgPkg.cs`
-  writer/reader + the build path + consume it when publishing from a package; mind the `sourceChecksum`
-  verify) and the **`expand-wildcards`** (SELECT *) refactor command. Column-rename CLI authoring (the
-  `.sql` rewrite for a column) is also deferred — the deploy planner already *consumes* logged column
-  renames; only the `rename`-command rewrite is table-scoped today.
+- **`.pgpkg` packing DONE:** the log is packed as `refactorlog.json` (not part of `sourceChecksum`),
+  `PgPkgBuilder.FromBuild` populates it, and `publish` from a `.pgpkg` consumes it
+  (`PublishPlanOptions.RefactorLog`). Tests in `PgPkgRoundTripTests`.
+- **STILL OPEN in #136 (follow-up):** the **`expand-wildcards`** (SELECT *) refactor command (needs view
+  column resolution from the semantic model; pure source hygiene, no deploy-safety impact). Column-rename
+  CLI authoring (the `.sql` rewrite for a column) is also deferred — the deploy planner already *consumes*
+  logged column renames; only the `rename`-command rewrite is table-scoped today.
 
 ## REMAINING OPEN ISSUES (priority from GitHub labels)
 

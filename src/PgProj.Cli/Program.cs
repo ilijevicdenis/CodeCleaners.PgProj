@@ -422,10 +422,21 @@ public static class Program
         // output presentation, and exit-code mapping.
         var connection = RequireConnection(args);
         var service = new PublishService();
+        var planOptions = BuildPublishPlanOptions(args, profile);
+
+        // When publishing from a pre-built .pgpkg (no project on disk), consume the log packed inside it (#136)
+        // so a publish-from-package emits the same data-preserving ALTERs a publish-from-source would.
+        if (project is null)
+        {
+            var srcPath = RequirePositional(args, "project file or package");
+            if (PgPkg.IsPackagePath(srcPath) && PgPkg.Read(Path.GetFullPath(srcPath)).RefactorLogJson is { Length: > 0 } rlj)
+                planOptions = planOptions with { RefactorLog = RefactorLog.Parse(rlj) };
+        }
+
         PublishPlan plan;
         try
         {
-            plan = await service.PlanAsync(project, source, connection, BuildPublishPlanOptions(args, profile));
+            plan = await service.PlanAsync(project, source, connection, planOptions);
         }
         catch (DataLossBlockedException ex)
         {

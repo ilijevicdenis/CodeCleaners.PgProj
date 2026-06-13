@@ -65,6 +65,12 @@ public sealed record PublishPlanOptions
 
     /// <summary>Object-type tokens whose standalone DROP is suppressed.</summary>
     public IReadOnlyList<string> DoNotDropObjectTypes { get; init; } = Array.Empty<string>();
+
+    /// <summary>
+    /// An explicit refactor log to consume (#136). When set it wins over loading from the project — used when
+    /// the source is a pre-built <c>.pgpkg</c> that carries its own packed log. Null ⇒ load from the project.
+    /// </summary>
+    public Refactoring.RefactorLog? RefactorLog { get; init; }
 }
 
 /// <summary>
@@ -151,9 +157,8 @@ public sealed class PublishService
         // #136: consume the project's persisted refactor log BY DEFAULT (its presence is the opt-in) so a
         // logged rename/move deploys as a data-preserving ALTER instead of DROP+CREATE. No project (a
         // pre-built .pgpkg source) ⇒ no log here.
-        var refactorLog = project is not null
-            ? Refactoring.RefactorLog.LoadForProject(project.ProjectFilePath)
-            : null;
+        var refactorLog = options.RefactorLog
+            ?? (project is not null ? Refactoring.RefactorLog.LoadForProject(project.ProjectFilePath) : null);
 
         var changes = new SchemaComparer(versionProfile).Compare(
             sourceModel, target,

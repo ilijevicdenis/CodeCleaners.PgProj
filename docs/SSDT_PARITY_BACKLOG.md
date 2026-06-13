@@ -87,8 +87,9 @@ The headless engine is in good shape. These epics are **complete** and only need
 > EP-DESIGNER (#112/#119/#120), and the wave-3 epics — snapshot workflow (#142),
 > data extract/BACPAC (#134), NuGet package references (#133), data
 > compare (#132), PL/pgSQL unit testing (#139). **Partially done:** refactorlog (#136) — artifact +
-> default deploy-as-ALTER consumption (table/column rename, schema move) + `rename`/`move-schema` CLI
-> shipped; `.pgpkg` packing and `expand-wildcards` deferred. **Closed since:** the full
+> default deploy-as-ALTER consumption (table/column rename, schema move) + `rename`/`move-schema` CLI +
+> `.pgpkg` packing (publish-from-package consumes it) shipped; only `expand-wildcards` deferred.
+> **Closed since:** the full
 > DacDeployOptions-equivalent publish-options family (#140), lock-minimizing/CONCURRENTLY deploy (#137),
 > and analyzer rules PG015/PG016 (#81).
 
@@ -416,7 +417,7 @@ Matrix *Command line tools / CI-CD* (GitHub `sql-action`, Azure DevOps task).
 | Graphical table designer | ✅ `describe-table`/`emit-table` round-trip | ⚠️ read-only webview | ❌ editable (#112/#119/#120) |
 | Code analysis configure/suppress | ✅ per-rule config, packs, SARIF, `SuppressWarnings`/`TreatWarningsAsErrors` | ✅ | ✅ |
 | Run code analysis | ✅ `analyze` | ✅ | ✅ build gate |
-| Object rename/refactor (refactorlog) | ⚠️ `rename`/`move-schema` + `.pgrefactorlog` deploy-as-ALTER (#136; pgpkg-pack/expand-wildcards open) | ❌ | ❌ |
+| Object rename/refactor (refactorlog) | ⚠️ `rename`/`move-schema` + `.pgrefactorlog` deploy-as-ALTER + `.pgpkg` packing (#136; only `expand-wildcards` open) | ❌ | ❌ |
 | IntelliSense from project model | ✅ `serve` LSP (alias-aware, column-precise nav) | ✅ | ✅ incl. coloring/F12/peek — validated 115/115 |
 | Database unit testing | ❌ #139 | ❌ | ❌ |
 | Data compare | ❌ #132 | ❌ | ❌ |
