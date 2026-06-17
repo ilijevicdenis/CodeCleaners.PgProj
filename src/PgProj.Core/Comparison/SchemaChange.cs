@@ -16,6 +16,15 @@ public abstract record SchemaChange
     public abstract bool IsDestructive { get; }
     public abstract string Describe();
     public abstract string ToSql();
+
+    /// <summary>
+    /// True when this step must NOT run inside the deploy's BEGIN/COMMIT — e.g. an index built
+    /// <c>CONCURRENTLY</c> (PostgreSQL forbids it in a transaction block) or a separate
+    /// <c>VALIDATE CONSTRAINT</c> pass (run on its own to take only a SHARE UPDATE EXCLUSIVE lock).
+    /// The generator emits these after <c>COMMIT</c>; the phased deployer runs them in autocommit
+    /// (#137). Default false — every existing change is transactional.
+    /// </summary>
+    public virtual bool RunsOutsideTransaction => false;
 }
 
 public sealed record CreateSchemaChange(string Schema) : SchemaChange
@@ -154,13 +163,13 @@ public sealed record AlterTableStorageChange(string Schema, string Table, string
         $"-- storage options on {SqlEmitter.Qualified(Schema, Table)} differ (source: {SourceOptions ?? "<none>"}); apply manually.";
 }
 
-public sealed record AddCheckConstraintChange(string Schema, string Table, CheckConstraintDefinition Check) : SchemaChange
+public sealed record AddCheckConstraintChange(string Schema, string Table, CheckConstraintDefinition Check, bool NotValid = false) : SchemaChange
 {
     public override int Phase => 48;
     public override bool IsDestructive => false;
     public override string Describe() => $"Add check constraint on {Schema}.{Table}";
     public override string ToSql() =>
-        $"ALTER TABLE {SqlEmitter.Qualified(Schema, Table)} ADD {SqlEmitter.Check(Check)};";
+        $"ALTER TABLE {SqlEmitter.Qualified(Schema, Table)} ADD {SqlEmitter.Check(Check)}{(NotValid ? " NOT VALID" : "")};";
 }
 
 public sealed record AddRawTableConstraintChange(string Schema, string Table, string Clause) : SchemaChange
@@ -201,30 +210,52 @@ public sealed record AddPrimaryKeyChange(string Schema, string Table, PrimaryKey
     }
 }
 
-public sealed record DropIndexChange(string Schema, string Name) : SchemaChange
+public sealed record DropIndexChange(string Schema, string Name, bool Concurrent = false) : SchemaChange
 {
     public override int Phase => 60;
     public override bool IsDestructive => true;
-    public override string Describe() => $"Drop index {Schema}.{Name}";
-    public override string ToSql() => $"DROP INDEX IF EXISTS {SqlEmitter.Qualified(Schema, Name)};";
+    public override bool RunsOutsideTransaction => Concurrent;
+    public override string Describe() => $"Drop index {Schema}.{Name}{(Concurrent ? " (concurrently)" : "")}";
+    public override string ToSql() =>
+        $"DROP INDEX {(Concurrent ? "CONCURRENTLY " : "")}IF EXISTS {SqlEmitter.Qualified(Schema, Name)};";
 }
 
-public sealed record CreateIndexChange(IndexDefinition Index, bool OnMaterializedView = false) : SchemaChange
+public sealed record CreateIndexChange(IndexDefinition Index, bool OnMaterializedView = false, bool Concurrent = false) : SchemaChange
 {
     // Table indexes go at 65 (after tables at 40); an index ON a materialized view must wait until the
     // matview itself exists, which is created with the other views at 75.
     public override int Phase => OnMaterializedView ? 76 : 65;
     public override bool IsDestructive => false;
-    public override string Describe() => $"Create index {Index.Schema}.{Index.Name}";
-    public override string ToSql() => SqlEmitter.CreateIndex(Index);
+    public override bool RunsOutsideTransaction => Concurrent;
+    public override string Describe() => $"Create index {Index.Schema}.{Index.Name}{(Concurrent ? " (concurrently)" : "")}";
+    public override string ToSql() => SqlEmitter.CreateIndex(Index, Concurrent);
 }
 
-public sealed record AddForeignKeyChange(TableDefinition Table, ForeignKeyDefinition ForeignKey) : SchemaChange
+public sealed record AddForeignKeyChange(TableDefinition Table, ForeignKeyDefinition ForeignKey, bool NotValid = false) : SchemaChange
 {
     public override int Phase => 70;
     public override bool IsDestructive => false;
     public override string Describe() => $"Add foreign key on {Table.Schema}.{Table.Name} -> {ForeignKey.ReferencedSchema}.{ForeignKey.ReferencedTable}";
-    public override string ToSql() => SqlEmitter.ForeignKey(Table.Schema, Table.Name, ForeignKey);
+    public override string ToSql()
+    {
+        var sql = SqlEmitter.ForeignKey(Table.Schema, Table.Name, ForeignKey);
+        return NotValid ? sql[..sql.LastIndexOf(';')] + " NOT VALID;" : sql;
+    }
+}
+
+/// <summary>
+/// A standalone <c>ALTER TABLE … VALIDATE CONSTRAINT</c> pass for a constraint that was added
+/// <c>NOT VALID</c> (lock-minimizing deploy, #137). Validation scans existing rows but takes only a
+/// SHARE UPDATE EXCLUSIVE lock, so it runs outside the main transaction in its own short transaction.
+/// </summary>
+public sealed record ValidateConstraintChange(string Schema, string Table, string Name) : SchemaChange
+{
+    public override int Phase => 90;   // after every add
+    public override bool IsDestructive => false;
+    public override bool RunsOutsideTransaction => true;
+    public override string Describe() => $"Validate constraint {Name} on {Schema}.{Table}";
+    public override string ToSql() =>
+        $"ALTER TABLE {SqlEmitter.Qualified(Schema, Table)} VALIDATE CONSTRAINT {SqlEmitter.Quote(Name)};";
 }
 
 public sealed record CreateOrReplaceViewChange(ViewDefinition View) : SchemaChange

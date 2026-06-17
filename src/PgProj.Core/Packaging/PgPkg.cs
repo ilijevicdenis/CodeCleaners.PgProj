@@ -29,12 +29,20 @@ public sealed class PgPkg
     private const string SourcesPrefix = "sources/";
     private const string ScriptsPrefix = "scripts/";
     private const string ScriptsPlaceholder = "scripts/.keep";
+    private const string RefactorLogEntry = "refactorlog.json";
 
     public required PgPkgManifest Manifest { get; init; }
     public required DatabaseModel Model { get; init; }
 
     /// <summary>The original sources, keyed by their forward-slashed relative path.</summary>
     public required IReadOnlyList<PgPkgSource> Sources { get; init; }
+
+    /// <summary>
+    /// The project's <c>.pgrefactorlog</c> JSON carried in the package (#136), or null when the project has
+    /// none. It travels with the artifact so a "publish from package" emits the same data-preserving ALTERs
+    /// a "publish from source" would. NOT part of the <c>sourceChecksum</c> (it is metadata, not a source).
+    /// </summary>
+    public string? RefactorLogJson { get; init; }
 
     /// <summary>True if a file has the <c>.pgpkg</c> extension (case-insensitive).</summary>
     public static bool IsPackagePath(string path) =>
@@ -47,12 +55,14 @@ public sealed class PgPkg
     /// <see cref="ModelJson"/> path the loose <c>model.json</c> build output uses, so the embedded model
     /// is byte-identical.
     /// </summary>
-    public static PgPkg Create(PgPkgManifest manifest, DatabaseModel model, IEnumerable<PgPkgSource> sources) =>
+    public static PgPkg Create(PgPkgManifest manifest, DatabaseModel model, IEnumerable<PgPkgSource> sources,
+        string? refactorLogJson = null) =>
         new()
         {
             Manifest = manifest,
             Model = model,
             Sources = sources.OrderBy(s => s.RelativePath, StringComparer.Ordinal).ToList(),
+            RefactorLogJson = string.IsNullOrWhiteSpace(refactorLogJson) ? null : refactorLogJson,
         };
 
     /// <summary>Writes the package to <paramref name="path"/>, overwriting any existing file.</summary>
@@ -76,6 +86,9 @@ public sealed class PgPkg
             WriteEntry(archive, SourcesPrefix + src.RelativePath, src.Content);
         // Reserve the scripts/ folder for EP-DEPLOYSCRIPTS (pre/post scripts travel inside the package).
         WriteEntry(archive, ScriptsPlaceholder, string.Empty);
+        // The refactor log (#136) travels with the package so a publish-from-package emits the same ALTERs.
+        if (RefactorLogJson is { Length: > 0 })
+            WriteEntry(archive, RefactorLogEntry, RefactorLogJson);
     }
 
     private static void WriteEntry(ZipArchive archive, string name, string content)
@@ -135,7 +148,8 @@ public sealed class PgPkg
                 $"but the carried sources hash to '{actual}'. The package may be corrupt or tampered with.");
 
         var model = ModelJson.Deserialize(modelText);
-        return new PgPkg { Manifest = manifest, Model = model, Sources = sources };
+        var refactorLogJson = archive.GetEntry(RefactorLogEntry) is { } rl ? ReadEntry(rl) : null;
+        return new PgPkg { Manifest = manifest, Model = model, Sources = sources, RefactorLogJson = refactorLogJson };
     }
 
     /// <summary>

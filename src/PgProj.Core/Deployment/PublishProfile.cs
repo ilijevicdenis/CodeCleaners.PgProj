@@ -20,6 +20,51 @@ public sealed record PublishProfileOptions
 
     /// <summary>Wrap the whole deploy in one BEGIN/COMMIT — the inverse of the <c>--no-transaction</c> flag.</summary>
     public bool? WrapInTransaction { get; init; }
+
+    // ---- #140 DacDeployOptions-equivalent family (each nullable: unset ⇒ CLI/built-in default stands) ----
+
+    /// <summary>Abort the publish if any step could destroy data (SqlPackage <c>BlockOnPossibleDataLoss</c>; publish default: block).</summary>
+    public bool? BlockOnPossibleDataLoss { get; init; }
+
+    /// <summary>Drop constraints (PK/FK/unique/check) present in the target but absent from the source. SqlPackage <c>DropConstraintsNotInSource</c>.</summary>
+    public bool? DropConstraintsNotInSource { get; init; }
+
+    /// <summary>Drop indexes present in the target but absent from the source. SqlPackage <c>DropIndexesNotInSource</c>.</summary>
+    public bool? DropIndexesNotInSource { get; init; }
+
+    /// <summary>Synthesize a default when adding a <c>NOT NULL</c> column to a populated table. SqlPackage <c>GenerateSmartDefaults</c>.</summary>
+    public bool? GenerateSmartDefaults { get; init; }
+
+    /// <summary>Validate newly added FK/CHECK constraints against existing rows; off ⇒ emit them <c>NOT VALID</c>. SqlPackage <c>ScriptNewConstraintValidation</c>.</summary>
+    public bool? ScriptNewConstraintValidation { get; init; }
+
+    /// <summary>Permit drop-and-recreate when an in-place ALTER cannot express the change. SqlPackage <c>AllowTableRecreation</c> (publish default: off).</summary>
+    public bool? AllowTableRecreation { get; init; }
+
+    /// <summary>Lock-minimizing index ops: CONCURRENTLY index create/drop + NOT VALID/VALIDATE constraints. SqlPackage <c>PerformIndexOperationsOnline</c> (#137).</summary>
+    public bool? ConcurrentIndexOperations { get; init; }
+
+    /// <summary>Per-session <c>statement_timeout</c> in milliseconds. SqlPackage <c>CommandTimeout</c>/<c>LongRunningCommandTimeout</c>.</summary>
+    public int? CommandTimeoutMs { get; init; }
+
+    /// <summary>Per-session <c>lock_timeout</c> in milliseconds (lock-acquisition cap). SqlPackage <c>DatabaseLockTimeout</c>.</summary>
+    public int? LockTimeoutMs { get; init; }
+
+    /// <summary>Object-type tokens to exclude from the diff entirely (no add/alter/drop). SqlPackage <c>ExcludeObjectTypes</c>.</summary>
+    public IReadOnlyList<string>? ExcludeObjectTypes { get; init; }
+
+    /// <summary>Object-type tokens whose DROP is suppressed (CREATE/ALTER still emit). SqlPackage <c>DoNotDropObjectTypes</c>.</summary>
+    public IReadOnlyList<string>? DoNotDropObjectTypes { get; init; }
+
+    /// <summary>True when no option is set (every member null) — used to omit the <c>options</c> block on serialize.</summary>
+    public bool IsEmpty =>
+        AllowDrops is null && WrapInTransaction is null && BlockOnPossibleDataLoss is null
+        && DropConstraintsNotInSource is null && DropIndexesNotInSource is null
+        && GenerateSmartDefaults is null && ScriptNewConstraintValidation is null
+        && AllowTableRecreation is null && ConcurrentIndexOperations is null
+        && CommandTimeoutMs is null && LockTimeoutMs is null
+        && (ExcludeObjectTypes is null || ExcludeObjectTypes.Count == 0)
+        && (DoNotDropObjectTypes is null || DoNotDropObjectTypes.Count == 0);
 }
 
 /// <summary>
@@ -110,7 +155,7 @@ public sealed record PublishProfile
                 ? null
                 : Variables.OrderBy(k => k.Key, StringComparer.OrdinalIgnoreCase)
                            .ToDictionary(k => k.Key, v => v.Value, StringComparer.Ordinal),
-            Options = Options is { AllowDrops: null, WrapInTransaction: null } ? null : Options,
+            Options = Options.IsEmpty ? null : Options,
         };
         return JsonSerializer.Serialize(dto, Json);
     }

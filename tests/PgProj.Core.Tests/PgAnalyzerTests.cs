@@ -140,6 +140,64 @@ public class PgAnalyzerTests
     }
 
     [Fact]
+    public void PG015_uppercase_identifier_in_table_or_column()
+    {
+        // A mixed-case table name and a mixed-case column name each fire.
+        Assert.Contains(A("CREATE TABLE s.Customer (id int PRIMARY KEY);"),
+            x => x.RuleId == "PG015" && x.Severity == DiagnosticSeverity.Info);
+        Assert.Contains(A("CREATE TABLE s.orders (id int PRIMARY KEY, customerId int);"),
+            x => x.RuleId == "PG015");
+        // All-lowercase snake_case is clean.
+        Assert.DoesNotContain(A("CREATE TABLE s.customer (id int PRIMARY KEY, customer_id int);"),
+            x => x.RuleId == "PG015");
+    }
+
+    [Fact]
+    public void PG016_identifier_longer_than_63_bytes()
+    {
+        var longName = new string('a', 64);                 // 64 bytes > the 63-byte limit
+        Assert.Contains(A($"CREATE TABLE s.{longName} (id int PRIMARY KEY);"),
+            x => x.RuleId == "PG016" && x.Severity == DiagnosticSeverity.Warning);
+        Assert.Contains(A($"CREATE TABLE s.t (id int PRIMARY KEY, {longName} int);"),
+            x => x.RuleId == "PG016");
+        // A name at the 63-byte boundary is fine.
+        var okName = new string('a', 63);
+        Assert.DoesNotContain(A($"CREATE TABLE s.{okName} (id int PRIMARY KEY);"),
+            x => x.RuleId == "PG016");
+    }
+
+    [Fact]
+    public void PG017_json_column_prefers_jsonb()
+    {
+        Assert.Contains(A("CREATE TABLE s.t (id int PRIMARY KEY, doc json);"), x => x.RuleId == "PG017" && x.Severity == DiagnosticSeverity.Info);
+        Assert.Contains(A("CREATE TABLE s.t (id int PRIMARY KEY, docs json[]);"), x => x.RuleId == "PG017");
+        // jsonb is the recommended form — never flagged.
+        Assert.DoesNotContain(A("CREATE TABLE s.t (id int PRIMARY KEY, doc jsonb);"), x => x.RuleId == "PG017");
+    }
+
+    [Fact]
+    public void PG020_exception_when_others()
+    {
+        var swallow = "CREATE FUNCTION s.f() RETURNS void LANGUAGE plpgsql VOLATILE AS $$ BEGIN PERFORM 1; EXCEPTION WHEN OTHERS THEN NULL; END $$;";
+        Assert.Contains(A(swallow), x => x.RuleId == "PG020" && x.Severity == DiagnosticSeverity.Warning);
+        // Catching a specific condition is fine.
+        var specific = "CREATE FUNCTION s.f() RETURNS void LANGUAGE plpgsql VOLATILE AS $$ BEGIN PERFORM 1; EXCEPTION WHEN unique_violation THEN NULL; END $$;";
+        Assert.DoesNotContain(A(specific), x => x.RuleId == "PG020");
+    }
+
+    [Fact]
+    public void PG021_select_into_without_strict()
+    {
+        string Fn(string body) => $"CREATE FUNCTION s.f() RETURNS int LANGUAGE plpgsql VOLATILE AS $$ DECLARE v int; BEGIN {body} RETURN v; END $$;";
+
+        Assert.Contains(A(Fn("SELECT id INTO v FROM s.t WHERE id = 1;")), x => x.RuleId == "PG021" && x.Severity == DiagnosticSeverity.Warning);
+        // INTO STRICT is the safe form.
+        Assert.DoesNotContain(A(Fn("SELECT id INTO STRICT v FROM s.t WHERE id = 1;")), x => x.RuleId == "PG021");
+        // INSERT ... INTO is unrelated DML, not a select-into target.
+        Assert.DoesNotContain(A(Fn("INSERT INTO s.t (id) VALUES (1);")), x => x.RuleId == "PG021");
+    }
+
+    [Fact]
     public void Clean_statements_produce_no_findings()
     {
         Assert.Empty(A("CREATE FUNCTION s.f(x int) RETURNS int LANGUAGE sql IMMUTABLE AS $$ SELECT x $$;"));

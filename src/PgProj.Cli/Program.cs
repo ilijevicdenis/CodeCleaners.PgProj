@@ -15,8 +15,10 @@ using PgProj.Core.Packaging;
 using PgProj.Core.Project;
 using PgProj.Core.Project.References;
 using PgProj.Core.Publishing;
+using PgProj.Core.Refactoring;
 using PgProj.Core.Snapshot;
 using PgProj.Core.Solutions;
+using PgProj.Core.Testing;
 using PgProj.Core.Templates;
 
 namespace PgProj.Cli;
@@ -47,6 +49,10 @@ public static class Program
                 "drift" => await Drift(args),
                 "pull" => await Pull(args),
                 "sync-file" => await SyncFile(args),
+                "rename" => Rename(args),
+                "move-schema" => MoveSchema(args),
+                "data-compare" => await DataCompareCmd(args),
+                "test" => await Test(args),
                 "deploy-report" => await DeployReport(args),
                 "verify" => Verify(args),
                 "analyze" => Analyze(args),
@@ -419,13 +425,29 @@ public static class Program
         // output presentation, and exit-code mapping.
         var connection = RequireConnection(args);
         var service = new PublishService();
-        var plan = await service.PlanAsync(project, source, connection, new PublishPlanOptions
+        var planOptions = BuildPublishPlanOptions(args, profile);
+
+        // When publishing from a pre-built .pgpkg (no project on disk), consume the log packed inside it (#136)
+        // so a publish-from-package emits the same data-preserving ALTERs a publish-from-source would.
+        if (project is null)
         {
-            AllowDrops = allowDrops,
-            WrapInTransaction = wrapInTransaction,
-            ProfileVariables = profile?.Variables,
-            VariableOverrides = ParseCliVars(args),
-        });
+            var srcPath = RequirePositional(args, "project file or package");
+            if (PgPkg.IsPackagePath(srcPath) && PgPkg.Read(Path.GetFullPath(srcPath)).RefactorLogJson is { Length: > 0 } rlj)
+                planOptions = planOptions with { RefactorLog = RefactorLog.Parse(rlj) };
+        }
+
+        PublishPlan plan;
+        try
+        {
+            plan = await service.PlanAsync(project, source, connection, planOptions);
+        }
+        catch (DataLossBlockedException ex)
+        {
+            // BlockOnPossibleDataLoss gate (#140): a possible-data-loss step was planned and the gate is on.
+            Console.Error.WriteLine($"Publish blocked — {ex.Message}");
+            Console.Error.WriteLine("Re-run with --allow-data-loss to proceed (or --allow-drops for drop-not-in-source).");
+            return ExitCode.DataLossBlocked;
+        }
 
         var outPath = GetOption(args, "-o", "--output");
         if (outPath is not null)
@@ -470,6 +492,171 @@ public static class Program
         return 0;
     }
 
+    // ---- refactor: rename / move-schema (rewrite .sql + append .pgrefactorlog atomically, #136) ----
+
+    private static int Rename(string[] args)
+    {
+        var p = args.Skip(1).Where(a => !a.StartsWith('-')).ToList();
+        if (p.Count < 3)
+            throw new CliUsageException("Usage: pgproj rename <project.pgproj> <schema.table> <new-name>");
+        return RunRefactor(p[0], proj => RefactorEngine.RenameTable(proj, p[1], p[2]));
+    }
+
+    private static int MoveSchema(string[] args)
+    {
+        var p = args.Skip(1).Where(a => !a.StartsWith('-')).ToList();
+        if (p.Count < 3)
+            throw new CliUsageException("Usage: pgproj move-schema <project.pgproj> <schema.table> <new-schema>");
+        return RunRefactor(p[0], proj => RefactorEngine.MoveTableToSchema(proj, p[1], p[2]));
+    }
+
+    private static int RunRefactor(string projectPath, Func<DatabaseProject, RefactorResult> refactor)
+    {
+        var project = DatabaseProject.Load(projectPath);
+        try
+        {
+            var r = refactor(project);
+            Console.WriteLine($"{r.Entry.OldName} -> {r.Entry.NewName}: {r.Replacements} replacement(s) across " +
+                              $"{r.ChangedFiles.Count} .sql file(s); recorded in {Path.GetFileName(RefactorLog.PathFor(project.ProjectFilePath))}.");
+            Console.WriteLine("The next publish will emit a data-preserving ALTER (not DROP+CREATE). " +
+                              "Review any unqualified references the rewrite could not see.");
+            return ExitCode.Success;
+        }
+        catch (RefactorException ex)
+        {
+            Console.Error.WriteLine($"error: {ex.Message}");
+            return ExitCode.Usage;
+        }
+    }
+
+    // ---- test (PL/pgSQL database unit tests over the shadow DB, #139) -------------------
+
+    private static async Task<int> Test(string[] args)
+    {
+        var project = DatabaseProject.Load(RequirePositional(args, "project file"));
+        var conn = RequireConnection(args);
+
+        // Discover *.test.sql under the project (kept out of the build by naming, run only here).
+        var files = Directory.Exists(project.ProjectDirectory)
+            ? Directory.EnumerateFiles(project.ProjectDirectory, "*.test.sql", SearchOption.AllDirectories)
+                       .OrderBy(f => f, StringComparer.Ordinal).ToList()
+            : new System.Collections.Generic.List<string>();
+        if (files.Count == 0) { Console.WriteLine("No *.test.sql files found in the project."); return ExitCode.Success; }
+
+        var tests = files.Select(f =>
+        {
+            var sql = File.ReadAllText(f);
+            return new TestCase(Path.GetRelativePath(project.ProjectDirectory, f), sql, PgUnitRunner.ParseExpectedSqlState(sql));
+        }).ToList();
+
+        // --deploy spins a throwaway shadow DB, deploys the project schema, runs the tests there, drops it.
+        var runConn = conn;
+        string? temp = null;
+        if (HasFlag(args, "--deploy"))
+        {
+            var build = await project.BuildAsync();
+            if (build.Diagnostics.Count > 0)
+            {
+                Console.Error.WriteLine($"Cannot test — build failed with {build.Diagnostics.Count} problem(s):");
+                foreach (var d in build.Diagnostics) Console.Error.WriteLine($"  - {d}");
+                return ExitCode.BuildError;
+            }
+            temp = "pgproj_test_" + Guid.NewGuid().ToString("N")[..16];
+            await using (var admin = new Npgsql.NpgsqlConnection(conn))
+            {
+                await admin.OpenAsync();
+                await using var create = new Npgsql.NpgsqlCommand($"CREATE DATABASE \"{temp}\"", admin);
+                await create.ExecuteNonQueryAsync();
+            }
+            runConn = new Npgsql.NpgsqlConnectionStringBuilder(conn) { Database = temp }.ConnectionString;
+            var schema = new DeployScriptGenerator().Generate(
+                new SchemaComparer().Compare(build.Model, new DatabaseModel()), new DeployOptions { WrapInTransaction = true });
+            await new DatabaseDeployer().ExecuteAsync(runConn, schema);
+        }
+
+        try
+        {
+            var result = await PgUnitRunner.RunAsync(runConn, tests);
+            foreach (var r in result.Results)
+            {
+                var mark = r.Status switch { TestStatus.Passed => "PASS", TestStatus.Failed => "FAIL", _ => "INC " };
+                Console.WriteLine($"  [{mark}] {r.Name}" + (r.Message is null ? "" : $" — {r.Message}"));
+            }
+            Console.WriteLine($"\n{result.Passed} passed, {result.Failed} failed, {result.Inconclusive} inconclusive ({result.Results.Count} total).");
+            return result.AllPassed ? ExitCode.Success : ExitCode.TestFailed;
+        }
+        finally
+        {
+            if (temp is not null)
+            {
+                Npgsql.NpgsqlConnection.ClearAllPools();
+                await using var admin = new Npgsql.NpgsqlConnection(conn);
+                await admin.OpenAsync();
+                await using var drop = new Npgsql.NpgsqlCommand($"DROP DATABASE IF EXISTS \"{temp}\" WITH (FORCE)", admin);
+                await drop.ExecuteNonQueryAsync();
+            }
+        }
+    }
+
+    // ---- data-compare (row-level data diff + sync between two databases, #132) ----------
+
+    private static async Task<int> DataCompareCmd(string[] args)
+    {
+        var cli = new CliArgs(args);
+        var sourceConn = cli.GetOption("--source")
+            ?? throw new CliUsageException("data-compare needs --source <conn> and --target <conn>.");
+        var targetConn = cli.GetOption("--target")
+            ?? throw new CliUsageException("data-compare needs --source <conn> and --target <conn>.");
+        var tables = (cli.GetOption("--tables") ?? "")
+            .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
+        var result = await PgProj.Core.Data.DataCompare.CompareAsync(
+            sourceConn, targetConn, new PgProj.Core.Data.DataCompareOptions { Tables = tables });
+
+        var outPath = cli.GetOption("-o", "--output");
+        if (outPath is not null && outPath.EndsWith(".sql", StringComparison.OrdinalIgnoreCase))
+        {
+            File.WriteAllText(outPath, PgProj.Core.Data.DataCompare.GenerateSyncScript(result));
+            Console.WriteLine($"Sync script written to {outPath}");
+        }
+        else if (outPath is not null)
+        {
+            File.WriteAllText(outPath, System.Text.Json.JsonSerializer.Serialize(result, new System.Text.Json.JsonSerializerOptions
+            {
+                PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase,
+                WriteIndented = true,
+                Converters = { new System.Text.Json.Serialization.JsonStringEnumConverter() },
+            }));
+            Console.WriteLine($"Data diff written to {outPath}");
+        }
+
+        foreach (var t in result.Tables)
+            Console.WriteLine($"  {t.Schema}.{t.Table}: {t.DifferentCount} different, " +
+                              $"{t.OnlyInSourceCount} only-in-source, {t.OnlyInTargetCount} only-in-target, {t.IdenticalCount} identical");
+        foreach (var s in result.Skipped)
+            Console.WriteLine($"  (skipped {s.Qualified}: {s.Reason})");
+
+        if (cli.HasFlag("--apply"))
+        {
+            if (result.InSync) { Console.WriteLine("Data already in sync — nothing to apply."); return ExitCode.Success; }
+            var script = PgProj.Core.Data.DataCompare.GenerateSyncScript(result, wrapInTransaction: true);
+            try
+            {
+                await new DatabaseDeployer().ExecuteAsync(targetConn, script);
+                Console.WriteLine("Applied: the target's data now matches the source.");
+            }
+            catch (Npgsql.PostgresException ex)
+            {
+                Console.Error.WriteLine($"Data sync failed (rolled back): {ex.Message}  [{PgProj.Core.Diagnostics.PgErrorCodes.Describe(ex.SqlState)}]");
+                return ExitCode.DeployError;
+            }
+            return ExitCode.Success;
+        }
+
+        if (result.InSync) Console.WriteLine("Data is in sync.");
+        return cli.HasFlag("--fail-on-changes") && !result.InSync ? ExitCode.Drift : ExitCode.Success;
+    }
+
     // ---- validate (apply to a throwaway temp DB in a rolled-back txn) --------------------
 
     private static async Task<int> Validate(string[] args)
@@ -505,8 +692,10 @@ public static class Program
 
     private static async Task<int> Extract(string[] args)
     {
+        var cli = new CliArgs(args);
         var outDir = GetOption(args, "-o", "--output") ?? "extracted";
-        var model = await new LiveDatabaseReader().ReadAsync(RequireConnection(args));
+        var conn = RequireConnection(args);
+        var model = await new LiveDatabaseReader().ReadAsync(conn);
         var files = DdlExporter.ExportFiles(model);
 
         foreach (var (rel, content) in files)
@@ -516,9 +705,28 @@ public static class Program
             File.WriteAllText(path, content);
         }
 
-        // Drop a .pgproj so the extracted folder is immediately buildable.
-        var projName = new Npgsql.NpgsqlConnectionStringBuilder(RequireConnection(args)).Database ?? "Extracted";
-        File.WriteAllText(Path.Combine(outDir, $"{projName}.pgproj"), DefaultProjectFile(projName));
+        // #134: optionally extract user-table data as an FK-ordered post-deploy seed (publish loads it after
+        // schema). --all-table-data takes every table; --table-data schema.table (repeatable) names a subset.
+        var allData = cli.HasFlag("--all-table-data");
+        var tableData = cli.GetOptionValues("--table-data")
+            .SelectMany(v => v.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+            .ToList();
+        var withData = allData || tableData.Count > 0;
+
+        var projName = new Npgsql.NpgsqlConnectionStringBuilder(conn).Database ?? "Extracted";
+        if (withData)
+        {
+            var dataSql = await PgProj.Core.Data.DataExporter.ExportAsync(conn, model, allData ? null : tableData);
+            var scriptsDir = Path.Combine(outDir, "Scripts");
+            Directory.CreateDirectory(scriptsDir);
+            File.WriteAllText(Path.Combine(scriptsDir, "PostDeploy.sql"), dataSql);
+            Console.WriteLine($"Extracted table data to Scripts/PostDeploy.sql ({(allData ? "all tables" : $"{tableData.Count} table(s)")}).");
+        }
+
+        // Drop a .pgproj so the extracted folder is immediately buildable (the data variant excludes the
+        // seed from Build and wires it as the PostDeploy script).
+        File.WriteAllText(Path.Combine(outDir, $"{projName}.pgproj"),
+            withData ? ProjectFileWithData(projName) : DefaultProjectFile(projName));
 
         Console.WriteLine($"Extracted {files.Count} object file(s) to {Path.GetFullPath(outDir)}");
         PrintModelSummary(model);
@@ -534,6 +742,131 @@ public static class Program
     /// staleness), so a snapshot captured against the wrong server version is flagged when it is compared.
     /// </summary>
     private static async Task<int> Snapshot(string[] args)
+    {
+        // Project-snapshot subcommands (#142) are distinct from the legacy live-DB capture (which takes
+        // --connection and no positional). Route on the first positional; anything else → the live form.
+        var sub = args.Skip(1).FirstOrDefault(a => !a.StartsWith('-'))?.ToLowerInvariant();
+        return sub switch
+        {
+            "create" => await SnapshotCreate(args),
+            "compare" => await SnapshotCompare(args),
+            "revert" => await SnapshotRevert(args),
+            "import" => SnapshotImport(args),
+            _ => await SnapshotLive(args),
+        };
+    }
+
+    // ---- project snapshots (#142): timestamped read-only .pgpkg baselines of the BUILT project model,
+    // with no database connection — distinct from the live-DB .schema.snapshot above. ----
+
+    private const string SnapshotsFolder = "Snapshots";
+
+    /// <summary>Default snapshot directory for a project: <c>&lt;projectDir&gt;/Snapshots</c>.</summary>
+    private static string SnapshotDir(string[] args, DatabaseProject project) =>
+        GetOption(args, "-o", "--output") ?? Path.Combine(project.ProjectDirectory, SnapshotsFolder);
+
+    private static async Task<int> SnapshotCreate(string[] args)
+    {
+        var p = args.Skip(1).Where(a => !a.StartsWith('-')).ToList();   // [create, <project>]
+        var projectPath = p.ElementAtOrDefault(1)
+            ?? throw new CliUsageException("Usage: pgproj snapshot create <project.pgproj> [-o <dir>]");
+        var project = DatabaseProject.Load(projectPath);
+
+        var result = await project.BuildAsync();
+        if (result.Diagnostics.Count > 0)
+        {
+            Console.Error.WriteLine($"Cannot snapshot — build failed with {result.Diagnostics.Count} problem(s):");
+            foreach (var d in result.Diagnostics) Console.Error.WriteLine($"  - {d}");
+            return ExitCode.BuildError;
+        }
+
+        var dir = SnapshotDir(args, project);
+        Directory.CreateDirectory(dir);
+        // Timestamp is generated at the CLI boundary (non-deterministic by design); the SSDT naming convention.
+        var stamp = DateTime.UtcNow.ToString("yyyyMMdd_HH-mm-ss", System.Globalization.CultureInfo.InvariantCulture);
+        var path = Path.Combine(dir, $"Project_{stamp}{PgPkg.Extension}");
+
+        var pkg = PgPkgBuilder.FromBuild(project, result.Model, result.Files, ToolVersion, UtcStamp());
+        pkg.Write(path);
+        try { File.SetAttributes(path, File.GetAttributes(path) | FileAttributes.ReadOnly); } catch { /* best effort */ }
+
+        Console.WriteLine($"Project snapshot written to {path} (read-only).");
+        Console.WriteLine($"  {pkg.Sources.Count} source(s), checksum {pkg.Manifest.SourceChecksum}");
+        Console.WriteLine($"Compare it later with: pgproj snapshot compare \"{path}\" <other.pgpkg|project.pgproj>");
+        return 0;
+    }
+
+    private static async Task<int> SnapshotCompare(string[] args)
+    {
+        var p = args.Skip(1).Where(a => !a.StartsWith('-')).ToList();   // [compare, A, B]
+        if (p.Count < 3)
+            throw new CliUsageException("Usage: pgproj snapshot compare <A.pgpkg> <B.pgpkg|project.pgproj> [-o diff.json] [--format json]");
+        // Reuse the unified two-way Schema Compare (EndpointResolver already accepts .pgpkg + .pgproj).
+        return await CompareTwoWay(new CliArgs(args), p[1], p[2]);
+    }
+
+    private static async Task<int> SnapshotRevert(string[] args)
+    {
+        var p = args.Skip(1).Where(a => !a.StartsWith('-')).ToList();   // [revert, <project>, <snapshot.pgpkg>]
+        if (p.Count < 3)
+            throw new CliUsageException("Usage: pgproj snapshot revert <project.pgproj> <snapshot.pgpkg> [--dry-run] [--allow-deletes]");
+        var project = DatabaseProject.Load(p[1]);
+        if (!PgPkg.IsPackagePath(p[2]))
+            throw new CliUsageException("snapshot revert expects a .pgpkg snapshot as the second argument.");
+
+        // The snapshot's model is the desired state; reverse-sync rewrites the project's .sql from it (the
+        // same emitter `pull` uses), so revert is byte-consistent with how the project authors SQL.
+        var snapshotModel = PgPkg.Read(Path.GetFullPath(p[2])).Model;
+        var allowDeletes = HasFlag(args, "--allow-deletes");
+        var plan = await PgProj.Core.Sync.ReverseSync.PlanAsync(project, snapshotModel,
+            new PgProj.Core.Sync.DriftOptions { AllowDeletes = allowDeletes });
+
+        if (!plan.HasDrift)
+        {
+            Console.WriteLine("Nothing to revert — the project already matches the snapshot.");
+            return 0;
+        }
+
+        Console.WriteLine($"{plan.FileChanges.Count} project file(s) will be {(HasFlag(args, "--dry-run") ? "changed" : "written")} to match the snapshot:");
+        foreach (var fc in plan.FileChanges)
+            Console.WriteLine($"  [{Mark(fc)}] {fc.Kind.ToString().ToLowerInvariant()} {fc.RelativePath} — {fc.Summary}");
+
+        if (HasFlag(args, "--dry-run"))
+        {
+            Console.WriteLine("\n(dry run — no files written)");
+            return 0;
+        }
+
+        var touched = PgProj.Core.Sync.ReverseSync.Apply(project, plan);
+        Console.WriteLine($"\nReverted {touched.Count} file(s) to the snapshot.");
+        if (!allowDeletes && plan.SchemaChanges.Any(c => c.IsDestructive))
+            Console.WriteLine("Note: objects absent from the snapshot were left in place (re-run with --allow-deletes to remove their files).");
+        return 0;
+    }
+
+    private static int SnapshotImport(string[] args)
+    {
+        var p = args.Skip(1).Where(a => !a.StartsWith('-')).ToList();   // [import, <project>, <external.pgpkg>]
+        if (p.Count < 3)
+            throw new CliUsageException("Usage: pgproj snapshot import <project.pgproj> <external.pgpkg> [-o <dir>]");
+        var project = DatabaseProject.Load(p[1]);
+        var srcPath = Path.GetFullPath(p[2]);
+        // Validate it is a real package before copying it in (also fails fast on a corrupt/tampered file).
+        var pkg = PgPkg.Read(srcPath);
+
+        var dir = SnapshotDir(args, project);
+        Directory.CreateDirectory(dir);
+        var dest = Path.Combine(dir, Path.GetFileName(srcPath));
+        if (File.Exists(dest)) { try { File.SetAttributes(dest, FileAttributes.Normal); } catch { } }
+        File.Copy(srcPath, dest, overwrite: true);
+        try { File.SetAttributes(dest, File.GetAttributes(dest) | FileAttributes.ReadOnly); } catch { /* best effort */ }
+
+        Console.WriteLine($"Imported snapshot '{pkg.Manifest.Name}' (built {pkg.Manifest.CreatedUtc}) → {dest} (read-only).");
+        Console.WriteLine($"It is now a selectable compare source: pgproj snapshot compare \"{dest}\" <other>");
+        return 0;
+    }
+
+    private static async Task<int> SnapshotLive(string[] args)
     {
         var conn = RequireConnection(args);
         var outPath = GetOption(args, "-o", "--output")
@@ -1056,11 +1389,22 @@ public static class Program
         var profile = LoadProfile(args);            // EP-PROFILE: CLI flags override profile values.
         var (source, project) = await BuildSourceOrThrowAsync(args);
         var changes = new SchemaComparer().Compare(source, new DatabaseModel());
+        var opts = BuildPublishPlanOptions(args, profile);
         var script = new DeployScriptGenerator().Generate(changes, new DeployOptions
         {
-            WrapInTransaction = ResolveWrapInTransaction(args, profile),
+            WrapInTransaction = opts.WrapInTransaction,
             Scripts = LoadDeployScripts(project),
             Variables = BuildVariableResolver(project, args, profile),
+            // #140: the same option family the publish path honours (a from-empty create has no drops/
+            // data-loss, but smart-defaults, constraint validation, object-type filters and timeouts apply).
+            GenerateSmartDefaults = opts.GenerateSmartDefaults,
+            ScriptNewConstraintValidation = opts.ScriptNewConstraintValidation,
+            AllowTableRecreation = opts.AllowTableRecreation,
+            StatementTimeoutMs = opts.CommandTimeoutMs,
+            LockTimeoutMs = opts.LockTimeoutMs,
+            ExcludeObjectTypes = opts.ExcludeObjectTypes,
+            DoNotDropObjectTypes = PublishService.ResolveDropSuppression(opts),
+            ConcurrentIndexOperations = opts.ConcurrentIndexOperations,
         });
 
         var outPath = GetOption(args, "-o", "--output");
@@ -1238,6 +1582,71 @@ public static class Program
     private static bool ResolveWrapInTransaction(string[] args, PublishProfile? profile) =>
         !HasFlag(args, "--no-transaction") && (profile?.Options.WrapInTransaction ?? true);
 
+    // ---- #140 DacDeployOptions-family resolvers (CLI flag > profile > built-in default) ----
+
+    /// <summary>Block on a possible-data-loss step. Default block; <c>--allow-data-loss</c> opts out (CLI wins).</summary>
+    private static bool ResolveBlockOnDataLoss(string[] args, PublishProfile? profile) =>
+        !HasFlag(args, "--allow-data-loss") && (profile?.Options.BlockOnPossibleDataLoss ?? true);
+
+    /// <summary>Permit object drop-and-recreate. Default off for publish; <c>--allow-table-recreation</c> enables it.</summary>
+    private static bool ResolveAllowTableRecreation(string[] args, PublishProfile? profile) =>
+        HasFlag(args, "--allow-table-recreation") || (profile?.Options.AllowTableRecreation ?? false);
+
+    /// <summary>Synthesize a default for a new NOT NULL column. Default off; <c>--smart-defaults</c> enables it.</summary>
+    private static bool ResolveSmartDefaults(string[] args, PublishProfile? profile) =>
+        HasFlag(args, "--smart-defaults") || (profile?.Options.GenerateSmartDefaults ?? false);
+
+    /// <summary>Validate new FK/CHECK constraints. Default on; <c>--no-validate-constraints</c> emits them NOT VALID.</summary>
+    private static bool ResolveValidateConstraints(string[] args, PublishProfile? profile) =>
+        !HasFlag(args, "--no-validate-constraints") && (profile?.Options.ScriptNewConstraintValidation ?? true);
+
+    /// <summary>Parses a millisecond integer option (CLI then profile), or null. Throws on a non-integer value.</summary>
+    private static int? ResolveTimeout(string[] args, string flag, int? profileValue)
+    {
+        var raw = GetOption(args, flag);
+        if (raw is null) return profileValue;
+        if (!int.TryParse(raw, out var ms) || ms < 0)
+            throw new CliUsageException($"{flag} expects a non-negative integer (milliseconds); got '{raw}'.");
+        return ms;
+    }
+
+    /// <summary>Union of a repeatable comma-separated CLI option and a profile list (canonicalized tokens).</summary>
+    private static IReadOnlyList<string> ResolveObjectTypeList(string[] args, string flag, IReadOnlyList<string>? profileList)
+    {
+        var set = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        if (profileList is not null)
+            foreach (var t in profileList) set.Add(SchemaCompareObjectType.Parse(t));
+        foreach (var v in new CliArgs(args).GetOptionValues(flag))
+            foreach (var t in v.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+                set.Add(SchemaCompareObjectType.Parse(t));
+        return set.Count == 0 ? System.Array.Empty<string>() : set.ToArray();
+    }
+
+    /// <summary>
+    /// Resolves the full #140 publish-options family into a <see cref="PublishPlanOptions"/> with EP-PROFILE
+    /// precedence (CLI flag &gt; profile &gt; built-in default). Shared by <c>publish</c> so the service path
+    /// drives the same options the CLI flags express.
+    /// </summary>
+    private static PublishPlanOptions BuildPublishPlanOptions(string[] args, PublishProfile? profile) => new()
+    {
+        AllowDrops = ResolveAllowDrops(args, profile),
+        WrapInTransaction = ResolveWrapInTransaction(args, profile),
+        ProfileVariables = profile?.Variables,
+        VariableOverrides = ParseCliVars(args),
+        BlockOnPossibleDataLoss = ResolveBlockOnDataLoss(args, profile),
+        GenerateSmartDefaults = ResolveSmartDefaults(args, profile),
+        ScriptNewConstraintValidation = ResolveValidateConstraints(args, profile),
+        AllowTableRecreation = ResolveAllowTableRecreation(args, profile),
+        ConcurrentIndexOperations = HasFlag(args, "--concurrent-indexes") || HasFlag(args, "--minimize-locks")
+            || (profile?.Options.ConcurrentIndexOperations ?? false),
+        DropConstraintsNotInSource = !HasFlag(args, "--no-drop-constraints") && (profile?.Options.DropConstraintsNotInSource ?? true),
+        DropIndexesNotInSource = !HasFlag(args, "--no-drop-indexes") && (profile?.Options.DropIndexesNotInSource ?? true),
+        CommandTimeoutMs = ResolveTimeout(args, "--command-timeout", profile?.Options.CommandTimeoutMs),
+        LockTimeoutMs = ResolveTimeout(args, "--lock-timeout", profile?.Options.LockTimeoutMs),
+        ExcludeObjectTypes = ResolveObjectTypeList(args, "--exclude-type", profile?.Options.ExcludeObjectTypes),
+        DoNotDropObjectTypes = ResolveObjectTypeList(args, "--no-drop-type", profile?.Options.DoNotDropObjectTypes),
+    };
+
     /// <summary>Parses every <c>--var Name=Value</c> occurrence into a case-insensitive override map.</summary>
     private static IReadOnlyDictionary<string, string> ParseCliVars(string[] args) =>
         new CliArgs(args).GetKeyValues("--var");
@@ -1348,6 +1757,23 @@ public static class Program
         </Project>
         """;
 
+    /// <summary>Project file for an extract that carried table data: the seed under Scripts/ is excluded from
+    /// Build and declared as the PostDeploy script, so a publish loads schema then the data (#134).</summary>
+    private static string ProjectFileWithData(string name) =>
+        $"""
+        <Project Sdk="PgProj.Sdk/0.1.0" DefaultTargets="Build">
+          <PropertyGroup>
+            <Name>{name}</Name>
+            <DefaultSchema>public</DefaultSchema>
+          </PropertyGroup>
+          <ItemGroup>
+            <Build Include="**/*.sql" />
+            <Build Remove="Scripts/**/*.sql" />
+            <None Include="Scripts/PostDeploy.sql"><BuildAction>PostDeploy</BuildAction></None>
+          </ItemGroup>
+        </Project>
+        """;
+
     private static void PrintUsage()
     {
         Console.WriteLine("""
@@ -1363,18 +1789,27 @@ public static class Program
           pgproj compare <project.pgproj|.pgpkg> --connection <conn> [--allow-drops] [--profile <file>]                 (one-way: project/package → live DB)
           pgproj compare --source <X> --target <Y> [-o diff.json] [--format json] [--exclude <type,...>] [--allow-drops] [--fail-on-changes]
                          (two-way Schema Compare; X and Y each a .pgproj, .pgpkg, .schema.snapshot, or connection string)
-          pgproj publish <project.pgproj|.pgpkg> --connection <conn> [--dry-run] [-o script.sql] [--allow-drops] [--no-transaction] [--parallel] [--strict] [--no-analyze] [--var N=V] [--substitute-objects] [--profile <file>]
+          pgproj publish <project.pgproj|.pgpkg> --connection <conn> [--dry-run] [-o script.sql] [--allow-drops] [--allow-data-loss] [--no-transaction] [--parallel] [--strict] [--no-analyze] [--var N=V] [--substitute-objects] [--profile <file>]
+                         [--smart-defaults] [--no-validate-constraints] [--allow-table-recreation] [--concurrent-indexes] [--no-drop-constraints] [--no-drop-indexes] [--no-drop-type <type,...>] [--exclude-type <type,...>] [--command-timeout <ms>] [--lock-timeout <ms>]
           pgproj validate <project.pgproj|.pgpkg> --connection <conn> [--strict] [--no-analyze]   (apply to a throwaway temp DB, rolled back)
+          pgproj test <project.pgproj> --connection <conn> [--deploy]   (run *.test.sql unit tests in BEGIN…ROLLBACK; --deploy applies the schema to a shadow DB first; exit 10 on a failed test)
           pgproj pkg inspect <file.pgpkg>                                              (dump the manifest + object inventory)
           pgproj profile create <out.pgpublish.json> [--target-version 18] [--connection-name <label>] [--var N=V] [--allow-drops] [--no-transaction]
                          (write a reusable publish profile from the current flags; the connection string is never stored)
-          pgproj extract --connection <conn> -o <outDir>
+          pgproj extract --connection <conn> -o <outDir> [--all-table-data | --table-data schema.table ...]   (reverse-engineer a live DB into a buildable project; the data flags add an FK-ordered post-deploy seed)
           pgproj snapshot --connection <conn> -o <db.schema.snapshot>                    (introspect a live DB once → a portable schema.snapshot for offline compare)
+          pgproj snapshot create <project.pgproj> [-o <dir>]                            (project snapshot: a timestamped read-only Project_YYYYMMDD_HH-MM-SS.pgpkg under Snapshots/ — no DB)
+          pgproj snapshot compare <A.pgpkg> <B.pgpkg|project.pgproj> [-o diff.json] [--format json]   (Schema Compare two snapshots / a snapshot vs the project)
+          pgproj snapshot revert <project.pgproj> <snapshot.pgpkg> [--dry-run] [--allow-deletes]      (rewrite the project .sql back to a snapshot via reverse-sync)
+          pgproj snapshot import <project.pgproj> <external.pgpkg> [-o <dir>]            (register an external snapshot as a selectable compare source under Snapshots/)
           pgproj drift   <project.pgproj> --connection <conn> [--fail-on-drift]         (preview project files that differ from the DB; --fail-on-drift exits 6 on drift)
           pgproj pull    <project.pgproj> --connection <conn> [--dry-run] [--allow-deletes]   (rewrite project files FROM the DB — scenario 3)
           pgproj verify <a.pgpkg> <b.pgpkg> [--format json] [-o report.json]   (package equivalence: model + sources + options; exit 6 on drift - DacpacVerify analogue)
           pgproj deploy-report <project.pgproj|.pgpkg> --connection <conn> [-o report.json] [--format xml] [--profile <file>] [--var N=V] [--allow-drops] [--parallel]   (planned-change report, never applies - DeployReport analogue; alias: publish --report-only)
           pgproj sync-file <project.pgproj> --file <rel.sql> --connection <conn> [--apply-to-local | --apply-to-db [--allow-drops] [--dry-run]]   (one file vs the DB: JSON state for editors, or apply either direction)
+          pgproj rename <project.pgproj> <schema.table> <new-name>      (rewrite .sql + record in .pgrefactorlog so the next publish ALTERs … RENAME instead of drop+create)
+          pgproj move-schema <project.pgproj> <schema.table> <new-schema>   (rewrite .sql + record a schema move so the next publish ALTERs … SET SCHEMA instead of drop+create)
+          pgproj data-compare --source <conn> --target <conn> [--tables a,b] [-o diff.json | sync.sql] [--apply] [--fail-on-changes]   (row-level data diff; -o .sql writes a sync script; --apply runs it on the target in one transaction)
           pgproj analyze <project.pgproj> [--strict]    (static safety analysis over the AST)
           pgproj model-tree <project.pgproj> [--format json]   (objects + source positions, for editors)
           pgproj describe-table <table.sql> [--table schema.name] [--default-schema public]   (one table's model as JSON, for the graphical designer)
@@ -1399,6 +1834,9 @@ public static class Program
           --no-package       build: skip writing the portable .pgpkg artifact
           --no-transaction   Do not wrap the deploy script in BEGIN/COMMIT
           --parallel         Publish with intra-phase parallelism (phase-level atomicity)
+          --concurrent-indexes  Lock-minimizing deploy: CREATE/DROP INDEX CONCURRENTLY + FK/CHECK NOT VALID then a separate VALIDATE (alias: --minimize-locks)
+          --allow-data-loss     publish: proceed past the possible-data-loss gate (which blocks by default → exit 9)
+          --smart-defaults      publish/script: synthesize a DEFAULT for a new NOT NULL column so it applies to a populated table
           --strict           Analysis gate: treat warnings as errors (build/publish fail on warnings)
           --no-analyze       Skip the static-analysis gate on build/publish
           --var Name=Value   Override a SqlCmdVariable (repeatable; CLI beats the profile, profile beats the project DefaultValue)

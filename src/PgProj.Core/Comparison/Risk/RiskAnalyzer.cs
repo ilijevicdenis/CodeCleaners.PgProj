@@ -36,10 +36,16 @@ public sealed class RiskAnalyzer
         CreateSequenceChange => Safe("Create a new sequence."),
         AlterSequenceChange => Safe("Adjust sequence options; existing rows are untouched."),
         CreateTableChange => Safe("Create a new table."),
-        CreateIndexChange => Warning("Create an index; takes a lock and scans the table.", rewrite: false, exclusiveLock: false),
+        // A concurrent build is non-blocking (SHARE UPDATE EXCLUSIVE, reads+writes continue) but can leave an
+        // INVALID index if it fails; a plain build takes a SHARE lock that blocks writes while it scans (#137).
+        CreateIndexChange { Concurrent: true } => Warning("Create an index CONCURRENTLY; non-blocking (reads/writes continue), but a failed build leaves an INVALID index to clean up.", rewrite: false, exclusiveLock: false),
+        CreateIndexChange => Warning("Create an index; blocks writes while it scans the table.", rewrite: false, exclusiveLock: false),
+        AddForeignKeyChange { NotValid: true } => Warning("Add a foreign key NOT VALID; instant, no existing-row scan (a separate VALIDATE pass checks rows non-blockingly)."),
         AddForeignKeyChange => Warning("Add a foreign key; validates existing rows under a lock."),
         AddPrimaryKeyChange => Warning("Add a primary key; builds a unique index and may reject existing rows."),
+        AddCheckConstraintChange { NotValid: true } => Warning("Add a check constraint NOT VALID; instant, no existing-row scan (a separate VALIDATE pass checks rows non-blockingly)."),
         AddCheckConstraintChange => Warning("Add a check constraint; validates existing rows."),
+        ValidateConstraintChange => Safe("Validate a constraint; scans rows under a SHARE UPDATE EXCLUSIVE lock (reads/writes continue)."),
         AddRawTableConstraintChange => Warning("Add a table constraint; may validate existing rows."),
         CreateOrReplaceViewChange => Safe("Create or replace a view; no table data is touched."),
         CreateOrReplaceFunctionChange => Safe("Create or replace a function; no table data is touched."),
@@ -55,6 +61,15 @@ public sealed class RiskAnalyzer
         DropPrimaryKeyChange => Dangerous("Drop a primary key; dependent foreign keys and row identity are affected."),
         DropConstraintChange => Warning("Drop a constraint; data is retained but no longer validated."),
         DropForeignKeyChange => Warning("Drop a foreign key; referential integrity is no longer enforced."),
+
+        // ---- data-preserving renames / schema moves (refactor log, #136) ------------------------
+        // These replace the destructive DROP+CREATE the name-keyed diff would otherwise infer; the object's
+        // data is kept in place, so they are SAFE (the whole point of the refactor log).
+        RenameTableChange => Safe("Rename a table in place (ALTER TABLE … RENAME); rows are preserved."),
+        RenameColumnChange => Safe("Rename a column in place (ALTER TABLE … RENAME COLUMN); column data is preserved."),
+        SetTableSchemaChange => Safe("Move a table to another schema (ALTER TABLE … SET SCHEMA); rows are preserved."),
+        RenameSequenceChange or RenameIndexChange or RenameViewChange or RenameFunctionChange =>
+            Safe("Rename an object in place (ALTER … RENAME); no data is lost."),
 
         // ---- raw objects ------------------------------------------------------------------------
         CreateRawObjectChange => Safe("Create a new object."),

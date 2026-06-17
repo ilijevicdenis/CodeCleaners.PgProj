@@ -66,6 +66,37 @@ public sealed class PgPkgRoundTripTests : IDisposable
     private const string Tool = "test-1.2.3";
 
     [Fact]
+    public void Refactor_log_is_packed_into_the_package_and_read_back()
+    {
+        var (project, result) = BuildSample();
+        // A committed refactor log next to the project (#136).
+        new PgProj.Core.Refactoring.RefactorLog
+        {
+            Entries = new[] { new PgProj.Core.Refactoring.RefactorEntry("rename", "table", "app.client", "app.customers") },
+        }.Save(PgProj.Core.Refactoring.RefactorLog.PathFor(project.ProjectFilePath));
+
+        var pkg = PgPkgBuilder.FromBuild(project, result.Model, result.Files, Tool, Stamp);
+        var path = Path.Combine(_dir, "withlog.pgpkg");
+        pkg.Write(path);
+
+        var read = PgPkg.Read(path);
+        Assert.NotNull(read.RefactorLogJson);
+        var log = PgProj.Core.Refactoring.RefactorLog.Parse(read.RefactorLogJson!);
+        Assert.Single(log.Entries);
+        Assert.Equal("app.customers", log.Entries[0].NewName);
+    }
+
+    [Fact]
+    public void No_refactor_log_means_no_entry_in_the_package()
+    {
+        var (project, result) = BuildSample();   // no .pgrefactorlog written
+        var pkg = PgPkgBuilder.FromBuild(project, result.Model, result.Files, Tool, Stamp);
+        var path = Path.Combine(_dir, "nolog.pgpkg");
+        pkg.Write(path);
+        Assert.Null(PgPkg.Read(path).RefactorLogJson);
+    }
+
+    [Fact]
     public void Write_then_read_round_trips_model_and_manifest()
     {
         var (project, result) = BuildSample();

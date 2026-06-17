@@ -26,7 +26,7 @@
 | SSDT (Visual Studio) | VSIX pair: .pgproj project type, templates, property pages, Publish, Schema Compare, Import, file-level Sync, full PG editor (coloring/IntelliSense/diagnostics/F12/peek) — validated 115/115 E2E | ✅ exists |
 | SQL Database Projects extension (VS Code) | pgproj VS Code extension (LSP client, webviews) | ✅ exists |
 | Schema Compare | two-way `SchemaCompare` engine + VS interactive window + VS Code webview | ✅ exists |
-| Publish profile (`.publish.xml`) | `.pgpublish.json` (CLI>profile>default); full DacDeployOptions family tracked in #140 | ✅ exists |
+| Publish profile (`.publish.xml`) | `.pgpublish.json` (CLI>profile>default); full DacDeployOptions-equivalent family (#140) | ✅ exists |
 | SQLCMD variables `$(Var)` | project variables + profile/CLI overrides (`--var`) | ✅ exists |
 | Pre/Post-deployment scripts | pre/post-deploy scripts spliced into the deploy script | ✅ exists |
 | Target platform (`Sql160`…) | `TargetPostgresVersion` enforced (`PGV###` gate) | ✅ exists |
@@ -84,9 +84,16 @@ The headless engine is in good shape. These epics are **complete** and only need
 > **Reality check (2026-06-12):** the per-epic task checklists in §3 below are the *original* backlog and
 > were not all re-ticked — treat §2 + `PROGRESS.md` as truth. **Genuinely open:** EP-ANALYSIS+ rule
 > backlog (#81), EP-COVERAGE blocked tail (#72: #102/#108 need C functions in the server), editable
-> EP-DESIGNER (#112/#119/#120), and the wave-3 epics — snapshot workflow (#142), refactorlog (#136),
-> CONCURRENTLY deploys (#137), data extract/BACPAC (#134), NuGet package references (#133), data
-> compare (#132), PL/pgSQL unit testing (#139), full publish-options family (#140).
+> EP-DESIGNER (#112/#119/#120), and NuGet package references (#133). **Partially done:** refactorlog (#136) — artifact +
+> default deploy-as-ALTER consumption (table/column rename, schema move) + `rename`/`move-schema` CLI +
+> `.pgpkg` packing (publish-from-package consumes it) shipped; only `expand-wildcards` deferred.
+> **Closed since:** the full
+> DacDeployOptions-equivalent publish-options family (#140), lock-minimizing/CONCURRENTLY deploy (#137),
+> the project-snapshot CLI (#142: `snapshot create`/`compare`/`revert`/`import`), row-level data compare
+> (#132: `data-compare` diff + sync script + apply), table-data extract (#134: `extract --all-table-data`/
+> `--table-data` → an FK-ordered post-deploy seed; `.pgpkg`-embedded data variant deferred), the PL/pgSQL
+> unit-test runner (#139: `pgproj test`, BEGIN…ROLLBACK isolation + predefined conditions + expected
+> SQLSTATE), and analyzer rules PG015/PG016 (#81).
 
 ---
 
@@ -98,7 +105,7 @@ Each has **user stories** (As a … I want … so that …) and **engineering ta
 
 ---
 
-### EP-PKG — Portable build artifact (the `.dacpac` analogue) — **P0** — ✅ DONE (+ `verify` #138; data/BACPAC #134 and snapshot workflow #142 open)
+### EP-PKG — Portable build artifact (the `.dacpac` analogue) — **P0** — ✅ DONE (+ `verify` #138; snapshot workflow #142; table-data extract #134 — `.pgpkg`-embedded data variant open)
 
 SSDT's whole model hinges on the `.dacpac`: one portable, versioned, referenceable file that is the
 build output, the unit of deployment, and the unit of reference. pgproj emits a `bin/*.model.json`
@@ -228,7 +235,7 @@ SSDT lets you enable/disable rules and set severity, plus third-party rule packs
 
 ---
 
-### EP-PROFILE — Publish profiles — **P1** — ✅ DONE (full DacDeployOptions family open, #140)
+### EP-PROFILE — Publish profiles — **P1** — ✅ DONE (full DacDeployOptions-equivalent family delivered, #140)
 
 > ✅ **DELIVERED** (M7 audit 2026-06-07, issue #68). `Deployment/PublishProfile.cs` (secret-whitelisted `.pgpublish.json`), `profile create` verb, `--profile` on publish/script/compare (CLI>profile>default). Tests `PublishProfileTests`. Tasks below are historical.
 
@@ -394,7 +401,7 @@ Matrix *Command line tools / CI-CD* (GitHub `sql-action`, Azure DevOps task).
 | Solution management | ✅ `sln new/add/list` | n/a | ✅ `.slnx` loads natively |
 | Build | ✅ `build` (+ `--verbose`, warning policy) | ✅ | ✅ SDK + IDE build |
 | Publish to server / local instance | ✅ `publish` (transactional/phased) | ✅ webview | ✅ Publish dialog |
-| Publish options/properties | ✅ flags + `.pgpublish.json` (#140 grows the family) | ✅ | ✅ property pages |
+| Publish options/properties | ✅ flags + `.pgpublish.json` — full DacDeployOptions-equivalent family (#140) | ✅ | ✅ property pages |
 | Deploy report (plan w/o apply) | ✅ `deploy-report` (JSON/XML, risk + data-loss gate) | ⚠️ via CLI | ⚠️ via CLI |
 | Package equivalence (DacpacVerify) | ✅ `verify` (exit 0/6) | ⚠️ via CLI | ⚠️ via CLI |
 | Target platform updatable + enforced | ✅ `TargetPostgresVersion` + `PGV###` | ✅ | ✅ property page |
@@ -412,11 +419,11 @@ Matrix *Command line tools / CI-CD* (GitHub `sql-action`, Azure DevOps task).
 | Graphical table designer | ✅ `describe-table`/`emit-table` round-trip | ⚠️ read-only webview | ❌ editable (#112/#119/#120) |
 | Code analysis configure/suppress | ✅ per-rule config, packs, SARIF, `SuppressWarnings`/`TreatWarningsAsErrors` | ✅ | ✅ |
 | Run code analysis | ✅ `analyze` | ✅ | ✅ build gate |
-| Object rename/refactor (refactorlog) | ❌ #136 | ❌ | ❌ |
+| Object rename/refactor (refactorlog) | ⚠️ `rename`/`move-schema` + `.pgrefactorlog` deploy-as-ALTER + `.pgpkg` packing (#136; only `expand-wildcards` open) | ❌ | ❌ |
 | IntelliSense from project model | ✅ `serve` LSP (alias-aware, column-precise nav) | ✅ | ✅ incl. coloring/F12/peek — validated 115/115 |
-| Database unit testing | ❌ #139 | ❌ | ❌ |
-| Data compare | ❌ #132 | ❌ | ❌ |
-| Schema + data package (BACPAC) | ❌ #134 | ❌ | ❌ |
+| Database unit testing | ✅ `test` (BEGIN…ROLLBACK + predefined conditions + expected SQLSTATE) (#139; scaffolder open) | ⚠️ via CLI | ⚠️ via CLI |
+| Data compare | ✅ `data-compare` (4-category diff + sync script + apply) (#132) | ⚠️ via CLI | ⚠️ via CLI |
+| Schema + data package (BACPAC) | ⚠️ `extract --all-table-data`/`--table-data` → FK-ordered post-deploy seed (#134; `.pgpkg`-embedded data variant open) | ⚠️ via CLI | ⚠️ via CLI |
 ## 5. Suggested phasing
 
 **Phase 1 — engine completeness (unblocks everything, all P0):**

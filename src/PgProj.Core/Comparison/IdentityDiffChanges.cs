@@ -25,6 +25,28 @@ public sealed record RenameTableChange(string Schema, string OldName, string New
         $"ALTER TABLE {SqlEmitter.Qualified(Schema, OldName)} RENAME TO {SqlEmitter.Quote(NewName)};";
 }
 
+/// <summary>Renames a column in place via <c>ALTER TABLE … RENAME COLUMN … TO</c> — data-preserving,
+/// replacing the Drop+Add pair a column rename would otherwise produce (#136).</summary>
+public sealed record RenameColumnChange(string Schema, string Table, string OldName, string NewName) : SchemaChange
+{
+    public override int Phase => 44; // after a table rename (39), before column adds/alters (45/50)
+    public override bool IsDestructive => false;
+    public override string Describe() => $"Rename column {Schema}.{Table}.{OldName} -> {NewName}";
+    public override string ToSql() =>
+        $"ALTER TABLE {SqlEmitter.Qualified(Schema, Table)} RENAME COLUMN {SqlEmitter.Quote(OldName)} TO {SqlEmitter.Quote(NewName)};";
+}
+
+/// <summary>Moves a table to another schema via <c>ALTER TABLE … SET SCHEMA</c> — data-preserving,
+/// replacing the Drop+Create pair a schema move would otherwise produce (#136).</summary>
+public sealed record SetTableSchemaChange(string OldSchema, string Name, string NewSchema) : SchemaChange
+{
+    public override int Phase => 39;
+    public override bool IsDestructive => false;
+    public override string Describe() => $"Move table {OldSchema}.{Name} -> {NewSchema}.{Name}";
+    public override string ToSql() =>
+        $"ALTER TABLE {SqlEmitter.Qualified(OldSchema, Name)} SET SCHEMA {SqlEmitter.Quote(NewSchema)};";
+}
+
 /// <summary>Renames a sequence via <c>ALTER SEQUENCE … RENAME TO</c>.</summary>
 public sealed record RenameSequenceChange(string Schema, string OldName, string NewName) : SchemaChange
 {
