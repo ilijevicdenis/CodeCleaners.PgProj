@@ -107,10 +107,104 @@ public class ModelAnalyzerTests
             """);
 
         var off = AnalysisConfig.FromOverrides(new Dictionary<string, RuleOverride> { ["PG014"] = new(Enabled: false) });
-        Assert.Empty(new ModelAnalyzer(off).Analyze(model));
+        Assert.DoesNotContain(new ModelAnalyzer(off).Analyze(model), x => x.RuleId == "PG014");
 
         var asError = AnalysisConfig.FromOverrides(new Dictionary<string, RuleOverride> { ["PG014"] = new(Severity: DiagnosticSeverity.Error) });
         Assert.Contains(new ModelAnalyzer(asError).Analyze(model), x => x.RuleId == "PG014" && x.Severity == DiagnosticSeverity.Error);
+    }
+
+    [Fact]
+    public void PG019_fk_without_referential_action()
+    {
+        var d = A("""
+            CREATE TABLE s.parent (id int PRIMARY KEY);
+            CREATE TABLE s.child (id int PRIMARY KEY, parent_id int REFERENCES s.parent(id));
+            """);
+        Assert.Contains(d, x => x.RuleId == "PG019" && x.Severity == DiagnosticSeverity.Info && x.Target == "s.child");
+    }
+
+    [Fact]
+    public void PG019_clear_when_any_action_declared()
+    {
+        // ON DELETE alone is enough to count as a stated decision.
+        var onDelete = A("""
+            CREATE TABLE s.parent (id int PRIMARY KEY);
+            CREATE TABLE s.child (id int PRIMARY KEY, parent_id int REFERENCES s.parent(id) ON DELETE CASCADE);
+            """);
+        Assert.DoesNotContain(onDelete, x => x.RuleId == "PG019");
+
+        var onUpdate = A("""
+            CREATE TABLE s.parent (id int PRIMARY KEY);
+            CREATE TABLE s.child (id int PRIMARY KEY, parent_id int REFERENCES s.parent(id) ON UPDATE RESTRICT);
+            """);
+        Assert.DoesNotContain(onUpdate, x => x.RuleId == "PG019");
+    }
+
+    [Fact]
+    public void PG024_duplicate_index()
+    {
+        var d = A("""
+            CREATE TABLE s.t (id int PRIMARY KEY, a int, b int);
+            CREATE INDEX ix1 ON s.t (a, b);
+            CREATE INDEX ix2 ON s.t (a, b);
+            """);
+        var dup = d.Where(x => x.RuleId == "PG024").ToList();
+        Assert.Single(dup);                       // only the second is flagged; the first is the keeper
+        Assert.Equal(DiagnosticSeverity.Info, dup[0].Severity);
+    }
+
+    [Fact]
+    public void PG024_clear_when_columns_or_predicate_differ()
+    {
+        // Different column order is a different b-tree — not a duplicate.
+        var order = A("""
+            CREATE TABLE s.t (id int PRIMARY KEY, a int, b int);
+            CREATE INDEX ix1 ON s.t (a, b);
+            CREATE INDEX ix2 ON s.t (b, a);
+            """);
+        Assert.DoesNotContain(order, x => x.RuleId == "PG024");
+
+        // Same columns but different predicates — not a duplicate.
+        var pred = A("""
+            CREATE TABLE s.t (id int PRIMARY KEY, a int);
+            CREATE INDEX ix1 ON s.t (a) WHERE a > 0;
+            CREATE INDEX ix2 ON s.t (a) WHERE a < 0;
+            """);
+        Assert.DoesNotContain(pred, x => x.RuleId == "PG024");
+    }
+
+    [Fact]
+    public void PG025_redundant_prefix_index()
+    {
+        // (a) is a leading prefix of (a, b) — the wider index already serves it.
+        var d = A("""
+            CREATE TABLE s.t (id int PRIMARY KEY, a int, b int);
+            CREATE INDEX ix_a ON s.t (a);
+            CREATE INDEX ix_ab ON s.t (a, b);
+            """);
+        var redundant = d.Where(x => x.RuleId == "PG025").ToList();
+        Assert.Single(redundant);
+        Assert.Contains("ix_a", redundant[0].Message);
+    }
+
+    [Fact]
+    public void PG025_clear_when_not_a_leading_prefix_or_partial()
+    {
+        // (b) is NOT a leading prefix of (a, b) — a separate-column index, not redundant.
+        var notPrefix = A("""
+            CREATE TABLE s.t (id int PRIMARY KEY, a int, b int);
+            CREATE INDEX ix_b ON s.t (b);
+            CREATE INDEX ix_ab ON s.t (a, b);
+            """);
+        Assert.DoesNotContain(notPrefix, x => x.RuleId == "PG025");
+
+        // A partial index changes coverage — never reported as redundant.
+        var partial = A("""
+            CREATE TABLE s.t (id int PRIMARY KEY, a int, b int);
+            CREATE INDEX ix_a ON s.t (a) WHERE a IS NOT NULL;
+            CREATE INDEX ix_ab ON s.t (a, b);
+            """);
+        Assert.DoesNotContain(partial, x => x.RuleId == "PG025");
     }
 
     [Fact]
@@ -118,8 +212,12 @@ public class ModelAnalyzerTests
     {
         Assert.Equal(ModelAnalyzer.RuleCount, ModelAnalyzer.RuleDefaults.Count);
         Assert.True(ModelAnalyzer.IsKnownRule("PG014"));
+        Assert.True(ModelAnalyzer.IsKnownRule("PG019"));
+        Assert.True(ModelAnalyzer.IsKnownRule("PG024"));
+        Assert.True(ModelAnalyzer.IsKnownRule("PG025"));
         Assert.False(ModelAnalyzer.IsKnownRule("PG001"));   // per-file rules live in PgAnalyzer
         Assert.Equal(DiagnosticSeverity.Warning, ModelAnalyzer.DefaultSeverityOf("PG014"));
+        Assert.Equal(DiagnosticSeverity.Info, ModelAnalyzer.DefaultSeverityOf("PG019"));
     }
 
     private sealed class TestModelRule : IModelRule

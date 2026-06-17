@@ -167,6 +167,37 @@ public class PgAnalyzerTests
     }
 
     [Fact]
+    public void PG017_json_column_prefers_jsonb()
+    {
+        Assert.Contains(A("CREATE TABLE s.t (id int PRIMARY KEY, doc json);"), x => x.RuleId == "PG017" && x.Severity == DiagnosticSeverity.Info);
+        Assert.Contains(A("CREATE TABLE s.t (id int PRIMARY KEY, docs json[]);"), x => x.RuleId == "PG017");
+        // jsonb is the recommended form — never flagged.
+        Assert.DoesNotContain(A("CREATE TABLE s.t (id int PRIMARY KEY, doc jsonb);"), x => x.RuleId == "PG017");
+    }
+
+    [Fact]
+    public void PG020_exception_when_others()
+    {
+        var swallow = "CREATE FUNCTION s.f() RETURNS void LANGUAGE plpgsql VOLATILE AS $$ BEGIN PERFORM 1; EXCEPTION WHEN OTHERS THEN NULL; END $$;";
+        Assert.Contains(A(swallow), x => x.RuleId == "PG020" && x.Severity == DiagnosticSeverity.Warning);
+        // Catching a specific condition is fine.
+        var specific = "CREATE FUNCTION s.f() RETURNS void LANGUAGE plpgsql VOLATILE AS $$ BEGIN PERFORM 1; EXCEPTION WHEN unique_violation THEN NULL; END $$;";
+        Assert.DoesNotContain(A(specific), x => x.RuleId == "PG020");
+    }
+
+    [Fact]
+    public void PG021_select_into_without_strict()
+    {
+        string Fn(string body) => $"CREATE FUNCTION s.f() RETURNS int LANGUAGE plpgsql VOLATILE AS $$ DECLARE v int; BEGIN {body} RETURN v; END $$;";
+
+        Assert.Contains(A(Fn("SELECT id INTO v FROM s.t WHERE id = 1;")), x => x.RuleId == "PG021" && x.Severity == DiagnosticSeverity.Warning);
+        // INTO STRICT is the safe form.
+        Assert.DoesNotContain(A(Fn("SELECT id INTO STRICT v FROM s.t WHERE id = 1;")), x => x.RuleId == "PG021");
+        // INSERT ... INTO is unrelated DML, not a select-into target.
+        Assert.DoesNotContain(A(Fn("INSERT INTO s.t (id) VALUES (1);")), x => x.RuleId == "PG021");
+    }
+
+    [Fact]
     public void Clean_statements_produce_no_findings()
     {
         Assert.Empty(A("CREATE FUNCTION s.f(x int) RETURNS int LANGUAGE sql IMMUTABLE AS $$ SELECT x $$;"));
