@@ -4,7 +4,7 @@
 > SSDT-for-PostgreSQL parity and is the single place to read "where are we now". It is **updated on
 > every delivered milestone** (see [Update contract](#update-contract) below).
 
-**Last updated:** 2026-06-12 (M1–M6 complete; **M7 substantially delivered** — and the VS experience is
+**Last updated:** 2026-06-24 (M1–M6 complete; **M7 substantially delivered** — and the VS experience is
 now VALIDATED IN THE INSTALLED PRODUCT: a 115-scenario VM E2E suite (FlaUI+DTE, real sample database)
 found and fixed three silent editor-chain breaks (per-user MEF cache, content-type overwrite, CodeRemote
 LSP gate), live diagnostics reached build parity (+ cross-file invalidation), navigation/completion are
@@ -176,6 +176,19 @@ is a `tracking` issue; tasks are linked children.
 > [Update contract](#update-contract): tick its box, recompute the M7 `Done` count in §1, add a §3 row,
 > and close the issue.
 
+#### Next wave — prepared & ready to implement (opened 2026-06-24)
+
+Scoped, unblocked tickets forming the next implementation push (designer #112/#119/#120 stays parked;
+#102/#108 stay `blocked` pending C functions in the server). All on milestone **M7**:
+
+- ⬜ **#133 EP-REF** — NuGet `.pgpkg` package references (net-new), broken into:
+  - ⬜ **#147** — `dotnet pack` a project's built `.pgpkg` into a consumable `.nupkg` (id/version metadata).
+  - ⬜ **#148** — `ReferenceResolver` restores + resolves a `PackageReference` `.pgpkg` into the composite model, **reference-only** (no deploy DDL); unresolvable id+version → clear diagnostic.
+  - ⬜ **#149** — consumer build/deploy parity vs the inlined baseline on the shadow-DB + blackbox harness.
+- ⬜ **#150** (child of #139 EP-UNITTEST) — `pgproj test` **stub scaffolder** (pre/test/post from the semantic model, leading-`_` naming) — the last open piece of the unit-test runner.
+- ⬜ **#151** (child of #134 EP-EXTRACT) — `.pgpkg`-embedded `data/` **COPY section** (BACPAC-analogue variant) — the last open piece of data extract.
+- ⬜ **#152** (child of #136 EP-REFACTOR) — **`expand-wildcards`** command (`SELECT *` → explicit columns, model-resolved) — the last open piece of refactoring.
+
 ---
 
 ## 3. Delivery log
@@ -184,6 +197,7 @@ Newest first. One line per delivered issue/milestone; this is the audit trail of
 
 | Date | Milestone | Item | Commit | Notes |
 |------|-----------|------|--------|-------|
+| 2026-06-24 | M7+ | **Blackbox test suite** — new `tests/PgProj.Blackbox.Tests` drives the `pgproj` CLI end-to-end against a live dockerized source+target (`tests/blackbox-db`): basics, build/publish happy + failure-recovery, data-compare, extract+sync, refactor, snapshot/package, test-runner; plus a DB-backed VS Code E2E (`db.test.ts`, `runTest.ts` forwards the Docker connection strings + built CLI dll) and VS UiTests tooling scenarios. Wired into `PgProj.slnx`. | `5fa4f87` | Closed the four fully-delivered epics this validates: **#132** EP-DATACOMPARE (`f2d6330`), **#137** EP-DEPLOY (`5fbd9f1`), **#140** EP-PROFILE (`5fbd9f1`), **#142** EP-PKG (`0f81c34`). Commented blackbox coverage on the still-open tails #139/#134/#136. |
 | 2026-06-17 | M7 | **EP-ANALYSIS+: six new analyzer rules** (#81) — PG017 `json` column (prefer `jsonb`), PG019 FK with no `ON DELETE`/`ON UPDATE` action, PG020 `EXCEPTION WHEN OTHERS`, PG021 `SELECT … INTO` without `STRICT` (per-file); PG024 duplicate index + PG025 redundant (leading-prefix) index (model-level, b-tree-ordered, explicit-only, partial-aware) | `278518b` | New `PgAnalyzerTests` (PG017/PG020/PG021) + `ModelAnalyzerTests` (PG019/PG024/PG025 incl. column-order/predicate/partial negatives); registry-consistency extended; documented in `docs/ANALYSIS_RULES.md`. Full DB-free suite 22,615 pass / 0 fail. **#81 stays open** as the ongoing rule backlog. |
 | 2026-06-13 | M7+ | **EP-UNITTEST: PL/pgSQL unit-test runner done** (#139, core) — `pgproj test <project> --connection [--deploy]` discovers `*.test.sql`, runs each inside its own `BEGIN … ROLLBACK` (single-transaction scope, residue-free), reporting passed/failed/inconclusive with a non-zero exit (new code 10 `TestFailed`). `PgUnitRunner` ships an assertion prelude (the predefined conditions: assert, row count, scalar, empty/not-empty, column-type/expected-schema, data checksum, plus `pgproj_inconclusive`) and an `-- @expect-sqlstate:` directive for negative/expected-exception tests; `--deploy` applies the project schema to a throwaway shadow DB first | `97db767` | New `PgUnitRunnerTests` (conditions pass/fail, expected-SQLSTATE incl. wrong/none, inconclusive, single-transaction-scope residue check, directive parser) + a CLI `test --deploy` smoke. Full suite 25,164 / 0. **Open in #139:** the stub scaffolder. |
 | 2026-06-13 | M7+ | **EP-EXTRACT: table-data extract done** (#134, core) — `pgproj extract --all-table-data` / `--table-data schema.table` adds an FK-ordered `Scripts/PostDeploy.sql` data seed to the extracted project (excluded from Build, wired as the PostDeploy script, so a normal publish loads schema then data); `DataExporter` emits INSERT batches parents-before-children, writes identity columns with `OVERRIDING SYSTEM VALUE`, and `setval`-corrects each identity/serial sequence past the loaded rows | `8a9fe6e` | New `DataExporterTests` — a live extract→load round-trip proving rows + identity + next-id sequence reproduce, and `--table-data` selection — plus a CLI smoke (extracted project builds). Full suite 25,156 / 0. **Open in #134:** the `.pgpkg`-embedded `data/` (COPY) variant. |
