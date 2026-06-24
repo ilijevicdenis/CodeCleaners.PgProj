@@ -51,6 +51,7 @@ public static class Program
                 "sync-file" => await SyncFile(args),
                 "rename" => Rename(args),
                 "move-schema" => MoveSchema(args),
+                "expand-wildcards" => ExpandWildcards(args),
                 "data-compare" => await DataCompareCmd(args),
                 "test" => await Test(args),
                 "deploy-report" => await DeployReport(args),
@@ -508,6 +509,14 @@ public static class Program
         if (p.Count < 3)
             throw new CliUsageException("Usage: pgproj move-schema <project.pgproj> <schema.table> <new-schema>");
         return RunRefactor(p[0], proj => RefactorEngine.MoveTableToSchema(proj, p[1], p[2]));
+    }
+
+    private static int ExpandWildcards(string[] args)
+    {
+        var p = args.Skip(1).Where(a => !a.StartsWith('-')).ToList();
+        if (p.Count < 2)
+            throw new CliUsageException("Usage: pgproj expand-wildcards <project.pgproj> <schema.view>");
+        return RunRefactor(p[0], proj => RefactorEngine.ExpandWildcards(proj, p[1]));
     }
 
     private static int RunRefactor(string projectPath, Func<DatabaseProject, RefactorResult> refactor)
@@ -1853,6 +1862,7 @@ public static class Program
           pgproj sync-file <project.pgproj> --file <rel.sql> --connection <conn> [--apply-to-local | --apply-to-db [--allow-drops] [--dry-run]]   (one file vs the DB: JSON state for editors, or apply either direction)
           pgproj rename <project.pgproj> <schema.table> <new-name>      (rewrite .sql + record in .pgrefactorlog so the next publish ALTERs … RENAME instead of drop+create)
           pgproj move-schema <project.pgproj> <schema.table> <new-schema>   (rewrite .sql + record a schema move so the next publish ALTERs … SET SCHEMA instead of drop+create)
+          pgproj expand-wildcards <project.pgproj> <schema.view>   (rewrite SELECT * / alias.* in a view to an explicit column list; record in .pgrefactorlog)
           pgproj data-compare --source <conn> --target <conn> [--tables a,b] [-o diff.json | sync.sql] [--apply] [--fail-on-changes]   (row-level data diff; -o .sql writes a sync script; --apply runs it on the target in one transaction)
           pgproj analyze <project.pgproj> [--strict]    (static safety analysis over the AST)
           pgproj model-tree <project.pgproj> [--format json]   (objects + source positions, for editors)

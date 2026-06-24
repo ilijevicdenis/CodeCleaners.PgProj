@@ -34,8 +34,10 @@ public sealed class RefactorLog
 
     public const string OpRename = "rename";
     public const string OpMoveSchema = "move-schema";
+    public const string OpExpandWildcards = "expand-wildcards";
     public const string TypeTable = "table";
     public const string TypeColumn = "column";
+    public const string TypeView = "view";
 
     public IReadOnlyList<RefactorEntry> Entries { get; init; } = Array.Empty<RefactorEntry>();
 

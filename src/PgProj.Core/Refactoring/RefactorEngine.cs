@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using PgProj.Core.Model;
 using PgProj.Core.Project;
+using PgProj.Core.Syntax;
 
 namespace PgProj.Core.Refactoring;
 
@@ -53,6 +55,88 @@ public static class RefactorEngine
         var entry = new RefactorEntry(RefactorLog.OpMoveSchema, RefactorLog.TypeTable, oldQualified, newQualified);
         AppendLog(project, entry);
         return new RefactorResult(entry, changed, count);
+    }
+
+    /// <summary>
+    /// Expand <c>SELECT *</c> (and <c>alias.*</c>) in a view's projection to an explicit column list, resolved
+    /// from the semantic model, rewriting the <c>.sql</c> source in place and logging the operation. Mirrors
+    /// SSDT's "Expand Wildcards" refactor. Only the star tokens are rewritten — the rest of the file stays
+    /// byte-identical. Supported shape: a plain top-level <c>SELECT</c> over table sources; WITH/UNION/
+    /// subquery-or-function sources raise a clear <see cref="RefactorException"/>.
+    /// </summary>
+    public static RefactorResult ExpandWildcards(DatabaseProject project, string viewQualified)
+    {
+        var (schema, name) = RequireQualified(viewQualified);
+
+        var build = project.BuildAsync().GetAwaiter().GetResult();
+        var view = build.Model.Views.FirstOrDefault(v =>
+            DatabaseModel.NameEquals(v.Schema, schema) && DatabaseModel.NameEquals(v.Name, name));
+        if (view is null)
+            throw new RefactorException($"No view '{viewQualified}' found in the project (only views can be expanded).");
+
+        var sources = ResolveSources(view, build.Model);
+
+        var changed = new List<string>();
+        var total = 0;
+        foreach (var file in project.ResolveSqlFiles())
+        {
+            var text = File.ReadAllText(file);
+            var (rewritten, count) = WildcardExpander.Rewrite(text, schema, name, sources);
+            if (count > 0)
+            {
+                File.WriteAllText(file, rewritten, new System.Text.UTF8Encoding(encoderShouldEmitUTF8Identifier: false));
+                changed.Add(file);
+                total += count;
+            }
+        }
+        if (total == 0)
+            throw new RefactorException($"Could not locate the definition of view '{viewQualified}' to rewrite.");
+
+        var entry = new RefactorEntry(RefactorLog.OpExpandWildcards, RefactorLog.TypeView, viewQualified, viewQualified);
+        AppendLog(project, entry);
+        return new RefactorResult(entry, changed, total);
+    }
+
+    /// <summary>
+    /// Resolve the view body's FROM sources (each TableRef and its joins) to (visible-name, ordered-columns)
+    /// using the model's tables. Only table sources are resolvable; a subquery/function/unknown source yields
+    /// no columns — a star that needs it then fails loudly in <see cref="WildcardExpander"/>.
+    /// </summary>
+    private static IReadOnlyList<WildcardExpander.Source> ResolveSources(ViewDefinition view, DatabaseModel model)
+    {
+        ParseResult parsed;
+        try { parsed = new PgParser().Parse(view.Body); }
+        catch (Exception ex) { throw new RefactorException($"Could not parse the body of view '{view.Schema}.{view.Name}': {ex.Message}"); }
+
+        var query = parsed.Statements.OfType<QueryStatement>().FirstOrDefault()?.Query;
+        if (query is null || query.SetOp is not null || query.From is null)
+            throw new RefactorException($"View '{view.Schema}.{view.Name}' is not a plain single SELECT over a FROM clause (expand-wildcards does not support WITH/UNION/FROM-less views).");
+
+        var sources = new List<WildcardExpander.Source>();
+        foreach (var rel in query.From.Relations)
+        {
+            AddSource(sources, rel, model);
+            foreach (var join in rel.Joins) AddSource(sources, join.Right, model);
+        }
+        return sources;
+    }
+
+    private static void AddSource(List<WildcardExpander.Source> sources, TableRef rel, DatabaseModel model)
+    {
+        var visible = rel.Alias ?? rel.TableName;
+        if (string.IsNullOrEmpty(visible)) return;                       // unnamed subquery — unresolvable
+
+        // Only relation refs carry resolvable columns (a subquery/function source has TableName == null).
+        if (rel.TableName is null || rel.Subquery is not null || rel.Function is not null)
+        {
+            sources.Add(new WildcardExpander.Source(visible, Array.Empty<string>()));
+            return;
+        }
+
+        var candidates = model.Tables.Where(t => DatabaseModel.NameEquals(t.Name, rel.TableName!)
+            && (rel.Schema is null || DatabaseModel.NameEquals(t.Schema, rel.Schema))).ToList();
+        var cols = candidates.Count == 1 ? candidates[0].Columns.Select(c => c.Name).ToList() : new List<string>();
+        sources.Add(new WildcardExpander.Source(visible, cols));
     }
 
     /// <summary>
