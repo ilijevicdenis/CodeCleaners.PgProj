@@ -1,0 +1,34 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="coverlet.collector" Version="6.0.4" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.4" />
+    <!-- The tests treat pgproj as an opaque binary; Npgsql is used ONLY to set up DB state and to
+         assert observable outcomes (does the object exist, did the transaction roll back). -->
+    <PackageReference Include="Npgsql" Version="9.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+  <!-- BLACKBOX: we reference the CLI only to force it to build before the tests run; we do NOT link
+       its assembly (ReferenceOutputAssembly=false) so the test code cannot touch engine types. The
+       harness locates and shells out to the produced PgProj.Cli.dll. -->
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\PgProj.Cli\PgProj.Cli.csproj">
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <Private>false</Private>
+    </ProjectReference>
+  </ItemGroup>
+
+</Project>

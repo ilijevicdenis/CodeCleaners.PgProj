@@ -1,0 +1,57 @@
+# Two PostgreSQL 18 servers for the BLACKBOX test suite (tests/PgProj.Blackbox.Tests + the editor
+# E2E harnesses). The tool's whole job is to move schema between a SOURCE and a TARGET, so the
+# blackbox harness gives each its own server on its own port:
+#
+#   * SOURCE (pgproj-bb-source, port 15432) — seeded with the same broad sample schema the rest of
+#     the repo uses (reuses ../sample-db/init), so `extract`, `compare --source <live>`, `pull`,
+#     `drift`, and `data-compare --source` have a real, populated database to read.
+#   * TARGET (pgproj-bb-target, port 15433) — starts EMPTY. Blackbox tests create their own
+#     throwaway databases on it (CREATE DATABASE ...) so greenfield/incremental `publish`,
+#     `validate`, and `test --deploy` each get a clean, isolated target and drop it afterwards.
+#
+# Ports are fixed (15432/15433) so the connection strings are stable across machines, and bound to
+# 0.0.0.0 so a Hyper-V test VM can reach the host's Docker over the virtual switch (the VS UiTests).
+#
+# Start/stop via tests/blackbox-db/blackbox-db.ps1 (it prints the connection strings and exports the
+# PGPROJ_SOURCE_CONNECTION / PGPROJ_TARGET_CONNECTION the blackbox suite reads).
+#
+# NOTE: the source publishes 15432 — the SAME port as tests/sample-db. They are interchangeable
+# (identical seed) but must not run at once; blackbox-db.ps1 stops the sample-db container first.
+services:
+  pgproj-bb-source:
+    image: postgres:18
+    container_name: pgproj-bb-source
+    # The blackbox + E2E suites run many short live-DB cases; raise the backend cap so a burst of
+    # parallel connections never shows up as a flaky "too many clients" failure (matches sample-db).
+    command: ["postgres", "-c", "max_connections=400"]
+    environment:
+      POSTGRES_PASSWORD: pgproj
+      POSTGRES_DB: sampledb
+    ports:
+      - "15432:5432"
+    volumes:
+      # Reuse the canonical sample seed (schemas sales/inventory/audit + data) so the source is a
+      # genuine, populated database to extract/compare/pull from. Runs once on a fresh data dir.
+      - ../sample-db/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d sampledb"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+  pgproj-bb-target:
+    image: postgres:18
+    container_name: pgproj-bb-target
+    command: ["postgres", "-c", "max_connections=400"]
+    environment:
+      POSTGRES_PASSWORD: pgproj
+      # The target is the maintenance DB only; tests CREATE/DROP their own per-case databases on it.
+      POSTGRES_DB: postgres
+    ports:
+      - "15433:5432"
+    # No seed volume: the target starts empty by design (greenfield deploys need an empty server).
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d postgres"]
+      interval: 2s
+      timeout: 3s
+      retries: 30

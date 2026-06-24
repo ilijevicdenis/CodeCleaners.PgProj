@@ -41,6 +41,11 @@ async function main(): Promise<void> {
     // The sample AllFeaturesDb project lives at repo-root/sample/AllFeaturesDb.
     let workspace = path.resolve(extensionDevelopmentPath, "../../sample/AllFeaturesDb");
 
+    // Resolve the built CLI dll from the REAL repo path now, before any space-free mirroring rewrites
+    // the paths — the in-host tests can't recompute it (their __dirname is the temp mirror). Forwarded
+    // via env so the DB-backed E2E points the engine at the real binary.
+    const cliDll = path.resolve(extensionDevelopmentPath, "../../src/PgProj.Cli/bin/Debug/net10.0/PgProj.Cli.dll");
+
     if (/\s/.test(extensionDevelopmentPath)) {
       const m = mirrorToSpaceFree(extensionDevelopmentPath, workspace);
       extensionDevelopmentPath = m.extDev;
@@ -48,9 +53,18 @@ async function main(): Promise<void> {
       workspace = m.workspace;
     }
 
+    // Forward the blackbox Docker connection strings into the VS Code host so the DB-backed E2E
+    // (validate against the live target) can read them; absent → those tests skip themselves.
+    const passEnv: Record<string, string> = {};
+    for (const k of ["PGPROJ_TARGET_CONNECTION", "PGPROJ_SOURCE_CONNECTION"]) {
+      if (process.env[k]) passEnv[k] = process.env[k] as string;
+    }
+    if (fs.existsSync(cliDll)) passEnv.PGPROJ_CLI_DLL = cliDll;
+
     await runTests({
       extensionDevelopmentPath,
       extensionTestsPath,
+      extensionTestsEnv: passEnv,
       // Stable space-free cache so repeated runs don't re-download VS Code.
       cachePath: path.join(os.tmpdir(), "pgproj-vscode-e2e-cache"),
       launchArgs: [workspace, "--disable-extensions", "--user-data-dir", path.join(os.tmpdir(), "pgproj-vscode-e2e-ud")],
