@@ -56,6 +56,22 @@
     <Exec Command="$(_PgProjCliInvocation) build &quot;$(MSBuildProjectFullPath)&quot; -o &quot;$(PgProjOutput)&quot; --package &quot;$(PgProjPackage)&quot;" />
   </Target>
 
+  <!--
+    EP-REF #147: contribute the built .pgpkg to the NuGet package under pgpkg/<Name>.pgpkg. NuGet's pack
+    invokes the targets listed in TargetsForTfmSpecificContentInPackage (wired in Sdk.props); DependsOn the
+    pgproj build so the .pgpkg exists by the time pack collects content. `dotnet pack` therefore yields a
+    <Name>.<Version>.nupkg whose only payload is the portable package — consumed as a PackageReference (#148).
+  -->
+  <Target Name="_PgProjPackPackage" DependsOnTargets="Build">
+    <Error Condition="!Exists('$(PgProjPackage)')"
+           Text="pgproj pack: the built package '$(PgProjPackage)' was not produced — the database build must succeed before pack." />
+    <ItemGroup>
+      <TfmSpecificPackageFile Include="$(PgProjPackage)">
+        <PackagePath>$(PgProjPackageFolder)/$(MSBuildProjectName).pgpkg</PackagePath>
+      </TfmSpecificPackageFile>
+    </ItemGroup>
+  </Target>
+
   <!-- Remove the pgproj outputs when the project is cleaned (alongside Common's Clean). -->
   <Target Name="_PgProjClean" AfterTargets="Clean">
     <Delete Files="$(PgProjOutput)" Condition="Exists('$(PgProjOutput)')" />

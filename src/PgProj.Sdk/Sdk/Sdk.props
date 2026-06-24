@@ -81,6 +81,21 @@
 
     <!-- Opt out of the default .sql glob with EnableDefaultSqlItems=false to manage <Build> yourself. -->
     <EnableDefaultSqlItems Condition="'$(EnableDefaultSqlItems)' == ''">true</EnableDefaultSqlItems>
+
+    <!--
+      EP-REF #147: `dotnet pack` produces a .nupkg that carries this project's built .pgpkg under pgpkg/,
+      so a reusable "common schema" project can be published and consumed by id+version (a PackageReference,
+      #148). The package id defaults to the project name and the version to <Version> (1.0.0 if unset).
+      A schema package has NO lib/ assembly (the .pgpkg is the payload) and NO dependencies, so suppress the
+      build-output + dependency machinery and the "empty package" warning. The .pgpkg is contributed by the
+      _PgProjPackPackage target (Sdk.targets) via TargetsForTfmSpecificContentInPackage.
+    -->
+    <IncludeBuildOutput Condition="'$(IncludeBuildOutput)' == ''">false</IncludeBuildOutput>
+    <SuppressDependenciesWhenPacking Condition="'$(SuppressDependenciesWhenPacking)' == ''">true</SuppressDependenciesWhenPacking>
+    <NoWarn>$(NoWarn);NU5128</NoWarn>
+    <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);_PgProjPackPackage</TargetsForTfmSpecificContentInPackage>
+    <!-- The folder a referenced package's .pgpkg lands in (consumed by ReferenceResolver, #148). -->
+    <PgProjPackageFolder Condition="'$(PgProjPackageFolder)' == ''">pgpkg</PgProjPackageFolder>
   </PropertyGroup>
 
   <!--
