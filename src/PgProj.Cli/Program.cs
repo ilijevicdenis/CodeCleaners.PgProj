@@ -533,6 +533,9 @@ public static class Program
 
     private static async Task<int> Test(string[] args)
     {
+        var sub = args.Skip(1).FirstOrDefault(a => !a.StartsWith('-'))?.ToLowerInvariant();
+        if (sub == "scaffold") return await TestScaffold(args);
+
         var project = DatabaseProject.Load(RequirePositional(args, "project file"));
         var conn = RequireConnection(args);
 
@@ -595,6 +598,46 @@ public static class Program
                 await using var drop = new Npgsql.NpgsqlCommand($"DROP DATABASE IF EXISTS \"{temp}\" WITH (FORCE)", admin);
                 await drop.ExecuteNonQueryAsync();
             }
+        }
+    }
+
+    // ---- test scaffold (generate a pre/test/post stub for a function/procedure/trigger, #139) ----
+    private static async Task<int> TestScaffold(string[] args)
+    {
+        // args: test scaffold <project.pgproj> <schema.object>
+        var p = args.Skip(1).Where(a => !a.StartsWith('-')).ToList();
+        if (p.Count < 3)
+            throw new CliUsageException("Usage: pgproj test scaffold <project.pgproj> <schema.object>");
+
+        var project = DatabaseProject.Load(p[1]);
+        var build = await project.BuildAsync();
+        if (build.Diagnostics.Count > 0)
+        {
+            Console.Error.WriteLine($"Cannot scaffold — build failed with {build.Diagnostics.Count} problem(s):");
+            foreach (var d in build.Diagnostics) Console.Error.WriteLine($"  - {d}");
+            return ExitCode.BuildError;
+        }
+
+        try
+        {
+            var result = TestScaffolder.Scaffold(build.Model, p[2]);
+            var dir = Path.Combine(project.ProjectDirectory, "Tests");
+            Directory.CreateDirectory(dir);
+            var path = Path.Combine(dir, result.FileName);
+            if (File.Exists(path) && !HasFlag(args, "--force"))
+            {
+                Console.Error.WriteLine($"error: {result.FileName} already exists (pass --force to overwrite).");
+                return ExitCode.Usage;
+            }
+            File.WriteAllText(path, result.Content, new System.Text.UTF8Encoding(encoderShouldEmitUTF8Identifier: false));
+            Console.WriteLine($"Scaffolded {result.Kind} test stub: {Path.GetRelativePath(project.ProjectDirectory, path)}");
+            Console.WriteLine("Edit the arrange/act/assert sections, then run `pgproj test <project> --connection ...`.");
+            return ExitCode.Success;
+        }
+        catch (ScaffoldException ex)
+        {
+            Console.Error.WriteLine($"error: {ex.Message}");
+            return ExitCode.Usage;
         }
     }
 
@@ -1793,6 +1836,7 @@ public static class Program
                          [--smart-defaults] [--no-validate-constraints] [--allow-table-recreation] [--concurrent-indexes] [--no-drop-constraints] [--no-drop-indexes] [--no-drop-type <type,...>] [--exclude-type <type,...>] [--command-timeout <ms>] [--lock-timeout <ms>]
           pgproj validate <project.pgproj|.pgpkg> --connection <conn> [--strict] [--no-analyze]   (apply to a throwaway temp DB, rolled back)
           pgproj test <project.pgproj> --connection <conn> [--deploy]   (run *.test.sql unit tests in BEGIN…ROLLBACK; --deploy applies the schema to a shadow DB first; exit 10 on a failed test)
+          pgproj test scaffold <project.pgproj> <schema.object>         (generate a pre/test/post unit-test stub for a function/procedure/trigger; writes Tests/_schema.object.test.sql)
           pgproj pkg inspect <file.pgpkg>                                              (dump the manifest + object inventory)
           pgproj profile create <out.pgpublish.json> [--target-version 18] [--connection-name <label>] [--var N=V] [--allow-drops] [--no-transaction]
                          (write a reusable publish profile from the current flags; the connection string is never stored)
