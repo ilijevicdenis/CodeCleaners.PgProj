@@ -18,8 +18,11 @@ public static class ReferenceErrorCodes
     /// <summary>A referenced artifact is not a readable/valid <c>.pgpkg</c>.</summary>
     public const string InvalidArtifact = "PGREF004";
 
-    /// <summary>A <c>&lt;PackageReference/&gt;</c> was declared but NuGet restore is not yet implemented.</summary>
+    /// <summary>A <c>&lt;PackageReference/&gt;</c> was declared but NuGet restore is not yet implemented. (Superseded by <see cref="PackageNotResolved"/> once #148 landed restore-aware resolution.)</summary>
     public const string PackageRestoreNotImplemented = "PGREF005";
+
+    /// <summary>A <c>&lt;PackageReference/&gt;</c>'s <c>.pgpkg</c> could not be located in the restored NuGet global packages folder (run <c>dotnet restore</c>; the package must carry <c>pgpkg/&lt;Name&gt;.pgpkg</c>).</summary>
+    public const string PackageNotResolved = "PGREF006";
 }
 
 /// <summary>A diagnostic emitted while resolving references, carrying a stable <see cref="Code"/>.</summary>

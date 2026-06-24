@@ -46,8 +46,10 @@ public sealed record ReferenceResolution(
 /// <see cref="ReferenceErrorCodes.Circular"/> instead of overflowing the stack.
 ///
 /// Scope: same-database / other-schema references. Cross-database (FDW/dblink) is deferred — see the
-/// epic. NuGet <c>&lt;PackageReference/&gt;</c> parse is honored but restore is a follow-up: it yields a
-/// clear <see cref="ReferenceErrorCodes.PackageRestoreNotImplemented"/> diagnostic.
+/// epic. A NuGet <c>&lt;PackageReference/&gt;</c> (#148) is resolved from the restored global packages folder:
+/// the package's embedded <c>pgpkg/&lt;Name&gt;.pgpkg</c> is loaded reference-only, exactly like an
+/// <c>&lt;ArtifactReference/&gt;</c>. NuGet restore itself stays an MSBuild concern; an unrestored package
+/// fails with <see cref="ReferenceErrorCodes.PackageNotResolved"/>.
 /// </summary>
 public sealed class ReferenceResolver
 {
@@ -55,6 +57,15 @@ public sealed class ReferenceResolver
     private readonly List<ReferenceDiagnostic> _diagnostics = new();
     private readonly HashSet<string> _done = new(StringComparer.OrdinalIgnoreCase);   // keys already injected
     private readonly HashSet<string> _onPath = new(StringComparer.OrdinalIgnoreCase); // active DFS stack (cycle guard)
+    private readonly string _packagesFolder;
+
+    /// <param name="nugetPackagesFolder">
+    /// The NuGet global packages folder to resolve <c>&lt;PackageReference/&gt;</c>s from. Defaults to
+    /// <see cref="NuGetPackageLocator.DefaultGlobalPackagesFolder"/> (<c>$NUGET_PACKAGES</c> / <c>~/.nuget/packages</c>);
+    /// tests inject a temp folder.
+    /// </param>
+    public ReferenceResolver(string? nugetPackagesFolder = null) =>
+        _packagesFolder = nugetPackagesFolder ?? NuGetPackageLocator.DefaultGlobalPackagesFolder();
 
     /// <summary>Resolves every reference of <paramref name="project"/>, transitively.</summary>
     public ReferenceResolution Resolve(DatabaseProject project)
@@ -146,14 +157,35 @@ public sealed class ReferenceResolver
 
     private void ResolvePackage(ProjectReferenceItem item)
     {
-        // Parse is supported; restore is not. Surface a precise, actionable diagnostic rather than
-        // silently ignoring the reference (which would make cross-schema names fail later for no reason).
-        var ver = item.Version is null ? "" : $" (version {item.Version})";
-        Report(ReferenceErrorCodes.PackageRestoreNotImplemented,
-            $"PackageReference '{item.Include}'{ver} is not yet restored from NuGet. " +
-            "NuGet restore of .pgpkg packages is a planned follow-up (depends on SDK packaging / EP-PKG); " +
-            "use an <ArtifactReference> to a local .pgpkg in the meantime.");
-        _done.Add(item.Key);   // don't re-report the same package id repeatedly
+        var (pgpkgPath, _) = NuGetPackageLocator.Locate(_packagesFolder, item.Include, item.Version);
+        if (pgpkgPath is null)
+        {
+            var ver = item.Version is null ? "" : $" (version {item.Version})";
+            Report(ReferenceErrorCodes.PackageNotResolved,
+                $"PackageReference '{item.Include}'{ver} could not be resolved: no restored .pgpkg was found under the " +
+                $"NuGet global packages folder ('{_packagesFolder}'). Run `dotnet restore` (or `dotnet add package`) so the " +
+                "package is restored, and ensure it was produced by `dotnet pack` on a PgProj project (it must carry pgpkg/<Name>.pgpkg).");
+            _done.Add(item.Key);   // don't re-report the same package id repeatedly
+            return;
+        }
+
+        try
+        {
+            var pkg = PgPkg.Read(pgpkgPath);   // verifies the integrity checksum
+            Inject(item, pkg.Model);           // reference-only — never enters the comparer's model (no deploy DDL)
+        }
+        catch (PgPkgFormatException ex)
+        {
+            Report(ReferenceErrorCodes.InvalidArtifact,
+                $"PackageReference '{item.Include}' restored an invalid .pgpkg ('{pgpkgPath}'): {ex.Message}");
+            _done.Add(item.Key);
+        }
+        catch (Exception ex)
+        {
+            Report(ReferenceErrorCodes.InvalidArtifact,
+                $"Failed to read the .pgpkg restored for PackageReference '{item.Include}' ('{pgpkgPath}'): {ex.Message}");
+            _done.Add(item.Key);
+        }
     }
 
     private void Inject(ProjectReferenceItem item, DatabaseModel model)

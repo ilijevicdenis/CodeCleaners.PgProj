@@ -251,24 +251,78 @@ public sealed class ProjectReferenceResolutionTests : IDisposable
         Assert.Contains(resolution.Diagnostics, d => d.Code == ReferenceErrorCodes.NotFound);
     }
 
-    // ---- package reference: documented not-yet-restored ------------------------------------
+    // ---- package reference: restore-aware resolution (#148) --------------------------------
+
+    /// <summary>Build A into a .pgpkg and place it where NuGet restore would expand it: feed/&lt;id&gt;/&lt;version&gt;/pgpkg/.</summary>
+    private void PackAIntoFeed(string packagesFolder, string id, string version)
+    {
+        WriteProjectA();
+        var aProject = DatabaseProject.Load(Path.Combine(_root, "A", "A.pgproj"));
+        var builtA = aProject.Build();
+        Assert.False(builtA.HasErrors);
+        var pkg = PgPkgBuilder.FromBuild(aProject, builtA.Model, builtA.Files, "t", "2026-01-01T00:00:00Z");
+        var dir = Path.Combine(packagesFolder, id.ToLowerInvariant(), version, "pgpkg");
+        Directory.CreateDirectory(dir);
+        pkg.Write(Path.Combine(dir, id + ".pgpkg"));
+    }
 
     [Fact]
-    public void Package_reference_yields_not_yet_restored_diagnostic()
+    public void Package_reference_resolves_from_the_restored_global_packages_folder()
     {
+        var feed = Path.Combine(_root, "nuget");
+        PackAIntoFeed(feed, "Acme.CommonSchema", "1.2.3");
+        var bProj = Write("B/B.pgproj",
+            MakeProjB("""<PackageReference Include="Acme.CommonSchema" Version="1.2.3" />"""));
+        Write("B/v.sql", "CREATE VIEW app.cust AS SELECT c.id FROM common.customer c;");
+
+        var project = DatabaseProject.Load(bProj);
+        Assert.Equal(ReferenceKind.Package, project.References[0].Kind);
+
+        var resolution = new ReferenceResolver(feed).Resolve(project);
+        Assert.False(resolution.HasErrors, string.Join("\n", resolution.Diagnostics));
+        // The package's objects widen resolution…
+        Assert.Contains(resolution.ExternalModel.Tables,
+            t => DatabaseModel.NameEquals(t.Schema, "common") && DatabaseModel.NameEquals(t.Name, "customer"));
+        // …so B's view over common.customer validates.
+        Assert.Empty(ReferenceValidator.Validate(project, resolution));
+    }
+
+    [Fact]
+    public void Package_referenced_objects_are_reference_only_never_emitted()
+    {
+        var feed = Path.Combine(_root, "nuget");
+        PackAIntoFeed(feed, "Acme.CommonSchema", "1.0.0");
+        var bProj = Write("B/B.pgproj",
+            MakeProjB("""<PackageReference Include="Acme.CommonSchema" Version="1.0.0" />"""));
+        Write("B/t.sql", "CREATE TABLE app.t (id int PRIMARY KEY);");
+
+        var project = DatabaseProject.Load(bProj);
+        var built = project.Build();
+        Assert.False(built.HasErrors);
+
+        // Reference-only: the package's objects never enter B's own model, so deploying B to an empty
+        // database creates B's table only — never the referenced common.customer.
+        Assert.Contains(built.Model.Tables, t => DatabaseModel.NameEquals(t.Schema, "app") && DatabaseModel.NameEquals(t.Name, "t"));
+        Assert.DoesNotContain(built.Model.Tables, t => DatabaseModel.NameEquals(t.Schema, "common"));
+        var changes = new SchemaComparer().Compare(built.Model, new DatabaseModel());
+        Assert.NotEmpty(changes);
+        Assert.DoesNotContain(changes, c => c.ToString()!.Contains("common.customer", StringComparison.OrdinalIgnoreCase));
+    }
+
+    [Fact]
+    public void Unresolvable_package_reports_not_resolved_with_an_actionable_message()
+    {
+        var feed = Path.Combine(_root, "nuget");   // empty feed — nothing restored
+        Directory.CreateDirectory(feed);
         var bProj = Write("B/B.pgproj",
             MakeProjB("""<PackageReference Include="Acme.CommonSchema" Version="1.2.3" />"""));
         Write("B/v.sql", "CREATE TABLE app.t (id int);");
 
-        var project = DatabaseProject.Load(bProj);
-        Assert.Equal(ReferenceKind.Package, project.References[0].Kind);
-        Assert.Equal("1.2.3", project.References[0].Version);
-
-        var resolution = new ReferenceResolver().Resolve(project);
+        var resolution = new ReferenceResolver(feed).Resolve(DatabaseProject.Load(bProj));
         var diag = Assert.Single(resolution.Diagnostics);
-        Assert.Equal(ReferenceErrorCodes.PackageRestoreNotImplemented, diag.Code);
+        Assert.Equal(ReferenceErrorCodes.PackageNotResolved, diag.Code);
         Assert.Contains("Acme.CommonSchema", diag.Message);
-        Assert.Contains("1.2.3", diag.Message);
+        Assert.Contains("dotnet restore", diag.Message);
     }
 
     // ---- UI-consumable resolver shape ------------------------------------------------------
