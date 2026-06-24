@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Npgsql;
 using PgProj.Core.Model;
+using PgProj.Core.Packaging;
 
 namespace PgProj.Core.Data;
 
@@ -71,6 +72,50 @@ public static class DataExporter
         }
 
         return sb.ToString();
+    }
+
+    /// <summary>
+    /// Export <paramref name="onlyTables"/> (all eligible when null/empty) as FK-ordered PostgreSQL text-format
+    /// <c>COPY</c> payloads (#151 — the schema+data <c>.pgpkg</c> section). Each non-empty table becomes one
+    /// <see cref="PgPkgDataTable"/>; rows are captured via <c>COPY (SELECT … ORDER BY key) TO STDOUT</c> so the
+    /// dump is deterministic, and generated-STORED columns are excluded (PostgreSQL recomputes them on load).
+    /// </summary>
+    public static async Task<IReadOnlyList<PgPkgDataTable>> ExportCopyAsync(
+        string connectionString, DatabaseModel model,
+        IReadOnlyCollection<string>? onlyTables = null, CancellationToken ct = default)
+    {
+        var filter = onlyTables is { Count: > 0 }
+            ? new HashSet<string>(onlyTables, StringComparer.OrdinalIgnoreCase)
+            : null;
+        var tables = FkOrder(model.Tables.Where(t => filter is null || filter.Contains(t.QualifiedName)).ToList());
+
+        var result = new List<PgPkgDataTable>();
+        await using var conn = new NpgsqlConnection(connectionString);
+        await conn.OpenAsync(ct);
+
+        foreach (var t in tables)
+        {
+            var cols = t.Columns.Where(c => c.GeneratedExpression is null).ToList();
+            if (cols.Count == 0) continue;
+
+            var keyOrder = t.PrimaryKey is { Columns.Count: > 0 } pk ? pk.Columns : cols.Select(c => c.Name).ToList();
+            var inner = $"SELECT {string.Join(", ", cols.Select(c => Quote(c.Name)))} FROM {Quote(t.Schema)}.{Quote(t.Name)} " +
+                        $"ORDER BY {string.Join(", ", keyOrder.Select(Quote))}";
+            var copySql = $"COPY ({inner}) TO STDOUT";
+
+            var sb = new StringBuilder();
+            using (var reader = await conn.BeginTextExportAsync(copySql, ct))
+            {
+                var buf = new char[8192];
+                int n;
+                while ((n = await reader.ReadAsync(buf, 0, buf.Length)) > 0) sb.Append(buf, 0, n);
+            }
+            if (sb.Length == 0) continue;   // no rows → nothing to carry
+
+            var hasAlways = cols.Any(c => c is { IsIdentity: true, IdentityKind: "ALWAYS" });
+            result.Add(new PgPkgDataTable(t.Schema, t.Name, cols.Select(c => c.Name).ToList(), hasAlways, sb.ToString()));
+        }
+        return result;
     }
 
     private static async Task<List<string[]>> ReadAllAsync(NpgsqlConnection conn, TableDefinition t, IReadOnlyList<ColumnDefinition> cols, CancellationToken ct)

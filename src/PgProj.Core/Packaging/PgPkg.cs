@@ -4,6 +4,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using PgProj.Core.Model;
 
 namespace PgProj.Core.Packaging;
@@ -30,6 +31,8 @@ public sealed class PgPkg
     private const string ScriptsPrefix = "scripts/";
     private const string ScriptsPlaceholder = "scripts/.keep";
     private const string RefactorLogEntry = "refactorlog.json";
+    private const string DataPrefix = "data/";
+    private const string DataIndexEntry = "data/index.json";
 
     public required PgPkgManifest Manifest { get; init; }
     public required DatabaseModel Model { get; init; }
@@ -44,6 +47,17 @@ public sealed class PgPkg
     /// </summary>
     public string? RefactorLogJson { get; init; }
 
+    /// <summary>
+    /// The embedded FK-ordered table data (#151 — the schema+data / BACPAC-analogue variant), or empty when
+    /// the package is schema-only. Each entry carries a table's column list and a PostgreSQL text-format
+    /// <c>COPY</c> payload; the loader streams them after schema in this order. NOT part of the
+    /// <c>sourceChecksum</c> (it is captured data, not source).
+    /// </summary>
+    public IReadOnlyList<PgPkgDataTable> Data { get; init; } = Array.Empty<PgPkgDataTable>();
+
+    /// <summary>True when the package carries an embedded table-data section.</summary>
+    public bool HasData => Data.Count > 0;
+
     /// <summary>True if a file has the <c>.pgpkg</c> extension (case-insensitive).</summary>
     public static bool IsPackagePath(string path) =>
         Path.GetExtension(path).Equals(Extension, StringComparison.OrdinalIgnoreCase);
@@ -56,14 +70,22 @@ public sealed class PgPkg
     /// is byte-identical.
     /// </summary>
     public static PgPkg Create(PgPkgManifest manifest, DatabaseModel model, IEnumerable<PgPkgSource> sources,
-        string? refactorLogJson = null) =>
+        string? refactorLogJson = null, IReadOnlyList<PgPkgDataTable>? data = null) =>
         new()
         {
             Manifest = manifest,
             Model = model,
             Sources = sources.OrderBy(s => s.RelativePath, StringComparer.Ordinal).ToList(),
             RefactorLogJson = string.IsNullOrWhiteSpace(refactorLogJson) ? null : refactorLogJson,
+            Data = data ?? Array.Empty<PgPkgDataTable>(),
         };
+
+    private static readonly JsonSerializerOptions DataJson = new()
+    {
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        PropertyNameCaseInsensitive = true,
+        WriteIndented = true,
+    };
 
     /// <summary>Writes the package to <paramref name="path"/>, overwriting any existing file.</summary>
     public void Write(string path)
@@ -89,7 +111,19 @@ public sealed class PgPkg
         // The refactor log (#136) travels with the package so a publish-from-package emits the same ALTERs.
         if (RefactorLogJson is { Length: > 0 })
             WriteEntry(archive, RefactorLogEntry, RefactorLogJson);
+        // The table-data section (#151): an ordered index + one COPY payload per table.
+        if (Data.Count > 0)
+        {
+            var index = Data.Select((d, i) => new PgPkgDataIndexEntry(
+                i, d.Schema, d.Name, d.Columns, d.HasAlwaysIdentity, DataPayloadName(i, d))).ToList();
+            WriteEntry(archive, DataIndexEntry, JsonSerializer.Serialize(index, DataJson));
+            foreach (var (d, i) in Data.Select((d, i) => (d, i)))
+                WriteEntry(archive, DataPrefix + DataPayloadName(i, d), d.CopyText);
+        }
     }
+
+    private static string DataPayloadName(int ordinal, PgPkgDataTable d) =>
+        $"{ordinal:D4}_{d.Schema}.{d.Name}.copy";
 
     private static void WriteEntry(ZipArchive archive, string name, string content)
     {
@@ -149,7 +183,24 @@ public sealed class PgPkg
 
         var model = ModelJson.Deserialize(modelText);
         var refactorLogJson = archive.GetEntry(RefactorLogEntry) is { } rl ? ReadEntry(rl) : null;
-        return new PgPkg { Manifest = manifest, Model = model, Sources = sources, RefactorLogJson = refactorLogJson };
+        var data = ReadData(archive);
+        return new PgPkg { Manifest = manifest, Model = model, Sources = sources, RefactorLogJson = refactorLogJson, Data = data };
+    }
+
+    /// <summary>Reads the embedded data section (#151) in index order, or empty when the package is schema-only.</summary>
+    private static IReadOnlyList<PgPkgDataTable> ReadData(ZipArchive archive)
+    {
+        if (archive.GetEntry(DataIndexEntry) is not { } idxEntry) return Array.Empty<PgPkgDataTable>();
+        var index = JsonSerializer.Deserialize<List<PgPkgDataIndexEntry>>(ReadEntry(idxEntry), DataJson)
+                    ?? new List<PgPkgDataIndexEntry>();
+        var tables = new List<PgPkgDataTable>(index.Count);
+        foreach (var e in index.OrderBy(e => e.Ordinal))
+        {
+            var payload = archive.GetEntry(DataPrefix + e.File)
+                ?? throw new PgPkgFormatException($"Package data section is missing payload '{e.File}' for {e.Schema}.{e.Name}.");
+            tables.Add(new PgPkgDataTable(e.Schema, e.Name, e.Columns, e.HasAlwaysIdentity, ReadEntry(payload)));
+        }
+        return tables;
     }
 
     /// <summary>
@@ -179,3 +230,18 @@ public sealed class PgPkg
 
 /// <summary>An original <c>.sql</c> source carried inside a package, keyed by forward-slashed relative path.</summary>
 public sealed record PgPkgSource(string RelativePath, string Content);
+
+/// <summary>
+/// One table's embedded data (#151): its qualified name, the ordered column list the payload was captured
+/// with, whether it has a <c>GENERATED ALWAYS AS IDENTITY</c> column (so the loader knows to relax it around
+/// the COPY), and the PostgreSQL text-format <c>COPY</c> payload (tab-delimited rows, <c>\N</c> for null).
+/// </summary>
+public sealed record PgPkgDataTable(string Schema, string Name, IReadOnlyList<string> Columns,
+    bool HasAlwaysIdentity, string CopyText)
+{
+    public string QualifiedName => $"{Schema}.{Name}";
+}
+
+/// <summary>The serialized <c>data/index.json</c> row: load order + metadata + the payload file name.</summary>
+internal sealed record PgPkgDataIndexEntry(int Ordinal, string Schema, string Name,
+    IReadOnlyList<string> Columns, bool HasAlwaysIdentity, string File);

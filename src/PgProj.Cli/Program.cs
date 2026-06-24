@@ -478,6 +478,19 @@ public static class Program
             await service.ApplyAsync(plan, connection, parallel);
             Console.WriteLine($"Published {plan.ChangeCount} change(s) successfully" +
                               (parallel && !plan.HasDeployScripts ? " (parallel, phased)." : "."));
+
+            // #151: a schema+data .pgpkg loads its embedded COPY data after the schema deploy succeeds
+            // (FK-ordered; ALWAYS-identity columns are relaxed around the COPY then restored).
+            var pubSrc = args.Skip(1).FirstOrDefault(a => !a.StartsWith('-'));
+            if (project is null && pubSrc is not null && PgPkg.IsPackagePath(pubSrc))
+            {
+                var dataPkg = PgPkg.Read(Path.GetFullPath(pubSrc));
+                if (dataPkg.HasData)
+                {
+                    await PgProj.Core.Data.CopyDataLoader.LoadAsync(connection, dataPkg);
+                    Console.WriteLine($"Loaded embedded table data for {dataPkg.Data.Count} table(s).");
+                }
+            }
         }
         catch (Npgsql.PostgresException ex)
         {
@@ -779,6 +792,23 @@ public static class Program
         // seed from Build and wires it as the PostDeploy script).
         File.WriteAllText(Path.Combine(outDir, $"{projName}.pgproj"),
             withData ? ProjectFileWithData(projName) : DefaultProjectFile(projName));
+
+        // #151: optionally also emit a portable schema(+data) .pgpkg (the BACPAC analogue). With
+        // --all-table-data/--table-data the rows are embedded as an FK-ordered COPY section that a
+        // `publish <pkg>` loads after the schema; a normal extract yields a schema-only package.
+        var pkgOut = GetOption(args, "--package");
+        if (pkgOut is not null)
+        {
+            var pkgSources = files.Select(kv => new PgPkgSource(kv.Key.Replace('\\', '/'), kv.Value)).ToList();
+            var manifest = new PgPkgManifest(projName, "", ToolVersion, UtcStamp(),
+                SourceChecksum.Compute(pkgSources.Select(s => (s.RelativePath, s.Content))));
+            IReadOnlyList<PgPkgDataTable> data = withData
+                ? await PgProj.Core.Data.DataExporter.ExportCopyAsync(conn, model, allData ? null : tableData)
+                : Array.Empty<PgPkgDataTable>();
+            PgPkg.Create(manifest, model, pkgSources, data: data).Write(Path.GetFullPath(pkgOut));
+            Console.WriteLine($"Wrote package {Path.GetFullPath(pkgOut)} ({pkgSources.Count} source(s)" +
+                (data.Count > 0 ? $", {data.Count} data table(s)" : "") + ").");
+        }
 
         Console.WriteLine($"Extracted {files.Count} object file(s) to {Path.GetFullPath(outDir)}");
         PrintModelSummary(model);
@@ -1850,6 +1880,7 @@ public static class Program
           pgproj profile create <out.pgpublish.json> [--target-version 18] [--connection-name <label>] [--var N=V] [--allow-drops] [--no-transaction]
                          (write a reusable publish profile from the current flags; the connection string is never stored)
           pgproj extract --connection <conn> -o <outDir> [--all-table-data | --table-data schema.table ...]   (reverse-engineer a live DB into a buildable project; the data flags add an FK-ordered post-deploy seed)
+          pgproj extract --connection <conn> --package <out.pgpkg> [--all-table-data | --table-data ...]   (emit a portable schema+data .pgpkg; the data flags embed an FK-ordered COPY section a `publish <pkg>` loads after schema)
           pgproj snapshot --connection <conn> -o <db.schema.snapshot>                    (introspect a live DB once → a portable schema.snapshot for offline compare)
           pgproj snapshot create <project.pgproj> [-o <dir>]                            (project snapshot: a timestamped read-only Project_YYYYMMDD_HH-MM-SS.pgpkg under Snapshots/ — no DB)
           pgproj snapshot compare <A.pgpkg> <B.pgpkg|project.pgproj> [-o diff.json] [--format json]   (Schema Compare two snapshots / a snapshot vs the project)
