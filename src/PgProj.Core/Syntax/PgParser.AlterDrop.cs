@@ -71,13 +71,13 @@ public sealed partial class PgParser
         if (c.AtWord("ATTACH") || c.AtWord("DETACH")) { ConsumeRest(c); alter.Actions.Add("PARTITION"); return alter; }
 
         // action list
-        do { alter.Actions.Add(ParseAlterTableAction(c)); } while (c.MatchSymbol(','));
+        do { alter.Actions.Add(ParseAlterTableAction(c, alter)); } while (c.MatchSymbol(','));
         return alter;
     }
 
-    private string ParseAlterTableAction(TokenCursor c)
+    private string ParseAlterTableAction(TokenCursor c, AlterStatement alter)
     {
-        if (c.MatchWord("ADD")) return ParseAlterAdd(c);
+        if (c.MatchWord("ADD")) return ParseAlterAdd(c, alter);
         if (c.MatchWord("DROP")) return ParseAlterDropAction(c);
         if (c.MatchWord("ALTER")) return ParseAlterColumnOrConstraint(c);
         if (c.MatchWord("VALIDATE")) { c.ExpectWord("CONSTRAINT"); c.ExpectIdentifier(); return "VALIDATE"; }
@@ -99,7 +99,7 @@ public sealed partial class PgParser
         throw new ParseException($"unknown ALTER TABLE action at {Render(c.Current)}", c.Here);
     }
 
-    private string ParseAlterAdd(TokenCursor c)
+    private string ParseAlterAdd(TokenCursor c, AlterStatement alter)
     {
         if (c.MatchWord("COLUMN")) { c.MatchWords("IF", "NOT", "EXISTS"); var b = MakeTableHolder(); ParseColumnInto(c, b); return "ADD COLUMN"; }
         if (c.AtWord("CONSTRAINT") || c.AtAnyWord("PRIMARY", "UNIQUE", "FOREIGN", "CHECK", "EXCLUDE", "NOT"))
@@ -108,7 +108,9 @@ public sealed partial class PgParser
             if (c.MatchWord("CONSTRAINT")) name = c.ExpectIdentifier();
             if (c.AtWord("NOT"))   // PG18 table-level NOT NULL column [NO INHERIT]
             { c.ExpectWord("NOT"); c.ExpectWord("NULL"); c.ExpectIdentifier(); c.MatchWords("NO", "INHERIT"); c.MatchWords("NOT", "VALID"); return "ADD CONSTRAINT"; }
-            ParseTableConstraint(c, name);
+            // Capture the parsed constraint (#153) so ModelBuilder can fold a standalone ADD CONSTRAINT into the
+            // table model — same node the CREATE TABLE path produces, so no behavioural change to accept/reject.
+            alter.AddedConstraints.Add(ParseTableConstraint(c, name));
             c.MatchWords("NOT", "VALID");
             return "ADD CONSTRAINT";
         }

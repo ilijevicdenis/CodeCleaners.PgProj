@@ -9,6 +9,7 @@ public sealed class AlterStatement : SqlStatement
     public string? Schema { get; set; }
     public string Name { get; set; } = "";
     public List<string> Actions { get; } = new();        // action verbs, for inspection
+    public List<TableConstraint> AddedConstraints { get; } = new();  // structured ADD CONSTRAINT details (#153) — folded into the table model
 }
 
 /// <summary>DROP &lt;object&gt; [IF EXISTS] name[, …] [CASCADE|RESTRICT].</summary>

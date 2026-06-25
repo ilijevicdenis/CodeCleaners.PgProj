@@ -11,6 +11,37 @@ public class ConstraintAndColumnTests
     private static DatabaseModel Parse(string sql) => TestModel.Build(sql);
 
     [Fact]
+    public void Alter_table_add_foreign_key_is_folded_into_the_table_model()
+    {
+        // #153 follow-up: `pgproj extract` (and many real projects) emit FKs as a standalone ALTER TABLE
+        // ADD CONSTRAINT, not inline. ModelBuilder must fold it into TableDefinition.ForeignKeys so the
+        // comparer/deploy and the test-suite generator see it.
+        var child = Parse(
+            "CREATE TABLE app.parent (id int PRIMARY KEY);\n" +
+            "CREATE TABLE app.child (id int PRIMARY KEY, parent_id int NOT NULL);\n" +
+            "ALTER TABLE app.child ADD CONSTRAINT child_parent_fk FOREIGN KEY (parent_id) REFERENCES app.parent (id);")
+            .FindTable("app", "child")!;
+        var fk = Assert.Single(child.ForeignKeys);
+        Assert.Equal("child_parent_fk", fk.Name);
+        Assert.Equal(new[] { "parent_id" }, fk.Columns);
+        Assert.Equal("parent", fk.ReferencedTable);
+        Assert.Equal(new[] { "id" }, fk.ReferencedColumns);
+    }
+
+    [Fact]
+    public void Alter_table_add_primary_key_unique_and_check_are_folded_in()
+    {
+        var t = Parse(
+            "CREATE TABLE app.t (id int, email text, age int);\n" +
+            "ALTER TABLE app.t ADD CONSTRAINT t_pk PRIMARY KEY (id);\n" +
+            "ALTER TABLE app.t ADD CONSTRAINT t_email_uq UNIQUE (email);\n" +
+            "ALTER TABLE app.t ADD CONSTRAINT t_age_ck CHECK (age >= 0);").FindTable("app", "t")!;
+        Assert.Equal(new[] { "id" }, t.PrimaryKey!.Columns);
+        Assert.Equal("t_email_uq", Assert.Single(t.Unique).Name);
+        Assert.Equal("t_age_ck", Assert.Single(t.Checks).Name);
+    }
+
+    [Fact]
     public void Column_check_is_captured()
     {
         var t = Parse("CREATE TABLE app.t (qty int CHECK (qty > 0));").FindTable("app", "t")!;

@@ -210,14 +210,14 @@ public static class TableDesigner
                          && DatabaseModel.NameEquals(ci.Table, table.Name)
                          && ci.Name is not null && indexNames.Contains(ci.Name):
                     continue;
-                // A standalone ALTER TABLE … ADD FOREIGN KEY for this table — fold into the FK list so it is
-                // editable AND re-emitted through SqlEmitter (keeping the round-trip a fixed point).
+                // A standalone ALTER TABLE … ADD CONSTRAINT for this table is now folded into the table model by
+                // ModelBuilder (#153) — so it is already on `table` and re-emitted through SqlEmitter. Skip it
+                // here (do NOT re-add — that double-counts) so the round-trip stays a fixed point.
                 case AlterStatement alter
                     when alter.ObjectKind == "TABLE"
                          && DatabaseModel.NameEquals(Sch(alter.Schema, defaultSchema), table.Schema)
                          && DatabaseModel.NameEquals(alter.Name, table.Name)
-                         && TryParseAddForeignKey(stmt.SourceText, defaultSchema, out var fk):
-                    table.ForeignKeys.Add(fk!);
+                         && alter.AddedConstraints.Count > 0:
                     continue;
                 default:
                     var text = stmt.SourceText?.Trim();
@@ -229,84 +229,4 @@ public static class TableDesigner
     }
 
     private static string Sch(string? s, string defaultSchema) => string.IsNullOrEmpty(s) ? defaultSchema : s!;
-
-    /// <summary>
-    /// Recognises exactly the canonical FK shape <see cref="SqlEmitter.ForeignKey"/> emits —
-    /// <c>ALTER TABLE t ADD [CONSTRAINT n] FOREIGN KEY (cols) REFERENCES s.t (cols) [ON DELETE x] [ON UPDATE y]</c>
-    /// — and extracts it into a <see cref="ForeignKeyDefinition"/>. Returns false (→ stays a verbatim
-    /// companion) for any ALTER that does not match this single, well-defined form, so nothing exotic is
-    /// silently reinterpreted. The inverse of <c>SqlEmitter.ForeignKey</c>, so a folded FK re-emits byte-identically.
-    /// </summary>
-    private static bool TryParseAddForeignKey(string? source, string defaultSchema, out ForeignKeyDefinition? fk)
-    {
-        fk = null;
-        if (string.IsNullOrWhiteSpace(source)) return false;
-
-        var pooled = Tokenizer.TokenizeTransient(source);
-        try
-        {
-            var c = new TokenCursor(pooled);
-            if (!c.MatchWord("ALTER") || !c.MatchWord("TABLE")) return false;
-            c.MatchWords("IF", "EXISTS");
-            c.MatchWord("ONLY");
-            ReadQualified(c, out _, out _);                 // the table being altered (already matched by caller)
-            if (!c.MatchWord("ADD")) return false;
-
-            string? name = null;
-            if (c.MatchWord("CONSTRAINT")) name = c.ExpectIdentifier();
-            if (!c.MatchWords("FOREIGN", "KEY")) return false;
-
-            var cols = ReadColumnList(c);
-            if (cols.Count == 0) return false;
-            if (!c.MatchWord("REFERENCES")) return false;
-            ReadQualified(c, out var refSchema, out var refTable);
-            var refCols = c.AtSymbol('(') ? ReadColumnList(c) : new List<string>();
-
-            string? onDelete = null, onUpdate = null;
-            while (c.MatchWord("ON"))
-            {
-                if (c.MatchWord("DELETE")) onDelete = ReadReferentialAction(c);
-                else if (c.MatchWord("UPDATE")) onUpdate = ReadReferentialAction(c);
-                else return false;
-            }
-            // Anything left over (MATCH, DEFERRABLE, NOT VALID, …) → not the canonical shape; keep verbatim.
-            if (!c.AtEnd && !c.AtSymbol(';')) return false;
-
-            fk = new ForeignKeyDefinition(name, cols,
-                string.IsNullOrEmpty(refSchema) ? defaultSchema : refSchema, refTable, refCols, onDelete, onUpdate);
-            return true;
-        }
-        catch (ParseException) { return false; }
-        finally { pooled.Return(); }
-    }
-
-    private static void ReadQualified(TokenCursor c, out string schema, out string name)
-    {
-        var first = c.ExpectIdentifier();
-        if (c.MatchSymbol('.')) { schema = first; name = c.ExpectIdentifier(); }
-        else { schema = ""; name = first; }
-    }
-
-    private static List<string> ReadColumnList(TokenCursor c)
-    {
-        var cols = new List<string>();
-        if (!c.MatchSymbol('(')) return cols;
-        do { cols.Add(c.ExpectIdentifier()); } while (c.MatchSymbol(','));
-        c.ExpectSymbol(')');
-        return cols;
-    }
-
-    /// <summary>Reads a referential action word, normalised to the upper-case form SqlEmitter round-trips
-    /// (e.g. "CASCADE", "SET NULL", "NO ACTION", "RESTRICT", "SET DEFAULT").</summary>
-    private static string ReadReferentialAction(TokenCursor c)
-    {
-        if (c.MatchWord("NO")) { c.ExpectWord("ACTION"); return "NO ACTION"; }
-        if (c.MatchWord("SET"))
-        {
-            if (c.MatchWord("NULL")) return "SET NULL";
-            if (c.MatchWord("DEFAULT")) return "SET DEFAULT";
-            return "SET";
-        }
-        return c.ExpectIdentifier().ToUpperInvariant();   // CASCADE / RESTRICT
-    }
 }

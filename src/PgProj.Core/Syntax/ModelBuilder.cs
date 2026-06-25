@@ -49,6 +49,8 @@ public sealed class ModelBuilder
                 case CreateFunctionStatement s:
                     model.Functions.Add(new FunctionDefinition(Sch(s.Schema), s.Name, $"{Sch(s.Schema)}.{s.Name}({s.ArgTypes})", s.SourceText ?? "", s.ArgTypes));
                     EnsureSchema(model, Sch(s.Schema)); break;
+                case AlterStatement a when a.ObjectKind == "TABLE" && a.AddedConstraints.Count > 0:
+                    ApplyAlterAddConstraints(model, a); break;
                 case RawCreateStatement or UnsupportedStatement:
                     var raw = DeriveRaw(stmt.SourceText ?? "");
                     if (raw is not null) { model.Objects.Add(raw); if (!string.IsNullOrEmpty(raw.Schema)) EnsureSchema(model, raw.Schema); }
@@ -87,19 +89,41 @@ public sealed class ModelBuilder
             table.Columns.Add(new ColumnDefinition(col.Name, TypeNormalizer.Normalize(typeText), nullable, def, identity, idKind, generated, isSerial));
         }
         foreach (var tc in s.Constraints)
-        {
-            switch (tc)
-            {
-                case PrimaryKeyConstraint pk: table.PrimaryKey = new PrimaryKeyDefinition(pk.Name, pk.Columns); break;
-                case UniqueConstraint u: table.Unique.Add(new UniqueConstraintDefinition(u.Name, u.Columns)); break;
-                case ForeignKeyConstraint fk: table.ForeignKeys.Add(new ForeignKeyDefinition(fk.Name, fk.Columns, Sch(fk.RefSchema), fk.RefTable, fk.RefColumns, fk.OnDelete?.Action, fk.OnUpdate?.Action)); break;
-                case CheckConstraint ch: table.Checks.Add(new CheckConstraintDefinition(ch.Name, ch.Expression)); break;
-                case ExcludeConstraint ex: table.OtherConstraints.Add((ex.Name is null ? "" : $"CONSTRAINT {ex.Name} ") + "EXCLUDE " + ex.RawText); break;
-                case NotNullTableConstraint nn: { var c = table.FindColumn(nn.Column); if (c is not null) table.Columns[table.Columns.IndexOf(c)] = c with { IsNullable = false }; break; }
-            }
-        }
+            ApplyTableConstraint(table, tc);
         EnsureSchema(model, table.Schema);
         model.Tables.Add(table);
+    }
+
+    /// <summary>
+    /// Fold a parsed table-level constraint into the table model. Shared by <see cref="AddTable"/> (constraints
+    /// written inside CREATE TABLE) and the <c>ALTER TABLE … ADD CONSTRAINT</c> path (#153 follow-up) so a FK/PK/
+    /// UNIQUE/CHECK reaches <see cref="TableDefinition"/> regardless of which form the project (or <c>pgproj
+    /// extract</c>, which always emits the ALTER form) used.
+    /// </summary>
+    private void ApplyTableConstraint(TableDefinition table, TableConstraint tc)
+    {
+        switch (tc)
+        {
+            case PrimaryKeyConstraint pk: table.PrimaryKey = new PrimaryKeyDefinition(pk.Name, pk.Columns); break;
+            case UniqueConstraint u: table.Unique.Add(new UniqueConstraintDefinition(u.Name, u.Columns)); break;
+            case ForeignKeyConstraint fk: table.ForeignKeys.Add(new ForeignKeyDefinition(fk.Name, fk.Columns, Sch(fk.RefSchema), fk.RefTable, fk.RefColumns, fk.OnDelete?.Action, fk.OnUpdate?.Action)); break;
+            case CheckConstraint ch: table.Checks.Add(new CheckConstraintDefinition(ch.Name, ch.Expression)); break;
+            case ExcludeConstraint ex: table.OtherConstraints.Add((ex.Name is null ? "" : $"CONSTRAINT {ex.Name} ") + "EXCLUDE " + ex.RawText); break;
+            case NotNullTableConstraint nn: { var c = table.FindColumn(nn.Column); if (c is not null) table.Columns[table.Columns.IndexOf(c)] = c with { IsNullable = false }; break; }
+        }
+    }
+
+    /// <summary>
+    /// Apply the constraints from a standalone <c>ALTER TABLE … ADD CONSTRAINT</c> to its target table when that
+    /// table is already in the model (the table's CREATE precedes the ALTER in the same file — the form the
+    /// extractor emits). A cross-file ALTER whose table isn't present yet is left as-is (best effort).
+    /// </summary>
+    private void ApplyAlterAddConstraints(DatabaseModel model, AlterStatement a)
+    {
+        var table = model.FindTable(Sch(a.Schema), a.Name);
+        if (table is null) return;
+        foreach (var tc in a.AddedConstraints)
+            ApplyTableConstraint(table, tc);
     }
 
     private static bool IsSerial(string typeText)
