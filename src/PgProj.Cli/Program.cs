@@ -557,6 +557,7 @@ public static class Program
     {
         var sub = args.Skip(1).FirstOrDefault(a => !a.StartsWith('-'))?.ToLowerInvariant();
         if (sub == "scaffold") return await TestScaffold(args);
+        if (sub == "generate") return await TestGenerate(args);
 
         var project = DatabaseProject.Load(RequirePositional(args, "project file"));
         var conn = RequireConnection(args);
@@ -661,6 +662,117 @@ public static class Program
             Console.Error.WriteLine($"error: {ex.Message}");
             return ExitCode.Usage;
         }
+    }
+
+    // ---- test generate (whole-project auto-asserted suite + DB workflow, #153) ----------
+    private static async Task<int> TestGenerate(string[] args)
+    {
+        // args: test generate <project.pgproj> [--connection <conn>] [--mode preserved|wipeout]
+        //       [--allow-wipeout] [--categories ...] [-o <dir>] [--run]
+        var p = args.Skip(1).Where(a => !a.StartsWith('-')).ToList();
+        if (p.Count < 2)
+            throw new CliUsageException(
+                "Usage: pgproj test generate <project.pgproj> [--connection <conn>] " +
+                "[--mode preserved|wipeout] [--categories constraints,fk,crud,view,unit,exists] [-o <dir>] [--run]");
+
+        var project = DatabaseProject.Load(p[1]);
+        var build = await project.BuildAsync();
+        if (build.Diagnostics.Count > 0)
+        {
+            Console.Error.WriteLine($"Cannot generate — build failed with {build.Diagnostics.Count} problem(s):");
+            foreach (var d in build.Diagnostics) Console.Error.WriteLine($"  - {d}");
+            return ExitCode.BuildError;
+        }
+
+        SuiteOptions suiteOptions;
+        try { suiteOptions = SuiteOptions.Parse(GetOption(args, "--categories")); }
+        catch (ArgumentException ex) { throw new CliUsageException(ex.Message); }
+
+        var mode = (GetOption(args, "--mode") ?? "preserved").ToLowerInvariant();
+        if (mode is not ("preserved" or "wipeout"))
+            throw new CliUsageException("--mode must be 'preserved' or 'wipeout'.");
+
+        // The connection is OPTIONAL: generation alone needs no DB. It is required to deploy or to --run.
+        var conn = GetOption(args, "-c", "--connection")
+            ?? Environment.GetEnvironmentVariable("PGPROJ_CONNECTION")
+            ?? Environment.GetEnvironmentVariable("PGPROJ_TEST_CONNECTION");
+
+        if (conn is not null)
+        {
+            if (mode == "wipeout")
+            {
+                if (!HasFlag(args, "--allow-wipeout"))
+                    throw new CliUsageException(
+                        "--mode wipeout DROPs and recreates the target database; pass --allow-wipeout to confirm.");
+                await WipeoutAndDeploy(conn, build.Model);
+            }
+            else
+            {
+                // preserved: bring the live DB up to date incrementally (no drops → existing data preserved).
+                var svc = new PublishService();
+                var plan = await svc.PlanAsync(project, build.Model, conn, new PublishPlanOptions { WrapInTransaction = true });
+                await svc.ApplyAsync(plan, conn, parallel: false);
+            }
+        }
+
+        // Generate from the built model (the deploy makes the DB match it). Replace only OUR sentinel-bearing
+        // files so hand-promoted tests in the same folder are never clobbered.
+        var outDir = GetOption(args, "-o", "--output")
+            ?? Path.Combine(project.ProjectDirectory, "Tests", "Generated");
+        Directory.CreateDirectory(outDir);
+        var removed = 0;
+        foreach (var existing in Directory.EnumerateFiles(outDir, "*.test.sql"))
+            if (File.ReadAllText(existing).Contains(SuiteScaffolder.Sentinel)) { File.Delete(existing); removed++; }
+
+        var suite = SuiteScaffolder.GenerateSuite(build.Model, suiteOptions);
+        var enc = new System.Text.UTF8Encoding(encoderShouldEmitUTF8Identifier: false);
+        foreach (var r in suite)
+            File.WriteAllText(Path.Combine(outDir, r.FileName), r.Content, enc);
+
+        Console.WriteLine($"Generated {suite.Count} test file(s) into {Path.GetRelativePath(project.ProjectDirectory, outDir)} (replaced {removed}).");
+        foreach (var g in suite.GroupBy(r => r.Kind).OrderBy(g => g.Key, StringComparer.Ordinal))
+            Console.WriteLine($"  {g.Count(),4}  {g.Key}");
+
+        if (!HasFlag(args, "--run")) return ExitCode.Success;
+        if (conn is null)
+        {
+            Console.Error.WriteLine("--run needs a connection (--connection or PGPROJ_CONNECTION).");
+            return ExitCode.Usage;
+        }
+
+        var tests = Directory.EnumerateFiles(outDir, "*.test.sql", SearchOption.AllDirectories)
+            .OrderBy(f => f, StringComparer.Ordinal)
+            .Select(f => { var sql = File.ReadAllText(f); return new TestCase(Path.GetRelativePath(project.ProjectDirectory, f), sql, PgUnitRunner.ParseExpectedSqlState(sql)); })
+            .ToList();
+        var result = await PgUnitRunner.RunAsync(conn, tests);
+        foreach (var t in result.Results)
+        {
+            var mark = t.Status switch { TestStatus.Passed => "PASS", TestStatus.Failed => "FAIL", _ => "INC " };
+            Console.WriteLine($"  [{mark}] {t.Name}" + (t.Message is null ? "" : $" — {t.Message}"));
+        }
+        Console.WriteLine($"\n{result.Passed} passed, {result.Failed} failed, {result.Inconclusive} inconclusive ({result.Results.Count} total).");
+        return result.AllPassed ? ExitCode.Success : ExitCode.TestFailed;
+    }
+
+    /// <summary>Drop + recreate the target database, then greenfield-deploy the project model into it.</summary>
+    private static async Task WipeoutAndDeploy(string conn, DatabaseModel model)
+    {
+        var dbName = new Npgsql.NpgsqlConnectionStringBuilder(conn).Database
+            ?? throw new CliUsageException("The connection string must name a database for --mode wipeout.");
+        // DROP/CREATE must run from a maintenance DB, not the one being dropped.
+        var adminConn = new Npgsql.NpgsqlConnectionStringBuilder(conn) { Database = "postgres" }.ConnectionString;
+        Npgsql.NpgsqlConnection.ClearAllPools();
+        await using (var admin = new Npgsql.NpgsqlConnection(adminConn))
+        {
+            await admin.OpenAsync();
+            await using (var drop = new Npgsql.NpgsqlCommand($"DROP DATABASE IF EXISTS \"{dbName}\" WITH (FORCE)", admin))
+                await drop.ExecuteNonQueryAsync();
+            await using (var create = new Npgsql.NpgsqlCommand($"CREATE DATABASE \"{dbName}\"", admin))
+                await create.ExecuteNonQueryAsync();
+        }
+        var script = new DeployScriptGenerator().Generate(
+            new SchemaComparer().Compare(model, new DatabaseModel()), new DeployOptions { WrapInTransaction = true });
+        await new DatabaseDeployer().ExecuteAsync(conn, script);
     }
 
     // ---- data-compare (row-level data diff + sync between two databases, #132) ----------
@@ -1876,6 +1988,8 @@ public static class Program
           pgproj validate <project.pgproj|.pgpkg> --connection <conn> [--strict] [--no-analyze]   (apply to a throwaway temp DB, rolled back)
           pgproj test <project.pgproj> --connection <conn> [--deploy]   (run *.test.sql unit tests in BEGIN…ROLLBACK; --deploy applies the schema to a shadow DB first; exit 10 on a failed test)
           pgproj test scaffold <project.pgproj> <schema.object>         (generate a pre/test/post unit-test stub for a function/procedure/trigger; writes Tests/_schema.object.test.sql)
+          pgproj test generate <project.pgproj> [--connection <conn>] [--mode preserved|wipeout] [--categories ...] [-o <dir>] [--run]
+                         (generate a COMPLETE auto-asserted suite for every object into Tests/Generated/; preserved brings the DB up to date, wipeout recreates it -- needs --allow-wipeout; --run executes it, exit 10 on failure)
           pgproj pkg inspect <file.pgpkg>                                              (dump the manifest + object inventory)
           pgproj profile create <out.pgpublish.json> [--target-version 18] [--connection-name <label>] [--var N=V] [--allow-drops] [--no-transaction]
                          (write a reusable publish profile from the current flags; the connection string is never stored)

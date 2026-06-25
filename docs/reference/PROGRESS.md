@@ -4,11 +4,14 @@
 > SSDT-for-PostgreSQL parity and is the single place to read "where are we now". It is **updated on
 > every delivered milestone** (see [Update contract](#update-contract) below).
 
-**Last updated:** 2026-06-24 (M1–M6 complete; **M7 substantially delivered** — and the VS experience is
-now VALIDATED IN THE INSTALLED PRODUCT: a 115-scenario VM E2E suite (FlaUI+DTE, real sample database)
-found and fixed three silent editor-chain breaks (per-user MEF cache, content-type overwrite, CodeRemote
-LSP gate), live diagnostics reached build parity (+ cross-file invalidation), navigation/completion are
-alias-aware and column-precise, and a file-level Sync-with-Database command shipped) ·
+**Last updated:** 2026-06-25 (**M1–M7 complete *in scope*** — every buildable epic shipped and is
+verified against live PG18; the three remaining M7 boxes are explicit **non-goals**, not pending work:
+EP-DESIGNER #112 is **won't-do** (read/round-trip from M5 #26 is the supported level), base types/transforms
+#102/#108 are **won't-support** (would require shipping C functions in the PG server — out of scope by
+decision), and EP-CICD #71 was removed earlier. The VS experience is VALIDATED IN THE INSTALLED PRODUCT:
+a 115-scenario VM E2E suite (FlaUI+DTE, real sample database) found and fixed three silent editor-chain
+breaks, live diagnostics reached build parity, navigation/completion are alias-aware and column-precise,
+and a file-level Sync-with-Database command shipped) ·
 **Streams:** semantic core (EP-SEMCORE #41) · SSDT parity (#27) · performance (#12)
 
 Legend: ✅ delivered · 🟡 in progress · ⬜ not started · ⛔ blocked · ⏸️ deferred.
@@ -28,7 +31,7 @@ deliverable subtasks; **complex issues are broken into smaller subtasks when imp
 | **M4** | Diff, Risk, Deploy & Incremental | EP-SEMCORE | #52, #53, #54, #55, #56, #57, #58, #61, #64 | 9 / 9 | ✅ | [milestone/4](https://github.com/ilijevicdenis/CodeCleaners.PgProj/milestone/4) |
 | **M5** | SSDT Parity — Editor UI | parity #27 | #31, #24, #25, #26 | 4 / 4 | ✅ | [milestone/5](https://github.com/ilijevicdenis/CodeCleaners.PgProj/milestone/5) |
 | **M6** | Performance & Engine Backlog | perf #12 | #8, #10 | 2 / 2 | ✅ | [milestone/6](https://github.com/ilijevicdenis/CodeCleaners.PgProj/milestone/6) |
-| **M7** | SSDT Parity — Engine, Tooling & Coverage | parity #27 / coverage | 8 epics in scope (EP-CICD #71 removed); #66–#70,#72,#111,#112 | 7 / 8 | 🟡 | [milestone/7](https://github.com/ilijevicdenis/CodeCleaners.PgProj/milestone/7) |
+| **M7** | SSDT Parity — Engine, Tooling & Coverage | parity #27 / coverage | 7 in-scope epics (EP-CICD #71 removed; EP-DESIGNER #112 won't-do; #102/#108 won't-support); #66–#70,#72,#111 | 7 / 7 | ✅ | [milestone/7](https://github.com/ilijevicdenis/CodeCleaners.PgProj/milestone/7) |
 
 **Already shipped (not milestoned — do not rebuild):** the headless engine — `build`, `compare`,
 `publish`, `validate`, `extract`, `drift`, `analyze`, `PgProj.Sdk`, and **100% parser accept/reject
@@ -149,7 +152,11 @@ Open items from the perf/deploy-sync tracker (#12). Benchmark-gated (bytes/op); 
 - ✅ **#8** — reduce `ModelBuilder` allocation *(delivered; lazy table-constraint lists — All 16.16→16.06 MB/op, Table bucket 1.77→1.66; dashboard stage #24. Safe-by-construction, no footgun.)*
 - ✅ **#10** — profile the comparer / diff path (`CompareBenchmarks`) *(delivered; representative `CompareBenchmarks` + comparer fast-paths — −19% to −40% allocated/op across the compare path; behavior-preserving.)*
 
-### M7 · SSDT Parity — Engine, Tooling & Coverage 🟡
+### M7 · SSDT Parity — Engine, Tooling & Coverage ✅ (complete in scope)
+
+**Scope-complete (7/7 in-scope epics).** Every buildable epic shipped and is verified against live
+PG18. The three boxes that remain are **explicit non-goals decided by the owner (2026-06-25), not
+pending work** — see *Out of scope* below.
 
 Opened as a 55-issue backlog from [`docs/SSDT_PARITY_BACKLOG.md`](../SSDT_PARITY_BACKLOG.md) §3 + the
 open **Introspect** rows in [`COVERAGE.md`](./COVERAGE.md), then **audited against the code**: both source
@@ -166,15 +173,17 @@ is a `tracking` issue; tasks are linked children.
 - ✅ **#70** — **EP-TEMPLATES**: `Templates/*` + `add`/`new project` verbs + `dotnet new` pack at `templates/`. Tests `TemplateTests`/`TemplateIntegrationTests`.
 - ✅ **#67** — **EP-ANALYSIS+**: config (#77), `--rule` (#78), SARIF (#80), **external rule packs (#79** — `IPgRule` + `RulePackLoader`), and rules **PG006/PG008**. Doc `docs/ANALYSIS_RULES.md`. Epic closed; **#81** (grow the rule set) stays open as ongoing backlog.
 
-**Open / in progress:**
-- 🟡 **#72** — **EP-COVERAGE**: live-server introspection. **Done:** matview (#100), COMMENT ON (#105), aggregate (#106), cast/operator/op-class/family (#107), EXCLUDE (#98), EVENT TRIGGER tags (#104), POLICY `TO` roles (#103), USER MAPPING + **LANGUAGE** (#108), PARTITION/INHERITS (#99), index opclass/ordering (#101), expression statistics (#110), **TEXT SEARCH PARSER/TEMPLATE (#109)** — plus (already in code) collation/conversion/FDW/server/foreign-table/TS-config+dict/range/column-statistics/publications. **Backlog (genuinely need C functions in the PG server — in practice shipped via an extension):** base types (#102), transforms (#108 tail). All shipped work verified against PG18 on `milestone/m7-ssdt-parity`.
-- ❌ **#71** — **EP-CICD**: **removed from M7 scope** (user decision). #97 (stable exit-code contract) was already delivered (`ExitCode.cs` + `ExitCodeContractTests` + `docs/CICD.md`) → closed done; the unbuilt GitHub Action / Azure DevOps task / container-image tickets (#94/#95/#96) closed as not-planned; the opt-in `ci/azure-devops/` template removed. The CLI stays CI-friendly via the documented exit codes + `--fail-on-changes`/`--dry-run`.
-- ✅ **#111** — **EP-VS**: Visual Studio Route B VSIX + slngen grouping — all six children #113–#118 delivered 2026-06-11: real CPS `.pgproj` project type + templates + VS-loadable SDK (#113), `.vsct`/manifest wiring (#117), four property pages as `PgProj.Sdk` CPS rules incl. `PgProjPublishVariables`→`--var` (#114), modal Publish dialog (#115), interactive Schema Compare window with pickers/checkable diff/Generate Script/Apply (#116), and `pgproj sln new|add|list` solution grouping (#118, `PgProj.Core.Solutions`, 15 tests). Both VSIXes build headless-green (`editors/vs/build-vsix.cmd`); the runtime F5 pass in VS 2026 is manual (`editors/vs/README.md` follow-ups).
-- ⬜ **#112** — **EP-DESIGNER**: editable designer + PG-specific surfaces — children #119–#120 (M5 #26 shipped read/round-trip; this deepens to editable + partitioning/identity/RLS/EXCLUDE).
+**Delivered:**
+- ✅ **#72** — **EP-COVERAGE**: live-server introspection. **Done:** matview (#100), COMMENT ON (#105), aggregate (#106), cast/operator/op-class/family (#107), EXCLUDE (#98), EVENT TRIGGER tags (#104), POLICY `TO` roles (#103), USER MAPPING + **LANGUAGE** (#108), PARTITION/INHERITS (#99), index opclass/ordering (#101), expression statistics (#110), **TEXT SEARCH PARSER/TEMPLATE (#109)** — plus (already in code) collation/conversion/FDW/server/foreign-table/TS-config+dict/range/column-statistics/publications. All shipped work verified against PG18. (Base types #102 + transforms #108-tail are **out of scope** — see below.)
+- ✅ **#111** — **EP-VS**: Visual Studio Route B VSIX + slngen grouping — all six children #113–#118 delivered 2026-06-11: real CPS `.pgproj` project type + templates + VS-loadable SDK (#113), `.vsct`/manifest wiring (#117), four property pages as `PgProj.Sdk` CPS rules incl. `PgProjPublishVariables`→`--var` (#114), modal Publish dialog (#115), interactive Schema Compare window with pickers/checkable diff/Generate Script/Apply (#116), and `pgproj sln new|add|list` solution grouping (#118, `PgProj.Core.Solutions`, 15 tests). Both VSIXes build headless-green (`editors/vs/build-vsix.cmd`); the runtime F5 pass was later **validated in the installed product** (115-scenario VM E2E, see the delivery log).
 
-> As each remaining child ships on `milestone/m7-ssdt-parity`, follow the
-> [Update contract](#update-contract): tick its box, recompute the M7 `Done` count in §1, add a §3 row,
-> and close the issue.
+**Out of scope (owner decision 2026-06-25 — not pending work, will not be built):**
+- ⛔ **#112** — **EP-DESIGNER** (editable designer): **won't do.** The read/round-trip designer from M5 #26 (`describe-table`/`emit-table`, byte-stable over the corpus) is the supported level; the user hand-writes SQL (the graphical designer is parked, not pending). Children #119/#120 closed not-planned.
+- ⛔ **#102** base types + **#108-tail** transforms: **won't support.** These require shipping C functions inside the PostgreSQL server, which is outside what this tooling targets ("nobody can have it all"). Closed not-planned.
+- ❌ **#71** — **EP-CICD**: **removed from M7 scope** (user decision). #97 (stable exit-code contract) was delivered (`ExitCode.cs` + `ExitCodeContractTests` + `docs/CICD.md`) → closed done; the GitHub Action / Azure DevOps task / container-image tickets (#94/#95/#96) closed not-planned; the opt-in `ci/azure-devops/` template removed. The CLI stays CI-friendly via the documented exit codes + `--fail-on-changes`/`--dry-run`.
+
+> M7 is **complete in scope**. The only perpetually-open item is **#81** (grow the analyzer rule set),
+> which is an ongoing backlog by design, not a milestone gap.
 
 #### Next wave — prepared & ready to implement (opened 2026-06-24)
 
@@ -197,6 +206,8 @@ Newest first. One line per delivered issue/milestone; this is the audit trail of
 
 | Date | Milestone | Item | Commit | Notes |
 |------|-----------|------|--------|-------|
+| 2026-06-25 | M7+ | **EP-TESTGEN: complete unit + integration test-suite generator** (#153; children #154–#158) — extends EP-UNITTEST from one-stub-at-a-time to a **whole-project, auto-asserted** suite. New `SuiteScaffolder` walks the built model and emits one `.test.sql` per (object, category): NOT NULL/UNIQUE/PK negatives (`@expect-sqlstate` 23502/23505), FK orphan (23503), CRUD round-trip, view/matview queryability, fn/proc/trigger stubs (via `TestScaffolder`), and catalog existence smoke tests for the other `ObjectKind`s. Internal `BaselineRowSynthesizer` builds a minimal valid INSERT (deterministic literal-per-type, skips identity/serial/generated/default/nullable, seeds depth-1 FK parents with `OVERRIDING SYSTEM VALUE`), DOWNGRADING to an inconclusive stub rather than emit a false assertion (enum/UDT column, non-trivial CHECK, FK outside the model). New CLI `pgproj test generate <proj> [--connection] [--mode preserved\|wipeout] [--categories] [-o] [--run]`: preserved brings the DB up to date via `PublishService` (data kept), wipeout DROP+recreates (gated by `--allow-wipeout`), then writes `Tests/Generated/` replacing only its own sentinel-bearing files, and optionally runs the suite. Classic VS extension gains a **"Generate Tests (PgProj)…"** project-context command (shells the bundled CLI). | _(branch `feature/testgen-suite-generator`)_ | New `SuiteScaffolderTests` (12, offline: headers/synth/downgrade/determinism/clean-parse) + **live round-trip** `SuiteScaffolderIntegrationTests` (deploy→generate→run on PG18: constraint/FK/CRUD/view/existence PASS, enum/CHECK INCONCLUSIVE, 0 fail). Full Core suite **25,204 / 0** with live PG18. CLI e2e (wipeout `--run`): 12 pass / 1 inconclusive / 0 fail; idempotent regen + no-clobber of hand-promoted files verified. VSIX rebuilds with the command in its table; UiTests gains a registration scenario (VM run is the interactive step). |
+| 2026-06-25 | M7 | **M7 closed — complete in scope (7/7 in-scope epics).** Owner confirmed the three remaining boxes are non-goals, not pending work: EP-DESIGNER #112 **won't-do** (M5 #26 read/round-trip is the supported level; user hand-writes SQL), base types #102 + transforms #108-tail **won't-support** (would require C functions in the PG server — out of scope), EP-CICD #71 already removed. Tracker reframed: §1 M7 row → ✅, §2 recharacterized as *Out of scope*. | _(docs only)_ | No code change. #81 (analyzer-rule backlog) stays open as ongoing-by-design. All in-scope M7 work verified against live PG18 in prior rows. |
 | 2026-06-24 | M7+ | **EP-REF: NuGet `.pgpkg` package references done** (#133, closes #147/#148/#149) — `dotnet pack` packs a project's built `.pgpkg` into a `.nupkg` under `pgpkg/<Name>.pgpkg` (id=name, version=`<Version>`); `ReferenceResolver` resolves a `<PackageReference>` from the restored NuGet global packages folder (`NuGetPackageLocator`) and loads it **reference-only** — objects widen validation/binding but never enter the comparer's model, so no deploy DDL; unresolvable → `PGREF006`. CLI/SDK: pack via `dotnet pack`, consume via `<PackageReference>` after `dotnet restore` | `7344705`, `b110bc3`, `c445f8d` | `dotnet pack` smoke (nupkg carries `pgpkg/AllFeaturesDb.pgpkg`, id/version correct); reference resolution tests (resolve from temp feed, reference-only never-emitted, unresolvable PGREF006); **live shadow-DB parity** (consumer-with-package deploys schema-identical to the inlined baseline; cross-schema view queryable). Reference/packaging suites 40/0 with PG18. |
 | 2026-06-24 | M7+ | **EP-EXTRACT: `.pgpkg`-embedded data COPY section done** (#151, closes #134) — the schema+data BACPAC analogue: `PgPkg` gains a `data/` section (index + FK-ordered COPY payload per table, outside the source checksum); `DataExporter.ExportCopyAsync` (`COPY (SELECT … ORDER BY key) TO STDOUT`) + `CopyDataLoader` (`COPY … FROM STDIN`, then `setval`). Solves the COPY-vs-`GENERATED ALWAYS AS IDENTITY` blocker by relaxing the column to `BY DEFAULT` around the load and restoring `ALWAYS`. CLI: `extract --package <out.pgpkg> [--all-table-data|--table-data …]` produces it; `publish <pkg>` loads the data after schema | `0a06a3d` | New `CopyDataSectionTests` (DB-free format round-trip + checksum isolation; **live export→pack→unpack→load** reproduces rows + ALWAYS-identity ids + next-id sequence) + a live CLI extract→publish smoke. Packaging/data suites 24/0 with PG18. |
 | 2026-06-24 | M7+ | **EP-REFACTOR: expand-wildcards done** (#152, closes #136) — `pgproj expand-wildcards <project> <schema.view>` resolves a view's `SELECT *` / `alias.*` to an explicit, model-derived column list and rewrites the `.sql` in place + records it in `.pgrefactorlog`. `WildcardExpander` does minimal comment/string/dollar-quote/paren-aware surgery — only top-level star tokens change, the rest stays byte-identical (so `count(*)` and `'*'` literals are never touched); bare `*` over multiple sources is alias-qualified | `7809b6d` (branch `feature/m7-tail-children`) | New `ExpandWildcardsTests` (single-table, joined/aliased `t.*`, two-source bare `*`, count/literal safety, no-star + missing-view errors). Solution build green; 35 refactor/test-suite tests pass. |

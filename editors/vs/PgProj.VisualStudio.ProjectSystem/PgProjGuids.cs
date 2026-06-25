@@ -30,6 +30,9 @@ namespace PgProj.VisualStudio
         /// <summary>The in-proc Import Database command (mirrored in PgProjCommands.vsct).</summary>
         public const int ImportDatabaseCommandId = 0x0103;
 
+        /// <summary>The in-proc "Generate Tests" command on the .pgproj project node (mirrored in PgProjCommands.vsct).</summary>
+        public const int GenerateTestsCommandId = 0x0105;
+
         /// <summary>The .sql item-node context-menu group (mirrored in PgProjCommands.vsct).</summary>
         public const int ItemContextGroupId = 0x1021;
 

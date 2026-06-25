@@ -42,6 +42,17 @@
           <ButtonText>Import Database (PgProj)…</ButtonText>
         </Strings>
       </Button>
+      <!-- Generate Tests: right-click a .pgproj - generate a COMPLETE auto-asserted unit+integration
+           test suite into Tests\Generated\ (and optionally bring the DB up to date + run it). Handler
+           shells the bundled CLI (test generate verb). -->
+      <Button guid="guidPgProjCmdSet" id="cmdidGenerateTests" priority="0x0105" type="Button">
+        <Parent guid="guidPgProjCmdSet" id="PgProjProjectContextGroup" />
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <CommandFlag>DefaultInvisible</CommandFlag>
+        <Strings>
+          <ButtonText>Generate Tests (PgProj)…</ButtonText>
+        </Strings>
+      </Button>
       <!-- File-scoped sync: right-click a .sql in a .pgproj - diff local vs the live database and
            apply either direction. Handler shells the bundled CLI (sync-file verb). -->
       <Button guid="guidPgProjCmdSet" id="cmdidSyncFile" priority="0x0104" type="Button">
@@ -60,6 +71,7 @@
        command's BeforeQueryStatus once the package loads. -->
   <VisibilityConstraints>
     <VisibilityItem guid="guidPgProjCmdSet" id="cmdidImportDatabase" context="guidPgProjLoadedUIContext" />
+    <VisibilityItem guid="guidPgProjCmdSet" id="cmdidGenerateTests" context="guidPgProjLoadedUIContext" />
     <VisibilityItem guid="guidPgProjCmdSet" id="cmdidSyncFile" context="guidPgProjLoadedUIContext" />
   </VisibilityConstraints>
 
@@ -70,6 +82,7 @@
     <GuidSymbol name="guidPgProjCmdSet" value="{b0000000-0000-0000-0000-0000000000a2}">
       <IDSymbol name="PgProjProjectContextGroup" value="0x1020" />
       <IDSymbol name="cmdidImportDatabase" value="0x0103" />
+      <IDSymbol name="cmdidGenerateTests" value="0x0105" />
       <IDSymbol name="PgProjItemContextGroup" value="0x1021" />
       <IDSymbol name="cmdidSyncFile" value="0x0104" />
     </GuidSymbol>

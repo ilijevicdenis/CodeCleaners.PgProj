@@ -33,6 +33,19 @@ public sealed class ToolingOperationScenarios
     }
 
     [Fact]
+    public void The_generate_tests_command_is_registered_in_the_installed_ide()
+    {
+        // EP-TESTGEN (#157) — proves the classic VSIX's "Generate Tests (PgProj)…" command actually
+        // composed into the INSTALLED product: the vsct button + package registration resolve through the
+        // IDE command table. (The command's handler shows a modal options dialog, so we assert the wiring
+        // here rather than drive the dialog; the engine behavior is covered by the CLI/Core round-trip.)
+        const string commandSetGuid = "{b0000000-0000-0000-0000-0000000000a2}";
+        const int generateTestsCommandId = 0x0105;
+        var resolvedId = _vs.Dte.Invoke<int>(d => (int)d.Commands.Item(commandSetGuid, generateTestsCommandId).ID);
+        Assert.Equal(generateTestsCommandId, resolvedId);
+    }
+
+    [Fact]
     public void The_project_exposes_its_extracted_default_schema()
     {
         // The loaded project carries the DefaultSchema the extract wrote into the .pgproj manifest —
