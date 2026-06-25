@@ -77,6 +77,11 @@ public static class SuiteScaffolder
         if (options.Existence)
             AddExistenceTests(model, results);
 
+        // Safety net: two objects must never silently overwrite each other on disk. If any file name
+        // repeats (e.g. a future object kind with a clashing identity), disambiguate with a counter rather
+        // than lose a test. With Comments skipped this should not fire — but it guarantees it can't.
+        DisambiguateFileNames(results);
+
         results.Sort((a, b) => string.CompareOrdinal(a.FileName, b.FileName));
         return results;
     }
@@ -209,8 +214,15 @@ public static class SuiteScaffolder
         try
         {
             var stub = TestScaffolder.Scaffold(model, $"{schema}.{name}");
-            // Prepend the regeneration sentinel so this file is replaced (not orphaned) on the next run.
-            var content = SentinelLine + "\n" + stub.Content;
+            // The generator cannot know an object's expected BEHAVIOUR, so an unedited unit stub must be
+            // INCONCLUSIVE — never a failing assertion. We raise pgproj_inconclusive FIRST (so the suite is
+            // clean by default and a trigger-returning function is never called directly), then keep the
+            // TestScaffolder template below as authoring guidance (dead code after the raise — it parses but
+            // never runs). The author writes the assertion and moves the file out of Generated/.
+            var content = SentinelLine + "\n" +
+                $"-- Generated {stub.Kind} unit-test stub — INCONCLUSIVE until you author the assertion below.\n" +
+                $"SELECT pgproj_inconclusive({Lit($"author the {stub.Kind} test for {schema}.{name}: arrange, act, then assert")});\n\n" +
+                stub.Content;
             outp.Add(new ScaffoldResult(FileName(schema, name, "unit"), content, stub.Kind));
         }
         catch (ScaffoldException)
@@ -229,6 +241,11 @@ public static class SuiteScaffolder
 
         foreach (var o in model.Objects)
         {
+            // A Comment is metadata ON another object, not a standalone testable object — and the extractor
+            // gives it no schema/name, so every comment would collide on one file name. Skip it (and any
+            // other nameless object) outright.
+            if (o.Kind == ObjectKind.Comment || string.IsNullOrEmpty(o.Name)) continue;
+
             var qn = string.IsNullOrEmpty(o.Schema) ? o.Name : $"{o.Schema}.{o.Name}";
             switch (o.Kind)
             {
@@ -332,6 +349,23 @@ public static class SuiteScaffolder
         foreach (var ch in s)
             sb.Append(char.IsLetterOrDigit(ch) || ch is '_' or '-' ? ch : '_');
         return sb.Length == 0 ? "_" : sb.ToString();
+    }
+
+    /// <summary>Rename any duplicate file names in place (append <c>.2</c>, <c>.3</c>, …) so no test is lost on write.</summary>
+    private static void DisambiguateFileNames(List<ScaffoldResult> results)
+    {
+        var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        for (var i = 0; i < results.Count; i++)
+        {
+            var name = results[i].FileName;
+            if (seen.Add(name)) continue;
+            var stem = name.EndsWith(".test.sql", StringComparison.Ordinal) ? name[..^".test.sql".Length] : name;
+            for (var n = 2; ; n++)
+            {
+                var candidate = $"{stem}.{n}.test.sql";
+                if (seen.Add(candidate)) { results[i] = results[i] with { FileName = candidate }; break; }
+            }
+        }
     }
 
     /// <summary>The bare table name from a possibly schema-qualified <c>schema.table</c>.</summary>

@@ -150,6 +150,36 @@ public sealed class SuiteScaffolderTests
     }
 
     [Fact]
+    public void Comment_objects_are_skipped_and_never_collide_on_one_file_name()
+    {
+        // Comments carry no schema/name from the extractor — every one would otherwise map to
+        // _gen._._.exists.test.sql and silently overwrite the others. They are skipped outright.
+        var model = Model("CREATE SCHEMA app; CREATE TABLE app.t (id int PRIMARY KEY);");
+        model.Objects.Add(new RawObjectDefinition(ObjectKind.Comment, "", "", "comment:1", "COMMENT ON TABLE app.t IS 'a';"));
+        model.Objects.Add(new RawObjectDefinition(ObjectKind.Comment, "", "", "comment:2", "COMMENT ON COLUMN app.t.id IS 'b';"));
+
+        var suite = SuiteScaffolder.GenerateSuite(model, SuiteOptions.All);
+
+        Assert.DoesNotContain(suite, r => r.FileName.Contains("_._"));        // no empty-schema/name collision
+        Assert.DoesNotContain(suite, r => r.Content.Contains("for Comment")); // no comment existence stub
+        Assert.Equal(suite.Select(r => r.FileName).Distinct().Count(), suite.Count); // every file name unique
+    }
+
+    [Fact]
+    public void Unit_stub_is_inconclusive_by_default_not_a_failing_assertion()
+    {
+        // The generator can't know an object's expected behaviour, so a generated unit stub must raise
+        // pgproj_inconclusive FIRST — never run a placeholder assert (which would FAIL) or call a
+        // trigger-returning function directly (which errors). The template stays below as guidance.
+        var model = Model("CREATE FUNCTION app.add(a int, b int) RETURNS int LANGUAGE sql AS $$ SELECT a + b $$;");
+        var unit = SuiteScaffolder.GenerateSuite(model, SuiteOptions.Parse("unit")).Single(r => r.FileName.Contains("add.unit"));
+        Assert.Contains("pgproj_inconclusive", unit.Content);
+        // The inconclusive raise precedes the (dead-code) placeholder assert, so the test never fails.
+        Assert.True(unit.Content.IndexOf("pgproj_inconclusive", System.StringComparison.Ordinal)
+                  < unit.Content.IndexOf("<expected-value>", System.StringComparison.Ordinal));
+    }
+
+    [Fact]
     public void Category_filter_limits_what_is_emitted()
     {
         var onlyViews = SuiteScaffolder.GenerateSuite(Model(Schema), SuiteOptions.Parse("view"));
