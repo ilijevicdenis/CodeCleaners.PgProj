@@ -326,13 +326,49 @@ public sealed class Tokenizer
             char radix = char.ToLowerInvariant(_s[_i + 1]);
             int j = _i + 2, digits = 0;
             while (j < _s.Length && (IsRadixDigit(_s[j], radix) || (_s[j] == '_' && digits > 0))) { if (_s[j] != '_') digits++; j++; }
-            if (digits > 0) { _i = j; return Intern(start, _i - start); }
+            if (digits > 0) { _i = j; CheckTrailingJunk(start); return Intern(start, _i - start); }
         }
-        while (_i < _s.Length && (char.IsDigit(_s[_i]) || _s[_i] == '.' || _s[_i] == 'e' || _s[_i] == 'E'
-                                  || ((_s[_i] == '+' || _s[_i] == '-') && _i > start && (_s[_i - 1] == 'e' || _s[_i - 1] == 'E'))
+
+        // Decimal literal, PG grammar (live-verified): digits [ '.' [digits] ] [ e [+|-] digits ], with
+        // '_' group separators between digits (PG16). The old char-soup loop accepted 1.2.3, 1e+, 1e5e6
+        // as ONE Number token — Postgres rejects all of them.
+        TakeDigits(start);
+        // At most ONE decimal point ('1.2.3' stops after '1.2' — PG then errors at '.3'), and the dot is
+        // not taken when another dot follows ('1..3' lexes as '1' + '..' — PG's dot-dot rule, which keeps
+        // PL/pgSQL FOR-ranges lexable).
+        if (_i < _s.Length && _s[_i] == '.' && Peek(1) != '.')
+        {
+            _i++;
+            TakeDigits(start);
+        }
+        // An exponent is consumed only when real digits follow ('1e+' / '1e' stop before the 'e', and the
+        // trailing-junk check below flags it exactly like Postgres does).
+        if (_i < _s.Length && (_s[_i] == 'e' || _s[_i] == 'E'))
+        {
+            int save = _i;
+            _i++;
+            if (_i < _s.Length && (_s[_i] == '+' || _s[_i] == '-')) _i++;
+            if (_i < _s.Length && char.IsDigit(_s[_i])) TakeDigits(start);
+            else _i = save;
+        }
+        CheckTrailingJunk(start);
+        return Intern(start, _i - start);
+    }
+
+    private void TakeDigits(int start)
+    {
+        while (_i < _s.Length && (char.IsDigit(_s[_i])
                                   || (_s[_i] == '_' && _i > start && char.IsDigit(_s[_i - 1]) && char.IsDigit(Peek(1)))))  // digit group separators (PG16)
             _i++;
-        return Intern(start, _i - start);
+    }
+
+    /// <summary>PostgreSQL's "trailing junk after numeric literal": a number immediately followed by an
+    /// identifier character is a LEX error ('1a', '1e+', '1e5e6', '0x1G'). The scan still splits the
+    /// tokens (number + word) so it always terminates; the error surfaces as a hard diagnostic.</summary>
+    private void CheckTrailingJunk(int start)
+    {
+        if (_i < _s.Length && IsIdentStart(_s[_i]))
+            RecordError($"trailing junk after numeric literal at or near \"{_s[start.._i]}{_s[_i]}\"", start);
     }
 
     private string ReadWord()
