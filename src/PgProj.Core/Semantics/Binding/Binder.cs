@@ -251,6 +251,16 @@ public sealed class Binder
                 ? _symbols.FunctionOverloads(schema, name)
                 : _catalog.SearchPath.Schemas.SelectMany(s => _symbols.FunctionOverloads(s, name))).Distinct().ToList();
             if (overloads.Count == 1) { fn = overloads[0]; sig = fn.Signature ?? sig; }
+            else if (overloads.Count > 1)
+            {
+                // Numeric-widening pass (audit P1: integer literals used to be typed bigint and then
+                // exact-string matched, so fn(42) against fn(integer) reported a false "no function
+                // matches"). PG implicitly widens smallint→integer→bigint→numeric→real→double precision;
+                // an unknown-typed arg matches anything. Accept only an UNAMBIGUOUS widened candidate —
+                // two survivors mean we'd be guessing, so stay unresolved (conservative).
+                var widened = overloads.Where(o => o.Signature is { } os && SignatureWidensTo(sig, os)).ToList();
+                if (widened.Count == 1) { fn = widened[0]; sig = fn.Signature ?? sig; }
+            }
         }
 
         return new BoundFuncCall
@@ -289,11 +299,73 @@ public sealed class Binder
     /// </summary>
     private static ResolvedType FunctionReturnType(SymbolEntry? fn) => ResolvedType.Unknown;
 
+    /// <summary>PG types a whole-number literal by the smallest of integer → bigint → numeric that holds
+    /// it (the old constant bigint broke overload resolution for the overwhelmingly common small literal).</summary>
+    private static ResolvedType IntegerLiteralType(string text)
+    {
+        var t = text.Replace("_", "");   // PG16 digit-group separators
+        try
+        {
+            long value = t.Length > 1 && t[0] == '0' && (t[1] is 'x' or 'X') ? Convert.ToInt64(t[2..], 16)
+                       : t.Length > 1 && t[0] == '0' && (t[1] is 'o' or 'O') ? Convert.ToInt64(t[2..], 8)
+                       : t.Length > 1 && t[0] == '0' && (t[1] is 'b' or 'B') ? Convert.ToInt64(t[2..], 2)
+                       : long.Parse(t, System.Globalization.CultureInfo.InvariantCulture);
+            return value is >= int.MinValue and <= int.MaxValue ? ResolvedType.Integer : ResolvedType.Bigint;
+        }
+        catch (Exception e) when (e is OverflowException or FormatException)
+        {
+            return ResolvedType.Numeric;   // exceeds int8 → PG types it numeric
+        }
+    }
+
+    // PG's implicit numeric widening chain, tightest first. Index = rank; a call arg widens to any
+    // candidate parameter of equal or higher rank.
+    private static readonly string[] NumericWideningChain = { "smallint", "integer", "bigint", "numeric", "real", "double precision" };
+
+    private static int NumericRank(string type) => System.Array.IndexOf(NumericWideningChain, type);
+
+    /// <summary>Arg-by-arg signature match allowing PG's implicit numeric widening; an unknown (empty)
+    /// call-arg type matches any parameter. Splits on TOP-LEVEL commas only, so types carrying their own
+    /// commas (<c>numeric(10,2)</c>) don't shear the list.</summary>
+    private static bool SignatureWidensTo(FunctionSignature call, FunctionSignature candidate)
+    {
+        var callArgs = SplitTopLevel(call.ArgTypes);
+        var candArgs = SplitTopLevel(candidate.ArgTypes);
+        if (callArgs.Count != candArgs.Count) return false;
+        for (var i = 0; i < callArgs.Count; i++)
+        {
+            var a = callArgs[i];
+            var p = candArgs[i];
+            if (a.Length == 0) continue;                                        // unknown arg — wildcard
+            if (string.Equals(a, p, StringComparison.OrdinalIgnoreCase)) continue;
+            var ar = NumericRank(a);
+            var pr = NumericRank(p);
+            if (ar < 0 || pr < 0 || ar > pr) return false;
+        }
+        return true;
+    }
+
+    private static List<string> SplitTopLevel(string argTypes)
+    {
+        var parts = new List<string>();
+        if (argTypes.Length == 0) return parts;
+        int depth = 0, start = 0;
+        for (var i = 0; i < argTypes.Length; i++)
+        {
+            var ch = argTypes[i];
+            if (ch == '(') depth++;
+            else if (ch == ')') depth--;
+            else if (ch == ',' && depth == 0) { parts.Add(argTypes[start..i].Trim()); start = i + 1; }
+        }
+        parts.Add(argTypes[start..].Trim());
+        return parts;
+    }
+
     private static ResolvedType LiteralType(LiteralExpr lit) => lit.Kind switch
     {
         "number" => lit.Text.Contains('.') || lit.Text.Contains('e') || lit.Text.Contains('E')
             ? ResolvedType.Numeric
-            : ResolvedType.Bigint,
+            : IntegerLiteralType(lit.Text),
         "string" => ResolvedType.Text,
         "bool" => ResolvedType.Boolean,
         _ => ResolvedType.Unknown,

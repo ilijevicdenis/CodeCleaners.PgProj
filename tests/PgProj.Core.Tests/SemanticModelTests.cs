@@ -196,7 +196,7 @@ public sealed class SemanticModelTests
 
         var items = bound.SelectItems;
         Assert.Equal("text", items[0].Type.Name);
-        Assert.Equal("bigint", items[1].Type.Name);
+        Assert.Equal("integer", items[1].Type.Name);     // PG smallest-fit: 42 is int4, not bigint
         Assert.Equal("boolean", items[2].Type.Name);     // comparison → boolean
     }
 

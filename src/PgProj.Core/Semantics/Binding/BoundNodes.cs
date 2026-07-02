@@ -40,6 +40,7 @@ public sealed class ResolvedType
     /// <summary>The bottom type: "we don't know" (never asserts a concrete, possibly-wrong type).</summary>
     public static readonly ResolvedType Unknown = new("?");
     public static readonly ResolvedType Boolean = new("boolean");
+    public static readonly ResolvedType Integer = new("integer");
     public static readonly ResolvedType Bigint = new("bigint");
     public static readonly ResolvedType Numeric = new("numeric");
     public static readonly ResolvedType Text = new("text");
