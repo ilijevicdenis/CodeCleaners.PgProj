@@ -188,8 +188,13 @@ public sealed partial class PgParser
 
     private Expr ParseExponent(TokenCursor c)
     {
+        // '^' is LEFT-associative in PostgreSQL (2^3^2 = (2^3)^2 = 64, verified live) — the old
+        // self-recursion on the right made it right-associative. The right operand still goes through
+        // ParseUnarySign so `2 ^ -2` binds the unary sign (also live-verified; unspaced `2^-2` is a
+        // single `^-` operator per the trailing-sign lexer rule and errors in PG itself).
         var left = ParseUnarySign(c);
-        if (c.MatchOperator("^")) return new BinaryExpr { Op = "^", Left = left, Right = ParseExponent(c) };
+        while (c.MatchOperator("^"))
+            left = new BinaryExpr { Op = "^", Left = left, Right = ParseUnarySign(c) };
         return left;
     }
 

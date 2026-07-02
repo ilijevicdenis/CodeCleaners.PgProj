@@ -19,6 +19,14 @@ public static class OperatorLexer
 
     private static bool IsOpChar(char c) => OpChars.Contains(c);
 
+    // PostgreSQL's trailing-sign lexer rule: a multi-character operator may only END in '+' or '-' when
+    // it also contains one of these characters. Otherwise the trailing sign starts its own token — so
+    // "a<=-1" lexes as a <= -1, not as a bogus "<=-" operator (audit P1: the unconditional merge silently
+    // built BinaryExpr{Op="<=-"} for any unspaced comparison against a negative literal).
+    private static readonly SearchValues<char> SignAllowing = SearchValues.Create("~!@#%^&|?");
+
+    private static bool IsSign(char c) => c is '+' or '-';
+
     /// <summary>
     /// Merges adjacent operator-character runs into single Symbol tokens, in place. The merged stream is
     /// never longer than the input, so it is compacted into the same <see cref="List{Token}"/> with a
@@ -50,6 +58,11 @@ public static class OperatorLexer
                     endPos++;
                     j++;
                 }
+                // Trailing-sign back-off (PG lexer rule): shed trailing +/- when no sign-allowing char is
+                // present, so "<=-" becomes "<=" and the '-' re-enters the loop as its own run/token.
+                // (Containment is invariant under shedding — the shed chars are signs, never allowing.)
+                if (j - i > 1 && IsSign(tokens[j - 1].Value[0]) && !ContainsSignAllowing(tokens, i, j))
+                    do j--; while (j - i > 1 && IsSign(tokens[j - 1].Value[0]));
                 // Allocate a new Token only when a run actually merged; a lone operator is kept as-is.
                 // Build the merged value once via a span (one final string), not char-by-char string +=.
                 tokens[write++] = j == i + 1 ? t : new Token(TokenKind.Symbol, BuildRun(tokens, i, j, scratch), start);
@@ -87,6 +100,20 @@ public static class OperatorLexer
         return new string(buf);
     }
 
+    private static bool ContainsSignAllowing(List<Token> tokens, int i, int j)
+    {
+        for (int k = i; k < j; k++)
+            if (SignAllowing.Contains(tokens[k].Value[0])) return true;
+        return false;
+    }
+
+    private static bool ContainsSignAllowing(Token[] arr, int i, int j)
+    {
+        for (int k = i; k < j; k++)
+            if (SignAllowing.Contains(arr[k].Value[0])) return true;
+        return false;
+    }
+
     /// <summary>Same in-place operator merge as <see cref="Merge"/>, but over a pooled token buffer
     /// (the main parse path) — compacts the rented array and trims the logical Count, no new list.</summary>
     public static PooledTokens MergeInPlace(PooledTokens tokens)
@@ -112,6 +139,9 @@ public static class OperatorLexer
                     endPos++;
                     j++;
                 }
+                // Trailing-sign back-off — see Merge for the PG rule.
+                if (j - i > 1 && IsSign(arr[j - 1].Value[0]) && !ContainsSignAllowing(arr, i, j))
+                    do j--; while (j - i > 1 && IsSign(arr[j - 1].Value[0]));
                 arr[write++] = j == i + 1 ? t : new Token(TokenKind.Symbol, BuildRun(arr, i, j, scratch), start);
                 i = j;
             }
