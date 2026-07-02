@@ -18,7 +18,8 @@
           "IsNullable": false,
           "IsIdentity": true,
           "IdentityKind": "BY DEFAULT",
-          "IsSerial": false
+          "IsSerial": false,
+          "GeneratedIsStored": true
         },
         {
           "Name": "created_at",
@@ -26,14 +27,16 @@
           "IsNullable": false,
           "Default": "now()",
           "IsIdentity": false,
-          "IsSerial": false
+          "IsSerial": false,
+          "GeneratedIsStored": true
         },
         {
           "Name": "kind",
           "DataType": "text",
           "IsNullable": false,
           "IsIdentity": false,
-          "IsSerial": false
+          "IsSerial": false,
+          "GeneratedIsStored": true
         }
       ],
       "PrimaryKey": {
@@ -57,7 +60,8 @@
           "IsNullable": true,
           "IsIdentity": true,
           "IdentityKind": "BY DEFAULT",
-          "IsSerial": false
+          "IsSerial": false,
+          "GeneratedIsStored": true
         },
         {
           "Name": "tenant_id",
@@ -65,42 +69,48 @@
           "IsNullable": false,
           "Default": "1",
           "IsIdentity": false,
-          "IsSerial": false
+          "IsSerial": false,
+          "GeneratedIsStored": true
         },
         {
           "Name": "email",
           "DataType": "afd.email",
           "IsNullable": false,
           "IsIdentity": false,
-          "IsSerial": false
+          "IsSerial": false,
+          "GeneratedIsStored": true
         },
         {
           "Name": "full_name",
           "DataType": "text",
           "IsNullable": false,
           "IsIdentity": false,
-          "IsSerial": false
+          "IsSerial": false,
+          "GeneratedIsStored": true
         },
         {
           "Name": "code",
           "DataType": "character(8)",
           "IsNullable": true,
           "IsIdentity": false,
-          "IsSerial": false
+          "IsSerial": false,
+          "GeneratedIsStored": true
         },
         {
           "Name": "short_name",
           "DataType": "character varying(50)",
           "IsNullable": true,
           "IsIdentity": false,
-          "IsSerial": false
+          "IsSerial": false,
+          "GeneratedIsStored": true
         },
         {
           "Name": "notes",
           "DataType": "text",
           "IsNullable": true,
           "IsIdentity": false,
-          "IsSerial": false
+          "IsSerial": false,
+          "GeneratedIsStored": true
         },
         {
           "Name": "balance_cents",
@@ -108,7 +118,8 @@
           "IsNullable": false,
           "Default": "0",
           "IsIdentity": false,
-          "IsSerial": false
+          "IsSerial": false,
+          "GeneratedIsStored": true
         },
         {
           "Name": "score",
@@ -116,21 +127,24 @@
           "IsNullable": false,
           "Default": "0",
           "IsIdentity": false,
-          "IsSerial": false
+          "IsSerial": false,
+          "GeneratedIsStored": true
         },
         {
           "Name": "rating",
           "DataType": "real",
           "IsNullable": true,
           "IsIdentity": false,
-          "IsSerial": false
+          "IsSerial": false,
+          "GeneratedIsStored": true
         },
         {
           "Name": "big_rating",
           "DataType": "double precision",
           "IsNullable": true,
           "IsIdentity": false,
-          "IsSerial": false
+          "IsSerial": false,
+          "GeneratedIsStored": true
         },
         {
           "Name": "qty",
@@ -138,21 +152,24 @@
           "IsNullable": true,
           "Default": "1",
           "IsIdentity": false,
-          "IsSerial": false
+          "IsSerial": false,
+          "GeneratedIsStored": true
         },
         {
           "Name": "serial_no",
           "DataType": "integer",
           "IsNullable": false,
           "IsIdentity": false,
-          "IsSerial": true
+          "IsSerial": true,
+          "GeneratedIsStored": true
         },
         {
           "Name": "big_serial_no",
           "DataType": "bigint",
           "IsNullable": false,
           "IsIdentity": false,
-          "IsSerial": true
+          "IsSerial": true,
+          "GeneratedIsStored": true
         },
         {
           "Name": "is_active",
@@ -160,7 +177,8 @@
           "IsNullable": false,
           "Default": "true",
           "IsIdentity": false,
-          "IsSerial": false
+          "IsSerial": false,
+          "GeneratedIsStored": true
         },
         {
           "Name": "created_at",
@@ -168,56 +186,64 @@
           "IsNullable": false,
           "Default": "now()",
           "IsIdentity": false,
-          "IsSerial": false
+          "IsSerial": false,
+          "GeneratedIsStored": true
         },
         {
           "Name": "born_on",
           "DataType": "date",
           "IsNullable": true,
           "IsIdentity": false,
-          "IsSerial": false
+          "IsSerial": false,
+          "GeneratedIsStored": true
         },
         {
           "Name": "wake_time",
           "DataType": "time without time zone",
           "IsNullable": true,
           "IsIdentity": false,
-          "IsSerial": false
+          "IsSerial": false,
+          "GeneratedIsStored": true
         },
         {
           "Name": "duration",
           "DataType": "interval",
           "IsNullable": true,
           "IsIdentity": false,
-          "IsSerial": false
+          "IsSerial": false,
+          "GeneratedIsStored": true
         },
         {
           "Name": "ip_addr",
           "DataType": "inet",
           "IsNullable": true,
           "IsIdentity": false,
-          "IsSerial": false
+          "IsSerial": false,
+          "GeneratedIsStored": true
         },
         {
           "Name": "mac",
           "DataType": "macaddr",
           "IsNullable": true,
           "IsIdentity": false,
-          "IsSerial": false
+          "IsSerial": false,
+          "GeneratedIsStored": true
         },
         {
           "Name": "flags",
           "DataType": "bit(8)",
           "IsNullable": true,
           "IsIdentity": false,
-          "IsSerial": false
+          "IsSerial": false,
+          "GeneratedIsStored": true
         },
         {
           "Name": "varflags",
           "DataType": "bit varying(16)",
           "IsNullable": true,
           "IsIdentity": false,
-          "IsSerial": false
+          "IsSerial": false,
+          "GeneratedIsStored": true
         },
         {
           "Name": "ext_id",
@@ -225,14 +251,16 @@
           "IsNullable": true,
           "Default": "gen_random_uuid()",
           "IsIdentity": false,
-          "IsSerial": false
+          "IsSerial": false,
+          "GeneratedIsStored": true
         },
         {
           "Name": "wallet",
           "DataType": "money",
           "IsNullable": true,
           "IsIdentity": false,
-          "IsSerial": false
+          "IsSerial": false,
+          "GeneratedIsStored": true
         },
         {
           "Name": "tags",
@@ -240,21 +268,24 @@
           "IsNullable": false,
           "Default": "\u0027{}\u0027",
           "IsIdentity": false,
-          "IsSerial": false
+          "IsSerial": false,
+          "GeneratedIsStored": true
         },
         {
           "Name": "scores",
           "DataType": "integer[]",
           "IsNullable": true,
           "IsIdentity": false,
-          "IsSerial": false
+          "IsSerial": false,
+          "GeneratedIsStored": true
         },
         {
           "Name": "matrix",
           "DataType": "numeric(6, 2)[][]",
           "IsNullable": true,
           "IsIdentity": false,
-          "IsSerial": false
+          "IsSerial": false,
+          "GeneratedIsStored": true
         },
         {
           "Name": "profile",
@@ -262,28 +293,32 @@
           "IsNullable": false,
           "Default": "\u0027{}\u0027::jsonb",
           "IsIdentity": false,
-          "IsSerial": false
+          "IsSerial": false,
+          "GeneratedIsStored": true
         },
         {
           "Name": "legacy_doc",
           "DataType": "json",
           "IsNullable": true,
           "IsIdentity": false,
-          "IsSerial": false
+          "IsSerial": false,
+          "GeneratedIsStored": true
         },
         {
           "Name": "xml_doc",
           "DataType": "xml",
           "IsNullable": true,
           "IsIdentity": false,
-          "IsSerial": false
+          "IsSerial": false,
+          "GeneratedIsStored": true
         },
         {
           "Name": "home",
           "DataType": "afd.address",
           "IsNullable": true,
           "IsIdentity": false,
-          "IsSerial": false
+          "IsSerial": false,
+          "GeneratedIsStored": true
         },
         {
           "Name": "status",
@@ -291,35 +326,40 @@
           "IsNullable": false,
           "Default": "\u0027ok\u0027",
           "IsIdentity": false,
-          "IsSerial": false
+          "IsSerial": false,
+          "GeneratedIsStored": true
         },
         {
           "Name": "valid_period",
           "DataType": "tstzrange",
           "IsNullable": true,
           "IsIdentity": false,
-          "IsSerial": false
+          "IsSerial": false,
+          "GeneratedIsStored": true
         },
         {
           "Name": "temp_range",
           "DataType": "afd.float_range",
           "IsNullable": true,
           "IsIdentity": false,
-          "IsSerial": false
+          "IsSerial": false,
+          "GeneratedIsStored": true
         },
         {
           "Name": "region",
           "DataType": "circle",
           "IsNullable": true,
           "IsIdentity": false,
-          "IsSerial": false
+          "IsSerial": false,
+          "GeneratedIsStored": true
         },
         {
           "Name": "search",
           "DataType": "tsvector",
           "IsNullable": true,
           "IsIdentity": false,
-          "IsSerial": false
+          "IsSerial": false,
+          "GeneratedIsStored": true
         },
         {
           "Name": "order_no",
@@ -327,7 +367,8 @@
           "IsNullable": false,
           "Default": "nextval(\u0027afd.order_no_seq\u0027)",
           "IsIdentity": false,
-          "IsSerial": false
+          "IsSerial": false,
+          "GeneratedIsStored": true
         },
         {
           "Name": "name_upper",
@@ -335,7 +376,8 @@
           "IsNullable": true,
           "IsIdentity": false,
           "GeneratedExpression": "upper(full_name)",
-          "IsSerial": false
+          "IsSerial": false,
+          "GeneratedIsStored": true
         },
         {
           "Name": "balance_dollars",
@@ -343,21 +385,24 @@
           "IsNullable": true,
           "IsIdentity": false,
           "GeneratedExpression": "balance_cents/100.0",
-          "IsSerial": false
+          "IsSerial": false,
+          "GeneratedIsStored": true
         },
         {
           "Name": "discount",
           "DataType": "integer",
           "IsNullable": true,
           "IsIdentity": false,
-          "IsSerial": false
+          "IsSerial": false,
+          "GeneratedIsStored": true
         },
         {
           "Name": "referral_email",
           "DataType": "afd.email",
           "IsNullable": true,
           "IsIdentity": false,
-          "IsSerial": false
+          "IsSerial": false,
+          "GeneratedIsStored": true
         }
       ],
       "PrimaryKey": {
@@ -404,7 +449,8 @@
           "IsNullable": false,
           "Default": "now()",
           "IsIdentity": false,
-          "IsSerial": false
+          "IsSerial": false,
+          "GeneratedIsStored": true
         }
       ],
       "Unique": [],
@@ -422,14 +468,16 @@
           "DataType": "text",
           "IsNullable": false,
           "IsIdentity": false,
-          "IsSerial": false
+          "IsSerial": false,
+          "GeneratedIsStored": true
         },
         {
           "Name": "body",
           "DataType": "text",
           "IsNullable": true,
           "IsIdentity": false,
-          "IsSerial": false
+          "IsSerial": false,
+          "GeneratedIsStored": true
         }
       ],
       "Unique": [],
@@ -449,28 +497,32 @@
           "IsNullable": true,
           "IsIdentity": true,
           "IdentityKind": "BY DEFAULT",
-          "IsSerial": false
+          "IsSerial": false,
+          "GeneratedIsStored": true
         },
         {
           "Name": "occurred",
           "DataType": "date",
           "IsNullable": false,
           "IsIdentity": false,
-          "IsSerial": false
+          "IsSerial": false,
+          "GeneratedIsStored": true
         },
         {
           "Name": "kind",
           "DataType": "text",
           "IsNullable": false,
           "IsIdentity": false,
-          "IsSerial": false
+          "IsSerial": false,
+          "GeneratedIsStored": true
         },
         {
           "Name": "payload",
           "DataType": "jsonb",
           "IsNullable": true,
           "IsIdentity": false,
-          "IsSerial": false
+          "IsSerial": false,
+          "GeneratedIsStored": true
         }
       ],
       "PrimaryKey": {
@@ -496,21 +548,24 @@
           "IsNullable": false,
           "IsIdentity": true,
           "IdentityKind": "ALWAYS",
-          "IsSerial": false
+          "IsSerial": false,
+          "GeneratedIsStored": true
         },
         {
           "Name": "tenant_id",
           "DataType": "integer",
           "IsNullable": false,
           "IsIdentity": false,
-          "IsSerial": false
+          "IsSerial": false,
+          "GeneratedIsStored": true
         },
         {
           "Name": "customer_id",
           "DataType": "bigint",
           "IsNullable": false,
           "IsIdentity": false,
-          "IsSerial": false
+          "IsSerial": false,
+          "GeneratedIsStored": true
         },
         {
           "Name": "total_cents",
@@ -518,7 +573,8 @@
           "IsNullable": false,
           "Default": "0",
           "IsIdentity": false,
-          "IsSerial": false
+          "IsSerial": false,
+          "GeneratedIsStored": true
         },
         {
           "Name": "placed_at",
@@ -526,7 +582,8 @@
           "IsNullable": false,
           "Default": "now()",
           "IsIdentity": false,
-          "IsSerial": false
+          "IsSerial": false,
+          "GeneratedIsStored": true
         }
       ],
       "PrimaryKey": {
@@ -570,21 +627,24 @@
           "IsNullable": false,
           "IsIdentity": true,
           "IdentityKind": "BY DEFAULT",
-          "IsSerial": false
+          "IsSerial": false,
+          "GeneratedIsStored": true
         },
         {
           "Name": "room_id",
           "DataType": "integer",
           "IsNullable": false,
           "IsIdentity": false,
-          "IsSerial": false
+          "IsSerial": false,
+          "GeneratedIsStored": true
         },
         {
           "Name": "during",
           "DataType": "tstzrange",
           "IsNullable": false,
           "IsIdentity": false,
-          "IsSerial": false
+          "IsSerial": false,
+          "GeneratedIsStored": true
         }
       ],
       "PrimaryKey": {

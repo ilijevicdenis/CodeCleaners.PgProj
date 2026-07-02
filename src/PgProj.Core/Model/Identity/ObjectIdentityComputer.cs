@@ -203,8 +203,10 @@ public sealed class ObjectIdentityComputer
                             c.IsIdentity ? "id:" + N(c.IdentityKind ?? "") : "",
                             c.IsSerial ? "serial" : "",
                             // Generated/CHECK/default are scalar EXPRESSIONS — fold redundant outer parens and
-                            // operator spacing (#51) so `(a>0)` ≡ `a > 0` in the semantic hash.
-                            c.GeneratedExpression is null ? "" : "gen:" + Canonicalizer.NormalizeExpression(c.GeneratedExpression),
+                            // operator spacing (#51) so `(a>0)` ≡ `a > 0` in the semantic hash. VIRTUAL gets
+                            // its own prefix ("genv:") so a STORED↔VIRTUAL flip changes the identity; STORED
+                            // keeps the historical "gen:" so existing snapshots/hashes are unaffected.
+                            c.GeneratedExpression is null ? "" : (c.GeneratedIsStored ? "gen:" : "genv:") + Canonicalizer.NormalizeExpression(c.GeneratedExpression),
                             c.IsSerial ? "" : "def:" + Canonicalizer.NormalizeExpression(c.Default)))
               .Append('|');
         if (t.PrimaryKey is { } pk)

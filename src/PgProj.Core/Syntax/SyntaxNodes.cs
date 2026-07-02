@@ -227,7 +227,9 @@ public sealed class InlinePrimaryKey : ColumnConstraint { public List<string> In
 public sealed class InlineUnique : ColumnConstraint { public bool NullsNotDistinct { get; set; } public List<string> Include { get; } = new(); public Deferrability Deferrability { get; } = new(); }
 public sealed class InlineCheck : ColumnConstraint { public string Expression { get; init; } = ""; public bool NoInherit { get; set; } public bool NotValid { get; set; } public Deferrability Deferrability { get; } = new(); }
 public sealed class GeneratedIdentity : ColumnConstraint { public string Kind { get; init; } = ""; }      // ALWAYS / BY DEFAULT
-public sealed class GeneratedStored : ColumnConstraint { public string Expression { get; init; } = ""; }
+// GENERATED ALWAYS AS (expr) STORED|VIRTUAL — IsStored=false for explicit VIRTUAL and for the
+// storage-omitted PG18 form (defaults to VIRTUAL); the two kinds deploy differently, never conflate.
+public sealed class GeneratedStored : ColumnConstraint { public string Expression { get; init; } = ""; public bool IsStored { get; init; } = true; }
 public sealed class InlineReferences : ColumnConstraint
 {
     public string? RefSchema { get; init; }

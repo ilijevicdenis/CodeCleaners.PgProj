@@ -55,7 +55,9 @@ public sealed partial class LiveDatabaseReader
 
             var isIdentity = idChar is 'a' or 'd';
             var identityKind = idChar switch { 'a' => "ALWAYS", 'd' => "BY DEFAULT", _ => (string?)null };
-            var isGenerated = genChar == 's';
+            // attgenerated: 's' = STORED, 'v' = VIRTUAL (PG18). Both are generated columns — treating 'v'
+            // as non-generated would surface its generation expression as a bogus DEFAULT.
+            var isGenerated = genChar is 's' or 'v';
             var generatedExpr = isGenerated && !string.IsNullOrEmpty(defExpr) ? $"({defExpr})" : null;
             // A nextval(...) default is the signature of a serial column; treat it as such so it
             // matches a project's `serial`/`bigserial` rather than churning a default diff.
@@ -68,7 +70,8 @@ public sealed partial class LiveDatabaseReader
                 IsIdentity: isIdentity,
                 IdentityKind: identityKind,
                 GeneratedExpression: generatedExpr,
-                IsSerial: isSerial));
+                IsSerial: isSerial,
+                GeneratedIsStored: genChar != 'v'));
         }
         return (tables, byKey);
     }

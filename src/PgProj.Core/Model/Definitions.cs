@@ -17,8 +17,9 @@ public sealed record ColumnDefinition(
     string? Default = null,
     bool IsIdentity = false,
     string? IdentityKind = null,        // "ALWAYS" | "BY DEFAULT" when IsIdentity
-    string? GeneratedExpression = null,  // the (expr) for GENERATED ALWAYS AS (expr) STORED
-    bool IsSerial = false);              // serial/bigserial/smallserial (auto-sequence pseudo-type)
+    string? GeneratedExpression = null,  // the (expr) for GENERATED ALWAYS AS (expr) STORED|VIRTUAL
+    bool IsSerial = false,               // serial/bigserial/smallserial (auto-sequence pseudo-type)
+    bool GeneratedIsStored = true);      // STORED vs VIRTUAL when GeneratedExpression is set (PG18 virtual)
 
 public sealed record PrimaryKeyDefinition(string? Name, IReadOnlyList<string> Columns);
 

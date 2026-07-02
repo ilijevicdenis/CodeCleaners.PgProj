@@ -760,7 +760,9 @@ public sealed class SchemaComparer
         // Generated-column expressions canonicalize with NormalizeExpression (issue #64) so a source
         // `GENERATED ALWAYS AS (upper(full_name)) STORED` matches the catalog's parenthesised/cast rendering
         // `(upper(full_name))` without a phantom column recreate.
-        && NormalizeExpression(a.GeneratedExpression ?? "") == NormalizeExpression(b.GeneratedExpression ?? "");
+        && NormalizeExpression(a.GeneratedExpression ?? "") == NormalizeExpression(b.GeneratedExpression ?? "")
+        // STORED vs VIRTUAL (PG18) are different physical shapes — a kind flip must surface as a change.
+        && (a.GeneratedExpression is null || a.GeneratedIsStored == b.GeneratedIsStored);
 
     private bool DefaultsEqual(string? a, string? b)
     {

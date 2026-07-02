@@ -71,6 +71,7 @@ public sealed class ModelBuilder
             var nullable = !isSerial;
             string? def = null, idKind = null, generated = null;
             var identity = false;
+            var generatedStored = true;
             foreach (var c in col.Constraints)
             {
                 switch (c)
@@ -82,11 +83,11 @@ public sealed class ModelBuilder
                     case InlineUnique: table.Unique.Add(new UniqueConstraintDefinition(null, new[] { col.Name })); break;
                     case InlineReferences r: table.ForeignKeys.Add(new ForeignKeyDefinition(null, new[] { col.Name }, Sch(r.RefSchema), r.RefTable, r.RefColumns, r.OnDelete?.Action, r.OnUpdate?.Action)); break;
                     case GeneratedIdentity g: identity = true; idKind = g.Kind; break;
-                    case GeneratedStored g: generated = g.Expression; break;
+                    case GeneratedStored g: generated = g.Expression; generatedStored = g.IsStored; break;
                     case InlineCheck ch: table.Checks.Add(new CheckConstraintDefinition(ch.Name, ch.Expression)); break;
                 }
             }
-            table.Columns.Add(new ColumnDefinition(col.Name, TypeNormalizer.Normalize(typeText), nullable, def, identity, idKind, generated, isSerial));
+            table.Columns.Add(new ColumnDefinition(col.Name, TypeNormalizer.Normalize(typeText), nullable, def, identity, idKind, generated, isSerial, generatedStored));
         }
         foreach (var tc in s.Constraints)
             ApplyTableConstraint(table, tc);

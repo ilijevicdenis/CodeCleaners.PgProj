@@ -25,8 +25,11 @@ public sealed record DesignerColumnDto
     /// <summary>"ALWAYS" | "BY DEFAULT" when <see cref="Identity"/>.</summary>
     public string? IdentityKind { get; init; }
 
-    /// <summary>The (expr) for <c>GENERATED ALWAYS AS (expr) STORED</c>, or null.</summary>
+    /// <summary>The (expr) for <c>GENERATED ALWAYS AS (expr) STORED|VIRTUAL</c>, or null.</summary>
     public string? Generated { get; init; }
+
+    /// <summary>STORED (true, default) vs VIRTUAL (false, PG18) when <see cref="Generated"/> is set.</summary>
+    public bool GeneratedStored { get; init; } = true;
 
     /// <summary>serial / bigserial / smallserial pseudo-type (auto-sequence).</summary>
     public bool Serial { get; init; }

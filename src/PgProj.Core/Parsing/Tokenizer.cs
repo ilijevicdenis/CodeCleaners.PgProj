@@ -5,6 +5,10 @@ using System.Text;
 
 namespace PgProj.Core.Parsing;
 
+/// <summary>A lexical error the tokenizer recovered from (it consumes to end-of-input so the scan always
+/// terminates, but the swallowed text may hide whole statements — the caller must surface this).</summary>
+public readonly record struct LexError(string Message, int Offset);
+
 /// <summary>
 /// Lexes Postgres SQL into <see cref="Token"/>s. It is deliberately dialect-aware where it
 /// matters for DDL: it understands dollar-quoted bodies (so semicolons inside a function body
@@ -15,6 +19,8 @@ public sealed class Tokenizer
 {
     private readonly string _s;
     private int _i;
+    // First unterminated-construct error (the rest of the input is inside it, so later errors are noise).
+    private LexError? _error;
 
     // Output buffer rented from ArrayPool (see PooledTokens). Filled via Emit with manual grow, so the
     // per-parse token array can be returned to the pool after the model is built — Token[] was the single
@@ -101,10 +107,18 @@ public sealed class Tokenizer
     /// <summary>Tokenize to a pooled buffer — the main PgParser.Parse path. The caller owns the returned
     /// <see cref="PooledTokens"/> and releases it (ParseResult.ReleaseTokens) once the model is built.
     /// Small inputs skip pooling (PoolThreshold) so a single small/CLI parse pays no rent/return overhead.</summary>
-    public static PooledTokens TokenizePooled(string sql)
+    public static PooledTokens TokenizePooled(string sql) => TokenizePooled(sql, out _);
+
+    /// <summary>Same as <see cref="TokenizePooled(string)"/> but also reports the first lexical error
+    /// (unterminated block comment / string / quoted identifier / dollar-quote). The scan still consumes
+    /// to end-of-input, so <paramref name="error"/> being non-null means later statements may have been
+    /// SWALLOWED into the unterminated construct — treat it as a hard diagnostic, never ignore it.</summary>
+    public static PooledTokens TokenizePooled(string sql, out LexError? error)
     {
         var t = new Tokenizer(sql ?? string.Empty);
-        return t.Run(pool: t._s.Length >= PoolThreshold);
+        var tokens = t.Run(pool: t._s.Length >= PoolThreshold);
+        error = t._error;
+        return tokens;
     }
 
     /// <summary>Tokenize to an <b>always-pooled</b> buffer the caller returns immediately — for the
@@ -206,6 +220,7 @@ public sealed class Tokenizer
 
     private void SkipBlockComment()
     {
+        var start = _i;
         _i += 2; // consume /*
         var depth = 1;
         while (_i < _s.Length && depth > 0)
@@ -214,7 +229,13 @@ public sealed class Tokenizer
             else if (_s[_i] == '*' && Peek(1) == '/') { depth--; _i += 2; }
             else _i++;
         }
+        if (depth > 0)
+            RecordError("unterminated block comment (missing '*/') — everything after it was swallowed", start);
     }
+
+    /// <summary>Keep only the FIRST lexical error: the input after it sits inside the unterminated
+    /// construct, so any subsequent error is a cascade.</summary>
+    private void RecordError(string message, int offset) => _error ??= new LexError(message, offset);
 
     private bool TryReadDollarString(out string value)
     {
@@ -230,7 +251,9 @@ public sealed class Tokenizer
         var close = _s.IndexOf(tag, bodyStart, StringComparison.Ordinal);
         if (close < 0)
         {
-            // Unterminated — consume to end so we don't loop forever.
+            // Unterminated — consume to end so we don't loop forever, but report it: the swallowed
+            // remainder may contain whole statements.
+            RecordError($"unterminated dollar-quoted string (missing closing {tag})", _i);
             value = _s.Substring(_i);
             _i = _s.Length;
             return true;
@@ -263,6 +286,7 @@ public sealed class Tokenizer
         // Slow path: an escape is present (or the literal is unterminated). Build the value char-by-char,
         // exactly as before — doubled quotes collapse to one, E-string backslash pairs are kept verbatim.
         var sb = new StringBuilder();
+        var closed = false;
         _i = contentStart; // already past the opening quote
         while (_i < _s.Length)
         {
@@ -278,11 +302,16 @@ public sealed class Tokenizer
             {
                 if (Peek(1) == quote) { sb.Append(quote); _i += 2; continue; } // doubled escape
                 _i++; // closing quote
+                closed = true;
                 break;
             }
             sb.Append(c);
             _i++;
         }
+        if (!closed)
+            RecordError(quote == '\''
+                ? "unterminated string literal (missing closing ')"
+                : "unterminated quoted identifier (missing closing \")", contentStart - 1);
         return sb.ToString();
     }
 

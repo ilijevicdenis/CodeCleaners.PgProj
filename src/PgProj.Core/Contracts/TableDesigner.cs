@@ -140,11 +140,12 @@ public static class TableDesigner
         Identity = c.IsIdentity,
         IdentityKind = c.IdentityKind,
         Generated = c.GeneratedExpression,
+        GeneratedStored = c.GeneratedIsStored,
         Serial = c.IsSerial,
     };
 
     private static ColumnDefinition ToModel(DesignerColumnDto c) => new(
-        c.Name, c.DataType, c.Nullable, c.Default, c.Identity, c.IdentityKind, c.Generated, c.Serial);
+        c.Name, c.DataType, c.Nullable, c.Default, c.Identity, c.IdentityKind, c.Generated, c.Serial, c.GeneratedStored);
 
     private static DesignerForeignKeyDto ToDto(ForeignKeyDefinition fk) => new()
     {

@@ -34,9 +34,18 @@ public sealed partial class PgParser
     {
         var result = new ParseResult();
         PooledTokens tokens;
-        try { tokens = OperatorLexer.MergeInPlace(Tokenizer.TokenizePooled(sql)); }
+        Parsing.LexError? lexError;
+        try { tokens = OperatorLexer.MergeInPlace(Tokenizer.TokenizePooled(sql, out lexError)); }
         catch (Exception ex) { result.Diagnostics.Add(new ParseDiagnostic("tokenize failed: " + ex.Message, 1, 1, 0)); return result; }
         result.SetTokens(tokens);   // hand the pooled buffer to the result for ReleaseTokens after build
+
+        // An unterminated construct (block comment / string / dollar-quote) consumed to end-of-input:
+        // statements after it were SWALLOWED, so this must be a hard diagnostic, never a silent pass.
+        if (lexError is { } le)
+        {
+            result.FullyRecognized = false;
+            result.Diagnostics.Add(ToDiagnostic(le.Message, le.Offset, sql));
+        }
 
         var c = new TokenCursor(System.Array.Empty<Token>());   // reused per statement (Reset) — not retained
         foreach (var segment in SplitStatements(tokens))
@@ -535,8 +544,9 @@ public sealed partial class PgParser
                 if (b.AtSymbol('('))
                 {
                     var expr = ParseParenExpression(b);
-                    if (!b.MatchWord("STORED")) b.MatchWord("VIRTUAL");   // PG18: omitted defaults to VIRTUAL
-                    return new GeneratedStored { Expression = expr };
+                    var stored = b.MatchWord("STORED");
+                    if (!stored) b.MatchWord("VIRTUAL");   // PG18: omitted defaults to VIRTUAL
+                    return new GeneratedStored { Expression = expr, IsStored = stored };
                 }
                 b.ExpectWord("IDENTITY");
                 if (b.AtSymbol('(')) b.SkipBalancedParens();
@@ -923,15 +933,18 @@ public sealed partial class PgParser
         if (tokens.Count > start) yield return new TokenSegment(tokens, start, tokens.Count - start);
     }
 
-    private static ParseDiagnostic ToDiagnostic(ParseException pe, string sql)
+    private static ParseDiagnostic ToDiagnostic(ParseException pe, string sql) =>
+        ToDiagnostic(pe.Message, pe.Offset, sql);
+
+    private static ParseDiagnostic ToDiagnostic(string message, int offset, string sql)
     {
         int line = 1, col = 1;
-        int limit = Math.Min(pe.Offset, sql.Length);
+        int limit = Math.Min(offset, sql.Length);
         for (int i = 0; i < limit; i++)
         {
             if (sql[i] == '\n') { line++; col = 1; }
             else col++;
         }
-        return new ParseDiagnostic(pe.Message, line, col, pe.Offset);
+        return new ParseDiagnostic(message, line, col, offset);
     }
 }

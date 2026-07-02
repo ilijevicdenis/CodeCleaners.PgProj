@@ -42,7 +42,8 @@ public static class SqlEmitter
 
         sb.Append(c.DataType);
         if (!string.IsNullOrWhiteSpace(c.GeneratedExpression))
-            sb.Append(" GENERATED ALWAYS AS ").Append(WrapParens(c.GeneratedExpression!)).Append(" STORED");
+            sb.Append(" GENERATED ALWAYS AS ").Append(WrapParens(c.GeneratedExpression!))
+              .Append(c.GeneratedIsStored ? " STORED" : " VIRTUAL");
         else if (c.IsIdentity)
             sb.Append(" GENERATED ").Append(c.IdentityKind ?? "BY DEFAULT").Append(" AS IDENTITY");
         if (!c.IsNullable) sb.Append(" NOT NULL");
