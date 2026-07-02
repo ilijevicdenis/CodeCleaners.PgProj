@@ -93,6 +93,44 @@ public sealed class Catalog
             Symbols.Add(SymbolEntry.ForColumn(s, name, c.Name, c.Type, sourceFile: sourceFile, external: external));
     }
 
+    /// <summary>
+    /// Amend an already-added relation for a standalone <c>ALTER TABLE</c> (audit P1: the catalog used to
+    /// ignore ALTERs entirely, so a view over an ALTER-added column false-positived "column does not
+    /// exist"). Adds/drops/retypes columns so binding sees the post-ALTER shape. A relation not yet
+    /// absorbed is left unchanged — best effort, same contract as ModelBuilder's fold. A dropped column
+    /// keeps its symbol entry (the symbol table is append-only): a reference to it resolves instead of
+    /// erroring — a missed diagnostic, never a false positive.
+    /// </summary>
+    public void AmendRelation(string? schema, string name,
+        IEnumerable<ColumnInfo> addedColumns,
+        IEnumerable<string> droppedColumns,
+        IEnumerable<(string Column, string NewType)> retypedColumns)
+    {
+        var s = schema ?? DefaultSchema;
+        var key = $"{s}.{name}";
+        if (!_relationColumns.TryGetValue(key, out var cols) || !_relations.TryGetValue(key, out var names))
+            return;
+
+        foreach (var add in addedColumns)
+        {
+            cols.Add(add);
+            names.Add(add.Name);
+            Symbols.Add(SymbolEntry.ForColumn(s, name, add.Name, add.Type));
+        }
+        foreach (var dropped in droppedColumns)
+        {
+            cols.RemoveAll(c => string.Equals(c.Name, dropped, StringComparison.OrdinalIgnoreCase));
+            names.RemoveAll(n => string.Equals(n, dropped, StringComparison.OrdinalIgnoreCase));
+        }
+        foreach (var (column, newType) in retypedColumns)
+        {
+            var idx = cols.FindIndex(c => string.Equals(c.Name, column, StringComparison.OrdinalIgnoreCase));
+            if (idx < 0) continue;
+            cols[idx] = cols[idx] with { Type = newType };
+            Symbols.Add(SymbolEntry.ForColumn(s, name, cols[idx].Name, newType));   // Add overwrites by key
+        }
+    }
+
     public void AddType(string? schema, string name)
     {
         if (schema is not null) { AddSchema(schema); _types.Add($"{schema}.{name}"); Symbols.Add(SymbolEntry.ForType(schema, name)); }

@@ -42,7 +42,10 @@ public sealed class SemanticAnalyzer
     public IReadOnlyList<SemanticDiagnostic> Analyze(ParseResult result)
     {
         _scriptRenames = result.Statements.OfType<AlterStatement>().Any(a => a.Actions.Contains("RENAME"));
-        _scriptAlters = result.Statements.OfType<AlterStatement>().Any();
+        // Narrowed (audit P1): column-level ALTERs fold into the catalog (CatalogBuilder.AmendRelation),
+        // so only name/shape-invalidating actions (rename / schema move / typed-of / inherit / partition)
+        // force the skip — an ADD CONSTRAINT or folded column change keeps column checks ON.
+        _scriptAlters = result.Statements.OfType<AlterStatement>().Any(a => a.InvalidatesBinding);
         foreach (var stmt in result.Statements) AnalyzeStatement(stmt);
         return _diags;
     }

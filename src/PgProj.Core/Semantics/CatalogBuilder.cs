@@ -88,6 +88,18 @@ public static class CatalogBuilder
             case CreateSchemaStatement s when s.Name is not null:
                 c.AddSchema(s.Name);
                 break;
+            // Standalone ALTER TABLE column changes fold into the catalog (audit P1) so binding sees the
+            // post-ALTER shape — a view over an ALTER-added column no longer false-positives, and the
+            // analyzers can keep validation ON for files whose ALTERs are all folded/binding-neutral
+            // (AlterStatement.InvalidatesBinding is the remaining conservatism gate).
+            case AlterStatement a when a.ObjectKind == "TABLE"
+                                       && (a.AddedColumns.Count > 0 || a.DroppedColumns.Count > 0 || a.ColumnActions.Count > 0):
+                c.AmendRelation(a.Schema, a.Name,
+                    a.AddedColumns.Select(col => new Catalog.ColumnInfo(col.Name, TypeNormalizer.Normalize(col.Type.Text))),
+                    a.DroppedColumns,
+                    a.ColumnActions.Where(x => x.Kind == "TYPE" && x.Value is not null)
+                                   .Select(x => (x.Column, TypeNormalizer.Normalize(x.Value!))));
+                break;
             case RawCreateStatement r when r.Name is not null:
                 switch (r.ObjectKind)
                 {

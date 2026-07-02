@@ -83,9 +83,12 @@ public sealed class SemanticValidator
 
         int startIndex = _diags.Count;   // so this call returns only the findings it adds (one validator, many files)
 
-        // A RENAME/ALTER mid-file changes names/columns we cannot track — match the base analyzer and skip
-        // (relation/column resolution would be unreliable, risking false positives).
-        bool hasAlterOrRename = parsed.Statements.OfType<AlterStatement>().Any();
+        // Only an ALTER that changes NAMES or unmodeled shape (rename / schema move / typed-of / inherit /
+        // partition attach) makes binding unreliable for this file. Column-level ALTERs are folded into
+        // the catalog (CatalogBuilder.AmendRelation) and constraint/storage actions don't affect
+        // resolution — so the extractor's routine ADD CONSTRAINT no longer disables validation for the
+        // whole file (audit P1: one ALTER used to blanket-skip View/Trigger/CHECK/query validation).
+        bool hasAlterOrRename = parsed.Statements.OfType<AlterStatement>().Any(a => a.InvalidatesBinding);
 
         foreach (var stmt in parsed.Statements)
         {

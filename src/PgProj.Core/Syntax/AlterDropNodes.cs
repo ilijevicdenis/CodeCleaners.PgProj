@@ -21,6 +21,27 @@ public sealed class AlterStatement : SqlStatement
     /// statements — re-adding their text double-folds (the #153 lesson).</summary>
     public bool FoldsIntoTableModel =>
         AddedConstraints.Count > 0 || AddedColumns.Count > 0 || DroppedColumns.Count > 0 || ColumnActions.Count > 0;
+
+    // Actions that change NAMES or shape the catalog cannot track. Column adds/drops/retypes are folded
+    // into the semantic catalog (CatalogBuilder), and constraint/storage/RLS actions don't affect
+    // name/column resolution — so only these force the analyzers' skip-the-file conservatism.
+    private static readonly System.Collections.Generic.HashSet<string> BindingInvalidatingActions =
+        new(System.StringComparer.Ordinal)
+        { "RENAME", "SET SCHEMA", "OF", "NOT OF", "INHERIT", "NO INHERIT", "PARTITION", "RENAME VALUE", "RENAME ATTRIBUTE", "ATTRIBUTE" };
+
+    /// <summary>True when this ALTER makes name/column binding unreliable for its parse unit (rename /
+    /// schema move / typed-of / inheritance / partition attach). Everything else is either folded into
+    /// the catalog or irrelevant to binding, so validation can stay ON for the file (P1 audit fix:
+    /// the extractor's routine <c>ADD CONSTRAINT</c> used to disable validation for the whole file).</summary>
+    public bool InvalidatesBinding
+    {
+        get
+        {
+            foreach (var a in Actions)
+                if (BindingInvalidatingActions.Contains(a)) return true;
+            return false;
+        }
+    }
 }
 
 /// <summary>One structured <c>ALTER TABLE … ALTER COLUMN</c> action ModelBuilder can fold.
