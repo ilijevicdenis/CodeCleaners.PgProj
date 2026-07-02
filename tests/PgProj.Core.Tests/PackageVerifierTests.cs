@@ -148,25 +148,49 @@ public sealed class PackageVerifierTests : IDisposable
     {
         // sync/extract round-trip: introspect the live DB twice -> two packages from the two
         // extracts must verify equivalent (introspection + canonical rendering are deterministic).
-        var conn = Environment.GetEnvironmentVariable("PGPROJ_TEST_CONNECTION");
-        if (string.IsNullOrWhiteSpace(conn)) return;   // no live DB - treated as a skip
+        var admin = Environment.GetEnvironmentVariable("PGPROJ_TEST_CONNECTION");
+        if (string.IsNullOrWhiteSpace(admin)) return;   // no live DB - treated as a skip
 
-        var live1 = await new PgProj.Core.Introspection.LiveDatabaseReader().ReadAsync(conn);
-        var live2 = await new PgProj.Core.Introspection.LiveDatabaseReader().ReadAsync(conn);
-
-        PgPkg FromModel(PgProj.Core.Model.DatabaseModel m, string created)
+        // A PRIVATE throwaway database: reading the shared admin DB twice raced the other live tests
+        // mutating the server in parallel (objects appearing between the two reads → flaky inequality).
+        var adminNoPool = new Npgsql.NpgsqlConnectionStringBuilder(admin) { Pooling = false }.ConnectionString;
+        var db = "pgproj_pkgver_" + Guid.NewGuid().ToString("N")[..12];
+        await ExecAsync(adminNoPool, $"CREATE DATABASE \"{db}\"");
+        var conn = new Npgsql.NpgsqlConnectionStringBuilder(admin) { Database = db, Pooling = false }.ConnectionString;
+        try
         {
-            var files = PgProj.Core.Comparison.DdlExporter.ExportFiles(m)
-                .Select(kv => new PgPkgSource(kv.Key.Replace('\\', '/'), kv.Value)).ToList();
-            var checksum = SourceChecksum.Compute(files.ConvertAll(s => (s.RelativePath, s.Content)));
-            return PgPkg.Create(new PgPkgManifest("Extracted", "18", "1.0.0-test", created, checksum), m, files);
-        }
+            await ExecAsync(conn, "CREATE TABLE public.t (id int PRIMARY KEY, name text DEFAULT 'X'); CREATE VIEW public.v AS SELECT id FROM public.t;");
 
-        var report = PackageVerifier.Verify(
-            FromModel(live1, "2026-01-01T00:00:00Z"),
-            FromModel(live2, "2026-06-12T00:00:00Z"));
-        Assert.True(report.Equivalent,
-            "two extracts of the same database must package equivalently:\n" + PackageVerifier.RenderText(report));
+            var live1 = await new PgProj.Core.Introspection.LiveDatabaseReader().ReadAsync(conn);
+            var live2 = await new PgProj.Core.Introspection.LiveDatabaseReader().ReadAsync(conn);
+
+            PgPkg FromModel(PgProj.Core.Model.DatabaseModel m, string created)
+            {
+                var files = PgProj.Core.Comparison.DdlExporter.ExportFiles(m)
+                    .Select(kv => new PgPkgSource(kv.Key.Replace('\\', '/'), kv.Value)).ToList();
+                var checksum = SourceChecksum.Compute(files.ConvertAll(s => (s.RelativePath, s.Content)));
+                return PgPkg.Create(new PgPkgManifest("Extracted", "18", "1.0.0-test", created, checksum), m, files);
+            }
+
+            var report = PackageVerifier.Verify(
+                FromModel(live1, "2026-01-01T00:00:00Z"),
+                FromModel(live2, "2026-06-12T00:00:00Z"));
+            Assert.True(report.Equivalent,
+                "two extracts of the same database must package equivalently:\n" + PackageVerifier.RenderText(report));
+        }
+        finally
+        {
+            Npgsql.NpgsqlConnection.ClearAllPools();
+            await ExecAsync(adminNoPool, $"DROP DATABASE IF EXISTS \"{db}\" WITH (FORCE)");
+        }
+    }
+
+    private static async Task ExecAsync(string conn, string sql)
+    {
+        await using var c = new Npgsql.NpgsqlConnection(conn);
+        await c.OpenAsync();
+        await using var cmd = new Npgsql.NpgsqlCommand(sql, c);
+        await cmd.ExecuteNonQueryAsync();
     }
     [Fact]
     public async Task Text_rendering_carries_the_verdict_and_each_difference()

@@ -44,9 +44,32 @@ public static class Canonicalizer
     // ('active'::character varying).
     private static readonly Regex CastSuffix = new(@"::\s*""?[A-Za-z][A-Za-z0-9_ ]*""?(\[\])?", RegexOptions.Compiled);
 
-    /// <summary>Collapse whitespace, trim, lower-case. The base normalizer everything else builds on.</summary>
-    public static string NormalizeText(string s) =>
-        Whitespace.Replace(s.Trim(), " ").ToLowerInvariant();
+    /// <summary>Collapse whitespace, trim, and lower-case OUTSIDE string literals. The base normalizer
+    /// everything else builds on. The content of <c>'…'</c> literals (<c>''</c> doubling respected) keeps
+    /// its case: <c>'ACTIVE'</c> and <c>'active'</c> are different VALUES, and the old whole-string
+    /// lowercase made a case-only literal edit in a default/CHECK/view/function invisible to schema
+    /// compare — a silent no-deploy (audit P1).</summary>
+    public static string NormalizeText(string s)
+    {
+        var t = Whitespace.Replace(s.Trim(), " ");
+        if (t.IndexOf('\'') < 0) return t.ToLowerInvariant();   // fast path: no literal anywhere
+
+        var buf = new System.Text.StringBuilder(t.Length);
+        var inLiteral = false;
+        for (var i = 0; i < t.Length; i++)
+        {
+            var ch = t[i];
+            if (ch == '\'')
+            {
+                if (inLiteral && i + 1 < t.Length && t[i + 1] == '\'') { buf.Append("''"); i++; continue; }
+                inLiteral = !inLiteral;
+                buf.Append(ch);
+                continue;
+            }
+            buf.Append(inLiteral ? ch : char.ToLowerInvariant(ch));
+        }
+        return buf.ToString();
+    }
 
     /// <summary>Body comparison for verbatim objects: case-, whitespace-, punctuation-spacing-,
     /// dollar-tag-, literal-cast- and trailing-`;`-agnostic.</summary>
