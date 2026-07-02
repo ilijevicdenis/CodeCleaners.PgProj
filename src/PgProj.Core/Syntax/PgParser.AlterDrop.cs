@@ -78,8 +78,8 @@ public sealed partial class PgParser
     private string ParseAlterTableAction(TokenCursor c, AlterStatement alter)
     {
         if (c.MatchWord("ADD")) return ParseAlterAdd(c, alter);
-        if (c.MatchWord("DROP")) return ParseAlterDropAction(c);
-        if (c.MatchWord("ALTER")) return ParseAlterColumnOrConstraint(c);
+        if (c.MatchWord("DROP")) return ParseAlterDropAction(c, alter);
+        if (c.MatchWord("ALTER")) return ParseAlterColumnOrConstraint(c, alter);
         if (c.MatchWord("VALIDATE")) { c.ExpectWord("CONSTRAINT"); c.ExpectIdentifier(); return "VALIDATE"; }
         if (c.MatchWord("OWNER")) { c.ExpectWord("TO"); ParseRoleSpec(c); return "OWNER"; }
         if (c.MatchWord("CLUSTER")) { c.ExpectWord("ON"); c.ExpectIdentifier(); return "CLUSTER"; }
@@ -101,7 +101,9 @@ public sealed partial class PgParser
 
     private string ParseAlterAdd(TokenCursor c, AlterStatement alter)
     {
-        if (c.MatchWord("COLUMN")) { c.MatchWords("IF", "NOT", "EXISTS"); var b = MakeTableHolder(); ParseColumnInto(c, b); return "ADD COLUMN"; }
+        // ADD COLUMN details are captured structurally (same ColumnDef node as CREATE TABLE) so
+        // ModelBuilder folds the column into the table model instead of silently discarding it.
+        if (c.MatchWord("COLUMN")) { c.MatchWords("IF", "NOT", "EXISTS"); alter.AddedColumns.Add(ParseColumnDef(c)); return "ADD COLUMN"; }
         if (c.AtWord("CONSTRAINT") || c.AtAnyWord("PRIMARY", "UNIQUE", "FOREIGN", "CHECK", "EXCLUDE", "NOT"))
         {
             string? name = null;
@@ -116,38 +118,40 @@ public sealed partial class PgParser
         }
         // ADD column without the COLUMN keyword
         c.MatchWords("IF", "NOT", "EXISTS");
-        var holder = MakeTableHolder();
-        ParseColumnInto(c, holder);
+        alter.AddedColumns.Add(ParseColumnDef(c));
         return "ADD COLUMN";
     }
 
-    private string ParseAlterDropAction(TokenCursor c)
+    private string ParseAlterDropAction(TokenCursor c, AlterStatement alter)
     {
         if (c.MatchWord("CONSTRAINT")) { c.MatchWords("IF", "EXISTS"); c.ExpectIdentifier(); MatchCascadeRestrict(c); return "DROP CONSTRAINT"; }
         c.MatchWord("COLUMN");
         c.MatchWords("IF", "EXISTS");
-        c.ExpectIdentifier();
+        alter.DroppedColumns.Add(c.ExpectIdentifier());
         MatchCascadeRestrict(c);
         return "DROP COLUMN";
     }
 
-    private string ParseAlterColumnOrConstraint(TokenCursor c)
+    private string ParseAlterColumnOrConstraint(TokenCursor c, AlterStatement alter)
     {
         if (c.MatchWord("CONSTRAINT")) { c.ExpectIdentifier(); ConsumeActionRest(c); return "ALTER CONSTRAINT"; }
         c.MatchWord("COLUMN");
-        c.ExpectIdentifier();    // column name
+        var column = c.ExpectIdentifier();
 
         if (c.MatchWords("SET", "DATA", "TYPE") || c.MatchWord("TYPE"))
         {
-            ParseCastType(c);
+            var newType = ParseCastType(c);
             if (c.MatchWord("COLLATE")) ParseQualifiedName(c);
             if (c.MatchWord("USING")) ParseExpression(c);
+            alter.ColumnActions.Add(new AlterColumnAction(column, "TYPE", newType));
             return "ALTER COLUMN TYPE";
         }
-        if (c.MatchWords("SET", "DEFAULT")) { ParseExpression(c); return "SET DEFAULT"; }
-        if (c.MatchWords("DROP", "DEFAULT")) return "DROP DEFAULT";
-        if (c.MatchWords("SET", "NOT", "NULL")) return "SET NOT NULL";
-        if (c.MatchWords("DROP", "NOT", "NULL")) return "DROP NOT NULL";
+        // DEFAULT text is captured the same way an inline column DEFAULT is (CaptureExpression), so the
+        // folded model value matches what CREATE TABLE would have produced.
+        if (c.MatchWords("SET", "DEFAULT")) { alter.ColumnActions.Add(new AlterColumnAction(column, "SET DEFAULT", CaptureExpression(c))); return "SET DEFAULT"; }
+        if (c.MatchWords("DROP", "DEFAULT")) { alter.ColumnActions.Add(new AlterColumnAction(column, "DROP DEFAULT", null)); return "DROP DEFAULT"; }
+        if (c.MatchWords("SET", "NOT", "NULL")) { alter.ColumnActions.Add(new AlterColumnAction(column, "SET NOT NULL", null)); return "SET NOT NULL"; }
+        if (c.MatchWords("DROP", "NOT", "NULL")) { alter.ColumnActions.Add(new AlterColumnAction(column, "DROP NOT NULL", null)); return "DROP NOT NULL"; }
         if (c.MatchWords("DROP", "EXPRESSION")) { c.MatchWords("IF", "EXISTS"); return "DROP EXPRESSION"; }
         if (c.MatchWords("ADD", "GENERATED")) { ConsumeActionRest(c); return "ADD GENERATED"; }
         if (c.MatchWords("SET", "GENERATED")) { ConsumeActionRest(c); return "SET GENERATED"; }
@@ -368,6 +372,4 @@ public sealed partial class PgParser
         }
     }
 
-    private static CreateTableStatement MakeTableHolder() => new();
-    private void ParseColumnInto(TokenCursor c, CreateTableStatement holder) => holder.Columns.Add(ParseColumnDef(c));
 }

@@ -211,14 +211,15 @@ public static class TableDesigner
                          && DatabaseModel.NameEquals(ci.Table, table.Name)
                          && ci.Name is not null && indexNames.Contains(ci.Name):
                     continue;
-                // A standalone ALTER TABLE … ADD CONSTRAINT for this table is now folded into the table model by
-                // ModelBuilder (#153) — so it is already on `table` and re-emitted through SqlEmitter. Skip it
-                // here (do NOT re-add — that double-counts) so the round-trip stays a fixed point.
+                // A standalone ALTER TABLE with structured details (ADD CONSTRAINT #153, ADD/DROP COLUMN,
+                // ALTER COLUMN) for this table is folded into the table model by ModelBuilder — so it is
+                // already on `table` and re-emitted through SqlEmitter. Skip it here (do NOT re-add — that
+                // double-counts) so the round-trip stays a fixed point.
                 case AlterStatement alter
                     when alter.ObjectKind == "TABLE"
                          && DatabaseModel.NameEquals(Sch(alter.Schema, defaultSchema), table.Schema)
                          && DatabaseModel.NameEquals(alter.Name, table.Name)
-                         && alter.AddedConstraints.Count > 0:
+                         && alter.FoldsIntoTableModel:
                     continue;
                 default:
                     var text = stmt.SourceText?.Trim();

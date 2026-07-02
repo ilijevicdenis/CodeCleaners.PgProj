@@ -49,8 +49,8 @@ public sealed class ModelBuilder
                 case CreateFunctionStatement s:
                     model.Functions.Add(new FunctionDefinition(Sch(s.Schema), s.Name, $"{Sch(s.Schema)}.{s.Name}({s.ArgTypes})", s.SourceText ?? "", s.ArgTypes));
                     EnsureSchema(model, Sch(s.Schema)); break;
-                case AlterStatement a when a.ObjectKind == "TABLE" && a.AddedConstraints.Count > 0:
-                    ApplyAlterAddConstraints(model, a); break;
+                case AlterStatement a when a.ObjectKind == "TABLE" && a.FoldsIntoTableModel:
+                    ApplyAlterTable(model, a); break;
                 case RawCreateStatement or UnsupportedStatement:
                     var raw = DeriveRaw(stmt.SourceText ?? "");
                     if (raw is not null) { model.Objects.Add(raw); if (!string.IsNullOrEmpty(raw.Schema)) EnsureSchema(model, raw.Schema); }
@@ -65,34 +65,40 @@ public sealed class ModelBuilder
     {
         var table = new TableDefinition { Schema = Sch(s.Schema), Name = s.Name, TrailingOptions = s.TrailingText };
         foreach (var col in s.Columns)
-        {
-            var typeText = col.Type.Text;
-            var isSerial = IsSerial(typeText);
-            var nullable = !isSerial;
-            string? def = null, idKind = null, generated = null;
-            var identity = false;
-            var generatedStored = true;
-            foreach (var c in col.Constraints)
-            {
-                switch (c)
-                {
-                    case NotNullConstraint: nullable = false; break;
-                    case NullConstraint: nullable = true; break;
-                    case DefaultConstraint d: def = d.Expression; break;
-                    case InlinePrimaryKey: table.PrimaryKey = new PrimaryKeyDefinition(null, new[] { col.Name }); nullable = false; break;
-                    case InlineUnique: table.Unique.Add(new UniqueConstraintDefinition(null, new[] { col.Name })); break;
-                    case InlineReferences r: table.ForeignKeys.Add(new ForeignKeyDefinition(null, new[] { col.Name }, Sch(r.RefSchema), r.RefTable, r.RefColumns, r.OnDelete?.Action, r.OnUpdate?.Action)); break;
-                    case GeneratedIdentity g: identity = true; idKind = g.Kind; break;
-                    case GeneratedStored g: generated = g.Expression; generatedStored = g.IsStored; break;
-                    case InlineCheck ch: table.Checks.Add(new CheckConstraintDefinition(ch.Name, ch.Expression)); break;
-                }
-            }
-            table.Columns.Add(new ColumnDefinition(col.Name, TypeNormalizer.Normalize(typeText), nullable, def, identity, idKind, generated, isSerial, generatedStored));
-        }
+            FoldColumnDef(table, col);
         foreach (var tc in s.Constraints)
             ApplyTableConstraint(table, tc);
         EnsureSchema(model, table.Schema);
         model.Tables.Add(table);
+    }
+
+    /// <summary>Fold one parsed column (and its inline constraints) into the table model. Shared by
+    /// <see cref="AddTable"/> and the standalone <c>ALTER TABLE … ADD COLUMN</c> path, so an added
+    /// column reaches the model exactly as if it had been written inside the CREATE TABLE.</summary>
+    private void FoldColumnDef(TableDefinition table, ColumnDef col)
+    {
+        var typeText = col.Type.Text;
+        var isSerial = IsSerial(typeText);
+        var nullable = !isSerial;
+        string? def = null, idKind = null, generated = null;
+        var identity = false;
+        var generatedStored = true;
+        foreach (var c in col.Constraints)
+        {
+            switch (c)
+            {
+                case NotNullConstraint: nullable = false; break;
+                case NullConstraint: nullable = true; break;
+                case DefaultConstraint d: def = d.Expression; break;
+                case InlinePrimaryKey: table.PrimaryKey = new PrimaryKeyDefinition(null, new[] { col.Name }); nullable = false; break;
+                case InlineUnique: table.Unique.Add(new UniqueConstraintDefinition(null, new[] { col.Name })); break;
+                case InlineReferences r: table.ForeignKeys.Add(new ForeignKeyDefinition(null, new[] { col.Name }, Sch(r.RefSchema), r.RefTable, r.RefColumns, r.OnDelete?.Action, r.OnUpdate?.Action)); break;
+                case GeneratedIdentity g: identity = true; idKind = g.Kind; break;
+                case GeneratedStored g: generated = g.Expression; generatedStored = g.IsStored; break;
+                case InlineCheck ch: table.Checks.Add(new CheckConstraintDefinition(ch.Name, ch.Expression)); break;
+            }
+        }
+        table.Columns.Add(new ColumnDefinition(col.Name, TypeNormalizer.Normalize(typeText), nullable, def, identity, idKind, generated, isSerial, generatedStored));
     }
 
     /// <summary>
@@ -115,16 +121,48 @@ public sealed class ModelBuilder
     }
 
     /// <summary>
-    /// Apply the constraints from a standalone <c>ALTER TABLE … ADD CONSTRAINT</c> to its target table when that
-    /// table is already in the model (the table's CREATE precedes the ALTER in the same file — the form the
-    /// extractor emits). A cross-file ALTER whose table isn't present yet is left as-is (best effort).
+    /// Apply a standalone <c>ALTER TABLE</c>'s structured details (ADD CONSTRAINT #153, and now ADD COLUMN /
+    /// DROP COLUMN / ALTER COLUMN) to its target table when that table is already in the model (the table's
+    /// CREATE precedes the ALTER in the same file — the form the extractor emits). A cross-file ALTER whose
+    /// table isn't present yet is left as-is (best effort). Previously everything except ADD CONSTRAINT was
+    /// parsed, validated, then silently DISCARDED — the model (and deploys) never saw the change.
     /// </summary>
-    private void ApplyAlterAddConstraints(DatabaseModel model, AlterStatement a)
+    private void ApplyAlterTable(DatabaseModel model, AlterStatement a)
     {
         var table = model.FindTable(Sch(a.Schema), a.Name);
         if (table is null) return;
+
         foreach (var tc in a.AddedConstraints)
             ApplyTableConstraint(table, tc);
+
+        foreach (var col in a.AddedColumns)
+            FoldColumnDef(table, col);
+
+        foreach (var name in a.DroppedColumns)
+        {
+            table.Columns.RemoveAll(c => DatabaseModel.NameEquals(c.Name, name));
+            // Postgres auto-drops indexes and table constraints involving the column — mirror the
+            // finely-modelled ones (CHECKs are text expressions; involvement isn't reliably decidable).
+            if (table.PrimaryKey is { } pk && pk.Columns.Any(c => DatabaseModel.NameEquals(c, name)))
+                table.PrimaryKey = null;
+            table.Unique.RemoveAll(u => u.Columns.Any(c => DatabaseModel.NameEquals(c, name)));
+            table.ForeignKeys.RemoveAll(fk => fk.Columns.Any(c => DatabaseModel.NameEquals(c, name)));
+        }
+
+        foreach (var action in a.ColumnActions)
+        {
+            var idx = table.Columns.FindIndex(c => DatabaseModel.NameEquals(c.Name, action.Column));
+            if (idx < 0) continue;   // unknown column — best effort, same as an absent table
+            table.Columns[idx] = action.Kind switch
+            {
+                "TYPE" => table.Columns[idx] with { DataType = TypeNormalizer.Normalize(action.Value ?? "") },
+                "SET DEFAULT" => table.Columns[idx] with { Default = action.Value },
+                "DROP DEFAULT" => table.Columns[idx] with { Default = null },
+                "SET NOT NULL" => table.Columns[idx] with { IsNullable = false },
+                "DROP NOT NULL" => table.Columns[idx] with { IsNullable = true },
+                _ => table.Columns[idx],
+            };
+        }
     }
 
     private static bool IsSerial(string typeText)
