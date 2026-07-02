@@ -204,10 +204,30 @@ public sealed partial class PgParser
 
     private void ParseGroupingElement(TokenCursor c, SelectQuery q)
     {
-        if (c.AtAnyWord("ROLLUP", "CUBE")) { q.GroupByKind = c.Advance().Value.ToUpperInvariant(); c.SkipBalancedParens(); return; }
-        if (c.MatchWords("GROUPING", "SETS")) { q.GroupByKind = "GROUPING SETS"; c.SkipBalancedParens(); return; }
+        if (c.AtAnyWord("ROLLUP", "CUBE")) { q.GroupByKind = c.Advance().Value.ToUpperInvariant(); ParseGroupingExprList(c, q); return; }
+        if (c.MatchWords("GROUPING", "SETS")) { q.GroupByKind = "GROUPING SETS"; ParseGroupingExprList(c, q); return; }
         if (c.AtSymbol('(') && c.Peek()?.IsSymbol(')') == true) { c.Advance(); c.Advance(); return; }   // GROUP BY () — grand total
         q.AddGroupBy(ParseExpression(c));
+    }
+
+    /// <summary>The parenthesized argument list of ROLLUP / CUBE / GROUPING SETS. Every leaf expression
+    /// folds into <see cref="SelectQuery.GroupBy"/> so semantic consumers see the participating columns —
+    /// previously the whole list was skipped as raw tokens (audit P1) and those columns were invisible.
+    /// Elements nest per the grammar: <c>(a, (b, c))</c>, <c>GROUPING SETS ((a), (), CUBE(d))</c>; a
+    /// parenthesized expression like <c>(a+b)</c> simply parses as a one-leaf sub-list.</summary>
+    private void ParseGroupingExprList(TokenCursor c, SelectQuery q)
+    {
+        c.ExpectSymbol('(');
+        if (c.MatchSymbol(')')) return;   // empty grouping set: ()
+        do
+        {
+            if (c.AtSymbol('(') && c.Peek()?.IsSymbol(')') == true) { c.Advance(); c.Advance(); }
+            else if (c.AtSymbol('(')) ParseGroupingExprList(c, q);
+            else if (c.AtAnyWord("ROLLUP", "CUBE")) { c.Advance(); ParseGroupingExprList(c, q); }
+            else if (c.LookaheadWords("GROUPING", "SETS")) { c.MatchWords("GROUPING", "SETS"); ParseGroupingExprList(c, q); }
+            else q.AddGroupBy(ParseExpression(c));
+        } while (c.MatchSymbol(','));
+        c.ExpectSymbol(')');
     }
 
     private FromClause ParseFromClause(TokenCursor c)
