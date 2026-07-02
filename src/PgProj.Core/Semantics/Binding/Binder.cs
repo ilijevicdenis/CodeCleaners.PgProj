@@ -292,12 +292,22 @@ public sealed class Binder
     }
 
     /// <summary>
-    /// A function's return type. The symbol table does not yet store return types (Phase 2 stored only the
-    /// arg-signature overload key), so when the body is a single-relation SELECT we cannot recover it here —
-    /// we return Unknown rather than guess. The hook is centralized so #48/#50 can enrich it once return
-    /// types land on <see cref="SymbolEntry"/>.
+    /// A function's return type, from the symbol table (CatalogBuilder has stored the normalized
+    /// RETURNS type since #48 — this hook just never consumed it, leaving every function-routed
+    /// expression Unknown and blinding downstream type checks; audit P2). Set-returning / composite /
+    /// trigger returns are not scalar expression types, so they conservatively stay Unknown.
     /// </summary>
-    private static ResolvedType FunctionReturnType(SymbolEntry? fn) => ResolvedType.Unknown;
+    private ResolvedType FunctionReturnType(SymbolEntry? fn)
+    {
+        var rt = fn?.ReturnType;
+        if (string.IsNullOrEmpty(rt)) return ResolvedType.Unknown;
+        if (rt!.StartsWith("setof", StringComparison.OrdinalIgnoreCase)
+            || rt.StartsWith("table", StringComparison.OrdinalIgnoreCase)
+            || rt.Equals("trigger", StringComparison.OrdinalIgnoreCase)
+            || rt.Equals("record", StringComparison.OrdinalIgnoreCase))
+            return ResolvedType.Unknown;
+        return TypeFor(rt);
+    }
 
     /// <summary>PG types a whole-number literal by the smallest of integer → bigint → numeric that holds
     /// it (the old constant bigint broke overload resolution for the overwhelmingly common small literal).</summary>

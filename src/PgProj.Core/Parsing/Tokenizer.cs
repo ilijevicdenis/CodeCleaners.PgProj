@@ -181,9 +181,18 @@ public sealed class Tokenizer
                 // C-style backslash escapes, so an escaped quote \' does NOT end the string. We require the
                 // e/E to be a lone prefix (the char before it is not identifier-like — otherwise it is the tail
                 // of a word/number such as TRUE'x' or 1e'x', which are a plain identifier/number + normal '…').
-                bool eString = _i >= 1 && (_s[_i - 1] == 'e' || _s[_i - 1] == 'E')
-                               && (_i < 2 || !IsIdentPart(_s[_i - 2]));
-                Emit(new Token(TokenKind.String, ReadQuoted('\'', eString), start));
+                bool lonePrefix = _i >= 1 && (_i < 2 || !IsIdentPart(_s[_i - 2]));
+                bool eString = lonePrefix && (_s[_i - 1] == 'e' || _s[_i - 1] == 'E');
+                var content = ReadQuoted('\'', eString);
+                // Bit/hex string constants (B'…' / X'…', same lone-prefix rule) have a fixed alphabet the
+                // lexer can check exactly — PG rejects B'2' / X'GG' at parse time (live-verified), while the
+                // old scan accepted any content silently (audit P2). U&'…' stays DB-tier: a trailing UESCAPE
+                // clause changes the escape character, which the lexer cannot see without false positives.
+                if (lonePrefix && (_s[start - 1] is 'b' or 'B'))
+                    ValidateRadixContent(content, start, binary: true);
+                else if (lonePrefix && (_s[start - 1] is 'x' or 'X'))
+                    ValidateRadixContent(content, start, binary: false);
+                Emit(new Token(TokenKind.String, content, start));
                 continue;
             }
             if (c == '"') { Emit(new Token(TokenKind.QuotedIdent, ReadQuoted('"'), start)); continue; }
@@ -237,11 +246,28 @@ public sealed class Tokenizer
     /// construct, so any subsequent error is a cascade.</summary>
     private void RecordError(string message, int offset) => _error ??= new LexError(message, offset);
 
+    /// <summary>B'…' must be 0/1 only; X'…' must be hex digits — PG rejects anything else at parse time.</summary>
+    private void ValidateRadixContent(string content, int offset, bool binary)
+    {
+        foreach (var ch in content)
+        {
+            if (binary ? ch is '0' or '1' : Uri.IsHexDigit(ch)) continue;
+            RecordError(binary
+                ? $"\"{ch}\" is not a valid binary digit"
+                : $"\"{ch}\" is not a valid hexadecimal digit", offset);
+            return;
+        }
+    }
+
     private bool TryReadDollarString(out string value)
     {
         value = string.Empty;
-        // Read a candidate tag: $ [A-Za-z_][A-Za-z0-9_]* $
+        // Read a candidate tag: $ [A-Za-z_][A-Za-z0-9_]* $ — the tag follows identifier rules, so it
+        // must NOT start with a digit: PG lexes $1$foo$1$ as positional param $1 followed by an
+        // unterminated $foo$ string (live-verified), never as a digit-tagged dollar quote.
         var j = _i + 1;
+        if (j < _s.Length && char.IsDigit(_s[j]))
+            return false; // positional parameter ($1, $2, …)
         while (j < _s.Length && (char.IsLetterOrDigit(_s[j]) || _s[j] == '_')) j++;
         if (j >= _s.Length || _s[j] != '$')
             return false; // not a dollar-quote open (e.g. a stray '$' or a positional param)
