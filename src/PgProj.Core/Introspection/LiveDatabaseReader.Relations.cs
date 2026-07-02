@@ -80,8 +80,8 @@ public sealed partial class LiveDatabaseReader
     {
         var sql = _q.Constraints;
 
-        var pk = new Dictionary<(string, string, string), List<string>>();
-        var uq = new Dictionary<(string, string, string), List<string>>();
+        var pk = new Dictionary<(string, string, string), (List<string> cols, bool defr, bool initDefr, bool nnd, string? include)>();
+        var uq = new Dictionary<(string, string, string), (List<string> cols, bool defr, bool initDefr, bool nnd, string? include)>();
 
         await using var cmd = new NpgsqlCommand(sql, conn);
         await using var r = await cmd.ExecuteReaderAsync(ct);
@@ -94,17 +94,25 @@ public sealed partial class LiveDatabaseReader
             var col = r.GetString(4);
             var bucket = type == 'p' ? pk : uq;
             var keyTuple = (schema, table, name);
-            if (!bucket.TryGetValue(keyTuple, out var list)) bucket[keyTuple] = list = new List<string>();
-            list.Add(col);
+            if (!bucket.TryGetValue(keyTuple, out var acc))
+                bucket[keyTuple] = acc = (new List<string>(), r.GetBoolean(6), r.GetBoolean(7), r.GetBoolean(8),
+                                          r.IsDBNull(9) ? null : r.GetString(9));
+            acc.cols.Add(col);
         }
 
-        foreach (var ((schema, table, name), cols) in pk)
-            if (tables.TryGetValue($"{schema}.{table}", out var def))
-                def.PrimaryKey = new PrimaryKeyDefinition(name, cols);
+        static IReadOnlyList<string>? SplitInclude(string? csv) =>
+            string.IsNullOrEmpty(csv) ? null : csv!.Split(',');
 
-        foreach (var ((schema, table, name), cols) in uq)
+        foreach (var ((schema, table, name), v) in pk)
             if (tables.TryGetValue($"{schema}.{table}", out var def))
-                def.Unique.Add(new UniqueConstraintDefinition(name, cols));
+                def.PrimaryKey = new PrimaryKeyDefinition(name, v.cols,
+                    Include: SplitInclude(v.include), Deferrable: v.defr, InitiallyDeferred: v.initDefr);
+
+        foreach (var ((schema, table, name), v) in uq)
+            if (tables.TryGetValue($"{schema}.{table}", out var def))
+                def.Unique.Add(new UniqueConstraintDefinition(name, v.cols,
+                    NullsNotDistinct: v.nnd, Include: SplitInclude(v.include),
+                    Deferrable: v.defr, InitiallyDeferred: v.initDefr));
     }
 
     private async Task ReadChecksAsync(NpgsqlConnection conn, Dictionary<string, TableDefinition> tables, CancellationToken ct)
@@ -119,12 +127,20 @@ public sealed partial class LiveDatabaseReader
             if (!tables.TryGetValue(key, out var def)) continue;
             var name = r.GetString(2);
             var constraintDef = r.GetString(3); // e.g. "CHECK ((value > 0))"
+            var notValid = !r.GetBoolean(4);    // convalidated
+            var noInherit = r.GetBoolean(5);    // connoinherit
             var expr = constraintDef.StartsWith("CHECK ", StringComparison.OrdinalIgnoreCase)
                 ? constraintDef["CHECK ".Length..].Trim()
                 : constraintDef;
-            def.Checks.Add(new CheckConstraintDefinition(name, expr));
+            // pg_get_constraintdef appends the attributes as text suffixes ("… NO INHERIT NOT VALID") —
+            // strip them so the expression stays a pure predicate (the flags carry the attributes).
+            expr = StripSuffix(StripSuffix(expr, "NOT VALID"), "NO INHERIT");
+            def.Checks.Add(new CheckConstraintDefinition(name, expr, NotValid: notValid, NoInherit: noInherit));
         }
     }
+
+    private static string StripSuffix(string s, string suffix) =>
+        s.EndsWith(suffix, StringComparison.OrdinalIgnoreCase) ? s[..^suffix.Length].TrimEnd() : s;
 
     // EXCLUDE constraints (#98): contype 'x', reconstructed verbatim via pg_get_constraintdef into
     // TableDefinition.OtherConstraints — the same slot the parser uses, so an unchanged EXCLUDE produces no
@@ -168,7 +184,7 @@ public sealed partial class LiveDatabaseReader
     {
         var sql = _q.ForeignKeys;
 
-        var fks = new Dictionary<(string, string, string), (List<string> cols, string rs, string rt, List<string> refCols, char del, char upd)>();
+        var fks = new Dictionary<(string, string, string), (List<string> cols, string rs, string rt, List<string> refCols, char del, char upd, bool defr, bool initDefr, bool notValid, char match)>();
 
         await using var cmd = new NpgsqlCommand(sql, conn);
         await using var r = await cmd.ExecuteReaderAsync(ct);
@@ -178,7 +194,8 @@ public sealed partial class LiveDatabaseReader
             if (!fks.TryGetValue(keyTuple, out var acc))
             {
                 acc = (new List<string>(), r.GetString(5), r.GetString(6), new List<string>(),
-                       ReadChar(r, 8), ReadChar(r, 9));
+                       ReadChar(r, 8), ReadChar(r, 9),
+                       r.GetBoolean(10), r.GetBoolean(11), !r.GetBoolean(12), ReadChar(r, 13));
                 fks[keyTuple] = acc;
             }
             acc.cols.Add(r.GetString(3));
@@ -188,7 +205,9 @@ public sealed partial class LiveDatabaseReader
         foreach (var ((schema, table, name), v) in fks)
             if (tables.TryGetValue($"{schema}.{table}", out var def))
                 def.ForeignKeys.Add(new ForeignKeyDefinition(name, v.cols, v.rs, v.rt, v.refCols,
-                    FkAction(v.del), FkAction(v.upd)));
+                    FkAction(v.del), FkAction(v.upd),
+                    Deferrable: v.defr, InitiallyDeferred: v.initDefr, NotValid: v.notValid,
+                    Match: v.match == 'f' ? "FULL" : null));   // confmatchtype: 'f' full, 's' simple (default)
     }
 
     private static string? FkAction(char code) => code switch

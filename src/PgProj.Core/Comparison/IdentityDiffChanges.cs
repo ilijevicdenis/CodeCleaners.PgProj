@@ -131,7 +131,7 @@ public sealed record AddUniqueConstraintChange(string Schema, string Table, Uniq
     public override string ToSql()
     {
         var prefix = string.IsNullOrEmpty(Unique.Name) ? string.Empty : $"CONSTRAINT {SqlEmitter.Quote(Unique.Name!)} ";
-        return $"ALTER TABLE {SqlEmitter.Qualified(Schema, Table)} ADD {prefix}UNIQUE ({SqlEmitter.Cols(Unique.Columns)});";
+        return $"ALTER TABLE {SqlEmitter.Qualified(Schema, Table)} ADD {prefix}{SqlEmitter.UniqueBody(Unique)};";
     }
 }
 

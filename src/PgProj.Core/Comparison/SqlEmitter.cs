@@ -73,7 +73,25 @@ public static class SqlEmitter
     }
 
     public static string Check(CheckConstraintDefinition c) =>
-        $"{ConstraintPrefix(c.Name)}CHECK {WrapParens(c.Expression)}";
+        $"{ConstraintPrefix(c.Name)}CHECK {WrapParens(c.Expression)}{(c.NoInherit ? " NO INHERIT" : "")}";
+        // NOT VALID is an ALTER-only suffix — the change-level ToSql appends it (a CREATE TABLE's
+        // brand-new empty table validates trivially, and PG rejects NOT VALID inline anyway).
+
+    /// <summary>The PRIMARY KEY constraint body (after the optional CONSTRAINT name prefix), including
+    /// the INCLUDE / DEFERRABLE attributes when set — attributes only render when non-default, so
+    /// attribute-free constraints emit byte-identically to before.</summary>
+    public static string PrimaryKeyBody(PrimaryKeyDefinition pk) =>
+        $"PRIMARY KEY ({Cols(pk.Columns)}){IncludeSuffix(pk.Include)}{DeferrableSuffix(pk.Deferrable, pk.InitiallyDeferred)}";
+
+    /// <summary>The UNIQUE constraint body, including NULLS NOT DISTINCT / INCLUDE / DEFERRABLE when set.</summary>
+    public static string UniqueBody(UniqueConstraintDefinition u) =>
+        $"UNIQUE{(u.NullsNotDistinct ? " NULLS NOT DISTINCT" : "")} ({Cols(u.Columns)}){IncludeSuffix(u.Include)}{DeferrableSuffix(u.Deferrable, u.InitiallyDeferred)}";
+
+    private static string IncludeSuffix(IReadOnlyList<string>? include) =>
+        include is { Count: > 0 } ? $" INCLUDE ({Cols(include)})" : "";
+
+    private static string DeferrableSuffix(bool deferrable, bool initiallyDeferred) =>
+        (deferrable ? " DEFERRABLE" : "") + (initiallyDeferred ? " INITIALLY DEFERRED" : "");
 
     public static string CreateTable(TableDefinition t)
     {
@@ -81,10 +99,10 @@ public static class SqlEmitter
         lines.AddRange(t.Columns.Select(c => "    " + Column(c)));
 
         if (t.PrimaryKey is { Columns.Count: > 0 } pk)
-            lines.Add($"    {ConstraintPrefix(pk.Name)}PRIMARY KEY ({Cols(pk.Columns)})");
+            lines.Add($"    {ConstraintPrefix(pk.Name)}{PrimaryKeyBody(pk)}");
 
         foreach (var u in t.Unique)
-            lines.Add($"    {ConstraintPrefix(u.Name)}UNIQUE ({Cols(u.Columns)})");
+            lines.Add($"    {ConstraintPrefix(u.Name)}{UniqueBody(u)}");
 
         foreach (var c in t.Checks)
             lines.Add($"    {Check(c)}");
@@ -103,8 +121,11 @@ public static class SqlEmitter
         if (!string.IsNullOrEmpty(fk.Name)) sb.Append($"CONSTRAINT {Quote(fk.Name)} ");
         sb.Append($"FOREIGN KEY ({Cols(fk.Columns)}) REFERENCES {Qualified(fk.ReferencedSchema, fk.ReferencedTable)}");
         if (fk.ReferencedColumns.Count > 0) sb.Append($" ({Cols(fk.ReferencedColumns)})");
+        if (!string.IsNullOrEmpty(fk.Match)) sb.Append($" MATCH {fk.Match}");
         if (!string.IsNullOrEmpty(fk.OnDelete)) sb.Append($" ON DELETE {fk.OnDelete}");
         if (!string.IsNullOrEmpty(fk.OnUpdate)) sb.Append($" ON UPDATE {fk.OnUpdate}");
+        sb.Append(DeferrableSuffix(fk.Deferrable, fk.InitiallyDeferred));
+        if (fk.NotValid) sb.Append(" NOT VALID");
         sb.Append(';');
         return sb.ToString();
     }

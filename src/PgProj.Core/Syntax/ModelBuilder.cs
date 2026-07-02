@@ -90,12 +90,33 @@ public sealed class ModelBuilder
                 case NotNullConstraint: nullable = false; break;
                 case NullConstraint: nullable = true; break;
                 case DefaultConstraint d: def = d.Expression; break;
-                case InlinePrimaryKey: table.PrimaryKey = new PrimaryKeyDefinition(null, new[] { col.Name }); nullable = false; break;
-                case InlineUnique: table.Unique.Add(new UniqueConstraintDefinition(null, new[] { col.Name })); break;
-                case InlineReferences r: table.ForeignKeys.Add(new ForeignKeyDefinition(null, new[] { col.Name }, Sch(r.RefSchema), r.RefTable, r.RefColumns, r.OnDelete?.Action, r.OnUpdate?.Action)); break;
+                case InlinePrimaryKey ipk:
+                    table.PrimaryKey = new PrimaryKeyDefinition(null, new[] { col.Name },
+                        Include: ipk.Include.Count > 0 ? ipk.Include : null,
+                        Deferrable: ipk.Deferrability.Deferrable == true,
+                        InitiallyDeferred: ipk.Deferrability.InitiallyDeferred == true);
+                    nullable = false;
+                    break;
+                case InlineUnique iu:
+                    table.Unique.Add(new UniqueConstraintDefinition(null, new[] { col.Name },
+                        NullsNotDistinct: iu.NullsNotDistinct,
+                        Include: iu.Include.Count > 0 ? iu.Include : null,
+                        Deferrable: iu.Deferrability.Deferrable == true,
+                        InitiallyDeferred: iu.Deferrability.InitiallyDeferred == true));
+                    break;
+                case InlineReferences r:
+                    table.ForeignKeys.Add(new ForeignKeyDefinition(null, new[] { col.Name }, Sch(r.RefSchema), r.RefTable, r.RefColumns,
+                        r.OnDelete?.Action, r.OnUpdate?.Action,
+                        Deferrable: r.Deferrability.Deferrable == true,
+                        InitiallyDeferred: r.Deferrability.InitiallyDeferred == true,
+                        NotValid: r.NotValid,
+                        Match: string.Equals(r.Match, "FULL", StringComparison.OrdinalIgnoreCase) ? "FULL" : null));
+                    break;
                 case GeneratedIdentity g: identity = true; idKind = g.Kind; break;
                 case GeneratedStored g: generated = g.Expression; generatedStored = g.IsStored; break;
-                case InlineCheck ch: table.Checks.Add(new CheckConstraintDefinition(ch.Name, ch.Expression)); break;
+                case InlineCheck ch:
+                    table.Checks.Add(new CheckConstraintDefinition(ch.Name, ch.Expression, NotValid: ch.NotValid, NoInherit: ch.NoInherit));
+                    break;
             }
         }
         table.Columns.Add(new ColumnDefinition(col.Name, TypeNormalizer.Normalize(typeText), nullable, def, identity, idKind, generated, isSerial, generatedStored));
@@ -111,10 +132,39 @@ public sealed class ModelBuilder
     {
         switch (tc)
         {
-            case PrimaryKeyConstraint pk: table.PrimaryKey = new PrimaryKeyDefinition(pk.Name, pk.Columns); break;
-            case UniqueConstraint u: table.Unique.Add(new UniqueConstraintDefinition(u.Name, u.Columns)); break;
-            case ForeignKeyConstraint fk: table.ForeignKeys.Add(new ForeignKeyDefinition(fk.Name, fk.Columns, Sch(fk.RefSchema), fk.RefTable, fk.RefColumns, fk.OnDelete?.Action, fk.OnUpdate?.Action)); break;
-            case CheckConstraint ch: table.Checks.Add(new CheckConstraintDefinition(ch.Name, ch.Expression)); break;
+            case PrimaryKeyConstraint pk:
+                table.PrimaryKey = new PrimaryKeyDefinition(pk.Name, pk.Columns,
+                    Include: pk.Include.Count > 0 ? pk.Include : null,
+                    Deferrable: pk.Deferrability.Deferrable == true,
+                    InitiallyDeferred: pk.Deferrability.InitiallyDeferred == true);
+                // PRIMARY KEY implies NOT NULL — the inline form already folds that; without this the
+                // table-level form left the columns nullable in the model, producing a phantom
+                // alter-column diff against any live database (where PG makes them NOT NULL).
+                foreach (var pkCol in pk.Columns)
+                {
+                    var c = table.FindColumn(pkCol);
+                    if (c is not null && c.IsNullable)
+                        table.Columns[table.Columns.IndexOf(c)] = c with { IsNullable = false };
+                }
+                break;
+            case UniqueConstraint u:
+                table.Unique.Add(new UniqueConstraintDefinition(u.Name, u.Columns,
+                    NullsNotDistinct: u.NullsNotDistinct,
+                    Include: u.Include.Count > 0 ? u.Include : null,
+                    Deferrable: u.Deferrability.Deferrable == true,
+                    InitiallyDeferred: u.Deferrability.InitiallyDeferred == true));
+                break;
+            case ForeignKeyConstraint fk:
+                table.ForeignKeys.Add(new ForeignKeyDefinition(fk.Name, fk.Columns, Sch(fk.RefSchema), fk.RefTable, fk.RefColumns,
+                    fk.OnDelete?.Action, fk.OnUpdate?.Action,
+                    Deferrable: fk.Deferrability.Deferrable == true,
+                    InitiallyDeferred: fk.Deferrability.InitiallyDeferred == true,
+                    NotValid: fk.NotValid,
+                    Match: string.Equals(fk.Match, "FULL", StringComparison.OrdinalIgnoreCase) ? "FULL" : null));
+                break;
+            case CheckConstraint ch:
+                table.Checks.Add(new CheckConstraintDefinition(ch.Name, ch.Expression, NotValid: ch.NotValid, NoInherit: ch.NoInherit));
+                break;
             case ExcludeConstraint ex: table.OtherConstraints.Add((ex.Name is null ? "" : $"CONSTRAINT {ex.Name} ") + "EXCLUDE " + ex.RawText); break;
             case NotNullTableConstraint nn: { var c = table.FindColumn(nn.Column); if (c is not null) table.Columns[table.Columns.IndexOf(c)] = c with { IsNullable = false }; break; }
         }

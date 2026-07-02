@@ -169,7 +169,7 @@ public sealed record AddCheckConstraintChange(string Schema, string Table, Check
     public override bool IsDestructive => false;
     public override string Describe() => $"Add check constraint on {Schema}.{Table}";
     public override string ToSql() =>
-        $"ALTER TABLE {SqlEmitter.Qualified(Schema, Table)} ADD {SqlEmitter.Check(Check)}{(NotValid ? " NOT VALID" : "")};";
+        $"ALTER TABLE {SqlEmitter.Qualified(Schema, Table)} ADD {SqlEmitter.Check(Check)}{(NotValid || Check.NotValid ? " NOT VALID" : "")};";
 }
 
 public sealed record AddRawTableConstraintChange(string Schema, string Table, string Clause) : SchemaChange
@@ -206,7 +206,7 @@ public sealed record AddPrimaryKeyChange(string Schema, string Table, PrimaryKey
     public override string ToSql()
     {
         var prefix = string.IsNullOrEmpty(Pk.Name) ? string.Empty : $"CONSTRAINT {SqlEmitter.Quote(Pk.Name!)} ";
-        return $"ALTER TABLE {SqlEmitter.Qualified(Schema, Table)} ADD {prefix}PRIMARY KEY ({SqlEmitter.Cols(Pk.Columns)});";
+        return $"ALTER TABLE {SqlEmitter.Qualified(Schema, Table)} ADD {prefix}{SqlEmitter.PrimaryKeyBody(Pk)};";
     }
 }
 
@@ -239,7 +239,9 @@ public sealed record AddForeignKeyChange(TableDefinition Table, ForeignKeyDefini
     public override string ToSql()
     {
         var sql = SqlEmitter.ForeignKey(Table.Schema, Table.Name, ForeignKey);
-        return NotValid ? sql[..sql.LastIndexOf(';')] + " NOT VALID;" : sql;
+        // The emitter already appends NOT VALID when the DEFINITION carries it — only splice the
+        // lock-minimizer's change-level flag in when it isn't there yet.
+        return NotValid && !ForeignKey.NotValid ? sql[..sql.LastIndexOf(';')] + " NOT VALID;" : sql;
     }
 }
 

@@ -355,7 +355,13 @@ public sealed class SchemaComparer
     private static void CompareUniqueConstraints(TableDefinition src, TableDefinition tgt, List<SchemaChange> changes, ComparerOptions options)
     {
         static string Sig(UniqueConstraintDefinition u) =>
-            string.Join(",", u.Columns.Select(c => c.ToLowerInvariant()).OrderBy(c => c, StringComparer.Ordinal));
+            string.Join(",", u.Columns.Select(c => c.ToLowerInvariant()).OrderBy(c => c, StringComparer.Ordinal))
+            // Attributes are part of the constraint's shape — a NULLS NOT DISTINCT / INCLUDE / DEFERRABLE
+            // flip must surface as a change instead of comparing equal on columns alone.
+            + (u.NullsNotDistinct ? "|nnd" : "")
+            + (u.Include is { Count: > 0 } inc ? "|inc:" + string.Join(",", inc.Select(c => c.ToLowerInvariant())) : "")
+            + (u.Deferrable ? "|def" : "")
+            + (u.InitiallyDeferred ? "|initdef" : "");
 
         // Skip the target signature set unless the source has unique constraints to match (no source ⇒ no add).
         if (src.Unique.Count > 0)
@@ -459,11 +465,25 @@ public sealed class SchemaComparer
             return;
         }
 
-        if (!srcPk.Columns.SequenceEqual(tgtPk.Columns, StringComparer.OrdinalIgnoreCase))
+        if (!srcPk.Columns.SequenceEqual(tgtPk.Columns, StringComparer.OrdinalIgnoreCase)
+            || !ConstraintAttributesEqual(srcPk.Include, srcPk.Deferrable, srcPk.InitiallyDeferred,
+                                          tgtPk.Include, tgtPk.Deferrable, tgtPk.InitiallyDeferred))
         {
             changes.Add(new DropPrimaryKeyChange(src.Schema, src.Name, tgtPk.Name ?? $"{src.Name}_pkey"));
             changes.Add(new AddPrimaryKeyChange(src.Schema, src.Name, srcPk));
         }
+    }
+
+    /// <summary>INCLUDE/DEFERRABLE attribute equality (null and empty INCLUDE are the same shape).</summary>
+    private static bool ConstraintAttributesEqual(
+        IReadOnlyList<string>? aInclude, bool aDeferrable, bool aInitiallyDeferred,
+        IReadOnlyList<string>? bInclude, bool bDeferrable, bool bInitiallyDeferred)
+    {
+        var ai = aInclude ?? System.Array.Empty<string>();
+        var bi = bInclude ?? System.Array.Empty<string>();
+        return ai.SequenceEqual(bi, StringComparer.OrdinalIgnoreCase)
+            && aDeferrable == bDeferrable
+            && aInitiallyDeferred == bInitiallyDeferred;
     }
 
     private void CompareChecks(TableDefinition src, TableDefinition tgt, List<SchemaChange> changes, ComparerOptions options)
@@ -478,9 +498,9 @@ public sealed class SchemaComparer
         // membership set when the source actually has checks to test (an empty source emits nothing).
         if (src.Checks.Count > 0)
         {
-            var targetExprs = tgt.Checks.Select(c => NormalizeConstraint(c.Expression)).ToHashSet();
+            var targetExprs = tgt.Checks.Select(CheckSignature).ToHashSet();
             foreach (var c in src.Checks)
-                if (!targetExprs.Contains(NormalizeConstraint(c.Expression)))
+                if (!targetExprs.Contains(CheckSignature(c)))
                     changes.Add(new AddCheckConstraintChange(src.Schema, src.Name, c));
         }
 
@@ -496,11 +516,17 @@ public sealed class SchemaComparer
 
         if (options.DropObjectsNotInSource && tgt.Checks.Count > 0)
         {
-            var sourceExprs = src.Checks.Select(c => NormalizeConstraint(c.Expression)).ToHashSet();
-            foreach (var c in tgt.Checks.Where(c => c.Name is not null && !sourceExprs.Contains(NormalizeConstraint(c.Expression))))
+            var sourceExprs = src.Checks.Select(CheckSignature).ToHashSet();
+            foreach (var c in tgt.Checks.Where(c => c.Name is not null && !sourceExprs.Contains(CheckSignature(c))))
                 changes.Add(new DropConstraintChange(src.Schema, src.Name, c.Name!));
         }
     }
+
+    /// <summary>A CHECK's matching key: the canonical predicate plus NO INHERIT (structural). NOT VALID is
+    /// deliberately excluded — it is validation state, and matching on it would churn a validated live
+    /// constraint against a project that declares NOT VALID.</summary>
+    private string CheckSignature(CheckConstraintDefinition c) =>
+        NormalizeConstraint(c.Expression) + (c.NoInherit ? "|noinherit" : "");
 
     private void CompareForeignKeys(TableDefinition src, TableDefinition tgt, List<SchemaChange> changes, ComparerOptions options)
     {
@@ -836,7 +862,19 @@ public sealed class SchemaComparer
     private static string ForeignKeySignature(ForeignKeyDefinition fk) =>
         string.Join(",", fk.Columns.Select(c => c.ToLowerInvariant()))
         + "->" + fk.ReferencedSchema.ToLowerInvariant() + "." + fk.ReferencedTable.ToLowerInvariant()
-        + "(" + string.Join(",", fk.ReferencedColumns.Select(c => c.ToLowerInvariant())) + ")";
+        + "(" + string.Join(",", fk.ReferencedColumns.Select(c => c.ToLowerInvariant())) + ")"
+        // Referential actions and DEFERRABLE/MATCH are part of the FK's semantics — a flip must surface
+        // as a change. NO ACTION ≡ absent (the parser may carry it explicitly; the catalog reader omits
+        // it), and NOT VALID is deliberately EXCLUDED: it is validation state, not shape — matching on it
+        // would churn a validated live FK against a project that declares NOT VALID.
+        + RefActionSig("|del:", fk.OnDelete) + RefActionSig("|upd:", fk.OnUpdate)
+        + (fk.Match is null ? "" : "|match:" + fk.Match.ToLowerInvariant())
+        + (fk.Deferrable ? "|def" : "")
+        + (fk.InitiallyDeferred ? "|initdef" : "");
+
+    private static string RefActionSig(string prefix, string? action) =>
+        action is null || action.Equals("NO ACTION", StringComparison.OrdinalIgnoreCase)
+            ? "" : prefix + action.ToLowerInvariant();
 
     private static string NormalizeText(string s) => Canonicalizer.NormalizeText(s);
 

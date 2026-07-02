@@ -94,9 +94,18 @@ public sealed partial record CatalogQueries
             WHERE schemaname NOT IN ('pg_catalog','information_schema') AND schemaname NOT LIKE 'pg_%'
             ORDER BY schemaname, sequencename;";
 
-    // Wave-2, table-dependent.
+    // Wave-2, table-dependent. Cols 6-9 carry the constraint attributes (same value on every per-column
+    // row): condeferrable/condeferred, the backing index's NULLS NOT DISTINCT (PG15+; the 13/14 profile
+    // overrides this query with FALSE), and the INCLUDE (non-key) columns of the backing index.
     public string Constraints { get; init; } = @"
-            SELECT n.nspname, c.relname, con.conname, con.contype, a.attname, k.ord
+            SELECT n.nspname, c.relname, con.conname, con.contype, a.attname, k.ord,
+                   con.condeferrable, con.condeferred,
+                   COALESCE((SELECT ix.indnullsnotdistinct FROM pg_index ix WHERE ix.indexrelid = con.conindid), false) AS nulls_not_distinct,
+                   (SELECT string_agg(ia.attname, ',' ORDER BY ikey.ord)
+                      FROM pg_index ix
+                      JOIN LATERAL unnest(ix.indkey) WITH ORDINALITY AS ikey(attnum, ord) ON ikey.ord > ix.indnkeyatts
+                      JOIN pg_attribute ia ON ia.attrelid = ix.indrelid AND ia.attnum = ikey.attnum
+                      WHERE ix.indexrelid = con.conindid) AS include_cols
             FROM pg_constraint con
             JOIN pg_class c ON c.oid = con.conrelid
             JOIN pg_namespace n ON n.oid = c.relnamespace
@@ -107,7 +116,8 @@ public sealed partial record CatalogQueries
             ORDER BY n.nspname, c.relname, con.conname, k.ord;";
 
     public string Checks { get; init; } = @"
-            SELECT n.nspname, c.relname, con.conname, pg_get_constraintdef(con.oid) AS def
+            SELECT n.nspname, c.relname, con.conname, pg_get_constraintdef(con.oid) AS def,
+                   con.convalidated, con.connoinherit
             FROM pg_constraint con
             JOIN pg_class c ON c.oid = con.conrelid
             JOIN pg_namespace n ON n.oid = c.relnamespace
@@ -131,7 +141,8 @@ public sealed partial record CatalogQueries
             SELECT n.nspname, c.relname, con.conname,
                    a.attname AS col, k.ord,
                    rn.nspname AS ref_schema, rc.relname AS ref_table, ra.attname AS ref_col,
-                   con.confdeltype, con.confupdtype
+                   con.confdeltype, con.confupdtype,
+                   con.condeferrable, con.condeferred, con.convalidated, con.confmatchtype
             FROM pg_constraint con
             JOIN pg_class c ON c.oid = con.conrelid
             JOIN pg_namespace n ON n.oid = c.relnamespace

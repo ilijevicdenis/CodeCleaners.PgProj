@@ -42,7 +42,9 @@
       "PrimaryKey": {
         "Columns": [
           "id"
-        ]
+        ],
+        "Deferrable": false,
+        "InitiallyDeferred": false
       },
       "Unique": [],
       "ForeignKeys": [],
@@ -57,7 +59,7 @@
         {
           "Name": "id",
           "DataType": "bigint",
-          "IsNullable": true,
+          "IsNullable": false,
           "IsIdentity": true,
           "IdentityKind": "BY DEFAULT",
           "IsSerial": false,
@@ -410,30 +412,48 @@
         "Columns": [
           "tenant_id",
           "id"
-        ]
+        ],
+        "Include": [
+          "email"
+        ],
+        "Deferrable": false,
+        "InitiallyDeferred": false
       },
       "Unique": [
         {
           "Columns": [
             "referral_email"
-          ]
+          ],
+          "NullsNotDistinct": true,
+          "Deferrable": false,
+          "InitiallyDeferred": false
         },
         {
           "Name": "customers_email_uq",
           "Columns": [
             "tenant_id",
             "email"
-          ]
+          ],
+          "NullsNotDistinct": false,
+          "Include": [
+            "full_name"
+          ],
+          "Deferrable": false,
+          "InitiallyDeferred": false
         }
       ],
       "ForeignKeys": [],
       "Checks": [
         {
-          "Expression": "discount BETWEEN 0 AND 100"
+          "Expression": "discount BETWEEN 0 AND 100",
+          "NotValid": false,
+          "NoInherit": false
         },
         {
           "Name": "customers_score_chk",
-          "Expression": "score\u003E=0"
+          "Expression": "score\u003E=0",
+          "NotValid": false,
+          "NoInherit": false
         }
       ],
       "OtherConstraints": [],
@@ -494,7 +514,7 @@
         {
           "Name": "id",
           "DataType": "bigint",
-          "IsNullable": true,
+          "IsNullable": false,
           "IsIdentity": true,
           "IdentityKind": "BY DEFAULT",
           "IsSerial": false,
@@ -529,7 +549,9 @@
         "Columns": [
           "id",
           "occurred"
-        ]
+        ],
+        "Deferrable": false,
+        "InitiallyDeferred": false
       },
       "Unique": [],
       "ForeignKeys": [],
@@ -589,7 +611,9 @@
       "PrimaryKey": {
         "Columns": [
           "id"
-        ]
+        ],
+        "Deferrable": false,
+        "InitiallyDeferred": false
       },
       "Unique": [],
       "ForeignKeys": [
@@ -606,12 +630,17 @@
             "id"
           ],
           "OnDelete": "CASCADE",
-          "OnUpdate": "RESTRICT"
+          "OnUpdate": "RESTRICT",
+          "Deferrable": true,
+          "InitiallyDeferred": true,
+          "NotValid": false
         }
       ],
       "Checks": [
         {
-          "Expression": "total_cents\u003E=0"
+          "Expression": "total_cents\u003E=0",
+          "NotValid": false,
+          "NoInherit": false
         }
       ],
       "OtherConstraints": [],
@@ -650,7 +679,9 @@
       "PrimaryKey": {
         "Columns": [
           "id"
-        ]
+        ],
+        "Deferrable": false,
+        "InitiallyDeferred": false
       },
       "Unique": [],
       "ForeignKeys": [],

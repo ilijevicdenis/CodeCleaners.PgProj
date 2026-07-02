@@ -209,11 +209,21 @@ public sealed class ObjectIdentityComputer
                             c.GeneratedExpression is null ? "" : (c.GeneratedIsStored ? "gen:" : "genv:") + Canonicalizer.NormalizeExpression(c.GeneratedExpression),
                             c.IsSerial ? "" : "def:" + Canonicalizer.NormalizeExpression(c.Default)))
               .Append('|');
+        // Constraint attributes append markers only when NON-default, so attribute-free constraints keep
+        // their historical canonical form (and hash) — existing snapshots/goldens are unaffected.
         if (t.PrimaryKey is { } pk)
-            fp.Append("pk:").Append(string.Join(",", pk.Columns.Select(N))).Append('|');
-        foreach (var sig in t.Unique.Select(u => "uq:" + string.Join(",", u.Columns.Select(N))).OrderBy(x => x, StringComparer.Ordinal))
+            fp.Append("pk:").Append(string.Join(",", pk.Columns.Select(N)))
+              .Append(ConstraintAttrMarkers(pk.Include, deferrable: pk.Deferrable, initiallyDeferred: pk.InitiallyDeferred))
+              .Append('|');
+        foreach (var sig in t.Unique
+                     .Select(u => "uq:" + string.Join(",", u.Columns.Select(N))
+                                  + (u.NullsNotDistinct ? "+nnd" : "")
+                                  + ConstraintAttrMarkers(u.Include, deferrable: u.Deferrable, initiallyDeferred: u.InitiallyDeferred))
+                     .OrderBy(x => x, StringComparer.Ordinal))
             fp.Append(sig).Append('|');
-        foreach (var sig in t.Checks.Select(c => "ck:" + Canonicalizer.NormalizeExpression(c.Expression)).OrderBy(x => x, StringComparer.Ordinal))
+        foreach (var sig in t.Checks
+                     .Select(c => "ck:" + Canonicalizer.NormalizeExpression(c.Expression) + (c.NoInherit ? "+noinh" : ""))
+                     .OrderBy(x => x, StringComparer.Ordinal))
             fp.Append(sig).Append('|');
         foreach (var sig in t.ForeignKeys.Select(ForeignKeyFingerprint).OrderBy(x => x, StringComparer.Ordinal))
             fp.Append(sig).Append('|');
@@ -265,7 +275,17 @@ public sealed class ObjectIdentityComputer
         "fk:" + string.Join(",", fk.Columns.Select(N))
         + "->" + N(fk.ReferencedSchema) + "." + N(fk.ReferencedTable)
         + "(" + string.Join(",", fk.ReferencedColumns.Select(N)) + ")"
-        + ":" + N(fk.OnDelete ?? "") + ":" + N(fk.OnUpdate ?? "");
+        + ":" + N(fk.OnDelete ?? "") + ":" + N(fk.OnUpdate ?? "")
+        // Non-default attribute markers only (NOT VALID is validation state, not shape — excluded).
+        + (fk.Match is null ? "" : "+match:" + N(fk.Match))
+        + ConstraintAttrMarkers(include: null, deferrable: fk.Deferrable, initiallyDeferred: fk.InitiallyDeferred);
+
+    /// <summary>Canonical-form suffix for constraint attributes — empty when everything is default, so
+    /// attribute-free constraints keep their historical form/hash.</summary>
+    private static string ConstraintAttrMarkers(IReadOnlyList<string>? include, bool deferrable, bool initiallyDeferred) =>
+        (include is { Count: > 0 } inc ? "+inc:" + string.Join(",", inc.Select(N)) : "")
+        + (deferrable ? "+def" : "")
+        + (initiallyDeferred ? "+initdef" : "");
 
     // Canonicalize an argument-type list: split on commas, normalize each type, lower-case, rejoin. So
     // "INT, text" and "integer,TEXT" hash equal (project file vs catalog spelling), but order matters

@@ -21,11 +21,30 @@ public sealed record ColumnDefinition(
     bool IsSerial = false,               // serial/bigserial/smallserial (auto-sequence pseudo-type)
     bool GeneratedIsStored = true);      // STORED vs VIRTUAL when GeneratedExpression is set (PG18 virtual)
 
-public sealed record PrimaryKeyDefinition(string? Name, IReadOnlyList<string> Columns);
+// Constraint attributes (Include/NullsNotDistinct/Deferrable/InitiallyDeferred/NotValid/NoInherit/Match)
+// are appended with defaults so existing positional construction is unaffected. They were previously
+// parsed and validated but DISCARDED before the model (P0 audit 2026-07-02) — a deploy silently lost them.
 
-public sealed record UniqueConstraintDefinition(string? Name, IReadOnlyList<string> Columns);
+public sealed record PrimaryKeyDefinition(
+    string? Name,
+    IReadOnlyList<string> Columns,
+    IReadOnlyList<string>? Include = null,   // covering-index INCLUDE columns (null/empty = none)
+    bool Deferrable = false,
+    bool InitiallyDeferred = false);
 
-public sealed record CheckConstraintDefinition(string? Name, string Expression);
+public sealed record UniqueConstraintDefinition(
+    string? Name,
+    IReadOnlyList<string> Columns,
+    bool NullsNotDistinct = false,           // PG15+: NULLS NOT DISTINCT
+    IReadOnlyList<string>? Include = null,
+    bool Deferrable = false,
+    bool InitiallyDeferred = false);
+
+public sealed record CheckConstraintDefinition(
+    string? Name,
+    string Expression,
+    bool NotValid = false,
+    bool NoInherit = false);
 
 public sealed record ForeignKeyDefinition(
     string? Name,
@@ -34,7 +53,11 @@ public sealed record ForeignKeyDefinition(
     string ReferencedTable,
     IReadOnlyList<string> ReferencedColumns,
     string? OnDelete = null,
-    string? OnUpdate = null);
+    string? OnUpdate = null,
+    bool Deferrable = false,
+    bool InitiallyDeferred = false,
+    bool NotValid = false,
+    string? Match = null);                   // "FULL" (MATCH SIMPLE is the default and stays null)
 
 public sealed record TableDefinition
 {

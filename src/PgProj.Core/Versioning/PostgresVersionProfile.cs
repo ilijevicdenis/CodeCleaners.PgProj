@@ -58,9 +58,18 @@ public sealed class PostgresVersionProfile
 
     private static IReadOnlyDictionary<int, PostgresVersionProfile> Build()
     {
+        // PG13/14: pg_index has no indnullsnotdistinct (NULLS NOT DISTINCT is PG15+) — referencing the
+        // column fails at prepare even inside COALESCE, so those majors read a constant FALSE instead.
+        var pre15 = CatalogQueries.Default with
+        {
+            Constraints = CatalogQueries.Default.Constraints.Replace(
+                "COALESCE((SELECT ix.indnullsnotdistinct FROM pg_index ix WHERE ix.indexrelid = con.conindid), false)",
+                "false"),
+        };
+
         var map = new Dictionary<int, PostgresVersionProfile>();
         for (var major = EarliestMajorVersion; major <= LatestMajorVersion; major++)
-            map[major] = new PostgresVersionProfile(major, CatalogQueries.Default, ObjectCapabilities.Default);
+            map[major] = new PostgresVersionProfile(major, major < 15 ? pre15 : CatalogQueries.Default, ObjectCapabilities.Default);
         return map;
     }
 
