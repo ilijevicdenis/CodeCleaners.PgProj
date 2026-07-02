@@ -556,124 +556,25 @@ public static class Program
     private static async Task<int> Test(string[] args)
     {
         var sub = args.Skip(1).FirstOrDefault(a => !a.StartsWith('-'))?.ToLowerInvariant();
-        if (sub == "scaffold") return await TestScaffold(args);
         if (sub == "generate") return await TestGenerate(args);
-
-        var project = DatabaseProject.Load(RequirePositional(args, "project file"));
-        var conn = RequireConnection(args);
-
-        // Discover *.test.sql under the project (kept out of the build by naming, run only here).
-        var files = Directory.Exists(project.ProjectDirectory)
-            ? Directory.EnumerateFiles(project.ProjectDirectory, "*.test.sql", SearchOption.AllDirectories)
-                       .OrderBy(f => f, StringComparer.Ordinal).ToList()
-            : new System.Collections.Generic.List<string>();
-        if (files.Count == 0) { Console.WriteLine("No *.test.sql files found in the project."); return ExitCode.Success; }
-
-        var tests = files.Select(f =>
-        {
-            var sql = File.ReadAllText(f);
-            return new TestCase(Path.GetRelativePath(project.ProjectDirectory, f), sql, PgUnitRunner.ParseExpectedSqlState(sql));
-        }).ToList();
-
-        // --deploy spins a throwaway shadow DB, deploys the project schema, runs the tests there, drops it.
-        var runConn = conn;
-        string? temp = null;
-        if (HasFlag(args, "--deploy"))
-        {
-            var build = await project.BuildAsync();
-            if (build.Diagnostics.Count > 0)
-            {
-                Console.Error.WriteLine($"Cannot test — build failed with {build.Diagnostics.Count} problem(s):");
-                foreach (var d in build.Diagnostics) Console.Error.WriteLine($"  - {d}");
-                return ExitCode.BuildError;
-            }
-            temp = "pgproj_test_" + Guid.NewGuid().ToString("N")[..16];
-            await using (var admin = new Npgsql.NpgsqlConnection(conn))
-            {
-                await admin.OpenAsync();
-                await using var create = new Npgsql.NpgsqlCommand($"CREATE DATABASE \"{temp}\"", admin);
-                await create.ExecuteNonQueryAsync();
-            }
-            runConn = new Npgsql.NpgsqlConnectionStringBuilder(conn) { Database = temp }.ConnectionString;
-            var schema = new DeployScriptGenerator().Generate(
-                new SchemaComparer().Compare(build.Model, new DatabaseModel()), new DeployOptions { WrapInTransaction = true });
-            await new DatabaseDeployer().ExecuteAsync(runConn, schema);
-        }
-
-        try
-        {
-            var result = await PgUnitRunner.RunAsync(runConn, tests);
-            foreach (var r in result.Results)
-            {
-                var mark = r.Status switch { TestStatus.Passed => "PASS", TestStatus.Failed => "FAIL", _ => "INC " };
-                Console.WriteLine($"  [{mark}] {r.Name}" + (r.Message is null ? "" : $" — {r.Message}"));
-            }
-            Console.WriteLine($"\n{result.Passed} passed, {result.Failed} failed, {result.Inconclusive} inconclusive ({result.Results.Count} total).");
-            return result.AllPassed ? ExitCode.Success : ExitCode.TestFailed;
-        }
-        finally
-        {
-            if (temp is not null)
-            {
-                Npgsql.NpgsqlConnection.ClearAllPools();
-                await using var admin = new Npgsql.NpgsqlConnection(conn);
-                await admin.OpenAsync();
-                await using var drop = new Npgsql.NpgsqlCommand($"DROP DATABASE IF EXISTS \"{temp}\" WITH (FORCE)", admin);
-                await drop.ExecuteNonQueryAsync();
-            }
-        }
+        throw new CliUsageException(TestGenerateUsage);
     }
 
-    // ---- test scaffold (generate a pre/test/post stub for a function/procedure/trigger, #139) ----
-    private static async Task<int> TestScaffold(string[] args)
-    {
-        // args: test scaffold <project.pgproj> <schema.object>
-        var p = args.Skip(1).Where(a => !a.StartsWith('-')).ToList();
-        if (p.Count < 3)
-            throw new CliUsageException("Usage: pgproj test scaffold <project.pgproj> <schema.object>");
+    private const string TestGenerateUsage =
+        "Usage: pgproj test generate <project.pgproj> [-o <dir>] " +
+        "[--categories constraints,fk,crud,view,unit,exists] [--namespace <ns>] [--name <TestProjectName>] " +
+        "[--image postgres:18] [--db-mode auto|container|existing] [--connection <admin-conn>] " +
+        "[--no-seeds] [--force]";
 
-        var project = DatabaseProject.Load(p[1]);
-        var build = await project.BuildAsync();
-        if (build.Diagnostics.Count > 0)
-        {
-            Console.Error.WriteLine($"Cannot scaffold — build failed with {build.Diagnostics.Count} problem(s):");
-            foreach (var d in build.Diagnostics) Console.Error.WriteLine($"  - {d}");
-            return ExitCode.BuildError;
-        }
-
-        try
-        {
-            var result = TestScaffolder.Scaffold(build.Model, p[2]);
-            var dir = Path.Combine(project.ProjectDirectory, "Tests");
-            Directory.CreateDirectory(dir);
-            var path = Path.Combine(dir, result.FileName);
-            if (File.Exists(path) && !HasFlag(args, "--force"))
-            {
-                Console.Error.WriteLine($"error: {result.FileName} already exists (pass --force to overwrite).");
-                return ExitCode.Usage;
-            }
-            File.WriteAllText(path, result.Content, new System.Text.UTF8Encoding(encoderShouldEmitUTF8Identifier: false));
-            Console.WriteLine($"Scaffolded {result.Kind} test stub: {Path.GetRelativePath(project.ProjectDirectory, path)}");
-            Console.WriteLine("Edit the arrange/act/assert sections, then run `pgproj test <project> --connection ...`.");
-            return ExitCode.Success;
-        }
-        catch (ScaffoldException ex)
-        {
-            Console.Error.WriteLine($"error: {ex.Message}");
-            return ExitCode.Usage;
-        }
-    }
-
-    // ---- test generate (whole-project auto-asserted suite + DB workflow, #153) ----------
+    // ---- test generate (whole-project standalone xUnit test project, #153) --------------
     private static async Task<int> TestGenerate(string[] args)
     {
-        // args: test generate <project.pgproj> [--connection <conn>] [--mode preserved|wipeout]
-        //       [--allow-wipeout] [--categories ...] [-o <dir>] [--run]
+        // args: test generate <project.pgproj> [-o <dir>] [--categories ...] [--namespace <ns>]
+        //       [--name <TestProjectName>] [--image <docker-image>] [--db-mode auto|container|existing]
+        //       [--connection <admin-conn>] [--no-seeds] [--force]
         var p = args.Skip(1).Where(a => !a.StartsWith('-')).ToList();
         if (p.Count < 2)
-            throw new CliUsageException(
-                "Usage: pgproj test generate <project.pgproj> [--connection <conn>] " +
-                "[--mode preserved|wipeout] [--categories constraints,fk,crud,view,unit,exists] [-o <dir>] [--run]");
+            throw new CliUsageException(TestGenerateUsage);
 
         var project = DatabaseProject.Load(p[1]);
         var build = await project.BuildAsync();
@@ -684,96 +585,94 @@ public static class Program
             return ExitCode.BuildError;
         }
 
-        SuiteOptions suiteOptions;
-        try { suiteOptions = SuiteOptions.Parse(GetOption(args, "--categories")); }
+        XunitSuiteOptions categories;
+        try { categories = XunitSuiteOptions.Parse(GetOption(args, "--categories")); }
         catch (ArgumentException ex) { throw new CliUsageException(ex.Message); }
 
-        var mode = (GetOption(args, "--mode") ?? "preserved").ToLowerInvariant();
-        if (mode is not ("preserved" or "wipeout"))
-            throw new CliUsageException("--mode must be 'preserved' or 'wipeout'.");
+        // Emit a STANDALONE xUnit project: it spins its own PostgreSQL (Testcontainers), deploys the
+        // greenfield schema once, and runs each test in a rolled-back transaction. No DB connection is
+        // needed at generation time; `dotnet test` (or the VS Test Explorer) is the only runner.
+        var projName = Path.GetFileNameWithoutExtension(project.ProjectFilePath);
+        var testName = GetOption(args, "--name") ?? $"{projName}.Tests";
+        var ns = GetOption(args, "--namespace") ?? MakeNamespace(testName);
+        var image = GetOption(args, "--image") ?? "postgres:18";
 
-        // The connection is OPTIONAL: generation alone needs no DB. It is required to deploy or to --run.
-        var conn = GetOption(args, "-c", "--connection")
-            ?? Environment.GetEnvironmentVariable("PGPROJ_CONNECTION")
-            ?? Environment.GetEnvironmentVariable("PGPROJ_TEST_CONNECTION");
-
-        if (conn is not null)
+        // How the generated fixture picks its database. A --connection with no explicit --db-mode
+        // means "existing server" (the connection lands in a git-ignored *.local.runsettings).
+        var connection = GetOption(args, "--connection", "-c");
+        var dbMode = GetOption(args, "--db-mode")?.ToLowerInvariant() switch
         {
-            if (mode == "wipeout")
-            {
-                if (!HasFlag(args, "--allow-wipeout"))
-                    throw new CliUsageException(
-                        "--mode wipeout DROPs and recreates the target database; pass --allow-wipeout to confirm.");
-                await WipeoutAndDeploy(conn, build.Model);
-            }
-            else
-            {
-                // preserved: bring the live DB up to date incrementally (no drops → existing data preserved).
-                var svc = new PublishService();
-                var plan = await svc.PlanAsync(project, build.Model, conn, new PublishPlanOptions { WrapInTransaction = true });
-                await svc.ApplyAsync(plan, conn, parallel: false);
-            }
-        }
+            null => connection is not null ? XunitDbMode.ExistingConnection : XunitDbMode.Auto,
+            "auto" => XunitDbMode.Auto,
+            "container" or "testcontainers" or "docker" => XunitDbMode.Testcontainers,
+            "existing" or "connection" or "server" => XunitDbMode.ExistingConnection,
+            var other => throw new CliUsageException($"Unknown --db-mode '{other}' (use: auto, container, existing)."),
+        };
+        if (connection is not null && dbMode == XunitDbMode.Testcontainers)
+            throw new CliUsageException("--connection makes no sense with --db-mode container (the container is throwaway).");
 
-        // Generate from the built model (the deploy makes the DB match it). Replace only OUR sentinel-bearing
-        // files so hand-promoted tests in the same folder are never clobbered.
+        var settings = new XunitSuiteSettings
+        {
+            RootNamespace = ns,
+            TestProjectName = testName,
+            PostgresImage = image,
+            Categories = categories,
+            DbMode = dbMode,
+            GenerateSeedHooks = !HasFlag(args, "--no-seeds"),
+            TestConnection = connection,
+        };
+        var suite = XunitSuiteScaffolder.Generate(build.Model, settings);
+
         var outDir = GetOption(args, "-o", "--output")
-            ?? Path.Combine(project.ProjectDirectory, "Tests", "Generated");
-        Directory.CreateDirectory(outDir);
-        var removed = 0;
-        foreach (var existing in Directory.EnumerateFiles(outDir, "*.test.sql"))
-            if (File.ReadAllText(existing).Contains(SuiteScaffolder.Sentinel)) { File.Delete(existing); removed++; }
-
-        var suite = SuiteScaffolder.GenerateSuite(build.Model, suiteOptions);
+            ?? Path.Combine(project.ProjectDirectory, "Tests", testName);
+        var force = HasFlag(args, "--force");
         var enc = new System.Text.UTF8Encoding(encoderShouldEmitUTF8Identifier: false);
-        foreach (var r in suite)
-            File.WriteAllText(Path.Combine(outDir, r.FileName), r.Content, enc);
-
-        Console.WriteLine($"Generated {suite.Count} test file(s) into {Path.GetRelativePath(project.ProjectDirectory, outDir)} (replaced {removed}).");
-        foreach (var g in suite.GroupBy(r => r.Kind).OrderBy(g => g.Key, StringComparer.Ordinal))
-            Console.WriteLine($"  {g.Count(),4}  {g.Key}");
-
-        if (!HasFlag(args, "--run")) return ExitCode.Success;
-        if (conn is null)
+        int written = 0, preserved = 0;
+        foreach (var f in suite.Files)
         {
-            Console.Error.WriteLine("--run needs a connection (--connection or PGPROJ_CONNECTION).");
-            return ExitCode.Usage;
+            var path = Path.Combine(outDir, f.RelativePath.Replace('/', Path.DirectorySeparatorChar));
+            Directory.CreateDirectory(Path.GetDirectoryName(path)!);
+            // Scaffold-once files (csproj / fixtures / your Seed hooks) are written only when absent, unless
+            // --force. Regenerated files (test classes, schema.sql) are always overwritten.
+            if (!f.Overwrite && !force && File.Exists(path)) { preserved++; continue; }
+            File.WriteAllText(path, f.Content, enc);
+            written++;
         }
 
-        var tests = Directory.EnumerateFiles(outDir, "*.test.sql", SearchOption.AllDirectories)
-            .OrderBy(f => f, StringComparer.Ordinal)
-            .Select(f => { var sql = File.ReadAllText(f); return new TestCase(Path.GetRelativePath(project.ProjectDirectory, f), sql, PgUnitRunner.ParseExpectedSqlState(sql)); })
-            .ToList();
-        var result = await PgUnitRunner.RunAsync(conn, tests);
-        foreach (var t in result.Results)
+        var rel = Path.GetRelativePath(project.ProjectDirectory, outDir);
+        Console.WriteLine($"Generated xUnit test project into {rel} ({written} file(s) written, {preserved} preserved).");
+        Console.WriteLine($"Run it with:  dotnet test \"{rel}\"");
+        switch (dbMode)
         {
-            var mark = t.Status switch { TestStatus.Passed => "PASS", TestStatus.Failed => "FAIL", _ => "INC " };
-            Console.WriteLine($"  [{mark}] {t.Name}" + (t.Message is null ? "" : $" — {t.Message}"));
+            case XunitDbMode.Testcontainers:
+                Console.WriteLine("  • pinned to Testcontainers: it spins its own PostgreSQL container (needs a Docker daemon).");
+                break;
+            case XunitDbMode.ExistingConnection:
+                Console.WriteLine("  • pinned to an existing server: PGPROJ_TEST_CONNECTION (admin/server connection) is required; a throwaway DB is created + dropped.");
+                Console.WriteLine(connection is not null
+                    ? $"  • the connection was written to {testName}.local.runsettings (git-ignored; picked up automatically by dotnet test / Test Explorer)."
+                    : $"  • set it via {testName}.local.runsettings next to the csproj (auto-applied), or in the shell.");
+                break;
+            default:
+                Console.WriteLine("  • no config → it spins its own PostgreSQL via Testcontainers (needs a Docker daemon), or");
+                Console.WriteLine("  • set PGPROJ_TEST_CONNECTION to an admin/server connection to run against your own PostgreSQL (a throwaway DB is created + dropped).");
+                break;
         }
-        Console.WriteLine($"\n{result.Passed} passed, {result.Failed} failed, {result.Inconclusive} inconclusive ({result.Results.Count} total).");
-        return result.AllPassed ? ExitCode.Success : ExitCode.TestFailed;
+        // The DB mode lives in scaffold-once files — changing it on an existing suite needs --force.
+        if (preserved > 0 && !force && (dbMode != XunitDbMode.Auto || !settings.GenerateSeedHooks))
+            Console.WriteLine("  • note: the csproj/fixture are scaffold-once and were preserved — pass --force to apply a changed --db-mode to an existing suite.");
+        return ExitCode.Success;
     }
 
-    /// <summary>Drop + recreate the target database, then greenfield-deploy the project model into it.</summary>
-    private static async Task WipeoutAndDeploy(string conn, DatabaseModel model)
-    {
-        var dbName = new Npgsql.NpgsqlConnectionStringBuilder(conn).Database
-            ?? throw new CliUsageException("The connection string must name a database for --mode wipeout.");
-        // DROP/CREATE must run from a maintenance DB, not the one being dropped.
-        var adminConn = new Npgsql.NpgsqlConnectionStringBuilder(conn) { Database = "postgres" }.ConnectionString;
-        Npgsql.NpgsqlConnection.ClearAllPools();
-        await using (var admin = new Npgsql.NpgsqlConnection(adminConn))
+    /// <summary>Turn a project/test name into a valid dotted C# namespace (each segment a legal identifier).</summary>
+    private static string MakeNamespace(string name) =>
+        string.Join('.', name.Split('.', StringSplitOptions.RemoveEmptyEntries).Select(seg =>
         {
-            await admin.OpenAsync();
-            await using (var drop = new Npgsql.NpgsqlCommand($"DROP DATABASE IF EXISTS \"{dbName}\" WITH (FORCE)", admin))
-                await drop.ExecuteNonQueryAsync();
-            await using (var create = new Npgsql.NpgsqlCommand($"CREATE DATABASE \"{dbName}\"", admin))
-                await create.ExecuteNonQueryAsync();
-        }
-        var script = new DeployScriptGenerator().Generate(
-            new SchemaComparer().Compare(model, new DatabaseModel()), new DeployOptions { WrapInTransaction = true });
-        await new DatabaseDeployer().ExecuteAsync(conn, script);
-    }
+            var s = new string(seg.Select(ch => char.IsLetterOrDigit(ch) ? ch : '_').ToArray());
+            if (s.Length == 0) s = "_";
+            if (char.IsDigit(s[0])) s = "_" + s;
+            return s;
+        }));
 
     // ---- data-compare (row-level data diff + sync between two databases, #132) ----------
 
@@ -1986,10 +1885,8 @@ public static class Program
           pgproj publish <project.pgproj|.pgpkg> --connection <conn> [--dry-run] [-o script.sql] [--allow-drops] [--allow-data-loss] [--no-transaction] [--parallel] [--strict] [--no-analyze] [--var N=V] [--substitute-objects] [--profile <file>]
                          [--smart-defaults] [--no-validate-constraints] [--allow-table-recreation] [--concurrent-indexes] [--no-drop-constraints] [--no-drop-indexes] [--no-drop-type <type,...>] [--exclude-type <type,...>] [--command-timeout <ms>] [--lock-timeout <ms>]
           pgproj validate <project.pgproj|.pgpkg> --connection <conn> [--strict] [--no-analyze]   (apply to a throwaway temp DB, rolled back)
-          pgproj test <project.pgproj> --connection <conn> [--deploy]   (run *.test.sql unit tests in BEGIN…ROLLBACK; --deploy applies the schema to a shadow DB first; exit 10 on a failed test)
-          pgproj test scaffold <project.pgproj> <schema.object>         (generate a pre/test/post unit-test stub for a function/procedure/trigger; writes Tests/_schema.object.test.sql)
-          pgproj test generate <project.pgproj> [--connection <conn>] [--mode preserved|wipeout] [--categories ...] [-o <dir>] [--run]
-                         (generate a COMPLETE auto-asserted suite for every object into Tests/Generated/; preserved brings the DB up to date, wipeout recreates it -- needs --allow-wipeout; --run executes it, exit 10 on failure)
+          pgproj test generate <project.pgproj> [-o <dir>] [--categories constraints,fk,crud,view,unit,exists] [--namespace <ns>] [--name <TestProjectName>] [--image postgres:18] [--db-mode auto|container|existing] [--connection <admin-conn>] [--no-seeds] [--force]
+                         (generate a STANDALONE xUnit test project for every object: deploys the greenfield schema, runs each test in a rolled-back transaction — run it with `dotnet test`, discoverable in the VS Test Explorer, no pgproj tooling needed. --db-mode picks the database source: auto (default; Testcontainers, or PGPROJ_TEST_CONNECTION when set), container (always Docker), existing (always your server; --connection writes a git-ignored *.local.runsettings that is auto-applied). Your `partial void Seed(...)`/SuiteSeed hooks are never overwritten; --no-seeds skips emitting the hook stubs.)
           pgproj pkg inspect <file.pgpkg>                                              (dump the manifest + object inventory)
           pgproj profile create <out.pgpublish.json> [--target-version 18] [--connection-name <label>] [--var N=V] [--allow-drops] [--no-transaction]
                          (write a reusable publish profile from the current flags; the connection string is never stored)
@@ -2042,7 +1939,9 @@ public static class Program
           --profile <file>   compare/script/publish: load options + variable overrides from a .pgpublish.json (CLI flags win)
           --connection-name  profile create: a non-secret connection label/hint to record (never a connection string)
           --substitute-objects  Also expand $(Var) tokens in object .sql files (default: deploy-scripts only)
-          --force            add: overwrite an existing object file
+          --force            add: overwrite an existing object file; test generate: also rewrite scaffold-once files (csproj/fixture/seed stubs)
+          --db-mode          test generate: how the generated fixture obtains PostgreSQL — auto | container | existing
+          --no-seeds         test generate: skip emitting the never-overwritten Seeds/*.Seed.cs + SuiteSeed.cs hook stubs
           --default-schema   new project: default schema for the manifest (default 'public')
           --target-version   new project: target PostgreSQL major version (default 18)
           -p, --project      add: the project (.pgproj) or directory to scaffold into (default: current dir)

@@ -24,13 +24,14 @@ namespace PgProj.VisualStudio.ProjectSystem.Commands
         private static string StorePath => Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "pgproj", "connections.json");
 
-        /// <summary>The remembered connection for the project, or null.</summary>
-        public static string TryGet(string projectPath)
+        /// <summary>The remembered connection for the project, or null. <paramref name="purpose"/> keeps
+        /// independent connections per feature (null = the import connection, "testgen" = the test-run one).</summary>
+        public static string TryGet(string projectPath, string purpose = null)
         {
             lock (Gate)
             {
                 var map = Load();
-                if (!map.TryGetValue(Key(projectPath), out var blob))
+                if (!map.TryGetValue(Key(projectPath, purpose), out var blob))
                     return null;
                 try
                 {
@@ -45,24 +46,24 @@ namespace PgProj.VisualStudio.ProjectSystem.Commands
         }
 
         /// <summary>Remembers (or replaces) the project's connection string.</summary>
-        public static void Save(string projectPath, string connectionString)
+        public static void Save(string projectPath, string connectionString, string purpose = null)
         {
             lock (Gate)
             {
                 var map = Load();
                 var bytes = ProtectedData.Protect(Encoding.UTF8.GetBytes(connectionString), null, DataProtectionScope.CurrentUser);
-                map[Key(projectPath)] = Convert.ToBase64String(bytes);
+                map[Key(projectPath, purpose)] = Convert.ToBase64String(bytes);
                 Write(map);
             }
         }
 
         /// <summary>Drops the remembered connection for the project.</summary>
-        public static void Forget(string projectPath)
+        public static void Forget(string projectPath, string purpose = null)
         {
             lock (Gate)
             {
                 var map = Load();
-                if (map.Remove(Key(projectPath)))
+                if (map.Remove(Key(projectPath, purpose)))
                     Write(map);
             }
         }
@@ -108,6 +109,8 @@ namespace PgProj.VisualStudio.ProjectSystem.Commands
 
         private static string Unescape(string s) => Regex.Replace(s, "\\\\(.)", "$1");
 
-        private static string Key(string projectPath) => Path.GetFullPath(projectPath).ToLowerInvariant();
+        // null purpose keeps the historical key shape, so already-stored import connections survive.
+        private static string Key(string projectPath, string purpose) =>
+            Path.GetFullPath(projectPath).ToLowerInvariant() + (purpose == null ? "" : "|" + purpose);
     }
 }

@@ -7,7 +7,7 @@ namespace PgProj.Core.Testing;
 
 /// <summary>
 /// Synthesises a minimal *valid* INSERT for a table from the semantic model (the crux of <see
-/// cref="SuiteScaffolder"/>). It emits a value only for the columns it must — mandatory columns with no
+/// cref="XunitSuiteScaffolder"/>). It emits a value only for the columns it must — mandatory columns with no
 /// auto-source — letting identity / serial / generated / defaulted / nullable columns fill themselves, which
 /// keeps the row small and side-effect free. Mandatory foreign keys are satisfied by recursively inserting a
 /// depth-1 parent row first (bounded to one level — deeper or cyclic chains downgrade). Values are deterministic
