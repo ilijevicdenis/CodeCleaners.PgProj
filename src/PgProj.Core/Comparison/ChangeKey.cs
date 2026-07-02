@@ -29,6 +29,7 @@ internal static class ChangeKey
         DropColumnChange d             => Relation(d.Schema, d.Table),
 
         CreateOrReplaceViewChange v    => Relation(v.View.Schema, v.View.Name),
+        RecreateMaterializedViewChange v => Relation(v.View.Schema, v.View.Name),
         DropViewChange v               => Relation(v.Schema, v.Name),
 
         CreateOrReplaceFunctionChange f => Function(f.Function),

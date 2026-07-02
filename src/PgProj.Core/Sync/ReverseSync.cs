@@ -208,6 +208,7 @@ public static class ReverseSync
         DropIndexChange c => ResolveIndexTable(c, projectModel),
         DropTableChange c => Tbl(c.Schema, c.Name),
         CreateOrReplaceViewChange c => View(c.View.Schema, c.View.Name),
+        RecreateMaterializedViewChange c => View(c.View.Schema, c.View.Name),
         DropViewChange c => View(c.Schema, c.Name),
         CreateOrReplaceFunctionChange c => DdlExporter.FunctionUnit(c.Function),
         CreateRawObjectChange c => Raw(c.Def),

@@ -556,8 +556,15 @@ public sealed class SchemaComparer
             if (plan is not null && plan.NewSatisfied(IdentityDiffEngine.KindView, $"{src.Schema}.{src.Name}"))
                 continue;
             tgtByName.TryGetValue((src.Schema, src.Name), out var tgt);
-            if (tgt is null || NormalizeBody(src.Body) != NormalizeBody(tgt.Body))
+            if (tgt is null)
                 changes.Add(new CreateOrReplaceViewChange(src));
+            else if (NormalizeBody(src.Body) != NormalizeBody(tgt.Body))
+                // A changed MATERIALIZED view must drop+recreate: its emitter falls back to
+                // CREATE ... IF NOT EXISTS (no OR REPLACE exists), which is a silent no-op on an
+                // existing view — the body change would never be applied.
+                changes.Add(src.IsMaterialized
+                    ? new RecreateMaterializedViewChange(src)
+                    : new CreateOrReplaceViewChange(src));
         }
 
         if (options.DropObjectsNotInSource)

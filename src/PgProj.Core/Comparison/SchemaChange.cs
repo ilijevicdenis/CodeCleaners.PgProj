@@ -266,6 +266,20 @@ public sealed record CreateOrReplaceViewChange(ViewDefinition View) : SchemaChan
     public override string ToSql() => SqlEmitter.CreateOrReplaceView(View);
 }
 
+/// <summary>A materialized view whose body changed. Postgres has no <c>CREATE OR REPLACE MATERIALIZED
+/// VIEW</c>, and <c>CREATE … IF NOT EXISTS</c> on an existing one is a silent no-op — the only way to
+/// apply the new body is drop + recreate. Not destructive: the data is derived (repopulated by the
+/// CREATE), unlike a table drop.</summary>
+public sealed record RecreateMaterializedViewChange(ViewDefinition View) : SchemaChange
+{
+    public override int Phase => 75;
+    public override bool IsDestructive => false;
+    public override string Describe() => $"Recreate materialized view {View.Schema}.{View.Name} (body changed)";
+    public override string ToSql() =>
+        $"DROP MATERIALIZED VIEW IF EXISTS {SqlEmitter.Qualified(View.Schema, View.Name)};\n" +
+        SqlEmitter.CreateOrReplaceView(View);
+}
+
 public sealed record CreateOrReplaceFunctionChange(FunctionDefinition Function) : SchemaChange
 {
     public override int Phase => 80;

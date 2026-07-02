@@ -35,7 +35,7 @@ public static class SchemaCompareObjectType
 
         CreateIndexChange or DropIndexChange or RenameIndexChange => "index",
 
-        CreateOrReplaceViewChange or DropViewChange or RenameViewChange => "view",
+        CreateOrReplaceViewChange or RecreateMaterializedViewChange or DropViewChange or RenameViewChange => "view",
         CreateOrReplaceFunctionChange or AlterFunctionAttributesChange or RenameFunctionChange => "function",
 
         // An enum-label add is a structured delta on a `type` object.

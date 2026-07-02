@@ -48,6 +48,7 @@ public sealed class RiskAnalyzer
         ValidateConstraintChange => Safe("Validate a constraint; scans rows under a SHARE UPDATE EXCLUSIVE lock (reads/writes continue)."),
         AddRawTableConstraintChange => Warning("Add a table constraint; may validate existing rows."),
         CreateOrReplaceViewChange => Safe("Create or replace a view; no table data is touched."),
+        RecreateMaterializedViewChange => Warning("Drop + recreate a materialized view (no OR REPLACE exists); its derived data repopulates on create, but dependent objects would block the drop."),
         CreateOrReplaceFunctionChange => Safe("Create or replace a function; no table data is touched."),
 
         AddColumnChange add => ClassifyAddColumn(add),
