@@ -25,6 +25,15 @@ public sealed class DeployOptions
     /// <summary>Wrap the whole script in BEGIN/COMMIT so a failed step rolls everything back.</summary>
     public bool WrapInTransaction { get; init; } = true;
 
+    /// <summary>
+    /// Trust the incoming change order instead of re-sorting by <see cref="SchemaChange.Phase"/>. Set this
+    /// when the list came from the <see cref="DeploymentPlanner"/> (via
+    /// <see cref="ComparerOptions.DependencyGraph"/>): its dependency refinement can legitimately place a
+    /// higher-phase change before a lower-phase one (a function before the view that calls it, #160), and a
+    /// phase re-sort here would undo exactly that. Default false — hand-built change lists keep today's sort.
+    /// </summary>
+    public bool PreserveChangeOrder { get; init; }
+
     /// <summary>Emit a leading comment banner describing the plan (and the resolved variable map).</summary>
     public bool IncludeHeader { get; init; } = true;
 
@@ -213,7 +222,7 @@ public sealed class DeployScriptGenerator
         // The version profile that drives version-aware DDL (ALTER-vs-recreate via ObjectCapabilities, #43/#56).
         profile ??= Versioning.PostgresVersionProfile.ForTarget(options.TargetPostgresVersion);
 
-        var ordered = filtered.OrderBy(c => c.Phase).ToList();
+        var ordered = options.PreserveChangeOrder ? filtered.ToList() : filtered.OrderBy(c => c.Phase).ToList();
         var scripts = options.Scripts ?? new DeployScriptBundle();
 
         // Substitute SQLCMD variables in the deploy scripts up front so an unresolved token fails fast

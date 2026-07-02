@@ -1481,11 +1481,16 @@ public static class Program
     {
         var profile = LoadProfile(args);            // EP-PROFILE: CLI flags override profile values.
         var (source, project) = await BuildSourceOrThrowAsync(args);
-        var changes = new SchemaComparer().Compare(source, new DatabaseModel());
+        // #55/#160: dependency-refined ordering (function before the view that calls it); a .pgpkg source
+        // (no project) degrades to the historical phase order.
+        var graph = project is null ? null : DeploymentGraphFactory.TryBuild(project);
+        var changes = new SchemaComparer().Compare(source, new DatabaseModel(),
+            new ComparerOptions { DependencyGraph = graph });
         var opts = BuildPublishPlanOptions(args, profile);
         var script = new DeployScriptGenerator().Generate(changes, new DeployOptions
         {
             WrapInTransaction = opts.WrapInTransaction,
+            PreserveChangeOrder = graph is not null,
             Scripts = LoadDeployScripts(project),
             Variables = BuildVariableResolver(project, args, profile),
             // #140: the same option family the publish path honours (a from-empty create has no drops/

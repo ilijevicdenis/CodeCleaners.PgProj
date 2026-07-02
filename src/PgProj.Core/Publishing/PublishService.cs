@@ -160,9 +160,16 @@ public sealed class PublishService
         var refactorLog = options.RefactorLog
             ?? (project is not null ? Refactoring.RefactorLog.LoadForProject(project.ProjectFilePath) : null);
 
+        // #55/#160: the source project's dependency graph refines deploy order across phases (a view that
+        // calls a function deploys AFTER the function even though its phase is lower). Best-effort — null
+        // (a pre-built .pgpkg source, or a graph-build failure) degrades to the historical phase order.
+        // NOTE: the --parallel apply path (PhasedDeployer) still runs phase barriers — cross-phase
+        // refinement only takes effect in the generated script and the sequential deployer.
+        var graph = project is null ? null : DeploymentGraphFactory.TryBuild(project);
+
         var changes = new SchemaComparer(versionProfile).Compare(
             sourceModel, target,
-            new ComparerOptions { DropObjectsNotInSource = options.AllowDrops, RefactorLog = refactorLog });
+            new ComparerOptions { DropObjectsNotInSource = options.AllowDrops, RefactorLog = refactorLog, DependencyGraph = graph });
 
         // #137 lock-minimizing rewrite applied here (not just in the generator) so the changes the phased
         // deployer applies carry the same CONCURRENTLY/NOT VALID flags the generated script shows.
@@ -178,6 +185,7 @@ public sealed class PublishService
         var script = new DeployScriptGenerator().Generate(changes, new DeployOptions
         {
             WrapInTransaction = options.WrapInTransaction,
+            PreserveChangeOrder = graph is not null,   // the planner already ordered; a phase re-sort would undo #160
             Scripts = bundle,
             Variables = variables,
             BlockOnPossibleDataLoss = options.BlockOnPossibleDataLoss,

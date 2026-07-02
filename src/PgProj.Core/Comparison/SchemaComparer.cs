@@ -39,6 +39,16 @@ public sealed class ComparerOptions
     public Refactoring.RefactorLog? RefactorLog { get; init; }
 
     /// <summary>
+    /// Optional source-project dependency graph (issues #50/#55, built by
+    /// <see cref="DeploymentGraphFactory.TryBuild"/>). When present the change list is ordered by the
+    /// <see cref="DeploymentPlanner"/> — the stable phase order refined by real Hard/Soft edges, so e.g. a
+    /// view that CALLS a function deploys after that function even though the view's phase is lower
+    /// (issue #160); a hard cycle gets a skeleton pass. With no binding edge the output is byte-identical
+    /// to the phase sort (the golden-script equivalence guarantee). Null ⇒ the historical phase order.
+    /// </summary>
+    public Semantics.Dependencies.DependencyGraph? DependencyGraph { get; init; }
+
+    /// <summary>
     /// When true, two tables whose columns are identical but declared in a different order compare EQUAL
     /// (no <see cref="ColumnOrderChange"/> is emitted). Defaults to <c>false</c>: Postgres column order is
     /// physically meaningful, so by default a pure reorder is reported (as a benign, non-destructive,
@@ -163,8 +173,13 @@ public sealed class SchemaComparer
         CompareFunctions(source, target, changes, plan);
         CompareRawObjects(source, target, changes, options);
 
-        // OrderBy is a stable sort, so changes at the same phase keep insertion order (preserving the
-        // existing within-phase ordering the golden tests pin).
+        // Ordering. With a dependency graph the DeploymentPlanner refines the stable phase order on real
+        // Hard/Soft edges (function-before-dependent-view across phases — issue #160; skeleton pass for a
+        // hard cycle) and is byte-identical to the plain phase sort when no edge binds. Without a graph:
+        // the historical stable phase sort (OrderBy is stable, so same-phase changes keep insertion order —
+        // the ordering the golden tests pin).
+        if (options.DependencyGraph is { } graph)
+            return new DeploymentPlanner().Plan(changes, graph).AllSteps;
         return changes.OrderBy(c => c.Phase).ToList();
     }
 
