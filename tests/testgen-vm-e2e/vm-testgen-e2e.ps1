@@ -39,7 +39,10 @@ foreach ($f in @("Sampledb.Tests.csproj", "PgDatabaseFixture.cs", "PgTestBase.cs
 }
 if (-not (Get-ChildItem "$WorkDir\Tests\Generated" -Filter *.g.cs -ErrorAction SilentlyContinue)) { Fail "no Generated\*.g.cs" }
 if (-not (Get-ChildItem "$WorkDir\Tests\Seeds" -Filter *.Seed.cs -ErrorAction SilentlyContinue)) { Fail "no Seeds\*.Seed.cs" }
-Write-Host "   generated project shape OK"
+# The retired SQL generator is gone: assert no .test.sql leaked into the C# xUnit output.
+$legacySql = Get-ChildItem "$WorkDir\Tests" -Filter *.test.sql -Recurse -ErrorAction SilentlyContinue
+if ($legacySql) { Fail "retired .test.sql output present: $($legacySql.Name -join ', ')" }
+Write-Host "   generated project shape OK (C# xUnit, no .test.sql)"
 
 Write-Host "== 3) dotnet test (env-var path: throwaway DB on $DbHost, no Docker) =="
 $env:PGPROJ_TEST_CONNECTION = $testConn

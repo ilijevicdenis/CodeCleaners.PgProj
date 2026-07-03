@@ -467,6 +467,23 @@ public sealed class VsFixture : IDisposable
         return Directory.EnumerateFiles(outDir, "*.pgproj", SearchOption.TopDirectoryOnly).Single();
     }
 
+    /// <summary>
+    /// Runs the INSTALLED extension's bundled pgproj CLI (the exact dll the .pgproj context-menu
+    /// commands shell) with <paramref name="args"/> and captures its result. Lets a scenario assert
+    /// the installed payload's behaviour blackbox — e.g. that "Generate Tests" now emits a C# xUnit
+    /// project, not the retired .test.sql — and doubles as a guard against a stale bundled CLI.
+    /// </summary>
+    public static (int ExitCode, string StdOut, string StdErr) RunBundledCli(string args)
+    {
+        var psi = new System.Diagnostics.ProcessStartInfo("dotnet", $"\"{LocateBundledCli()}\" {args}")
+        { RedirectStandardOutput = true, RedirectStandardError = true, UseShellExecute = false, CreateNoWindow = true };
+        using var p = System.Diagnostics.Process.Start(psi)!;
+        var stdout = p.StandardOutput.ReadToEnd();
+        var stderr = p.StandardError.ReadToEnd();
+        p.WaitForExit();
+        return (p.ExitCode, stdout, stderr);
+    }
+
     /// <summary>The pgproj CLI bundled inside the INSTALLED extension — the exact payload VS uses.</summary>
     private static string LocateBundledCli()
     {

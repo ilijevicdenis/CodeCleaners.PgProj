@@ -7,10 +7,14 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using EnvDTE;
+using EnvDTE80;
 using Microsoft.VisualStudio.PlatformUI;
 using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.Interop;
 
 namespace PgProj.VisualStudio.ProjectSystem.Commands
 {
@@ -227,10 +231,52 @@ namespace PgProj.VisualStudio.ProjectSystem.Commands
             else if (connectionBox.IsEnabled && rememberBox.IsChecked != true)
                 ConnectionStore.Forget(projectPath, TestConnectionPurpose);
 
-            MessageBox.Show(this, result.Output.Trim(), "PgProj Generate Tests",
+            // Add the freshly generated test project to the open solution so it shows up in
+            // Solution Explorer / Test Explorer without a manual "Add > Existing Project".
+            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+            var addNote = TryAddGeneratedProjectToSolution(outputBox.Text.Trim());
+
+            MessageBox.Show(this, result.Output.Trim() + addNote, "PgProj Generate Tests",
                 MessageBoxButton.OK, MessageBoxImage.Information);
             DialogResult = true;
             Close();
+        }
+
+        /// <summary>
+        /// Adds the emitted <c>*.csproj</c> under <paramref name="outputDir"/> to the currently open
+        /// solution (idempotent — a no-op if it is already loaded). Returns a short line to append to
+        /// the success message; failures are reported as guidance, never thrown (the files exist on
+        /// disk regardless, so a solution-add hiccup must not read as a generation failure).
+        /// </summary>
+        private static string TryAddGeneratedProjectToSolution(string outputDir)
+        {
+            ThreadHelper.ThrowIfNotOnUIThread();
+            try
+            {
+                if (outputDir.Length == 0 || !Directory.Exists(outputDir)) return "";
+                if (Package.GetGlobalService(typeof(SDTE)) is not DTE2 dte || dte.Solution is null) return "";
+
+                var csproj = Directory.EnumerateFiles(outputDir, "*.csproj", SearchOption.TopDirectoryOnly).FirstOrDefault();
+                if (csproj is null) return "";
+
+                foreach (Project existing in dte.Solution.Projects)
+                {
+                    try
+                    {
+                        if (string.Equals(existing.FullName, csproj, StringComparison.OrdinalIgnoreCase))
+                            return "\n\nThe test project is already part of the solution.";
+                    }
+                    catch { /* solution folders / unloaded projects throw on FullName — skip */ }
+                }
+
+                dte.Solution.AddFromFile(csproj, /*Exclusive*/ false);
+                return "\n\nAdded the test project to the solution.";
+            }
+            catch (Exception ex)
+            {
+                return "\n\nThe project was generated on disk, but adding it to the solution failed: "
+                     + ex.Message + "\nAdd it manually via Solution ▸ Add ▸ Existing Project.";
+            }
         }
 
         /// <summary>The `test generate` CLI arguments for the current choices, or null (with a message) when invalid.</summary>
