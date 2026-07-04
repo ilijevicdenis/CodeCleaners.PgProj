@@ -59,6 +59,7 @@ public sealed class PgAnalyzer
         new RuleInfo("PG017", DiagnosticSeverity.Info,    "json column (prefer jsonb)"),
         new RuleInfo("PG020", DiagnosticSeverity.Warning, "EXCEPTION WHEN OTHERS in a function body"),
         new RuleInfo("PG021", DiagnosticSeverity.Warning, "SELECT ... INTO without STRICT in a function body"),
+        new RuleInfo("PG022", DiagnosticSeverity.Info,    "ALTER action not reflected in the project model"),
     };
 
     private static readonly Dictionary<string, RuleInfo> ById =
@@ -100,6 +101,7 @@ public sealed class PgAnalyzer
                     Emit(diags, "PG003", "UPDATE without a WHERE clause mutates every row.", Q(u.Schema, u.Table)); break;
                 case DeleteStatement d when d.Where is null && d.WhereCurrentOf is null:
                     Emit(diags, "PG003", "DELETE without a WHERE clause removes every row.", Q(d.Schema, d.Table)); break;
+                case AlterStatement al: AnalyzeAlter(al, diags); break;
             }
         }
         return diags;
@@ -262,6 +264,40 @@ public sealed class PgAnalyzer
         if (q is null) return;
         if (q.Limit is not null && q.OrderBy.Count == 0 && q.SetOp is null)
             Emit(diags, "PG009", "LIMIT without ORDER BY returns a non-deterministic subset.", "query");
+    }
+
+    // Action verbs that ModelBuilder.ApplyAlterTable actually folds into the table model (#153/#154):
+    // a standalone ALTER carrying one of these changes the model exactly as the inline CREATE clause would.
+    // Every OTHER action an ALTER can carry is parsed then dropped — that's what PG022 surfaces.
+    private static readonly HashSet<string> ReflectedTableActions = new(StringComparer.Ordinal)
+    {
+        "ADD COLUMN", "ADD CONSTRAINT", "DROP COLUMN", "ALTER COLUMN TYPE",
+        "SET DEFAULT", "DROP DEFAULT", "SET NOT NULL", "DROP NOT NULL",
+    };
+
+    // PG022 — an ALTER action pgproj parses but does NOT fold into the model (OWNER TO, SET storage/
+    // reloptions, ENABLE/DISABLE/FORCE ROW LEVEL SECURITY, RENAME, SET SCHEMA, partition attach, cluster,
+    // …). Such an action reaches neither the comparer nor the deploy script, so it used to vanish with no
+    // trace (the 2026-07-02 audit's "parse-then-silently-drop" P0). Flag it so the model's blind spot is
+    // visible. Structural table actions (ADD/DROP COLUMN, ADD CONSTRAINT, ALTER COLUMN TYPE/DEFAULT/NOT
+    // NULL) DO fold, so a statement carrying only those never fires; a mixed ALTER fires only for its
+    // unmodeled actions.
+    private void AnalyzeAlter(AlterStatement a, List<Diagnostic> diags)
+    {
+        if (!_config.IsEnabled("PG022")) return;   // skip the scan when the rule is off
+
+        var unmodeled = new List<string>();
+        foreach (var verb in a.Actions)
+            if (!ReflectedTableActions.Contains(verb) && !unmodeled.Contains(verb))
+                unmodeled.Add(verb);
+        if (unmodeled.Count == 0) return;
+
+        var target = a.Name.Length == 0 ? a.ObjectKind : Q(a.Schema, a.Name);
+        Emit(diags, "PG022",
+            $"ALTER {a.ObjectKind} action ({string.Join(", ", unmodeled)}) is not reflected in the project model — " +
+            "pgproj models structure (columns, constraints, types), not ownership/storage/RLS or rename/schema moves, " +
+            "so this action is neither compared nor deployed. Express the desired state in the object's CREATE, or track it out-of-band.",
+            target);
     }
 
     /// <summary>

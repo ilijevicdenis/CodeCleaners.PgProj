@@ -27,14 +27,22 @@
 | PG019 | Info | Foreign key with no `ON DELETE`/`ON UPDATE` action (defaults to `NO ACTION` — model-level) |
 | PG020 | Warning | `EXCEPTION WHEN OTHERS` in a function body (swallows every error; catch specific SQLSTATEs or re-RAISE) |
 | PG021 | Warning | `SELECT … INTO` without `STRICT` in a function body (no row → unset, many rows → arbitrary; goes silent) |
+| PG022 | Info | `ALTER` action pgproj parses but does **not** model — `OWNER TO`, `SET (storage/reloptions)`, `ENABLE/FORCE ROW LEVEL SECURITY`, `RENAME`, `SET SCHEMA`, partition attach, … (neither compared nor deployed; surfaced instead of silently dropped) |
 | PG024 | Info | Duplicate index — same columns + predicate as another index (model-level) |
 | PG025 | Info | Redundant index — its columns are a leading prefix of a wider index (model-level) |
 | PGV### | Error | Syntax newer than the project's `TargetPostgresVersion` (version gating, EP-TARGET) |
 
-PG001–PG013, PG015–PG017, PG020 and PG021 are **per-file** rules over the parsed AST (PG015/PG016
-check table and column identifiers; PG020/PG021 scan the routine body). **PG014, PG019, PG024 and
-PG025 are model-level rules**: they run once over the merged project model, so they see relationships
-that span files (the FK in one file, its covering index in another).
+PG001–PG013, PG015–PG017 and PG020–PG022 are **per-file** rules over the parsed AST (PG015/PG016
+check table and column identifiers; PG020/PG021 scan the routine body; PG022 inspects each `ALTER`
+statement's action list). **PG014, PG019, PG024 and PG025 are model-level rules**: they run once over
+the merged project model, so they see relationships that span files (the FK in one file, its covering
+index in another).
+
+- **PG022** fires per unmodeled action, not per statement noise: a mixed `ALTER TABLE t ADD COLUMN c
+  int, OWNER TO bob` flags only `OWNER` (the `ADD COLUMN` folds into the model). The structural table
+  actions that DO fold — `ADD`/`DROP COLUMN`, `ADD CONSTRAINT`, `ALTER COLUMN TYPE`/`SET`/`DROP
+  DEFAULT`/`SET`/`DROP NOT NULL` — never fire it. It's advisory (Info) by default; raise it to a
+  warning per project if an ignored `RENAME`/`SET SCHEMA` should block the build.
 
 - **PG014** coverage counts the primary key, unique constraints, and any non-partial index whose
   **leading columns** (any order) are exactly the FK's columns.

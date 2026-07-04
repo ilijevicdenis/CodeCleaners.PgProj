@@ -197,6 +197,52 @@ public class PgAnalyzerTests
         Assert.DoesNotContain(A(Fn("INSERT INTO s.t (id) VALUES (1);")), x => x.RuleId == "PG021");
     }
 
+    [Theory]
+    [InlineData("ALTER TABLE s.t OWNER TO bob")]
+    [InlineData("ALTER TABLE s.t RENAME TO t2")]
+    [InlineData("ALTER TABLE s.t SET SCHEMA other")]
+    [InlineData("ALTER TABLE s.t ENABLE ROW LEVEL SECURITY")]
+    [InlineData("ALTER TABLE s.t SET (fillfactor = 70)")]
+    [InlineData("ALTER VIEW s.v OWNER TO bob")]          // non-table kind: the whole ALTER is unmodeled
+    [InlineData("ALTER TYPE s.mood RENAME TO feeling")]
+    public void PG022_flags_alter_actions_not_reflected_in_the_model(string sql)
+    {
+        var d = A(sql);
+        Assert.Contains(d, x => x.RuleId == "PG022" && x.Severity == DiagnosticSeverity.Info);
+    }
+
+    [Theory]
+    [InlineData("ALTER TABLE s.t ADD COLUMN c int")]           // folded via AddedColumns
+    [InlineData("ALTER TABLE s.t DROP COLUMN c")]              // folded via DroppedColumns
+    [InlineData("ALTER TABLE s.t ADD CONSTRAINT pk PRIMARY KEY (id)")]  // folded via AddedConstraints (#153)
+    [InlineData("ALTER TABLE s.t ALTER COLUMN c SET NOT NULL")] // folded via ColumnActions
+    [InlineData("ALTER TABLE s.t ALTER COLUMN c TYPE bigint")]  // folded via ColumnActions
+    public void PG022_silent_on_actions_the_model_actually_folds(string sql)
+    {
+        Assert.DoesNotContain(A(sql), x => x.RuleId == "PG022");
+    }
+
+    [Fact]
+    public void PG022_in_a_mixed_alter_flags_only_the_unmodeled_action()
+    {
+        // ADD COLUMN folds into the model; OWNER TO does not — only the latter is surfaced, and the
+        // finding names it without dragging in the folded action.
+        var d = A("ALTER TABLE s.t ADD COLUMN c int, OWNER TO bob");
+        var pg022 = Assert.Single(d, x => x.RuleId == "PG022");
+        Assert.Equal("s.t", pg022.Target);
+        Assert.Contains("OWNER", pg022.Message);
+        Assert.DoesNotContain("ADD COLUMN", pg022.Message);
+    }
+
+    [Fact]
+    public void PG022_can_be_disabled_via_config()
+    {
+        var config = AnalysisConfig.FromOverrides(
+            new System.Collections.Generic.Dictionary<string, RuleOverride> { ["PG022"] = new RuleOverride(Enabled: false) });
+        var d = new PgAnalyzer(config).Analyze(new PgParser().Parse("ALTER TABLE s.t OWNER TO bob"));
+        Assert.DoesNotContain(d, x => x.RuleId == "PG022");
+    }
+
     [Fact]
     public void Clean_statements_produce_no_findings()
     {
