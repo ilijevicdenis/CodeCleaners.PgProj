@@ -89,8 +89,30 @@ public sealed partial class PgParser
         if (!(c.MatchWord("TO") || c.MatchOperator("=")))
             throw new ParseException("expected TO or = in SET", c.Here);
         if (c.AtEnd) throw new ParseException("expected a value in SET", c.Here);
+
+        // search_path drives how UNQUALIFIED names resolve, so capture its schema list — the reference
+        // resolver honors it for the statements that follow (#164). Every other GUC is model-irrelevant;
+        // consume its value tail leniently.
+        if (name.Equals("search_path", StringComparison.OrdinalIgnoreCase))
+            return new CommandStatement { Kind = "SET", Detail = name, SearchPath = ParseSearchPathValues(c) };
+
         ConsumeRest(c);
         return new CommandStatement { Kind = "SET", Detail = name };
+    }
+
+    // The comma-separated value list of `SET search_path = …`: each item a schema identifier or a string
+    // literal ('public'); DEFAULT yields an empty list = "reset to the default path". "$user" is kept
+    // verbatim — the SearchPath model maps it to the current-user (default) schema.
+    private List<string> ParseSearchPathValues(TokenCursor c)
+    {
+        var list = new List<string>();
+        if (c.MatchWord("DEFAULT")) return list;
+        do
+        {
+            if (c.Current is { Kind: TokenKind.String } s) { list.Add(s.Value); c.Advance(); }
+            else list.Add(c.ExpectIdentifier());
+        } while (c.MatchSymbol(','));
+        return list;
     }
 
     private CommandStatement ParseShow(TokenCursor c)

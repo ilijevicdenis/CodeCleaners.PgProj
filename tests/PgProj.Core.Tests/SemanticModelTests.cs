@@ -176,6 +176,46 @@ public sealed class SemanticModelTests
         Assert.DoesNotContain(call.Args, a => a is ColumnRef);       // the element name "foo" was not
     }
 
+    // ---- #164: SET search_path is tracked so unqualified names resolve against the active path -------
+
+    [Fact]
+    public void Set_search_path_makes_a_later_unqualified_relation_resolve_against_the_active_path_164()
+    {
+        // Default schema is "public", so the unqualified `widget` would NOT resolve to app.widget under the
+        // frozen "$user",public path. After `SET search_path = app`, the reference resolver honors the active
+        // path and the view's unqualified `widget` binds to app.widget (a reference of app.v).
+        const string sql =
+            "CREATE TABLE app.widget (id int);\n" +
+            "SET search_path = app;\n" +
+            "CREATE VIEW app.v AS SELECT id FROM widget;";
+
+        var c = CatalogBuilder.Build(sql, "public");
+        ReferenceCollector.Collect(c, new PgParser().Parse(sql), "schema.sql");
+        var model = SemanticModel.Build(c, new PgParser().Parse(sql), "schema.sql");
+
+        var widget = model.GetSymbol("app", "widget");
+        Assert.NotNull(widget);
+        Assert.Contains(model.ReferencesTo(widget!), r => r.ReferencerKey == "app.v");
+    }
+
+    [Fact]
+    public void Without_the_active_search_path_the_unqualified_relation_stays_unresolved_164()
+    {
+        // Control for the above: with no SET search_path, the unqualified `widget` resolves against the
+        // default path (public) and never reaches app.widget — so app.v is NOT recorded as a referencer.
+        const string sql =
+            "CREATE TABLE app.widget (id int);\n" +
+            "CREATE VIEW app.v AS SELECT id FROM widget;";
+
+        var c = CatalogBuilder.Build(sql, "public");
+        ReferenceCollector.Collect(c, new PgParser().Parse(sql), "schema.sql");
+        var model = SemanticModel.Build(c, new PgParser().Parse(sql), "schema.sql");
+
+        var widget = model.GetSymbol("app", "widget");
+        Assert.NotNull(widget);
+        Assert.DoesNotContain(model.ReferencesTo(widget!), r => r.ReferencerKey == "app.v");
+    }
+
     // ---- ACCEPTANCE 3: overloaded function call binds to the correct overload by arg types ----------
 
     [Fact]

@@ -12,4 +12,9 @@ public sealed class CommandStatement : SqlStatement
     public SqlStatement? Inner { get; set; }         // EXPLAIN / PREPARE wrapped statement
     public SelectQuery? Query { get; set; }          // DECLARE CURSOR FOR <query>
     public string? Body { get; set; }                // DO: the (dollar-quoted) code block, verbatim
+
+    /// <summary>For <c>SET search_path = a, b, …</c> the ordered schema list (each entry verbatim, with
+    /// <c>"$user"</c> preserved); an EMPTY list means <c>SET search_path = DEFAULT</c> (reset to default).
+    /// Null for every other command — only search_path affects how unqualified names resolve (#164).</summary>
+    public System.Collections.Generic.List<string>? SearchPath { get; set; }
 }
