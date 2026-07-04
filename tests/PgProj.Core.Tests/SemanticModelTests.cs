@@ -142,6 +142,40 @@ public sealed class SemanticModelTests
         Assert.True(occ.Count(o => o.Kind == OccurrenceKind.Reference) >= 2);
     }
 
+    // ---- #162: references nested inside an irregular JSON/XML call reach the dependency graph -------
+
+    [Fact]
+    public void References_inside_a_json_call_reach_the_dependency_graph_162()
+    {
+        // A subquery inside json_object used to be discarded (SkipBalancedParens), so the table it reads
+        // was invisible to the reverse index. It now flows through, so app.detail is a reference of app.v.
+        const string sql =
+            "CREATE TABLE app.detail (id int);\n" +
+            "CREATE VIEW app.v AS SELECT json_object('items' VALUE (SELECT count(*) FROM app.detail));";
+
+        var c = CatalogBuilder.Build(sql, "app");
+        ReferenceCollector.Collect(c, new PgParser().Parse(sql), "schema.sql");
+        var model = SemanticModel.Build(c, new PgParser().Parse(sql), "schema.sql");
+
+        var detail = model.GetSymbol("app", "detail");
+        Assert.NotNull(detail);
+        Assert.Contains(model.ReferencesTo(detail!), r => r.ReferencerKey == "app.v");
+    }
+
+    [Fact]
+    public void KeywordCall_captures_value_subexpressions_but_not_bare_element_names_162()
+    {
+        // The harvester takes the unambiguous value-subexpression (the subquery) but NOT the element NAME
+        // token — turning "foo" into a column ref would bind to nothing and emit a false "column does not
+        // exist". So the captured args contain the subquery and zero bare column refs.
+        var r = new PgParser().Parse("SELECT xmlelement(NAME foo, (SELECT id FROM app.t));");
+        var call = (FuncCallExpr)((QueryStatement)r.Statements[0]).Query!.Items[0].Expr;
+
+        Assert.Equal("xmlelement", call.Name[^1].ToLowerInvariant());
+        Assert.NotEmpty(call.Args);                                  // the subquery was captured
+        Assert.DoesNotContain(call.Args, a => a is ColumnRef);       // the element name "foo" was not
+    }
+
     // ---- ACCEPTANCE 3: overloaded function call binds to the correct overload by arg types ----------
 
     [Fact]

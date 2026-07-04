@@ -459,16 +459,64 @@ public sealed partial class PgParser
     }
 
     // XML and SQL/JSON functions have keyword-laden, irregular argument syntax (NAME, XMLATTRIBUTES,
-    // PASSING, COLUMNS, RETURNING, ON ERROR …). Accept any balanced argument list.
+    // PASSING, COLUMNS, RETURNING, ON ERROR …) that a general expression grammar can't parse. We don't
+    // try to; instead we walk the balanced argument list and pull out the nested VALUE-subexpressions the
+    // binder and dependency graph care about — subqueries and function calls — so relations/functions used
+    // inside an xml/json call are no longer invisible (#162). Bare identifiers are deliberately NOT
+    // captured: an element/attribute NAME, a RETURNING type, or a COLUMNS/PATH token is a bare word, and
+    // turning one into a column ref would bind to nothing and emit a false "column does not exist". A
+    // subquery is unambiguously `(SELECT|WITH|VALUES|TABLE …)`; a function call is unambiguously `word(` —
+    // neither can be a bare NAME/type/path. The walk is resilient (it never throws; on any difficulty it
+    // just skips a token), so it preserves the previous "accept any balanced list" robustness.
     private Expr ParseKeywordCall(TokenCursor c)
     {
         var call = new FuncCallExpr();
         call.Name.Add(c.Advance().Value);
-        c.SkipBalancedParens();
+        HarvestKeywordCallRefs(c, call);
         // aggregate/window tails also apply to keyword-calls like xmlagg(...) FILTER (WHERE …) OVER (…)
         if (c.MatchWord("FILTER")) { c.ExpectSymbol('('); c.ExpectWord("WHERE"); call.Filter = ParseExpression(c); c.ExpectSymbol(')'); }
         if (c.MatchWord("OVER")) call.Over = ParseWindowSpecOrName(c);
         return call;
+    }
+
+    // XMLATTRIBUTES is XML's inline attribute-list construct, not a function — never capture it as a call
+    // (its `value AS name` body isn't an argument list anyway, so it self-skips, but naming it is clearer).
+    private static readonly HashSet<string> KeywordCallNonFunctions =
+        new(StringComparer.OrdinalIgnoreCase) { "XMLATTRIBUTES" };
+
+    // Walk the balanced `( … )` of a keyword call, collecting only the unambiguous value-subexpressions
+    // (subqueries + function calls) into <paramref name="call"/>.Args. See ParseKeywordCall for the why.
+    private void HarvestKeywordCallRefs(TokenCursor c, FuncCallExpr call)
+    {
+        c.ExpectSymbol('(');
+        int depth = 1;
+        while (!c.AtEnd && depth > 0)
+        {
+            // A parenthesised subquery — capture it so its relations flow to the collector/binder (scoped
+            // to the subquery, so its own columns are validated correctly, never against the outer call).
+            if (c.AtSymbol('(') && c.Peek() is { Kind: TokenKind.Word } p
+                && (p.IsWord("SELECT") || p.IsWord("WITH") || p.IsWord("VALUES") || p.IsWord("TABLE")))
+            {
+                int mark = c.Mark();
+                try { call.Args.Add(ParseParenOrSubquery(c)); continue; }
+                catch { c.Reset(mark); }
+            }
+            // A function call `word( … )` — capture the whole call so its function reference and its own
+            // arguments (which may hold real columns/subqueries) are seen. A structural keyword or malformed
+            // arg list throws and is skipped instead (try/catch), so nothing invalid is captured.
+            else if (c.Current is { Kind: TokenKind.Word } w && c.Peek()?.IsSymbol('(') == true
+                     && !KeywordCallNonFunctions.Contains(w.Value))
+            {
+                int mark = c.Mark();
+                try { call.Args.Add(ParseNameOrCall(c)); continue; }
+                catch { c.Reset(mark); }
+            }
+
+            // Otherwise: track nesting and skip one token (bare names / types / paths / keyword noise).
+            if (c.AtSymbol('(')) { depth++; c.Advance(); }
+            else if (c.AtSymbol(')')) { depth--; c.Advance(); }
+            else c.Advance();
+        }
     }
 
     private static readonly HashSet<string> ExtractFields = new(StringComparer.OrdinalIgnoreCase)
