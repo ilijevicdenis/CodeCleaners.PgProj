@@ -38,10 +38,19 @@ public sealed partial class PgParser
         return ParsePredicate(c);
     }
 
-    // comparison / IS / BETWEEN / IN / LIKE / quantified — sits above the arithmetic/general bands
+    // Predicate band: comparison / IS / ISNULL / NOTNULL / OVERLAPS / BETWEEN / IN / LIKE. These chain
+    // left-associatively — a predicate can apply to an earlier one, e.g. `x IS NOT NULL IN (a, b)` is
+    // `(x IS NOT NULL) IN (a, b)` (oracle-verified: PG forms IS NOT NULL first, then applies IN). The ONE
+    // precedence rule PG imposes within this band: BETWEEN/IN/LIKE/ILIKE/SIMILAR bind TIGHTER than the
+    // comparison operators, so a comparison's RIGHT operand must itself consume a trailing match — that
+    // makes `a = b BETWEEN c AND d` group as `a = (b BETWEEN c AND d)`, not `(a = b) BETWEEN c AND d`. The
+    // leading operand and any post-comparison match are handled by ParseMatch / the branches below.
+    // (PG makes bare comparisons non-associative — `a = b = c` is an error — but pgproj stays lenient and
+    // parses that invalid form left-associatively rather than rejecting it; every VALID form is unchanged.)
+    // All groupings here are oracle-verified against PG via pg_get_viewdef (#161).
     private Expr ParsePredicate(TokenCursor c)
     {
-        var left = ParseGeneralOp(c);
+        var left = ParseMatch(c);
         while (true)
         {
             if (c.CurrentOperator is { } op && ComparisonOps.Contains(op))
@@ -52,12 +61,14 @@ public sealed partial class PgParser
                     var q = c.Advance().Value.ToUpperInvariant();
                     left = ParseQuantified(c, left, op, q);
                 }
-                else left = new BinaryExpr { Op = op, Left = left, Right = ParseGeneralOp(c) };
+                else left = new BinaryExpr { Op = op, Left = left, Right = ParseMatch(c) };
                 continue;
             }
 
+            // A BETWEEN/IN/LIKE that chains onto an earlier predicate result (e.g. after IS): a leading
+            // match on the operand itself is already consumed by ParseMatch above / the comparison right.
             bool not = false;
-            if (c.AtWord("NOT") && (c.Peek() is { } p && (p.IsWord("BETWEEN") || p.IsWord("IN") || p.IsWord("LIKE") || p.IsWord("ILIKE") || p.IsWord("SIMILAR"))))
+            if (c.AtWord("NOT") && c.Peek() is { } p && (p.IsWord("BETWEEN") || p.IsWord("IN") || p.IsWord("LIKE") || p.IsWord("ILIKE") || p.IsWord("SIMILAR")))
             { c.Advance(); not = true; }
 
             if (c.MatchWord("BETWEEN")) { left = ParseBetween(c, left, not); continue; }
@@ -66,10 +77,32 @@ public sealed partial class PgParser
             if (c.MatchWord("SIMILAR")) { c.ExpectWord("TO"); left = ParseLike(c, left, "SIMILAR TO", not); continue; }
             if (not) throw new ParseException("expected BETWEEN/IN/LIKE after NOT", c.Here);
 
-            if (c.MatchWord("OVERLAPS")) { left = new BinaryExpr { Op = "OVERLAPS", Left = left, Right = ParseGeneralOp(c) }; continue; }
+            if (c.MatchWord("OVERLAPS")) { left = new BinaryExpr { Op = "OVERLAPS", Left = left, Right = ParseMatch(c) }; continue; }
             if (c.MatchWord("IS")) { left = ParseIs(c, left); continue; }
             if (c.MatchWord("ISNULL")) { left = new PostfixExpr { Op = "ISNULL", Operand = left }; continue; }
             if (c.MatchWord("NOTNULL")) { left = new PostfixExpr { Op = "NOTNULL", Operand = left }; continue; }
+            break;
+        }
+        return left;
+    }
+
+    // The BETWEEN/IN/LIKE band — tighter than comparison: a general operand followed by any BETWEEN / IN /
+    // LIKE / ILIKE / SIMILAR (left-associative among themselves). Used for the leading operand and for a
+    // comparison's right operand, so those matches bind before the surrounding comparison.
+    private Expr ParseMatch(TokenCursor c)
+    {
+        var left = ParseGeneralOp(c);
+        while (true)
+        {
+            bool not = false;
+            if (c.AtWord("NOT") && c.Peek() is { } p && (p.IsWord("BETWEEN") || p.IsWord("IN") || p.IsWord("LIKE") || p.IsWord("ILIKE") || p.IsWord("SIMILAR")))
+            { c.Advance(); not = true; }
+
+            if (c.MatchWord("BETWEEN")) { left = ParseBetween(c, left, not); continue; }
+            if (c.MatchWord("IN")) { left = ParseIn(c, left, not); continue; }
+            if (c.AtAnyWord("LIKE", "ILIKE")) { var k = c.Advance().Value.ToUpperInvariant(); left = ParseLike(c, left, k, not); continue; }
+            if (c.MatchWord("SIMILAR")) { c.ExpectWord("TO"); left = ParseLike(c, left, "SIMILAR TO", not); continue; }
+            if (not) throw new ParseException("expected BETWEEN/IN/LIKE after NOT", c.Here);
             break;
         }
         return left;

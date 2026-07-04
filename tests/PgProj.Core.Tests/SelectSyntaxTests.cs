@@ -17,6 +17,64 @@ public class SelectSyntaxTests
 
     private static ParseResult Parse(string sql) => new PgParser().Parse(sql);
 
+    // #161 — the three PostgreSQL precedence bands (BETWEEN/IN/LIKE > comparison > IS), each grouping
+    // oracle-verified against PG via pg_get_viewdef. The old flat band got the first two wrong.
+
+    [Fact]
+    public void Between_binds_tighter_than_comparison_161()
+    {
+        // PG: a = b BETWEEN c AND d  =>  a = (b BETWEEN c AND d)
+        var cmp = Assert.IsType<BinaryExpr>(Q("SELECT a = b BETWEEN c AND d").Items[0].Expr);
+        Assert.Equal("=", cmp.Op);
+        Assert.IsType<BetweenExpr>(cmp.Right);
+    }
+
+    [Fact]
+    public void Comparison_after_a_between_groups_the_between_first_161()
+    {
+        // PG: b BETWEEN c AND d = a  =>  (b BETWEEN c AND d) = a
+        var cmp = Assert.IsType<BinaryExpr>(Q("SELECT b BETWEEN c AND d = a").Items[0].Expr);
+        Assert.Equal("=", cmp.Op);
+        Assert.IsType<BetweenExpr>(cmp.Left);
+    }
+
+    [Fact]
+    public void In_binds_tighter_than_comparison_161()
+    {
+        // PG: b IN (1, 2) = a  =>  (b IN (1, 2)) = a
+        var cmp = Assert.IsType<BinaryExpr>(Q("SELECT b IN (1, 2) = a").Items[0].Expr);
+        Assert.Equal("=", cmp.Op);
+        Assert.IsType<InExpr>(cmp.Left);
+    }
+
+    [Fact]
+    public void Is_is_lower_precedence_than_comparison_161()
+    {
+        // PG: b = c IS NULL  =>  (b = c) IS NULL
+        var isck = Assert.IsType<IsCheckExpr>(Q("SELECT b = c IS NULL").Items[0].Expr);
+        var cmp = Assert.IsType<BinaryExpr>(isck.Operand);
+        Assert.Equal("=", cmp.Op);
+    }
+
+    [Fact]
+    public void A_match_op_chains_onto_an_is_predicate_161()
+    {
+        // PG (oracle): x IS NOT NULL IN (true, false)  =>  (x IS NOT NULL) IN (true, false).
+        // PG forms IS NOT NULL first, then applies IN to it — predicates chain left-associatively.
+        var inx = Assert.IsType<InExpr>(Q("SELECT x IS NOT NULL IN (true, false)").Items[0].Expr);
+        Assert.IsType<IsCheckExpr>(inx.Operand);
+    }
+
+    [Fact]
+    public void Chained_comparisons_parse_left_associatively_161()
+    {
+        // PG rejects `a = b = c` (comparisons are non-associative); pgproj stays lenient and parses it
+        // left-associatively as (a = b) = c — the precedence BANDS are the fix, not strict chain rejection.
+        var cmp = Assert.IsType<BinaryExpr>(Q("SELECT a = b = c").Items[0].Expr);
+        Assert.Equal("=", cmp.Op);
+        Assert.IsType<BinaryExpr>(cmp.Left);
+    }
+
     [Fact]
     public void Target_list_aliases_and_star()
     {
