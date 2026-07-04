@@ -1,3 +1,4 @@
+using System.IO;
 using System.Linq;
 using PgProj.Core.Testing;
 using Xunit;
@@ -25,6 +26,21 @@ public class XunitSuiteScaffolderTests
 
     private static string File(GeneratedTestProject p, string endsWith) =>
         p.Files.Single(f => f.RelativePath.EndsWith(endsWith)).Content;
+
+    [Fact]
+    public void DefaultOutputDirectory_is_a_sibling_outside_the_project_glob_root()
+    {
+        // #166: a .pgproj globs **/*.sql rooted at its own directory. If the generated suite (whose
+        // schema.sql is a bare, non-underscored file) lands under that directory, it's swept up as
+        // duplicate database objects and breaks the build. The default must be a sibling, not a child.
+        var projectDir = Path.Combine(Path.GetTempPath(), "mydb");
+        var outDir = XunitSuiteScaffolder.DefaultOutputDirectory(projectDir, "mydb.Tests");
+
+        Assert.Equal("mydb.Tests", Path.GetFileName(outDir));
+        // Same parent as the project dir → a sibling, and NOT nested inside the project (glob) root.
+        Assert.Equal(Directory.GetParent(projectDir)!.FullName, Directory.GetParent(outDir)!.FullName);
+        Assert.StartsWith("..", Path.GetRelativePath(projectDir, outDir));
+    }
 
     [Fact]
     public void Emits_the_project_scaffold_once_files()

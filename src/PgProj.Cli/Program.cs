@@ -623,8 +623,11 @@ public static class Program
         };
         var suite = XunitSuiteScaffolder.Generate(build.Model, settings);
 
+        // Default OUTSIDE the .pgproj directory (a sibling): the project globs **/*.sql rooted at its own
+        // folder, so a test suite nested under it gets its regenerated schema.sql swept up as duplicate
+        // objects and breaks the build (#166). XunitSuiteScaffolder.DefaultOutputDirectory is the canonical rule.
         var outDir = GetOption(args, "-o", "--output")
-            ?? Path.Combine(project.ProjectDirectory, "Tests", testName);
+            ?? XunitSuiteScaffolder.DefaultOutputDirectory(project.ProjectDirectory, testName);
         var force = HasFlag(args, "--force");
         var enc = new System.Text.UTF8Encoding(encoderShouldEmitUTF8Identifier: false);
         int written = 0, preserved = 0;

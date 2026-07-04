@@ -93,7 +93,12 @@ namespace PgProj.VisualStudio.ProjectSystem.Commands
             ResizeMode = ResizeMode.NoResize;
             WindowStartupLocation = WindowStartupLocation.CenterOwner;
 
-            outputBox.Text = Path.Combine(projectDir ?? "", "Tests", testProjectName);
+            // Default OUTSIDE the .pgproj directory (a sibling): a .pgproj globs **/*.sql rooted at its own
+            // folder, so a test project nested under it gets its regenerated schema.sql swept up as duplicate
+            // objects and breaks the build (#166). Mirrors XunitSuiteScaffolder.DefaultOutputDirectory in
+            // PgProj.Core (this net472 extension can't link the net10 engine, so the rule is duplicated).
+            var testsParent = string.IsNullOrEmpty(projectDir) ? "" : (Path.GetDirectoryName(projectDir) ?? projectDir);
+            outputBox.Text = Path.Combine(testsParent, testProjectName);
             connectionBox.Text = ConnectionStore.TryGet(projectPath, TestConnectionPurpose)
                 ?? Environment.GetEnvironmentVariable("PGPROJ_TEST_CONNECTION")
                 ?? string.Empty;
