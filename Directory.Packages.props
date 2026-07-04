@@ -1,0 +1,26 @@
+<Project>
+
+  <!--
+    Central Package Management for the buildable PgProj.slnx projects (src / tests / bench).
+    One version per package id here is the single source of truth; leaf csproj carry a bare
+    <PackageReference Include="..." /> with no Version. This kills the hand-copied-version drift
+    that had already crept in (test-runner versions diverging between the test projects).
+
+    NOTE: the editors\vs\* VSIX projects (net472 VSSDK / net10-windows) are intentionally opted OUT
+    of CPM via editors\vs\Directory.Build.props — they can't build headless and pin their own
+    VSSDK / VisualStudio.Extensibility versions, so they must not be governed from here.
+  -->
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageVersion Include="BenchmarkDotNet" Version="0.15.8" />
+    <PackageVersion Include="coverlet.collector" Version="6.0.4" />
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+    <PackageVersion Include="Npgsql" Version="9.0.3" />
+    <PackageVersion Include="xunit" Version="2.9.3" />
+    <PackageVersion Include="xunit.runner.visualstudio" Version="3.1.4" />
+  </ItemGroup>
+
+</Project>

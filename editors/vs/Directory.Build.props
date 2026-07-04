@@ -1,0 +1,16 @@
+<Project>
+
+  <!--
+    Opt the editors\vs\* projects OUT of the repo-root Central Package Management
+    (Directory.Packages.props). These are the classic-VSSDK (net472) and VisualStudio.Extensibility
+    (net10-windows) projects: they can't build headless, they're deliberately out of PgProj.slnx and
+    the default `dotnet test` sweep, and they pin their own tightly-coupled VSSDK / Extensibility /
+    ProjectSystem package versions. Governing them from the root CPM file would be unverifiable here
+    and risks silently breaking the (documented-fragile) VSIX build, so they keep managing versions
+    inline via <PackageReference ... Version="..." />.
+  -->
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+
+</Project>
